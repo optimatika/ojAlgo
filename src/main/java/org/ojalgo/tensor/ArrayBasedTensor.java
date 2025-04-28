@@ -34,9 +34,9 @@ abstract class ArrayBasedTensor<N extends Comparable<N>, T extends ArrayBasedTen
 
     public static abstract class Factory<N extends Comparable<N>> {
 
-        private final DenseArray.Factory<N> myArrayFactory;
+        private final DenseArray.Factory<N, ?> myArrayFactory;
 
-        Factory(final DenseArray.Factory<N> arrayFactory) {
+        Factory(final DenseArray.Factory<N, ?> arrayFactory) {
             super();
             myArrayFactory = arrayFactory;
         }
@@ -76,7 +76,7 @@ abstract class ArrayBasedTensor<N extends Comparable<N>, T extends ArrayBasedTen
             return myArrayFactory.scalar();
         }
 
-        DenseArray.Factory<N> getArrayFactory() {
+        DenseArray.Factory<N, ?> getArrayFactory() {
             return myArrayFactory;
         }
 

@@ -32,7 +32,7 @@ import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.type.ObjectPool;
 import org.ojalgo.type.context.NumberContext;
 
-public abstract class SparseR064 extends FactoryStore<Double> implements TransformableRegion<Double> {
+public abstract class LinkedR064 extends FactoryStore<Double> implements TransformableRegion<Double>, SparseStructure2D {
 
     public static final class ElementNode implements ElementView1D<Double, ElementNode> {
 
@@ -44,17 +44,17 @@ public abstract class SparseR064 extends FactoryStore<Double> implements Transfo
         /**
          * next in linked list
          */
-        public ElementNode next;
+        public ElementNode next = null;
+
+        /**
+         * previous in linked list
+         */
+        public ElementNode previous = null;
 
         /**
          * The value
          */
         public double value;
-
-        /**
-         * previous in linked list
-         */
-        public ElementNode previous;
 
         ElementNode(final int index, final double value) {
             this.index = index;
@@ -160,7 +160,7 @@ public abstract class SparseR064 extends FactoryStore<Double> implements Transfo
 
     private final TransformableRegion.FillByMultiplying<Double> myMultiplier;
 
-    protected SparseR064(final int nbRows, final int nbCols) {
+    protected LinkedR064(final int nbRows, final int nbCols) {
         super(R064Store.FACTORY, nbRows, nbCols);
         myMultiplier = MultiplyBoth.newPrimitive64(nbRows, nbCols);
     }
@@ -247,6 +247,14 @@ public abstract class SparseR064 extends FactoryStore<Double> implements Transfo
     public final void set(final long row, final long col, final Comparable<?> value) {
         this.set(Math.toIntExact(row), Math.toIntExact(col), Scalar.doubleValue(value));
     }
+
+    public abstract void setFirst(final int row, final int col, final double value);
+
+    public abstract void setLast(final int row, final int col, final double value);
+
+    public abstract R064CSC toCSC();
+
+    public abstract R064CSR toCSR();
 
     abstract void removeIfZero(final int row, final int col, final ElementNode node);
 

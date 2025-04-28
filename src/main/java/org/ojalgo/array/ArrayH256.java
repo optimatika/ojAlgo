@@ -21,12 +21,9 @@
  */
 package org.ojalgo.array;
 
-import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.QuaternionFunction;
-import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.aggregator.QuaternionAggregator;
+import java.util.Arrays;
+
 import org.ojalgo.scalar.Quaternion;
-import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.math.MathType;
 
 /**
@@ -36,45 +33,21 @@ import org.ojalgo.type.math.MathType;
  */
 public class ArrayH256 extends ScalarArray<Quaternion> {
 
-    public static final DenseArray.Factory<Quaternion> FACTORY = new DenseArray.Factory<>() {
+    public static final ScalarArray.Factory<Quaternion> FACTORY = new ScalarArray.Factory<>(MathType.H256) {
 
-        @Override
-        public AggregatorSet<Quaternion> aggregator() {
-            return QuaternionAggregator.getSet();
+        public ArrayH256 make(final int size) {
+            return ArrayH256.make(size);
         }
-
-        @Override
-        public FunctionSet<Quaternion> function() {
-            return QuaternionFunction.getSet();
-        }
-
-        @Override
-        public MathType getMathType() {
-            return MathType.H256;
-        }
-
-        @Override
-        public Scalar.Factory<Quaternion> scalar() {
-            return Quaternion.FACTORY;
-        }
-
-        @Override
-        PlainArray<Quaternion> makeDenseArray(final long size) {
-            return ArrayH256.make((int) size);
-        }
-
     };
 
     public static ArrayH256 make(final int size) {
-        return new ArrayH256(size);
+        Quaternion[] data = new Quaternion[size];
+        Arrays.fill(data, Quaternion.ZERO);
+        return new ArrayH256(data);
     }
 
     public static ArrayH256 wrap(final Quaternion... data) {
         return new ArrayH256(data);
-    }
-
-    protected ArrayH256(final int size) {
-        super(FACTORY, size);
     }
 
     protected ArrayH256(final Quaternion[] data) {

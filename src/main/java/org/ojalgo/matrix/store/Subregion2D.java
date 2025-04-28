@@ -30,6 +30,7 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.operation.MultiplyBoth;
 import org.ojalgo.structure.*;
+import org.ojalgo.type.math.MathType;
 
 abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegion<N> {
 
@@ -1552,12 +1553,19 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
 
     }
 
-    static <N extends Comparable<N>> TransformableRegion.FillByMultiplying<N> findMultiplier(final Class<?> tmpType, final int rowsCount,
-            final int columnsCount) {
-        if (tmpType.equals(Double.class)) {
-            return (TransformableRegion.FillByMultiplying<N>) MultiplyBoth.newPrimitive64(rowsCount, columnsCount);
+    static <N extends Comparable<N>> TransformableRegion.FillByMultiplying<N> findMultiplier(final Class<?> type, final int nbRows, final int nbCols) {
+        if (type.equals(Double.class)) {
+            return (TransformableRegion.FillByMultiplying<N>) MultiplyBoth.newPrimitive64(nbRows, nbCols);
         } else {
-            return (TransformableRegion.FillByMultiplying<N>) MultiplyBoth.newGeneric(rowsCount, columnsCount);
+            return (TransformableRegion.FillByMultiplying<N>) MultiplyBoth.newGeneric(nbRows, nbCols);
+        }
+    }
+
+    static <N extends Comparable<N>> TransformableRegion.FillByMultiplying<N> findMultiplier(final MathType type, final int nbRows, final int nbCols) {
+        if (type.isPrimitive()) {
+            return (TransformableRegion.FillByMultiplying<N>) MultiplyBoth.newPrimitive64(nbRows, nbCols);
+        } else {
+            return (TransformableRegion.FillByMultiplying<N>) MultiplyBoth.newGeneric(nbRows, nbCols);
         }
     }
 

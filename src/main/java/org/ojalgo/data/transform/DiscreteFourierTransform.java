@@ -336,16 +336,14 @@ public abstract class DiscreteFourierTransform implements DataTransform<Access1D
                         output.set(i, ComplexNumber.of(workRe[i], -workIm[i]));
                     }
                 }
+            } else if (scale) {
+                double divisor = size;
+                for (int i = 0; i < size; i++) {
+                    output.set(i, ComplexNumber.of(workRe[i] / divisor, workIm[i] / divisor));
+                }
             } else {
-                if (scale) {
-                    double divisor = size;
-                    for (int i = 0; i < size; i++) {
-                        output.set(i, ComplexNumber.of(workRe[i] / divisor, workIm[i] / divisor));
-                    }
-                } else {
-                    for (int i = 0; i < size; i++) {
-                        output.set(i, ComplexNumber.of(workRe[i], workIm[i]));
-                    }
+                for (int i = 0; i < size; i++) {
+                    output.set(i, ComplexNumber.of(workRe[i], workIm[i]));
                 }
             }
         }
@@ -656,38 +654,35 @@ public abstract class DiscreteFourierTransform implements DataTransform<Access1D
 
             return UNIT_ROOTS[exponent];
 
+        } else if (exponent == 0) {
+
+            return UNIT_ROOTS[0] = new ComplexNumber[] { ComplexNumber.ONE };
+
+        } else if (exponent == 1) {
+
+            return UNIT_ROOTS[1] = new ComplexNumber[] { ComplexNumber.ONE, ComplexNumber.NEG };
+
+        } else if (exponent == 2) {
+
+            return UNIT_ROOTS[2] = new ComplexNumber[] { ComplexNumber.ONE, ComplexNumber.N, ComplexNumber.NEG, ComplexNumber.I };
+
         } else {
 
-            if (exponent == 0) {
+            ComplexNumber[] half = DiscreteFourierTransform.lookupRootsExponent(exponent - 1);
 
-                return UNIT_ROOTS[0] = new ComplexNumber[] { ComplexNumber.ONE };
+            ComplexNumber[] full = UNIT_ROOTS[exponent] = new ComplexNumber[half.length + half.length];
 
-            } else if (exponent == 1) {
+            ComplexNumber[] unitRoots = ComplexNumber.newUnitRoots(full.length);
 
-                return UNIT_ROOTS[1] = new ComplexNumber[] { ComplexNumber.ONE, ComplexNumber.NEG };
+            for (int i = 0; i < half.length; i++) {
+                int ii = 2 * i;
+                int ii1 = ii + 1;
 
-            } else if (exponent == 2) {
-
-                return UNIT_ROOTS[2] = new ComplexNumber[] { ComplexNumber.ONE, ComplexNumber.N, ComplexNumber.NEG, ComplexNumber.I };
-
-            } else {
-
-                ComplexNumber[] half = DiscreteFourierTransform.lookupRootsExponent(exponent - 1);
-
-                ComplexNumber[] full = UNIT_ROOTS[exponent] = new ComplexNumber[half.length + half.length];
-
-                ComplexNumber[] unitRoots = ComplexNumber.newUnitRoots(full.length);
-
-                for (int i = 0; i < half.length; i++) {
-                    int ii = 2 * i;
-                    int ii1 = ii + 1;
-
-                    full[ii] = half[i];
-                    full[ii1] = unitRoots[ii1];
-                }
-
-                return full;
+                full[ii] = half[i];
+                full[ii1] = unitRoots[ii1];
             }
+
+            return full;
         }
     }
 

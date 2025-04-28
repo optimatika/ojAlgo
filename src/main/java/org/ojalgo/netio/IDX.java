@@ -40,7 +40,7 @@ public abstract class IDX {
         return IDX.parse(filePath, ArrayR032.FACTORY);
     }
 
-    public static ArrayAnyD<Double> parse(final File file, final DenseArray.Factory<Double> factory) {
+    public static ArrayAnyD<Double> parse(final File file, final DenseArray.Factory<Double, ?> factory) {
 
         try (DataReader<ArrayAnyD<Double>> reader = DataReader.of(file, DataInterpreter.newIDX(factory))) {
             return reader.read();
@@ -53,7 +53,7 @@ public abstract class IDX {
         return IDX.parse(new File(filePath));
     }
 
-    public static ArrayAnyD<Double> parse(final String filePath, final DenseArray.Factory<Double> arrayFactory) {
+    public static ArrayAnyD<Double> parse(final String filePath, final DenseArray.Factory<Double, ?> arrayFactory) {
         return IDX.parse(new File(filePath), arrayFactory);
     }
 

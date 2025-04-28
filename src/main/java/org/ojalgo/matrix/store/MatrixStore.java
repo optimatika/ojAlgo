@@ -50,7 +50,7 @@ import org.ojalgo.type.context.NumberContext;
  * <p>
  * A {@linkplain MatrixStore} extends {@linkplain Access2D} (as well as
  * {@linkplain org.ojalgo.structure.Access2D.Visitable} and
- * {@linkplain org.ojalgo.structure.Access2D.Elements}) and defines some futher funtionality - mainly matrix
+ * {@linkplain org.ojalgo.structure.Access2D.Elements}) and defines some further functionality - mainly matrix
  * multiplication.
  * </p>
  * <p>

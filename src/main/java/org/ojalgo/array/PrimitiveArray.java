@@ -21,9 +21,28 @@
  */
 package org.ojalgo.array;
 
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
+import org.ojalgo.type.math.MathType;
 
 public abstract class PrimitiveArray extends PlainArray<Double> implements Mutate1D.Sortable {
+
+    public static abstract class Factory extends PlainArray.Factory<Double, PrimitiveArray> {
+
+        protected Factory(final MathType mathType) {
+            super(mathType);
+        }
+
+        @Override
+        public PrimitiveArray copy(final Access1D<?> values) {
+            PrimitiveArray retVal = this.make(values);
+            for (long i = 0L, limit = values.count(); i < limit; i++) {
+                retVal.set(i, values.doubleValue(i));
+            }
+            return retVal;
+        }
+
+    }
 
     public static PrimitiveArray make(final int size) {
         return ArrayR064.make(size);
@@ -37,7 +56,7 @@ public abstract class PrimitiveArray extends PlainArray<Double> implements Mutat
         return ArrayR032.wrap(data);
     }
 
-    PrimitiveArray(final DenseArray.Factory<Double> factory, final int size) {
+    PrimitiveArray(final PrimitiveArray.Factory factory, final int size) {
         super(factory, size);
     }
 

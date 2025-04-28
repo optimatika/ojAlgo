@@ -6,18 +6,22 @@ import java.util.List;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.array.SparseArray.SparseFactory;
+import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ElementView1D;
+import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.structure.Transformation2D;
 
 /**
  * Sparse rows – rows can be added and removed.
  *
  * @author apete
  */
-public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<N>, Mutate2D, SparseStructure2D {
+public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<N>, SparseStructure2D, Mutate2D.ModifiableReceiver<N> {
 
     public static final class SingleView<N extends Comparable<N>> extends RowView<N> implements Access2D.Collectable<N, PhysicalStore<N>> {
 
@@ -86,6 +90,16 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
         myRowFactory = SparseArray.factory(factory.array());
     }
 
+    @Override
+    public void add(final long row, final long col, final Comparable<?> addend) {
+        myRows.get((int) row).add(col, addend);
+    }
+
+    @Override
+    public void add(final long row, final long col, final double addend) {
+        myRows.get((int) row).add(col, addend);
+    }
+
     public SparseArray<N> addRow() {
         return this.addRow(myRowFactory.make(myColumnsCount));
     }
@@ -123,9 +137,62 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
         return nonZeros / totalElements;
     }
 
+    /**
+     * Performs the row/column cyclic shifts required by the Forrest-Tomlin update algorithm as implemented in
+     * ojAlgo's own sparse LU decomposition. This method is not intended for any other use case.
+     *
+     * @param from   the row index to start the cyclic shift
+     * @param row    a Mutate1D to receive the removed row's values (shifted left by one column)
+     * @param to     the row index to end the cyclic shift
+     * @param column an Access1D providing the new column values
+     */
+    public void doCyclicFT(final int from, final Mutate1D row, final int to, final Access1D<?> column) {
+
+        for (int i = 0; i < from; i++) {
+            myRows.get(i).removeShiftAndInsert(from, to, column.doubleValue(i));
+        }
+
+        SparseArray<N> moved = myRows.get(from);
+        moved.removeShiftAndInsert(from, to, column.doubleValue(from));
+        moved.supplyNonZerosTo(row);
+        moved.reset();
+
+        for (int i = from; i < to; i++) {
+            SparseArray<N> next = myRows.get(i + 1);
+            next.removeShiftAndInsert(from, to, column.doubleValue(i + 1));
+            myRows.set(i, next);
+        }
+
+        myRows.set(to, moved);
+
+        for (int i = to + 1; i < myRows.size(); i++) {
+            myRows.get(i).removeShiftAndInsert(from, to, column.doubleValue(i));
+        }
+    }
+
     @Override
     public double doubleValue(final int row, final int col) {
         return myRows.get(row).doubleValue(col);
+    }
+
+    @Override
+    public void exchangeColumns(final long colA, final long colB) {
+        int a = Math.toIntExact(colA);
+        int b = Math.toIntExact(colB);
+        for (SparseArray<N> row : myRows) {
+            double temp = row.doubleValue(a);
+            row.set(a, row.doubleValue(b));
+            row.set(b, temp);
+        }
+    }
+
+    @Override
+    public void exchangeRows(final long rowA, final long rowB) {
+        int a = Math.toIntExact(rowA);
+        int b = Math.toIntExact(rowB);
+        SparseArray<N> temp = myRows.get(a);
+        myRows.set(a, myRows.get(b));
+        myRows.set(b, temp);
     }
 
     @Override
@@ -150,6 +217,16 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
     @Override
     public int getRowDim() {
         return myRows.size();
+    }
+
+    @Override
+    public void modifyAny(final Transformation2D<N> modifier) {
+        modifier.transform(this);
+    }
+
+    @Override
+    public void modifyOne(final long row, final long col, final UnaryFunction<N> modifier) {
+        myRows.get((int) row).modifyOne(col, modifier);
     }
 
     @Override
@@ -235,6 +312,11 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
     @Override
     public void set(final long row, final long col, final Comparable<?> value) {
         myRows.get(Math.toIntExact(row)).set(col, value);
+    }
+
+    @Override
+    public SparseArray<N> sliceRow(final long row) {
+        return this.getRow(Math.toIntExact(row));
     }
 
     @Override

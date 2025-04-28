@@ -1,5 +1,7 @@
 package org.ojalgo.array;
 
+import java.util.function.LongFunction;
+
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.PowerOf2;
@@ -26,11 +28,6 @@ final class GrowthStrategy {
         private long myInitial = INITIAL;
         private long mySegment = SEGMENT;
 
-        Builder(final DenseArray.Factory<?> denseFactory) {
-            this(denseFactory.getElementSize());
-
-        }
-
         Builder(final long elementSize) {
 
             super();
@@ -40,6 +37,11 @@ final class GrowthStrategy {
 
             long memoryPageElements = Hardware.OS_MEMORY_PAGE_SIZE / elementSize;
             this.chunk(memoryPageElements);
+        }
+
+        Builder(final MathType mathType) {
+            this(mathType.getTotalMemory());
+
         }
 
         GrowthStrategy build() {
@@ -82,12 +84,12 @@ final class GrowthStrategy {
 
     }
 
-    static Builder newBuilder(final DenseArray.Factory<?> denseFactory) {
-        return new Builder(denseFactory);
+    static Builder newBuilder(final MathType mathType) {
+        return new Builder(mathType);
     }
 
-    static GrowthStrategy newInstance(final DenseArray.Factory<?> denseFactory) {
-        return new Builder(denseFactory).build();
+    static GrowthStrategy newInstance(final MathType mathType) {
+        return new Builder(mathType).build();
     }
 
     private final long myChunk;
@@ -143,16 +145,16 @@ final class GrowthStrategy {
         return count > mySegment;
     }
 
-    <N extends Comparable<N>> DenseArray<N> makeChunk(final DenseArray.Factory<N> denseFactory) {
-        return denseFactory.make(myChunk);
+    <T> T makeChunk(final LongFunction<T> factory) {
+        return factory.apply(myChunk);
     }
 
-    <N extends Comparable<N>> DenseArray<N> makeInitial(final DenseArray.Factory<N> denseFactory) {
-        return denseFactory.make(myInitial);
+    <T> T makeInitial(final LongFunction<T> factory) {
+        return factory.apply(myInitial);
     }
 
-    <N extends Comparable<N>> DenseArray<N> makeSegment(final DenseArray.Factory<N> denseFactory) {
-        return denseFactory.make(mySegment);
+    <T> T makeSegment(final LongFunction<T> factory) {
+        return factory.apply(mySegment);
     }
 
     long segment() {

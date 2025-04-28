@@ -21,12 +21,9 @@
  */
 package org.ojalgo.array;
 
-import org.ojalgo.function.ComplexFunction;
-import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.aggregator.ComplexAggregator;
+import java.util.Arrays;
+
 import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.math.MathType;
 
 /**
@@ -36,37 +33,17 @@ import org.ojalgo.type.math.MathType;
  */
 public class ArrayC128 extends ScalarArray<ComplexNumber> {
 
-    public static final DenseArray.Factory<ComplexNumber> FACTORY = new DenseArray.Factory<>() {
+    public static final ScalarArray.Factory<ComplexNumber> FACTORY = new ScalarArray.Factory<>(MathType.C128) {
 
-        @Override
-        public AggregatorSet<ComplexNumber> aggregator() {
-            return ComplexAggregator.getSet();
+        public ArrayC128 make(final int size) {
+            return ArrayC128.make(size);
         }
-
-        @Override
-        public FunctionSet<ComplexNumber> function() {
-            return ComplexFunction.getSet();
-        }
-
-        @Override
-        public MathType getMathType() {
-            return MathType.C128;
-        }
-
-        @Override
-        public Scalar.Factory<ComplexNumber> scalar() {
-            return ComplexNumber.FACTORY;
-        }
-
-        @Override
-        PlainArray<ComplexNumber> makeDenseArray(final long size) {
-            return ArrayC128.make((int) size);
-        }
-
     };
 
     public static ArrayC128 make(final int size) {
-        return new ArrayC128(size);
+        ComplexNumber[] data = new ComplexNumber[size];
+        Arrays.fill(data, ComplexNumber.ZERO);
+        return new ArrayC128(data);
     }
 
     public static ArrayC128 wrap(final ComplexNumber... data) {
@@ -75,10 +52,6 @@ public class ArrayC128 extends ScalarArray<ComplexNumber> {
 
     protected ArrayC128(final ComplexNumber[] data) {
         super(FACTORY, data);
-    }
-
-    protected ArrayC128(final int size) {
-        super(FACTORY, size);
     }
 
 }

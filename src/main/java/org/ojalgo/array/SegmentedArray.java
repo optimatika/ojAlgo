@@ -43,7 +43,7 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
 
     private final int myIndexBits;
     private final long myIndexMask;
-    private final ArrayFactory<N, ?> mySegmentFactory;
+    private final BaseFactory<N, ?> mySegmentFactory;
     private final BasicArray<N>[] mySegments;
 
     /**
@@ -52,7 +52,7 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
      */
     private final long mySegmentSize;
 
-    SegmentedArray(final BasicArray<N>[] segments, final ArrayFactory<N, ?> segmentFactory) {
+    SegmentedArray(final BasicArray<N>[] segments, final BaseFactory<N, ?> segmentFactory) {
 
         super(segmentFactory);
 
@@ -79,7 +79,7 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
     }
 
     @SuppressWarnings("unchecked")
-    SegmentedArray(final long count, final int indexBits, final ArrayFactory<N, ?> segmentFactory) {
+    SegmentedArray(final long count, final int indexBits, final BaseFactory<N, ?> segmentFactory) {
 
         super(segmentFactory);
 
@@ -92,10 +92,10 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
 
         mySegments = (BasicArray<N>[]) new BasicArray<?>[tmpTotalNumberOfSegments];
         for (int s = 0; s < tmpNumberOfUniformSegments; s++) {
-            mySegments[s] = segmentFactory.makeStructuredZero(tmpSegmentSize);
+            mySegments[s] = segmentFactory.make(tmpSegmentSize);
         }
         if (tmpRemainder != 0L) {
-            mySegments[tmpNumberOfUniformSegments] = segmentFactory.makeStructuredZero(tmpRemainder);
+            mySegments[tmpNumberOfUniformSegments] = segmentFactory.make(tmpRemainder);
         }
 
         mySegmentSize = tmpSegmentSize;

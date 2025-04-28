@@ -21,12 +21,9 @@
  */
 package org.ojalgo.array;
 
-import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.RationalFunction;
-import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.aggregator.RationalAggregator;
+import java.util.Arrays;
+
 import org.ojalgo.scalar.RationalNumber;
-import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.math.MathType;
 
 /**
@@ -36,45 +33,21 @@ import org.ojalgo.type.math.MathType;
  */
 public class ArrayQ128 extends ScalarArray<RationalNumber> {
 
-    public static final DenseArray.Factory<RationalNumber> FACTORY = new DenseArray.Factory<>() {
+    public static final ScalarArray.Factory<RationalNumber> FACTORY = new ScalarArray.Factory<>(MathType.Q128) {
 
-        @Override
-        public AggregatorSet<RationalNumber> aggregator() {
-            return RationalAggregator.getSet();
+        public ArrayQ128 make(final int size) {
+            return ArrayQ128.make(size);
         }
-
-        @Override
-        public FunctionSet<RationalNumber> function() {
-            return RationalFunction.getSet();
-        }
-
-        @Override
-        public MathType getMathType() {
-            return MathType.Q128;
-        }
-
-        @Override
-        public Scalar.Factory<RationalNumber> scalar() {
-            return RationalNumber.FACTORY;
-        }
-
-        @Override
-        PlainArray<RationalNumber> makeDenseArray(final long size) {
-            return ArrayQ128.make((int) size);
-        }
-
     };
 
     public static ArrayQ128 make(final int size) {
-        return new ArrayQ128(size);
+        RationalNumber[] data = new RationalNumber[size];
+        Arrays.fill(data, RationalNumber.ZERO);
+        return new ArrayQ128(data);
     }
 
     public static ArrayQ128 wrap(final RationalNumber... data) {
         return new ArrayQ128(data);
-    }
-
-    protected ArrayQ128(final int size) {
-        super(FACTORY, size);
     }
 
     protected ArrayQ128(final RationalNumber[] data) {

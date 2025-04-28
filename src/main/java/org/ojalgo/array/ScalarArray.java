@@ -29,6 +29,7 @@ import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
+import org.ojalgo.type.math.MathType;
 
 /**
  * A one- and/or arbitrary-dimensional array of {@linkplain org.ojalgo.scalar.Scalar}.
@@ -37,11 +38,15 @@ import org.ojalgo.structure.Mutate1D;
  */
 public abstract class ScalarArray<N extends Scalar<N>> extends ReferenceTypeArray<N> {
 
-    protected ScalarArray(final DenseArray.Factory<N> factory, final int length) {
-        super(factory, length);
+    public static abstract class Factory<N extends Scalar<N>> extends ReferenceTypeArray.Factory<N> {
+
+        protected Factory(final MathType mathType) {
+            super(mathType);
+        }
+
     }
 
-    protected ScalarArray(final DenseArray.Factory<N> factory, final N[] data) {
+    protected ScalarArray(final ScalarArray.Factory<N> factory, final N[] data) {
         super(factory, data);
     }
 

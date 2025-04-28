@@ -133,12 +133,12 @@ final class Pivot {
     /**
      * Performs a cycle permutation on the pivot order.
      * <p>
-     * This method applies a cycle permutation that moves the element at position ind1 to position ind2,
-     * while shifting all elements in between one position to the left.
+     * This method applies a cycle permutation that moves the element at position ind1 to position ind2, while
+     * shifting all elements in between one position to the left.
      * </p>
      * <p>
-     * The method only performs the cycle if ind1 is less than ind2. If ind1 is greater than or equal
-     * to ind2, no changes are made to the pivot order.
+     * The method only performs the cycle if ind1 is less than ind2. If ind1 is greater than or equal to ind2,
+     * no changes are made to the pivot order.
      * </p>
      *
      * @param ind1 The starting index of the cycle
@@ -159,6 +159,11 @@ final class Pivot {
 
     boolean isModified() {
         return myModified;
+    }
+
+    int locationOf(final int original) {
+        int[] reverseOrder = this.reverseOrder();
+        return reverseOrder[original];
     }
 
     void reset(final int numberOf) {

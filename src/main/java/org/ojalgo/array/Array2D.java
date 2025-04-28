@@ -24,6 +24,7 @@ package org.ojalgo.array;
 import java.math.BigDecimal;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.array.BasicArray.BaseFactory;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
@@ -58,7 +59,7 @@ public final class Array2D<N extends Comparable<N>>
 
         private final BasicArray.Factory<N> myDelegate;
 
-        Factory(final DenseArray.Factory<N> denseArray) {
+        Factory(final DenseArray.Factory<N, ?> denseArray) {
             super();
             myDelegate = new BasicArray.Factory<>(denseArray);
         }
@@ -130,7 +131,7 @@ public final class Array2D<N extends Comparable<N>>
     public static final Factory<Double> Z032 = Array2D.factory(ArrayZ032.FACTORY);
     public static final Factory<Double> Z064 = Array2D.factory(ArrayZ064.FACTORY);
 
-    public static <N extends Comparable<N>> Array2D.Factory<N> factory(final DenseArray.Factory<N> denseArray) {
+    public static <N extends Comparable<N>> Array2D.Factory<N> factory(final DenseArray.Factory<N, ?> denseArray) {
         return new Array2D.Factory<>(denseArray);
     }
 
@@ -861,7 +862,7 @@ public final class Array2D<N extends Comparable<N>>
 
         return new Factory2D<>() {
 
-            ArrayFactory<N, ?> delegate = myDelegate.factory();
+            BaseFactory<N, ?> delegate = myDelegate.factory();
 
             public FunctionSet<?> function() {
                 return delegate.function();

@@ -74,7 +74,7 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Compara
     private final IndexMapper<K> myMapper;
     private String myName = null;
 
-    MappedIndexSeries(final DenseArray.Factory<N> denseArrayFactory, final IndexMapper<K> indexMapper, final BinaryFunction<N> accumulator) {
+    MappedIndexSeries(final DenseArray.Factory<N, ?> denseArrayFactory, final IndexMapper<K> indexMapper, final BinaryFunction<N> accumulator) {
         super();
         myDelegate = LongToNumberMap.factory(denseArrayFactory).make();
         myMapper = indexMapper;

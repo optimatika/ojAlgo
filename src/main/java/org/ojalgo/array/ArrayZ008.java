@@ -31,13 +31,9 @@ import org.ojalgo.array.operation.OperationBinary;
 import org.ojalgo.array.operation.OperationUnary;
 import org.ojalgo.array.operation.OperationVoid;
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
-import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
@@ -51,37 +47,16 @@ import org.ojalgo.type.math.MathType;
  */
 public class ArrayZ008 extends PrimitiveArray {
 
-    public static final DenseArray.Factory<Double> FACTORY = new DenseArray.Factory<>() {
+    public static final PrimitiveArray.Factory FACTORY = new PrimitiveArray.Factory(MathType.Z008) {
 
         @Override
-        public AggregatorSet<Double> aggregator() {
-            return PrimitiveAggregator.getSet();
+        public ArrayZ008 make(final int size) {
+            return ArrayZ008.make(size);
         }
-
-        @Override
-        public FunctionSet<Double> function() {
-            return PrimitiveFunction.getSet();
-        }
-
-        @Override
-        public MathType getMathType() {
-            return MathType.Z008;
-        }
-
-        @Override
-        public Scalar.Factory<Double> scalar() {
-            return PrimitiveScalar.FACTORY;
-        }
-
-        @Override
-        PlainArray<Double> makeDenseArray(final long size) {
-            return ArrayZ008.make((int) size);
-        }
-
     };
 
     public static ArrayZ008 make(final int size) {
-        return new ArrayZ008(size);
+        return new ArrayZ008(new byte[size]);
     }
 
     public static ArrayZ008 wrap(final byte... data) {
@@ -98,13 +73,6 @@ public class ArrayZ008 extends PrimitiveArray {
         super(FACTORY, data.length);
 
         this.data = data;
-    }
-
-    protected ArrayZ008(final int size) {
-
-        super(FACTORY, size);
-
-        data = new byte[size];
     }
 
     @Override

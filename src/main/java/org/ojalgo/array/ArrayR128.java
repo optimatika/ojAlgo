@@ -21,12 +21,9 @@
  */
 package org.ojalgo.array;
 
-import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.QuadrupleFunction;
-import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.aggregator.QuadrupleAggregator;
+import java.util.Arrays;
+
 import org.ojalgo.scalar.Quadruple;
-import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.math.MathType;
 
 /**
@@ -36,45 +33,21 @@ import org.ojalgo.type.math.MathType;
  */
 public class ArrayR128 extends ScalarArray<Quadruple> {
 
-    public static final DenseArray.Factory<Quadruple> FACTORY = new DenseArray.Factory<>() {
+    public static final ScalarArray.Factory<Quadruple> FACTORY = new ScalarArray.Factory<>(MathType.R128) {
 
-        @Override
-        public AggregatorSet<Quadruple> aggregator() {
-            return QuadrupleAggregator.getSet();
+        public ArrayR128 make(final int size) {
+            return ArrayR128.make(size);
         }
-
-        @Override
-        public FunctionSet<Quadruple> function() {
-            return QuadrupleFunction.getSet();
-        }
-
-        @Override
-        public MathType getMathType() {
-            return MathType.R128;
-        }
-
-        @Override
-        public Scalar.Factory<Quadruple> scalar() {
-            return Quadruple.FACTORY;
-        }
-
-        @Override
-        PlainArray<Quadruple> makeDenseArray(final long size) {
-            return ArrayR128.make((int) size);
-        }
-
     };
 
     public static ArrayR128 make(final int size) {
-        return new ArrayR128(size);
+        Quadruple[] data = new Quadruple[size];
+        Arrays.fill(data, Quadruple.ZERO);
+        return new ArrayR128(data);
     }
 
     public static ArrayR128 wrap(final Quadruple... data) {
         return new ArrayR128(data);
-    }
-
-    protected ArrayR128(final int size) {
-        super(FACTORY, size);
     }
 
     protected ArrayR128(final Quadruple[] data) {

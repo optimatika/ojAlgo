@@ -24,8 +24,21 @@ package org.ojalgo.type.math;
 import java.math.BigDecimal;
 
 import org.ojalgo.algebra.NumberSet;
+import org.ojalgo.function.BigFunction;
+import org.ojalgo.function.ComplexFunction;
+import org.ojalgo.function.FunctionSet;
+import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.QuadrupleFunction;
+import org.ojalgo.function.QuaternionFunction;
+import org.ojalgo.function.RationalFunction;
 import org.ojalgo.machine.JavaType;
+import org.ojalgo.scalar.BigScalar;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.scalar.Quadruple;
+import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.scalar.Scalar;
 
 /**
  * The number sets supported by ojAlgo, paired with a declaration of how they are implemented/approximated.
@@ -108,175 +121,203 @@ public enum MathType {
     public MathType common(final MathType other) {
 
         switch (this) {
+        case Z008:
+            return Z008;
+        case Z016:
+            switch (other) {
+            case Z008:
+                return Z008;
+            default:
+                return Z016;
+            }
+        case Z032:
+            switch (other) {
             case Z008:
                 return Z008;
             case Z016:
-                switch (other) {
-                    case Z008:
-                        return Z008;
-                    default:
-                        return Z016;
-                }
+                return Z016;
+            default:
+                return Z032;
+            }
+        case Z064:
+            switch (other) {
+            case Z008:
+                return Z008;
+            case Z016:
+                return Z016;
             case Z032:
-                switch (other) {
-                    case Z008:
-                        return Z008;
-                    case Z016:
-                        return Z016;
-                    default:
-                        return Z032;
-                }
+                return Z032;
+            default:
+                return Z064;
+            }
+        case Q128:
+            switch (other) {
+            case Z008:
+                return Z008;
+            case Z016:
+                return Z016;
+            case Z032:
+                return Z032;
             case Z064:
-                switch (other) {
-                    case Z008:
-                        return Z008;
-                    case Z016:
-                        return Z016;
-                    case Z032:
-                        return Z032;
-                    default:
-                        return Z064;
-                }
+                return Z064;
+            default:
+                return Q128;
+            }
+        case R032:
+            switch (other) {
+            case Z008:
+                return Z008;
+            case Z016:
+                return Z016;
+            case Z032:
+                return Z032;
+            case Z064:
+                return Z064;
             case Q128:
-                switch (other) {
-                    case Z008:
-                        return Z008;
-                    case Z016:
-                        return Z016;
-                    case Z032:
-                        return Z032;
-                    case Z064:
-                        return Z064;
-                    default:
-                        return Q128;
-                }
+                return Q128;
+            default:
+                return R032;
+            }
+        case R064:
+            switch (other) {
+            case Z008:
+                return Z008;
+            case Z016:
+                return Z016;
+            case Z032:
+                return Z032;
+            case Z064:
+                return Z064;
+            case Q128:
+                return Q128;
             case R032:
-                switch (other) {
-                    case Z008:
-                        return Z008;
-                    case Z016:
-                        return Z016;
-                    case Z032:
-                        return Z032;
-                    case Z064:
-                        return Z064;
-                    case Q128:
-                        return Q128;
-                    default:
-                        return R032;
-                }
-            case R064:
-                switch (other) {
-                    case Z008:
-                        return Z008;
-                    case Z016:
-                        return Z016;
-                    case Z032:
-                        return Z032;
-                    case Z064:
-                        return Z064;
-                    case Q128:
-                        return Q128;
-                    case R032:
-                        return R032;
-                    default:
-                        return R064;
-                }
-            case R128:
-                switch (other) {
-                    case Z008:
-                        return Z008;
-                    case Z016:
-                        return Z016;
-                    case Z032:
-                        return Z032;
-                    case Z064:
-                        return Z064;
-                    case Q128:
-                        return Q128;
-                    case R032:
-                        return R032;
-                    case R064:
-                        return R064;
-                    default:
-                        return R128;
-                }
-            case R256:
-                switch (other) {
-                    case Z008:
-                        return Z008;
-                    case Z016:
-                        return Z016;
-                    case Z032:
-                        return Z032;
-                    case Z064:
-                        return Z064;
-                    case Q128:
-                        return Q128;
-                    case R032:
-                        return R032;
-                    case R064:
-                        return R064;
-                    case R128:
-                        return R128;
-                    default:
-                        return R256;
-                }
-            case C128:
-                switch (other) {
-                    case Z008:
-                        return Z008;
-                    case Z016:
-                        return Z016;
-                    case Z032:
-                        return Z032;
-                    case Z064:
-                        return Z064;
-                    case Q128:
-                        return Q128;
-                    case R032:
-                        return R032;
-                    case R064:
-                        return R064;
-                    case R128:
-                        return R128;
-                    case R256:
-                        return R256;
-                    default:
-                        return C128;
-                }
-            case H256:
-                switch (other) {
-                    case Z008:
-                        return Z008;
-                    case Z016:
-                        return Z016;
-                    case Z032:
-                        return Z032;
-                    case Z064:
-                        return Z064;
-                    case Q128:
-                        return Q128;
-                    case R032:
-                        return R032;
-                    case R064:
-                        return R064;
-                    case R128:
-                        return R128;
-                    case R256:
-                        return R256;
-                    case C128:
-                        return C128;
-                    default:
-                        return H256;
-                }
+                return R032;
             default:
                 return R064;
+            }
+        case R128:
+            switch (other) {
+            case Z008:
+                return Z008;
+            case Z016:
+                return Z016;
+            case Z032:
+                return Z032;
+            case Z064:
+                return Z064;
+            case Q128:
+                return Q128;
+            case R032:
+                return R032;
+            case R064:
+                return R064;
+            default:
+                return R128;
+            }
+        case R256:
+            switch (other) {
+            case Z008:
+                return Z008;
+            case Z016:
+                return Z016;
+            case Z032:
+                return Z032;
+            case Z064:
+                return Z064;
+            case Q128:
+                return Q128;
+            case R032:
+                return R032;
+            case R064:
+                return R064;
+            case R128:
+                return R128;
+            default:
+                return R256;
+            }
+        case C128:
+            switch (other) {
+            case Z008:
+                return Z008;
+            case Z016:
+                return Z016;
+            case Z032:
+                return Z032;
+            case Z064:
+                return Z064;
+            case Q128:
+                return Q128;
+            case R032:
+                return R032;
+            case R064:
+                return R064;
+            case R128:
+                return R128;
+            case R256:
+                return R256;
+            default:
+                return C128;
+            }
+        case H256:
+            switch (other) {
+            case Z008:
+                return Z008;
+            case Z016:
+                return Z016;
+            case Z032:
+                return Z032;
+            case Z064:
+                return Z064;
+            case Q128:
+                return Q128;
+            case R032:
+                return R032;
+            case R064:
+                return R064;
+            case R128:
+                return R128;
+            case R256:
+                return R256;
+            case C128:
+                return C128;
+            default:
+                return H256;
+            }
+        default:
+            return R064;
         }
     }
 
     public int getComponents() {
         return myComponents;
+    }
+
+    public <N extends Comparable<N>> FunctionSet<N> getFunctionSet() {
+
+        FunctionSet<N> retVal = null;
+
+        switch (this) {
+        case C128:
+            retVal = (FunctionSet<N>) ComplexFunction.getSet();
+            break;
+        case H256:
+            retVal = (FunctionSet<N>) QuaternionFunction.getSet();
+            break;
+        case Q128:
+            retVal = (FunctionSet<N>) RationalFunction.getSet();
+            break;
+        case R128:
+            retVal = (FunctionSet<N>) QuadrupleFunction.getSet();
+            break;
+        case R256:
+            retVal = (FunctionSet<N>) BigFunction.getSet();
+            break;
+        default:
+            retVal = (FunctionSet<N>) PrimitiveFunction.getSet();
+            break;
+        }
+
+        return retVal;
     }
 
     public Class<?> getJavaClass() {
@@ -289,6 +330,34 @@ public enum MathType {
 
     public NumberSet getNumberSet() {
         return myNumberSet;
+    }
+
+    public <N extends Comparable<N>> Scalar.Factory<N> getScalarFactory() {
+
+        Scalar.Factory<N> retVal = null;
+
+        switch (this) {
+        case C128:
+            retVal = (Scalar.Factory<N>) ComplexNumber.FACTORY;
+            break;
+        case H256:
+            retVal = (Scalar.Factory<N>) Quaternion.FACTORY;
+            break;
+        case Q128:
+            retVal = (Scalar.Factory<N>) RationalNumber.FACTORY;
+            break;
+        case R128:
+            retVal = (Scalar.Factory<N>) Quadruple.FACTORY;
+            break;
+        case R256:
+            retVal = (Scalar.Factory<N>) BigScalar.FACTORY;
+            break;
+        default:
+            retVal = (Scalar.Factory<N>) PrimitiveScalar.FACTORY;
+            break;
+        }
+
+        return retVal;
     }
 
     public long getTotalMemory() {

@@ -23,7 +23,6 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.array.PlainArray;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
@@ -108,11 +107,6 @@ public interface QR<N extends Comparable<N>> extends MatrixDecomposition.Updatab
     }
 
     @Override
-    default PhysicalStore<N> preallocate(final int nbEquations) {
-        return this.preallocate(nbEquations, 1);
-    }
-
-    @Override
     default MatrixStore<N> reconstruct() {
         MatrixStore<N> mtrxQ = this.getQ();
         MatrixStore<N> mtrxR = this.getR();
@@ -120,8 +114,7 @@ public interface QR<N extends Comparable<N>> extends MatrixDecomposition.Updatab
     }
 
     @Override
-    default boolean updateColumn(final int columnIndex, final Access1D.Collectable<N, ? super TransformableRegion<N>> newColumn,
-            final PhysicalStore<N> preallocated) {
+    default boolean updateColumn(final int columnIndex, final Access1D.Collectable<N, ? super TransformableRegion<N>> newColumn) {
         throw new UnsupportedOperationException();
     }
 

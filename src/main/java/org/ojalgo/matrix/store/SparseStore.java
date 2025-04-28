@@ -336,8 +336,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         Arrays.fill(myFirsts, nbCols);
         // Arrays.fill(myLimits, 0); // Behövs inte, redan 0
 
-        Class<? extends Comparable> tmpType = factory.scalar().zero().get().getClass();
-        myMultiplier = Subregion2D.findMultiplier(tmpType, nbRows, nbCols);
+        myMultiplier = Subregion2D.findMultiplier(factory.getMathType(), nbRows, nbCols);
     }
 
     @Override

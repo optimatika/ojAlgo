@@ -86,6 +86,8 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
     private Pivot myColPivot = null;
     private final Pivot myPivot = new Pivot();
+    private transient PhysicalStore<N> myWorkerColumn = null;
+    private transient PhysicalStore<N> myWorkerRow = null;
 
     protected DenseLU(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
         super(aFactory);
@@ -324,15 +326,14 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
     }
 
     @Override
-    public boolean updateColumn(final int columnIndex, final org.ojalgo.structure.Access1D.Collectable<N, ? super TransformableRegion<N>> newColumn,
-            final PhysicalStore<N> preallocated) {
+    public boolean updateColumn(final int columnIndex, final org.ojalgo.structure.Access1D.Collectable<N, ? super TransformableRegion<N>> newColumn) {
 
         if (myColPivot == null) {
             myColPivot = new Pivot();
             myColPivot.reset(this.getColDim());
         }
 
-        return FletcherMatthews.update(myPivot, this.getInPlace(), myColPivot, columnIndex, newColumn, preallocated);
+        return FletcherMatthews.update(myPivot, this.getInPlace(), myColPivot, columnIndex, newColumn, this.getWorkerColumn(this.getRowDim()));
     }
 
     private boolean doDecompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean pivoting) {
@@ -405,6 +406,20 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
         }
 
         return retVal;
+    }
+
+    PhysicalStore<N> getWorkerColumn(final int nbRows) {
+        if (myWorkerColumn == null || myWorkerColumn.getRowDim() != nbRows) {
+            myWorkerColumn = this.preallocate(nbRows, 1, 1);
+        }
+        return myWorkerColumn;
+    }
+
+    PhysicalStore<N> getWorkerRow(final int nbCols) {
+        if (myWorkerRow == null || myWorkerRow.getColDim() != nbCols) {
+            myWorkerRow = this.preallocate(1, nbCols, 1);
+        }
+        return myWorkerRow;
     }
 
 }

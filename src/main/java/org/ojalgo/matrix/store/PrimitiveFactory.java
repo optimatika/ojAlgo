@@ -22,7 +22,7 @@
 package org.ojalgo.matrix.store;
 
 import org.ojalgo.array.ArrayR064;
-import org.ojalgo.array.DenseArray;
+import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
@@ -42,7 +42,7 @@ abstract class PrimitiveFactory<I extends PhysicalStore<Double> & Factory2D.Buil
     }
 
     @Override
-    public DenseArray.Factory<Double> array() {
+    public PrimitiveArray.Factory array() {
         return ArrayR064.FACTORY;
     }
 

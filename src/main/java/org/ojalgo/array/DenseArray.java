@@ -22,10 +22,11 @@
 package org.ojalgo.array;
 
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Factory1D;
-import org.ojalgo.structure.StructureAnyD;
+import org.ojalgo.type.math.MathType;
 
 /**
  * Each and every element occupies memory and holds a value.
@@ -34,58 +35,39 @@ import org.ojalgo.structure.StructureAnyD;
  */
 public abstract class DenseArray<N extends Comparable<N>> extends BasicArray<N> implements Factory1D.Builder<DenseArray<N>> {
 
-    public static abstract class Factory<N extends Comparable<N>> extends ArrayFactory<N, DenseArray<N>>
-            implements Factory1D.TwoStep<DenseArray<N>, DenseArray<N>> {
+    public abstract static class Factory<N extends Comparable<N>, A extends DenseArray<N>> extends BaseFactory<N, A> {
 
-        @Override
-        public DenseArray<N> newBuilder(final long count) {
-            return this.makeToBeFilled(count);
+        protected Factory(final MathType mathType) {
+            super(mathType);
         }
 
-        @Override
-        long getCapacityLimit() {
-            return PlainArray.MAX_SIZE;
-        }
-
-        final long getElementSize() {
-            return this.getMathType().getTotalMemory();
-        }
-
-        abstract DenseArray<N> makeDenseArray(long size);
-
-        @Override
-        final DenseArray<N> makeStructuredZero(final long... structure) {
-
-            final long total = StructureAnyD.count(structure);
-
-            if (total > this.getCapacityLimit()) {
-
-                throw new IllegalArgumentException();
-
-            } else {
-
-                return this.makeDenseArray(total);
+        public A copy(final Access1D<?> values) {
+            A retVal = this.make(values);
+            for (long i = 0L, limit = values.count(); i < limit; i++) {
+                retVal.set(i, values.get(i));
             }
+            return retVal;
         }
 
-        @Override
-        final DenseArray<N> makeToBeFilled(final long... structure) {
-
-            final long total = StructureAnyD.count(structure);
-
-            if (total > this.getCapacityLimit()) {
-
-                throw new IllegalArgumentException();
-
-            } else {
-
-                return this.makeDenseArray(total);
+        public A copy(final double[] values) {
+            A retVal = this.make(values.length);
+            for (int i = 0, limit = values.length; i < limit; i++) {
+                retVal.set(i, values[i]);
             }
+            return retVal;
+        }
+
+        public A makeFilled(final int size, final NullaryFunction<?> supplier) {
+            A retVal = this.make(size);
+            for (int i = 0; i < size; i++) {
+                retVal.set(i, supplier.doubleValue());
+            }
+            return retVal;
         }
 
     }
 
-    protected DenseArray(final DenseArray.Factory<N> factory) {
+    protected DenseArray(final DenseArray.Factory<N, ?> factory) {
         super(factory);
     }
 

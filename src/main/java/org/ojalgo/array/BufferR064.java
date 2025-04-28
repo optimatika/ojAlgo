@@ -33,12 +33,8 @@ final class BufferR064 extends BufferArray {
     private final DoubleBuffer myBuffer;
 
     BufferR064(final BufferArray.Factory factory, final ByteBuffer buffer, final AutoCloseable closeable) {
-        this(factory, buffer.asDoubleBuffer(), closeable);
-    }
-
-    BufferR064(final BufferArray.Factory factory, final DoubleBuffer buffer, final AutoCloseable closeable) {
         super(factory, buffer, closeable);
-        myBuffer = buffer;
+        myBuffer = buffer.asDoubleBuffer();
     }
 
     @Override

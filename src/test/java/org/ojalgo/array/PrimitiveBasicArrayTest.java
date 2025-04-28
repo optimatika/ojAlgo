@@ -116,7 +116,7 @@ public abstract class PrimitiveBasicArrayTest extends ArrayTests {
 
     @Test
     public void testSegmentedPrimitive() {
-        this.doTest(ArrayR064.FACTORY.makeSegmented(COUNT));
+        this.doTest(new BasicArray.Factory<>(ArrayR064.FACTORY).makeSegmented(COUNT));
     }
 
     @Test

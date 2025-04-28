@@ -27,7 +27,7 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.array.ArrayR032;
-import org.ojalgo.array.DenseArray;
+import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.array.operation.FillCompatible;
 import org.ojalgo.array.operation.FillMatchingSingle;
 import org.ojalgo.array.operation.RotateLeft;
@@ -71,17 +71,17 @@ public final class R032Store extends ArrayR032 implements PhysicalStore<Double>,
     public static final PhysicalStore.Factory<Double, R032Store> FACTORY = new PrimitiveFactory<>() {
 
         @Override
-        public DenseArray.Factory<Double> array() {
+        public PrimitiveArray.Factory array() {
             return ArrayR032.FACTORY;
         }
 
         @Override
         public R032Store copy(final Access2D<?> source) {
 
-            final int tmpRowDim = (int) source.countRows();
-            final int tmpColDim = (int) source.countColumns();
+            int tmpRowDim = (int) source.countRows();
+            int tmpColDim = (int) source.countColumns();
 
-            final R032Store retVal = new R032Store(tmpRowDim, tmpColDim);
+            final R032Store retVal = this.make(source);
 
             if (tmpColDim > FillMatchingSingle.THRESHOLD) {
 
@@ -111,12 +111,7 @@ public final class R032Store extends ArrayR032 implements PhysicalStore<Double>,
 
         @Override
         public R032Store make(final int rows, final int columns) {
-            return new R032Store(rows, columns);
-        }
-
-        @Override
-        public R032Store make(final long rows, final long columns) {
-            return new R032Store((int) rows, (int) columns);
+            return new R032Store(rows, columns, new float[rows * columns]);
         }
 
         @Override
@@ -127,27 +122,27 @@ public final class R032Store extends ArrayR032 implements PhysicalStore<Double>,
         @Override
         public R032Store transpose(final Access2D<?> source) {
 
-            final R032Store retVal = new R032Store((int) source.countColumns(), (int) source.countRows());
+            R032Store retVal = this.make(source.getColDim(), source.getRowDim());
 
-            final int tmpRowDim = retVal.getRowDim();
-            final int tmpColDim = retVal.getColDim();
+            int nbRows = retVal.getRowDim();
+            int nbCols = retVal.getColDim();
 
-            if (tmpColDim > FillMatchingSingle.THRESHOLD) {
+            if (nbCols > FillMatchingSingle.THRESHOLD) {
 
                 final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                     @Override
                     public void conquer(final int first, final int limit) {
-                        FillMatchingSingle.transpose(retVal.data, tmpRowDim, first, limit, source);
+                        FillMatchingSingle.transpose(retVal.data, nbRows, first, limit, source);
                     }
 
                 };
 
-                tmpConquerer.invoke(0, tmpColDim, FillMatchingSingle.THRESHOLD);
+                tmpConquerer.invoke(0, nbCols, FillMatchingSingle.THRESHOLD);
 
             } else {
 
-                FillMatchingSingle.transpose(retVal.data, tmpRowDim, 0, tmpColDim, source);
+                FillMatchingSingle.transpose(retVal.data, nbRows, 0, nbCols, source);
             }
 
             return retVal;
@@ -198,21 +193,6 @@ public final class R032Store extends ArrayR032 implements PhysicalStore<Double>,
 
         myRowDim = numbRows;
         myColDim = numbCols;
-
-        myUtility = this.wrapInArray2D(myRowDim);
-
-        multiplyBoth = MultiplyBoth.newPrimitive32(myRowDim, myColDim);
-        multiplyLeft = MultiplyLeft.newPrimitive32(myRowDim, myColDim);
-        multiplyRight = MultiplyRight.newPrimitive32(myRowDim, myColDim);
-        multiplyNeither = MultiplyNeither.newPrimitive32(myRowDim, myColDim);
-    }
-
-    R032Store(final long numbRows, final long numbCols) {
-
-        super(Math.toIntExact(numbRows * numbCols));
-
-        myRowDim = Math.toIntExact(numbRows);
-        myColDim = Math.toIntExact(numbCols);
 
         myUtility = this.wrapInArray2D(myRowDim);
 
@@ -353,11 +333,6 @@ public final class R032Store extends ArrayR032 implements PhysicalStore<Double>,
     }
 
     @Override
-    public void fillCompatible(final Access2D<Double> left, final BinaryFunction<Double> operator, final Access2D<Double> right) {
-        FillCompatible.invoke(data, myRowDim, left, operator, right);
-    }
-
-    @Override
     public void fillByMultiplying(final Access1D<Double> left, final Access1D<Double> right) {
 
         int complexity = Math.toIntExact(left.count() / this.countRows());
@@ -406,6 +381,11 @@ public final class R032Store extends ArrayR032 implements PhysicalStore<Double>,
     @Override
     public void fillColumn(final long col, final NullaryFunction<?> supplier) {
         myUtility.fillColumn(col, supplier);
+    }
+
+    @Override
+    public void fillCompatible(final Access2D<Double> left, final BinaryFunction<Double> operator, final Access2D<Double> right) {
+        FillCompatible.invoke(data, myRowDim, left, operator, right);
     }
 
     @Override
@@ -566,23 +546,23 @@ public final class R032Store extends ArrayR032 implements PhysicalStore<Double>,
 
         this.modify(0, myRowDim * myColDim, 1, modifier);
 
-        //        if (myColDim > ModifyAll.THRESHOLD) {
+        // if (myColDim > ModifyAll.THRESHOLD) {
         //
-        //            final DivideAndConquer conquerer = new DivideAndConquer() {
+        // final DivideAndConquer conquerer = new DivideAndConquer() {
         //
-        //                @Override
-        //                public void conquer(final int first, final int limit) {
-        //                    Primitive32Store.this.modify(myRowDim * first, myRowDim * limit, 1, modifier);
-        //                }
+        // @Override
+        // public void conquer(final int first, final int limit) {
+        // Primitive32Store.this.modify(myRowDim * first, myRowDim * limit, 1, modifier);
+        // }
         //
-        //            };
+        // };
         //
-        //            conquerer.invoke(0, myColDim, ModifyAll.THRESHOLD);
+        // conquerer.invoke(0, myColDim, ModifyAll.THRESHOLD);
         //
-        //        } else {
+        // } else {
         //
-        //            this.modify(0, myRowDim * myColDim, 1, modifier);
-        //        }
+        // this.modify(0, myRowDim * myColDim, 1, modifier);
+        // }
     }
 
     @Override
@@ -832,6 +812,11 @@ public final class R032Store extends ArrayR032 implements PhysicalStore<Double>,
     }
 
     @Override
+    public PrimitiveScalar toScalar(final int row, final int col) {
+        return PrimitiveScalar.of(this.doubleValue(row, col));
+    }
+
+    @Override
     public String toString() {
         return Access2D.toString(this);
     }
@@ -925,11 +910,6 @@ public final class R032Store extends ArrayR032 implements PhysicalStore<Double>,
     @Override
     public void visitRow(final long row, final VoidFunction<Double> visitor) {
         myUtility.visitRow(row, visitor);
-    }
-
-    @Override
-    public PrimitiveScalar toScalar(final int row, final int col) {
-        return PrimitiveScalar.of(this.doubleValue(row, col));
     }
 
     private float[] getWorkerColumn() {

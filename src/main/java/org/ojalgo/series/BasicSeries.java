@@ -103,12 +103,12 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Comparab
             myTimeIndex = timeIndex;
         }
 
-        public <N extends Comparable<N>> BasicSeries<K, N> build(final DenseArray.Factory<N> denseArrayFactory) {
+        public <N extends Comparable<N>> BasicSeries<K, N> build(final DenseArray.Factory<N, ?> denseArrayFactory) {
             ProgrammingError.throwIfNull(denseArrayFactory);
             return this.doBuild(denseArrayFactory, null);
         }
 
-        public <N extends Comparable<N>> BasicSeries<K, N> build(final DenseArray.Factory<N> denseArrayFactory, final BinaryFunction<N> accumularor) {
+        public <N extends Comparable<N>> BasicSeries<K, N> build(final DenseArray.Factory<N, ?> denseArrayFactory, final BinaryFunction<N> accumularor) {
             ProgrammingError.throwIfNull(denseArrayFactory, accumularor);
             return this.doBuild(denseArrayFactory, accumularor);
         }
@@ -123,7 +123,7 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Comparab
             return this;
         }
 
-        private <N extends Comparable<N>> BasicSeries<K, N> doBuild(final DenseArray.Factory<N> arrayFactory, final BinaryFunction<N> accumularor) {
+        private <N extends Comparable<N>> BasicSeries<K, N> doBuild(final DenseArray.Factory<N, ?> arrayFactory, final BinaryFunction<N> accumularor) {
             if (myReference != null) {
                 if (myResolution != null) {
                     return new MappedIndexSeries<>(arrayFactory, myTimeIndex.from(myReference, myResolution), accumularor);
@@ -217,19 +217,19 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Comparab
         return retVal;
     }
 
-    static BasicSeries<Double, Double> make(final DenseArray.Factory<Double> arrayFactory) {
+    static BasicSeries<Double, Double> make(final DenseArray.Factory<Double, ?> arrayFactory) {
         return new MappedIndexSeries<>(arrayFactory, MappedIndexSeries.MAPPER, null);
     }
 
-    static BasicSeries<Double, Double> make(final DenseArray.Factory<Double> arrayFactory, final BinaryFunction<Double> accumulator) {
+    static BasicSeries<Double, Double> make(final DenseArray.Factory<Double, ?> arrayFactory, final BinaryFunction<Double> accumulator) {
         return new MappedIndexSeries<>(arrayFactory, MappedIndexSeries.MAPPER, accumulator);
     }
 
-    static <N extends Comparable<N>> BasicSeries<N, N> make(final DenseArray.Factory<N> arrayFactory, final Structure1D.IndexMapper<N> indexMapper) {
+    static <N extends Comparable<N>> BasicSeries<N, N> make(final DenseArray.Factory<N, ?> arrayFactory, final Structure1D.IndexMapper<N> indexMapper) {
         return new MappedIndexSeries<>(arrayFactory, indexMapper, null);
     }
 
-    static <N extends Comparable<N>> BasicSeries<N, N> make(final DenseArray.Factory<N> arrayFactory, final Structure1D.IndexMapper<N> indexMapper,
+    static <N extends Comparable<N>> BasicSeries<N, N> make(final DenseArray.Factory<N, ?> arrayFactory, final Structure1D.IndexMapper<N> indexMapper,
             final BinaryFunction<N> accumulator) {
         return new MappedIndexSeries<>(arrayFactory, indexMapper, accumulator);
     }
@@ -298,6 +298,7 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Comparab
 
     V get(K key);
 
+    @Override
     default V get(final Object key) {
         return this.get((K) key);
     }

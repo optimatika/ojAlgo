@@ -1,40 +1,28 @@
 package org.ojalgo.array;
 
-import org.ojalgo.function.FunctionSet;
-import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.math.MathType;
 
-public abstract class StrategyBuildingFactory<N extends Comparable<N>, I extends Access1D<N>, SB extends StrategyBuildingFactory<N, I, SB>> {
+abstract class StrategyBuildingFactory<N extends Comparable<N>, I extends Access1D<N>, SB extends StrategyBuildingFactory<N, I, SB>> {
 
-    private final DenseArray.Factory<N> myDenseFactory;
     private final GrowthStrategy.Builder myStrategyBuilder;
 
-    public StrategyBuildingFactory(final DenseArray.Factory<N> denseFactory) {
+    StrategyBuildingFactory(final MathType mathType) {
 
         super();
 
-        myDenseFactory = denseFactory;
-        myStrategyBuilder = GrowthStrategy.newBuilder(denseFactory);
+        myStrategyBuilder = GrowthStrategy.newBuilder(mathType);
     }
 
     /**
      * @param chunk Defines a capacity break point. Below this point the capacity is doubled when needed.
-     *        Above it, it is grown by adding one "chunk" at the time. Must be a power of 2. (The builder will
-     *        enforce that for you.)
+     *              Above it, it is grown by adding one "chunk" at the time. Must be a power of 2. (The
+     *              builder will enforce that for you.)
      * @return this
      */
     public SB chunk(final long chunk) {
         myStrategyBuilder.chunk(chunk);
         return (SB) this;
-    }
-
-    public FunctionSet<N> function() {
-        return myDenseFactory.function();
-    }
-
-    public MathType getMathType() {
-        return myDenseFactory.getMathType();
     }
 
     /**
@@ -46,10 +34,6 @@ public abstract class StrategyBuildingFactory<N extends Comparable<N>, I extends
         return (SB) this;
     }
 
-    public Scalar.Factory<N> scalar() {
-        return myDenseFactory.scalar();
-    }
-
     /**
      * With very large data structures, particularly sparse ones, the underlying (dense) storage is segmented.
      * (Very large arrays are implemented as an array of arrays.) This determines the size/length of one such
@@ -59,10 +43,6 @@ public abstract class StrategyBuildingFactory<N extends Comparable<N>, I extends
     public SB segment(final long segment) {
         myStrategyBuilder.segment(segment);
         return (SB) this;
-    }
-
-    DenseArray.Factory<N> getDenseFactory() {
-        return myDenseFactory;
     }
 
     GrowthStrategy getGrowthStrategy() {

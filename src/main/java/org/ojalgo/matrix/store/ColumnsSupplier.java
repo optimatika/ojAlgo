@@ -6,19 +6,21 @@ import java.util.List;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.array.SparseArray.SparseFactory;
+import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.structure.Transformation2D;
 
 /**
  * Sparse columns – columns can be added and removed.
  *
  * @author apete
  */
-public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixStore<N>, Mutate2D, SparseStructure2D {
+public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixStore<N>, SparseStructure2D, Mutate2D.ModifiableReceiver<N> {
 
     public static final class SingleView<N extends Comparable<N>> extends ColumnView<N> implements Access2D.Collectable<N, PhysicalStore<N>> {
 
@@ -85,6 +87,16 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixSto
         myRowsCount = numberOfRows;
         myPhysicalStoreFactory = factory;
         myColumnFactory = SparseArray.factory(factory.array());
+    }
+
+    @Override
+    public void add(final long row, final long col, final Comparable<?> addend) {
+        myColumns.get((int) col).add(row, addend);
+    }
+
+    @Override
+    public void add(final long row, final long col, final double addend) {
+        myColumns.get((int) col).add(row, addend);
     }
 
     public SparseArray<N> addColumn() {
@@ -189,6 +201,26 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixSto
     }
 
     @Override
+    public void exchangeColumns(final long colA, final long colB) {
+        int a = Math.toIntExact(colA);
+        int b = Math.toIntExact(colB);
+        SparseArray<N> temp = myColumns.get(a);
+        myColumns.set(a, myColumns.get(b));
+        myColumns.set(b, temp);
+    }
+
+    @Override
+    public void exchangeRows(final long rowA, final long rowB) {
+        int a = Math.toIntExact(rowA);
+        int b = Math.toIntExact(rowB);
+        for (SparseArray<N> column : myColumns) {
+            double temp = column.doubleValue(a);
+            column.set(a, column.doubleValue(b));
+            column.set(b, temp);
+        }
+    }
+
+    @Override
     public PhysicalStore<N> get() {
         return this.collect(myPhysicalStoreFactory);
     }
@@ -210,6 +242,16 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixSto
     @Override
     public int getRowDim() {
         return myRowsCount;
+    }
+
+    @Override
+    public void modifyAny(final Transformation2D<N> modifier) {
+        modifier.transform(this);
+    }
+
+    @Override
+    public void modifyOne(final long row, final long col, final UnaryFunction<N> modifier) {
+        myColumns.get((int) col).modifyOne(row, modifier);
     }
 
     @Override
@@ -237,6 +279,11 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixSto
     @Override
     public void set(final long row, final long col, final Comparable<?> value) {
         myColumns.get(Math.toIntExact(col)).set(row, value);
+    }
+
+    @Override
+    public SparseArray<N> sliceColumn(final long col) {
+        return this.getColumn(Math.toIntExact(col));
     }
 
     @Override

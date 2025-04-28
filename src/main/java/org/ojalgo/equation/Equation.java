@@ -21,8 +21,7 @@
  */
 package org.ojalgo.equation;
 
-import static org.ojalgo.function.constant.PrimitiveMath.ONE;
-import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +41,7 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         return Equation.dense(pivot, cols, ArrayR064.FACTORY);
     }
 
-    public static <N extends Comparable<N>> Equation dense(final int pivot, final int cols, final DenseArray.Factory<N> factory) {
+    public static <N extends Comparable<N>> Equation dense(final int pivot, final int cols, final DenseArray.Factory<N, ?> factory) {
         return new Equation(factory.make(cols), pivot, ZERO);
     }
 
@@ -50,7 +49,7 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         return Equation.denseSystem(rows, cols, ArrayR064.FACTORY);
     }
 
-    public static <N extends Comparable<N>> List<Equation> denseSystem(final int rows, final int cols, final DenseArray.Factory<N> factory) {
+    public static <N extends Comparable<N>> List<Equation> denseSystem(final int rows, final int cols, final DenseArray.Factory<N, ?> factory) {
 
         List<Equation> system = new ArrayList<>(rows);
 
@@ -69,11 +68,12 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         return Equation.sparse(pivot, cols, ArrayR064.FACTORY);
     }
 
-    public static <N extends Comparable<N>> Equation sparse(final int pivot, final int cols, final DenseArray.Factory<N> factory) {
+    public static <N extends Comparable<N>> Equation sparse(final int pivot, final int cols, final DenseArray.Factory<N, ?> factory) {
         return new Equation(SparseArray.factory(factory).make(cols), pivot, ZERO);
     }
 
-    public static <N extends Comparable<N>> Equation sparse(final int pivot, final int cols, final DenseArray.Factory<N> factory, final int numberOfNonzeros) {
+    public static <N extends Comparable<N>> Equation sparse(final int pivot, final int cols, final DenseArray.Factory<N, ?> factory,
+            final int numberOfNonzeros) {
         return new Equation(SparseArray.factory(factory).initial(numberOfNonzeros).make(cols), pivot, ZERO);
     }
 
@@ -85,7 +85,7 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         return Equation.sparseSystem(rows, cols, ArrayR064.FACTORY);
     }
 
-    public static <N extends Comparable<N>> List<Equation> sparseSystem(final int rows, final int cols, final DenseArray.Factory<N> factory) {
+    public static <N extends Comparable<N>> List<Equation> sparseSystem(final int rows, final int cols, final DenseArray.Factory<N, ?> factory) {
 
         List<Equation> system = new ArrayList<>(rows);
 
@@ -96,7 +96,7 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         return system;
     }
 
-    public static <N extends Comparable<N>> List<Equation> sparseSystem(final int rows, final int cols, final DenseArray.Factory<N> factory,
+    public static <N extends Comparable<N>> List<Equation> sparseSystem(final int rows, final int cols, final DenseArray.Factory<N, ?> factory,
             final int numberOfNonzeros) {
 
         List<Equation> system = new ArrayList<>(rows);
@@ -154,7 +154,7 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
     /**
      * Will perform a (relaxed) GaussSeidel update.
      *
-     * @param x The current solution (one element will be updated)
+     * @param x          The current solution (one element will be updated)
      * @param relaxation Typically 1.0 but could be anything (Most likely should be between 0.0 and 2.0).
      * @return The error in this equation
      */

@@ -29,6 +29,7 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.type.math.MathType;
 
 /**
  * NumberListTest
@@ -113,7 +114,7 @@ public class NumberListTest extends ArrayTests {
     @Test
     public void testGrowCapacity() {
 
-        GrowthStrategy tmpStrategy = GrowthStrategy.newInstance(ArrayR064.FACTORY);
+        GrowthStrategy tmpStrategy = GrowthStrategy.newInstance(MathType.R064);
         long initial = tmpStrategy.initial();
         long chunk = tmpStrategy.chunk();
 

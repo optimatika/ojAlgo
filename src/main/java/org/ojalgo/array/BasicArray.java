@@ -21,6 +21,7 @@
  */
 package org.ojalgo.array;
 
+import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.array.operation.AMAX;
 import org.ojalgo.array.operation.Exchange;
 import org.ojalgo.array.operation.FillAll;
@@ -38,6 +39,7 @@ import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.special.PowerOf2;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Factory1D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.StructureAnyD;
 import org.ojalgo.type.math.MathType;
@@ -56,37 +58,27 @@ import org.ojalgo.type.math.MathType;
 public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>, Access1D.Aggregatable<N>, Access1D.Visitable<N>, Mutate1D,
         Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Access1D.Collectable<N, Mutate1D> {
 
-    public static final class Factory<N extends Comparable<N>> extends ArrayFactory<N, BasicArray<N>> {
+    public static final class Factory<N extends Comparable<N>> extends BaseFactory<N, BasicArray<N>> {
 
         private static final long SPARSE_SEGMENTATION_LIMIT = PowerOf2.powerOfLong2(46);
 
-        private final DenseArray.Factory<N> myDenseFactory;
+        private final DenseArray.Factory<N, ?> myDenseFactory;
         private final GrowthStrategy myGrowthStrategy;
 
-        Factory(final org.ojalgo.array.DenseArray.Factory<N> denseFactory) {
-            super();
+        Factory(final DenseArray.Factory<N, ?> denseFactory) {
+            super(denseFactory.getMathType());
             myDenseFactory = denseFactory;
-            myGrowthStrategy = GrowthStrategy.newInstance(denseFactory);
+            myGrowthStrategy = GrowthStrategy.newInstance(denseFactory.getMathType());
         }
 
         @Override
-        public AggregatorSet<N> aggregator() {
-            return myDenseFactory.aggregator();
+        public BasicArray<N> make(final int size) {
+            return this.makeToBeFilled(size);
         }
 
         @Override
-        public FunctionSet<N> function() {
-            return myDenseFactory.function();
-        }
-
-        @Override
-        public MathType getMathType() {
-            return myDenseFactory.getMathType();
-        }
-
-        @Override
-        public Scalar.Factory<N> scalar() {
-            return myDenseFactory.scalar();
+        public BasicArray<N> make(final long size) {
+            return this.makeStructuredZero(size);
         }
 
         @Override
@@ -94,7 +86,25 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
             return Long.MAX_VALUE;
         }
 
-        @Override
+        SegmentedArray<N> makeSegmented(final long... structure) {
+
+            long totalCount = StructureAnyD.count(structure);
+
+            int max = PowerOf2.powerOf2Smaller(totalCount);
+            int min = PowerOf2.powerOf2Larger(totalCount / PlainArray.MAX_SIZE);
+
+            if (min > max) {
+                throw new IllegalArgumentException();
+            }
+
+            int indexBits = Math.max(min, max - OjAlgoUtils.ENVIRONMENT.cores);
+
+            return new SegmentedArray<>(totalCount, indexBits, this);
+        }
+
+        /**
+         * Most likely sparse, and then also segmented.
+         */
         BasicArray<N> makeStructuredZero(final long... structure) {
 
             long total = StructureAnyD.count(structure);
@@ -113,13 +123,15 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
             }
         }
 
-        @Override
+        /**
+         * Maybe segmented, but dense.
+         */
         BasicArray<N> makeToBeFilled(final long... structure) {
 
             long total = StructureAnyD.count(structure);
 
             if (myGrowthStrategy.isSegmented(total)) {
-                return myDenseFactory.makeSegmented(total);
+                return this.makeSegmented(total);
             } else {
                 return myDenseFactory.make(total);
             }
@@ -127,14 +139,62 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
 
     }
 
-    private final ArrayFactory<N, ?> myFactory;
+    abstract static class BaseFactory<N extends Comparable<N>, A extends BasicArray<N>> implements Factory1D<A> {
+
+        private final AggregatorSet<N> myAggregator;
+        private final FunctionSet<N> myFunction;
+        private final MathType myMathType;
+        private final Scalar.Factory<N> myScalar;
+
+        BaseFactory(final MathType mathType) {
+
+            super();
+
+            myMathType = mathType;
+
+            myScalar = myMathType.getScalarFactory();
+            myFunction = myMathType.getFunctionSet();
+            myAggregator = myFunction.aggregator();
+        }
+
+        public final AggregatorSet<N> aggregator() {
+            return myAggregator;
+        }
+
+        @Override
+        public final FunctionSet<N> function() {
+            return myFunction;
+        }
+
+        @Override
+        public final MathType getMathType() {
+            return myMathType;
+        }
+
+        @Override
+        public final Scalar.Factory<N> scalar() {
+            return myScalar;
+        }
+
+        /**
+         * Max number of elements in this array.
+         */
+        abstract long getCapacityLimit();
+
+        final long getElementSize() {
+            return myMathType.getTotalMemory();
+        }
+
+    }
+
+    private final BaseFactory<N, ?> myFactory;
 
     @SuppressWarnings("unused")
     private BasicArray() {
         this(null);
     }
 
-    protected BasicArray(final ArrayFactory<N, ?> factory) {
+    protected BasicArray(final BaseFactory<N, ?> factory) {
         super();
         myFactory = factory;
     }
@@ -292,7 +352,7 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
         return new ArrayAnyD<>(this, structure);
     }
 
-    final ArrayFactory<N, ?> factory() {
+    final BaseFactory<N, ?> factory() {
         return myFactory;
     }
 

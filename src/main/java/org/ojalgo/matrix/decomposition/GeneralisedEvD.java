@@ -83,6 +83,7 @@ final class GeneralisedEvD<N extends Comparable<N>> extends DenseEigenvalue<N> i
         return myEigenvalue.isOrdered();
     }
 
+    @Override
     public boolean prepare(final Collectable<N, ? super TransformableRegion<N>> matrixB) {
         return myCholesky.decompose(matrixB);
     }
