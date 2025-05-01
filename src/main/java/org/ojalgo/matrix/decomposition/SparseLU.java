@@ -28,6 +28,7 @@ import java.util.Arrays;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.SparseArray;
+import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.matrix.store.DiagonalStore;
 import org.ojalgo.matrix.store.LinkedR064;
 import org.ojalgo.matrix.store.LinkedR064.ElementNode;
@@ -82,14 +83,24 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
 
         @Override
         public void btran(final PhysicalStore<Double> arg) {
-            // TODO Auto-generated method stub
 
+            // For eta matrix, backward substitution is just forward substitution in reverse
+            // Only process non-zero elements using the sparse array iterator
+            double rowValue = arg.doubleValue(myRow);
+            for (NonzeroView<Double> nz : myElements.nonzeros()) {
+                arg.add(nz.index(), -nz.doubleValue() * rowValue);
+            }
         }
 
         @Override
         public void ftran(final PhysicalStore<Double> arg) {
-            // TODO Auto-generated method stub
 
+            // For eta matrix, forward substitution
+            // Only process non-zero elements using the sparse array iterator
+            double rowValue = arg.doubleValue(myRow);
+            for (NonzeroView<Double> nz : myElements.nonzeros()) {
+                arg.add(nz.index(), nz.doubleValue() * rowValue);
+            }
         }
 
         @Override
@@ -119,14 +130,46 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
 
         @Override
         public void btran(final PhysicalStore<Double> arg) {
-            // TODO Auto-generated method stub
 
+            // For cyclic shift permutation, backward substitution
+            // Store the value that will be moved to the end
+            double tmp = arg.doubleValue(myFrom);
+
+            // Shift all elements between from and to one position up
+            if (myFrom < myTo) {
+                for (int i = myFrom; i < myTo; i++) {
+                    arg.set(i, arg.doubleValue(i + 1));
+                }
+            } else {
+                for (int i = myFrom; i > myTo; i--) {
+                    arg.set(i, arg.doubleValue(i - 1));
+                }
+            }
+
+            // Place the stored value at the to position
+            arg.set(myTo, tmp);
         }
 
         @Override
         public void ftran(final PhysicalStore<Double> arg) {
-            // TODO Auto-generated method stub
 
+            // For cyclic shift permutation, forward substitution
+            // Store the value that will be moved to the end
+            double tmp = arg.doubleValue(myTo);
+
+            // Shift all elements between from and to one position down
+            if (myFrom < myTo) {
+                for (int i = myTo; i > myFrom; i--) {
+                    arg.set(i, arg.doubleValue(i - 1));
+                }
+            } else {
+                for (int i = myTo; i < myFrom; i++) {
+                    arg.set(i, arg.doubleValue(i + 1));
+                }
+            }
+
+            // Place the stored value at the from position
+            arg.set(myFrom, tmp);
         }
 
         @Override
