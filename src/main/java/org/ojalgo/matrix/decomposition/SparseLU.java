@@ -26,6 +26,8 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import java.util.Arrays;
 
 import org.ojalgo.RecoverableCondition;
+import org.ojalgo.array.ArrayR064;
+import org.ojalgo.array.SparseArray;
 import org.ojalgo.matrix.store.DiagonalStore;
 import org.ojalgo.matrix.store.LinkedR064;
 import org.ojalgo.matrix.store.LinkedR064.ElementNode;
@@ -35,6 +37,7 @@ import org.ojalgo.matrix.store.R064LSC;
 import org.ojalgo.matrix.store.R064LSR;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.TransformableRegion;
+import org.ojalgo.matrix.transformation.InvertibleFactor;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
@@ -63,6 +66,80 @@ import org.ojalgo.type.context.NumberContext;
  * modifications.
  */
 final class SparseLU extends AbstractDecomposition<Double, R064Store> implements LU<Double> {
+
+    static final class Eta implements InvertibleFactor<Double> {
+
+        private final int myDim;
+        private final int myRow;
+        private final SparseArray<Double> myElements;
+
+        Eta(final int dim, final int row) {
+            super();
+            myDim = dim;
+            myRow = row;
+            myElements = SparseArray.factory(ArrayR064.FACTORY).make(dim);
+        }
+
+        @Override
+        public void btran(final PhysicalStore<Double> arg) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void ftran(final PhysicalStore<Double> arg) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public int getColDim() {
+            return myDim;
+        }
+
+        @Override
+        public int getRowDim() {
+            return myDim;
+        }
+
+    }
+
+    static final class Permutation implements InvertibleFactor<Double> {
+
+        private final int myDim;
+        private final int myFrom;
+        private final int myTo;
+
+        Permutation(final int dim, final int from, final int to) {
+            super();
+            myDim = dim;
+            myFrom = from;
+            myTo = to;
+        }
+
+        @Override
+        public void btran(final PhysicalStore<Double> arg) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void ftran(final PhysicalStore<Double> arg) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public int getColDim() {
+            return myDim;
+        }
+
+        @Override
+        public int getRowDim() {
+            return myDim;
+        }
+
+    }
 
     private static Access2D.Sliceable<Double> cast(final Collectable<Double, ? super TransformableRegion<Double>> matrix) {
 
