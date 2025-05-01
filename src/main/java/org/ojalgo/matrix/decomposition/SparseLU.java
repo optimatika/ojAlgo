@@ -23,7 +23,9 @@ package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.ArrayR064;
@@ -39,11 +41,14 @@ import org.ojalgo.matrix.store.R064LSR;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.matrix.transformation.InvertibleFactor;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Access2D.Sliceable;
+import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Structure2D;
+import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -68,7 +73,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 final class SparseLU extends AbstractDecomposition<Double, R064Store> implements LU<Double> {
 
-    static final class Eta implements InvertibleFactor<Double> {
+    static final class Eta implements InvertibleFactor<Double>, Mutate1D {
 
         private final int myDim;
         private final int myRow;
@@ -111,6 +116,21 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
         @Override
         public int getRowDim() {
             return myDim;
+        }
+
+        @Override
+        public void reset() {
+            myElements.reset();
+        }
+
+        @Override
+        public void set(final int j, final double value) {
+            myElements.set(j, value);
+        }
+
+        @Override
+        public void set(final long index, final Comparable<?> value) {
+            myElements.set(index, NumberDefinition.doubleValue(value));
         }
 
     }
@@ -184,6 +204,10 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
 
     }
 
+    private static final boolean DEBUG = true;
+    private static final NumberContext PRECISION = NumberContext.of(12);
+    private static final NumberContext SAFE = NumberContext.of(4);
+
     private static Access2D.Sliceable<Double> cast(final Collectable<Double, ? super TransformableRegion<Double>> matrix) {
 
         if (matrix instanceof Access2D.Sliceable<?>) {
@@ -201,6 +225,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
     private R064LSC myL;
     private final Pivot myPivot;
     private R064LSR myU;
+    private final List<InvertibleFactor<Double>> myFactors = new ArrayList<>();
 
     SparseLU() {
 
@@ -603,14 +628,89 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
      */
     @Override
     public boolean updateColumn(final int columnIndex, final Access1D.Collectable<Double, ? super TransformableRegion<Double>> newColumn,
-            final PhysicalStore<Double> preallocated) {
+            final PhysicalStore<Double> preallocated2) {
+
+        int m = this.getRowDim();
+        int n = this.getColDim();
+        int r = Math.min(m, n);
+
+        R064Store tmpRow = R064Store.FACTORY.make(1, n);
+        double[] wRow = tmpRow.data;
+        R064Store tmpCol = R064Store.FACTORY.make(m, 1);
+        double[] wCol = tmpCol.data;
 
         if (myColPivot == null) {
             myColPivot = new Pivot();
-            myColPivot.reset(this.getColDim());
+            myColPivot.reset(n);
         }
 
-        return FletcherMatthews.update(myPivot, myL, myDiagU, myU, myColPivot, columnIndex, newColumn, preallocated);
+        if (DEBUG) {
+            MatrixStore<Double> mtrxL = this.getL();
+            MatrixStore<Double> mtrxU = myU.superimpose(DiagonalStore.wrap(myDiagU));
+            BasicLogger.debug("Initial");
+            BasicLogger.debug("P: {}", myPivot);
+            BasicLogger.debugMatrix("L", mtrxL);
+            BasicLogger.debugMatrix("U", mtrxU);
+            BasicLogger.debug("Q: {}", myColPivot);
+            BasicLogger.debugMatrix("Recreated", mtrxL.multiply(mtrxU).rows(myPivot.reverseOrder()).columns(myColPivot.reverseOrder()));
+        }
+
+        // newColumn.supplyTo(tmpCol);
+
+        newColumn.supplyTo(tmpCol);
+        myPivot.applyPivotOrder(tmpCol);
+
+        int lastRowNonZero = -1;
+        for (int ij = 0; ij < r; ij++) {
+            double varI = -tmpCol.doubleValue(ij);
+            if (!PRECISION.isZero(varI)) {
+                lastRowNonZero = ij;
+                LinkedR064.ElementNode colNodeL = myL.getLastInColumn(ij);
+                while (colNodeL != null && colNodeL.index > ij) {
+                    tmpCol.add(colNodeL.index, colNodeL.value * varI);
+                    colNodeL = colNodeL.previous;
+                }
+            }
+        }
+
+        myU.removeShiftAndInsert(columnIndex, lastRowNonZero, tmpCol);
+        for (int i = columnIndex; i < lastRowNonZero; i++) {
+            myU.exchangeRows(i, i + 1);
+            myDiagU[i] = myDiagU[i + 1];
+        }
+        myDiagU[lastRowNonZero] = myU.doubleValue(lastRowNonZero, lastRowNonZero);
+        myU.set(lastRowNonZero, lastRowNonZero, ZERO);
+
+        myFactors.add(new Permutation(r, columnIndex, lastRowNonZero));
+
+        if (DEBUG) {
+            MatrixStore<Double> mtrxL = this.getL();
+            MatrixStore<Double> mtrxU = myU.superimpose(DiagonalStore.wrap(myDiagU));
+            BasicLogger.debug("Transformed shift & replace");
+            BasicLogger.debug("P: {}", myPivot);
+            BasicLogger.debugMatrix("L", mtrxL);
+            BasicLogger.debugMatrix("U", mtrxU);
+            BasicLogger.debug("Q: {}", myColPivot);
+        }
+
+        for (int j = 0; j < n; j++) {
+            wRow[j] = myU.doubleValue(lastRowNonZero, j);
+        }
+        wRow[lastRowNonZero] = myDiagU[lastRowNonZero];
+
+        Eta eta = new Eta(r, lastRowNonZero);
+
+        for (int ij = columnIndex; ij < lastRowNonZero; ij++) {
+            double denom = myDiagU[ij];
+            double numer = wRow[ij];
+            double ratio = numer / denom;
+
+            eta.set(ij, ratio);
+        }
+
+        myFactors.add(eta);
+
+        return false;
     }
 
     private void ftran(final PhysicalStore<Double> arg, final int col) {

@@ -34,7 +34,7 @@ import org.ojalgo.TestUtils;
  */
 public abstract class MatrixDecompositionTests {
 
-    static final boolean DEBUG = false;
+    static final boolean DEBUG = true;
 
     public static List<MatrixDecomposition<?>> getAnyAll() {
 

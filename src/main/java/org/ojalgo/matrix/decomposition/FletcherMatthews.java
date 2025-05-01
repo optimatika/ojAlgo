@@ -23,11 +23,11 @@ package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import org.ojalgo.matrix.store.LinkedR064;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064LSC;
 import org.ojalgo.matrix.store.R064LSR;
-import org.ojalgo.matrix.store.LinkedR064;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Access1D;
@@ -60,7 +60,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 abstract class FletcherMatthews {
 
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     private static final NumberContext PRECISION = NumberContext.of(12);
     private static final NumberContext SAFE = NumberContext.of(4);
 
