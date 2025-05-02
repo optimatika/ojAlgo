@@ -23,6 +23,7 @@ package org.ojalgo.matrix.store;
 
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,6 +32,7 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Factory2D;
+import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.type.math.MathType;
 
 /**
@@ -76,8 +78,15 @@ public final class R064LSR extends LinkedR064 {
 
     @Override
     public double density() {
-        // TODO Auto-generated method stub
-        return 0;
+        int nonZeroCount = 0;
+        for (int row = 0; row < myFirstInRows.length; row++) {
+            ElementNode current = myFirstInRows[row];
+            while (current != null) {
+                nonZeroCount++;
+                current = current.next;
+            }
+        }
+        return ((double) nonZeroCount) / this.count();
     }
 
     @Override
@@ -346,6 +355,26 @@ public final class R064LSR extends LinkedR064 {
     }
 
     @Override
+    public void shift(final int from, final int to, final Access1D<?> column, final Mutate1D row) {
+
+        ElementNode old = null;
+        ElementNode current = this.getFirstInRow(from);
+        while (current != null) {
+            row.set(current.index, current.value);
+            old = current;
+            current = current.next;
+            this.remove(from, old);
+        }
+
+        for (int i = from; i < to; i++) {
+            myFirstInRows[i] = myFirstInRows[i + 1];
+            myLastInRows[i] = myLastInRows[i + 1];
+        }
+
+        this.removeShiftAndInsert(from, to, column);
+    }
+
+    @Override
     public void supplyTo(final TransformableRegion<Double> receiver) {
 
         // First clear the receiver
@@ -367,8 +396,15 @@ public final class R064LSR extends LinkedR064 {
 
     @Override
     public List<Triplet> toTriplets() {
-        // TODO Auto-generated method stub
-        return null;
+        List<Triplet> retVal = new ArrayList<>();
+        for (int row = 0; row < myFirstInRows.length; row++) {
+            ElementNode current = myFirstInRows[row];
+            while (current != null) {
+                retVal.add(new Triplet(row, current.index, current.value));
+                current = current.next;
+            }
+        }
+        return retVal;
     }
 
     private void removeAndShift(final int row, final ElementNode firstInRow, final int remove, final int insert) {

@@ -23,12 +23,15 @@ package org.ojalgo.matrix.store;
 
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Factory2D;
+import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.type.math.MathType;
 
 /**
@@ -74,8 +77,15 @@ public final class R064LSC extends LinkedR064 {
 
     @Override
     public double density() {
-        // TODO Auto-generated method stub
-        return 0;
+        int nonZeroCount = 0;
+        for (int col = 0; col < myFirstInColumns.length; col++) {
+            ElementNode current = myFirstInColumns[col];
+            while (current != null) {
+                nonZeroCount++;
+                current = current.next;
+            }
+        }
+        return ((double) nonZeroCount) / this.count();
     }
 
     @Override
@@ -297,6 +307,12 @@ public final class R064LSC extends LinkedR064 {
     }
 
     @Override
+    public void shift(final int from, final int to, final Access1D<?> column, final Mutate1D row) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
     public void supplyTo(final TransformableRegion<Double> receiver) {
 
         // First clear the receiver
@@ -318,8 +334,15 @@ public final class R064LSC extends LinkedR064 {
 
     @Override
     public List<Triplet> toTriplets() {
-        // TODO Auto-generated method stub
-        return null;
+        List<Triplet> retVal = new ArrayList<>();
+        for (int col = 0; col < myFirstInColumns.length; col++) {
+            ElementNode current = myFirstInColumns[col];
+            while (current != null) {
+                retVal.add(new Triplet(current.index, col, current.value));
+                current = current.next;
+            }
+        }
+        return retVal;
     }
 
     @Override

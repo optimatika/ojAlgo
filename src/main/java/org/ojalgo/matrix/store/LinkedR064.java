@@ -29,6 +29,7 @@ import org.ojalgo.matrix.operation.MultiplyBoth;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView1D;
+import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.type.ObjectPool;
 import org.ojalgo.type.context.NumberContext;
 
@@ -247,6 +248,22 @@ public abstract class LinkedR064 extends FactoryStore<Double> implements Transfo
     public final void set(final long row, final long col, final Comparable<?> value) {
         this.set(Math.toIntExact(row), Math.toIntExact(col), Scalar.doubleValue(value));
     }
+
+    /**
+     * Logically what should happen:
+     * <ol>
+     * <li>The from column is replaced with the values in column. Only the non-zero values with row indices
+     * [0,to) needs to copied.
+     * <li>The from column is moved to to, and all columns in between are shifted one step to the left.
+     * <li>The from row is removed and copied to row. All rows in between from and to are shifted one step up.
+     * </ol>
+     *
+     * @param from
+     * @param to
+     * @param column
+     * @param row
+     */
+    public abstract void shift(int from, int to, Access1D<?> column, Mutate1D row);
 
     abstract void removeIfZero(final int row, final int col, final ElementNode node);
 
