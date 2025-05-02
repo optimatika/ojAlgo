@@ -24,6 +24,7 @@ package org.ojalgo.matrix.store;
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.scalar.Scalar;
@@ -71,6 +72,12 @@ public final class R064LSR extends LinkedR064 {
         myFirstInRows = new LinkedR064.ElementNode[nbRows];
         myLastInRows = new LinkedR064.ElementNode[nbRows];
         mySplit = nbRows / 2;
+    }
+
+    @Override
+    public double density() {
+        // TODO Auto-generated method stub
+        return 0;
     }
 
     @Override
@@ -356,6 +363,12 @@ public final class R064LSR extends LinkedR064 {
                 current = current.next;
             }
         }
+    }
+
+    @Override
+    public List<Triplet> toTriplets() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     private void removeAndShift(final int row, final ElementNode firstInRow, final int remove, final int insert) {

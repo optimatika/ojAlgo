@@ -32,7 +32,7 @@ import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.type.ObjectPool;
 import org.ojalgo.type.context.NumberContext;
 
-public abstract class LinkedR064 extends FactoryStore<Double> implements TransformableRegion<Double> {
+public abstract class LinkedR064 extends FactoryStore<Double> implements TransformableRegion<Double>, SparseStructure2D {
 
     public static final class ElementNode implements ElementView1D<Double, ElementNode> {
 
