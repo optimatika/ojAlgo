@@ -256,6 +256,10 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
             }
         }
 
+        for (int i = myFactors.size() - 1; i >= 0; i++) {
+            myFactors.get(i).btran(arg);
+        }
+
         for (int ij = r - 1; ij >= 0; ij--) {
 
             double sum = ZERO;
@@ -673,6 +677,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
             }
         }
 
+        myColPivot.cycle(columnIndex, lastRowNonZero);
         myU.removeShiftAndInsert(columnIndex, lastRowNonZero, tmpCol);
         for (int i = columnIndex; i < lastRowNonZero; i++) {
             myU.exchangeRows(i, i + 1);
@@ -706,9 +711,33 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
             double ratio = numer / denom;
 
             eta.set(ij, ratio);
+
+            wRow[ij] = ZERO;
+
+            ElementNode rowNodeU = myU.getFirstInRow(ij);
+            while (rowNodeU != null) {
+                wRow[rowNodeU.index] -= ratio * rowNodeU.value;
+                rowNodeU = rowNodeU.next;
+            }
+            myU.set(lastRowNonZero, ij, ZERO);
+        }
+
+        myDiagU[lastRowNonZero] = wRow[lastRowNonZero];
+        for (int j = lastRowNonZero + 1; j < n; j++) {
+            myU.set(lastRowNonZero, j, wRow[j]);
         }
 
         myFactors.add(eta);
+
+        if (DEBUG) {
+            MatrixStore<Double> mtrxL = this.getL();
+            MatrixStore<Double> mtrxU = myU.superimpose(DiagonalStore.wrap(myDiagU));
+            BasicLogger.debug("Final");
+            BasicLogger.debug("P: {}", myPivot);
+            BasicLogger.debugMatrix("L", mtrxL);
+            BasicLogger.debugMatrix("U", mtrxU);
+            BasicLogger.debug("Q: {}", myColPivot);
+        }
 
         return false;
     }
@@ -726,6 +755,10 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
                 arg.add(colNodeL.index, col, colNodeL.value * varJ);
                 colNodeL = colNodeL.next;
             }
+        }
+
+        for (int i = 0; i < myFactors.size(); i++) {
+            myFactors.get(i).ftran(arg);
         }
 
         for (int ij = r - 1; ij >= 0; ij--) {
