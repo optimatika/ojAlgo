@@ -90,7 +90,7 @@ public final class R064LSR extends LinkedR064 {
     }
 
     /**
-     * Performs the row/column cyclic shift required by the Forrest-Tomlin update algorithm as implemented in
+     * Performs the row/column cyclic shifts required by the Forrest-Tomlin update algorithm as implemented in
      * ojAlgo's own sparse LU decomposition. Although public, this method is not intended for any other use
      * case.
      *

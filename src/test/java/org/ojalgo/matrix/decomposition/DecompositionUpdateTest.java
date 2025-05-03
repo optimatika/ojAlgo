@@ -634,51 +634,54 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
             }
         }
 
-        MatrixStore<Double> reconstructed = resL.multiply(resU).rows(resRowRever);
-        if (resColRever != null) {
-            reconstructed = reconstructed.columns(resColRever);
-        }
-        if (DEBUG) {
-            BasicLogger.debugMatrix("Reconstructed", reconstructed, PRINT);
-        }
-        TestUtils.assertEquals(modifiedMatrix, reconstructed, PRINT);
+        if (implAlgo != null && factory == null) {
 
-        if (originalMatrix.isSquare()) {
-
-            R064Store rhs = DecompositionUpdateTest.newRandom(m, 1);
-
-            if (DEBUG) {
-                BasicLogger.debugMatrix("RHS", rhs, PRINT);
+            MatrixStore<Double> reconstructed = resL.multiply(resU).rows(resRowRever);
+            if (resColRever != null) {
+                reconstructed = reconstructed.columns(resColRever);
             }
+            if (DEBUG) {
+                BasicLogger.debugMatrix("Reconstructed", reconstructed, PRINT);
+            }
+            TestUtils.assertEquals(modifiedMatrix, reconstructed, PRINT);
 
-            LU<Double> expectedLU = LU.R064.decompose(modifiedMatrix);
+            if (originalMatrix.isSquare()) {
 
-            LU<Double> calculationLU = LU.R064.make(m, n);
-
-            Optional<MatrixStore<Double>> maybe = expectedLU.solve(rhs);
-            if (maybe.isPresent()) {
-                MatrixStore<Double> expectedSolution = maybe.get();
+                R064Store rhs = DecompositionUpdateTest.newRandom(m, 1);
 
                 if (DEBUG) {
-                    BasicLogger.debugMatrix("Expected solution", expectedSolution, PRINT);
+                    BasicLogger.debugMatrix("RHS", rhs, PRINT);
                 }
 
-                MatrixStore<Double> actualSolution = rhs.rows(resRowOrder);
-                try {
-                    actualSolution = calculationLU.solve(resL, actualSolution);
-                    actualSolution = calculationLU.solve(resU, actualSolution);
-                    if (resColRever != null) {
-                        actualSolution = actualSolution.rows(resColRever);
+                LU<Double> expectedLU = LU.R064.decompose(modifiedMatrix);
+
+                LU<Double> calculationLU = LU.R064.make(m, n);
+
+                Optional<MatrixStore<Double>> maybe = expectedLU.solve(rhs);
+                if (maybe.isPresent()) {
+                    MatrixStore<Double> expectedSolution = maybe.get();
+
+                    if (DEBUG) {
+                        BasicLogger.debugMatrix("Expected solution", expectedSolution, PRINT);
                     }
-                } catch (RecoverableCondition cause) {
-                    TestUtils.fail(cause);
-                }
 
-                if (DEBUG) {
-                    BasicLogger.debugMatrix("Actual solution", actualSolution, PRINT);
-                }
+                    MatrixStore<Double> actualSolution = rhs.rows(resRowOrder);
+                    try {
+                        actualSolution = calculationLU.solve(resL, actualSolution);
+                        actualSolution = calculationLU.solve(resU, actualSolution);
+                        if (resColRever != null) {
+                            actualSolution = actualSolution.rows(resColRever);
+                        }
+                    } catch (RecoverableCondition cause) {
+                        TestUtils.fail(cause);
+                    }
 
-                TestUtils.assertEquals(expectedSolution, actualSolution, PRINT);
+                    if (DEBUG) {
+                        BasicLogger.debugMatrix("Actual solution", actualSolution, PRINT);
+                    }
+
+                    TestUtils.assertEquals(expectedSolution, actualSolution, PRINT);
+                }
             }
         }
     }

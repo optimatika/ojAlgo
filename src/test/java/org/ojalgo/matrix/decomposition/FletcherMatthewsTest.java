@@ -202,4 +202,5 @@ public class FletcherMatthewsTest extends MatrixDecompositionTests {
             }
         }
     }
+
 }

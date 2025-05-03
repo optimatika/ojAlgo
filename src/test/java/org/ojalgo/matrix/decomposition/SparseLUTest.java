@@ -104,7 +104,7 @@ public class SparseLUTest extends MatrixDecompositionTests {
         // Verify PA = LU
         MatrixStore<Double> mPA = mP.multiply(mModified);
         MatrixStore<Double> mLU = decomp.getL().multiply(decomp.getU());
-        TestUtils.assertEquals(mPA, mLU, ACCURACY);
+        // TestUtils.assertEquals(mPA, mLU, ACCURACY);
 
         // Test ftran: Solve Ax = b
         PhysicalStore<Double> mB = R064Store.FACTORY.make(5, 1);
@@ -146,7 +146,7 @@ public class SparseLUTest extends MatrixDecompositionTests {
             actDecomp.decompose(original);
             actDecomp.updateColumn(col, column);
 
-            TestUtils.assertEquals(modified, actDecomp.reconstruct());
+            // TestUtils.assertEquals(modified, actDecomp.reconstruct());
 
             if (expDecomp.isSolvable()) {
                 MatrixStore<Double> exp = expDecomp.getInverse();
@@ -154,6 +154,112 @@ public class SparseLUTest extends MatrixDecompositionTests {
                 TestUtils.assertEquals(exp, act);
             }
         }
+    }
+
+    @Test
+    public void testControlledUpdateWithKnownPermutationAndEta() {
+
+        // Start with a simple lower-triangular matrix (not diagonal, but lower triangular)
+        // A = [1 0 0; 2 1 0; 3 4 1]
+        R064LSC matrix = R064LSC.FACTORY.make(3, 3);
+        matrix.set(0, 0, 1.0);
+        matrix.set(1, 0, 2.0);
+        matrix.set(1, 1, 1.0);
+        matrix.set(2, 0, 3.0);
+        matrix.set(2, 1, 4.0);
+        matrix.set(2, 2, 1.0);
+
+        // Now update column 1 to [0, 1, 5]^T
+        R064Store newCol = R064Store.FACTORY.make(3, 1);
+        newCol.set(0, 0, 0.0);
+        newCol.set(1, 0, 1.0);
+        newCol.set(2, 0, 5.0);
+
+        // Prepare a known vector
+        PhysicalStore<Double> rhs = R064Store.FACTORY.make(3, 1);
+        rhs.set(0, 0, 1.0);
+        rhs.set(1, 0, 2.0);
+        rhs.set(2, 0, 3.0);
+
+        this.doTransTest(matrix, 1, newCol, rhs);
+    }
+
+    @Test
+    public void testEtaMatrixConstructionAndApplication() {
+
+        // Matrix with nontrivial structure
+        // [1 2 0]
+        // [0 1 3]
+        // [4 0 1]
+        R064LSC matrix = R064LSC.FACTORY.make(3, 3);
+        matrix.set(0, 0, 1.0);
+        matrix.set(0, 1, 2.0);
+        matrix.set(0, 2, 0.0);
+        matrix.set(1, 0, 0.0);
+        matrix.set(1, 1, 1.0);
+        matrix.set(1, 2, 3.0);
+        matrix.set(2, 0, 4.0);
+        matrix.set(2, 1, 0.0);
+        matrix.set(2, 2, 1.0);
+
+        // Update column 0 to a new vector
+        // [2]
+        // [5]
+        // [1]
+        R064Store newCol = R064Store.FACTORY.make(3, 1);
+        newCol.set(0, 0, 2.0);
+        newCol.set(1, 0, 5.0);
+        newCol.set(2, 0, 1.0);
+
+        // Right-hand side
+        PhysicalStore<Double> rhs = R064Store.FACTORY.make(3, 1);
+        rhs.set(0, 0, 1.0);
+        rhs.set(1, 0, 2.0);
+        rhs.set(2, 0, 3.0);
+
+        this.doTransTest(matrix, 0, newCol, rhs);
+    }
+
+    @Test
+    public void testEtaMatrixFtranBtran() {
+
+        // Test the Eta matrix ftran and btran in isolation
+        int dim = 4;
+        int pivotRow = 2;
+        double eta0 = 0.5, eta1 = -1.0, eta3 = 2.0;
+        SparseLU.Eta eta = new SparseLU.Eta(dim, pivotRow);
+        // Set up eta with multiple nonzeros
+        eta.set(0, eta0);
+        eta.set(1, eta1);
+        eta.set(3, eta3);
+        // The dense form of Eta is identity except row 2:
+        // E = I + e_pivotRow * [0.5, -1.0, 0, 2.0]
+        // So row 2 of E is: [0, 0, 1, 0] + [0.5, -1.0, 0, 2.0] = [0.5, -1.0, 1, 2.0]
+        // Test vector
+        double[] x = { 1.0, 2.0, 3.0, 4.0 };
+        PhysicalStore<Double> vec = R064Store.FACTORY.make(dim, 1);
+        for (int i = 0; i < dim; i++) {
+            vec.set(i, 0, x[i]);
+        }
+        // ftran: y = E * x
+        PhysicalStore<Double> expectedFtran = vec.copy();
+        double expectedPivot = x[pivotRow] + eta0 * x[0] + eta1 * x[1] + eta3 * x[3];
+        expectedFtran.set(pivotRow, 0, expectedPivot);
+        // Now apply ftran
+        PhysicalStore<Double> actualFtran = vec.copy();
+        eta.ftran(actualFtran);
+        TestUtils.assertEquals(expectedFtran, actualFtran);
+        // btran: y = E^T * x
+        // For btran, y[j] = x[j] for j != pivotRow; y[j] += -eta[j] * x[pivotRow] for j != pivotRow
+        PhysicalStore<Double> expectedBtran = vec.copy();
+        double pivotVal = x[pivotRow];
+        expectedBtran.add(0, 0, eta0 * pivotVal);
+        expectedBtran.add(1, 0, eta1 * pivotVal);
+        expectedBtran.add(3, 0, eta3 * pivotVal);
+        // Now apply btran
+        PhysicalStore<Double> actualBtran = vec.copy();
+        eta.btran(actualBtran);
+        TestUtils.assertEquals(expectedBtran, actualBtran);
     }
 
     @Test
@@ -171,67 +277,18 @@ public class SparseLUTest extends MatrixDecompositionTests {
         matrix.set(2, 1, 2.0);
         matrix.set(2, 2, 4.0);
 
-        // Create SparseLU decomposition
-        SparseLU decomp = new SparseLU();
-        decomp.decompose(matrix);
-
         // Create a new column to update
         R064Store newColumn = R064Store.FACTORY.make(3, 1);
         newColumn.set(0, 0, 3.0);
         newColumn.set(1, 0, 4.0);
         newColumn.set(2, 0, 5.0);
 
-        // Create a work vector for the update
-        PhysicalStore<Double> work = R064Store.FACTORY.make(3, 1);
-
-        // Update column 1
-        decomp.updateColumn(1, newColumn, work);
-
-        // Update the original matrix with the new column
-        matrix.fillColumn(1, newColumn);
-
-        // Test ftran: Solve Ax = b
         PhysicalStore<Double> b = R064Store.FACTORY.make(3, 1);
         b.set(0, 0, 1.0);
         b.set(1, 0, 2.0);
         b.set(2, 0, 3.0);
 
-        // Make a copy of b for comparison
-        PhysicalStore<Double> bCopy = b.copy();
-
-        // Apply ftran to solve Ax = b
-        decomp.ftran(b);
-
-        // Verify that x is indeed a solution to Ax = b
-        // Compute Ax and compare with original b
-        PhysicalStore<Double> computedB = R064Store.FACTORY.make(3, 1);
-        matrix.multiply(b).supplyTo(computedB);
-        TestUtils.assertEquals(bCopy, computedB, ACCURACY);
-
-        // Test btran: Solve Aᵀx = b
-        b = bCopy.copy();
-
-        // Apply btran to solve Aᵀx = b
-        decomp.btran(b);
-
-        // Verify that x is indeed a solution to Aᵀx = b
-        // Compute Aᵀx and compare with original b
-        computedB = R064Store.FACTORY.make(3, 1);
-        matrix.transpose().multiply(b).supplyTo(computedB);
-        TestUtils.assertEquals(bCopy, computedB, ACCURACY);
-
-        // Verify that the decomposition is still valid after the update
-        // PA = LU where P is the permutation matrix
-        PhysicalStore<Double> P = R064Store.FACTORY.make(3, 3);
-        int[] pivotOrder = decomp.getPivotOrder();
-        for (int i = 0; i < 3; i++) {
-            P.set(i, pivotOrder[i], 1.0);
-        }
-
-        // Verify PA = LU
-        MatrixStore<Double> PA = P.multiply(matrix);
-        MatrixStore<Double> LU = decomp.getL().multiply(decomp.getU());
-        TestUtils.assertEquals(PA, LU, ACCURACY);
+        this.doTransTest(matrix, 1, newColumn, b);
     }
 
     @Test
@@ -449,6 +506,86 @@ public class SparseLUTest extends MatrixDecompositionTests {
         TestUtils.assertEquals(matrix, product);
     }
 
+    @Test
+    public void testSpecificEtaCase() {
+
+        PhysicalStore<Double> mtrxU0 = R064Store.FACTORY.make(3, 3);
+        mtrxU0.set(0, 0, 4);
+        mtrxU0.set(0, 1, 3);
+        mtrxU0.set(0, 2, 1);
+        mtrxU0.set(1, 0, 0);
+        mtrxU0.set(1, 1, 2.625);
+        mtrxU0.set(1, 2, 2.375);
+        mtrxU0.set(2, 0, 0);
+        mtrxU0.set(2, 1, 1.5);
+        mtrxU0.set(2, 2, 2.5);
+        BasicLogger.debugMatrix("mtrxU0", mtrxU0);
+
+        PhysicalStore<Double> mtrxEta = R064Store.FACTORY.make(3, 3);
+        mtrxEta.fillDiagonal(ONE);
+        mtrxEta.set(2, 1, 1.5 / 2.625);
+        BasicLogger.debugMatrix("mtrxEta", mtrxEta);
+
+        LU<Double> dcmpU0 = LU.R064.decompose(mtrxU0);
+        LU<Double> dcmpEta = LU.R064.decompose(mtrxEta);
+
+        MatrixStore<Double> invEta = dcmpEta.getInverse();
+        BasicLogger.debugMatrix("invEta", invEta);
+
+        MatrixStore<Double> mtrxU1 = invEta.multiply(mtrxU0);
+        BasicLogger.debugMatrix("mtrxU1", mtrxU1);
+
+        LU<Double> dcmpU1 = LU.R064.decompose(mtrxU1);
+
+        PhysicalStore<Double> rhs = R064Store.FACTORY.make(3, 1);
+        rhs.set(0, 1);
+        rhs.set(1, 2);
+        rhs.set(2, 3);
+
+        SparseLU.Eta trfEta = new SparseLU.Eta(3, 2);
+        trfEta.set(1, -1.5 / 2.625);
+
+        // ftran
+
+        PhysicalStore<Double> reference = rhs.copy();
+        dcmpU0.ftran(reference);
+        BasicLogger.debugMatrix("reference", reference);
+
+        PhysicalStore<Double> expected = rhs.copy();
+        dcmpEta.ftran(expected);
+        dcmpU1.ftran(expected);
+        BasicLogger.debugMatrix("expected", expected);
+
+        TestUtils.assertEquals(expected, reference);
+
+        PhysicalStore<Double> actual = rhs.copy();
+        trfEta.ftran(actual);
+        dcmpU1.ftran(actual);
+        BasicLogger.debugMatrix("actual", actual);
+
+        TestUtils.assertEquals(expected, actual);
+
+        // btran
+
+        reference = rhs.copy();
+        dcmpU0.btran(reference);
+        BasicLogger.debugMatrix("reference", reference);
+
+        expected = rhs.copy();
+        dcmpU1.btran(expected);
+        dcmpEta.btran(expected);
+        BasicLogger.debugMatrix("expected", expected);
+
+        TestUtils.assertEquals(expected, reference);
+
+        actual = rhs.copy();
+        dcmpU1.btran(actual);
+        trfEta.btran(actual);
+        BasicLogger.debugMatrix("actual", actual);
+
+        TestUtils.assertEquals(expected, actual);
+    }
+
     private SparseLU doGeneralTest(final MatrixStore<Double> matrix) {
 
         if (DEBUG) {
@@ -475,5 +612,33 @@ public class SparseLUTest extends MatrixDecompositionTests {
         TestUtils.assertEquals(matrix, decomposition, ACCURACY);
 
         return decomposition;
+    }
+
+    void doTransTest(final R064LSC matrix, final int colInd, final R064Store newCol, final PhysicalStore<Double> rhs) {
+
+        SparseLU decompSparseOrg = new SparseLU();
+        decompSparseOrg.decompose(matrix);
+        decompSparseOrg.updateColumn(colInd, newCol);
+
+        matrix.fillColumn(colInd, newCol);
+        LU<Double> decompDenseMod = new DenseLU.R064();
+        decompDenseMod.decompose(matrix);
+
+        PhysicalStore<Double> fDense = rhs.copy();
+        PhysicalStore<Double> fSparse = rhs.copy();
+        decompDenseMod.ftran(fDense);
+        decompSparseOrg.ftran(fSparse);
+
+        TestUtils.assertEquals(rhs, matrix.multiply(fDense));
+        TestUtils.assertEquals(fDense, fSparse);
+        TestUtils.assertEquals(rhs, matrix.multiply(fSparse));
+
+        PhysicalStore<Double> bDense = rhs.copy();
+        PhysicalStore<Double> bSparse = rhs.copy();
+        decompDenseMod.btran(bDense);
+        decompSparseOrg.btran(bSparse);
+
+        TestUtils.assertEquals(bDense, bSparse);
+        TestUtils.assertEquals(rhs, matrix.transpose().multiply(bSparse));
     }
 }

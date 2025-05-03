@@ -89,23 +89,20 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
         @Override
         public void btran(final PhysicalStore<Double> arg) {
 
-            // For eta matrix, backward substitution is just forward substitution in reverse
-            // Only process non-zero elements using the sparse array iterator
             double rowValue = arg.doubleValue(myRow);
             for (NonzeroView<Double> nz : myElements.nonzeros()) {
-                arg.add(nz.index(), -nz.doubleValue() * rowValue);
+                arg.add(nz.index(), nz.doubleValue() * rowValue);
             }
         }
 
         @Override
         public void ftran(final PhysicalStore<Double> arg) {
 
-            // For eta matrix, forward substitution
-            // Only process non-zero elements using the sparse array iterator
-            double rowValue = arg.doubleValue(myRow);
+            double sum = ZERO;
             for (NonzeroView<Double> nz : myElements.nonzeros()) {
-                arg.add(nz.index(), nz.doubleValue() * rowValue);
+                sum += nz.doubleValue() * arg.doubleValue(nz.index());
             }
+            arg.add(myRow, sum);
         }
 
         @Override
@@ -151,28 +148,6 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
         @Override
         public void btran(final PhysicalStore<Double> arg) {
 
-            // For cyclic shift permutation, backward substitution
-            // Store the value that will be moved to the end
-            double tmp = arg.doubleValue(myFrom);
-
-            // Shift all elements between from and to one position up
-            if (myFrom < myTo) {
-                for (int i = myFrom; i < myTo; i++) {
-                    arg.set(i, arg.doubleValue(i + 1));
-                }
-            } else {
-                for (int i = myFrom; i > myTo; i--) {
-                    arg.set(i, arg.doubleValue(i - 1));
-                }
-            }
-
-            // Place the stored value at the to position
-            arg.set(myTo, tmp);
-        }
-
-        @Override
-        public void ftran(final PhysicalStore<Double> arg) {
-
             // For cyclic shift permutation, forward substitution
             // Store the value that will be moved to the end
             double tmp = arg.doubleValue(myTo);
@@ -190,6 +165,28 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
 
             // Place the stored value at the from position
             arg.set(myFrom, tmp);
+        }
+
+        @Override
+        public void ftran(final PhysicalStore<Double> arg) {
+
+            // For cyclic shift permutation, backward substitution
+            // Store the value that will be moved to the end
+            double tmp = arg.doubleValue(myFrom);
+
+            // Shift all elements between from and to one position up
+            if (myFrom < myTo) {
+                for (int i = myFrom; i < myTo; i++) {
+                    arg.set(i, arg.doubleValue(i + 1));
+                }
+            } else {
+                for (int i = myFrom; i > myTo; i--) {
+                    arg.set(i, arg.doubleValue(i - 1));
+                }
+            }
+
+            // Place the stored value at the to position
+            arg.set(myTo, tmp);
         }
 
         @Override
@@ -240,40 +237,71 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
 
         int r = this.getMinDim();
 
+        if (DEBUG) {
+            BasicLogger.debugMatrix("btran: before column permutation (myColPivot)", arg);
+        }
         if (myColPivot != null) {
             this.applyPivotOrder(myColPivot, arg);
         }
+        if (DEBUG) {
+            BasicLogger.debugMatrix("btran: after column permutation (myColPivot)", arg);
+        }
 
+        if (DEBUG) {
+            BasicLogger.debugMatrix("btran: before U step", arg);
+        }
         for (int ij = 0; ij < r; ij++) {
-
             double varJ = arg.doubleValue(ij) / myDiagU[ij];
             arg.set(ij, varJ);
-
             ElementNode rowNodeU = myU.getLastInRow(ij);
             while (rowNodeU != null) {
                 arg.add(rowNodeU.index, -rowNodeU.value * varJ);
                 rowNodeU = rowNodeU.previous;
             }
         }
-
-        for (int i = myFactors.size() - 1; i >= 0; i++) {
-            myFactors.get(i).btran(arg);
+        if (DEBUG) {
+            BasicLogger.debugMatrix("btran: after U step", arg);
         }
 
+        if (DEBUG) {
+            BasicLogger.debug("btran: before factors ({} total)", myFactors.size());
+        }
+        for (int i = myFactors.size() - 1; i >= 0; i--) {
+            if (DEBUG) {
+                BasicLogger.debug("btran: before factor {} ({})", i, myFactors.get(i).getClass().getSimpleName());
+            }
+            myFactors.get(i).btran(arg);
+            if (DEBUG) {
+                BasicLogger.debug("btran: after factor {} ({}), arg = {}", i, myFactors.get(i).getClass().getSimpleName(), arg.copy());
+            }
+        }
+        if (DEBUG) {
+            BasicLogger.debugMatrix("btran: after factors", arg);
+        }
+
+        if (DEBUG) {
+            BasicLogger.debugMatrix("btran: before L step", arg);
+        }
         for (int ij = r - 1; ij >= 0; ij--) {
-
             double sum = ZERO;
-
             ElementNode colNodeL = myL.getFirstInColumn(ij);
             while (colNodeL != null) {
                 sum -= colNodeL.value * arg.doubleValue(colNodeL.index);
                 colNodeL = colNodeL.next;
             }
-
             arg.add(ij, sum);
         }
+        if (DEBUG) {
+            BasicLogger.debugMatrix("btran: after L step", arg);
+        }
 
+        if (DEBUG) {
+            BasicLogger.debugMatrix("btran: before reverse row permutation (myPivot)", arg);
+        }
         this.applyReverseOrder(myPivot, arg);
+        if (DEBUG) {
+            BasicLogger.debugMatrix("btran: after reverse row permutation (myPivot)", arg);
+        }
     }
 
     @Override
@@ -466,12 +494,30 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
     @Override
     public void ftran(final PhysicalStore<Double> arg) {
 
+        if (DEBUG) {
+            BasicLogger.debugMatrix("ftran: before row permutation: " + myPivot, arg);
+        }
         this.applyPivotOrder(myPivot, arg);
+        if (DEBUG) {
+            BasicLogger.debugMatrix("ftran: after row permutation: " + myPivot, arg);
+        }
 
+        if (DEBUG) {
+            BasicLogger.debugMatrix("ftran: before main ftran logic", arg);
+        }
         this.ftran(arg, 0);
+        if (DEBUG) {
+            BasicLogger.debugMatrix("ftran: after main ftran logic", arg);
+        }
 
+        if (DEBUG) {
+            BasicLogger.debugMatrix("ftran: before column permutation: " + myColPivot, arg);
+        }
         if (myColPivot != null) {
             this.applyReverseOrder(myColPivot, arg);
+        }
+        if (DEBUG) {
+            BasicLogger.debugMatrix("ftran: after column permutation: " + myColPivot, arg);
         }
     }
 
@@ -494,29 +540,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
 
     @Override
     public MatrixStore<Double> getInverse(final PhysicalStore<Double> preallocated) {
-
-        int nbEquations = this.getRowDim();
-        int nbSolutions = this.getColDim();
-
-        preallocated.fillAll(ZERO);
-        if (myPivot.isModified()) {
-            int[] pivotOrder = myPivot.getOrder();
-            for (int i = 0; i < nbEquations; i++) {
-                preallocated.set(i, pivotOrder[i], ONE);
-            }
-        } else {
-            preallocated.fillDiagonal(ONE);
-        }
-
-        for (int col = 0; col < nbSolutions; col++) {
-            this.ftran(preallocated, col);
-        }
-
-        if (myColPivot != null) {
-            this.applyReverseOrder(myColPivot, preallocated);
-        }
-
-        return preallocated;
+        return this.getSolution(R064Store.FACTORY.makeIdentity(this.getMinDim()), preallocated);
     }
 
     @Override
@@ -559,8 +583,22 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
 
         int nbSolutions = rhs.getColDim();
 
-        for (int col = 0; col < nbSolutions; col++) {
-            this.ftran(preallocated, col);
+        if (nbSolutions > 1 && myFactors.size() > 0) {
+
+            R064Store column = R064Store.FACTORY.make(rhs.getRowDim(), 1);
+
+            for (int col = 0; col < nbSolutions; col++) {
+
+                column.fillMatching(preallocated.sliceColumn(col));
+                this.ftran(column, 0);
+                preallocated.fillColumn(col, column);
+            }
+
+        } else {
+
+            for (int col = 0; col < nbSolutions; col++) {
+                this.ftran(preallocated, col);
+            }
         }
 
         if (myColPivot != null) {
@@ -659,81 +697,137 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
             BasicLogger.debugMatrix("Recreated", mtrxL.multiply(mtrxU).rows(myPivot.reverseOrder()).columns(myColPivot.reverseOrder()));
         }
 
-        // newColumn.supplyTo(tmpCol);
-
         newColumn.supplyTo(tmpCol);
         myPivot.applyPivotOrder(tmpCol);
+
+        if (DEBUG) {
+            BasicLogger.debugMatrix("updateColumn: after pivot applied to new column", tmpCol);
+        }
+
+        double diag = NaN;
 
         int lastRowNonZero = -1;
         for (int ij = 0; ij < r; ij++) {
             double varI = -tmpCol.doubleValue(ij);
             if (!PRECISION.isZero(varI)) {
                 lastRowNonZero = ij;
+                diag = -varI;
                 LinkedR064.ElementNode colNodeL = myL.getLastInColumn(ij);
                 while (colNodeL != null && colNodeL.index > ij) {
                     tmpCol.add(colNodeL.index, colNodeL.value * varI);
                     colNodeL = colNodeL.previous;
                 }
             }
-        }
-
-        myColPivot.cycle(columnIndex, lastRowNonZero);
-
-        myU.doCyclicFT(columnIndex, tmpRow, lastRowNonZero, tmpCol);
-        for (int i = columnIndex; i < lastRowNonZero; i++) {
-            myDiagU[i] = myDiagU[i + 1];
-        }
-        wRow[lastRowNonZero] = tmpCol.doubleValue(columnIndex);
-
-        myFactors.add(new Permutation(r, columnIndex, lastRowNonZero));
-
-        if (DEBUG) {
-            MatrixStore<Double> mtrxL = this.getL();
-            MatrixStore<Double> mtrxU = myU.superimpose(DiagonalStore.wrap(myDiagU));
-            BasicLogger.debug("Transformed shift & replace");
-            BasicLogger.debug("P: {}", myPivot);
-            BasicLogger.debugMatrix("L", mtrxL);
-            BasicLogger.debugMatrix("U", mtrxU);
-            BasicLogger.debug("Q: {}", myColPivot);
-        }
-
-        Eta eta = new Eta(r, lastRowNonZero);
-
-        for (int ij = columnIndex; ij < lastRowNonZero; ij++) {
-            double denom = myDiagU[ij];
-            double numer = wRow[ij];
-            double ratio = numer / denom;
-
-            eta.set(ij, ratio);
-
-            wRow[ij] = ZERO;
-
-            ElementNode rowNodeU = myU.getFirstInRow(ij);
-            while (rowNodeU != null) {
-                wRow[rowNodeU.index] -= ratio * rowNodeU.value;
-                rowNodeU = rowNodeU.next;
+            if (DEBUG) {
+                BasicLogger.debugMatrix("updateColumn: tmpCol after elimination step " + ij, tmpCol);
             }
-            myU.set(lastRowNonZero, ij, ZERO);
         }
-
-        myDiagU[lastRowNonZero] = wRow[lastRowNonZero];
-        for (int j = lastRowNonZero + 1; j < n; j++) {
-            myU.set(lastRowNonZero, j, wRow[j]);
-        }
-
-        myFactors.add(eta);
 
         if (DEBUG) {
-            MatrixStore<Double> mtrxL = this.getL();
-            MatrixStore<Double> mtrxU = myU.superimpose(DiagonalStore.wrap(myDiagU));
-            BasicLogger.debug("Final");
-            BasicLogger.debug("P: {}", myPivot);
-            BasicLogger.debugMatrix("L", mtrxL);
-            BasicLogger.debugMatrix("U", mtrxU);
-            BasicLogger.debug("Q: {}", myColPivot);
+            BasicLogger.debug("updateColumn: lastRowNonZero = {}", lastRowNonZero);
+            BasicLogger.debugMatrix("updateColumn: tmpCol after elimination", tmpCol);
         }
 
-        return false;
+        if (lastRowNonZero < columnIndex) {
+
+            // This means the updated matrix is singular
+            return false;
+
+        } else if (SAFE.isZero(diag)) {
+
+            // Numerically unstable
+            return false;
+
+        } else if (lastRowNonZero == columnIndex) {
+
+            // Lucky!
+            for (int i = 0; i < columnIndex; i++) {
+                myU.set(i, columnIndex, tmpCol.doubleValue(i));
+            }
+            myDiagU[columnIndex] = tmpCol.doubleValue(columnIndex);
+
+        } else {
+
+            myColPivot.cycle(columnIndex, lastRowNonZero);
+
+            if (DEBUG) {
+                BasicLogger.debug("updateColumn: myColPivot after cycle: {}", myColPivot);
+            }
+
+            myU.doCyclicFT(columnIndex, tmpRow, lastRowNonZero, tmpCol);
+            if (DEBUG) {
+                BasicLogger.debugMatrix("updateColumn: myU after doCyclicFT", myU);
+                BasicLogger.debug("updateColumn: wRow after doCyclicFT: {}", Arrays.toString(wRow));
+            }
+            for (int i = columnIndex; i < lastRowNonZero; i++) {
+                myDiagU[i] = myDiagU[i + 1];
+            }
+            wRow[lastRowNonZero] = tmpCol.doubleValue(columnIndex);
+
+            if (DEBUG) {
+                BasicLogger.debug("updateColumn: myDiagU after shift: {}", Arrays.toString(myDiagU));
+                BasicLogger.debug("updateColumn: wRow after setting lastRowNonZero: {}", Arrays.toString(wRow));
+            }
+
+            Permutation perm = new Permutation(r, columnIndex, lastRowNonZero);
+            myFactors.add(perm);
+            if (DEBUG) {
+                BasicLogger.debug("updateColumn: Added Permutation({}, {}, {})", r, columnIndex, lastRowNonZero);
+            }
+
+            Eta eta = new Eta(r, lastRowNonZero);
+
+            for (int ij = columnIndex; ij < lastRowNonZero; ij++) {
+                double denom = myDiagU[ij];
+                double numer = wRow[ij];
+                double ratio = numer / denom;
+
+                eta.set(ij, -ratio);
+
+                wRow[ij] = ZERO;
+
+                ElementNode rowNodeU = myU.getFirstInRow(ij);
+                while (rowNodeU != null) {
+                    wRow[rowNodeU.index] -= ratio * rowNodeU.value;
+                    rowNodeU = rowNodeU.next;
+                }
+                // myU.set(lastRowNonZero, ij, ZERO);
+
+                if (DEBUG) {
+                    BasicLogger.debug("updateColumn: wRow after eta step {}: {}", ij, Arrays.toString(wRow));
+                    BasicLogger.debugMatrix("updateColumn: myU after eta step " + ij, myU);
+                }
+            }
+
+            myDiagU[lastRowNonZero] = wRow[lastRowNonZero];
+            for (int j = lastRowNonZero + 1; j < n; j++) {
+                myU.set(lastRowNonZero, j, wRow[j]);
+            }
+
+            if (DEBUG) {
+                BasicLogger.debug("updateColumn: myDiagU after setting lastRowNonZero: {}", Arrays.toString(myDiagU));
+                BasicLogger.debugMatrix("updateColumn: myU after setting lastRowNonZero", myU);
+            }
+
+            myFactors.add(eta);
+
+            if (DEBUG) {
+                BasicLogger.debug("updateColumn: Added Eta at row {}", lastRowNonZero);
+                BasicLogger.debug("updateColumn: Eta nonzeros:");
+                for (SparseArray.NonzeroView<Double> nz : eta.myElements.nonzeros()) {
+                    BasicLogger.debug("  eta[{}] = {}", nz.index(), nz.doubleValue());
+                }
+                MatrixStore<Double> mtrxL = this.getL();
+                MatrixStore<Double> mtrxU = myU.superimpose(DiagonalStore.wrap(myDiagU));
+                BasicLogger.debugMatrix("Final", mtrxL.multiply(mtrxU));
+                BasicLogger.debug("P: {}", myPivot);
+                BasicLogger.debugMatrix("L", mtrxL);
+                BasicLogger.debugMatrix("U", mtrxU);
+                BasicLogger.debug("Q: {}", myColPivot);
+            }
+        }
+
+        return true;
     }
 
     private void ftran(final PhysicalStore<Double> arg, final int col) {
@@ -751,8 +845,16 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
             }
         }
 
+        if (DEBUG) {
+            BasicLogger.debugMatrix("ftran: before myFactors logic", arg);
+        }
+
         for (int i = 0; i < myFactors.size(); i++) {
             myFactors.get(i).ftran(arg);
+
+            if (DEBUG) {
+                BasicLogger.debugMatrix("ftran: after myFactor logic " + i, arg);
+            }
         }
 
         for (int ij = r - 1; ij >= 0; ij--) {
@@ -807,6 +909,8 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
         if (myU == null || myU.getRowDim() != m || myU.getColDim() != n) {
             myU = R064LSR.FACTORY.make(m, n);
         }
+
+        myFactors.clear();
     }
 
 }
