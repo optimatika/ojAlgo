@@ -89,6 +89,71 @@ public final class R064LSR extends LinkedR064 {
         return ((double) nonZeroCount) / this.count();
     }
 
+    /**
+     * Performs the row/column cyclic shift required by the Forrest-Tomlin update algorithm as implemented in
+     * ojAlgo's own sparse LU decomposition. Although public, this method is not intended for any other use
+     * case.
+     *
+     * @param from
+     * @param row
+     * @param to
+     * @param column
+     */
+    public void doCyclicFT(final int from, final Mutate1D row, final int to, final Access1D<?> column) {
+
+        if (from >= to) {
+            throw new IllegalArgumentException();
+        }
+
+        ElementNode next = null;
+        ElementNode current = this.getFirstInRow(from);
+        while (current != null) {
+            row.set(current.index - 1, current.value);
+            next = current.next;
+            this.remove(from, current);
+            current = next;
+        }
+
+        for (int i = from; i < to; i++) {
+            myFirstInRows[i] = myFirstInRows[i + 1];
+            myLastInRows[i] = myLastInRows[i + 1];
+        }
+        myFirstInRows[to] = null;
+        myLastInRows[to] = null;
+
+        for (int i = 0; i < myFirstInRows.length; i++) {
+
+            current = myFirstInRows[i];
+            while (current != null && current.index <= to) {
+
+                if (current.index == from) {
+                    next = current.next;
+                    this.remove(i, current);
+                    current = next;
+                } else if (from < current.index) {
+                    --current.index;
+                    current = current.next;
+                } else {
+                    current = current.next;
+                }
+            }
+        }
+
+        double tmpVal;
+        for (int i = 0; i < from; i++) {
+            tmpVal = column.doubleValue(i);
+            if (tmpVal != ZERO) {
+                this.set(i, to, tmpVal);
+            }
+        }
+        for (int i = from; i < to; i++) {
+            tmpVal = column.doubleValue(i + 1);
+            if (tmpVal != ZERO) {
+                this.set(i, to, tmpVal);
+            }
+        }
+    }
+
     @Override
     public double doubleValue(final int row, final int col) {
 
@@ -352,26 +417,6 @@ public final class R064LSR extends LinkedR064 {
     public void reset() {
         Arrays.fill(myFirstInRows, null);
         Arrays.fill(myLastInRows, null);
-    }
-
-    @Override
-    public void shift(final int from, final int to, final Access1D<?> column, final Mutate1D row) {
-
-        ElementNode old = null;
-        ElementNode current = this.getFirstInRow(from);
-        while (current != null) {
-            row.set(current.index, current.value);
-            old = current;
-            current = current.next;
-            this.remove(from, old);
-        }
-
-        for (int i = from; i < to; i++) {
-            myFirstInRows[i] = myFirstInRows[i + 1];
-            myLastInRows[i] = myLastInRows[i + 1];
-        }
-
-        this.removeShiftAndInsert(from, to, column);
     }
 
     @Override

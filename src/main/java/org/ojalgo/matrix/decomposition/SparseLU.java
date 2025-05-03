@@ -678,13 +678,12 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
         }
 
         myColPivot.cycle(columnIndex, lastRowNonZero);
-        myU.removeShiftAndInsert(columnIndex, lastRowNonZero, tmpCol);
+
+        myU.doCyclicFT(columnIndex, tmpRow, lastRowNonZero, tmpCol);
         for (int i = columnIndex; i < lastRowNonZero; i++) {
-            myU.exchangeRows(i, i + 1);
             myDiagU[i] = myDiagU[i + 1];
         }
-        myDiagU[lastRowNonZero] = myU.doubleValue(lastRowNonZero, lastRowNonZero);
-        myU.set(lastRowNonZero, lastRowNonZero, ZERO);
+        wRow[lastRowNonZero] = tmpCol.doubleValue(columnIndex);
 
         myFactors.add(new Permutation(r, columnIndex, lastRowNonZero));
 
@@ -697,11 +696,6 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
             BasicLogger.debugMatrix("U", mtrxU);
             BasicLogger.debug("Q: {}", myColPivot);
         }
-
-        for (int j = 0; j < n; j++) {
-            wRow[j] = myU.doubleValue(lastRowNonZero, j);
-        }
-        wRow[lastRowNonZero] = myDiagU[lastRowNonZero];
 
         Eta eta = new Eta(r, lastRowNonZero);
 

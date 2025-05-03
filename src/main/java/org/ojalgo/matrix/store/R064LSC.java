@@ -29,9 +29,7 @@ import java.util.List;
 
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Factory2D;
-import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.type.math.MathType;
 
 /**
@@ -304,12 +302,6 @@ public final class R064LSC extends LinkedR064 {
     public void reset() {
         Arrays.fill(myFirstInColumns, null);
         Arrays.fill(myLastInColumns, null);
-    }
-
-    @Override
-    public void shift(final int from, final int to, final Access1D<?> column, final Mutate1D row) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
