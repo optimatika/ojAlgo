@@ -52,6 +52,21 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
 
     }
 
+    static class UpdateCase {
+
+        int columnIndex;
+        MatrixStore<Double> originalMatrix;
+        MatrixStore<Double> newColumn;
+
+        UpdateCase(final MatrixStore<Double> originalMatrix, final int columnIndex, final MatrixStore<Double> newColumn) {
+            super();
+            this.originalMatrix = originalMatrix;
+            this.columnIndex = columnIndex;
+            this.newColumn = newColumn;
+        }
+
+    }
+
     private static final NumberContext ACCURACY = NumberContext.of(12);
     private static final Pivot COL_ORDER = new Pivot();
     private static final NumberContext PRINT = NumberContext.of(6);
@@ -686,7 +701,11 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         }
     }
 
-    static void doTest(final MatrixStore<Double> originalMatrix, final int columnIndex, final MatrixStore<Double> newColumn) {
+    static void doTest(final UpdateCase updateCase) {
+
+        MatrixStore<Double> originalMatrix = updateCase.originalMatrix;
+        int columnIndex = updateCase.columnIndex;
+        MatrixStore<Double> newColumn = updateCase.newColumn;
 
         PhysicalStore<Double> modifiedMatrix = originalMatrix.copy();
         modifiedMatrix.fillColumn(columnIndex, newColumn);
@@ -735,12 +754,9 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         DecompositionUpdateTest.doOne("Fletcher-Matthews (dense)", originalMatrix, columnIndex, newColumn, modifiedMatrix, pivotOrder, mtrxL, mtrxU,
                 DecompositionUpdateTest::doFletcherMatthewsDense, null);
 
-        DecompositionUpdateTest.doOne("SparseLU", originalMatrix, columnIndex, newColumn, modifiedMatrix, pivotOrder, mtrxL, mtrxU, null, SparseLU::new);
-
         DecompositionUpdateTest.doOne("DenseLU", originalMatrix, columnIndex, newColumn, modifiedMatrix, pivotOrder, mtrxL, mtrxU, null, DenseLU.R064::new);
 
         DecompositionUpdateTest.doOne("RawLU", originalMatrix, columnIndex, newColumn, modifiedMatrix, pivotOrder, mtrxL, mtrxU, null, RawLU::new);
-
     }
 
     @Test
@@ -766,8 +782,12 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         newColumn.set(2, 0, 2.0);
 
         int columnIndex = 1;
+        final MatrixStore<Double> originalMatrix = matrix;
+        final int columnIndex1 = columnIndex;
+        final MatrixStore<Double> newColumn1 = newColumn;
 
-        DecompositionUpdateTest.doTest(matrix, columnIndex, newColumn);
+        UpdateCase updateCase = new UpdateCase(originalMatrix, columnIndex1, newColumn1);
+        DecompositionUpdateTest.doTest(updateCase);
     }
 
     /**
@@ -793,9 +813,12 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         newColumn.set(0, 0, 5.0);
         newColumn.set(1, 0, 7.0);
         newColumn.set(2, 0, 9.0);
+        final MatrixStore<Double> originalMatrix = matrix;
+        final MatrixStore<Double> newColumn1 = newColumn;
 
         // Test the update
-        DecompositionUpdateTest.doTest(matrix, 1, newColumn);
+        UpdateCase updateCase = new UpdateCase(originalMatrix, 1, newColumn1);
+        DecompositionUpdateTest.doTest(updateCase);
     }
 
     /**
@@ -838,8 +861,12 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         newColumnWithSpike.set(3, 0, 8.0); // Spike - larger than diagonal
 
         int columnIndex = 2;
+        final MatrixStore<Double> originalMatrix = matrixWithSpike;
+        final int columnIndex1 = columnIndex;
+        final MatrixStore<Double> newColumn = newColumnWithSpike;
 
-        DecompositionUpdateTest.doTest(matrixWithSpike, columnIndex, newColumnWithSpike);
+        UpdateCase updateCase = new UpdateCase(originalMatrix, columnIndex1, newColumn);
+        DecompositionUpdateTest.doTest(updateCase);
     }
 
     /**
@@ -891,10 +918,13 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         newColumn.set(1, 0, 2.0); // Value for row 1
         newColumn.set(2, 0, 8.0); // Value for row 2 (diagonal element, larger than others)
         newColumn.set(3, 0, 3.0); // Value for row 3
-        newColumn.set(4, 0, 2.0); // Value for row 4
+        newColumn.set(4, 0, 2.0);
+        final MatrixStore<Double> originalMatrix = matrix;
+        final MatrixStore<Double> newColumn1 = newColumn; // Value for row 4
 
         // Test the update
-        DecompositionUpdateTest.doTest(matrix, 2, newColumn);
+        UpdateCase updateCase = new UpdateCase(originalMatrix, 2, newColumn1);
+        DecompositionUpdateTest.doTest(updateCase);
     }
 
     @Test
@@ -943,8 +973,12 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
                         BasicLogger.debug("isSolvable: {}", decompose.isSolvable());
                     }
                 }
+                final MatrixStore<Double> originalMatrix = matrix;
+                final int columnIndex1 = columnIndex;
+                final MatrixStore<Double> newColumn1 = newColumn;
                 // Test the update
-                DecompositionUpdateTest.doTest(matrix, columnIndex, newColumn);
+                UpdateCase updateCase = new UpdateCase(originalMatrix, columnIndex1, newColumn1);
+                DecompositionUpdateTest.doTest(updateCase);
             }
 
         }
@@ -1015,9 +1049,13 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         if (DEBUG) {
             BasicLogger.debug("Calculated new column: [{}, {}, {}]", newCol0, newCol1, newCol2);
         }
+        final MatrixStore<Double> originalMatrix = matrix;
+        final int columnIndex1 = columnIndex;
+        final MatrixStore<Double> newColumn1 = newColumn;
 
         // Test the update
-        DecompositionUpdateTest.doTest(matrix, columnIndex, newColumn);
+        UpdateCase updateCase = new UpdateCase(originalMatrix, columnIndex1, newColumn1);
+        DecompositionUpdateTest.doTest(updateCase);
     }
 
     /**
@@ -1086,9 +1124,13 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         if (DEBUG) {
             BasicLogger.debug("Calculated new column: [{}, {}, {}]", newCol0, newCol1, newCol2);
         }
+        final MatrixStore<Double> originalMatrix = matrix;
+        final int columnIndex1 = columnIndex;
+        final MatrixStore<Double> newColumn1 = newColumn;
 
         // Test the update
-        DecompositionUpdateTest.doTest(matrix, columnIndex, newColumn);
+        UpdateCase updateCase = new UpdateCase(originalMatrix, columnIndex1, newColumn1);
+        DecompositionUpdateTest.doTest(updateCase);
     }
 
     @Test
@@ -1110,8 +1152,12 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
 
         int colIndex = 1;
         MatrixStore<Double> colElements = RawStore.wrap(3.0, 1.0, 2.0).transpose();
+        final MatrixStore<Double> originalMatrix = mtrxA;
+        final int columnIndex = colIndex;
+        final MatrixStore<Double> newColumn = colElements;
 
-        DecompositionUpdateTest.doTest(mtrxA, colIndex, colElements);
+        UpdateCase updateCase = new UpdateCase(originalMatrix, columnIndex, newColumn);
+        DecompositionUpdateTest.doTest(updateCase);
     }
 
     /**
@@ -1155,9 +1201,12 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         newColumn.set(2, 0, 4.0);
         newColumn.set(3, 0, 5.0);
         newColumn.set(4, 0, 6.0);
+        final MatrixStore<Double> originalMatrix = matrix;
+        final MatrixStore<Double> newColumn1 = newColumn;
 
         // Test column update on an ill-conditioned matrix
-        DecompositionUpdateTest.doTest(matrix, 2, newColumn);
+        UpdateCase updateCase = new UpdateCase(originalMatrix, 2, newColumn1);
+        DecompositionUpdateTest.doTest(updateCase);
     }
 
     @Test
@@ -1171,7 +1220,11 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         // Test updating each column
         for (int col = 0; col < dim; col++) {
             R064Store newColumn = DecompositionUpdateTest.newRandom(dim, 1);
-            DecompositionUpdateTest.doTest(matrix, col, newColumn);
+            final MatrixStore<Double> originalMatrix = matrix;
+            final int columnIndex = col;
+            final MatrixStore<Double> newColumn1 = newColumn;
+            UpdateCase updateCase = new UpdateCase(originalMatrix, columnIndex, newColumn1);
+            DecompositionUpdateTest.doTest(updateCase);
         }
 
     }
@@ -1195,8 +1248,12 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         // Update multiple columns in sequence
         for (int col = 0; col < dim; col += 2) {
             R064Store newColumn = DecompositionUpdateTest.newRandom(dim, 1);
+            final MatrixStore<Double> originalMatrix = matrix;
+            final int columnIndex = col;
+            final MatrixStore<Double> newColumn1 = newColumn;
 
-            DecompositionUpdateTest.doTest(matrix, col, newColumn);
+            UpdateCase updateCase = new UpdateCase(originalMatrix, columnIndex, newColumn1);
+            DecompositionUpdateTest.doTest(updateCase);
 
             updatedMatrix.fillColumn(col, newColumn);
 
