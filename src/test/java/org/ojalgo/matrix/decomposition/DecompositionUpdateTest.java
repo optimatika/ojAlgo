@@ -18,6 +18,7 @@ import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
+import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -52,17 +53,31 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
 
     }
 
-    static class UpdateCase {
+    static class UpdateCase implements Structure2D {
 
-        int columnIndex;
-        MatrixStore<Double> originalMatrix;
-        MatrixStore<Double> newColumn;
+        final int columnIndex;
+        final MatrixStore<Double> originalMatrix;
+        final MatrixStore<Double> newColumn;
 
         UpdateCase(final MatrixStore<Double> originalMatrix, final int columnIndex, final MatrixStore<Double> newColumn) {
             super();
             this.originalMatrix = originalMatrix;
             this.columnIndex = columnIndex;
             this.newColumn = newColumn;
+        }
+
+        @Override
+        public int getColDim() {
+            return originalMatrix.getColDim();
+        }
+
+        @Override
+        public int getRowDim() {
+            return originalMatrix.getRowDim();
+        }
+
+        MatrixStore<Double> getOriginalColumn(final int col) {
+            return originalMatrix.column(col);
         }
 
     }
@@ -649,54 +664,51 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
             }
         }
 
-        if (implAlgo != null && factory == null) {
+        MatrixStore<Double> reconstructed = resL.multiply(resU).rows(resRowRever);
+        if (resColRever != null) {
+            reconstructed = reconstructed.columns(resColRever);
+        }
+        if (DEBUG) {
+            BasicLogger.debugMatrix("Reconstructed", reconstructed, PRINT);
+        }
+        TestUtils.assertEquals(modifiedMatrix, reconstructed, PRINT);
 
-            MatrixStore<Double> reconstructed = resL.multiply(resU).rows(resRowRever);
-            if (resColRever != null) {
-                reconstructed = reconstructed.columns(resColRever);
-            }
+        if (originalMatrix.isSquare()) {
+
+            R064Store rhs = DecompositionUpdateTest.newRandom(m, 1);
+
             if (DEBUG) {
-                BasicLogger.debugMatrix("Reconstructed", reconstructed, PRINT);
+                BasicLogger.debugMatrix("RHS", rhs, PRINT);
             }
-            TestUtils.assertEquals(modifiedMatrix, reconstructed, PRINT);
 
-            if (originalMatrix.isSquare()) {
+            LU<Double> expectedLU = LU.R064.decompose(modifiedMatrix);
 
-                R064Store rhs = DecompositionUpdateTest.newRandom(m, 1);
+            LU<Double> calculationLU = LU.R064.make(m, n);
+
+            Optional<MatrixStore<Double>> maybe = expectedLU.solve(rhs);
+            if (maybe.isPresent()) {
+                MatrixStore<Double> expectedSolution = maybe.get();
 
                 if (DEBUG) {
-                    BasicLogger.debugMatrix("RHS", rhs, PRINT);
+                    BasicLogger.debugMatrix("Expected solution", expectedSolution, PRINT);
                 }
 
-                LU<Double> expectedLU = LU.R064.decompose(modifiedMatrix);
-
-                LU<Double> calculationLU = LU.R064.make(m, n);
-
-                Optional<MatrixStore<Double>> maybe = expectedLU.solve(rhs);
-                if (maybe.isPresent()) {
-                    MatrixStore<Double> expectedSolution = maybe.get();
-
-                    if (DEBUG) {
-                        BasicLogger.debugMatrix("Expected solution", expectedSolution, PRINT);
+                MatrixStore<Double> actualSolution = rhs.rows(resRowOrder);
+                try {
+                    actualSolution = calculationLU.solve(resL, actualSolution);
+                    actualSolution = calculationLU.solve(resU, actualSolution);
+                    if (resColRever != null) {
+                        actualSolution = actualSolution.rows(resColRever);
                     }
-
-                    MatrixStore<Double> actualSolution = rhs.rows(resRowOrder);
-                    try {
-                        actualSolution = calculationLU.solve(resL, actualSolution);
-                        actualSolution = calculationLU.solve(resU, actualSolution);
-                        if (resColRever != null) {
-                            actualSolution = actualSolution.rows(resColRever);
-                        }
-                    } catch (RecoverableCondition cause) {
-                        TestUtils.fail(cause);
-                    }
-
-                    if (DEBUG) {
-                        BasicLogger.debugMatrix("Actual solution", actualSolution, PRINT);
-                    }
-
-                    TestUtils.assertEquals(expectedSolution, actualSolution, PRINT);
+                } catch (RecoverableCondition cause) {
+                    TestUtils.fail(cause);
                 }
+
+                if (DEBUG) {
+                    BasicLogger.debugMatrix("Actual solution", actualSolution, PRINT);
+                }
+
+                TestUtils.assertEquals(expectedSolution, actualSolution, PRINT);
             }
         }
     }
@@ -759,8 +771,7 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         DecompositionUpdateTest.doOne("RawLU", originalMatrix, columnIndex, newColumn, modifiedMatrix, pivotOrder, mtrxL, mtrxU, null, RawLU::new);
     }
 
-    @Test
-    public void test3x3NoPivotingOrSpikes() {
+    static UpdateCase make3x3NoPivotingOrSpikes() {
 
         // Create a simple 3x3 matrix that we know works well
         // Initial matrix with a clear structure
@@ -776,17 +787,19 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         matrix.set(2, 2, 2.0);
 
         // Create new column to replace column 1 (index 1)
-        R064Store newColumn = DecompositionUpdateTest.newEmpty(3, 1);
-        newColumn.set(0, 0, 1.0);
-        newColumn.set(1, 0, 4.0);
-        newColumn.set(2, 0, 2.0);
+        R064Store column = DecompositionUpdateTest.newEmpty(3, 1);
+        column.set(0, 0, 1.0);
+        column.set(1, 0, 4.0);
+        column.set(2, 0, 2.0);
 
-        int columnIndex = 1;
-        final MatrixStore<Double> originalMatrix = matrix;
-        final int columnIndex1 = columnIndex;
-        final MatrixStore<Double> newColumn1 = newColumn;
+        return new UpdateCase(matrix, 1, column);
+    }
 
-        UpdateCase updateCase = new UpdateCase(originalMatrix, columnIndex1, newColumn1);
+    @Test
+    public void test3x3NoPivotingOrSpikes() {
+
+        UpdateCase updateCase = DecompositionUpdateTest.make3x3NoPivotingOrSpikes();
+
         DecompositionUpdateTest.doTest(updateCase);
     }
 

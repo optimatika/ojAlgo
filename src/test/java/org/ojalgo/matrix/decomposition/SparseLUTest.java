@@ -23,9 +23,13 @@ package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
+import org.ojalgo.matrix.decomposition.DecompositionUpdateTest.UpdateCase;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064LSC;
@@ -33,10 +37,105 @@ import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.type.keyvalue.EntryPair;
+import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 
 public class SparseLUTest extends MatrixDecompositionTests {
 
+    static class BuildSequence {
+
+        static BuildSequence from(final DecompositionUpdateTest.UpdateCase updateCase) {
+
+            int nbRows = updateCase.getRowDim();
+            int nbCols = updateCase.getColDim();
+
+            R064Store eye = R064Store.FACTORY.makeEye(nbRows, nbCols);
+
+            Pivot rowOrder = new Pivot();
+            rowOrder.reset(nbRows);
+            for (int i = 0; i < nbRows; i++) {
+                rowOrder.change(i, Uniform.randomInteger(nbRows));
+            }
+            Pivot colOrder = new Pivot();
+            colOrder.reset(nbCols);
+            for (int j = 0; j < nbCols; j++) {
+                colOrder.change(j, Uniform.randomInteger(nbCols));
+            }
+
+            MatrixStore<Double> original = eye.rows(rowOrder.getOrder());
+
+            List<KeyedPrimitive<MatrixStore<Double>>> updates = new ArrayList<>();
+
+            int[] order = colOrder.getOrder();
+            for (int j = 0; j < nbCols; j++) {
+                int col = order[j];
+                updates.add(EntryPair.of(updateCase.getOriginalColumn(col), col));
+            }
+
+            return new BuildSequence(original, updates);
+        }
+
+        MatrixStore<Double> original;
+        List<KeyedPrimitive<MatrixStore<Double>>> updates;
+
+        BuildSequence(final MatrixStore<Double> original, final List<KeyedPrimitive<MatrixStore<Double>>> updates) {
+            super();
+            this.original = original;
+            this.updates = updates;
+        }
+
+        MatrixStore<Double> rhs() {
+
+            int nbRows = original.getRowDim();
+
+            PhysicalStore<Double> rhs = R064Store.FACTORY.make(nbRows, 1);
+            for (int i = 0; i < nbRows; i++) {
+                rhs.set(i, 0, i + ONE);
+            }
+
+            return rhs;
+        }
+
+    }
+
     private static final NumberContext ACCURACY = NumberContext.of(8);
+
+    @Test
+    public void test3x3NoPivotingOrSpikes() {
+
+        UpdateCase updateCase = DecompositionUpdateTest.make3x3NoPivotingOrSpikes();
+
+        BuildSequence updateSequence = BuildSequence.from(updateCase);
+
+        LU<Double> sparse = LU.newSparseR064();
+        sparse.decompose(updateSequence.original);
+        for (KeyedPrimitive<MatrixStore<Double>> update : updateSequence.updates) {
+            sparse.updateColumn(update.intValue(), update.left());
+        }
+
+        MatrixStore<Double> matrix = updateCase.originalMatrix;
+        LU<Double> dense = LU.R064.decompose(matrix);
+
+        MatrixStore<Double> rhs = updateSequence.rhs();
+
+        PhysicalStore<Double> fDense = rhs.copy();
+        PhysicalStore<Double> fSparse = rhs.copy();
+        dense.ftran(fDense);
+        sparse.ftran(fSparse);
+
+        TestUtils.assertEquals(rhs, matrix.multiply(fDense));
+        TestUtils.assertEquals(fDense, fSparse);
+        TestUtils.assertEquals(rhs, matrix.multiply(fSparse));
+
+        PhysicalStore<Double> bDense = rhs.copy();
+        PhysicalStore<Double> bSparse = rhs.copy();
+        dense.btran(bDense);
+        sparse.btran(bSparse);
+
+        TestUtils.assertEquals(rhs, matrix.transpose().multiply(bDense));
+        TestUtils.assertEquals(bDense, bSparse);
+        TestUtils.assertEquals(rhs, matrix.transpose().multiply(bSparse));
+    }
 
     @Test
     public void testColumnShiftingInU() {
