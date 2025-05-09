@@ -86,11 +86,10 @@ public abstract class DivideAndConquer {
             int nextWorkers = workers / 2;
 
             Future<?> firstPart = executor.submit(() -> DivideAndConquer.call(executor, first, split, threshold, nextWorkers, conquerer));
-            Future<?> secondPart = executor.submit(() -> DivideAndConquer.call(executor, split, limit, threshold, nextWorkers, conquerer));
 
             try {
+                DivideAndConquer.call(executor, split, limit, threshold, nextWorkers, conquerer);
                 firstPart.get();
-                secondPart.get();
             } catch (final InterruptedException | ExecutionException cause) {
                 throw new RuntimeException(cause);
             }
@@ -113,7 +112,8 @@ public abstract class DivideAndConquer {
      */
     public final void invoke(final int first, final int limit, final int threshold) {
 
-        // int availableWorkers = OjAlgoUtils.ENVIRONMENT.threads - DaemonPoolExecutor.INSTANCE.getActiveCount() / 2;
+        // int availableWorkers = OjAlgoUtils.ENVIRONMENT.threads -
+        // DaemonPoolExecutor.INSTANCE.getActiveCount() / 2;
         int availableWorkers = OjAlgoUtils.ENVIRONMENT.threads;
 
         DivideAndConquer.call(DaemonPoolExecutor.INSTANCE, first, limit, threshold, availableWorkers, this::conquer);

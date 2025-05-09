@@ -29,7 +29,7 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.RunnerException;
 
 /**
- * Mac Pro. 2017-08-16 => 16
+ * Mac Pro: 2017-08-16 => 16
  *
  * <pre>
 # Run complete. Total time: 00:01:28
@@ -47,7 +47,7 @@ ThresholdMultiplyLeft.tune    128    1  thrpt    3    22318.964 ±     357.957  
 ThresholdMultiplyLeft.tune    128    2  thrpt    3    77806.891 ±    1061.067  ops/min
  * </pre>
  *
- * MacBook Air. 2015-06-27 => 32
+ * MacBook Air: 2015-06-27 => 32
  *
  * <pre>
 # Run complete. Total time: 00:01:25
