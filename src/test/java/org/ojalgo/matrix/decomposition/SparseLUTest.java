@@ -110,36 +110,7 @@ public class SparseLUTest extends MatrixDecompositionTests {
 
         UpdateCase updateCase = DecompositionUpdateTest.make3x3NoPivotingOrSpikes();
 
-        BuildSequence updateSequence = BuildSequence.from(updateCase);
-
-        LU<Double> sparse = LU.newSparseR064();
-        sparse.decompose(updateSequence.original);
-        for (KeyedPrimitive<MatrixStore<Double>> update : updateSequence.updates) {
-            sparse.updateColumn(update.intValue(), update.left());
-        }
-
-        MatrixStore<Double> matrix = updateCase.originalMatrix;
-        LU<Double> dense = LU.R064.decompose(matrix);
-
-        MatrixStore<Double> rhs = updateSequence.rhs();
-
-        PhysicalStore<Double> fDense = rhs.copy();
-        PhysicalStore<Double> fSparse = rhs.copy();
-        dense.ftran(fDense);
-        sparse.ftran(fSparse);
-
-        TestUtils.assertEquals(rhs, matrix.multiply(fDense));
-        TestUtils.assertEquals(fDense, fSparse);
-        TestUtils.assertEquals(rhs, matrix.multiply(fSparse));
-
-        PhysicalStore<Double> bDense = rhs.copy();
-        PhysicalStore<Double> bSparse = rhs.copy();
-        dense.btran(bDense);
-        sparse.btran(bSparse);
-
-        TestUtils.assertEquals(rhs, matrix.transpose().multiply(bDense));
-        TestUtils.assertEquals(bDense, bSparse);
-        TestUtils.assertEquals(rhs, matrix.transpose().multiply(bSparse));
+        SparseLU sparse = this.doTestBuildingViaUpdates(updateCase);
     }
 
     @Test
@@ -716,6 +687,42 @@ public class SparseLUTest extends MatrixDecompositionTests {
         TestUtils.assertEquals(matrix, decomposition, ACCURACY);
 
         return decomposition;
+    }
+
+    SparseLU doTestBuildingViaUpdates(final UpdateCase updateCase) {
+
+        BuildSequence updateSequence = BuildSequence.from(updateCase);
+
+        SparseLU sparse = new SparseLU();
+        sparse.decompose(updateSequence.original);
+        for (KeyedPrimitive<MatrixStore<Double>> update : updateSequence.updates) {
+            sparse.updateColumn(update.intValue(), update.left());
+        }
+
+        MatrixStore<Double> matrix = updateCase.originalMatrix;
+        LU<Double> dense = LU.R064.decompose(matrix);
+
+        MatrixStore<Double> rhs = updateSequence.rhs();
+
+        PhysicalStore<Double> fDense = rhs.copy();
+        PhysicalStore<Double> fSparse = rhs.copy();
+        dense.ftran(fDense);
+        sparse.ftran(fSparse);
+
+        TestUtils.assertEquals(rhs, matrix.multiply(fDense));
+        TestUtils.assertEquals(fDense, fSparse);
+        TestUtils.assertEquals(rhs, matrix.multiply(fSparse));
+
+        PhysicalStore<Double> bDense = rhs.copy();
+        PhysicalStore<Double> bSparse = rhs.copy();
+        dense.btran(bDense);
+        sparse.btran(bSparse);
+
+        TestUtils.assertEquals(rhs, matrix.transpose().multiply(bDense));
+        TestUtils.assertEquals(bDense, bSparse);
+        TestUtils.assertEquals(rhs, matrix.transpose().multiply(bSparse));
+
+        return sparse;
     }
 
     void doTransTest(final R064LSC matrix, final int colInd, final R064Store newCol, final PhysicalStore<Double> rhs) {
