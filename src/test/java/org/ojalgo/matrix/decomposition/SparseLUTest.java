@@ -44,6 +44,11 @@ public class SparseLUTest extends MatrixDecompositionTests {
 
     static class BuildSequence {
 
+        /**
+         * Creates a random (permuted identity) matrix as the original, and then an update for each of the
+         * columns (in random order). When all the updates have been applied the result should be equal to the
+         * original matrix of the update case.
+         */
         static BuildSequence from(final DecompositionUpdateTest.UpdateCase updateCase) {
 
             int nbRows = updateCase.getRowDim();

@@ -203,6 +203,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
 
     private static final boolean DEBUG = true;
     private static final NumberContext PRECISION = NumberContext.of(12);
+    private static final NumberContext ACCURACY = NumberContext.of(12);
     private static final NumberContext SAFE = NumberContext.of(4);
 
     private static Access2D.Sliceable<Double> cast(final Collectable<Double, ? super TransformableRegion<Double>> matrix) {
@@ -669,7 +670,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
      * Should implement the Forrest-Tomlin update algorithm (maybe with Suhl's improvement).
      */
     @Override
-    public boolean updateColumn(final int columnIndex, final Access1D.Collectable<Double, ? super TransformableRegion<Double>> newColumn,
+    public boolean updateColumn(final int specifiedColumn, final Access1D.Collectable<Double, ? super TransformableRegion<Double>> newColumn,
             final PhysicalStore<Double> preallocated2) {
 
         int m = this.getRowDim();
@@ -697,6 +698,9 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
             BasicLogger.debugMatrix("Recreated", mtrxL.multiply(mtrxU).rows(myPivot.reverseOrder()).columns(myColPivot.reverseOrder()));
         }
 
+        // Get the actual column position after any previous updates
+        int columnIndex = myColPivot.getOrder()[specifiedColumn];
+
         newColumn.supplyTo(tmpCol);
         myPivot.applyPivotOrder(tmpCol);
 
@@ -704,14 +708,9 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
             BasicLogger.debugMatrix("updateColumn: after pivot applied to new column", tmpCol);
         }
 
-        double diag = NaN;
-
-        int lastRowNonZero = -1;
         for (int ij = 0; ij < r; ij++) {
             double varI = -tmpCol.doubleValue(ij);
             if (!PRECISION.isZero(varI)) {
-                lastRowNonZero = ij;
-                diag = -varI;
                 LinkedR064.ElementNode colNodeL = myL.getLastInColumn(ij);
                 while (colNodeL != null && colNodeL.index > ij) {
                     tmpCol.add(colNodeL.index, colNodeL.value * varI);
@@ -720,6 +719,25 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
             }
             if (DEBUG) {
                 BasicLogger.debugMatrix("updateColumn: tmpCol after elimination step " + ij, tmpCol);
+            }
+        }
+
+        // Apply any existing transformations to the new column
+        for (int i = 0; i < myFactors.size(); i++) {
+            myFactors.get(i).ftran(tmpCol);
+            if (DEBUG) {
+                BasicLogger.debugMatrix("updateColumn: after applying factor " + i, tmpCol);
+            }
+        }
+
+        // After forward substitution is complete, find the last non-zero row
+        double diag = NaN;
+        int lastRowNonZero = -1;
+        for (int i = m - 1; i >= 0; i--) {
+            if (!ACCURACY.isZero(tmpCol.doubleValue(i))) {
+                lastRowNonZero = i;
+                diag = tmpCol.doubleValue(i);
+                break; // Stop as soon as we find a non-zero value
             }
         }
 
@@ -791,7 +809,6 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
                     wRow[rowNodeU.index] -= ratio * rowNodeU.value;
                     rowNodeU = rowNodeU.next;
                 }
-                // myU.set(lastRowNonZero, ij, ZERO);
 
                 if (DEBUG) {
                     BasicLogger.debug("updateColumn: wRow after eta step {}: {}", ij, Arrays.toString(wRow));

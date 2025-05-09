@@ -473,7 +473,7 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         }
 
         Pivot rowPivot = new Pivot(pivotOrder);
-        Pivot colPivot = new Pivot(pivotOrder);
+        Pivot colPivot = new Pivot();
         colPivot.reset(n);
 
         FletcherMatthews.update(rowPivot, sparseL, diagU, sparseU, colPivot, columnIndex, column, R064Store.FACTORY.make(m, 1));
