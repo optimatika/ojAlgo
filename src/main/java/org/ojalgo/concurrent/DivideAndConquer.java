@@ -86,11 +86,10 @@ public abstract class DivideAndConquer {
             int nextWorkers = workers / 2;
 
             Future<?> firstPart = executor.submit(() -> DivideAndConquer.call(executor, first, split, threshold, nextWorkers, conquerer));
-            Future<?> secondPart = executor.submit(() -> DivideAndConquer.call(executor, split, limit, threshold, nextWorkers, conquerer));
+            DivideAndConquer.call(executor, split, limit, threshold, nextWorkers, conquerer);
 
             try {
                 firstPart.get();
-                secondPart.get();
             } catch (final InterruptedException | ExecutionException cause) {
                 throw new RuntimeException(cause);
             }
