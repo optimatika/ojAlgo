@@ -63,6 +63,30 @@ ThresholdMultiplyNeither.tune    128    2  thrpt    3    107449.078 ±     983.8
 ThresholdMultiplyNeither.tune    128    4  thrpt    3    149453.928 ±   80750.534  ops/min
  * </pre>
  *
+ * MacBook Air M2: 2025-06-27 => 32 (maybe 16)
+ *
+ * <pre>
+Benchmark                      (dim)  (z)   Mode  Cnt        Score       Error  Units
+ThresholdMultiplyNeither.tune      8    1  thrpt    3  9369406.510 ±  1332.201  ops/s
+ThresholdMultiplyNeither.tune      8    2  thrpt    3   163797.381 ±  6934.023  ops/s
+ThresholdMultiplyNeither.tune      8    4  thrpt    3    68042.905 ±  4266.196  ops/s
+ThresholdMultiplyNeither.tune     16    1  thrpt    3   585556.720 ± 35584.004  ops/s
+ThresholdMultiplyNeither.tune     16    2  thrpt    3   116366.238 ± 12589.595  ops/s
+ThresholdMultiplyNeither.tune     16    4  thrpt    3    62316.071 ±  6474.118  ops/s
+ThresholdMultiplyNeither.tune     32    1  thrpt    3    84966.656 ±   106.986  ops/s
+ThresholdMultiplyNeither.tune     32    2  thrpt    3    64021.111 ±  1230.716  ops/s
+ThresholdMultiplyNeither.tune     32    4  thrpt    3    45477.934 ± 11788.600  ops/s
+ThresholdMultiplyNeither.tune     64    1  thrpt    3    11702.643 ±   861.904  ops/s
+ThresholdMultiplyNeither.tune     64    2  thrpt    3    16968.997 ±  3069.848  ops/s
+ThresholdMultiplyNeither.tune     64    4  thrpt    3    22641.241 ±  2462.468  ops/s
+ThresholdMultiplyNeither.tune    128    1  thrpt    3     1517.919 ±    43.201  ops/s
+ThresholdMultiplyNeither.tune    128    2  thrpt    3     2597.902 ±   161.757  ops/s
+ThresholdMultiplyNeither.tune    128    4  thrpt    3     4218.452 ±   346.281  ops/s
+ThresholdMultiplyNeither.tune    256    1  thrpt    3      196.744 ±     1.157  ops/s
+ThresholdMultiplyNeither.tune    256    2  thrpt    3      331.772 ±    69.382  ops/s
+ThresholdMultiplyNeither.tune    256    4  thrpt    3      561.783 ±    64.744  ops/s
+ * </pre>
+ *
  * @author apete
  */
 @State(Scope.Benchmark)

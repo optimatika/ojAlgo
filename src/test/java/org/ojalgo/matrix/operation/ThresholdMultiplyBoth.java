@@ -29,7 +29,7 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.RunnerException;
 
 /**
- * MacBook Air. 2015-06-27 => 16
+ * MacBook Air: 2015-06-27 => 16
  *
  * <pre>
 Benchmark                   (dim)  (z)   Mode  Cnt         Score         Error    Units
@@ -64,6 +64,27 @@ ThresholdMultiplyBoth.tune     32    4  thrpt    3     545974.483 ±   238381.83
 ThresholdMultiplyBoth.tune     64    1  thrpt    3      29433.007 ±    24440.485  ops/min
 ThresholdMultiplyBoth.tune     64    2  thrpt    3      52450.287 ±     2508.972  ops/min
 ThresholdMultiplyBoth.tune     64    4  thrpt    3      79512.315 ±     9900.565  ops/min
+ * </pre>
+ *
+ * MacBook Air M2: 2025-06-27 => 8
+ *
+ * <pre>
+Benchmark                   (dim)  (z)   Mode  Cnt         Score         Error  Units
+ThresholdMultiplyBoth.tune      4    1  thrpt    3  24568052.181 ± 3262651.669  ops/s
+ThresholdMultiplyBoth.tune      4    2  thrpt    3    185673.180 ±  243969.419  ops/s
+ThresholdMultiplyBoth.tune      4    4  thrpt    3     67692.477 ±    1695.494  ops/s
+ThresholdMultiplyBoth.tune      8    1  thrpt    3   2225139.124 ±   56701.389  ops/s
+ThresholdMultiplyBoth.tune      8    2  thrpt    3    199354.559 ±    9399.286  ops/s
+ThresholdMultiplyBoth.tune      8    4  thrpt    3     64178.030 ±    8104.689  ops/s
+ThresholdMultiplyBoth.tune     16    1  thrpt    3     64436.913 ±    7285.055  ops/s
+ThresholdMultiplyBoth.tune     16    2  thrpt    3     80685.177 ±   12503.336  ops/s
+ThresholdMultiplyBoth.tune     16    4  thrpt    3     67431.992 ±    5099.342  ops/s
+ThresholdMultiplyBoth.tune     32    1  thrpt    3      8160.964 ±     508.095  ops/s
+ThresholdMultiplyBoth.tune     32    2  thrpt    3     14946.035 ±    1530.107  ops/s
+ThresholdMultiplyBoth.tune     32    4  thrpt    3     30314.529 ±    6514.951  ops/s
+ThresholdMultiplyBoth.tune     64    1  thrpt    3      3006.589 ±     289.574  ops/s
+ThresholdMultiplyBoth.tune     64    2  thrpt    3      5433.925 ±     384.126  ops/s
+ThresholdMultiplyBoth.tune     64    4  thrpt    3      9094.494 ±     410.287  ops/s
  * </pre>
  *
  * @author apete

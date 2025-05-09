@@ -29,7 +29,7 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.RunnerException;
 
 /**
- * Mac Pro. 2015-06-24 => ?
+ * Mac Pro: 2015-06-24 => ?
  *
  * <pre>
  * </pre>
