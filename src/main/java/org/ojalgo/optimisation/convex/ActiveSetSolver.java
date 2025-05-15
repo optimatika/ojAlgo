@@ -345,7 +345,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         }
 
         if (state.isFeasible()) {
-            this.resetActivator();
+            this.resetActivator(!options.convex().isExtendedPrecision());
         } else {
             this.getSolutionX().fillAll(ZERO);
         }
@@ -400,8 +400,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     }
 
     /**
-     * Find the minimum (largest negative) lagrange multiplier - for the active inequalities - to
-     * potentially deactivate.
+     * Find the minimum (largest negative) lagrange multiplier - for the active inequalities - to potentially
+     * deactivate.
      */
     protected int suggestConstraintToExclude() {
 
@@ -468,8 +468,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
     /**
      * Find minimum (largest negative) slack - for the inactive inequalities - to potentially activate.
-     * Negative slack means the constraint is violated. Need to make sure it is enforced by activating
-     * it.
+     * Negative slack means the constraint is violated. Need to make sure it is enforced by activating it.
      */
     protected int suggestConstraintToInclude() {
         return this.getConstraintToInclude();
@@ -652,35 +651,38 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
     }
 
-    void resetActivator() {
+    void resetActivator(final boolean activate) {
 
         myActivator.excludeAll();
         myExcluded = null;
         myIncluded = null;
 
-        int nbInes = this.countInequalityConstraints();
-        int nbEqus = this.countEqualityConstraints();
-        int nbVars = this.countVariables();
+        if (activate) {
 
-        int maxToInclude = nbVars - nbEqus;
+            int nbInes = this.countInequalityConstraints();
+            int nbEqus = this.countEqualityConstraints();
+            int nbVars = this.countVariables();
 
-        if (this.isLogDebug() && maxToInclude < 0) {
-            this.log("Redundant contraints!");
-        }
+            int maxToInclude = nbVars - nbEqus;
 
-        if (nbInes > 0 && maxToInclude > 0) {
+            if (this.isLogDebug() && maxToInclude < 0) {
+                this.log("Redundant contraints!");
+            }
 
-            MatrixStore<Double> ineqSlack = this.getSlackI();
+            if (nbInes > 0 && maxToInclude > 0) {
 
-            for (int i = 0; i < nbInes; i++) {
+                MatrixStore<Double> ineqSlack = this.getSlackI();
 
-                double slack = ineqSlack.doubleValue(i);
+                for (int i = 0; i < nbInes; i++) {
 
-                if (slack >= ZERO && ACC.isZero(slack) && this.countIncluded() < maxToInclude) {
-                    if (this.isLogDebug()) {
-                        this.log("Will inlcude ineq {} with slack={}", i, slack);
+                    double slack = ineqSlack.doubleValue(i);
+
+                    if (slack >= ZERO && ACC.isZero(slack) && this.countIncluded() < maxToInclude) {
+                        if (this.isLogDebug()) {
+                            this.log("Will inlcude ineq {} with slack={}", i, slack);
+                        }
+                        this.include(i);
                     }
-                    this.include(i);
                 }
             }
         }
