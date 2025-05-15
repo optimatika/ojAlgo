@@ -304,9 +304,9 @@ final class IterativeASS extends ActiveSetSolver {
     }
 
     @Override
-    void resetActivator() {
+    void resetActivator(boolean activate) {
 
-        super.resetActivator();
+        super.resetActivator(activate);
 
         int nbEqus = this.countEqualityConstraints();
         int nbVars = this.countVariables();
