@@ -53,7 +53,7 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
 
     public static final class ListFactory<N extends Comparable<N>> extends StrategyBuildingFactory<N, NumberList<N>, ListFactory<N>> {
 
-        ListFactory(final DenseArray.Factory<N> denseFactory) {
+        ListFactory(final DenseArray.Factory<N, ?> denseFactory) {
             super(denseFactory);
         }
 
@@ -63,7 +63,7 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
 
     }
 
-    public static <N extends Comparable<N>> Collector<N, NumberList<N>, NumberList<N>> collector(final DenseArray.Factory<N> arrayFactory) {
+    public static <N extends Comparable<N>> Collector<N, NumberList<N>, NumberList<N>> collector(final DenseArray.Factory<N, ?> arrayFactory) {
 
         Supplier<NumberList<N>> supplier = () -> NumberList.factory(arrayFactory).make();
         BiConsumer<NumberList<N>, N> accumulator = NumberList::add;
@@ -76,20 +76,20 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         return Collector.of(supplier, accumulator, combiner, finisher, Collector.Characteristics.IDENTITY_FINISH);
     }
 
-    public static <N extends Comparable<N>> ListFactory<N> factory(final DenseArray.Factory<N> arrayFactory) {
+    public static <N extends Comparable<N>> ListFactory<N> factory(final DenseArray.Factory<N, ?> arrayFactory) {
         return new ListFactory<>(arrayFactory);
     }
 
     private long myActualCount;
-    private final DenseArray.Factory<N> myDenseFactory;
+    private final DenseArray.Factory<N, ?> myDenseFactory;
     private final GrowthStrategy myGrowthStrategy;
     private BasicArray<N> myStorage;
 
-    NumberList(final DenseArray.Factory<N> denseFactory, final GrowthStrategy growthStrategy) {
+    NumberList(final DenseArray.Factory<N, ?> denseFactory, final GrowthStrategy growthStrategy) {
         this(denseFactory, growthStrategy, growthStrategy.makeInitial(denseFactory), 0L);
     }
 
-    NumberList(final DenseArray.Factory<N> denseFactory, final GrowthStrategy growthStrategy, final BasicArray<N> storage, final long actualCount) {
+    NumberList(final DenseArray.Factory<N, ?> denseFactory, final GrowthStrategy growthStrategy, final BasicArray<N> storage, final long actualCount) {
 
         super();
 
@@ -485,7 +485,8 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
             if (myStorage instanceof SegmentedArray) {
                 myStorage = ((SegmentedArray<N>) myStorage).grow();
             } else {
-                myStorage = myDenseFactory.wrapAsSegments(myStorage, myGrowthStrategy.makeChunk(myDenseFactory));
+                BasicArray<N>[] segments = (BasicArray<N>[]) new BasicArray<?>[] { myStorage, myGrowthStrategy.makeChunk(myDenseFactory) };
+                myStorage = new SegmentedArray<>(segments, myDenseFactory);
             }
 
         } else {

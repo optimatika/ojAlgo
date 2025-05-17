@@ -210,7 +210,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
     public static final class SparseFactory<N extends Comparable<N>> extends StrategyBuildingFactory<N, SparseArray<N>, SparseFactory<N>>
             implements Factory1D<SparseArray<N>> {
 
-        SparseFactory(final DenseArray.Factory<N> denseFactory) {
+        SparseFactory(final DenseArray.Factory<N, ?> denseFactory) {
             super(denseFactory);
         }
 
@@ -228,7 +228,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
     private static final NumberContext MATH_CONTEXT = NumberContext.ofMath(MathContext.DECIMAL64);
 
-    public static <N extends Comparable<N>> SparseFactory<N> factory(final DenseArray.Factory<N> denseFactory) {
+    public static <N extends Comparable<N>> SparseFactory<N> factory(final DenseArray.Factory<N, ?> denseFactory) {
         return new SparseFactory<>(denseFactory);
     }
 
@@ -237,7 +237,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
      */
     private int myActualLength = 0;
     private final long myCount;
-    private final DenseArray.Factory<N> myDenseFactory;
+    private final DenseArray.Factory<N, ?> myDenseFactory;
     private final GrowthStrategy myGrowthStrategy;
     private long[] myIndices;
     private DenseArray<N> myValues;
@@ -245,7 +245,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
     private final Scalar<N> myZeroScalar;
     private final double myZeroValue;
 
-    SparseArray(final DenseArray.Factory<N> denseFactory, final GrowthStrategy growthStrategy, final long count) {
+    SparseArray(final DenseArray.Factory<N, ?> denseFactory, final GrowthStrategy growthStrategy, final long count) {
 
         super(denseFactory);
 

@@ -65,6 +65,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
     @FunctionalInterface
     public interface Nullary extends NullaryFunction<Double> {
 
+        @Override
         default Double invoke() {
             return Double.valueOf(this.doubleValue());
         }

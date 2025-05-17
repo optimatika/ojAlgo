@@ -18,6 +18,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - New `MatrixStore`:s compressed sparse column (CSC) and compressed sparse row (CSR) implementations named `R064CSC` and `R064CSR` (primitive double, R064, only).
 - New class `Triplet` used when building, and converting between, various sparse formats.
 
+### Changed
+
+#### org.ojalgo.array
+
+- Refactored the constructors, factories and builders for the classes in the `org.ojalgo.array` package. Most things should work as before, but the generics signature of `DenseArray.Factory` has changed. Instead of `DenseArray.Factory<ELEMENT_TYPE>` it is now `DenseArray.Factory<ELEMENT_TYPE, ARRAY_TYPE>`. What you may want to do is to instead use a subclass like `PrimitiveArray.Factory`.
+
 ## [55.2.0] – 2025-04-25
 
 ### Added

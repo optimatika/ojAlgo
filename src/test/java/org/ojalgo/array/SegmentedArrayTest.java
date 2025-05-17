@@ -33,21 +33,21 @@ public class SegmentedArrayTest extends ArrayTests {
     @Test
     public void testRandomSetAndGetBackPrimitive64() {
 
-        final long tmpCount = 5000L;
+        long count = 5000L;
 
-        final SegmentedArray<Double> tmpArray = ArrayR064.FACTORY.makeSegmented(tmpCount);
+        BasicArray<Double> array = new BasicArray.Factory<>(ArrayR064.FACTORY).make(count);
 
-        ArrayTests.doTestRandomSetAndGetBack(tmpArray, tmpCount);
+        ArrayTests.doTestRandomSetAndGetBack(array, count);
     }
 
     @Test
     public void testVeryLargeRandomSetAndGetBackBasic() {
 
-        final long tmpCount = Long.MAX_VALUE;
+        long count = Long.MAX_VALUE;
 
-        final BasicArray<Double> tmpArray = new BasicArray.Factory<>(ArrayR064.FACTORY).make(tmpCount);
+        BasicArray<Double> array = new BasicArray.Factory<>(ArrayR064.FACTORY).make(count);
 
-        ArrayTests.doTestRandomSetAndGetBack(tmpArray, tmpCount);
+        ArrayTests.doTestRandomSetAndGetBack(array, count);
     }
 
 }

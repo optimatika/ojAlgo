@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.array.BasicArray.BaseFactory;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
@@ -61,7 +62,7 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
 
         private final BasicArray.Factory<N> myDelegate;
 
-        Factory(final DenseArray.Factory<N> denseArray) {
+        Factory(final DenseArray.Factory<N, ?> denseArray) {
             super();
             myDelegate = new BasicArray.Factory<>(denseArray);
         }
@@ -134,7 +135,7 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     public static final Factory<Double> Z032 = ArrayAnyD.factory(ArrayZ032.FACTORY);
     public static final Factory<Double> Z064 = ArrayAnyD.factory(ArrayZ064.FACTORY);
 
-    public static <N extends Comparable<N>> ArrayAnyD.Factory<N> factory(final DenseArray.Factory<N> denseArray) {
+    public static <N extends Comparable<N>> ArrayAnyD.Factory<N> factory(final DenseArray.Factory<N, ?> denseArray) {
         return new ArrayAnyD.Factory<>(denseArray);
     }
 
@@ -809,7 +810,7 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
 
         return new FactoryAnyD<>() {
 
-            ArrayFactory<N, ?> delegate = myDelegate.factory();
+            BaseFactory<N, ?> delegate = myDelegate.factory();
 
             public FunctionSet<?> function() {
                 return delegate.function();

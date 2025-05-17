@@ -27,13 +27,9 @@ import java.util.Arrays;
 
 import org.ojalgo.array.operation.*;
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
-import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
@@ -49,37 +45,17 @@ import org.ojalgo.type.math.MathType;
  */
 public class ArrayR032 extends PrimitiveArray {
 
-    public static final DenseArray.Factory<Double> FACTORY = new DenseArray.Factory<>() {
+    public static final PrimitiveArray.Factory FACTORY = new PrimitiveArray.Factory(MathType.R032) {
 
         @Override
-        public AggregatorSet<Double> aggregator() {
-            return PrimitiveAggregator.getSet();
-        }
-
-        @Override
-        public FunctionSet<Double> function() {
-            return PrimitiveFunction.getSet();
-        }
-
-        @Override
-        public MathType getMathType() {
-            return MathType.R032;
-        }
-
-        @Override
-        public Scalar.Factory<Double> scalar() {
-            return PrimitiveScalar.FACTORY;
-        }
-
-        @Override
-        PlainArray<Double> makeDenseArray(final long size) {
-            return ArrayR032.make((int) size);
+        public ArrayR032 make(final int size) {
+            return ArrayR032.make(size);
         }
 
     };
 
     public static ArrayR032 make(final int size) {
-        return new ArrayR032(size);
+        return new ArrayR032(new float[size]);
     }
 
     public static ArrayR032 wrap(final float... data) {
@@ -96,13 +72,6 @@ public class ArrayR032 extends PrimitiveArray {
         super(FACTORY, data.length);
 
         this.data = data;
-    }
-
-    protected ArrayR032(final int size) {
-
-        super(FACTORY, size);
-
-        data = new float[size];
     }
 
     @Override

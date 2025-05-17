@@ -37,14 +37,17 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
     @FunctionalInterface
     public interface Binary extends BinaryFunction<RationalNumber> {
 
+        @Override
         default double invoke(final double arg1, final double arg2) {
             return this.invoke(RationalNumber.valueOf(arg1), RationalNumber.valueOf(arg2)).doubleValue();
         }
 
+        @Override
         default float invoke(final float arg1, final float arg2) {
             return this.invoke(RationalNumber.valueOf(arg1), RationalNumber.valueOf(arg2)).floatValue();
         }
 
+        @Override
         default RationalNumber invoke(final RationalNumber arg1, final double arg2) {
             return this.invoke(arg1, RationalNumber.valueOf(arg2));
         }
@@ -54,10 +57,12 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
     @FunctionalInterface
     public interface Consumer extends VoidFunction<RationalNumber> {
 
+        @Override
         default void invoke(final double arg) {
             this.invoke(RationalNumber.valueOf(arg));
         }
 
+        @Override
         default void invoke(final float arg) {
             this.invoke(RationalNumber.valueOf(arg));
         }
@@ -67,6 +72,7 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
     @FunctionalInterface
     public interface Nullary extends NullaryFunction<RationalNumber> {
 
+        @Override
         default double doubleValue() {
             return this.invoke().doubleValue();
         }
@@ -76,10 +82,12 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
     @FunctionalInterface
     public interface Parameter extends ParameterFunction<RationalNumber> {
 
+        @Override
         default double invoke(final double arg, final int param) {
             return this.invoke(RationalNumber.valueOf(arg), param).doubleValue();
         }
 
+        @Override
         default float invoke(final float arg, final int param) {
             return this.invoke(RationalNumber.valueOf(arg), param).floatValue();
         }
@@ -89,10 +97,12 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
     @FunctionalInterface
     public interface Predicate extends PredicateFunction<RationalNumber> {
 
+        @Override
         default boolean invoke(final double arg) {
             return this.invoke(RationalNumber.valueOf(arg));
         }
 
+        @Override
         default boolean invoke(final float arg) {
             return this.invoke(RationalNumber.valueOf(arg));
         }
@@ -102,10 +112,12 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
     @FunctionalInterface
     public interface Unary extends UnaryFunction<RationalNumber> {
 
+        @Override
         default double invoke(final double arg) {
             return this.invoke(RationalNumber.valueOf(arg)).doubleValue();
         }
 
+        @Override
         default float invoke(final float arg) {
             return this.invoke(RationalNumber.valueOf(arg)).floatValue();
         }

@@ -31,6 +31,7 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.type.math.MathType;
 
 /**
  * Array class limited by integer (int, not long) indices. Typically this will be a plain java array as in
@@ -42,6 +43,19 @@ import org.ojalgo.structure.Access1D;
  */
 public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> implements RandomAccess {
 
+    public static abstract class Factory<N extends Comparable<N>, A extends PlainArray<N>> extends DenseArray.Factory<N, A> {
+
+        protected Factory(final MathType mathType) {
+            super(mathType);
+        }
+
+        @Override
+        long getCapacityLimit() {
+            return MAX_SIZE;
+        }
+
+    }
+
     /**
      * Exists as a private constant in {@link ArrayList}. The Oracle JVM seems to actually be limited at
      * Integer.MAX_VALUE - 2, but other JVM:s may have different limits.
@@ -52,7 +66,7 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
 
     private final int mySize;
 
-    PlainArray(final DenseArray.Factory<N> factory, final int size) {
+    PlainArray(final PlainArray.Factory<N, ?> factory, final int size) {
 
         super(factory);
 

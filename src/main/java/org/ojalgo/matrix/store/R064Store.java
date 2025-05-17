@@ -21,8 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
-import static org.ojalgo.function.constant.PrimitiveMath.ONE;
-import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
 
@@ -73,27 +72,27 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
         @Override
         public R064Store copy(final Access2D<?> source) {
 
-            final int tmpRowDim = (int) source.countRows();
-            final int tmpColDim = (int) source.countColumns();
+            int nbRows = source.getRowDim();
+            int nbCols = source.getColDim();
 
-            final R064Store retVal = new R064Store(tmpRowDim, tmpColDim);
+            R064Store retVal = this.make(nbRows, nbCols);
 
-            if (tmpColDim > FillMatchingSingle.THRESHOLD) {
+            if (nbCols > FillMatchingSingle.THRESHOLD) {
 
                 final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                     @Override
                     public void conquer(final int aFirst, final int aLimit) {
-                        FillMatchingSingle.copy(retVal.data, tmpRowDim, aFirst, aLimit, source);
+                        FillMatchingSingle.copy(retVal.data, nbRows, aFirst, aLimit, source);
                     }
 
                 };
 
-                tmpConquerer.invoke(0, tmpColDim, FillMatchingSingle.THRESHOLD);
+                tmpConquerer.invoke(0, nbCols, FillMatchingSingle.THRESHOLD);
 
             } else {
 
-                FillMatchingSingle.copy(retVal.data, tmpRowDim, 0, tmpColDim, source);
+                FillMatchingSingle.copy(retVal.data, nbRows, 0, nbCols, source);
             }
 
             return retVal;
@@ -106,21 +105,16 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
 
         @Override
         public R064Store make(final int rows, final int columns) {
-            return new R064Store(rows, columns);
-        }
-
-        @Override
-        public R064Store make(final long rows, final long columns) {
-            return new R064Store((int) rows, (int) columns);
+            return new R064Store(rows, columns, new double[rows * columns]);
         }
 
         @Override
         public R064Store transpose(final Access2D<?> source) {
 
-            final R064Store retVal = new R064Store((int) source.countColumns(), (int) source.countRows());
+            R064Store retVal = this.make(source.getColDim(), source.getRowDim());
 
-            final int tmpRowDim = retVal.getRowDim();
-            final int tmpColDim = retVal.getColDim();
+            int tmpRowDim = retVal.getRowDim();
+            int tmpColDim = retVal.getColDim();
 
             if (tmpColDim > FillMatchingSingle.THRESHOLD) {
 
@@ -210,7 +204,7 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
     }
 
     public static R064Store wrap(final double... data) {
-        return new R064Store(data);
+        return R064Store.wrap(data, data.length);
     }
 
     public static R064Store wrap(final double[] data, final int structure) {
@@ -253,37 +247,12 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
     private final Array2D<Double> myUtility;
     private transient double[] myWorkerColumn;
 
-    @SuppressWarnings("unused")
-    private R064Store(final double[] dataArray) {
-        this(dataArray.length, 1, dataArray);
-    }
-
-    @SuppressWarnings("unused")
-    private R064Store(final int numbRows) {
-        this(numbRows, 1);
-    }
-
     R064Store(final int numbRows, final int numbCols, final double[] dataArray) {
 
         super(dataArray);
 
         myRowDim = numbRows;
         myColDim = numbCols;
-
-        myUtility = this.wrapInArray2D(myRowDim);
-
-        multiplyBoth = MultiplyBoth.newPrimitive64(myRowDim, myColDim);
-        multiplyLeft = MultiplyLeft.newPrimitive64(myRowDim, myColDim);
-        multiplyRight = MultiplyRight.newPrimitive64(myRowDim, myColDim);
-        multiplyNeither = MultiplyNeither.newPrimitive64(myRowDim, myColDim);
-    }
-
-    R064Store(final long numbRows, final long numbCols) {
-
-        super(Math.toIntExact(numbRows * numbCols));
-
-        myRowDim = Math.toIntExact(numbRows);
-        myColDim = Math.toIntExact(numbCols);
 
         myUtility = this.wrapInArray2D(myRowDim);
 
@@ -528,11 +497,6 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
     }
 
     @Override
-    public void fillCompatible(final Access2D<Double> left, final BinaryFunction<Double> operator, final Access2D<Double> right) {
-        FillCompatible.invoke(data, myRowDim, left, operator, right);
-    }
-
-    @Override
     public void fillByMultiplying(final Access1D<Double> left, final Access1D<Double> right) {
 
         final int complexity = Math.toIntExact(left.count() / this.countRows());
@@ -566,6 +530,11 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
     @Override
     public void fillColumn(final long row, final long col, final NullaryFunction<?> supplier) {
         myUtility.fillColumn(row, col, supplier);
+    }
+
+    @Override
+    public void fillCompatible(final Access2D<Double> left, final BinaryFunction<Double> operator, final Access2D<Double> right) {
+        FillCompatible.invoke(data, myRowDim, left, operator, right);
     }
 
     @Override

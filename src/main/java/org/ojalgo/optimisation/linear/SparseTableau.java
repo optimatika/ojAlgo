@@ -26,6 +26,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.DenseArray;
+import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.operation.IndexOf;
 import org.ojalgo.function.UnaryFunction;
@@ -37,7 +38,7 @@ import org.ojalgo.structure.Primitive2D;
 final class SparseTableau extends SimplexTableau {
 
     private static final Array1D.Factory<Double> ARRAY1D_FACTORY = Array1D.factory(ArrayR064.FACTORY);
-    private static final DenseArray.Factory<Double> DENSE_FACTORY = ArrayR064.FACTORY;
+    private static final PrimitiveArray.Factory DENSE_FACTORY = ArrayR064.FACTORY;
 
     private static double scale(final SparseArray<Double> body, final double rhs, final int col) {
 
@@ -300,7 +301,8 @@ final class SparseTableau extends SimplexTableau {
         }
     }
 
-    @Override double getReducedCost(final int je) {
+    @Override
+    double getReducedCost(final int je) {
         if (myPhase1Objective != null) {
             return myPhase1Objective.doubleValue(excluded[je]);
         } else {

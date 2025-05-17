@@ -32,12 +32,8 @@ final class BufferZ032 extends BufferArray {
     private final IntBuffer myBuffer;
 
     BufferZ032(final BufferArray.Factory factory, final ByteBuffer buffer, final AutoCloseable closeable) {
-        this(factory, buffer.asIntBuffer(), closeable);
-    }
-
-    BufferZ032(final BufferArray.Factory factory, final IntBuffer buffer, final AutoCloseable closeable) {
         super(factory, buffer, closeable);
-        myBuffer = buffer;
+        myBuffer = buffer.asIntBuffer();
     }
 
     @Override

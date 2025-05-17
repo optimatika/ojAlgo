@@ -24,7 +24,14 @@ package org.ojalgo.matrix.store;
 import java.util.Arrays;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.*;
+import org.ojalgo.array.Array1D;
+import org.ojalgo.array.Array2D;
+import org.ojalgo.array.ArrayC128;
+import org.ojalgo.array.ArrayH256;
+import org.ojalgo.array.ArrayQ128;
+import org.ojalgo.array.ArrayR128;
+import org.ojalgo.array.BasicArray;
+import org.ojalgo.array.ScalarArray;
 import org.ojalgo.array.operation.*;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
@@ -64,9 +71,9 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
 
     static final class Factory<N extends Scalar<N>> implements PhysicalStore.Factory<N, GenericStore<N>> {
 
-        private final DenseArray.Factory<N> myDenseArrayFactory;
+        private final ScalarArray.Factory<N> myDenseArrayFactory;
 
-        Factory(final DenseArray.Factory<N> denseArrayFactory) {
+        Factory(final ScalarArray.Factory<N> denseArrayFactory) {
             super();
             myDenseArrayFactory = denseArrayFactory;
         }
@@ -77,14 +84,14 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
         }
 
         @Override
-        public DenseArray.Factory<N> array() {
+        public ScalarArray.Factory<N> array() {
             return myDenseArrayFactory;
         }
 
         @Override
         public GenericStore<N> conjugate(final Access2D<?> source) {
 
-            GenericStore<N> retVal = new GenericStore<>(this, (int) source.countColumns(), (int) source.countRows());
+            GenericStore<N> retVal = this.make(source.getColDim(), source.getRowDim());
 
             int tmpRowDim = retVal.getRowDim();
             int tmpColDim = retVal.getColDim();
@@ -116,7 +123,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
             int tmpRowDim = source.getRowDim();
             int tmpColDim = source.getColDim();
 
-            final GenericStore<N> retVal = new GenericStore<>(this, tmpRowDim, tmpColDim);
+            final GenericStore<N> retVal = this.make(tmpRowDim, tmpColDim);
 
             if (tmpColDim > FillMatchingSingle.THRESHOLD) {
 
@@ -151,12 +158,10 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
 
         @Override
         public GenericStore<N> make(final int nbRows, final int nbCols) {
-            return new GenericStore<>(this, nbRows, nbCols);
-        }
-
-        @Override
-        public GenericStore<N> make(final long nbRows, final long nbCols) {
-            return new GenericStore<>(this, (int) nbRows, (int) nbCols);
+            Scalar.Factory<N> scalar = this.scalar();
+            N[] data = scalar.newArrayInstance(nbRows * nbCols);
+            Arrays.fill(data, scalar.zero());
+            return new GenericStore<>(this, nbRows, nbCols, data);
         }
 
         @Override
@@ -182,7 +187,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
         @Override
         public GenericStore<N> transpose(final Access2D<?> source) {
 
-            GenericStore<N> retVal = new GenericStore<>(this, (int) source.countColumns(), (int) source.countRows());
+            GenericStore<N> retVal = this.make(source.getColDim(), source.getRowDim());
 
             int tmpRowDim = retVal.getRowDim();
             int tmpColDim = retVal.getColDim();
@@ -232,33 +237,6 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
     private final int myRowDim;
     private final Array2D<N> myUtility;
     private transient N[] myWorkerColumn;
-
-    @SuppressWarnings("unused")
-    private GenericStore(final GenericStore.Factory<N> factory, final int numbRows) {
-        this(factory, numbRows, 1);
-    }
-
-    @SuppressWarnings("unused")
-    private GenericStore(final GenericStore.Factory<N> factory, final N[] dataArray) {
-        this(factory, dataArray.length, 1, dataArray);
-    }
-
-    GenericStore(final GenericStore.Factory<N> factory, final int numbRows, final int numbCols) {
-
-        super(factory.array(), numbRows * numbCols);
-
-        myFactory = factory;
-
-        myRowDim = numbRows;
-        myColDim = numbCols;
-
-        myUtility = this.wrapInArray2D(myRowDim);
-
-        multiplyBoth = MultiplyBoth.newGeneric(myRowDim, myColDim);
-        multiplyLeft = MultiplyLeft.newGeneric(myRowDim, myColDim);
-        multiplyRight = MultiplyRight.newGeneric(myRowDim, myColDim);
-        multiplyNeither = MultiplyNeither.newGeneric(myRowDim, myColDim);
-    }
 
     GenericStore(final GenericStore.Factory<N> factory, final int numbRows, final int numbCols, final N[] dataArray) {
 

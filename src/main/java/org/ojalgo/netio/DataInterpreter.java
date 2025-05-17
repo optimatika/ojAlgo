@@ -108,7 +108,7 @@ public interface DataInterpreter<T> extends DataReader.Deserializer<T>, DataWrit
     @Deprecated
     DataInterpreter<String> STRING = STRING_UTF;
 
-    static <N extends Comparable<N>> DataInterpreter<ArrayAnyD<N>> newIDX(final DenseArray.Factory<N> denseArray) {
+    static <N extends Comparable<N>> DataInterpreter<ArrayAnyD<N>> newIDX(final DenseArray.Factory<N, ?> denseArray) {
 
         ArrayAnyD.Factory<N> factory = ArrayAnyD.factory(denseArray);
 

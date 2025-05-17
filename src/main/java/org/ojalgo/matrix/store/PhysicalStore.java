@@ -23,7 +23,7 @@ package org.ojalgo.matrix.store;
 
 import java.util.List;
 
-import org.ojalgo.array.DenseArray;
+import org.ojalgo.array.PlainArray;
 import org.ojalgo.array.operation.AMAX;
 import org.ojalgo.array.operation.SubstituteBackwards;
 import org.ojalgo.array.operation.SubstituteForwards;
@@ -59,7 +59,7 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
 
         AggregatorSet<N> aggregator();
 
-        DenseArray.Factory<N> array();
+        PlainArray.Factory<N, ?> array();
 
         I conjugate(Access2D<?> source);
 
@@ -167,7 +167,7 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
 
         @Override
         default I newBuilder(final long nbRows, final long nbCols) {
-            return this.make(nbRows, nbCols);
+            return this.make(Math.toIntExact(nbRows), Math.toIntExact(nbCols));
         }
 
         @Override

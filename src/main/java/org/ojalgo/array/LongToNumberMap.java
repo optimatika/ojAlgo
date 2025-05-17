@@ -29,7 +29,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
 
     public static final class MapFactory<N extends Comparable<N>> extends StrategyBuildingFactory<N, LongToNumberMap<N>, MapFactory<N>> {
 
-        MapFactory(final Factory<N> denseFactory) {
+        MapFactory(final Factory<N, ?> denseFactory) {
             super(denseFactory);
         }
 
@@ -39,15 +39,15 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
 
     }
 
-    public static <N extends Comparable<N>> MapFactory<N> factory(final DenseArray.Factory<N> denseFactory) {
+    public static <N extends Comparable<N>> MapFactory<N> factory(final DenseArray.Factory<N, ?> denseFactory) {
         return new MapFactory<>(denseFactory);
     }
 
     private final SparseArray<N> myStorage;
-    private final DenseArray.Factory<N> myDenseFactory;
+    private final DenseArray.Factory<N, ?> myDenseFactory;
     private final GrowthStrategy myGrowthStrategy;
 
-    LongToNumberMap(final DenseArray.Factory<N> denseFactory, final GrowthStrategy growthStrategy) {
+    LongToNumberMap(final DenseArray.Factory<N, ?> denseFactory, final GrowthStrategy growthStrategy) {
 
         super();
 

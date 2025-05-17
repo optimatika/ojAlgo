@@ -27,12 +27,7 @@ import java.util.Comparator;
 
 import org.ojalgo.array.operation.AMAX;
 import org.ojalgo.array.operation.AXPY;
-import org.ojalgo.function.BigFunction;
-import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.aggregator.BigAggregator;
 import org.ojalgo.scalar.BigScalar;
-import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.type.math.MathType;
@@ -44,37 +39,18 @@ import org.ojalgo.type.math.MathType;
  */
 public class ArrayR256 extends ReferenceTypeArray<BigDecimal> {
 
-    public static final DenseArray.Factory<BigDecimal> FACTORY = new DenseArray.Factory<>() {
+    public static final ReferenceTypeArray.Factory<BigDecimal> FACTORY = new ReferenceTypeArray.Factory<>(MathType.R256) {
 
-        @Override
-        public AggregatorSet<BigDecimal> aggregator() {
-            return BigAggregator.getSet();
-        }
-
-        @Override
-        public FunctionSet<BigDecimal> function() {
-            return BigFunction.getSet();
-        }
-
-        @Override
-        public MathType getMathType() {
-            return MathType.R128;
-        }
-
-        @Override
-        public Scalar.Factory<BigDecimal> scalar() {
-            return BigScalar.FACTORY;
-        }
-
-        @Override
-        PlainArray<BigDecimal> makeDenseArray(final long size) {
-            return ArrayR256.make((int) size);
+        public ArrayR256 make(final int size) {
+            return ArrayR256.make(size);
         }
 
     };
 
     public static ArrayR256 make(final int size) {
-        return new ArrayR256(size);
+        BigDecimal[] data = new BigDecimal[size];
+        Arrays.fill(data, BigDecimal.ZERO);
+        return new ArrayR256(data);
     }
 
     public static ArrayR256 wrap(final BigDecimal... data) {
@@ -83,10 +59,6 @@ public class ArrayR256 extends ReferenceTypeArray<BigDecimal> {
 
     protected ArrayR256(final BigDecimal[] data) {
         super(FACTORY, data);
-    }
-
-    protected ArrayR256(final int size) {
-        super(FACTORY, size);
     }
 
     @Override

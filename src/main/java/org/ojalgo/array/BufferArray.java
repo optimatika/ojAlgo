@@ -28,7 +28,6 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.List;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.operation.AMAX;
@@ -37,18 +36,12 @@ import org.ojalgo.array.operation.OperationBinary;
 import org.ojalgo.array.operation.OperationUnary;
 import org.ojalgo.array.operation.OperationVoid;
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
-import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Structure1D;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.math.MathType;
 
@@ -62,153 +55,47 @@ import org.ojalgo.type.math.MathType;
  */
 public abstract class BufferArray extends PlainArray<Double> implements AutoCloseable {
 
-    public static final class Factory extends DenseArray.Factory<Double> {
+    public static final class Factory extends PlainArray.Factory<Double, BufferArray> {
 
         private final BufferConstructor myConstructor;
-        private final MathType myMathType;
 
         Factory(final MathType mathType, final BufferConstructor constructor) {
-            super();
-            myMathType = mathType;
+            super(mathType);
             myConstructor = constructor;
         }
 
         @Override
-        public FunctionSet<Double> function() {
-            return PrimitiveFunction.getSet();
+        public BufferArray make(final int size) {
+            // TODO Auto-generated method stub
+            return this.make((long) size);
         }
 
         @Override
-        public MathType getMathType() {
-            return myMathType;
-        }
-
-        public MappedFileFactory newMapped(final File file) {
-            return new MappedFileFactory(this, file);
-        }
-
-        @Override
-        public Scalar.Factory<Double> scalar() {
-            return PrimitiveScalar.FACTORY;
-        }
-
-        @Override
-        AggregatorSet<Double> aggregator() {
-            return PrimitiveAggregator.getSet();
-        }
-
-        @Override
-        long getCapacityLimit() {
-            return PlainArray.MAX_SIZE / this.getElementSize();
-        }
-
-        @Override
-        BufferArray makeDenseArray(final long size) {
+        public BufferArray make(final long size) {
             int capacity = Math.toIntExact(size * this.getElementSize());
             ByteBuffer buffer = ByteBuffer.allocateDirect(capacity);
             return myConstructor.newInstance(this, buffer, null);
         }
 
-        /**
-         * Signature matching {@link BufferConstructor}.
-         */
-        BufferArray newInstance(final Factory factory, final ByteBuffer buffer, final AutoCloseable closeable) {
-            return myConstructor.newInstance(factory, buffer, closeable);
-        }
+        public BufferArray newMapped(final File file, final long size) {
 
-    }
-
-    public static final class MappedFileFactory extends DenseArray.Factory<Double> {
-
-        private final File myFile;
-        private final Factory myTypeFactory;
-
-        MappedFileFactory(final Factory typeFactory, final File file) {
-            super();
-            myTypeFactory = typeFactory;
-            myFile = file;
-        }
-
-        @Override
-        public BufferArray copy(final Access1D<?> source) {
-            return (BufferArray) super.copy(source);
-        }
-
-        @Override
-        public BufferArray copy(final Comparable<?>... source) {
-            return (BufferArray) super.copy(source);
-        }
-
-        @Override
-        public BufferArray copy(final double... source) {
-            return (BufferArray) super.copy(source);
-        }
-
-        @Override
-        public BufferArray copy(final List<? extends Comparable<?>> source) {
-            return (BufferArray) super.copy(source);
-        }
-
-        @Override
-        public FunctionSet<Double> function() {
-            return myTypeFactory.function();
-        }
-
-        @Override
-        public MathType getMathType() {
-            return myTypeFactory.getMathType();
-        }
-
-        @Override
-        public BufferArray make(final int size) {
-            return (BufferArray) super.make(size);
-        }
-
-        @Override
-        public BufferArray make(final long count) {
-            return (BufferArray) super.make(count);
-        }
-
-        @Override
-        public BufferArray make(final Structure1D shape) {
-            return (BufferArray) super.make(shape);
-        }
-
-        @Override
-        public BufferArray makeFilled(final long count, final NullaryFunction<?> supplier) {
-            return (BufferArray) super.makeFilled(count, supplier);
-        }
-
-        @Override
-        public Scalar.Factory<Double> scalar() {
-            return myTypeFactory.scalar();
-        }
-
-        @Override
-        AggregatorSet<Double> aggregator() {
-            return myTypeFactory.aggregator();
-        }
-
-        @Override
-        BufferArray makeDenseArray(final long size) {
-
-            long count = myTypeFactory.getElementSize() * size;
+            long count = this.getElementSize() * size;
 
             FileChannel fileChannel;
             MappedByteBuffer buffer;
             try {
-                fileChannel = new RandomAccessFile(myFile, "rw").getChannel();
+                fileChannel = new RandomAccessFile(file, "rw").getChannel();
                 buffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0L, count);
             } catch (IOException cause) {
                 throw new RuntimeException(cause);
             }
 
-            return myTypeFactory.newInstance(myTypeFactory, buffer, fileChannel);
+            return myConstructor.newInstance(this, buffer, fileChannel);
         }
 
         @Override
-        SegmentedArray<Double> makeSegmented(final long... structure) {
-            return super.makeSegmented(structure);
+        long getCapacityLimit() {
+            return Integer.MAX_VALUE / this.getElementSize();
         }
 
     }
@@ -220,19 +107,19 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
 
     }
 
-    public static final Factory R032 = new Factory(MathType.R032, BufferR032::new);
-    public static final Factory R064 = new Factory(MathType.R064, BufferR064::new);
-    public static final Factory Z008 = new Factory(MathType.Z008, BufferZ008::new);
-    public static final Factory Z016 = new Factory(MathType.Z016, BufferZ016::new);
-    public static final Factory Z032 = new Factory(MathType.Z032, BufferZ032::new);
-    public static final Factory Z064 = new Factory(MathType.Z064, BufferZ064::new);
+    public static final BufferArray.Factory R032 = new BufferArray.Factory(MathType.R032, BufferR032::new);
+    public static final BufferArray.Factory R064 = new BufferArray.Factory(MathType.R064, BufferR064::new);
+    public static final BufferArray.Factory Z008 = new BufferArray.Factory(MathType.Z008, BufferZ008::new);
+    public static final BufferArray.Factory Z016 = new BufferArray.Factory(MathType.Z016, BufferZ016::new);
+    public static final BufferArray.Factory Z032 = new BufferArray.Factory(MathType.Z032, BufferZ032::new);
+    public static final BufferArray.Factory Z064 = new BufferArray.Factory(MathType.Z064, BufferZ064::new);
 
     private final Buffer myBuffer;
     private final AutoCloseable myFile;
 
-    BufferArray(final Factory factory, final Buffer buffer, final AutoCloseable file) {
+    BufferArray(final BufferArray.Factory factory, final Buffer buffer, final AutoCloseable file) {
 
-        super(factory, buffer.capacity());
+        super(factory, Math.toIntExact(buffer.capacity() / factory.getElementSize()));
 
         myBuffer = buffer;
         myFile = file;

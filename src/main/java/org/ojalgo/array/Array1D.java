@@ -26,6 +26,7 @@ import java.util.AbstractList;
 import java.util.RandomAccess;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.array.BasicArray.BaseFactory;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
@@ -57,7 +58,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
         private final BasicArray.Factory<N> myDelegate;
 
-        Factory(final DenseArray.Factory<N> denseArray) {
+        Factory(final DenseArray.Factory<N, ?> denseArray) {
             super();
             myDelegate = new BasicArray.Factory<>(denseArray);
         }
@@ -133,7 +134,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     public static final Factory<Double> Z032 = Array1D.factory(ArrayZ032.FACTORY);
     public static final Factory<Double> Z064 = Array1D.factory(ArrayZ064.FACTORY);
 
-    public static <N extends Comparable<N>> Array1D.Factory<N> factory(final DenseArray.Factory<N> denseFactory) {
+    public static <N extends Comparable<N>> Array1D.Factory<N> factory(final DenseArray.Factory<N, ?> denseFactory) {
         return new Array1D.Factory<>(denseFactory);
     }
 
@@ -628,7 +629,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
         return new Factory1D<>() {
 
-            ArrayFactory<N, ?> delegate = myDelegate.factory();
+            BaseFactory<N, ?> delegate = myDelegate.factory();
 
             public FunctionSet<?> function() {
                 return delegate.function();

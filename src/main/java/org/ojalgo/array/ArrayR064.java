@@ -31,13 +31,9 @@ import java.util.stream.StreamSupport;
 
 import org.ojalgo.array.operation.*;
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
-import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
@@ -53,37 +49,17 @@ import org.ojalgo.type.math.MathType;
  */
 public class ArrayR064 extends PrimitiveArray {
 
-    public static final DenseArray.Factory<Double> FACTORY = new DenseArray.Factory<>() {
+    public static final PrimitiveArray.Factory FACTORY = new PrimitiveArray.Factory(MathType.R064) {
 
         @Override
-        public AggregatorSet<Double> aggregator() {
-            return PrimitiveAggregator.getSet();
-        }
-
-        @Override
-        public FunctionSet<Double> function() {
-            return PrimitiveFunction.getSet();
-        }
-
-        @Override
-        public MathType getMathType() {
-            return MathType.R064;
-        }
-
-        @Override
-        public Scalar.Factory<Double> scalar() {
-            return PrimitiveScalar.FACTORY;
-        }
-
-        @Override
-        PlainArray<Double> makeDenseArray(final long size) {
-            return ArrayR064.make((int) size);
+        public ArrayR064 make(final int size) {
+            return ArrayR064.make(size);
         }
 
     };
 
     public static ArrayR064 make(final int size) {
-        return new ArrayR064(size);
+        return new ArrayR064(new double[size]);
     }
 
     public static ArrayR064 wrap(final double... data) {
@@ -100,13 +76,6 @@ public class ArrayR064 extends PrimitiveArray {
         super(FACTORY, data.length);
 
         this.data = data;
-    }
-
-    protected ArrayR064(final int size) {
-
-        super(FACTORY, size);
-
-        data = new double[size];
     }
 
     @Override

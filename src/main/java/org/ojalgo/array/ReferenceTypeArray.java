@@ -41,6 +41,7 @@ import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
+import org.ojalgo.type.math.MathType;
 
 /**
  * A one- and/or arbitrary-dimensional array of {@linkplain java.lang.Comparable}.
@@ -49,21 +50,17 @@ import org.ojalgo.structure.Mutate1D;
  */
 public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainArray<N> implements Mutate1D.Sortable {
 
-    public final N[] data;
+    public static abstract class Factory<N extends Comparable<N>> extends PlainArray.Factory<N, ReferenceTypeArray<N>> {
 
-    ReferenceTypeArray(final DenseArray.Factory<N> factory, final int length) {
+        protected Factory(final MathType mathType) {
+            super(mathType);
+        }
 
-        super(factory, length);
-
-        Scalar.Factory<N> scalarFactory = factory.scalar();
-
-        data = scalarFactory.newArrayInstance(length);
-
-        N zero = scalarFactory.zero().get();
-        Arrays.fill(data, zero);
     }
 
-    ReferenceTypeArray(final DenseArray.Factory<N> factory, final N[] data) {
+    public final N[] data;
+
+    ReferenceTypeArray(final ReferenceTypeArray.Factory<N> factory, final N[] data) {
 
         super(factory, data.length);
 

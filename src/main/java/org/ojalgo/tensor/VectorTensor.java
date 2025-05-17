@@ -34,7 +34,7 @@ public final class VectorTensor<N extends Comparable<N>> extends ArrayBasedTenso
 
         private final Array1D.Factory<N> myFactory;
 
-        Factory(final DenseArray.Factory<N> arrayFactory) {
+        Factory(final DenseArray.Factory<N, ?> arrayFactory) {
 
             super(arrayFactory);
 
@@ -79,7 +79,7 @@ public final class VectorTensor<N extends Comparable<N>> extends ArrayBasedTenso
 
     }
 
-    public static <N extends Comparable<N>> TensorFactory1D<N, VectorTensor<N>> factory(final DenseArray.Factory<N> arrayFactory) {
+    public static <N extends Comparable<N>> TensorFactory1D<N, VectorTensor<N>> factory(final DenseArray.Factory<N, ?> arrayFactory) {
         return new TensorFactory1D<>(new VectorTensor.Factory<>(arrayFactory));
     }
 

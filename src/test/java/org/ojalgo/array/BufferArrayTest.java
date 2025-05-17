@@ -75,7 +75,7 @@ public class BufferArrayTest extends ArrayTests {
         int size = 5000;
         final int capacity = size;
 
-        try (BufferArray array = BufferArray.R064.newMapped(file).make(capacity)) {
+        try (BufferArray array = BufferArray.R064.newMapped(file, capacity)) {
             BufferArrayTest.doTest(array, size);
         }
     }

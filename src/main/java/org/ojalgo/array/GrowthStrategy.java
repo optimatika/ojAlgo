@@ -26,7 +26,7 @@ final class GrowthStrategy {
         private long myInitial = INITIAL;
         private long mySegment = SEGMENT;
 
-        Builder(final DenseArray.Factory<?> denseFactory) {
+        Builder(final DenseArray.Factory<?, ?> denseFactory) {
             this(denseFactory.getElementSize());
 
         }
@@ -82,11 +82,11 @@ final class GrowthStrategy {
 
     }
 
-    static Builder newBuilder(final DenseArray.Factory<?> denseFactory) {
+    static Builder newBuilder(final DenseArray.Factory<?, ?> denseFactory) {
         return new Builder(denseFactory);
     }
 
-    static GrowthStrategy newInstance(final DenseArray.Factory<?> denseFactory) {
+    static GrowthStrategy newInstance(final DenseArray.Factory<?, ?> denseFactory) {
         return new Builder(denseFactory).build();
     }
 
@@ -143,15 +143,15 @@ final class GrowthStrategy {
         return count > mySegment;
     }
 
-    <N extends Comparable<N>> DenseArray<N> makeChunk(final DenseArray.Factory<N> denseFactory) {
+    <N extends Comparable<N>> DenseArray<N> makeChunk(final DenseArray.Factory<N, ?> denseFactory) {
         return denseFactory.make(myChunk);
     }
 
-    <N extends Comparable<N>> DenseArray<N> makeInitial(final DenseArray.Factory<N> denseFactory) {
+    <N extends Comparable<N>> DenseArray<N> makeInitial(final DenseArray.Factory<N, ?> denseFactory) {
         return denseFactory.make(myInitial);
     }
 
-    <N extends Comparable<N>> DenseArray<N> makeSegment(final DenseArray.Factory<N> denseFactory) {
+    <N extends Comparable<N>> DenseArray<N> makeSegment(final DenseArray.Factory<N, ?> denseFactory) {
         return denseFactory.make(mySegment);
     }
 

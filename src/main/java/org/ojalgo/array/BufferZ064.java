@@ -32,12 +32,8 @@ final class BufferZ064 extends BufferArray {
     private final LongBuffer myBuffer;
 
     BufferZ064(final BufferArray.Factory factory, final ByteBuffer buffer, final AutoCloseable closeable) {
-        this(factory, buffer.asLongBuffer(), closeable);
-    }
-
-    BufferZ064(final BufferArray.Factory factory, final LongBuffer buffer, final AutoCloseable closeable) {
         super(factory, buffer, closeable);
-        myBuffer = buffer;
+        myBuffer = buffer.asLongBuffer();
     }
 
     @Override

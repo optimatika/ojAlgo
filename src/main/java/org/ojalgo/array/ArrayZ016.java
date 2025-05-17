@@ -31,13 +31,9 @@ import org.ojalgo.array.operation.OperationBinary;
 import org.ojalgo.array.operation.OperationUnary;
 import org.ojalgo.array.operation.OperationVoid;
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
-import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
@@ -51,37 +47,16 @@ import org.ojalgo.type.math.MathType;
  */
 public class ArrayZ016 extends PrimitiveArray {
 
-    public static final DenseArray.Factory<Double> FACTORY = new DenseArray.Factory<>() {
+    public static final PrimitiveArray.Factory FACTORY = new PrimitiveArray.Factory(MathType.Z016) {
 
         @Override
-        public AggregatorSet<Double> aggregator() {
-            return PrimitiveAggregator.getSet();
+        public ArrayZ016 make(final int size) {
+            return ArrayZ016.make(size);
         }
-
-        @Override
-        public FunctionSet<Double> function() {
-            return PrimitiveFunction.getSet();
-        }
-
-        @Override
-        public MathType getMathType() {
-            return MathType.Z016;
-        }
-
-        @Override
-        public Scalar.Factory<Double> scalar() {
-            return PrimitiveScalar.FACTORY;
-        }
-
-        @Override
-        PlainArray<Double> makeDenseArray(final long size) {
-            return ArrayZ016.make((int) size);
-        }
-
     };
 
     public static ArrayZ016 make(final int size) {
-        return new ArrayZ016(size);
+        return new ArrayZ016(new short[size]);
     }
 
     public static ArrayZ016 wrap(final short... data) {
@@ -89,13 +64,6 @@ public class ArrayZ016 extends PrimitiveArray {
     }
 
     public final short[] data;
-
-    protected ArrayZ016(final int size) {
-
-        super(FACTORY, size);
-
-        data = new short[size];
-    }
 
     /**
      * Array not copied! No checking!

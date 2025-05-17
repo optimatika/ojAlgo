@@ -7,10 +7,10 @@ import org.ojalgo.type.math.MathType;
 
 public abstract class StrategyBuildingFactory<N extends Comparable<N>, I extends Access1D<N>, SB extends StrategyBuildingFactory<N, I, SB>> {
 
-    private final DenseArray.Factory<N> myDenseFactory;
+    private final DenseArray.Factory<N, ?> myDenseFactory;
     private final GrowthStrategy.Builder myStrategyBuilder;
 
-    public StrategyBuildingFactory(final DenseArray.Factory<N> denseFactory) {
+    public StrategyBuildingFactory(final DenseArray.Factory<N, ?> denseFactory) {
 
         super();
 
@@ -20,8 +20,8 @@ public abstract class StrategyBuildingFactory<N extends Comparable<N>, I extends
 
     /**
      * @param chunk Defines a capacity break point. Below this point the capacity is doubled when needed.
-     *        Above it, it is grown by adding one "chunk" at the time. Must be a power of 2. (The builder will
-     *        enforce that for you.)
+     *              Above it, it is grown by adding one "chunk" at the time. Must be a power of 2. (The
+     *              builder will enforce that for you.)
      * @return this
      */
     public SB chunk(final long chunk) {
@@ -61,7 +61,7 @@ public abstract class StrategyBuildingFactory<N extends Comparable<N>, I extends
         return (SB) this;
     }
 
-    DenseArray.Factory<N> getDenseFactory() {
+    DenseArray.Factory<N, ?> getDenseFactory() {
         return myDenseFactory;
     }
 
