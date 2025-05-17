@@ -26,11 +26,13 @@ import java.util.RandomAccess;
 import java.util.Spliterator;
 
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.type.math.MathType;
 
 /**
  * Array class limited by integer (int, not long) indices. Typically this will be a plain java array as in
@@ -41,6 +43,21 @@ import org.ojalgo.structure.Access1D;
  * @author apete
  */
 public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> implements RandomAccess {
+
+    public static final class PlainFactory<N extends Comparable<N>, A extends PlainArray<N>> extends DenseArray.DenseFactory<N, A> {
+
+        protected PlainFactory(final MathType mathType, final org.ojalgo.scalar.Scalar.Factory<N> scalar, final FunctionSet<N> function) {
+            super(mathType, scalar, function);
+            // TODO Auto-generated constructor stub
+        }
+
+        @Override
+        public A make(final int size) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+    }
 
     /**
      * Exists as a private constant in {@link ArrayList}. The Oracle JVM seems to actually be limited at

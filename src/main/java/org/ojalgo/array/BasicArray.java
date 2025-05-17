@@ -38,6 +38,7 @@ import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.special.PowerOf2;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Factory1D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.StructureAnyD;
 import org.ojalgo.type.math.MathType;
@@ -125,6 +126,41 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
             }
         }
 
+    }
+
+    abstract static class BaseFactory<N extends Comparable<N>, A extends BasicArray<N>> implements Factory1D<A> {
+
+        private final AggregatorSet<N> myAggregator;
+        private final FunctionSet<N> myFunction;
+        private final MathType myMathType;
+        private final Scalar.Factory<N> myScalar;
+
+        BaseFactory(final MathType mathType, final Scalar.Factory<N> scalar, final FunctionSet<N> function) {
+            super();
+            myMathType = mathType;
+            myScalar = scalar;
+            myFunction = function;
+            myAggregator = function.aggregator();
+        }
+
+        public final AggregatorSet<N> aggregator() {
+            return myAggregator;
+        }
+
+        @Override
+        public final FunctionSet<N> function() {
+            return myFunction;
+        }
+
+        @Override
+        public final MathType getMathType() {
+            return myMathType;
+        }
+
+        @Override
+        public final Scalar.Factory<N> scalar() {
+            return myScalar;
+        }
     }
 
     private final ArrayFactory<N, ?> myFactory;

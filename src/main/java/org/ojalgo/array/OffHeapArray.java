@@ -47,6 +47,21 @@ import org.ojalgo.type.math.MathType;
  */
 public abstract class OffHeapArray extends DenseArray<Double> {
 
+    public static final class OffHeapFactory<A extends OffHeapArray> extends DenseArray.DenseFactory<Double, A> {
+
+        protected OffHeapFactory(final MathType mathType, final org.ojalgo.scalar.Scalar.Factory<Double> scalar, final FunctionSet<Double> function) {
+            super(mathType, scalar, function);
+            // TODO Auto-generated constructor stub
+        }
+
+        @Override
+        public A make(final int size) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+    }
+
     static final class Factory extends DenseArray.Factory<Double> {
 
         private final LongFunction<OffHeapArray> myConstructor;
@@ -89,6 +104,11 @@ public abstract class OffHeapArray extends DenseArray<Double> {
         }
 
     }
+
+    /**
+     * Just something in line with {@link PlainArray#MAX_SIZE}
+     */
+    public static final long MAX_SIZE = Long.MAX_VALUE - 8L;
 
     public static final DenseArray.Factory<Double> R032 = new Factory(MathType.R032, OffHeapR032::new);
     public static final DenseArray.Factory<Double> R064 = new Factory(MathType.R064, OffHeapR064::new);

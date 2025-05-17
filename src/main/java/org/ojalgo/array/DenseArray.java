@@ -22,10 +22,13 @@
 package org.ojalgo.array;
 
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Factory1D;
 import org.ojalgo.structure.StructureAnyD;
+import org.ojalgo.type.math.MathType;
 
 /**
  * Each and every element occupies memory and holds a value.
@@ -33,6 +36,14 @@ import org.ojalgo.structure.StructureAnyD;
  * @author apete
  */
 public abstract class DenseArray<N extends Comparable<N>> extends BasicArray<N> implements Factory1D.Builder<DenseArray<N>> {
+
+    public abstract static class DenseFactory<N extends Comparable<N>, A extends DenseArray<N>> extends BaseFactory<N, A> {
+
+        protected DenseFactory(final MathType mathType, final Scalar.Factory<N> scalar, final FunctionSet<N> function) {
+            super(mathType, scalar, function);
+        }
+
+    }
 
     public static abstract class Factory<N extends Comparable<N>> extends ArrayFactory<N, DenseArray<N>>
             implements Factory1D.TwoStep<DenseArray<N>, DenseArray<N>> {
