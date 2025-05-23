@@ -557,6 +557,19 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
         this.supplyNonZerosTo(receiver);
     }
 
+    public CompressedArrayR064 toCompressedR064() {
+
+        int[] indices = new int[myActualLength];
+        double[] values = new double[myActualLength];
+
+        for (int i = 0; i < myActualLength; i++) {
+            indices[i] = Math.toIntExact(myIndices[i]);
+            values[i] = myValues.doubleValue(i);
+        }
+
+        return new CompressedArrayR064(indices, values);
+    }
+
     @Override
     public void visitOne(final long index, final VoidFunction<N> visitor) {
         if (this.isPrimitive()) {
