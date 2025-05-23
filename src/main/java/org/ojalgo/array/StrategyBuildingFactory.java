@@ -1,21 +1,17 @@
 package org.ojalgo.array;
 
-import org.ojalgo.function.FunctionSet;
-import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.math.MathType;
 
-public abstract class StrategyBuildingFactory<N extends Comparable<N>, I extends Access1D<N>, SB extends StrategyBuildingFactory<N, I, SB>> {
+abstract class StrategyBuildingFactory<N extends Comparable<N>, I extends Access1D<N>, SB extends StrategyBuildingFactory<N, I, SB>> {
 
-    private final DenseArray.Factory<N, ?> myDenseFactory;
     private final GrowthStrategy.Builder myStrategyBuilder;
 
-    public StrategyBuildingFactory(final DenseArray.Factory<N, ?> denseFactory) {
+    StrategyBuildingFactory(final MathType mathType) {
 
         super();
 
-        myDenseFactory = denseFactory;
-        myStrategyBuilder = GrowthStrategy.newBuilder(denseFactory);
+        myStrategyBuilder = GrowthStrategy.newBuilder(mathType);
     }
 
     /**
@@ -29,14 +25,6 @@ public abstract class StrategyBuildingFactory<N extends Comparable<N>, I extends
         return (SB) this;
     }
 
-    public FunctionSet<N> function() {
-        return myDenseFactory.function();
-    }
-
-    public MathType getMathType() {
-        return myDenseFactory.getMathType();
-    }
-
     /**
      * @param initial Sets the initial capacity of the "arrays" to be created using this factory.
      * @return this
@@ -44,10 +32,6 @@ public abstract class StrategyBuildingFactory<N extends Comparable<N>, I extends
     public SB initial(final long initial) {
         myStrategyBuilder.initial(initial);
         return (SB) this;
-    }
-
-    public Scalar.Factory<N> scalar() {
-        return myDenseFactory.scalar();
     }
 
     /**
@@ -59,10 +43,6 @@ public abstract class StrategyBuildingFactory<N extends Comparable<N>, I extends
     public SB segment(final long segment) {
         myStrategyBuilder.segment(segment);
         return (SB) this;
-    }
-
-    DenseArray.Factory<N, ?> getDenseFactory() {
-        return myDenseFactory;
     }
 
     GrowthStrategy getGrowthStrategy() {

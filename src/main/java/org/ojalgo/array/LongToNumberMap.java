@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.DenseArray.Factory;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
@@ -29,12 +28,15 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
 
     public static final class MapFactory<N extends Comparable<N>> extends StrategyBuildingFactory<N, LongToNumberMap<N>, MapFactory<N>> {
 
-        MapFactory(final Factory<N, ?> denseFactory) {
-            super(denseFactory);
+        private final DenseArray.Factory<N, ?> myDenseArrayFactory;
+
+        MapFactory(final DenseArray.Factory<N, ?> denseFactory) {
+            super(denseFactory.getMathType());
+            myDenseArrayFactory = denseFactory;
         }
 
         public LongToNumberMap<N> make() {
-            return new LongToNumberMap<>(this.getDenseFactory(), this.getGrowthStrategy());
+            return new LongToNumberMap<>(myDenseArrayFactory, this.getGrowthStrategy());
         }
 
     }

@@ -27,6 +27,7 @@ import java.util.function.Consumer;
 import java.util.stream.LongStream;
 
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
@@ -40,6 +41,7 @@ import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Structure1D;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.type.math.MathType;
 
 /**
  * <p>
@@ -210,18 +212,36 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
     public static final class SparseFactory<N extends Comparable<N>> extends StrategyBuildingFactory<N, SparseArray<N>, SparseFactory<N>>
             implements Factory1D<SparseArray<N>> {
 
+        private final DenseArray.Factory<N, ?> myDenseArrayFactory;
+
         SparseFactory(final DenseArray.Factory<N, ?> denseFactory) {
-            super(denseFactory);
+            super(denseFactory.getMathType());
+            myDenseArrayFactory = denseFactory;
+        }
+
+        @Override
+        public final FunctionSet<N> function() {
+            return myDenseArrayFactory.function();
+        }
+
+        @Override
+        public final MathType getMathType() {
+            return myDenseArrayFactory.getMathType();
         }
 
         @Override
         public SparseArray<N> make(final int size) {
-            return new SparseArray<>(this.getDenseFactory(), this.getGrowthStrategy(), size);
+            return new SparseArray<>(myDenseArrayFactory, this.getGrowthStrategy(), size);
         }
 
         @Override
         public SparseArray<N> make(final long count) {
-            return new SparseArray<>(this.getDenseFactory(), this.getGrowthStrategy(), count);
+            return new SparseArray<>(myDenseArrayFactory, this.getGrowthStrategy(), count);
+        }
+
+        @Override
+        public final org.ojalgo.scalar.Scalar.Factory<N> scalar() {
+            return myDenseArrayFactory.scalar();
         }
 
     }
@@ -255,7 +275,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
         myGrowthStrategy = growthStrategy;
 
         myIndices = new long[growthStrategy.initial()];
-        myValues = growthStrategy.makeInitial(denseFactory);
+        myValues = growthStrategy.makeInitial(denseFactory::make);
 
         myZeroScalar = denseFactory.scalar().zero();
         myZeroNumber = myZeroScalar.get();

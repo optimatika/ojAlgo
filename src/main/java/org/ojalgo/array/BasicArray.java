@@ -68,7 +68,7 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
         Factory(final DenseArray.Factory<N, ?> denseFactory) {
             super(denseFactory.getMathType());
             myDenseFactory = denseFactory;
-            myGrowthStrategy = GrowthStrategy.newInstance(denseFactory);
+            myGrowthStrategy = GrowthStrategy.newInstance(denseFactory.getMathType());
         }
 
         @Override
