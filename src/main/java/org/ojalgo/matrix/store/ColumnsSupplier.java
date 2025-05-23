@@ -18,7 +18,7 @@ import org.ojalgo.structure.Mutate2D;
  *
  * @author apete
  */
-public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixStore<N>, Mutate2D, SparseStructure2D {
+public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixStore<N>, Mutate2D, SparseStructure2D, Mutate2D.Exchangeable {
 
     public static final class SingleView<N extends Comparable<N>> extends ColumnView<N> implements Access2D.Collectable<N, PhysicalStore<N>> {
 
@@ -186,6 +186,26 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixSto
     @Override
     public double doubleValue(final int row, final int col) {
         return myColumns.get(col).doubleValue(row);
+    }
+
+    @Override
+    public void exchangeColumns(final long colA, final long colB) {
+        int a = Math.toIntExact(colA);
+        int b = Math.toIntExact(colB);
+        SparseArray<N> temp = myColumns.get(a);
+        myColumns.set(a, myColumns.get(b));
+        myColumns.set(b, temp);
+    }
+
+    @Override
+    public void exchangeRows(final long rowA, final long rowB) {
+        int a = Math.toIntExact(rowA);
+        int b = Math.toIntExact(rowB);
+        for (SparseArray<N> column : myColumns) {
+            double temp = column.doubleValue(a);
+            column.set(a, column.doubleValue(b));
+            column.set(b, temp);
+        }
     }
 
     @Override
