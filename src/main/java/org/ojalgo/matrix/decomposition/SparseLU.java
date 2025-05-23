@@ -31,15 +31,8 @@ import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
-import org.ojalgo.matrix.store.DiagonalStore;
-import org.ojalgo.matrix.store.LinkedR064;
+import org.ojalgo.matrix.store.*;
 import org.ojalgo.matrix.store.LinkedR064.ElementNode;
-import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.R064LSC;
-import org.ojalgo.matrix.store.R064LSR;
-import org.ojalgo.matrix.store.R064Store;
-import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.matrix.transformation.InvertibleFactor;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
@@ -214,7 +207,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
      */
     private double[] myDiagU;
     private final List<InvertibleFactor<Double>> myFactors = new ArrayList<>();
-    private R064LSR myL;
+    private RowsSupplier<Double> myL;
     private final Pivot myPivot;
     private R064LSR myU;
     private transient R064Store myWorkerRow = null;
@@ -253,11 +246,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
 
         for (int ij = r - 1; ij > 0; ij--) {
             double varJ = arg.doubleValue(ij);
-            ElementNode rowNodeL = myL.getLastInRow(ij);
-            while (rowNodeL != null) {
-                arg.add(rowNodeL.index, -rowNodeL.value * varJ);
-                rowNodeL = rowNodeL.previous;
-            }
+            myL.getRow(ij).axpy(-varJ, arg);
         }
 
         this.applyReverseOrder(myPivot, arg);
@@ -304,14 +293,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
             myPivot.applyPivotOrder(wCol);
 
             for (int i = 0; i < m; i++) {
-
-                double sum = ZERO;
-                ElementNode rowNodeL = myL.getFirstInRow(i);
-                while (rowNodeL != null) {
-                    sum += rowNodeL.value * wColData[rowNodeL.index];
-                    rowNodeL = rowNodeL.next;
-                }
-                wColData[i] -= sum;
+                wColData[i] -= myL.getRow(i).dot(wCol);
             }
 
             int p = j;
@@ -348,7 +330,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
             if (j < m && tmpDenom != ZERO) {
                 for (int i = j + 1; i < m; i++) {
                     tmpNumer = wColData[i];
-                    myL.setLast(i, j, tmpNumer / tmpDenom);
+                    myL.set(i, j, tmpNumer / tmpDenom);
                 }
             }
         }
@@ -538,13 +520,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
         myPivot.applyPivotOrder(wCol);
 
         for (int ij = 1; ij < r; ij++) {
-            double sum = ZERO;
-            LinkedR064.ElementNode rowNodeL = myL.getFirstInRow(ij);
-            while (rowNodeL != null) {
-                sum -= rowNodeL.value * wCol.doubleValue(rowNodeL.index);
-                rowNodeL = rowNodeL.next;
-            }
-            wCol.add(ij, sum);
+            wCol.add(ij, -myL.getRow(ij).dot(wCol));
         }
 
         // Apply any existing transformations to the new column
@@ -629,12 +605,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
         int r = this.getMinDim();
 
         for (int ij = 1; ij < r; ij++) {
-            double sum = ZERO;
-            ElementNode rowNodeL = myL.getFirstInRow(ij);
-            while (rowNodeL != null) {
-                sum -= rowNodeL.value * arg.doubleValue(rowNodeL.index, col);
-                rowNodeL = rowNodeL.next;
-            }
+            double sum = -myL.getRow(ij).dot(arg.sliceColumn(col));
             arg.add(ij, col, sum);
         }
 
@@ -686,7 +657,8 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
         if (myL != null && myL.getRowDim() == m && myL.getColDim() == r) {
             myL.reset();
         } else {
-            myL = R064LSR.FACTORY.make(m, r);
+            myL = R064Store.FACTORY.makeRowsSupplier(r);
+            myL.addRows(m);
         }
 
         if (myDiagU != null && myDiagU.length == r) {
