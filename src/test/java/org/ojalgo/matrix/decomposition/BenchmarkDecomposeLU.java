@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.BenchmarkUtils;
+import org.ojalgo.array.SparseArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
@@ -77,6 +78,31 @@ BenchmarkDecomposeLU.sparse       0.01   2000  thrpt    3     0.052 ±   0.245  
 BenchmarkDecomposeLU.sparse       0.02    500  thrpt    3     7.628 ±   0.558  ops/s
 BenchmarkDecomposeLU.sparse       0.02   1000  thrpt    3     0.535 ±   0.210  ops/s
 BenchmarkDecomposeLU.sparse       0.02   2000  thrpt    3     0.047 ±   0.228  ops/s
+ * </pre>
+ *
+ * With newer {@link SparseArray} based L
+ *
+ * <pre>
+# Run complete. Total time: 00:16:36
+
+REMEMBER: The numbers below are just data. To gain reusable insights, you need to follow up on
+why the numbers are the way they are. Use profilers (see -prof, -lprof), design factorial
+experiments, perform baseline and negative tests that provide experimental control, make sure
+the benchmarking environment is safe on JVM/OS/HW level, ask for reviews from the domain experts.
+Do not assume the numbers tell you what you want them to tell.
+
+Benchmark                    (density)  (dim)   Mode  Cnt   Score    Error  Units
+BenchmarkDecomposeLU.sparse      0.005    500  thrpt    3  36.826 ± 83.025  ops/s
+BenchmarkDecomposeLU.sparse      0.005   1000  thrpt    3   1.503 ±  0.665  ops/s
+BenchmarkDecomposeLU.sparse      0.005   2000  thrpt    3   0.166 ±  0.015  ops/s
+
+BenchmarkDecomposeLU.sparse       0.01    500  thrpt    3  10.117 ±  0.147  ops/s
+BenchmarkDecomposeLU.sparse       0.01   1000  thrpt    3   1.205 ±  0.086  ops/s
+BenchmarkDecomposeLU.sparse       0.01   2000  thrpt    3   0.146 ±  0.024  ops/s
+
+BenchmarkDecomposeLU.sparse       0.02    500  thrpt    3   8.410 ±  0.158  ops/s
+BenchmarkDecomposeLU.sparse       0.02   1000  thrpt    3   1.093 ±  0.031  ops/s
+BenchmarkDecomposeLU.sparse       0.02   2000  thrpt    3   0.140 ±  0.013  ops/s
  * </pre>
  */
 @State(Scope.Benchmark)
