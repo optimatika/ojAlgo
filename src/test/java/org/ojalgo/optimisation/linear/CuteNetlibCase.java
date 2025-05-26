@@ -23,6 +23,8 @@ package org.ojalgo.optimisation.linear;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.type.context.NumberContext;
@@ -40,10 +42,10 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
+@Execution(ExecutionMode.CONCURRENT)
 public class CuteNetlibCase extends OptimisationLinearTests implements ModelFileTest {
 
     private static void doTest(final String name, final String expMinValString, final String expMaxValString, final NumberContext accuracy) {
-
         ExpressionsBasedModel model = ModelFileTest.makeModel("netlib", name, false);
 
         // model.options.debug(Optimisation.Solver.class);
