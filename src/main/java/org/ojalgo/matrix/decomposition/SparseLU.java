@@ -34,9 +34,9 @@ import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.matrix.store.DiagonalStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.R064LSC;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RowsSupplier;
+import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.matrix.transformation.InvertibleFactor;
 import org.ojalgo.structure.Access1D;
@@ -69,36 +69,50 @@ import org.ojalgo.type.NumberDefinition;
  */
 final class SparseLU extends AbstractDecomposition<Double, R064Store> implements LU<Double> {
 
-    static final class Eta implements InvertibleFactor<Double>, Mutate1D {
+    static final class PermutationEta implements InvertibleFactor<Double>, Mutate1D {
 
         private final int myDim;
         private final SparseArray<Double> myElements;
-        private final int myRow;
+        private final int myFrom;
+        private final int myTo;
 
-        Eta(final int dim, final int row) {
+        PermutationEta(final int dim, final int from, final int to) {
             super();
             myDim = dim;
-            myRow = row;
+            myFrom = from;
+            myTo = to;
             myElements = SparseArray.factory(ArrayR064.FACTORY).make(dim);
         }
 
         @Override
         public void btran(final PhysicalStore<Double> arg) {
 
-            double rowValue = arg.doubleValue(myRow);
+            double rowValue = arg.doubleValue(myTo);
             for (NonzeroView<Double> nz : myElements.nonzeros()) {
                 arg.add(nz.index(), nz.doubleValue() * rowValue);
             }
+
+            double tmp = arg.doubleValue(myTo);
+            for (int i = myTo; i > myFrom; i--) {
+                arg.set(i, arg.doubleValue(i - 1));
+            }
+            arg.set(myFrom, tmp);
         }
 
         @Override
         public void ftran(final PhysicalStore<Double> arg) {
 
+            double tmp = arg.doubleValue(myFrom);
+            for (int i = myFrom; i < myTo; i++) {
+                arg.set(i, arg.doubleValue(i + 1));
+            }
+            arg.set(myTo, tmp);
+
             double sum = ZERO;
             for (NonzeroView<Double> nz : myElements.nonzeros()) {
                 sum += nz.doubleValue() * arg.doubleValue(nz.index());
             }
-            arg.add(myRow, sum);
+            arg.add(myTo, sum);
         }
 
         @Override
@@ -128,81 +142,12 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
 
     }
 
-    static final class Permutation implements InvertibleFactor<Double> {
-
-        private final int myDim;
-        private final int myFrom;
-        private final int myTo;
-
-        Permutation(final int dim, final int from, final int to) {
-            super();
-            myDim = dim;
-            myFrom = from;
-            myTo = to;
-        }
-
-        @Override
-        public void btran(final PhysicalStore<Double> arg) {
-
-            // For cyclic shift permutation, forward substitution
-            // Store the value that will be moved to the end
-            double tmp = arg.doubleValue(myTo);
-
-            // Shift all elements between from and to one position down
-            if (myFrom < myTo) {
-                for (int i = myTo; i > myFrom; i--) {
-                    arg.set(i, arg.doubleValue(i - 1));
-                }
-            } else {
-                for (int i = myTo; i < myFrom; i++) {
-                    arg.set(i, arg.doubleValue(i + 1));
-                }
-            }
-
-            // Place the stored value at the from position
-            arg.set(myFrom, tmp);
-        }
-
-        @Override
-        public void ftran(final PhysicalStore<Double> arg) {
-
-            // For cyclic shift permutation, backward substitution
-            // Store the value that will be moved to the end
-            double tmp = arg.doubleValue(myFrom);
-
-            // Shift all elements between from and to one position up
-            if (myFrom < myTo) {
-                for (int i = myFrom; i < myTo; i++) {
-                    arg.set(i, arg.doubleValue(i + 1));
-                }
-            } else {
-                for (int i = myFrom; i > myTo; i--) {
-                    arg.set(i, arg.doubleValue(i - 1));
-                }
-            }
-
-            // Place the stored value at the to position
-            arg.set(myTo, tmp);
-        }
-
-        @Override
-        public int getColDim() {
-            return myDim;
-        }
-
-        @Override
-        public int getRowDim() {
-            return myDim;
-        }
-
-    }
-
     private static Access2D.Sliceable<Double> cast(final Collectable<Double, ? super TransformableRegion<Double>> matrix) {
 
         if (matrix instanceof Access2D.Sliceable<?>) {
             return (Access2D.Sliceable<Double>) matrix;
         } else {
-            return matrix.collect(R064LSC.FACTORY);
+            return matrix.collect(SparseStore.R064);
         }
     }
 
@@ -215,8 +160,8 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
     private RowsSupplier<Double> myL;
     private final Pivot myPivot;
     private RowsSupplier<Double> myU;
-    private transient R064Store myWorkerRow = null;
     private transient R064Store myWorkerColumn = null;
+    private transient R064Store myWorkerRow = null;
 
     SparseLU() {
 
@@ -322,7 +267,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
 
             for (int i = 0, limit = Math.min(m, j); i < limit; i++) {
                 tmpNumer = wColData[i];
-                myU.set(i, j, tmpNumer);
+                myU.putLast(i, j, tmpNumer);
             }
             if (j < r) {
                 myDiagU[j] = tmpDenom;
@@ -331,7 +276,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
             if (j < m && tmpDenom != ZERO) {
                 for (int i = j + 1; i < m; i++) {
                     tmpNumer = wColData[i];
-                    myL.set(i, j, tmpNumer / tmpDenom);
+                    myL.putLast(i, j, tmpNumer / tmpDenom);
                 }
             }
         }
@@ -568,10 +513,10 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
                 myDiagU[i] = myDiagU[i + 1];
             }
 
-            Permutation perm = new Permutation(r, columnIndex, lastRowNonZero);
-            myFactors.add(perm);
+            // Permutation perm = new Permutation(r, columnIndex, lastRowNonZero);
+            // myFactors.add(perm);
 
-            Eta eta = new Eta(r, lastRowNonZero);
+            PermutationEta eta = new PermutationEta(r, columnIndex, lastRowNonZero);
 
             for (int ij = columnIndex; ij < lastRowNonZero; ij++) {
                 double denom = myDiagU[ij];

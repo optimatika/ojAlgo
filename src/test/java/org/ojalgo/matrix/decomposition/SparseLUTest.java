@@ -27,16 +27,17 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.DecompositionUpdateTest.UpdateCase;
+import org.ojalgo.matrix.store.ColumnsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.R064LSC;
+import org.ojalgo.matrix.store.R064CSC;
+import org.ojalgo.matrix.store.R064CSR;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.RowsSupplier;
+import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.type.context.NumberContext;
-import org.ojalgo.matrix.store.R064CSC;
-import org.ojalgo.matrix.store.R064CSR;
-import org.ojalgo.matrix.store.R064LSR;
 
 public class SparseLUTest extends MatrixDecompositionTests {
 
@@ -102,7 +103,7 @@ public class SparseLUTest extends MatrixDecompositionTests {
     public void testColumnShiftingInU() {
 
         // Create a 5x5 matrix with a structure that will require column shifts
-        R064LSC mOriginal = R064LSC.FACTORY.make(5, 5);
+        SparseStore<Double> mOriginal = SparseStore.R064.make(5, 5);
 
         // Set up a matrix that will require column shifts when updated
         // The structure is designed so that updating column 2 will require shifting columns
@@ -221,7 +222,7 @@ public class SparseLUTest extends MatrixDecompositionTests {
 
         // Start with a simple lower-triangular matrix (not diagonal, but lower triangular)
         // A = [1 0 0; 2 1 0; 3 4 1]
-        R064LSC matrix = R064LSC.FACTORY.make(3, 3);
+        SparseStore<Double> matrix = SparseStore.R064.make(3, 3);
         matrix.set(0, 0, 1.0);
         matrix.set(1, 0, 2.0);
         matrix.set(1, 1, 1.0);
@@ -243,13 +244,50 @@ public class SparseLUTest extends MatrixDecompositionTests {
     }
 
     @Test
+    public void testEmptyMatrixConversions() {
+        // Test LSR to CSC/CSR
+        SparseStore<Double> lsrMatrix = SparseStore.R064.make(3, 3);
+        R064CSC lsrToCsc = lsrMatrix.toCSC();
+        R064CSR lsrToCsr = lsrMatrix.toCSR();
+
+        TestUtils.assertEquals(3, lsrToCsc.getRowDim());
+        TestUtils.assertEquals(3, lsrToCsc.getColDim());
+        TestUtils.assertEquals(3, lsrToCsr.getRowDim());
+        TestUtils.assertEquals(3, lsrToCsr.getColDim());
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                TestUtils.assertEquals(0.0, lsrToCsc.doubleValue(i, j));
+                TestUtils.assertEquals(0.0, lsrToCsr.doubleValue(i, j));
+            }
+        }
+
+        // Test LSC to CSC/CSR
+        SparseStore<Double> lscMatrix = SparseStore.R064.make(3, 3);
+        R064CSC lscToCsc = lscMatrix.toCSC();
+        R064CSR lscToCsr = lscMatrix.toCSR();
+
+        TestUtils.assertEquals(3, lscToCsc.getRowDim());
+        TestUtils.assertEquals(3, lscToCsc.getColDim());
+        TestUtils.assertEquals(3, lscToCsr.getRowDim());
+        TestUtils.assertEquals(3, lscToCsr.getColDim());
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                TestUtils.assertEquals(0.0, lscToCsc.doubleValue(i, j));
+                TestUtils.assertEquals(0.0, lscToCsr.doubleValue(i, j));
+            }
+        }
+    }
+
+    @Test
     public void testEtaMatrixConstructionAndApplication() {
 
         // Matrix with nontrivial structure
         // [1 2 0]
         // [0 1 3]
         // [4 0 1]
-        R064LSC matrix = R064LSC.FACTORY.make(3, 3);
+        SparseStore<Double> matrix = SparseStore.R064.make(3, 3);
         matrix.set(0, 0, 1.0);
         matrix.set(0, 1, 2.0);
         matrix.set(0, 2, 0.0);
@@ -283,7 +321,7 @@ public class SparseLUTest extends MatrixDecompositionTests {
         int dim = 4;
         int pivotRow = 2;
         double eta0 = 0.5, eta1 = -1.0, eta3 = 2.0;
-        SparseLU.Eta eta = new SparseLU.Eta(dim, pivotRow);
+        SparseLU.PermutationEta eta = new SparseLU.PermutationEta(dim, pivotRow, pivotRow);
         // Set up eta with multiple nonzeros
         eta.set(0, eta0);
         eta.set(1, eta1);
@@ -322,7 +360,7 @@ public class SparseLUTest extends MatrixDecompositionTests {
     public void testFtranBtranAfterUpdate() {
 
         // Create a 3x3 matrix
-        R064LSC matrix = R064LSC.FACTORY.make(3, 3);
+        SparseStore<Double> matrix = SparseStore.R064.make(3, 3);
         matrix.set(0, 0, 4.0);
         matrix.set(0, 1, 2.0);
         matrix.set(0, 2, 1.0);
@@ -404,6 +442,270 @@ public class SparseLUTest extends MatrixDecompositionTests {
     }
 
     @Test
+    public void testR064LSCToCSCConversion() {
+        // Create a sparse matrix in LSC format
+        SparseStore<Double> matrix = SparseStore.R064.make(4, 4);
+        matrix.set(0, 0, 1.0);
+        matrix.set(0, 1, 2.0);
+        matrix.set(1, 1, 3.0);
+        matrix.set(1, 2, 4.0);
+        matrix.set(2, 2, 5.0);
+        matrix.set(2, 3, 6.0);
+        matrix.set(3, 0, 7.0);
+        matrix.set(3, 3, 8.0);
+
+        // Convert to CSC format
+        R064CSC csc = matrix.toCSC();
+
+        // Verify dimensions
+        TestUtils.assertEquals(4, csc.getRowDim());
+        TestUtils.assertEquals(4, csc.getColDim());
+
+        // Verify values
+        TestUtils.assertEquals(1.0, csc.doubleValue(0, 0));
+        TestUtils.assertEquals(2.0, csc.doubleValue(0, 1));
+        TestUtils.assertEquals(3.0, csc.doubleValue(1, 1));
+        TestUtils.assertEquals(4.0, csc.doubleValue(1, 2));
+        TestUtils.assertEquals(5.0, csc.doubleValue(2, 2));
+        TestUtils.assertEquals(6.0, csc.doubleValue(2, 3));
+        TestUtils.assertEquals(7.0, csc.doubleValue(3, 0));
+        TestUtils.assertEquals(8.0, csc.doubleValue(3, 3));
+
+        // Verify zeros
+        TestUtils.assertEquals(0.0, csc.doubleValue(0, 2));
+        TestUtils.assertEquals(0.0, csc.doubleValue(0, 3));
+        TestUtils.assertEquals(0.0, csc.doubleValue(1, 0));
+        TestUtils.assertEquals(0.0, csc.doubleValue(1, 3));
+        TestUtils.assertEquals(0.0, csc.doubleValue(2, 0));
+        TestUtils.assertEquals(0.0, csc.doubleValue(2, 1));
+        TestUtils.assertEquals(0.0, csc.doubleValue(3, 1));
+        TestUtils.assertEquals(0.0, csc.doubleValue(3, 2));
+
+        // Additional checks: RowsSupplier, ColumnsSupplier, round-trip
+        RowsSupplier<Double> rows = R064Store.FACTORY.makeRowsSupplier(matrix.getColDim());
+        rows.addRows(matrix.getRowDim());
+        for (int i = 0; i < matrix.getRowDim(); i++) {
+            for (int j = 0; j < matrix.getColDim(); j++) {
+                rows.set(i, j, matrix.doubleValue(i, j));
+            }
+        }
+        ColumnsSupplier<Double> cols = R064Store.FACTORY.makeColumnsSupplier(matrix.getRowDim());
+        cols.addColumns(matrix.getColDim());
+        for (int i = 0; i < matrix.getRowDim(); i++) {
+            for (int j = 0; j < matrix.getColDim(); j++) {
+                cols.set(i, j, matrix.doubleValue(i, j));
+            }
+        }
+        R064CSC cscRows = rows.toCSC();
+        R064CSC cscCols = cols.toCSC();
+        TestUtils.assertEquals(csc, cscRows, ACCURACY);
+        TestUtils.assertEquals(csc, cscCols, ACCURACY);
+        TestUtils.assertEquals(cscRows, cscCols, ACCURACY);
+        // Round-trip CSC -> CSR -> CSC
+        R064CSR csr = csc.toCSR();
+        R064CSC csc2 = csr.toCSC();
+        TestUtils.assertEquals(csc, csc2, ACCURACY);
+    }
+
+    @Test
+    public void testR064LSCToCSRConversion() {
+        // Create a sparse matrix in LSC format
+        SparseStore<Double> matrix = SparseStore.R064.make(4, 4);
+        matrix.set(0, 0, 1.0);
+        matrix.set(0, 1, 2.0);
+        matrix.set(1, 1, 3.0);
+        matrix.set(1, 2, 4.0);
+        matrix.set(2, 2, 5.0);
+        matrix.set(2, 3, 6.0);
+        matrix.set(3, 0, 7.0);
+        matrix.set(3, 3, 8.0);
+
+        // Convert to CSR format
+        R064CSR csr = matrix.toCSR();
+
+        // Verify dimensions
+        TestUtils.assertEquals(4, csr.getRowDim());
+        TestUtils.assertEquals(4, csr.getColDim());
+
+        // Verify values
+        TestUtils.assertEquals(1.0, csr.doubleValue(0, 0));
+        TestUtils.assertEquals(2.0, csr.doubleValue(0, 1));
+        TestUtils.assertEquals(3.0, csr.doubleValue(1, 1));
+        TestUtils.assertEquals(4.0, csr.doubleValue(1, 2));
+        TestUtils.assertEquals(5.0, csr.doubleValue(2, 2));
+        TestUtils.assertEquals(6.0, csr.doubleValue(2, 3));
+        TestUtils.assertEquals(7.0, csr.doubleValue(3, 0));
+        TestUtils.assertEquals(8.0, csr.doubleValue(3, 3));
+
+        // Verify zeros
+        TestUtils.assertEquals(0.0, csr.doubleValue(0, 2));
+        TestUtils.assertEquals(0.0, csr.doubleValue(0, 3));
+        TestUtils.assertEquals(0.0, csr.doubleValue(1, 0));
+        TestUtils.assertEquals(0.0, csr.doubleValue(1, 3));
+        TestUtils.assertEquals(0.0, csr.doubleValue(2, 0));
+        TestUtils.assertEquals(0.0, csr.doubleValue(2, 1));
+        TestUtils.assertEquals(0.0, csr.doubleValue(3, 1));
+        TestUtils.assertEquals(0.0, csr.doubleValue(3, 2));
+
+        // Additional checks: RowsSupplier, ColumnsSupplier, round-trip
+        RowsSupplier<Double> rows = R064Store.FACTORY.makeRowsSupplier(matrix.getColDim());
+        rows.addRows(matrix.getRowDim());
+        for (int i = 0; i < matrix.getRowDim(); i++) {
+            for (int j = 0; j < matrix.getColDim(); j++) {
+                rows.set(i, j, matrix.doubleValue(i, j));
+            }
+        }
+        ColumnsSupplier<Double> cols = R064Store.FACTORY.makeColumnsSupplier(matrix.getRowDim());
+        cols.addColumns(matrix.getColDim());
+        for (int i = 0; i < matrix.getRowDim(); i++) {
+            for (int j = 0; j < matrix.getColDim(); j++) {
+                cols.set(i, j, matrix.doubleValue(i, j));
+            }
+        }
+        R064CSR csrRows = rows.toCSR();
+        R064CSR csrCols = cols.toCSR();
+        TestUtils.assertEquals(csr, csrRows, ACCURACY);
+        TestUtils.assertEquals(csr, csrCols, ACCURACY);
+        TestUtils.assertEquals(csrRows, csrCols, ACCURACY);
+        // Round-trip CSR -> CSC -> CSR
+        R064CSC csc = csr.toCSC();
+        R064CSR csr2 = csc.toCSR();
+        TestUtils.assertEquals(csr, csr2, ACCURACY);
+    }
+
+    @Test
+    public void testR064LSRToCSCConversion() {
+        // Create a sparse matrix in LSR format
+        SparseStore<Double> matrix = SparseStore.R064.make(4, 4);
+        matrix.set(0, 0, 1.0);
+        matrix.set(0, 1, 2.0);
+        matrix.set(1, 1, 3.0);
+        matrix.set(1, 2, 4.0);
+        matrix.set(2, 2, 5.0);
+        matrix.set(2, 3, 6.0);
+        matrix.set(3, 0, 7.0);
+        matrix.set(3, 3, 8.0);
+
+        // Convert to CSC format
+        R064CSC csc = matrix.toCSC();
+
+        // Verify dimensions
+        TestUtils.assertEquals(4, csc.getRowDim());
+        TestUtils.assertEquals(4, csc.getColDim());
+
+        // Verify values
+        TestUtils.assertEquals(1.0, csc.doubleValue(0, 0));
+        TestUtils.assertEquals(2.0, csc.doubleValue(0, 1));
+        TestUtils.assertEquals(3.0, csc.doubleValue(1, 1));
+        TestUtils.assertEquals(4.0, csc.doubleValue(1, 2));
+        TestUtils.assertEquals(5.0, csc.doubleValue(2, 2));
+        TestUtils.assertEquals(6.0, csc.doubleValue(2, 3));
+        TestUtils.assertEquals(7.0, csc.doubleValue(3, 0));
+        TestUtils.assertEquals(8.0, csc.doubleValue(3, 3));
+
+        // Verify zeros
+        TestUtils.assertEquals(0.0, csc.doubleValue(0, 2));
+        TestUtils.assertEquals(0.0, csc.doubleValue(0, 3));
+        TestUtils.assertEquals(0.0, csc.doubleValue(1, 0));
+        TestUtils.assertEquals(0.0, csc.doubleValue(1, 3));
+        TestUtils.assertEquals(0.0, csc.doubleValue(2, 0));
+        TestUtils.assertEquals(0.0, csc.doubleValue(2, 1));
+        TestUtils.assertEquals(0.0, csc.doubleValue(3, 1));
+        TestUtils.assertEquals(0.0, csc.doubleValue(3, 2));
+
+        // Additional checks: RowsSupplier, ColumnsSupplier, round-trip
+        RowsSupplier<Double> rows = R064Store.FACTORY.makeRowsSupplier(matrix.getColDim());
+        rows.addRows(matrix.getRowDim());
+        for (int i = 0; i < matrix.getRowDim(); i++) {
+            for (int j = 0; j < matrix.getColDim(); j++) {
+                rows.set(i, j, matrix.doubleValue(i, j));
+            }
+        }
+        ColumnsSupplier<Double> cols = R064Store.FACTORY.makeColumnsSupplier(matrix.getRowDim());
+        cols.addColumns(matrix.getColDim());
+        for (int i = 0; i < matrix.getRowDim(); i++) {
+            for (int j = 0; j < matrix.getColDim(); j++) {
+                cols.set(i, j, matrix.doubleValue(i, j));
+            }
+        }
+        R064CSC cscRows = rows.toCSC();
+        R064CSC cscCols = cols.toCSC();
+        TestUtils.assertEquals(csc, cscRows, ACCURACY);
+        TestUtils.assertEquals(csc, cscCols, ACCURACY);
+        TestUtils.assertEquals(cscRows, cscCols, ACCURACY);
+        // Round-trip CSC -> CSR -> CSC
+        R064CSR csr = csc.toCSR();
+        R064CSC csc2 = csr.toCSC();
+        TestUtils.assertEquals(csc, csc2, ACCURACY);
+    }
+
+    @Test
+    public void testR064LSRToCSRConversion() {
+        // Create a sparse matrix in LSR format
+        SparseStore<Double> matrix = SparseStore.R064.make(4, 4);
+        matrix.set(0, 0, 1.0);
+        matrix.set(0, 1, 2.0);
+        matrix.set(1, 1, 3.0);
+        matrix.set(1, 2, 4.0);
+        matrix.set(2, 2, 5.0);
+        matrix.set(2, 3, 6.0);
+        matrix.set(3, 0, 7.0);
+        matrix.set(3, 3, 8.0);
+
+        // Convert to CSR format
+        R064CSR csr = matrix.toCSR();
+
+        // Verify dimensions
+        TestUtils.assertEquals(4, csr.getRowDim());
+        TestUtils.assertEquals(4, csr.getColDim());
+
+        // Verify values
+        TestUtils.assertEquals(1.0, csr.doubleValue(0, 0));
+        TestUtils.assertEquals(2.0, csr.doubleValue(0, 1));
+        TestUtils.assertEquals(3.0, csr.doubleValue(1, 1));
+        TestUtils.assertEquals(4.0, csr.doubleValue(1, 2));
+        TestUtils.assertEquals(5.0, csr.doubleValue(2, 2));
+        TestUtils.assertEquals(6.0, csr.doubleValue(2, 3));
+        TestUtils.assertEquals(7.0, csr.doubleValue(3, 0));
+        TestUtils.assertEquals(8.0, csr.doubleValue(3, 3));
+
+        // Verify zeros
+        TestUtils.assertEquals(0.0, csr.doubleValue(0, 2));
+        TestUtils.assertEquals(0.0, csr.doubleValue(0, 3));
+        TestUtils.assertEquals(0.0, csr.doubleValue(1, 0));
+        TestUtils.assertEquals(0.0, csr.doubleValue(1, 3));
+        TestUtils.assertEquals(0.0, csr.doubleValue(2, 0));
+        TestUtils.assertEquals(0.0, csr.doubleValue(2, 1));
+        TestUtils.assertEquals(0.0, csr.doubleValue(3, 1));
+        TestUtils.assertEquals(0.0, csr.doubleValue(3, 2));
+
+        // Additional checks: RowsSupplier, ColumnsSupplier, round-trip
+        RowsSupplier<Double> rows = R064Store.FACTORY.makeRowsSupplier(matrix.getColDim());
+        rows.addRows(matrix.getRowDim());
+        for (int i = 0; i < matrix.getRowDim(); i++) {
+            for (int j = 0; j < matrix.getColDim(); j++) {
+                rows.set(i, j, matrix.doubleValue(i, j));
+            }
+        }
+        ColumnsSupplier<Double> cols = R064Store.FACTORY.makeColumnsSupplier(matrix.getRowDim());
+        cols.addColumns(matrix.getColDim());
+        for (int i = 0; i < matrix.getRowDim(); i++) {
+            for (int j = 0; j < matrix.getColDim(); j++) {
+                cols.set(i, j, matrix.doubleValue(i, j));
+            }
+        }
+        R064CSR csrRows = rows.toCSR();
+        R064CSR csrCols = cols.toCSR();
+        TestUtils.assertEquals(csr, csrRows, ACCURACY);
+        TestUtils.assertEquals(csr, csrCols, ACCURACY);
+        TestUtils.assertEquals(csrRows, csrCols, ACCURACY);
+        // Round-trip CSR -> CSC -> CSR
+        R064CSC csc = csr.toCSC();
+        R064CSR csr2 = csc.toCSR();
+        TestUtils.assertEquals(csr, csr2, ACCURACY);
+    }
+
+    @Test
     public void testRandom5x5() {
 
         R064Store matrix = R064Store.FACTORY.makeFilled(5, 5, Uniform.standard());
@@ -415,7 +717,7 @@ public class SparseLUTest extends MatrixDecompositionTests {
     public void testSimple2x2() throws RecoverableCondition {
 
         // Create a simple 2x2 matrix
-        R064LSC matrix = R064LSC.FACTORY.make(2, 2);
+        SparseStore<Double> matrix = SparseStore.R064.make(2, 2);
         matrix.set(0, 0, 4.0);
         matrix.set(0, 1, 3.0);
         matrix.set(1, 0, 6.0);
@@ -480,7 +782,7 @@ public class SparseLUTest extends MatrixDecompositionTests {
     public void testSimple3x3() throws RecoverableCondition {
 
         // Create a 3x3 matrix that requires pivoting
-        R064LSC matrix = R064LSC.FACTORY.make(3, 3);
+        SparseStore<Double> matrix = SparseStore.R064.make(3, 3);
 
         // Set values to force pivoting:
         // 1 2 3
@@ -562,10 +864,33 @@ public class SparseLUTest extends MatrixDecompositionTests {
     }
 
     @Test
+    public void testSingleElementMatrixConversions() {
+        // Test LSR to CSC/CSR
+        SparseStore<Double> lsrMatrix = SparseStore.R064.make(3, 3);
+        lsrMatrix.set(1, 1, 42.0);
+
+        R064CSC lsrToCsc = lsrMatrix.toCSC();
+        R064CSR lsrToCsr = lsrMatrix.toCSR();
+
+        TestUtils.assertEquals(42.0, lsrToCsc.doubleValue(1, 1));
+        TestUtils.assertEquals(42.0, lsrToCsr.doubleValue(1, 1));
+
+        // Test LSC to CSC/CSR
+        SparseStore<Double> lscMatrix = SparseStore.R064.make(3, 3);
+        lscMatrix.set(1, 1, 42.0);
+
+        R064CSC lscToCsc = lscMatrix.toCSC();
+        R064CSR lscToCsr = lscMatrix.toCSR();
+
+        TestUtils.assertEquals(42.0, lscToCsc.doubleValue(1, 1));
+        TestUtils.assertEquals(42.0, lscToCsr.doubleValue(1, 1));
+    }
+
+    @Test
     public void testSingularMatrix() {
 
         // Create a singular matrix
-        R064LSC matrix = R064LSC.FACTORY.make(3, 3);
+        SparseStore<Double> matrix = SparseStore.R064.make(3, 3);
         matrix.set(0, 0, 1.0);
         matrix.set(0, 1, 2.0);
         matrix.set(0, 2, 3.0);
@@ -585,7 +910,7 @@ public class SparseLUTest extends MatrixDecompositionTests {
     public void testSparse4x4() {
 
         // Create a sparse matrix with known pattern
-        R064LSC matrix = R064LSC.FACTORY.make(4, 4);
+        SparseStore<Double> matrix = SparseStore.R064.make(4, 4);
         matrix.set(0, 0, 1.0);
         matrix.set(1, 1, 2.0);
         matrix.set(2, 2, 3.0);
@@ -662,7 +987,7 @@ public class SparseLUTest extends MatrixDecompositionTests {
         rhs.set(1, 2);
         rhs.set(2, 3);
 
-        SparseLU.Eta trfEta = new SparseLU.Eta(3, 2);
+        SparseLU.PermutationEta trfEta = new SparseLU.PermutationEta(3, 2, 2);
         trfEta.set(1, -1.5 / 2.625);
 
         // ftran
@@ -716,230 +1041,6 @@ public class SparseLUTest extends MatrixDecompositionTests {
         }
 
         TestUtils.assertEquals(expected, actual);
-    }
-
-    @Test
-    public void testR064LSRToCSCConversion() {
-        // Create a sparse matrix in LSR format
-        R064LSR matrix = R064LSR.FACTORY.make(4, 4);
-        matrix.set(0, 0, 1.0);
-        matrix.set(0, 1, 2.0);
-        matrix.set(1, 1, 3.0);
-        matrix.set(1, 2, 4.0);
-        matrix.set(2, 2, 5.0);
-        matrix.set(2, 3, 6.0);
-        matrix.set(3, 0, 7.0);
-        matrix.set(3, 3, 8.0);
-
-        // Convert to CSC format
-        R064CSC csc = matrix.toCSC();
-
-        // Verify dimensions
-        TestUtils.assertEquals(4, csc.getRowDim());
-        TestUtils.assertEquals(4, csc.getColDim());
-
-        // Verify values
-        TestUtils.assertEquals(1.0, csc.doubleValue(0, 0));
-        TestUtils.assertEquals(2.0, csc.doubleValue(0, 1));
-        TestUtils.assertEquals(3.0, csc.doubleValue(1, 1));
-        TestUtils.assertEquals(4.0, csc.doubleValue(1, 2));
-        TestUtils.assertEquals(5.0, csc.doubleValue(2, 2));
-        TestUtils.assertEquals(6.0, csc.doubleValue(2, 3));
-        TestUtils.assertEquals(7.0, csc.doubleValue(3, 0));
-        TestUtils.assertEquals(8.0, csc.doubleValue(3, 3));
-
-        // Verify zeros
-        TestUtils.assertEquals(0.0, csc.doubleValue(0, 2));
-        TestUtils.assertEquals(0.0, csc.doubleValue(0, 3));
-        TestUtils.assertEquals(0.0, csc.doubleValue(1, 0));
-        TestUtils.assertEquals(0.0, csc.doubleValue(1, 3));
-        TestUtils.assertEquals(0.0, csc.doubleValue(2, 0));
-        TestUtils.assertEquals(0.0, csc.doubleValue(2, 1));
-        TestUtils.assertEquals(0.0, csc.doubleValue(3, 1));
-        TestUtils.assertEquals(0.0, csc.doubleValue(3, 2));
-    }
-
-    @Test
-    public void testR064LSRToCSRConversion() {
-        // Create a sparse matrix in LSR format
-        R064LSR matrix = R064LSR.FACTORY.make(4, 4);
-        matrix.set(0, 0, 1.0);
-        matrix.set(0, 1, 2.0);
-        matrix.set(1, 1, 3.0);
-        matrix.set(1, 2, 4.0);
-        matrix.set(2, 2, 5.0);
-        matrix.set(2, 3, 6.0);
-        matrix.set(3, 0, 7.0);
-        matrix.set(3, 3, 8.0);
-
-        // Convert to CSR format
-        R064CSR csr = matrix.toCSR();
-
-        // Verify dimensions
-        TestUtils.assertEquals(4, csr.getRowDim());
-        TestUtils.assertEquals(4, csr.getColDim());
-
-        // Verify values
-        TestUtils.assertEquals(1.0, csr.doubleValue(0, 0));
-        TestUtils.assertEquals(2.0, csr.doubleValue(0, 1));
-        TestUtils.assertEquals(3.0, csr.doubleValue(1, 1));
-        TestUtils.assertEquals(4.0, csr.doubleValue(1, 2));
-        TestUtils.assertEquals(5.0, csr.doubleValue(2, 2));
-        TestUtils.assertEquals(6.0, csr.doubleValue(2, 3));
-        TestUtils.assertEquals(7.0, csr.doubleValue(3, 0));
-        TestUtils.assertEquals(8.0, csr.doubleValue(3, 3));
-
-        // Verify zeros
-        TestUtils.assertEquals(0.0, csr.doubleValue(0, 2));
-        TestUtils.assertEquals(0.0, csr.doubleValue(0, 3));
-        TestUtils.assertEquals(0.0, csr.doubleValue(1, 0));
-        TestUtils.assertEquals(0.0, csr.doubleValue(1, 3));
-        TestUtils.assertEquals(0.0, csr.doubleValue(2, 0));
-        TestUtils.assertEquals(0.0, csr.doubleValue(2, 1));
-        TestUtils.assertEquals(0.0, csr.doubleValue(3, 1));
-        TestUtils.assertEquals(0.0, csr.doubleValue(3, 2));
-    }
-
-    @Test
-    public void testR064LSCToCSCConversion() {
-        // Create a sparse matrix in LSC format
-        R064LSC matrix = R064LSC.FACTORY.make(4, 4);
-        matrix.set(0, 0, 1.0);
-        matrix.set(0, 1, 2.0);
-        matrix.set(1, 1, 3.0);
-        matrix.set(1, 2, 4.0);
-        matrix.set(2, 2, 5.0);
-        matrix.set(2, 3, 6.0);
-        matrix.set(3, 0, 7.0);
-        matrix.set(3, 3, 8.0);
-
-        // Convert to CSC format
-        R064CSC csc = matrix.toCSC();
-
-        // Verify dimensions
-        TestUtils.assertEquals(4, csc.getRowDim());
-        TestUtils.assertEquals(4, csc.getColDim());
-
-        // Verify values
-        TestUtils.assertEquals(1.0, csc.doubleValue(0, 0));
-        TestUtils.assertEquals(2.0, csc.doubleValue(0, 1));
-        TestUtils.assertEquals(3.0, csc.doubleValue(1, 1));
-        TestUtils.assertEquals(4.0, csc.doubleValue(1, 2));
-        TestUtils.assertEquals(5.0, csc.doubleValue(2, 2));
-        TestUtils.assertEquals(6.0, csc.doubleValue(2, 3));
-        TestUtils.assertEquals(7.0, csc.doubleValue(3, 0));
-        TestUtils.assertEquals(8.0, csc.doubleValue(3, 3));
-
-        // Verify zeros
-        TestUtils.assertEquals(0.0, csc.doubleValue(0, 2));
-        TestUtils.assertEquals(0.0, csc.doubleValue(0, 3));
-        TestUtils.assertEquals(0.0, csc.doubleValue(1, 0));
-        TestUtils.assertEquals(0.0, csc.doubleValue(1, 3));
-        TestUtils.assertEquals(0.0, csc.doubleValue(2, 0));
-        TestUtils.assertEquals(0.0, csc.doubleValue(2, 1));
-        TestUtils.assertEquals(0.0, csc.doubleValue(3, 1));
-        TestUtils.assertEquals(0.0, csc.doubleValue(3, 2));
-    }
-
-    @Test
-    public void testR064LSCToCSRConversion() {
-        // Create a sparse matrix in LSC format
-        R064LSC matrix = R064LSC.FACTORY.make(4, 4);
-        matrix.set(0, 0, 1.0);
-        matrix.set(0, 1, 2.0);
-        matrix.set(1, 1, 3.0);
-        matrix.set(1, 2, 4.0);
-        matrix.set(2, 2, 5.0);
-        matrix.set(2, 3, 6.0);
-        matrix.set(3, 0, 7.0);
-        matrix.set(3, 3, 8.0);
-
-        // Convert to CSR format
-        R064CSR csr = matrix.toCSR();
-
-        // Verify dimensions
-        TestUtils.assertEquals(4, csr.getRowDim());
-        TestUtils.assertEquals(4, csr.getColDim());
-
-        // Verify values
-        TestUtils.assertEquals(1.0, csr.doubleValue(0, 0));
-        TestUtils.assertEquals(2.0, csr.doubleValue(0, 1));
-        TestUtils.assertEquals(3.0, csr.doubleValue(1, 1));
-        TestUtils.assertEquals(4.0, csr.doubleValue(1, 2));
-        TestUtils.assertEquals(5.0, csr.doubleValue(2, 2));
-        TestUtils.assertEquals(6.0, csr.doubleValue(2, 3));
-        TestUtils.assertEquals(7.0, csr.doubleValue(3, 0));
-        TestUtils.assertEquals(8.0, csr.doubleValue(3, 3));
-
-        // Verify zeros
-        TestUtils.assertEquals(0.0, csr.doubleValue(0, 2));
-        TestUtils.assertEquals(0.0, csr.doubleValue(0, 3));
-        TestUtils.assertEquals(0.0, csr.doubleValue(1, 0));
-        TestUtils.assertEquals(0.0, csr.doubleValue(1, 3));
-        TestUtils.assertEquals(0.0, csr.doubleValue(2, 0));
-        TestUtils.assertEquals(0.0, csr.doubleValue(2, 1));
-        TestUtils.assertEquals(0.0, csr.doubleValue(3, 1));
-        TestUtils.assertEquals(0.0, csr.doubleValue(3, 2));
-    }
-
-    @Test
-    public void testEmptyMatrixConversions() {
-        // Test LSR to CSC/CSR
-        R064LSR lsrMatrix = R064LSR.FACTORY.make(3, 3);
-        R064CSC lsrToCsc = lsrMatrix.toCSC();
-        R064CSR lsrToCsr = lsrMatrix.toCSR();
-
-        TestUtils.assertEquals(3, lsrToCsc.getRowDim());
-        TestUtils.assertEquals(3, lsrToCsc.getColDim());
-        TestUtils.assertEquals(3, lsrToCsr.getRowDim());
-        TestUtils.assertEquals(3, lsrToCsr.getColDim());
-
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                TestUtils.assertEquals(0.0, lsrToCsc.doubleValue(i, j));
-                TestUtils.assertEquals(0.0, lsrToCsr.doubleValue(i, j));
-            }
-        }
-
-        // Test LSC to CSC/CSR
-        R064LSC lscMatrix = R064LSC.FACTORY.make(3, 3);
-        R064CSC lscToCsc = lscMatrix.toCSC();
-        R064CSR lscToCsr = lscMatrix.toCSR();
-
-        TestUtils.assertEquals(3, lscToCsc.getRowDim());
-        TestUtils.assertEquals(3, lscToCsc.getColDim());
-        TestUtils.assertEquals(3, lscToCsr.getRowDim());
-        TestUtils.assertEquals(3, lscToCsr.getColDim());
-
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                TestUtils.assertEquals(0.0, lscToCsc.doubleValue(i, j));
-                TestUtils.assertEquals(0.0, lscToCsr.doubleValue(i, j));
-            }
-        }
-    }
-
-    @Test
-    public void testSingleElementMatrixConversions() {
-        // Test LSR to CSC/CSR
-        R064LSR lsrMatrix = R064LSR.FACTORY.make(3, 3);
-        lsrMatrix.set(1, 1, 42.0);
-        
-        R064CSC lsrToCsc = lsrMatrix.toCSC();
-        R064CSR lsrToCsr = lsrMatrix.toCSR();
-
-        TestUtils.assertEquals(42.0, lsrToCsc.doubleValue(1, 1));
-        TestUtils.assertEquals(42.0, lsrToCsr.doubleValue(1, 1));
-
-        // Test LSC to CSC/CSR
-        R064LSC lscMatrix = R064LSC.FACTORY.make(3, 3);
-        lscMatrix.set(1, 1, 42.0);
-        
-        R064CSC lscToCsc = lscMatrix.toCSC();
-        R064CSR lscToCsr = lscMatrix.toCSR();
-
-        TestUtils.assertEquals(42.0, lscToCsc.doubleValue(1, 1));
-        TestUtils.assertEquals(42.0, lscToCsr.doubleValue(1, 1));
     }
 
 }

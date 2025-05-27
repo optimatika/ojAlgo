@@ -11,11 +11,8 @@ import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
-import org.ojalgo.matrix.store.DiagonalStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.R064LSC;
-import org.ojalgo.matrix.store.R064LSR;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.netio.BasicLogger;
@@ -327,45 +324,6 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
     }
 
     /**
-     * A variant of {@link #doFletcherMatthews(int[], PhysicalStore, PhysicalStore, int, MatrixStore)}
-     * specifically target to be used with (copied to) {@link SparseLU}.
-     * <p>
-     * {@link SparseLU} stores the L and U factors separately in {@link R064LSC} (L) and {@link R064LSR} (U)
-     * instances with the diagonals of U in a separate double[].
-     */
-    private static Result doFletcherMatthewsSparse(final int[] pivotOrder, final PhysicalStore<Double> mtrxL, final PhysicalStore<Double> mtrxU,
-            final int columnIndex, final MatrixStore<Double> column) {
-
-        int m = mtrxL.getRowDim();
-        int r = mtrxU.getMinDim();
-        int n = mtrxU.getColDim();
-
-        R064LSC sparseL = R064LSC.FACTORY.make(mtrxL);
-        sparseL.fillMatching(mtrxL);
-
-        R064LSR sparseU = R064LSR.FACTORY.make(mtrxU);
-        sparseU.fillMatching(mtrxU);
-
-        double[] diagU = new double[r];
-        for (int ij = 0; ij < r; ij++) {
-            double diagVal = sparseU.doubleValue(ij, ij);
-            diagU[ij] = diagVal;
-            sparseU.set(ij, ij, ZERO);
-        }
-
-        Pivot rowPivot = new Pivot(pivotOrder);
-        Pivot colPivot = new Pivot();
-        colPivot.reset(n);
-
-        FletcherMatthews.update(rowPivot, sparseL, diagU, sparseU, colPivot, columnIndex, column, R064Store.FACTORY.make(m, 1));
-
-        MatrixStore<Double> tmpL = sparseL.triangular(false, true);
-        MatrixStore<Double> tmpU = sparseU.triangular(true, false).superimpose(DiagonalStore.wrap(diagU));
-
-        return new Result(rowPivot.getOrder(), tmpL, tmpU, colPivot.getOrder());
-    }
-
-    /**
      * A naive implementation of LU update for comparison and testing.
      * <p>
      * This method takes a brute-force approach by:
@@ -640,9 +598,6 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
 
         DecompositionUpdateTest.doOne("Fletcher-Matthews (outline)", originalMatrix, columnIndex, newColumn, modifiedMatrix, pivotOrder, mtrxL, mtrxU,
                 DecompositionUpdateTest::doFletcherMatthews, null);
-
-        DecompositionUpdateTest.doOne("Fletcher-Matthews (sparse)", originalMatrix, columnIndex, newColumn, modifiedMatrix, pivotOrder, mtrxL, mtrxU,
-                DecompositionUpdateTest::doFletcherMatthewsSparse, null);
 
         DecompositionUpdateTest.doOne("Fletcher-Matthews (dense)", originalMatrix, columnIndex, newColumn, modifiedMatrix, pivotOrder, mtrxL, mtrxU,
                 DecompositionUpdateTest::doFletcherMatthewsDense, null);

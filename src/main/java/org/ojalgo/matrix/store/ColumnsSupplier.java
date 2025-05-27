@@ -1,13 +1,13 @@
 package org.ojalgo.matrix.store;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
@@ -174,25 +174,20 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixSto
     }
 
     @Override
-    public long countRows() {
-        return myRowsCount;
+    public int countNonzeros() {
+
+        int retVal = 0;
+        for (SparseArray<N> array : myColumns) {
+            retVal += array.countNonzeros();
+        }
+
+        return retVal;
+
     }
 
     @Override
-    public double density() {
-
-        double totalElements = this.count();
-
-        if (totalElements == 0) {
-            return PrimitiveMath.ZERO;
-        }
-
-        long nonZeros = 0L;
-        for (SparseArray<N> column : myColumns) {
-            nonZeros += column.count();
-        }
-
-        return nonZeros / totalElements;
+    public long countRows() {
+        return myRowsCount;
     }
 
     @Override
@@ -259,8 +254,30 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixSto
         return myPhysicalStoreFactory;
     }
 
+    /**
+     * Efficiently appends a new nonzero element to the end of the specified column.
+     * <p>
+     * This method assumes that the supplied {@code row} is strictly greater than all existing row indices in
+     * the specified column. No search is performed; the value is simply appended. If the ascending order of
+     * row indices is broken, future behavior is unspecified. If the value is zero, nothing is stored.
+     *
+     * @param row   the row index (must be after all existing row indices in the column)
+     * @param col   the column to which the value should be appended
+     * @param value the value to insert (only nonzero values are actually stored)
+     */
+    public void putLast(final int row, final int col, final double value) {
+        myColumns.get(col).putLast(row, value);
+    }
+
     public Access1D<N> removeColumn(final int index) {
         return myColumns.remove(index);
+    }
+
+    @Override
+    public void reset() {
+        for (SparseArray<N> sparseArray : myColumns) {
+            sparseArray.reset();
+        }
     }
 
     public ColumnsSupplier<N> selectColumns(final int[] indices) {
@@ -297,24 +314,74 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixSto
     }
 
     @Override
-    public String toString() {
-        return Access2D.toString(this);
+    public R064CSC toCSC() {
+
+        int nbRows = this.getRowDim();
+        int nbCols = this.getColDim();
+        int nbNz = this.countNonzeros();
+
+        double[] values = new double[nbNz];
+        int[] rowIndices = new int[nbNz];
+        int[] colPointers = new int[nbCols + 1];
+
+        int pos = 0;
+        for (int j = 0; j < nbCols; j++) {
+            colPointers[j] = pos;
+            SparseArray<N> col = myColumns.get(j);
+            for (SparseArray.NonzeroView<N> nz : col.nonzeros()) {
+                values[pos] = nz.doubleValue();
+                rowIndices[pos] = (int) nz.index();
+                pos++;
+            }
+        }
+        colPointers[nbCols] = pos;
+
+        return new R064CSC(nbRows, nbCols, values, rowIndices, colPointers);
     }
 
     @Override
-    public List<Triplet> toTriplets() {
-        List<Triplet> triplets = new ArrayList<>();
+    public R064CSR toCSR() {
 
-        // Iterate through each column
-        for (int col = 0, limit = myColumns.size(); col < limit; col++) {
-            SparseArray<N> column = myColumns.get(col);
-            // For each non-zero element in this column
-            for (NonzeroView<N> nz : column.nonzeros()) {
-                triplets.add(new Triplet(Math.toIntExact(nz.index()), col, nz.doubleValue()));
+        int nbRows = this.getRowDim();
+        int nbCols = this.getColDim();
+        int nbNz = this.countNonzeros();
+
+        double[] values = new double[nbNz];
+        int[] colIndices = new int[nbNz];
+        int[] rowPointers = new int[nbRows + 1];
+
+        // Counting pass
+        for (int j = 0; j < nbCols; j++) {
+            SparseArray<N> col = myColumns.get(j);
+            for (SparseArray.NonzeroView<N> nz : col.nonzeros()) {
+                int row = (int) nz.index();
+                rowPointers[row + 1]++;
             }
         }
 
-        return triplets;
+        // Prefix sum
+        for (int i = 0; i < nbRows; i++) {
+            rowPointers[i + 1] += rowPointers[i];
+        }
+
+        // Filling pass
+        int[] next = Arrays.copyOf(rowPointers, nbRows);
+        for (int j = 0; j < nbCols; j++) {
+            SparseArray<N> col = myColumns.get(j);
+            for (SparseArray.NonzeroView<N> nz : col.nonzeros()) {
+                int row = (int) nz.index();
+                int pos = next[row]++;
+                values[pos] = nz.doubleValue();
+                colIndices[pos] = j;
+            }
+        }
+
+        return new R064CSR(nbRows, nbCols, values, colIndices, rowPointers);
+    }
+
+    @Override
+    public String toString() {
+        return Access2D.toString(this);
     }
 
     SparseArray<N> addColumn(final SparseArray<N> columnToAdd) {

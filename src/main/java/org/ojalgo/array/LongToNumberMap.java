@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.stream.Collectors;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.SparseArray.NonzeroView;
@@ -26,30 +27,62 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap<Long, N>, Access1D<N>, Mutate1D.Mixable<N> {
 
-    public static final class MapFactory<N extends Comparable<N>> extends StrategyBuildingFactory<N, LongToNumberMap<N>, MapFactory<N>> {
+    public static final class MapFactory<N extends Comparable<N>> {
 
-        private final DenseArray.Factory<N, ?> myDenseArrayFactory;
+        private final GrowthStrategy myGrowthStrategy;
+        private final PlainArray.Factory<N, ?> myPlainFactory;
 
-        MapFactory(final DenseArray.Factory<N, ?> denseFactory) {
-            super(denseFactory.getMathType());
-            myDenseArrayFactory = denseFactory;
+        MapFactory(final PlainArray.Factory<N, ?> denseFactory) {
+            myGrowthStrategy = new GrowthStrategy(denseFactory.getMathType());
+            myPlainFactory = denseFactory;
+        }
+
+        /**
+         * @param chunk Defines a capacity break point. Below this point the capacity is doubled when needed.
+         *              Above it, it is grown by adding one "chunk" at the time. Must be a power of 2. (The
+         *              builder will enforce that for you.)
+         * @return this
+         */
+        public MapFactory<N> chunk(final long chunk) {
+            myGrowthStrategy.chunk(chunk);
+            return this;
+        }
+
+        /**
+         * @param initial Sets the initial capacity of the "arrays" to be created using this factory.
+         * @return this
+         */
+        public MapFactory<N> initial(final long initial) {
+            myGrowthStrategy.initial(initial);
+            return this;
         }
 
         public LongToNumberMap<N> make() {
-            return new LongToNumberMap<>(myDenseArrayFactory, this.getGrowthStrategy());
+            return new LongToNumberMap<>(myPlainFactory, myGrowthStrategy);
+        }
+
+        /**
+         * With very large data structures, particularly sparse ones, the underlying (dense) storage is
+         * segmented. (Very large arrays are implemented as an array of arrays.) This determines the
+         * size/length of one such segment. Must be a multiple of the chunk size as well as a power of 2. (The
+         * builder will enforce this for you.)
+         */
+        public MapFactory<N> segment(final long segment) {
+            myGrowthStrategy.segment(segment);
+            return this;
         }
 
     }
 
-    public static <N extends Comparable<N>> MapFactory<N> factory(final DenseArray.Factory<N, ?> denseFactory) {
+    public static <N extends Comparable<N>> MapFactory<N> factory(final PlainArray.Factory<N, ?> denseFactory) {
         return new MapFactory<>(denseFactory);
     }
 
-    private final SparseArray<N> myStorage;
-    private final DenseArray.Factory<N, ?> myDenseFactory;
+    private final PlainArray.Factory<N, ?> myDenseFactory;
     private final GrowthStrategy myGrowthStrategy;
+    private final SparseArray<N> myStorage;
 
-    LongToNumberMap(final DenseArray.Factory<N, ?> denseFactory, final GrowthStrategy growthStrategy) {
+    LongToNumberMap(final PlainArray.Factory<N, ?> denseFactory, final GrowthStrategy growthStrategy) {
 
         super();
 
@@ -218,19 +251,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
 
     @Override
     public Set<Long> keySet() {
-        return new AbstractSet<>() {
-
-            @Override
-            public Iterator<Long> iterator() {
-                return myStorage.indices().iterator();
-            }
-
-            @Override
-            public int size() {
-                return myStorage.getActualLength();
-            }
-
-        };
+        return myStorage.indices().mapToObj(Long::valueOf).collect(Collectors.toSet());
     }
 
     @Override

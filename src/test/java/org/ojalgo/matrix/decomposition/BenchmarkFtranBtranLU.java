@@ -50,6 +50,11 @@ BenchmarkFtranBtranLU.raw_ftran          0.01   1000  thrpt    3  970.401 ± 55.
 BenchmarkFtranBtranLU.sparse_btran       0.01   1000  thrpt    3  577.551 ± 72.713  ops/s
 BenchmarkFtranBtranLU.sparse_ftran       0.01   1000  thrpt    3  598.610 ± 32.700  ops/s
  * </pre>
+ *
+ * Partial/temporary
+ *
+ * <pre>
+ * </pre>
  */
 @State(Scope.Benchmark)
 public class BenchmarkFtranBtranLU extends AbstractBenchmarkSparseLU {

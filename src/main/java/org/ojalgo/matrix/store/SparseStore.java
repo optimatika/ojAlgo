@@ -23,9 +23,7 @@ package org.ojalgo.matrix.store;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.IntBinaryOperator;
@@ -78,7 +76,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
      * This builder uses separate/additional memory to store the elements before they are copied to the actual
      * sparse matrix. The actual sparse matrix is built when the {@link #build()} method is called.
      */
-    public static final class Builder<N extends Comparable<N>> implements Factory2D.Builder<SparseStore<N>>, SparseStructure2D {
+    public static final class Builder<N extends Comparable<N>> implements Factory2D.Builder<SparseStore<N>> {
 
         private final int myColDim;
         private final Set<KeyedPrimitive<Comparable<?>>> myElements = ConcurrentHashMap.newKeySet();
@@ -106,18 +104,6 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         }
 
         @Override
-        public double density() {
-
-            double totalElements = this.count();
-
-            if (totalElements == ZERO) {
-                return ZERO;
-            } else {
-                return myElements.size() / totalElements;
-            }
-        }
-
-        @Override
         public int getColDim() {
             return myColDim;
         }
@@ -135,22 +121,6 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         @Override
         public void set(final long row, final long col, final Comparable<?> value) {
             myElements.add(EntryPair.of(value, Structure2D.index(myRowDim, row, col)));
-        }
-
-        @Override
-        public List<Triplet> toTriplets() {
-
-            List<Triplet> triplets = new ArrayList<>(myElements.size());
-
-            for (KeyedPrimitive<Comparable<?>> element : myElements) {
-                long index = element.longValue();
-                int row = Structure2D.row(index, myRowDim);
-                int col = Structure2D.column(index, myRowDim);
-                double value = NumberDefinition.doubleValue(element.getKey());
-                triplets.add(new Triplet(row, col, value));
-            }
-
-            return triplets;
         }
 
     }
@@ -216,15 +186,6 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         @Override
         public SparseStore<N> make(final int nbRows, final int nbCols) {
             return new SparseStore<>(myPhysicalFactory, nbRows, nbCols, myInitial);
-        }
-
-        public SparseStore<N> make(final int nbRows, final int nbCols, final List<Triplet> elements) {
-
-            SparseStore<N> retVal = this.initial((r, c) -> elements.size()).make(nbRows, nbCols);
-
-            elements.stream().sorted().forEach(triplet -> retVal.set(triplet.row, triplet.col, triplet.value));
-
-            return retVal;
         }
 
         @Override
@@ -330,7 +291,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
         super(factory, nbRows, nbCols);
 
-        myElements = SparseArray.factory(factory.array()).initial(initial.applyAsInt(nbRows, nbCols)).make(this.count());
+        myElements = SparseArray.factory(factory.array()).initial(initial.applyAsInt(nbRows, nbCols)).make(this.size());
         myFirsts = new int[nbRows];
         myLimits = new int[nbRows];
         Arrays.fill(myFirsts, nbCols);
@@ -352,15 +313,8 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
     }
 
     @Override
-    public double density() {
-
-        double totalElements = this.count();
-
-        if (totalElements == ZERO) {
-            return ZERO;
-        } else {
-            return myElements.count() / totalElements;
-        }
+    public int countNonzeros() {
+        return myElements.countNonzeros();
     }
 
     @Override
@@ -780,18 +734,80 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
     }
 
     @Override
-    public List<Triplet> toTriplets() {
+    public R064CSC toCSC() {
 
-        List<Triplet> triplets = new ArrayList<>(myElements.size());
+        int nbRows = this.getRowDim();
+        int nbCols = this.getColDim();
+        int nnz = myElements.countNonzeros();
 
-        for (ElementView2D<N, ?> element : this.nonzeros()) {
-            int row = Math.toIntExact(element.row());
-            int column = Math.toIntExact(element.column());
-            double value = element.doubleValue();
-            triplets.add(new Triplet(row, column, value));
+        double[] values = new double[nnz];
+        int[] rowIndices = new int[nnz];
+        int[] colPointers = new int[nbCols + 1];
+
+        int pos = 0;
+        int currentCol = 0;
+        colPointers[0] = 0;
+
+        for (NonzeroView<N> nz : myElements.nonzeros()) {
+            long index = nz.index();
+            int row = Structure2D.row(index, nbRows);
+            int col = Structure2D.column(index, nbRows);
+
+            // If we've moved to a new column, fill colPointers
+            while (currentCol < col) {
+                colPointers[++currentCol] = pos;
+            }
+
+            values[pos] = nz.doubleValue();
+            rowIndices[pos] = row;
+            pos++;
         }
 
-        return triplets;
+        // Fill remaining colPointers
+        while (currentCol < nbCols) {
+            colPointers[++currentCol] = pos;
+        }
+
+        return new R064CSC(nbRows, nbCols, values, rowIndices, colPointers);
+    }
+
+    @Override
+    public R064CSR toCSR() {
+
+        int nbRows = this.getRowDim();
+        int nbCols = this.getColDim();
+
+        int nnz = 0;
+        // First pass: count nonzeros per row
+        int[] rowCounts = new int[nbRows];
+        for (ElementView2D<N, ?> element : this.nonzeros()) {
+            int row = Math.toIntExact(element.row());
+            rowCounts[row]++;
+            nnz++;
+        }
+        double[] values = new double[nnz];
+        int[] colIndices = new int[nnz];
+        int[] rowPointers = new int[nbRows + 1];
+        // Compute rowPointers
+        int pos = 0;
+        for (int i = 0; i < nbRows; i++) {
+            rowPointers[i] = pos;
+            pos += rowCounts[i];
+        }
+        rowPointers[nbRows] = nnz;
+        // Second pass: fill values and colIndices
+        int[] next = new int[nbRows];
+        System.arraycopy(rowPointers, 0, next, 0, nbRows);
+        for (ElementView2D<N, ?> element : this.nonzeros()) {
+            int row = Math.toIntExact(element.row());
+            int col = Math.toIntExact(element.column());
+            double value = element.doubleValue();
+            int idx = next[row]++;
+            values[idx] = value;
+            colIndices[idx] = col;
+        }
+
+        return new R064CSR(nbRows, nbCols, values, colIndices, rowPointers);
     }
 
     @Override

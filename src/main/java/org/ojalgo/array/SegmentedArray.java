@@ -21,12 +21,14 @@
  */
 package org.ojalgo.array;
 
+import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.special.PowerOf2;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.StructureAnyD;
 import org.ojalgo.type.NumberDefinition;
 
 /**
@@ -41,9 +43,45 @@ import org.ojalgo.type.NumberDefinition;
  */
 final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
 
+    static <N extends Comparable<N>> SegmentedArray<N> make(final long count, final int indexBits, final BaseFactory<N, ?> segmentFactory) {
+
+        long segmentSize = 1L << indexBits; // 2^bits
+
+        int nbUniformSegments = (int) (count / segmentSize);
+        long remainder = count % segmentSize;
+
+        int nbTotalSegments = remainder == 0L ? (int) nbUniformSegments : nbUniformSegments + 1;
+
+        BasicArray<N>[] segments = (BasicArray<N>[]) new BasicArray<?>[nbTotalSegments];
+        for (int s = 0; s < nbUniformSegments; s++) {
+            segments[s] = segmentFactory.make(segmentSize);
+        }
+        if (remainder != 0L) {
+            segments[nbUniformSegments] = segmentFactory.make(remainder);
+        }
+
+        return new SegmentedArray<>(segments, segmentFactory);
+    }
+
+    static <N extends Comparable<N>> SegmentedArray<N> newInstance(final BaseFactory<N, ?> segmentFactory, final long... structure) {
+
+        long totalCount = StructureAnyD.count(structure);
+
+        int max = PowerOf2.powerOf2Smaller(totalCount);
+        int min = PowerOf2.powerOf2Larger(totalCount / PlainArray.MAX_SIZE);
+
+        if (min > max) {
+            throw new IllegalArgumentException();
+        }
+
+        int indexBits = Math.max(min, max - OjAlgoUtils.ENVIRONMENT.cores);
+
+        return SegmentedArray.make(totalCount, indexBits, segmentFactory);
+    }
+
     private final int myIndexBits;
     private final long myIndexMask;
-    private final BaseFactory<N, ?> mySegmentFactory;
+    private final BasicArray.BaseFactory<N, ?> mySegmentFactory;
     private final BasicArray<N>[] mySegments;
 
     /**
@@ -52,18 +90,18 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
      */
     private final long mySegmentSize;
 
-    SegmentedArray(final BasicArray<N>[] segments, final BaseFactory<N, ?> segmentFactory) {
+    SegmentedArray(final BasicArray<N>[] segments, final BasicArray.BaseFactory<N, ?> segmentFactory) {
 
         super(segmentFactory);
 
         mySegmentSize = segments[0].count();
-        int tmpIndexOfLastSegment = segments.length - 1;
-        for (int s = 1; s < tmpIndexOfLastSegment; s++) {
+        int indexOfLastSegment = segments.length - 1;
+        for (int s = 1; s < indexOfLastSegment; s++) {
             if (segments[s].count() != mySegmentSize) {
                 throw new IllegalArgumentException("All segments (except possibly the last) must have the same size!");
             }
         }
-        if (segments[tmpIndexOfLastSegment].count() > mySegmentSize) {
+        if (segments[indexOfLastSegment].count() > mySegmentSize) {
             throw new IllegalArgumentException("The last segment cannot be larger than the others!");
         }
 
@@ -75,34 +113,6 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
         myIndexMask = mySegmentSize - 1L;
 
         mySegments = segments;
-        mySegmentFactory = segmentFactory;
-    }
-
-    @SuppressWarnings("unchecked")
-    SegmentedArray(final long count, final int indexBits, final BaseFactory<N, ?> segmentFactory) {
-
-        super(segmentFactory);
-
-        long tmpSegmentSize = 1L << indexBits; // 2^bits
-
-        int tmpNumberOfUniformSegments = (int) (count / tmpSegmentSize);
-        long tmpRemainder = count % tmpSegmentSize;
-
-        int tmpTotalNumberOfSegments = tmpRemainder == 0L ? (int) tmpNumberOfUniformSegments : tmpNumberOfUniformSegments + 1;
-
-        mySegments = (BasicArray<N>[]) new BasicArray<?>[tmpTotalNumberOfSegments];
-        for (int s = 0; s < tmpNumberOfUniformSegments; s++) {
-            mySegments[s] = segmentFactory.make(tmpSegmentSize);
-        }
-        if (tmpRemainder != 0L) {
-            mySegments[tmpNumberOfUniformSegments] = segmentFactory.make(tmpRemainder);
-        }
-
-        mySegmentSize = tmpSegmentSize;
-
-        myIndexBits = indexBits;
-        myIndexMask = tmpSegmentSize - 1L;
-
         mySegmentFactory = segmentFactory;
     }
 

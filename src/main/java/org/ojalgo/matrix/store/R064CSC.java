@@ -23,14 +23,11 @@ package org.ojalgo.matrix.store;
 
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView2D;
-import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Structure2D;
 
 /**
@@ -161,44 +158,17 @@ public final class R064CSC extends CompressedR064 {
         }
     }
 
-    public static R064CSC make(final int nbRows, final int nbCols, final List<Triplet> elements) {
+    /**
+     * Assumes mtrxL is unit lower triangular, with the unit diagonal not stored.
+     */
+    public static void ftranUnitLowerTriangular(final R064CSC mtrxL, final int n, final PhysicalStore<Double> arg) {
 
-        // Sort elements by column, then by row within each column
-        Collections.sort(elements);
-
-        int nbElements = elements.size();
-
-        double[] values = new double[nbElements];
-        int[] indices = new int[nbElements];
-        int[] pointers = new int[nbCols + 1];
-
-        // Process elements in a single pass
-        int col = 0;
-        for (int k = 0; k < nbElements; k++) {
-            Triplet element = elements.get(k);
-
-            // Update column pointers for any skipped columns
-            while (col < element.col) {
-                pointers[col + 1] = k;
-                col++;
+        for (int j = 0; j < n; j++) {
+            double argJ = -arg.doubleValue(j);
+            for (int k = mtrxL.pointers[j], limit = mtrxL.pointers[j + 1]; k < limit; k++) {
+                arg.add(mtrxL.indices[k], mtrxL.values[k] * argJ);
             }
-
-            // Store the element
-            values[k] = element.value;
-            indices[k] = element.row;
         }
-
-        // Fill remaining column pointers
-        while (col < nbCols) {
-            pointers[col + 1] = nbElements;
-            col++;
-        }
-
-        return new R064CSC(nbRows, nbCols, values, indices, pointers);
-    }
-
-    public static Factory2D.Builder<R064CSC> newBuilder(final int nbRows, final int nbCols) {
-        return new CompressedR064.Builder<>(nbRows, nbCols, R064CSC::make);
     }
 
     /**
@@ -212,12 +182,6 @@ public final class R064CSC extends CompressedR064 {
      */
     R064CSC(final int nbRows, final int nbCols, final double[] elementValues, final int[] rowIndices, final int[] columnPointers) {
         super(nbRows, nbCols, elementValues, rowIndices, columnPointers);
-    }
-
-    @Override
-    public double density() {
-        double nz = values.length;
-        return nz / this.count();
     }
 
     /**
@@ -330,19 +294,42 @@ public final class R064CSC extends CompressedR064 {
     }
 
     @Override
-    public List<Triplet> toTriplets() {
+    public R064CSC toCSC() {
+        return this;
+    }
 
-        List<Triplet> triplets = new ArrayList<>(values.length);
+    @Override
+    public R064CSR toCSR() {
 
-        // Iterate through each column
-        for (int col = 0; col < this.getColDim(); col++) {
-            // For each non-zero element in this column
-            for (int k = pointers[col], limit = pointers[col + 1]; k < limit; k++) {
-                triplets.add(new Triplet(indices[k], col, values[k]));
+        int nbRows = this.getRowDim();
+        int nbCols = this.getColDim();
+        int nnz = values.length;
+
+        int[] rowCounts = new int[nbRows];
+        for (int j = 0; j < nbCols; j++) {
+            for (int k = pointers[j], limit = pointers[j + 1]; k < limit; k++) {
+                rowCounts[indices[k]]++;
             }
         }
 
-        return triplets;
+        int[] rowPointers = new int[nbRows + 1];
+        for (int i = 0; i < nbRows; i++) {
+            rowPointers[i + 1] = rowPointers[i] + rowCounts[i];
+        }
+
+        double[] valuesCSR = new double[nnz];
+        int[] colIndicesCSR = new int[nnz];
+        int[] next = Arrays.copyOf(rowPointers, nbRows);
+        for (int j = 0; j < nbCols; j++) {
+            for (int k = pointers[j], limit = pointers[j + 1]; k < limit; k++) {
+                int row = indices[k];
+                int dest = next[row]++;
+                valuesCSR[dest] = values[k];
+                colIndicesCSR[dest] = j;
+            }
+        }
+
+        return new R064CSR(nbRows, nbCols, valuesCSR, colIndicesCSR, rowPointers);
     }
 
 }

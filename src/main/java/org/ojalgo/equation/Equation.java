@@ -29,6 +29,7 @@ import java.util.List;
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.DenseArray;
+import org.ojalgo.array.PlainArray;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.structure.Access1D;
@@ -68,24 +69,28 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         return Equation.sparse(pivot, cols, ArrayR064.FACTORY);
     }
 
-    public static <N extends Comparable<N>> Equation sparse(final int pivot, final int cols, final DenseArray.Factory<N, ?> factory) {
+    public static Equation sparse(final int pivot, final int cols, final int numberOfNonzeros) {
+        return Equation.sparse(pivot, cols, ArrayR064.FACTORY, numberOfNonzeros);
+    }
+
+    public static <N extends Comparable<N>> Equation sparse(final int pivot, final int cols, final PlainArray.Factory<N, ?> factory) {
         return new Equation(SparseArray.factory(factory).make(cols), pivot, ZERO);
     }
 
-    public static <N extends Comparable<N>> Equation sparse(final int pivot, final int cols, final DenseArray.Factory<N, ?> factory,
+    public static <N extends Comparable<N>> Equation sparse(final int pivot, final int cols, final PlainArray.Factory<N, ?> factory,
             final int numberOfNonzeros) {
         return new Equation(SparseArray.factory(factory).initial(numberOfNonzeros).make(cols), pivot, ZERO);
-    }
-
-    public static Equation sparse(final int pivot, final int cols, final int numberOfNonzeros) {
-        return Equation.sparse(pivot, cols, ArrayR064.FACTORY, numberOfNonzeros);
     }
 
     public static List<Equation> sparseSystem(final int rows, final int cols) {
         return Equation.sparseSystem(rows, cols, ArrayR064.FACTORY);
     }
 
-    public static <N extends Comparable<N>> List<Equation> sparseSystem(final int rows, final int cols, final DenseArray.Factory<N, ?> factory) {
+    public static List<Equation> sparseSystem(final int rows, final int cols, final int numberOfNonzeros) {
+        return Equation.sparseSystem(rows, cols, ArrayR064.FACTORY, numberOfNonzeros);
+    }
+
+    public static <N extends Comparable<N>> List<Equation> sparseSystem(final int rows, final int cols, final PlainArray.Factory<N, ?> factory) {
 
         List<Equation> system = new ArrayList<>(rows);
 
@@ -96,7 +101,7 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         return system;
     }
 
-    public static <N extends Comparable<N>> List<Equation> sparseSystem(final int rows, final int cols, final DenseArray.Factory<N, ?> factory,
+    public static <N extends Comparable<N>> List<Equation> sparseSystem(final int rows, final int cols, final PlainArray.Factory<N, ?> factory,
             final int numberOfNonzeros) {
 
         List<Equation> system = new ArrayList<>(rows);
@@ -106,10 +111,6 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         }
 
         return system;
-    }
-
-    public static List<Equation> sparseSystem(final int rows, final int cols, final int numberOfNonzeros) {
-        return Equation.sparseSystem(rows, cols, ArrayR064.FACTORY, numberOfNonzeros);
     }
 
     public static Equation wrap(final BasicArray<?> body, final int pivot, final double rhs) {

@@ -38,7 +38,7 @@ public class SparsePerformance {
 
     long DIM = 10_000L;
 
-    SparseArray<Double> array;
+    BasicArray<Double> array;
 
     @Benchmark
     public double doTest() {

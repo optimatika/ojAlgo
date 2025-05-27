@@ -21,7 +21,6 @@
  */
 package org.ojalgo.array;
 
-import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.array.operation.AMAX;
 import org.ojalgo.array.operation.Exchange;
 import org.ojalgo.array.operation.FillAll;
@@ -60,15 +59,18 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
 
     public static final class Factory<N extends Comparable<N>> extends BaseFactory<N, BasicArray<N>> {
 
-        private static final long SPARSE_SEGMENTATION_LIMIT = PowerOf2.powerOfLong2(46);
-
         private final DenseArray.Factory<N, ?> myDenseFactory;
-        private final GrowthStrategy myGrowthStrategy;
+        private final GrowthStrategy myDenseStrategy;
+        private final GrowthStrategy mySparseStrategy;
 
         Factory(final DenseArray.Factory<N, ?> denseFactory) {
+
             super(denseFactory.getMathType());
+
             myDenseFactory = denseFactory;
-            myGrowthStrategy = GrowthStrategy.newInstance(denseFactory.getMathType());
+
+            myDenseStrategy = new GrowthStrategy(denseFactory.getMathType()).segment(PowerOf2.powerOfLong2(23));
+            mySparseStrategy = new GrowthStrategy(denseFactory.getMathType()).segment(PowerOf2.powerOfLong2(46));
         }
 
         @Override
@@ -86,22 +88,6 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
             return Long.MAX_VALUE;
         }
 
-        SegmentedArray<N> makeSegmented(final long... structure) {
-
-            long totalCount = StructureAnyD.count(structure);
-
-            int max = PowerOf2.powerOf2Smaller(totalCount);
-            int min = PowerOf2.powerOf2Larger(totalCount / PlainArray.MAX_SIZE);
-
-            if (min > max) {
-                throw new IllegalArgumentException();
-            }
-
-            int indexBits = Math.max(min, max - OjAlgoUtils.ENVIRONMENT.cores);
-
-            return new SegmentedArray<>(totalCount, indexBits, this);
-        }
-
         /**
          * Most likely sparse, and then also segmented.
          */
@@ -109,13 +95,13 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
 
             long total = StructureAnyD.count(structure);
 
-            if (total > SPARSE_SEGMENTATION_LIMIT) {
+            if (mySparseStrategy.isSegmented(total)) {
 
-                return this.makeSegmented(structure);
+                return SegmentedArray.newInstance(this, structure);
 
-            } else if (myGrowthStrategy.isChunked(total)) {
+            } else if (mySparseStrategy.isChunked(total) && myDenseFactory instanceof PlainArray.Factory) {
 
-                return new SparseArray<>(myDenseFactory, myGrowthStrategy, total);
+                return new SparseArray<>((PlainArray.Factory<N, ?>) myDenseFactory, mySparseStrategy, total);
 
             } else {
 
@@ -130,8 +116,8 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
 
             long total = StructureAnyD.count(structure);
 
-            if (myGrowthStrategy.isSegmented(total)) {
-                return this.makeSegmented(total);
+            if (myDenseStrategy.isSegmented(total)) {
+                return SegmentedArray.newInstance(this, total);
             } else {
                 return myDenseFactory.make(total);
             }

@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
-import java.util.List;
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import org.ojalgo.structure.Structure2D;
 
@@ -45,20 +45,27 @@ import org.ojalgo.structure.Structure2D;
  */
 public interface SparseStructure2D extends Structure2D {
 
+    int countNonzeros();
+
     /**
      * Returns the density of the matrix, defined as the ratio of non-zero elements to the total number of
      * elements in the matrix.
      *
      * @return The density of the matrix, between 0.0 and 1.0
      */
-    double density();
+    default double density() {
 
-    /**
-     * Converts the sparse matrix to a list of {@link Triplet}s, where each triplet represents a non-zero
-     * element with its row index, column index, and value.
-     *
-     * @return A list of triplets representing all non-zero elements in the matrix
-     */
-    List<Triplet> toTriplets();
+        double totalCount = this.count();
+
+        if (totalCount == ZERO) {
+            return ZERO;
+        } else {
+            return this.countNonzeros() / totalCount;
+        }
+    }
+
+    R064CSC toCSC();
+
+    R064CSR toCSR();
 
 }

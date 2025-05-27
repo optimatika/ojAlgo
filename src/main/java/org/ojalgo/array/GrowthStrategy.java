@@ -15,98 +15,42 @@ import org.ojalgo.type.math.MathType;
  */
 final class GrowthStrategy {
 
-    static final class Builder {
+    /**
+     * 512
+     */
+    private static final long CHUNK = Hardware.OS_MEMORY_PAGE_SIZE / MathType.R064.getTotalMemory();
+    private static final long INITIAL = 4L;
+    private static final long SEGMENT = 32_768L;
 
-        /**
-         * 512
-         */
-        private static final long CHUNK = Hardware.OS_MEMORY_PAGE_SIZE / MathType.R064.getTotalMemory();
-        private static final long INITIAL = 4L;
-        private static final long SEGMENT = 32_768L;
+    private long myChunk = CHUNK;
+    private long myInitial = INITIAL;
+    private long mySegment = SEGMENT;
 
-        private long myChunk = CHUNK;
-        private long myInitial = INITIAL;
-        private long mySegment = SEGMENT;
-
-        Builder(final long elementSize) {
-
-            super();
-
-            long halfTopLevelCacheElements = (OjAlgoUtils.ENVIRONMENT.cache / 2L) / elementSize;
-            this.segment(halfTopLevelCacheElements);
-
-            long memoryPageElements = Hardware.OS_MEMORY_PAGE_SIZE / elementSize;
-            this.chunk(memoryPageElements);
-        }
-
-        Builder(final MathType mathType) {
-            this(mathType.getTotalMemory());
-
-        }
-
-        GrowthStrategy build() {
-            return new GrowthStrategy(this);
-        }
-
-        long chunk() {
-            return myChunk;
-        }
-
-        Builder chunk(final long chunk) {
-            long notLargerThanCurrentSegment = Math.min(chunk, mySegment);
-            int power = PowerOf2.powerOf2Smaller(notLargerThanCurrentSegment);
-            myChunk = 1L << power;
-            return this;
-        }
-
-        int initial() {
-            return (int) myInitial;
-        }
-
-        /**
-         * Enforced to be &gt;= 1
-         */
-        Builder initial(final long initial) {
-            myInitial = Math.max(1, initial);
-            return this;
-        }
-
-        long segment() {
-            return mySegment;
-        }
-
-        Builder segment(final long segment) {
-            long notSmallerThanCurrentChunk = Math.max(myChunk, segment);
-            int power = PowerOf2.powerOf2Smaller(notSmallerThanCurrentChunk);
-            mySegment = 1L << power;
-            return this;
-        }
-
-    }
-
-    static Builder newBuilder(final MathType mathType) {
-        return new Builder(mathType);
-    }
-
-    static GrowthStrategy newInstance(final MathType mathType) {
-        return new Builder(mathType).build();
-    }
-
-    private final long myChunk;
-    private final long myInitial;
-    private final long mySegment;
-
-    GrowthStrategy(final Builder builder) {
+    GrowthStrategy(final long elementSize) {
 
         super();
 
-        myInitial = builder.initial();
-        myChunk = builder.chunk();
-        mySegment = builder.segment();
+        long halfTopLevelCacheElements = (OjAlgoUtils.ENVIRONMENT.cache / 2L) / elementSize;
+        this.segment(halfTopLevelCacheElements);
+
+        long memoryPageElements = Hardware.OS_MEMORY_PAGE_SIZE / elementSize;
+        this.chunk(memoryPageElements);
+    }
+
+    GrowthStrategy(final MathType mathType) {
+        this(mathType.getTotalMemory());
+
     }
 
     long chunk() {
         return myChunk;
+    }
+
+    GrowthStrategy chunk(final long chunk) {
+        long notLargerThanCurrentSegment = Math.min(chunk, mySegment);
+        int power = PowerOf2.powerOf2Smaller(notLargerThanCurrentSegment);
+        myChunk = 1L << power;
+        return this;
     }
 
     int grow(final int current) {
@@ -137,6 +81,14 @@ final class GrowthStrategy {
         return (int) myInitial;
     }
 
+    /**
+     * Enforced to be <= 1
+     */
+    GrowthStrategy initial(final long initial) {
+        myInitial = Math.max(1, initial);
+        return this;
+    }
+
     boolean isChunked(final long count) {
         return count > myChunk;
     }
@@ -159,6 +111,13 @@ final class GrowthStrategy {
 
     long segment() {
         return mySegment;
+    }
+
+    GrowthStrategy segment(final long segment) {
+        long notSmallerThanCurrentChunk = Math.max(myChunk, segment);
+        int power = PowerOf2.powerOf2Smaller(notSmallerThanCurrentChunk);
+        mySegment = 1L << power;
+        return this;
     }
 
 }

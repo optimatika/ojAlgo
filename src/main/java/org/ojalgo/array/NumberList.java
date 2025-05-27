@@ -51,17 +51,49 @@ import org.ojalgo.structure.Mutate1D;
  */
 public final class NumberList<N extends Comparable<N>> implements List<N>, RandomAccess, Access1D<N>, Access1D.Visitable<N>, Mutate1D, Mutate1D.Mixable<N> {
 
-    public static final class ListFactory<N extends Comparable<N>> extends StrategyBuildingFactory<N, NumberList<N>, ListFactory<N>> {
+    public static final class ListFactory<N extends Comparable<N>> {
 
-        private final DenseArray.Factory<N, ?> myDenseArrayFactory;
+        private final GrowthStrategy myGrowthStrategy;
+        private final DenseArray.Factory<N, ?> myDenseFactory;
 
         ListFactory(final DenseArray.Factory<N, ?> denseFactory) {
-            super(denseFactory.getMathType());
-            myDenseArrayFactory = denseFactory;
+            myGrowthStrategy = new GrowthStrategy(denseFactory.getMathType());
+            myDenseFactory = denseFactory;
+        }
+
+        /**
+         * @param chunk Defines a capacity break point. Below this point the capacity is doubled when needed.
+         *              Above it, it is grown by adding one "chunk" at the time. Must be a power of 2. (The
+         *              builder will enforce that for you.)
+         * @return this
+         */
+        public ListFactory<N> chunk(final long chunk) {
+            myGrowthStrategy.chunk(chunk);
+            return this;
+        }
+
+        /**
+         * @param initial Sets the initial capacity of the "arrays" to be created using this factory.
+         * @return this
+         */
+        public ListFactory<N> initial(final long initial) {
+            myGrowthStrategy.initial(initial);
+            return this;
         }
 
         public NumberList<N> make() {
-            return new NumberList<>(myDenseArrayFactory, this.getGrowthStrategy());
+            return new NumberList<>(myDenseFactory, this.myGrowthStrategy);
+        }
+
+        /**
+         * With very large data structures, particularly sparse ones, the underlying (dense) storage is
+         * segmented. (Very large arrays are implemented as an array of arrays.) This determines the
+         * size/length of one such segment. Must be a multiple of the chunk size as well as a power of 2. (The
+         * builder will enforce this for you.)
+         */
+        public ListFactory<N> segment(final long segment) {
+            myGrowthStrategy.segment(segment);
+            return this;
         }
 
     }

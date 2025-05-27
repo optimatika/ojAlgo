@@ -35,11 +35,10 @@ public class SparseTest extends ArrayTests {
     @Test
     public void testAggregateSumDifferentWays() {
 
-        long dim = 1000L;
-        long dim2 = dim * dim;
-        final long count = dim2;
+        int dim = 1000;
+        int dim2 = dim * dim;
 
-        SparseArray<Double> plain = SparseArray.factory(ArrayR064.FACTORY).make(count);
+        SparseArray<Double> plain = SparseArray.factory(ArrayR064.FACTORY).make(dim2);
         Array1D<Double> array1D = Array1D.R064.make(dim2);
         Array2D<Double> array2D = Array2D.R064.make(dim, dim);
 
@@ -65,7 +64,7 @@ public class SparseTest extends ArrayTests {
     @Test
     public void testIndexOfLargest() {
 
-        SparseArray<Double> sparseArray = SparseArray.factory(ArrayR064.FACTORY).make(1_000_000L);
+        BasicArray<Double> sparseArray = SparseArray.factory(ArrayR064.FACTORY).make(1_000_000L);
 
         for (int i = 0; i < 100; i++) {
             long index = Uniform.randomInteger(1_000_000L);
@@ -79,13 +78,36 @@ public class SparseTest extends ArrayTests {
     }
 
     @Test
+    public void testPutLastAppendsCorrectly() {
+
+        SparseArray<Double> arr = SparseArray.factory(ArrayR064.FACTORY).make(10);
+
+        arr.set(2, 1.0);
+        arr.putLast(5, 2.0);
+        arr.putLast(9, 3.0);
+
+        TestUtils.assertEquals(1.0, arr.doubleValue(2));
+        TestUtils.assertEquals(2.0, arr.doubleValue(5));
+        TestUtils.assertEquals(3.0, arr.doubleValue(9));
+        TestUtils.assertEquals(0.0, arr.doubleValue(0));
+        TestUtils.assertEquals(0.0, arr.doubleValue(8));
+    }
+
+    @Test
+    public void testPutLastSkipsZero() {
+        SparseArray<Double> arr = SparseArray.factory(ArrayR064.FACTORY).make(10);
+        arr.putLast(1, 0.0);
+        TestUtils.assertEquals(0, arr.countNonzeros());
+    }
+
+    @Test
     @Tag("slow")
     @Tag("unstable")
     public void testRandomAccess() {
 
         long dim = 100_000L;
 
-        SparseArray<Double> array = SparseArray.factory(ArrayR064.FACTORY).make(dim * dim);
+        BasicArray<Double> array = SparseArray.factory(ArrayR064.FACTORY).make(dim * dim);
 
         for (long i = 0L; i < dim; i++) {
             array.set(Uniform.randomInteger(dim * dim), 1.0);
@@ -96,7 +118,7 @@ public class SparseTest extends ArrayTests {
             sumOfAll += array.doubleValue(i);
         }
 
-        // There is of course a chanse the same random index was generated more
+        // There is of course a chance the same random index was generated more
         // than once (when setting the values). In that case the test will fail.
         TestUtils.assertEquals(dim, sumOfAll);
     }

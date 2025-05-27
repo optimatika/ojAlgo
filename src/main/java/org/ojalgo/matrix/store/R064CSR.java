@@ -23,16 +23,12 @@ package org.ojalgo.matrix.store;
 
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView2D;
-import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Structure2D;
-import org.ojalgo.type.NumberDefinition;
 
 /**
  * A compressed sparse row (CSR) matrix store implementation for double precision values. This format is
@@ -55,47 +51,6 @@ import org.ojalgo.type.NumberDefinition;
  * @author apete
  */
 public final class R064CSR extends CompressedR064 {
-
-    public static final class Builder implements Factory2D.Builder<R064CSR> {
-
-        private final int myColDim;
-        private final List<Triplet> myElements = new ArrayList<>();
-        private final int myRowDim;
-
-        public Builder(final int nbRows, final int nbCols) {
-            super();
-            myRowDim = nbRows;
-            myColDim = nbCols;
-        }
-
-        @Override
-        public R064CSR build() {
-            return R064CSR.make(myRowDim, myColDim, myElements);
-        }
-
-        @Override
-        public int getColDim() {
-            return myColDim;
-        }
-
-        @Override
-        public int getRowDim() {
-            return myRowDim;
-        }
-
-        @Override
-        public void set(final int row, final int col, final double value) {
-            if (value != ZERO) {
-                myElements.add(new Triplet(row, col, value));
-            }
-        }
-
-        @Override
-        public void set(final long row, final long col, final Comparable<?> value) {
-            this.set(row, col, NumberDefinition.doubleValue(value));
-        }
-
-    }
 
     public static final class NonZeroView implements ElementView2D<Double, NonZeroView> {
 
@@ -201,46 +156,6 @@ public final class R064CSR extends CompressedR064 {
         }
     }
 
-    public static R064CSR make(final int nbRows, final int nbCols, final List<Triplet> elements) {
-
-        // Sort elements by row, then by column within each row
-        Collections.sort(elements, Triplet.ROW_MAJOR);
-
-        int nbElements = elements.size();
-
-        double[] values = new double[nbElements];
-        int[] indices = new int[nbElements];
-        int[] pointers = new int[nbRows + 1];
-
-        // Process elements in a single pass
-        int row = 0;
-        for (int k = 0; k < nbElements; k++) {
-            Triplet element = elements.get(k);
-
-            // Update row pointers for any skipped rows
-            while (row < element.row) {
-                pointers[row + 1] = k;
-                row++;
-            }
-
-            // Store the element
-            values[k] = element.value;
-            indices[k] = element.col;
-        }
-
-        // Fill remaining row pointers
-        while (row < nbRows) {
-            pointers[row + 1] = nbElements;
-            row++;
-        }
-
-        return new R064CSR(nbRows, nbCols, values, indices, pointers);
-    }
-
-    public static Factory2D.Builder<R064CSR> newBuilder(final int nbRows, final int nbCols) {
-        return new CompressedR064.Builder<>(nbRows, nbCols, R064CSR::make);
-    }
-
     /**
      * Creates a new CSR matrix store.
      *
@@ -252,12 +167,6 @@ public final class R064CSR extends CompressedR064 {
      */
     R064CSR(final int nbRows, final int nbCols, final double[] elementValues, final int[] columnIndices, final int[] rowPointers) {
         super(nbRows, nbCols, elementValues, columnIndices, rowPointers);
-    }
-
-    @Override
-    public double density() {
-        double nz = values.length;
-        return nz / this.count();
     }
 
     /**
@@ -371,19 +280,40 @@ public final class R064CSR extends CompressedR064 {
     }
 
     @Override
-    public List<Triplet> toTriplets() {
+    public R064CSC toCSC() {
 
-        List<Triplet> triplets = new ArrayList<>(values.length);
+        int nbRows = this.getRowDim();
+        int nbCols = this.getColDim();
+        int nnz = values.length;
 
-        // Iterate through each row
-        for (int row = 0; row < this.getRowDim(); row++) {
-            // For each non-zero element in this row
-            for (int k = pointers[row], limit = pointers[row + 1]; k < limit; k++) {
-                triplets.add(new Triplet(row, indices[k], values[k]));
+        int[] colCounts = new int[nbCols];
+        for (int k = 0; k < nnz; k++) {
+            colCounts[indices[k]]++;
+        }
+
+        int[] colPointers = new int[nbCols + 1];
+        for (int j = 0; j < nbCols; j++) {
+            colPointers[j + 1] = colPointers[j] + colCounts[j];
+        }
+
+        double[] valuesCSC = new double[nnz];
+        int[] rowIndicesCSC = new int[nnz];
+        int[] next = Arrays.copyOf(colPointers, nbCols);
+        for (int i = 0; i < nbRows; i++) {
+            for (int k = pointers[i], limit = pointers[i + 1]; k < limit; k++) {
+                int col = indices[k];
+                int dest = next[col]++;
+                valuesCSC[dest] = values[k];
+                rowIndicesCSC[dest] = i;
             }
         }
 
-        return triplets;
+        return new R064CSC(nbRows, nbCols, valuesCSC, rowIndicesCSC, colPointers);
+    }
+
+    @Override
+    public R064CSR toCSR() {
+        return this;
     }
 
 }
