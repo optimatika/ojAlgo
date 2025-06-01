@@ -24,6 +24,7 @@ package org.ojalgo.array;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.BasicArray.BaseFactory;
@@ -60,34 +61,35 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
 
     public static final class Factory<N extends Comparable<N>> implements FactoryAnyD.MayBeSparse<ArrayAnyD<N>, ArrayAnyD<N>, ArrayAnyD<N>> {
 
-        private final BasicArray.Factory<N> myDelegate;
+        private transient BasicArray.Factory<N> myDelegate = null;
+        private final Supplier<BasicArray.Factory<N>> myDelegateSupplier;
 
         Factory(final DenseArray.Factory<N, ?> denseArray) {
             super();
-            myDelegate = new BasicArray.Factory<>(denseArray);
+            myDelegateSupplier = () -> new BasicArray.Factory<>(denseArray);
         }
 
         @Override
         public ArrayAnyD<N> copy(final AccessAnyD<?> source) {
-            BasicArray<N> basic = myDelegate.make(source.count());
+            BasicArray<N> basic = this.delegate().make(source.count());
             basic.fillMatching(source);
             return basic.wrapInArrayAnyD(source.shape());
         }
 
         @Override
         public FunctionSet<N> function() {
-            return myDelegate.function();
+            return this.delegate().function();
         }
 
         @Override
         public MathType getMathType() {
-            return myDelegate.getMathType();
+            return this.delegate().getMathType();
         }
 
         @Override
         public ArrayAnyD<N> make(final int... shape) {
             long[] longIndexes = Structure1D.toLongIndexes(shape);
-            return myDelegate.makeToBeFilled(longIndexes).wrapInArrayAnyD(longIndexes);
+            return this.delegate().makeToBeFilled(longIndexes).wrapInArrayAnyD(longIndexes);
         }
 
         @Override
@@ -97,28 +99,35 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
 
         @Override
         public ArrayAnyD<N> makeFilled(final long[] shape, final NullaryFunction<?> supplier) {
-            BasicArray<N> basic = myDelegate.makeToBeFilled(shape);
+            BasicArray<N> basic = this.delegate().makeToBeFilled(shape);
             basic.fillAll(supplier);
             return basic.wrapInArrayAnyD(shape);
         }
 
         @Override
         public ArrayAnyD<N> newDenseBuilder(final long... shape) {
-            return myDelegate.makeToBeFilled(shape).wrapInArrayAnyD(shape);
+            return this.delegate().makeToBeFilled(shape).wrapInArrayAnyD(shape);
         }
 
         @Override
         public ArrayAnyD<N> newSparseBuilder(final long... shape) {
-            return myDelegate.makeStructuredZero(shape).wrapInArrayAnyD(shape);
+            return this.delegate().makeStructuredZero(shape).wrapInArrayAnyD(shape);
         }
 
         @Override
         public Scalar.Factory<N> scalar() {
-            return myDelegate.scalar();
+            return this.delegate().scalar();
         }
 
         public TensorFactoryAnyD<N, ArrayAnyD<N>> tensor() {
             return TensorFactoryAnyD.of(this);
+        }
+
+        private BasicArray.Factory<N> delegate() {
+            if (myDelegate == null) {
+                myDelegate = myDelegateSupplier.get();
+            }
+            return myDelegate;
         }
 
     }

@@ -24,6 +24,7 @@ package org.ojalgo.array;
 import java.math.BigDecimal;
 import java.util.AbstractList;
 import java.util.RandomAccess;
+import java.util.function.Supplier;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.BasicArray.BaseFactory;
@@ -56,28 +57,29 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
     public static final class Factory<N extends Comparable<N>> implements Factory1D.MayBeSparse<Array1D<N>, Array1D<N>, Array1D<N>> {
 
-        private final BasicArray.Factory<N> myDelegate;
+        private transient BasicArray.Factory<N> myDelegate = null;
+        private final Supplier<BasicArray.Factory<N>> myDelegateSupplier;
 
         Factory(final DenseArray.Factory<N, ?> denseArray) {
             super();
-            myDelegate = new BasicArray.Factory<>(denseArray);
+            myDelegateSupplier = () -> new BasicArray.Factory<>(denseArray);
         }
 
         @Override
         public Array1D<N> copy(final Access1D<?> source) {
-            BasicArray<N> basic = myDelegate.make(source.count());
+            BasicArray<N> basic = this.delegate().make(source.count());
             basic.fillMatching(source);
             return basic.wrapInArray1D();
         }
 
         @Override
         public FunctionSet<N> function() {
-            return myDelegate.function();
+            return this.delegate().function();
         }
 
         @Override
         public MathType getMathType() {
-            return myDelegate.getMathType();
+            return this.delegate().getMathType();
         }
 
         @Override
@@ -92,24 +94,24 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
         @Override
         public Array1D<N> makeFilled(final long count, final NullaryFunction<?> supplier) {
-            BasicArray<N> basic = myDelegate.make(count);
+            BasicArray<N> basic = this.delegate().make(count);
             basic.fillAll(supplier);
             return basic.wrapInArray1D();
         }
 
         @Override
         public Array1D<N> newDenseBuilder(final long count) {
-            return myDelegate.makeToBeFilled(count).wrapInArray1D();
+            return this.delegate().makeToBeFilled(count).wrapInArray1D();
         }
 
         @Override
         public Array1D<N> newSparseBuilder(final long count) {
-            return myDelegate.makeStructuredZero(count).wrapInArray1D();
+            return this.delegate().makeStructuredZero(count).wrapInArray1D();
         }
 
         @Override
         public Scalar.Factory<N> scalar() {
-            return myDelegate.scalar();
+            return this.delegate().scalar();
         }
 
         public TensorFactory1D<N, Array1D<N>> tensor() {
@@ -118,6 +120,13 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
         public Array1D<N> wrap(final BasicArray<N> array) {
             return array.wrapInArray1D();
+        }
+
+        private BasicArray.Factory<N> delegate() {
+            if (myDelegate == null) {
+                myDelegate = myDelegateSupplier.get();
+            }
+            return myDelegate;
         }
 
     }

@@ -22,6 +22,7 @@
 package org.ojalgo.array;
 
 import java.math.BigDecimal;
+import java.util.function.Supplier;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.BasicArray.BaseFactory;
@@ -57,28 +58,29 @@ public final class Array2D<N extends Comparable<N>>
 
     public static final class Factory<N extends Comparable<N>> implements Factory2D.MayBeSparse<Array2D<N>, Array2D<N>, Array2D<N>> {
 
-        private final BasicArray.Factory<N> myDelegate;
+        private transient BasicArray.Factory<N> myDelegate = null;
+        private final Supplier<BasicArray.Factory<N>> myDelegateSupplier;
 
         Factory(final DenseArray.Factory<N, ?> denseArray) {
             super();
-            myDelegate = new BasicArray.Factory<>(denseArray);
+            myDelegateSupplier = () -> new BasicArray.Factory<>(denseArray);
         }
 
         @Override
         public Array2D<N> copy(final Access2D<?> source) {
-            BasicArray<N> basic = myDelegate.make(source.count());
+            BasicArray<N> basic = this.delegate().make(source.count());
             basic.fillMatching(source);
             return basic.wrapInArray2D(source.countRows());
         }
 
         @Override
         public FunctionSet<N> function() {
-            return myDelegate.function();
+            return this.delegate().function();
         }
 
         @Override
         public MathType getMathType() {
-            return myDelegate.getMathType();
+            return this.delegate().getMathType();
         }
 
         @Override
@@ -93,28 +95,35 @@ public final class Array2D<N extends Comparable<N>>
 
         @Override
         public Array2D<N> makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
-            BasicArray<N> basic = myDelegate.makeToBeFilled(rows, columns);
+            BasicArray<N> basic = this.delegate().makeToBeFilled(rows, columns);
             basic.fillAll(supplier);
             return basic.wrapInArray2D(rows);
         }
 
         @Override
         public Array2D<N> newDenseBuilder(final long nbRows, final long nbCols) {
-            return myDelegate.makeToBeFilled(nbRows, nbCols).wrapInArray2D(nbRows);
+            return this.delegate().makeToBeFilled(nbRows, nbCols).wrapInArray2D(nbRows);
         }
 
         @Override
         public Array2D<N> newSparseBuilder(final long nbRows, final long nbCols) {
-            return myDelegate.makeStructuredZero(nbRows, nbCols).wrapInArray2D(nbRows);
+            return this.delegate().makeStructuredZero(nbRows, nbCols).wrapInArray2D(nbRows);
         }
 
         @Override
         public Scalar.Factory<N> scalar() {
-            return myDelegate.scalar();
+            return this.delegate().scalar();
         }
 
         public TensorFactory2D<N, Array2D<N>> tensor() {
             return TensorFactory2D.of(this);
+        }
+
+        private BasicArray.Factory<N> delegate() {
+            if (myDelegate == null) {
+                myDelegate = myDelegateSupplier.get();
+            }
+            return myDelegate;
         }
 
     }
