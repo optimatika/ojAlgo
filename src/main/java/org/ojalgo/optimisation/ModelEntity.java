@@ -437,33 +437,53 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     private BigDecimal getLower(final boolean adjusted) {
-        BigDecimal limit = null;
+
+        BigDecimal retVal = null;
+
         if (adjusted && myLowerLimit != null) {
+
+            BigDecimal shifted = this.doShift(myLowerLimit);
+
             int adjustmentExponent = this.getAdjustmentExponent();
+
             if (adjustmentExponent != 0) {
-                limit = myLowerLimit.movePointRight(adjustmentExponent);
+                retVal = shifted.movePointRight(adjustmentExponent);
             } else {
-                limit = myLowerLimit;
+                retVal = shifted;
             }
+
         } else {
-            limit = myLowerLimit;
+
+            retVal = myLowerLimit;
         }
-        return limit;
+
+        return retVal;
     }
 
+    abstract BigDecimal doShift(BigDecimal value);
+
     private BigDecimal getUpper(final boolean adjusted) {
-        BigDecimal limit = null;
+
+        BigDecimal retVal = null;
+
         if (adjusted && myUpperLimit != null) {
+
+            BigDecimal shifted = this.doShift(myUpperLimit);
+
             int adjustmentExponent = this.getAdjustmentExponent();
+
             if (adjustmentExponent != 0) {
-                limit = myUpperLimit.movePointRight(adjustmentExponent);
+                retVal = shifted.movePointRight(adjustmentExponent);
             } else {
-                limit = myUpperLimit;
+                retVal = shifted;
             }
+
         } else {
-            limit = myUpperLimit;
+
+            retVal = myUpperLimit;
         }
-        return limit;
+
+        return retVal;
     }
 
     protected void appendLeftPart(final StringBuilder builder, final NumberContext display) {

@@ -131,9 +131,13 @@ public final class ConvexData<N extends Comparable<N>> implements ExpressionsBas
         return myBI.doubleValue(row);
     }
 
-    @Override
     public EntryPair<ModelEntity<?>, ConstraintType> getConstraint(final int idc) {
         return myConstraintsMetaData.getEntry(idc);
+    }
+
+    @Override
+    public EntryPair<ModelEntity<?>, ConstraintType> getConstraintMap(final int i) {
+        return myConstraintsMetaData.getEntry(i);
     }
 
     public ConvexObjectiveFunction<N> getObjective() {

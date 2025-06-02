@@ -124,6 +124,20 @@ public final class Variable extends ModelEntity<Variable> {
         }
         Variable other = (Variable) obj;
         return Objects.equals(myIndex, other.myIndex) && myInteger == other.myInteger && Objects.equals(myValue, other.myValue);
+}
+
+    public BigDecimal getBaseValue() {
+
+        BigDecimal lower = this.getLowerLimit();
+        BigDecimal upper = this.getUpperLimit();
+
+        if (lower != null) {
+            return lower;
+        } else if (upper != null) {
+            return upper;
+        } else {
+            return ZERO;
+        }
     }
 
     public BigDecimal getLowerSlack() {
@@ -215,17 +229,24 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     /**
-     * The range includes something < 0.0
+     * Negative if the variable's range, when shifted using {@link #getBaseValue()}, includes < 0.0
      */
     public boolean isNegative() {
-        return !this.isLowerLimitSet() || this.getLowerLimit().signum() < 0;
+
+        BigDecimal lower = this.getLowerLimit();
+
+        return lower == null;
     }
 
     /**
-     * The range includes something > 0.0
+     * Positive if the variable's range, when shifted using {@link #getBaseValue()}, includes > 0.0
      */
     public boolean isPositive() {
-        return !this.isUpperLimitSet() || this.getUpperLimit().signum() > 0;
+
+        BigDecimal lower = this.getLowerLimit();
+        BigDecimal upper = this.getUpperLimit();
+
+        return upper == null || lower != null && lower.compareTo(upper) < 0;
     }
 
     public boolean isValueSet() {
@@ -378,12 +399,21 @@ public final class Variable extends ModelEntity<Variable> {
         }
     }
 
+    @Override
+    BigDecimal doShift(final BigDecimal value) {
+        return value.subtract(this.getBaseValue());
+    }
+
     IntIndex getIndex() {
         return myIndex;
     }
 
     boolean isFixed() {
         return this.isEqualityConstraint();
+    }
+
+    boolean isShifted() {
+        return this.getBaseValue().compareTo(ZERO) != 0;
     }
 
     boolean isUnbounded() {
