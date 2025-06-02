@@ -181,6 +181,25 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
         }
     }
 
+    @Test
+    public void testCaseFromChat() {
+
+        Optimisation.Result expected = Optimisation.Result.of(9, Optimisation.State.OPTIMAL, 3, 0);
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x1 = model.addVariable("x1").lower(0).weight(3);
+        Variable x2 = model.addVariable("x2").lower(0).weight(2);
+
+        model.addExpression().set(x1, -1).set(x2, 2).upper(4);
+        model.addExpression().set(x1, 2).set(x2, 1).lower(6);
+        model.addExpression().set(x1, 1).set(x2, 1).level(3);
+
+        RevisedSimplexSolverTest.doTestDualVariants(model, expected);
+
+        RevisedSimplexSolverTest.doTestPhasedVariants(model, expected);
+    }
+
     /**
      * https://people.math.carleton.ca/~kcheung/math/notes/MATH5801/06/6_3_revised_dual_simplex.html
      */
@@ -522,9 +541,9 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
 
         Optimisation.Result expected = Result.of(State.OPTIMAL, 0.0, 2.0, 2.0, 0.0);
 
-        RevisedSimplexSolverTest.doTestPrimalVariants(builder, expected, 0, 1);
-
         RevisedSimplexSolverTest.doTestPhasedVariants(builder, expected);
+
+        RevisedSimplexSolverTest.doTestPrimalVariants(builder, expected, 0, 1);
     }
 
     /**
@@ -623,25 +642,6 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
         builder.objective(-3).upper(10);
 
         RevisedSimplexSolverTest.doTestPhasedVariants(builder, expected);
-    }
-
-    @Test
-    public void testCaseFromChat() {
-
-        Optimisation.Result expected = Optimisation.Result.of(9, Optimisation.State.OPTIMAL, 3, 0);
-
-        ExpressionsBasedModel model = new ExpressionsBasedModel();
-
-        Variable x1 = model.addVariable("x1").lower(0).weight(3);
-        Variable x2 = model.addVariable("x2").lower(0).weight(2);
-
-        model.addExpression().set(x1, -1).set(x2, 2).upper(4);
-        model.addExpression().set(x1, 2).set(x2, 1).lower(6);
-        model.addExpression().set(x1, 1).set(x2, 1).level(3);
-
-        RevisedSimplexSolverTest.doTestDualVariants(model, expected);
-
-        RevisedSimplexSolverTest.doTestPhasedVariants(model, expected);
     }
 
     /**

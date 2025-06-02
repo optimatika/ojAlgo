@@ -6,6 +6,10 @@ import org.ojalgo.matrix.transformation.InvertibleFactor;
 
 interface BasisRepresentation extends InvertibleFactor<Double> {
 
+    /**
+     * Until this has been called there is an implicit assumption that the basis is the identity matrix.
+     * {@link #update(MatrixStore, int, SparseArray)} before this method has been called.
+     */
     void reset(final MatrixStore<Double> basis);
 
     /**

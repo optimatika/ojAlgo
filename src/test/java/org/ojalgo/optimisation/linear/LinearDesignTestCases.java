@@ -24,7 +24,6 @@ package org.ojalgo.optimisation.linear;
 import static org.ojalgo.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
-import java.util.Map.Entry;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -47,6 +46,7 @@ import org.ojalgo.optimisation.Optimisation.Sense;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.OptimisationCase;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.type.keyvalue.KeyValue;
 
 public class LinearDesignTestCases extends OptimisationLinearTests {
 
@@ -176,7 +176,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         Optimisation.Result expected = Result.of(13.0, State.OPTIMAL, 5.0, 4.0, 0.0);
 
-        for (Entry<String, Integration<LinearSolver>> entry : INTEGRATIONS.entrySet()) {
+        for (KeyValue<String, Integration<LinearSolver>> entry : INTEGRATIONS) {
 
             String identifier = entry.getKey();
             ExpressionsBasedModel.Integration<LinearSolver> integration = entry.getValue();
@@ -505,9 +505,9 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         Variable x2013 = model.newVariable("x2013");
         Variable x2014 = model.newVariable("x2014");
         Variable x2015 = model.newVariable("x2015");
-        //      x2013.setInteger(true);
-        //      x2014.setInteger(true);
-        //      x2015.setInteger(true);
+        // x2013.setInteger(true);
+        // x2014.setInteger(true);
+        // x2015.setInteger(true);
         x2013.lower(BigDecimal.valueOf(1245L));
         x2014.lower(BigDecimal.valueOf(1269L));
 

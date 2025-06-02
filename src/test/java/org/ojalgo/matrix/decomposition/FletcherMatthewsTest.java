@@ -23,6 +23,7 @@ package org.ojalgo.matrix.decomposition;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.DecompositionUpdateTest.UpdateCase;
 import org.ojalgo.matrix.decomposition.DecompositionUpdateTest.UpdateSequence;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -35,6 +36,25 @@ import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
  * Focuses on testing repeated updates and column pivoting behavior.
  */
 public class FletcherMatthewsTest extends MatrixDecompositionTests {
+
+    /**
+     * Tests updateColumn on a small matrix with a known pattern.
+     */
+    @Test
+    public void test3x3SmallMatrixUpdate() {
+
+        UpdateCase updateCase = DecompositionUpdateTest.make3x3SmallMatrixUpdate();
+
+        // Perform initial LU decomposition
+        MatrixStore<Double> matrix = updateCase.originalMatrix;
+        LU<Double> decomposition = LU.R064.decompose(matrix);
+
+        int columnIndex = updateCase.columnIndex;
+        MatrixStore<Double> newColumn = updateCase.newColumn;
+
+        TestUtils.assertFalse(decomposition.updateColumn(columnIndex, newColumn));
+
+    }
 
     /**
      * Tests repeated updates with column pivoting. Creates a matrix, performs initial decomposition, then
@@ -98,22 +118,18 @@ public class FletcherMatthewsTest extends MatrixDecompositionTests {
 
         UpdateCase updateCase = DecompositionUpdateTest.makeUpdatesWithZeroDiagonal();
 
+        MatrixStore<Double> originalMatrix = updateCase.originalMatrix;
+
         // Perform initial LU decomposition
-        LU<Double> decomposition = LU.R064.make();
-        decomposition.decompose(updateCase.originalMatrix);
+        LU<Double> decomposition = LU.R064.decompose(originalMatrix);
 
         // Update first column
-        boolean success = decomposition.updateColumn(updateCase.columnIndex, updateCase.newColumn);
-        Assertions.assertTrue(success, "Update failed");
+        int columnIndex = updateCase.columnIndex;
+        MatrixStore<Double> newColumn = updateCase.newColumn;
 
-        // Verify structure after update
-        MatrixStore<Double> l = decomposition.getL();
-        MatrixStore<Double> u = decomposition.getU();
+        boolean success = decomposition.updateColumn(columnIndex, newColumn);
 
-        // Verify that column pivots were applied to handle zero diagonal
-        int[] pivotOrder = decomposition.getPivotOrder();
-        Assertions.assertNotNull(pivotOrder, "Pivot order should not be null");
-        Assertions.assertEquals(3, pivotOrder.length, "Pivot order should have length 3");
+        Assertions.assertFalse(success, "Update should report failure, but didn't");
     }
 
 }

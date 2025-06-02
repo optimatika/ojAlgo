@@ -136,6 +136,11 @@ abstract class FletcherMatthews {
 
                 if (Math.abs(offUr1) > Math.abs(diag)) {
 
+                    if (SAFE.isZero(offUr1)) {
+                        // zero on diagonal
+                        return false;
+                    }
+
                     combined.exchangeRows(ij, ijp1);
                     preallocated.exchangeRows(ij, ijp1);
 
@@ -168,6 +173,10 @@ abstract class FletcherMatthews {
 
                         offLc1 = ZERO;
                     }
+
+                } else if (SAFE.isZero(diag)) {
+                    // zero on diagonal
+                    return false;
                 }
 
                 if (!PRECISION.isZero(offUr1)) {
@@ -199,6 +208,11 @@ abstract class FletcherMatthews {
                     BasicLogger.debugMatrix("L", tmpL);
                     BasicLogger.debugMatrix("U", tmpU);
                 }
+            }
+
+            if (SAFE.isZero(preallocated.doubleValue(lastRowNonZero))) {
+                // zero on diagonal
+                return false;
             }
 
             for (int i = 0; i <= lastRowNonZero; i++) {

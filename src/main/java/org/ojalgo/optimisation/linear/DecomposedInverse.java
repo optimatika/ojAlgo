@@ -16,12 +16,18 @@ final class DecomposedInverse implements BasisRepresentation {
 
     @Override
     public void btran(final PhysicalStore<Double> arg) {
-        myDecomposition.btran(arg);
+
+        if (myDecomposition.isComputed()) {
+            myDecomposition.btran(arg);
+        }
     }
 
     @Override
     public void ftran(final PhysicalStore<Double> arg) {
-        myDecomposition.ftran(arg);
+
+        if (myDecomposition.isComputed()) {
+            myDecomposition.ftran(arg);
+        }
     }
 
     @Override
@@ -42,7 +48,7 @@ final class DecomposedInverse implements BasisRepresentation {
     @Override
     public void update(final MatrixStore<Double> basis, final int col, final SparseArray<Double> values) {
 
-        if (!myDecomposition.updateColumn(col, values)) {
+        if (!myDecomposition.isComputed() || !myDecomposition.updateColumn(col, values)) {
             myDecomposition.decompose(basis);
         }
     }

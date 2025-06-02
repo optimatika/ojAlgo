@@ -24,7 +24,6 @@ package org.ojalgo.optimisation.linear;
 import static org.ojalgo.function.constant.BigMath.*;
 
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,6 +46,7 @@ import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.keyvalue.EntryPair;
 import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
+import org.ojalgo.type.keyvalue.KeyValue;
 
 /**
  * Test cases that compare the primal and dual LP models - have to have both, as well as both the full primal
@@ -200,7 +200,7 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
 
         PrimalDualTest.assertPrimalDualPair(primBldrSolve, dualBldrSolve);
 
-        for (Entry<String, Integration<LinearSolver>> entry : INTEGRATIONS.entrySet()) {
+        for (KeyValue<String, Integration<LinearSolver>> entry : INTEGRATIONS) {
 
             String identifier = entry.getKey();
             ExpressionsBasedModel.Integration<LinearSolver> integration = entry.getValue();
@@ -269,7 +269,7 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
 
         PrimalDualTest.assertPrimalDualPair(primBldrSolve, dualBldrSolve);
 
-        for (Entry<String, Integration<LinearSolver>> entry : INTEGRATIONS.entrySet()) {
+        for (KeyValue<String, Integration<LinearSolver>> entry : INTEGRATIONS) {
 
             String identifier = entry.getKey();
             ExpressionsBasedModel.Integration<LinearSolver> integration = entry.getValue();
@@ -343,7 +343,7 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
 
         PrimalDualTest.assertPrimalDualPair(primBldrSolve, dualBldrSolve);
 
-        for (Entry<String, Integration<LinearSolver>> entry : INTEGRATIONS.entrySet()) {
+        for (KeyValue<String, Integration<LinearSolver>> entry : INTEGRATIONS) {
 
             String identifier = entry.getKey();
             ExpressionsBasedModel.Integration<LinearSolver> integration = entry.getValue();
@@ -404,7 +404,7 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
         Result primBldrSolve = primBuilder.solve().withNegatedValue(); // Negated, since max
         TestUtils.assertResult(primExpected, primBldrSolve);
 
-        for (Entry<String, Integration<LinearSolver>> entry : INTEGRATIONS.entrySet()) {
+        for (KeyValue<String, Integration<LinearSolver>> entry : INTEGRATIONS) {
 
             String identifier = entry.getKey();
             ExpressionsBasedModel.Integration<LinearSolver> integration = entry.getValue();

@@ -72,8 +72,9 @@ public class ProductFormInverseTest extends OptimisationLinearTests {
         R064Store act = R064Store.FACTORY.make(3, 1);
 
         LU<Double> lu = LU.R064.make();
-        ProductFormInverse factors = new ProductFormInverse(3, 1E-32);
         lu.decompose(expBase0);
+        ProductFormInverse factors = new ProductFormInverse(3, 1E-32);
+        factors.reset(expBase0);
 
         lu.ftran(random, exp);
         factors.ftran(random, act);

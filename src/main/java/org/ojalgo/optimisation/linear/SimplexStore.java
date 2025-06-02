@@ -448,6 +448,8 @@ abstract class SimplexStore {
      */
     abstract <T extends Mutate1D & Access1D<Double>> T phase1();
 
+    abstract void prepareToIterate();
+
     abstract void removePhase1();
 
     /**

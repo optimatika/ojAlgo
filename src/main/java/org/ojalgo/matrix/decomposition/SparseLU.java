@@ -441,7 +441,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
     }
 
     /**
-     * Should implement the Forrest-Tomlin update algorithm (maybe with Suhl's improvement).
+     * The Forrest-Tomlin update algorithm
      */
     @Override
     public boolean updateColumn(final int specifiedColumn, final Access1D.Collectable<Double, ? super TransformableRegion<Double>> newColumn) {
@@ -529,6 +529,11 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
 
                 myU.getRow(ij).axpy(-ratio, wRow);
 
+            }
+
+            if (FletcherMatthews.SAFE.isZero(wRowData[lastRowNonZero])) {
+                // zero on diagonal
+                return false;
             }
 
             myDiagU[lastRowNonZero] = wRowData[lastRowNonZero];

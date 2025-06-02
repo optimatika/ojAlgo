@@ -152,17 +152,19 @@ final class ProductFormInverse implements BasisRepresentation {
 
     @Override
     public void btran(final PhysicalStore<Double> arg) {
+
         for (int i = myFactors.size() - 1; i >= 0; i--) {
             myFactors.get(i).btran(arg);
         }
-        if (myRoot.isSolvable()) {
+        if (myRoot.isComputed()) {
             myRoot.ftran(arg);
         }
     }
 
     @Override
     public void ftran(final PhysicalStore<Double> arg) {
-        if (myRoot.isSolvable()) {
+
+        if (myRoot.isComputed()) {
             myRoot.btran(arg);
         }
         for (InvertibleFactor<Double> factor : myFactors) {
@@ -187,6 +189,7 @@ final class ProductFormInverse implements BasisRepresentation {
      */
     @Override
     public void reset(final MatrixStore<Double> basis) {
+
         this.clearFactors();
         myRoot.decompose(basis.transpose());
     }

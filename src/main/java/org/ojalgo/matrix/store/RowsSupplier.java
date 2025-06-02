@@ -148,7 +148,7 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
 
         SparseArray<N> moved = myRows.get(from);
         moved.removeShiftAndInsert(from, to, column.doubleValue(from));
-        moved.supplyNonZerosTo(row);
+        moved.supplyTo(row);
         moved.reset();
 
         for (int i = from; i < to; i++) {

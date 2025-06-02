@@ -24,7 +24,6 @@ package org.ojalgo.optimisation.linear;
 import static org.ojalgo.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
-import java.util.Map.Entry;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
@@ -37,6 +36,7 @@ import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.type.keyvalue.KeyValue;
 
 /**
  * A small collection of datasets found here: http://people.sc.fsu.edu/~jburkardt/datasets/mps/
@@ -51,7 +51,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
 
         ExpressionsBasedModel model = ModelFileTest.makeModel("burkardt", modelName, false);
 
-        for (Entry<String, Integration<LinearSolver>> entry : INTEGRATIONS.entrySet()) {
+        for (KeyValue<String, Integration<LinearSolver>> entry : INTEGRATIONS) {
 
             String key = entry.getKey();
             Integration<LinearSolver> integration = entry.getValue();
@@ -70,7 +70,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
                 // model.options.debug(Optimisation.Solver.class);
                 // model.options.debug(IntegerSolver.class);
                 // model.options.debug(ConvexSolver.class);
-                // model.options.debug(LinearSolver.class);
+                model.options.debug(LinearSolver.class);
                 // model.options.progress(IntegerSolver.class);
                 // model.options.validate = false;
                 // model.options.mip_defer = 0.25;

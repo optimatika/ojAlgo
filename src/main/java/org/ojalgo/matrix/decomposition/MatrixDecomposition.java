@@ -445,6 +445,11 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
 
         /**
          * Updates the decomposition when a column in the original matrix is replaced.
+         * <p>
+         * This method can only be called after an initial decomposition has been calculated.
+         * <p>
+         * If the updatable decomposition is a {@link MatrixDecomposition.Solver} then this method should only
+         * return true if {@link MatrixDecomposition.Solver#isSolvable()} is true after the update.
          *
          * @param columnIndex The index of the column, in the original matrix, to replace
          * @param newColumn   The new column values

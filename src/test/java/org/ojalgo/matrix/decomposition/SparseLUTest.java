@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.DecompositionUpdateTest.UpdateCase;
+import org.ojalgo.matrix.decomposition.DecompositionUpdateTest.UpdateSequence;
 import org.ojalgo.matrix.store.ColumnsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -38,6 +39,7 @@ import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 
 public class SparseLUTest extends MatrixDecompositionTests {
 
@@ -382,6 +384,39 @@ public class SparseLUTest extends MatrixDecompositionTests {
         SparseLU sparse = SparseLUTest.doTestBuildingViaUpdates(updateCase);
 
         SparseLUTest.doTestUpdate(updateCase, sparse);
+    }
+
+    /**
+     * Minimal test to mimic the structure of testUpdateAfiro and help isolate the update bug.
+     */
+    @Test
+    public void testMinimalAfiroUpdateScenario() {
+
+        UpdateSequence sequence = DecompositionUpdateTest.makeMinimalAfiroUpdateScenario();
+
+        // Perform initial LU decomposition
+        PhysicalStore<Double> matrix = sequence.matrix;
+        LU<Double> decomposition = LU.newSparseR064();
+        decomposition.decompose(matrix);
+
+        MatrixStore<Double> rhs = sequence.rhs();
+
+        DecompositionUpdateTest.doTestTran(matrix, decomposition, rhs);
+
+        for (KeyedPrimitive<MatrixStore<Double>> update : sequence.updates) {
+
+            int columnIndex = update.intValue();
+            MatrixStore<Double> newColumn = update.left();
+
+            matrix.fillColumn(columnIndex, newColumn);
+
+            if (decomposition.updateColumn(columnIndex, newColumn)) {
+                DecompositionUpdateTest.doTestTran(matrix, decomposition, rhs);
+            } else {
+                break;
+            }
+        }
+
     }
 
     @Test
@@ -1041,6 +1076,68 @@ public class SparseLUTest extends MatrixDecompositionTests {
         }
 
         TestUtils.assertEquals(expected, actual);
+    }
+
+    /**
+     * Test to reproduce update problem encountered with afiro.mps
+     */
+    @Test
+    public void testUpdateAfiro() {
+
+        UpdateSequence sequence = DecompositionUpdateTest.makeUpdateAfiro();
+
+        // Perform initial LU decomposition
+        PhysicalStore<Double> matrix = sequence.matrix;
+        LU<Double> decomposition = LU.newSparseR064();
+        decomposition.decompose(matrix);
+
+        MatrixStore<Double> rhs = sequence.rhs();
+
+        DecompositionUpdateTest.doTestTran(matrix, decomposition, rhs);
+
+        for (KeyedPrimitive<MatrixStore<Double>> update : sequence.updates) {
+
+            int columnIndex = update.intValue();
+            MatrixStore<Double> newColumn = update.left();
+
+            matrix.fillColumn(columnIndex, newColumn);
+
+            if (decomposition.updateColumn(columnIndex, newColumn)) {
+                DecompositionUpdateTest.doTestTran(matrix, decomposition, rhs);
+            } else {
+                break;
+            }
+        }
+    }
+
+    /**
+     * Test to reproduce update problem encountered with afiro.mps
+     */
+    @Test
+    public void testUpdateAfiro2() {
+
+        UpdateSequence sequence = DecompositionUpdateTest.makeUpdateAfiro2();
+
+        // Perform initial LU decomposition
+        PhysicalStore<Double> matrix = sequence.matrix;
+        LU<Double> decomposition = LU.newSparseR064();
+        decomposition.decompose(matrix);
+
+        MatrixStore<Double> rhs = sequence.rhs();
+
+        DecompositionUpdateTest.doTestTran(matrix, decomposition, rhs);
+
+        for (KeyedPrimitive<MatrixStore<Double>> update : sequence.updates) {
+
+            int columnIndex = update.intValue();
+            MatrixStore<Double> newColumn = update.left();
+
+            matrix.fillColumn(columnIndex, newColumn);
+
+            decomposition.updateColumn(columnIndex, newColumn);
+
+            DecompositionUpdateTest.doTestTran(matrix, decomposition, rhs);
+        }
     }
 
 }

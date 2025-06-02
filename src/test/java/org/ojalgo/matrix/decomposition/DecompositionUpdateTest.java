@@ -633,6 +633,12 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         }
     }
 
+    /**
+     * Creates a test case for a simple 3x3 matrix update that doesn't require pivoting or spike handling. The
+     * matrix has a clear structure with non-zero elements and the update column is designed to maintain the
+     * triangular structure without creating spikes. This test case is useful for verifying basic column
+     * update functionality.
+     */
     static UpdateCase make3x3NoPivotingOrSpikes() {
 
         // Create a simple 3x3 matrix that we know works well
@@ -657,6 +663,11 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         return new UpdateCase(matrix, 1, column);
     }
 
+    /**
+     * Creates a test case for updating a small 3x3 matrix where the update results in a zero on the diagonal
+     * in the U matrix. This test case is specifically designed to test how the decomposition handles updates
+     * that could potentially make the matrix singular.
+     */
     static UpdateCase make3x3SmallMatrixUpdate() {
 
         // Create simple 3x3 matrix
@@ -717,6 +728,12 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         return new UpdateCase(matrixWithSpike, 2, newColumnWithSpike);
     }
 
+    /**
+     * Creates a test case for a 5x5 matrix update that doesn't require spike handling. The matrix and update
+     * column are carefully constructed to maintain the triangular structure without creating spikes. This
+     * test case is useful for verifying that the update algorithm correctly handles larger matrices when no
+     * special spike handling is needed.
+     */
     static UpdateCase make5x5WithoutSpike() {
 
         // Create a 5x5 matrix with a specific structure
@@ -768,6 +785,12 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         return new UpdateCase(matrix, 2, newColumn);
     }
 
+    /**
+     * Creates a set of test cases for a 7x7 matrix with approximately half zero elements and a structure that
+     * forces pivoting. The method generates multiple update cases by systematically updating each column with
+     * different patterns of non-zero elements. This test suite is useful for verifying that the update
+     * algorithm correctly handles sparse matrices and maintains numerical stability through pivoting.
+     */
     static List<UpdateCase> make7x7WithZeros() {
 
         // Create a 7x7 matrix with about half zeros and structure that forces pivoting
@@ -805,6 +828,12 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         return retVal;
     }
 
+    /**
+     * Creates a test case specifically designed to have no spikes according to the Bartels-Golub-Reid (BGR)
+     * algorithm. The matrix and update column are carefully constructed so that after forward substitution,
+     * all elements below the diagonal in the column being updated are exactly zero. This test case is useful
+     * for verifying the BGR algorithm's handling of updates that don't require spike elimination.
+     */
     static UpdateCase makeBGRNoSpikes() {
 
         // Create a 3x3 matrix
@@ -866,6 +895,12 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         return new UpdateCase(matrix, 1, newColumn);
     }
 
+    /**
+     * Creates a test case specifically designed to have exactly one spike according to the Bartels-Golub-Reid
+     * (BGR) algorithm. The matrix and update column are carefully constructed so that after forward
+     * substitution, there is exactly one non-zero element below the diagonal in the column being updated.
+     * This test case is useful for verifying the BGR algorithm's spike elimination process.
+     */
     static UpdateCase makeBGRWithExactlyOneSpike() {
 
         // Create a 3x3 matrix - using the same matrix as in testBGRNoSpikes
@@ -935,6 +970,12 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         return updateCase;
     }
 
+    /**
+     * Creates a test case based on a specific 3x3 matrix example that demonstrates the relationship between
+     * the original matrix, its LU decomposition, and column updates. The test case includes a known L and U
+     * matrix pair along with their corresponding pivot order, making it useful for verifying the correctness
+     * of the decomposition and update process.
+     */
     static UpdateCase makeCaseGPT() {
 
         RawStore mtrxA = RawStore.wrap(new double[][] { { 2.0, 3.0, 4.0 }, { 1.0, 3.0, 4.5 }, { 1.0, 0.75, 1.75 } });
@@ -957,6 +998,11 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         return updateCase;
     }
 
+    /**
+     * Creates a test case with an ill-conditioned 5x5 matrix where the diagonal elements are very close to
+     * each other (differing by small amounts). This test case is designed to verify that the update algorithm
+     * maintains numerical stability when dealing with matrices that are close to being singular.
+     */
     static UpdateCase makeIllConditionedMatrix() {
 
         // Create an ill-conditioned matrix
@@ -1001,6 +1047,41 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         return new UpdateCase(originalMatrix, 2, newColumn1);
     }
 
+    /**
+     * Creates a minimal test scenario based on the Afiro model, using a 5x5 identity matrix as the starting
+     * point. The sequence includes two updates with sparse columns that mimic the structure of updates in the
+     * full Afiro model. This test case is useful for verifying basic update functionality in a controlled,
+     * simplified environment.
+     */
+    static UpdateSequence makeMinimalAfiroUpdateScenario() {
+
+        // Start with a 5x5 identity matrix
+        org.ojalgo.matrix.store.R064Store matrix = R064Store.FACTORY.makeEye(5, 5);
+
+        // First update: column 2 with a sparse column (mimics newColumn1 in makeUpdateAfiro)
+        org.ojalgo.matrix.store.R064Store col2 = R064Store.FACTORY.make(5, 1);
+        col2.set(1, 0, 1.0);
+        col2.set(3, 0, 0.5);
+        col2.set(4, 0, -0.2);
+
+        // Second update: column 3 with another sparse column (mimics newColumn2 in makeUpdateAfiro)
+        org.ojalgo.matrix.store.R064Store col3 = R064Store.FACTORY.make(5, 1);
+        col3.set(2, 0, -1.0);
+        col3.set(4, 0, 1.0);
+
+        UpdateSequence sequence = new UpdateSequence(matrix);
+
+        sequence.add(2, col2);
+        sequence.add(3, col3);
+
+        return sequence;
+    }
+
+    /**
+     * Creates a test sequence with a 7x7 random matrix and updates for each column. The random nature of this
+     * test case helps verify that the update algorithm works correctly across a wide range of matrix
+     * structures and values. Each column is updated with a new random column vector.
+     */
     static UpdateSequence makeRandomMatrixUpdate() {
 
         int dim = 7;
@@ -1018,6 +1099,12 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         return retVal;
     }
 
+    /**
+     * Creates a test sequence with a 4x4 matrix and a series of updates designed to force pivoting. Each
+     * update column contains a large value in a different position, ensuring that the update algorithm must
+     * perform pivoting to maintain numerical stability. This test case verifies that the algorithm correctly
+     * handles multiple updates that require pivoting.
+     */
     static UpdateSequence makeRepeatedUpdatesWithPivoting() {
 
         // Create initial 4x4 matrix
@@ -1050,6 +1137,12 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         return sequence;
     }
 
+    /**
+     * Creates a test sequence with a 10x10 random matrix and updates for every other column. This test case
+     * verifies that the update algorithm correctly handles sequential updates to a larger matrix, ensuring
+     * that each update maintains the correct structure and that the decomposition remains valid throughout
+     * the sequence.
+     */
     static UpdateSequence makeSequentialUpdates() {
 
         int dim = 10;
@@ -1065,6 +1158,94 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         return retVal;
     }
 
+    /**
+     * Creates a test sequence based on the Afiro model, using a 24x24 identity matrix as the starting point.
+     * The sequence includes two updates with sparse columns that match the structure of updates in the actual
+     * Afiro model. This test case is designed to verify that the update algorithm correctly handles the
+     * specific update patterns encountered in real-world linear programming problems.
+     */
+    static UpdateSequence makeUpdateAfiro() {
+
+        // Create initial 4x4 matrix
+        R064Store matrix = R064Store.FACTORY.makeEye(24, 24);
+
+        UpdateSequence sequence = new UpdateSequence(matrix);
+
+        // update 17 { 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.109, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        // 1.0, -0.43, 0.0, 0.0, 0.0, 0.0, 0.0 }
+
+        // Create new columns to update
+        MatrixStore<Double> newColumn1 = RawStore
+                .wrap(0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.109, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, -0.43, 0.0, 0.0, 0.0, 0.0, 0.0).transpose();
+
+        // update 18 { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        // 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }
+
+        MatrixStore<Double> newColumn2 = RawStore
+                .wrap(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0).transpose();
+
+        sequence.add(17, newColumn1);
+        sequence.add(18, newColumn2);
+
+        return sequence;
+    }
+
+    /**
+     * Creates a test sequence based on a modified version of the Afiro model update scenario. This test case
+     * is similar to makeUpdateAfiro but with a different sequence of updates, designed to verify that the
+     * update algorithm correctly handles alternative update patterns that might occur in the Afiro model.
+     */
+    static UpdateSequence makeUpdateAfiro2() {
+
+        // Create initial 4x4 matrix
+        RawStore matrix = RawStore.wrap(
+                new double[][] { { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                        { 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                        { 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                        { 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                        { 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                        { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                        { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                        { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                        { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                        { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.109, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                        { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                        { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                        { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                        { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                        { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                        { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                        { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                        { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                        { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.43, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                        { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0 },
+                        { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0 },
+                        { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0 },
+                        { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 },
+                        { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 } });
+
+        UpdateSequence sequence = new UpdateSequence(matrix);
+
+        // update 17 { 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.109, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        // 1.0, -0.43, 0.0, 0.0, 0.0, 0.0, 0.0 }
+
+        // update 18 { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        // 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }
+
+        MatrixStore<Double> newColumn2 = RawStore
+                .wrap(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0).transpose();
+
+        sequence.add(18, newColumn2);
+
+        return sequence;
+    }
+
+    /**
+     * Creates a test case with a 3x3 matrix containing very small diagonal elements (1.0E-10) and an update
+     * column with a large value (1.0E+10) to force pivoting. This test case is designed to verify that the
+     * update algorithm correctly handles numerical scaling issues and maintains stability through appropriate
+     * pivoting.
+     */
     static UpdateCase makeUpdatesWithSmallDiagonal() {
 
         // Create initial 3x3 matrix with small diagonal elements
@@ -1082,19 +1263,24 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         return new UpdateCase(original, 0, newColumn);
     }
 
+    /**
+     * Creates a test case with a 3x3 matrix containing a zero on the diagonal and an update column that
+     * doesn't fix this singularity. This test case is designed to verify that the update algorithm correctly
+     * detects and handles attempts to update a matrix that would remain singular after the update.
+     */
     static UpdateCase makeUpdatesWithZeroDiagonal() {
+
         // Create initial 3x3 matrix with zero diagonal
         R064Store original = R064Store.FACTORY.make(3, 3);
         original.fillAll(ONE);
-        original.set(0, 0, 0.0); // Zero diagonal element
+        original.set(0, 0, ZERO); // Zero diagonal element
 
         // Create new column to update
         R064Store newColumn = R064Store.FACTORY.make(3, 1);
         newColumn.fillAll(ONE);
-        newColumn.set(1, 0, 5.0); // Large value to force pivot
+        newColumn.set(1, 0, FIVE); // Large value to force pivot
 
-        UpdateCase updateCase = new UpdateCase(original, 0, newColumn);
-        return updateCase;
+        return new UpdateCase(original, 0, newColumn);
     }
 
     static MatrixStore<Double> rhs(final int nbRows) {
@@ -1111,17 +1297,6 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
     public void test3x3NoPivotingOrSpikes() {
 
         UpdateCase updateCase = DecompositionUpdateTest.make3x3NoPivotingOrSpikes();
-
-        DecompositionUpdateTest.doTest(updateCase);
-    }
-
-    /**
-     * Tests updateColumn on a small matrix with a known pattern.
-     */
-    @Test
-    public void test3x3SmallMatrixUpdate() {
-
-        UpdateCase updateCase = DecompositionUpdateTest.make3x3SmallMatrixUpdate();
 
         DecompositionUpdateTest.doTest(updateCase);
     }
@@ -1177,8 +1352,9 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
 
     /**
      * This test case is specifically designed to have exactly one spike according to the Bartels-Golub-Reid
-     * algorithm. The matrix and update column are carefully constructed so that after forward substitution,
-     * there is exactly one non-zero element below the diagonal in the column being updated.
+     * (BGR) algorithm. The matrix and update column are carefully constructed so that after forward
+     * substitution, there is exactly one non-zero element below the diagonal in the column being updated.
+     * This test case is useful for verifying the BGR algorithm's spike elimination process.
      */
     @Test
     public void testBGRWithExactlyOneSpike() {

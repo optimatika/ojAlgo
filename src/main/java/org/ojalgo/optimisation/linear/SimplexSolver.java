@@ -1451,6 +1451,8 @@ abstract class SimplexSolver extends LinearSolver {
 
     final IterDescr prepareToIterate() {
 
+        mySimplex.prepareToIterate();
+
         this.setup(mySimplex);
 
         if (mySimplex.m == 0) {
@@ -1478,9 +1480,11 @@ abstract class SimplexSolver extends LinearSolver {
     abstract void setup(SimplexStore simplex);
 
     final void shift(final int index, final double shift, final double weight) {
-        mySimplex.shiftColumn(index, shift);
-        mySolutionShift[index] += shift;
-        myValueShift += weight * shift;
+        if (shift != ZERO) {
+            mySimplex.shiftColumn(index, shift);
+            mySolutionShift[index] += shift;
+            myValueShift += weight * shift;
+        }
     }
 
     void switchToPhase2() {

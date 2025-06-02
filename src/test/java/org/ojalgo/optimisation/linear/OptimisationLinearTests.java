@@ -22,41 +22,41 @@
 package org.ojalgo.optimisation.linear;
 
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.type.keyvalue.KeyValue;
 
 abstract class OptimisationLinearTests {
 
     static final boolean DEBUG = false;
 
-    static final Map<String, ExpressionsBasedModel.Integration<LinearSolver>> INTEGRATIONS = Map.of("Dual-Default",
-            LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
-                opt.linear().dual();
-                opt.sparse = null;
-            }), "Dual-Dense", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
-                opt.linear().dual();
-                opt.sparse = Boolean.FALSE;
-            }), "Dual-Sparse", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+    static final List<KeyValue<String, ExpressionsBasedModel.Integration<LinearSolver>>> INTEGRATIONS = List
+            .of(KeyValue.of("Dual-Sparse", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
                 opt.linear().dual();
                 opt.sparse = Boolean.TRUE;
-            }), "Primal-Default", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+            })), KeyValue.of("Dual-Default", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+                opt.linear().dual();
+                opt.sparse = null;
+            })), KeyValue.of("Dual-Dense", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+                opt.linear().dual();
+                opt.sparse = Boolean.FALSE;
+            })), KeyValue.of("Primal-Default", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
                 opt.linear().primal();
                 opt.sparse = null;
-            }), "Primal-Dense", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+            })), KeyValue.of("Primal-Dense", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
                 opt.linear().primal();
                 opt.sparse = Boolean.FALSE;
-            }), "Primal-Sparse", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+            })), KeyValue.of("Primal-Sparse", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
                 opt.linear().primal();
                 opt.sparse = Boolean.TRUE;
-            }), "Default-Default", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+            })), KeyValue.of("Default-Default", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
                 opt.sparse = null;
-            }), "Default-Dense", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+            })), KeyValue.of("Default-Dense", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
                 opt.sparse = Boolean.FALSE;
-            }), "Default-Sparse", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+            })), KeyValue.of("Default-Sparse", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
                 opt.sparse = Boolean.TRUE;
-            }));
+            })));
 
     static final List<Function<LinearStructure, SimplexStore>> STORE_FACTORIES = List.of(RevisedStore::new, DenseTableau::new, SparseTableau::new);
 

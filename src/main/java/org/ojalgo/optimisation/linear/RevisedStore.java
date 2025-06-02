@@ -25,7 +25,6 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.constant.PrimitiveMath.Prefix;
 import org.ojalgo.matrix.store.ColumnsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -40,9 +39,9 @@ import org.ojalgo.structure.Primitive1D;
 final class RevisedStore extends SimplexStore {
 
     private static BasisRepresentation newBasisRepresentation(final int nbConstraints) {
-        return new ProductFormInverse(nbConstraints, Prefix.MICRO);
-        // return new DecomposedInverse(true, nbConstraints);
-        // return new DecomposedInverse(false, nbConstraints);
+        // return new ProductFormInverse(nbConstraints, Prefix.MICRO); // 0 + 0
+        // return new DecomposedInverse(false, nbConstraints); // 1 + 0
+        return new DecomposedInverse(true, nbConstraints); // 0 + 0
     }
 
     private static R064Store newColumn(final int nbRows) {
@@ -302,6 +301,12 @@ final class RevisedStore extends SimplexStore {
         }
 
         return myPhase1Objective;
+    }
+
+    @Override
+    void prepareToIterate() {
+        myInvBasis.reset(myBasis);
+
     }
 
     @Override

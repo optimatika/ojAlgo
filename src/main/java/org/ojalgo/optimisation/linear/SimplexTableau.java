@@ -296,6 +296,11 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
     }
 
     @Override
+    void prepareToIterate() {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
     final void resetBasis(final int[] newBasis) {
 
         super.resetBasis(newBasis);
