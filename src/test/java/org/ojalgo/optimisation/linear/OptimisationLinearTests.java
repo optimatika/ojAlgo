@@ -29,32 +29,39 @@ import org.ojalgo.type.keyvalue.KeyValue;
 
 abstract class OptimisationLinearTests {
 
-    static final boolean DEBUG = false;
+    static final boolean DEBUG = true;
+
+    // static final List<KeyValue<String, ExpressionsBasedModel.Integration<LinearSolver>>> INTEGRATIONS =
+    // List
+    // .of(KeyValue.of("Dual-Sparse", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+    // opt.linear().dual();
+    // opt.sparse = Boolean.TRUE;
+    // })), KeyValue.of("Dual-Default", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+    // opt.linear().dual();
+    // opt.sparse = null;
+    // })), KeyValue.of("Dual-Dense", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+    // opt.linear().dual();
+    // opt.sparse = Boolean.FALSE;
+    // })), KeyValue.of("Primal-Default", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+    // opt.linear().primal();
+    // opt.sparse = null;
+    // })), KeyValue.of("Primal-Dense", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+    // opt.linear().primal();
+    // opt.sparse = Boolean.FALSE;
+    // })), KeyValue.of("Primal-Sparse", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+    // opt.linear().primal();
+    // opt.sparse = Boolean.TRUE;
+    // })), KeyValue.of("Default-Default", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+    // opt.sparse = null;
+    // })), KeyValue.of("Default-Dense", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+    // opt.sparse = Boolean.FALSE;
+    // })), KeyValue.of("Default-Sparse", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+    // opt.sparse = Boolean.TRUE;
+    // })));
 
     static final List<KeyValue<String, ExpressionsBasedModel.Integration<LinearSolver>>> INTEGRATIONS = List
             .of(KeyValue.of("Dual-Sparse", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
                 opt.linear().dual();
-                opt.sparse = Boolean.TRUE;
-            })), KeyValue.of("Dual-Default", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
-                opt.linear().dual();
-                opt.sparse = null;
-            })), KeyValue.of("Dual-Dense", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
-                opt.linear().dual();
-                opt.sparse = Boolean.FALSE;
-            })), KeyValue.of("Primal-Default", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
-                opt.linear().primal();
-                opt.sparse = null;
-            })), KeyValue.of("Primal-Dense", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
-                opt.linear().primal();
-                opt.sparse = Boolean.FALSE;
-            })), KeyValue.of("Primal-Sparse", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
-                opt.linear().primal();
-                opt.sparse = Boolean.TRUE;
-            })), KeyValue.of("Default-Default", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
-                opt.sparse = null;
-            })), KeyValue.of("Default-Dense", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
-                opt.sparse = Boolean.FALSE;
-            })), KeyValue.of("Default-Sparse", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
                 opt.sparse = Boolean.TRUE;
             })));
 

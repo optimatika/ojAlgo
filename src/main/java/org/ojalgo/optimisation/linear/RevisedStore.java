@@ -40,8 +40,8 @@ final class RevisedStore extends SimplexStore {
 
     private static BasisRepresentation newBasisRepresentation(final int nbConstraints) {
         // return new ProductFormInverse(nbConstraints, Prefix.MICRO); // 0 + 0
-        // return new DecomposedInverse(false, nbConstraints); // 1 + 0
-        return new DecomposedInverse(true, nbConstraints); // 0 + 0
+        return new DecomposedInverse(false, nbConstraints); // 1 + 0
+        // return new DecomposedInverse(true, nbConstraints); // 0 + 0
     }
 
     private static R064Store newColumn(final int nbRows) {

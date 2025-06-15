@@ -62,7 +62,7 @@ BenchmarkUpdateColumnLU.raw          0.01   2000  thrpt    3     487.266 ±    3
 BenchmarkUpdateColumnLU.raw          0.02    500  thrpt    3    8332.677 ±   72.716  ops/s
 BenchmarkUpdateColumnLU.raw          0.02   1000  thrpt    3    2005.974 ±    1.847  ops/s
 BenchmarkUpdateColumnLU.raw          0.02   2000  thrpt    3     487.717 ±    3.455  ops/s
-BenchmarkUpdateColumnLU.sparse      0.005    500  thrpt    3  100448.475 ± 8515.196  ops/s
+Revised
 BenchmarkUpdateColumnLU.sparse      0.005   1000  thrpt    3    5649.611 ±  120.694  ops/s
 BenchmarkUpdateColumnLU.sparse      0.005   2000  thrpt    3     769.437 ±    8.479  ops/s
 BenchmarkUpdateColumnLU.sparse       0.01    500  thrpt    3   19901.066 ±  144.348  ops/s
