@@ -140,16 +140,16 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
     }
 
     @Override
-    public void add(final long ind, final Comparable<?> addend) {
-        this.add(ind, NumberDefinition.doubleValue(addend));
-    }
-
-    @Override
-    public void add(final long ind, final double addend) {
+    public void add(final int ind, final double addend) {
         myBody.add(ind, addend);
         if (ind == index) {
             myPivot = myBody.doubleValue(ind);
         }
+    }
+
+    @Override
+    public void add(final long ind, final Comparable<?> addend) {
+        this.add(ind, NumberDefinition.doubleValue(addend));
     }
 
     /**

@@ -69,8 +69,8 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
 
             myDenseFactory = denseFactory;
 
-            myDenseStrategy = new GrowthStrategy(denseFactory.getMathType()).segment(PowerOf2.powerOfLong2(23));
-            mySparseStrategy = new GrowthStrategy(denseFactory.getMathType()).segment(PowerOf2.powerOfLong2(46));
+            myDenseStrategy = GrowthStrategy.from(denseFactory.getMathType()).segment(PowerOf2.powerOfLong2(23));
+            mySparseStrategy = GrowthStrategy.from(denseFactory.getMathType()).segment(PowerOf2.powerOfLong2(46));
         }
 
         @Override
@@ -101,7 +101,7 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
 
             } else if (mySparseStrategy.isChunked(total) && myDenseFactory instanceof PlainArray.Factory) {
 
-                return new SparseArray<>((PlainArray.Factory<N, ?>) myDenseFactory, mySparseStrategy, total);
+                return new SparseArray<>((PlainArray.Factory<N, ?>) myDenseFactory, mySparseStrategy, Math.toIntExact(total));
 
             } else {
 

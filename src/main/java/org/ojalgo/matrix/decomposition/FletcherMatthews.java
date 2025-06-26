@@ -173,13 +173,19 @@ abstract class FletcherMatthews {
 
                         offLc1 = ZERO;
                     }
+                }
 
-                } else if (SAFE.isZero(diag)) {
+                if (SAFE.isZero(diag)) {
                     // zero on diagonal
                     return false;
                 }
 
                 if (!PRECISION.isZero(offUr1)) {
+
+                    // Check if diag is too small relative to offUr1
+                    if (SAFE.isSmall(offUr1, diag)) {
+                        return false; // Numerically unstable
+                    }
 
                     temp = offUr1 / diag;
 

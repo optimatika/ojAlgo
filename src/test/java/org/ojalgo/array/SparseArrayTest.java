@@ -21,6 +21,7 @@
  */
 package org.ojalgo.array;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
@@ -30,7 +31,7 @@ import org.ojalgo.random.Uniform;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.ElementView2D;
 
-public class SparseTest extends ArrayTests {
+public class SparseArrayTest extends ArrayTests {
 
     @Test
     public void testAggregateSumDifferentWays() {
@@ -59,6 +60,104 @@ public class SparseTest extends ArrayTests {
 
         TestUtils.assertEquals(expected, array1D.aggregateAll(Aggregator.SUM).doubleValue());
         TestUtils.assertEquals(expected, array2D.aggregateAll(Aggregator.SUM).doubleValue());
+    }
+
+    @Test
+    public void testExchange() {
+
+        SparseArray<Double> array = SparseArray.factory(ArrayR064.FACTORY).make(10);
+
+        array.set(2, 5.0);
+        array.set(7, 3.0);
+
+        array.exchange(2, 7);
+
+        Assertions.assertEquals(3.0, array.doubleValue(2));
+        Assertions.assertEquals(5.0, array.doubleValue(7));
+    }
+
+    @Test
+    public void testExchangeBothNonzero() {
+
+        SparseArray<Double> array = SparseArray.factory(ArrayR064.FACTORY).make(10);
+
+        array.set(2, 5.0);
+        array.set(7, 3.0);
+
+        Assertions.assertEquals(5.0, array.doubleValue(2));
+        Assertions.assertEquals(3.0, array.doubleValue(7));
+
+        array.exchange(2, 7);
+
+        Assertions.assertEquals(3.0, array.doubleValue(2));
+        Assertions.assertEquals(5.0, array.doubleValue(7));
+    }
+
+    @Test
+    public void testExchangeBothZero() {
+
+        SparseArray<Double> array = SparseArray.factory(ArrayR064.FACTORY).make(10);
+
+        // Both positions are zero (not stored)
+        Assertions.assertEquals(0.0, array.doubleValue(2));
+        Assertions.assertEquals(0.0, array.doubleValue(7));
+
+        array.exchange(2, 7);
+
+        // Should still be zero
+        Assertions.assertEquals(0.0, array.doubleValue(2));
+        Assertions.assertEquals(0.0, array.doubleValue(7));
+    }
+
+    @Test
+    public void testExchangeMaintainsSparseness() {
+
+        SparseArray<Double> array = SparseArray.factory(ArrayR064.FACTORY).make(100);
+
+        array.set(10, 1.0);
+        array.set(20, 2.0);
+        array.set(30, 3.0);
+
+        int initialNonzeros = array.countNonzeros();
+
+        array.exchange(10, 20);
+
+        Assertions.assertEquals(initialNonzeros, array.countNonzeros());
+        Assertions.assertEquals(2.0, array.doubleValue(10));
+        Assertions.assertEquals(1.0, array.doubleValue(20));
+        Assertions.assertEquals(3.0, array.doubleValue(30));
+    }
+
+    @Test
+    public void testExchangeOneZero() {
+
+        SparseArray<Double> array = SparseArray.factory(ArrayR064.FACTORY).make(10);
+
+        array.set(2, 5.0);
+        // Position 7 is zero (not stored)
+
+        Assertions.assertEquals(5.0, array.doubleValue(2));
+        Assertions.assertEquals(0.0, array.doubleValue(7));
+
+        array.exchange(2, 7);
+
+        Assertions.assertEquals(0.0, array.doubleValue(2));
+        Assertions.assertEquals(5.0, array.doubleValue(7));
+    }
+
+    @Test
+    public void testExchangeSameIndex() {
+
+        SparseArray<Double> array = SparseArray.factory(ArrayR064.FACTORY).make(10);
+
+        array.set(2, 5.0);
+
+        Assertions.assertEquals(5.0, array.doubleValue(2));
+
+        array.exchange(2, 2);
+
+        // Should remain unchanged
+        Assertions.assertEquals(5.0, array.doubleValue(2));
     }
 
     @Test
@@ -95,6 +194,7 @@ public class SparseTest extends ArrayTests {
 
     @Test
     public void testPutLastSkipsZero() {
+
         SparseArray<Double> arr = SparseArray.factory(ArrayR064.FACTORY).make(10);
         arr.putLast(1, 0.0);
         TestUtils.assertEquals(0, arr.countNonzeros());

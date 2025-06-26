@@ -50,7 +50,7 @@ import org.ojalgo.structure.Structure2D;
  *
  * @author apete
  */
-public final class R064CSC extends CompressedR064 {
+public final class R064CSC extends CompressedSparseR064 {
 
     public static final class NonZeroView implements ElementView2D<Double, NonZeroView> {
 

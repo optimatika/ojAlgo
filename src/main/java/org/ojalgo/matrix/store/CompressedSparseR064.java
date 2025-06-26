@@ -1,12 +1,12 @@
 package org.ojalgo.matrix.store;
 
-abstract class CompressedR064 extends FactoryStore<Double> implements SparseStructure2D {
+abstract class CompressedSparseR064 extends FactoryStore<Double> implements SparseStructure2D {
 
     public final int[] indices;
     public final int[] pointers;
     public final double[] values;
 
-    CompressedR064(final int nbRows, final int nbCols, final double[] elementValues, final int[] minorIndices, final int[] majorPointers) {
+    CompressedSparseR064(final int nbRows, final int nbCols, final double[] elementValues, final int[] minorIndices, final int[] majorPointers) {
 
         super(R064Store.FACTORY, nbRows, nbCols);
 

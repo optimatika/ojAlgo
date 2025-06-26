@@ -35,8 +35,9 @@ public abstract class PrimitiveArray extends PlainArray<Double> implements Mutat
 
         @Override
         public PrimitiveArray copy(final Access1D<?> values) {
-            PrimitiveArray retVal = this.make(values);
-            for (long i = 0L, limit = values.count(); i < limit; i++) {
+            int size = values.size();
+            PrimitiveArray retVal = this.make(size);
+            for (int i = 0; i < size; i++) {
                 retVal.set(i, values.doubleValue(i));
             }
             return retVal;

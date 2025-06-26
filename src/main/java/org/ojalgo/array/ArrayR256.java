@@ -62,6 +62,11 @@ public class ArrayR256 extends ReferenceTypeArray<BigDecimal> {
     }
 
     @Override
+    public void add(final int index, final double addend) {
+        this.fillOne(index, this.get(index).add(this.valueOf(addend)));
+    }
+
+    @Override
     public void axpy(final double a, final Mutate1D.Modifiable<?> y) {
         AXPY.invoke(y, a, data);
     }
@@ -113,11 +118,6 @@ public class ArrayR256 extends ReferenceTypeArray<BigDecimal> {
 
     @Override
     protected void add(final int index, final Comparable<?> addend) {
-        this.fillOne(index, this.get(index).add(this.valueOf(addend)));
-    }
-
-    @Override
-    protected void add(final int index, final double addend) {
         this.fillOne(index, this.get(index).add(this.valueOf(addend)));
     }
 

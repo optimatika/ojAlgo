@@ -54,6 +54,10 @@ public interface Mutate1D extends Structure1D {
             this.fillRange(0L, this.count(), supplier);
         }
 
+        default void fillCompatible(final Access1D<N> left, final BinaryFunction<N> operator, final Access1D<N> right) {
+            FillCompatible.invoke(this, left, operator, right);
+        }
+
         /**
          * <p>
          * Will fill the elements of [this] with the corresponding input values, and in the process (if
@@ -78,10 +82,6 @@ public interface Mutate1D extends Structure1D {
             for (long i = 0L, limit = Math.min(this.count(), arguments.count()); i < limit; i++) {
                 this.set(i, function.invoke(arguments.get(i)));
             }
-        }
-
-        default void fillCompatible(final Access1D<N> left, final BinaryFunction<N> operator, final Access1D<N> right) {
-            FillCompatible.invoke(this, left, operator, right);
         }
 
         default void fillRange(final long first, final long limit, final N value) {
@@ -117,13 +117,37 @@ public interface Mutate1D extends Structure1D {
 
     interface Modifiable<N extends Comparable<N>> extends Structure1D {
 
+        default void add(final int index, final byte addend) {
+            this.add(index, (short) addend);
+        }
+
+        void add(int index, double addend);
+
+        default void add(final int index, final float addend) {
+            this.add(index, (double) addend);
+        }
+
+        default void add(final int index, final int addend) {
+            this.add(index, (long) addend);
+        }
+
+        default void add(final int index, final long addend) {
+            this.add(index, (double) addend);
+        }
+
+        default void add(final int index, final short addend) {
+            this.add(index, (int) addend);
+        }
+
         default void add(final long index, final byte addend) {
             this.add(index, (short) addend);
         }
 
         void add(long index, Comparable<?> addend);
 
-        void add(long index, double addend);
+        default void add(final long index, final double addend) {
+            this.add(Math.toIntExact(index), addend);
+        }
 
         default void add(final long index, final float addend) {
             this.add(index, (double) addend);

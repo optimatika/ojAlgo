@@ -22,24 +22,30 @@ final class GrowthStrategy {
     private static final long INITIAL = 4L;
     private static final long SEGMENT = 32_768L;
 
-    private long myChunk = CHUNK;
-    private long myInitial = INITIAL;
-    private long mySegment = SEGMENT;
+    static GrowthStrategy from(final MathType mathType) {
 
-    GrowthStrategy(final long elementSize) {
-
-        super();
+        long elementSize = mathType.getTotalMemory();
 
         long halfTopLevelCacheElements = (OjAlgoUtils.ENVIRONMENT.cache / 2L) / elementSize;
-        this.segment(halfTopLevelCacheElements);
 
         long memoryPageElements = Hardware.OS_MEMORY_PAGE_SIZE / elementSize;
-        this.chunk(memoryPageElements);
+
+        return new GrowthStrategy(INITIAL, memoryPageElements, halfTopLevelCacheElements);
     }
 
-    GrowthStrategy(final MathType mathType) {
-        this(mathType.getTotalMemory());
+    private final long myChunk;
+    private final long myInitial;
+    private final long mySegment;
 
+    GrowthStrategy() {
+        this(INITIAL, CHUNK, SEGMENT);
+    }
+
+    GrowthStrategy(final long initial, final long chunk, final long segment) {
+        super();
+        myInitial = initial;
+        myChunk = chunk;
+        mySegment = segment;
     }
 
     long chunk() {
@@ -47,10 +53,11 @@ final class GrowthStrategy {
     }
 
     GrowthStrategy chunk(final long chunk) {
+
         long notLargerThanCurrentSegment = Math.min(chunk, mySegment);
         int power = PowerOf2.powerOf2Smaller(notLargerThanCurrentSegment);
-        myChunk = 1L << power;
-        return this;
+
+        return new GrowthStrategy(myInitial, 1L << power, mySegment);
     }
 
     int grow(final int current) {
@@ -85,8 +92,7 @@ final class GrowthStrategy {
      * Enforced to be <= 1
      */
     GrowthStrategy initial(final long initial) {
-        myInitial = Math.max(1, initial);
-        return this;
+        return new GrowthStrategy(Math.max(1, initial), myChunk, mySegment);
     }
 
     boolean isChunked(final long count) {
@@ -114,10 +120,11 @@ final class GrowthStrategy {
     }
 
     GrowthStrategy segment(final long segment) {
+
         long notSmallerThanCurrentChunk = Math.max(myChunk, segment);
         int power = PowerOf2.powerOf2Smaller(notSmallerThanCurrentChunk);
-        mySegment = 1L << power;
-        return this;
+
+        return new GrowthStrategy(myInitial, myChunk, 1L << power);
     }
 
 }

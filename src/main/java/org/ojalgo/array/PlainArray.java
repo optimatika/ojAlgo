@@ -50,6 +50,16 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
         }
 
         @Override
+        public A copy(final Access1D<?> values) {
+            int size = values.size();
+            A retVal = this.make(size);
+            for (int i = 0; i < size; i++) {
+                retVal.set(i, values.get(i));
+            }
+            return retVal;
+        }
+
+        @Override
         long getCapacityLimit() {
             return MAX_SIZE;
         }
@@ -75,6 +85,31 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
         }
 
         mySize = size;
+    }
+
+    @Override
+    public void add(final int index, final byte addend) {
+        this.add(index, (short) addend);
+    }
+
+    @Override
+    public void add(final int index, final float addend) {
+        this.add(index, (double) addend);
+    }
+
+    @Override
+    public void add(final int index, final int addend) {
+        this.add(index, (long) addend);
+    }
+
+    @Override
+    public void add(final int index, final long addend) {
+        this.add(index, (double) addend);
+    }
+
+    @Override
+    public void add(final int index, final short addend) {
+        this.add(index, (int) addend);
     }
 
     @Override
@@ -299,29 +334,7 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
         return retVal;
     }
 
-    protected void add(final int index, final byte addend) {
-        this.add(index, (short) addend);
-    }
-
     protected abstract void add(int index, Comparable<?> addend);
-
-    protected abstract void add(int index, double addend);
-
-    protected void add(final int index, final float addend) {
-        this.add(index, (double) addend);
-    }
-
-    protected void add(final int index, final int addend) {
-        this.add(index, (long) addend);
-    }
-
-    protected void add(final int index, final long addend) {
-        this.add(index, (double) addend);
-    }
-
-    protected void add(final int index, final short addend) {
-        this.add(index, (int) addend);
-    }
 
     protected abstract void exchange(int firstA, int firstB, int step, int count);
 

@@ -29,11 +29,11 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
 
     public static final class MapFactory<N extends Comparable<N>> {
 
-        private final GrowthStrategy myGrowthStrategy;
+        private GrowthStrategy myGrowthStrategy;
         private final PlainArray.Factory<N, ?> myPlainFactory;
 
         MapFactory(final PlainArray.Factory<N, ?> denseFactory) {
-            myGrowthStrategy = new GrowthStrategy(denseFactory.getMathType());
+            myGrowthStrategy = GrowthStrategy.from(denseFactory.getMathType());
             myPlainFactory = denseFactory;
         }
 
@@ -44,7 +44,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
          * @return this
          */
         public MapFactory<N> chunk(final long chunk) {
-            myGrowthStrategy.chunk(chunk);
+            myGrowthStrategy = myGrowthStrategy.chunk(chunk);
             return this;
         }
 
@@ -53,7 +53,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
          * @return this
          */
         public MapFactory<N> initial(final long initial) {
-            myGrowthStrategy.initial(initial);
+            myGrowthStrategy = myGrowthStrategy.initial(initial);
             return this;
         }
 
@@ -68,7 +68,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
          * builder will enforce this for you.)
          */
         public MapFactory<N> segment(final long segment) {
-            myGrowthStrategy.segment(segment);
+            myGrowthStrategy = myGrowthStrategy.segment(segment);
             return this;
         }
 
@@ -89,7 +89,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
         myDenseFactory = denseFactory;
         myGrowthStrategy = growthStrategy;
 
-        myStorage = new SparseArray<>(denseFactory, growthStrategy, Long.MAX_VALUE);
+        myStorage = new SparseArray<>(denseFactory, growthStrategy, Integer.MAX_VALUE);
     }
 
     /**

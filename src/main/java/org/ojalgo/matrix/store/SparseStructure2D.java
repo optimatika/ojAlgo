@@ -26,19 +26,24 @@ import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 import org.ojalgo.structure.Structure2D;
 
 /**
- * Interface for sparse matrix implementations that store only non-zero elements.
+ * Additional methods for sparse matrix implementations that store only non-zero elements.
  * <p>
- * This interface defines the contract for sparse matrix structures, which are optimized for storing matrices
- * where most elements are zero. Implementations typically use specialized data structures like Compressed
- * Sparse Row (CSR), Compressed Sparse Column (CSC), or Coordinate Format (COO) to efficiently store and
- * access non-zero elements.
+ * This interface defines common functionality for sparse matrix structures, which are optimized for storing
+ * matrices where most elements are zero. Implementations typically use specialized data structures like
+ * Compressed Sparse Row (CSR), Compressed Sparse Column (CSC), or Coordinate Format (COO) to efficiently
+ * store and access non-zero elements.
  * </p>
  * <p>
  * The interface provides methods to:
  * <ul>
- * <li>Convert the sparse matrix to a list of {@link Triplet}s representing non-zero elements</li>
+ * <li>Count the number of non-zero elements in the matrix</li>
  * <li>Calculate the density of the matrix (ratio of non-zero elements to total elements)</li>
+ * <li>Convert the sparse matrix to specific sparse formats (CSR, CSC)</li>
  * </ul>
+ * </p>
+ * <p>
+ * Note: This interface extends {@link Structure2D} and provides additional sparse-specific functionality. The
+ * main matrix functionality is defined in other interfaces that implement this one.
  * </p>
  *
  * @author apete

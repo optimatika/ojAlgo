@@ -45,7 +45,7 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
          * be the same as if the 'left' and 'right' matrices where expanded (repeated) so that all three where
          * of the same size, and then the operation was performed. The actual implementation may be more
          * efficient than that.
-         * 
+         *
          * @see https://se.mathworks.com/help/matlab/matlab_prog/compatible-array-sizes-for-basic-operations.html
          */
         default void fillCompatible(final AccessAnyD<N> left, final BinaryFunction<N> operator, final AccessAnyD<N> right) {
@@ -81,6 +81,11 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
     }
 
     interface Modifiable<N extends Comparable<N>> extends StructureAnyD, Mutate1D.Modifiable<N> {
+
+        @Override
+        default void add(final int index, final double addend) {
+            this.add(StructureAnyD.reference(index, this.shape()), addend);
+        }
 
         @Override
         default void add(final long index, final byte addend) {

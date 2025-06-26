@@ -1,11 +1,14 @@
 package org.ojalgo.matrix.decomposition;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.matrix.store.ColumnsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
 import org.openjdk.jmh.runner.RunnerException;
 
@@ -16,6 +19,8 @@ import org.openjdk.jmh.runner.RunnerException;
  * to learn what happens around (and above) that size.
  */
 public abstract class AbstractBenchmarkSparseLU {
+
+    private static final AtomicInteger COUNTER = new AtomicInteger(0);
 
     static final Uniform RANDOM = Uniform.of(-10, 20);
 
@@ -33,15 +38,18 @@ public abstract class AbstractBenchmarkSparseLU {
 
             sparse.decompose(matrix);
 
-            vecor = AbstractBenchmarkSparseLU.newSparseVector(dim, 0.01);
+            BasicLogger.debug("DecomposedInverse: reset after {} updates", COUNTER);
+            COUNTER.set(0);
+
             rhs = AbstractBenchmarkSparseLU.newDenseVector(dim);
 
             while (sparse.updateColumn(Uniform.randomInteger(dim), vecor)) {
-
+                COUNTER.incrementAndGet();
                 for (int t = 0; t < 5; t++) {
                     sparse.ftran(rhs);
                     sparse.btran(rhs);
                 }
+                vecor = AbstractBenchmarkSparseLU.newSparseVector(dim, 0.01);
             }
         }
     }

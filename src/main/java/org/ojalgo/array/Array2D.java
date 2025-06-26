@@ -159,6 +159,16 @@ public final class Array2D<N extends Comparable<N>>
     }
 
     @Override
+    public void add(final int index, final double addend) {
+        myDelegate.add(index, addend);
+    }
+
+    @Override
+    public void add(final int index, final float addend) {
+        myDelegate.add(index, addend);
+    }
+
+    @Override
     public void add(final long index, final byte addend) {
         myDelegate.add(index, addend);
     }

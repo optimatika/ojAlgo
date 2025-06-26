@@ -43,26 +43,6 @@ import org.ojalgo.type.NumberDefinition;
  */
 final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
 
-    static <N extends Comparable<N>> SegmentedArray<N> make(final long count, final int indexBits, final BaseFactory<N, ?> segmentFactory) {
-
-        long segmentSize = 1L << indexBits; // 2^bits
-
-        int nbUniformSegments = (int) (count / segmentSize);
-        long remainder = count % segmentSize;
-
-        int nbTotalSegments = remainder == 0L ? (int) nbUniformSegments : nbUniformSegments + 1;
-
-        BasicArray<N>[] segments = (BasicArray<N>[]) new BasicArray<?>[nbTotalSegments];
-        for (int s = 0; s < nbUniformSegments; s++) {
-            segments[s] = segmentFactory.make(segmentSize);
-        }
-        if (remainder != 0L) {
-            segments[nbUniformSegments] = segmentFactory.make(remainder);
-        }
-
-        return new SegmentedArray<>(segments, segmentFactory);
-    }
-
     static <N extends Comparable<N>> SegmentedArray<N> newInstance(final BaseFactory<N, ?> segmentFactory, final long... structure) {
 
         long totalCount = StructureAnyD.count(structure);
@@ -75,8 +55,20 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
         }
 
         int indexBits = Math.max(min, max - OjAlgoUtils.ENVIRONMENT.cores);
+        long segmentSize = 1L << indexBits; // 2^bits
+        int nbUniformSegments = Math.toIntExact(totalCount / segmentSize);
+        long remainder = totalCount % segmentSize;
+        int nbTotalSegments = remainder == 0L ? nbUniformSegments : nbUniformSegments + 1;
 
-        return SegmentedArray.make(totalCount, indexBits, segmentFactory);
+        BasicArray<N>[] segments = (BasicArray<N>[]) new BasicArray<?>[nbTotalSegments];
+        for (int s = 0; s < nbUniformSegments; s++) {
+            segments[s] = segmentFactory.make(segmentSize);
+        }
+        if (remainder != 0L) {
+            segments[nbUniformSegments] = segmentFactory.make(remainder);
+        }
+
+        return new SegmentedArray<>(segments, segmentFactory);
     }
 
     private final int myIndexBits;
@@ -95,25 +87,16 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
         super(segmentFactory);
 
         mySegmentSize = segments[0].count();
-        int indexOfLastSegment = segments.length - 1;
-        for (int s = 1; s < indexOfLastSegment; s++) {
-            if (segments[s].count() != mySegmentSize) {
-                throw new IllegalArgumentException("All segments (except possibly the last) must have the same size!");
-            }
-        }
-        if (segments[indexOfLastSegment].count() > mySegmentSize) {
-            throw new IllegalArgumentException("The last segment cannot be larger than the others!");
-        }
-
         myIndexBits = PowerOf2.find(mySegmentSize);
-        if (myIndexBits < 0 || mySegmentSize != 1L << myIndexBits) {
-            throw new IllegalArgumentException("The segment size must be a power of 2!");
-        }
-
         myIndexMask = mySegmentSize - 1L;
 
         mySegments = segments;
         mySegmentFactory = segmentFactory;
+    }
+
+    @Override
+    public void add(final int index, final double addend) {
+        mySegments[index >> myIndexBits].add(index & myIndexMask, addend);
     }
 
     @Override
@@ -441,38 +424,40 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
 
     /**
      * Will either grow the last segment to be the same size as all the others, or add another segment (with
-     * the same size). The returned (could be the same) instance is guaranteed to have a last segement of the
+     * the same size). The returned (could be the same) instance is guaranteed to have a last segment of the
      * same size as the others and at least one more "space" in that segment.
      */
     SegmentedArray<N> grow() {
 
-        BasicArray<N> tmpLastSegment = mySegments[mySegments.length - 1];
+        int last = mySegments.length - 1;
+
+        BasicArray<N> tmpLastSegment = mySegments[last];
         BasicArray<N> tmpNewSegment = mySegmentFactory.make(mySegmentSize);
 
         long tmpLastSegmentSize = tmpLastSegment.count();
 
         if (tmpLastSegmentSize < mySegmentSize) {
 
-            mySegments[mySegments.length - 1] = tmpNewSegment;
+            mySegments[last] = tmpNewSegment;
 
             tmpNewSegment.fillMatching(tmpLastSegment);
 
             return this;
 
-        }
-        if (tmpLastSegmentSize != mySegmentSize) {
+        } else {
 
-            throw new IllegalStateException();
-        }
-        @SuppressWarnings("unchecked")
-        BasicArray<N>[] tmpSegments = (BasicArray<N>[]) new BasicArray<?>[mySegments.length + 1];
+            if (tmpLastSegmentSize != mySegmentSize) {
+                throw new IllegalStateException();
+            }
 
-        for (int i = 0; i < mySegments.length; i++) {
-            tmpSegments[i] = mySegments[i];
-        }
-        tmpSegments[mySegments.length] = tmpNewSegment;
+            BasicArray<N>[] segments = (BasicArray<N>[]) new BasicArray<?>[mySegments.length + 1];
+            for (int i = 0; i < mySegments.length; i++) {
+                segments[i] = mySegments[i];
+            }
+            segments[mySegments.length] = tmpNewSegment;
 
-        return new SegmentedArray<>(tmpSegments, mySegmentFactory);
+            return new SegmentedArray<>(segments, mySegmentFactory);
+        }
     }
 
 }

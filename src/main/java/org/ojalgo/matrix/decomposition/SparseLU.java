@@ -180,20 +180,13 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
             this.applyPivotOrder(myColPivot, arg);
         }
 
-        for (int ij = 0; ij < r; ij++) {
-            double varJ = arg.doubleValue(ij) / myDiagU[ij];
-            arg.set(ij, varJ);
-            myU.getRow(ij).axpy(-varJ, arg);
-        }
+        this.btranU(r, arg);
 
         for (int i = myFactors.size() - 1; i >= 0; i--) {
             myFactors.get(i).btran(arg);
         }
 
-        for (int ij = r - 1; ij > 0; ij--) {
-            double varJ = arg.doubleValue(ij);
-            myL.getRow(ij).axpy(-varJ, arg);
-        }
+        this.btranL(r, arg);
 
         this.applyReverseOrder(myPivot, arg);
     }
@@ -238,9 +231,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
 
             myPivot.applyPivotOrder(wCol);
 
-            for (int i = 0; i < m; i++) {
-                wColData[i] -= myL.getRow(i).dot(wCol);
-            }
+            this.ftranL(r, wCol);
 
             int p = j;
             double magnP = Math.abs(wColData[p]);
@@ -465,9 +456,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
         newColumn.supplyTo(wCol);
         myPivot.applyPivotOrder(wCol);
 
-        for (int ij = 1; ij < r; ij++) {
-            wCol.add(ij, -myL.getRow(ij).dot(wCol));
-        }
+        this.ftranL(r, wCol);
 
         // Apply any existing transformations to the new column
         for (int i = 0; i < myFactors.size(); i++) {
@@ -547,18 +536,41 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
         return true;
     }
 
+    private void btranL(final int r, final PhysicalStore<Double> arg) {
+        for (int ij = r - 1; ij > 0; ij--) {
+            double varJ = arg.doubleValue(ij);
+            myL.getRow(ij).axpy(-varJ, arg);
+        }
+    }
+
+    private void btranU(final int r, final PhysicalStore<Double> arg) {
+        for (int ij = 0; ij < r; ij++) {
+            double varJ = arg.doubleValue(ij) / myDiagU[ij];
+            arg.set(ij, varJ);
+            myU.getRow(ij).axpy(-varJ, arg);
+        }
+    }
+
     private void ftranInternal(final PhysicalStore<Double> arg) {
 
         int r = this.getMinDim();
 
-        for (int ij = 1; ij < r; ij++) {
-            arg.add(ij, 0, -myL.getRow(ij).dot(arg));
-        }
+        this.ftranL(r, arg);
 
         for (int i = 0; i < myFactors.size(); i++) {
             myFactors.get(i).ftran(arg);
         }
 
+        this.ftranU(arg, r);
+    }
+
+    private void ftranL(final int r, final PhysicalStore<Double> arg) {
+        for (int ij = 1; ij < r; ij++) {
+            arg.add(ij, 0, -myL.getRow(ij).dot(arg));
+        }
+    }
+
+    private void ftranU(final PhysicalStore<Double> arg, final int r) {
         for (int ij = r - 1; ij >= 0; ij--) {
             double sum = arg.doubleValue(ij);
             sum -= myU.getRow(ij).dot(arg);

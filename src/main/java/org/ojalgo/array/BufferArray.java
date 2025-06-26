@@ -126,6 +126,36 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
     }
 
     @Override
+    public final void add(final int index, final byte addend) {
+        this.set(index, this.byteValue(index) + addend);
+    }
+
+    @Override
+    public final void add(final int index, final double addend) {
+        this.set(index, this.doubleValue(index) + addend);
+    }
+
+    @Override
+    public final void add(final int index, final float addend) {
+        this.set(index, this.floatValue(index) + addend);
+    }
+
+    @Override
+    public final void add(final int index, final int addend) {
+        this.set(index, this.intValue(index) + addend);
+    }
+
+    @Override
+    public final void add(final int index, final long addend) {
+        this.set(index, this.longValue(index) + addend);
+    }
+
+    @Override
+    public final void add(final int index, final short addend) {
+        this.set(index, this.shortValue(index) + addend);
+    }
+
+    @Override
     public void close() {
         if (myFile != null) {
             try {
@@ -145,36 +175,6 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
     public void reset() {
         this.fillAll(PrimitiveMath.ZERO);
         myBuffer.clear();
-    }
-
-    @Override
-    protected final void add(final int index, final byte addend) {
-        this.set(index, this.byteValue(index) + addend);
-    }
-
-    @Override
-    protected final void add(final int index, final double addend) {
-        this.set(index, this.doubleValue(index) + addend);
-    }
-
-    @Override
-    protected final void add(final int index, final float addend) {
-        this.set(index, this.floatValue(index) + addend);
-    }
-
-    @Override
-    protected final void add(final int index, final int addend) {
-        this.set(index, this.intValue(index) + addend);
-    }
-
-    @Override
-    protected final void add(final int index, final long addend) {
-        this.set(index, this.longValue(index) + addend);
-    }
-
-    @Override
-    protected final void add(final int index, final short addend) {
-        this.set(index, this.shortValue(index) + addend);
     }
 
     @Override

@@ -165,6 +165,11 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     }
 
     @Override
+    public void add(final int index, final double addend) {
+        myDelegate.add(index, addend);
+    }
+
+    @Override
     public void add(final long index, final byte addend) {
         myDelegate.add(index, addend);
     }

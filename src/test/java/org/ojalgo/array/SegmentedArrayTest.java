@@ -43,7 +43,7 @@ public class SegmentedArrayTest extends ArrayTests {
     @Test
     public void testVeryLargeRandomSetAndGetBackBasic() {
 
-        long count = Long.MAX_VALUE;
+        long count = Integer.MAX_VALUE;
 
         BasicArray<Double> array = new BasicArray.Factory<>(ArrayR064.FACTORY).make(count);
 

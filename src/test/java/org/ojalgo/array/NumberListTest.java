@@ -114,7 +114,7 @@ public class NumberListTest extends ArrayTests {
     @Test
     public void testGrowCapacity() {
 
-        GrowthStrategy tmpStrategy = new GrowthStrategy(MathType.R064);
+        GrowthStrategy tmpStrategy = GrowthStrategy.from(MathType.R064);
         long initial = tmpStrategy.initial();
         long chunk = tmpStrategy.chunk();
 

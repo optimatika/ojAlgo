@@ -75,6 +75,16 @@ public class ArrayR032 extends PrimitiveArray {
     }
 
     @Override
+    public void add(final int index, final double addend) {
+        data[index] += (float) addend;
+    }
+
+    @Override
+    public void add(final int index, final float addend) {
+        data[index] += addend;
+    }
+
+    @Override
     public void axpy(final double a, final Mutate1D.Modifiable<?> y) {
         AXPY.invoke(y, a, data);
     }
@@ -207,16 +217,6 @@ public class ArrayR032 extends PrimitiveArray {
     @Override
     protected void add(final int index, final Comparable<?> addend) {
         data[index] += NumberDefinition.floatValue(addend);
-    }
-
-    @Override
-    protected void add(final int index, final double addend) {
-        data[index] += (float) addend;
-    }
-
-    @Override
-    protected void add(final int index, final float addend) {
-        data[index] += addend;
     }
 
     protected final float[] copyOfData() {

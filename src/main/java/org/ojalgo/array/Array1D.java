@@ -172,6 +172,36 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     }
 
     @Override
+    public void add(final int index, final byte addend) {
+        myDelegate.add(this.convert(index), addend);
+    }
+
+    @Override
+    public void add(final int index, final double addend) {
+        myDelegate.add(this.convert(index), addend);
+    }
+
+    @Override
+    public void add(final int index, final float addend) {
+        myDelegate.add(this.convert(index), addend);
+    }
+
+    @Override
+    public void add(final int index, final int addend) {
+        myDelegate.add(this.convert(index), addend);
+    }
+
+    @Override
+    public void add(final int index, final long addend) {
+        myDelegate.add(this.convert(index), addend);
+    }
+
+    @Override
+    public void add(final int index, final short addend) {
+        myDelegate.add(this.convert(index), addend);
+    }
+
+    @Override
     public void add(final long index, final byte addend) {
         myDelegate.add(this.convert(index), addend);
     }

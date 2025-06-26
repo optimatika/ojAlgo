@@ -35,89 +35,7 @@ import org.openjdk.jmh.runner.RunnerException;
 
 /**
  * <pre>
-# Run complete. Total time: 00:45:39
-
-REMEMBER: The numbers below are just data. To gain reusable insights, you need to follow up on
-why the numbers are the way they are. Use profilers (see -prof, -lprof), design factorial
-experiments, perform baseline and negative tests that provide experimental control, make sure
-the benchmarking environment is safe on JVM/OS/HW level, ask for reviews from the domain experts.
-Do not assume the numbers tell you what you want them to tell.
-
-Benchmark                       (density)  (dim)   Mode  Cnt      Score      Error  Units
-BenchmarkUpdateColumnLU.dense       0.005    500  thrpt    3   5424.223 ±  459.031  ops/s
-BenchmarkUpdateColumnLU.dense       0.005   1000  thrpt    3   1322.074 ±  124.781  ops/s
-BenchmarkUpdateColumnLU.dense       0.005   2000  thrpt    3    313.872 ±    2.482  ops/s
-BenchmarkUpdateColumnLU.dense        0.01    500  thrpt    3   5386.049 ±   46.703  ops/s
-BenchmarkUpdateColumnLU.dense        0.01   1000  thrpt    3   1326.845 ±   43.153  ops/s
-BenchmarkUpdateColumnLU.dense        0.01   2000  thrpt    3    315.582 ±    7.197  ops/s
-BenchmarkUpdateColumnLU.dense        0.02    500  thrpt    3   5378.188 ±   32.443  ops/s
-BenchmarkUpdateColumnLU.dense        0.02   1000  thrpt    3   1317.328 ±  178.363  ops/s
-BenchmarkUpdateColumnLU.dense        0.02   2000  thrpt    3    312.010 ±   45.731  ops/s
-BenchmarkUpdateColumnLU.raw         0.005    500  thrpt    3   8339.717 ±   19.000  ops/s
-BenchmarkUpdateColumnLU.raw         0.005   1000  thrpt    3   1995.571 ±   79.612  ops/s
-BenchmarkUpdateColumnLU.raw         0.005   2000  thrpt    3    489.088 ±    4.421  ops/s
-BenchmarkUpdateColumnLU.raw          0.01    500  thrpt    3   8346.718 ±  141.460  ops/s
-BenchmarkUpdateColumnLU.raw          0.01   1000  thrpt    3   2003.039 ±  107.751  ops/s
-BenchmarkUpdateColumnLU.raw          0.01   2000  thrpt    3    485.526 ±   62.020  ops/s
-BenchmarkUpdateColumnLU.raw          0.02    500  thrpt    3   8334.504 ±   81.373  ops/s
-BenchmarkUpdateColumnLU.raw          0.02   1000  thrpt    3   2006.586 ±   11.834  ops/s
-BenchmarkUpdateColumnLU.raw          0.02   2000  thrpt    3    488.897 ±    1.049  ops/s
-BenchmarkUpdateColumnLU.sparse      0.005    500  thrpt    3  92339.697 ± 2506.696  ops/s
-BenchmarkUpdateColumnLU.sparse      0.005   1000  thrpt    3   5650.841 ±  842.956  ops/s
-BenchmarkUpdateColumnLU.sparse      0.005   2000  thrpt    3    738.278 ±   17.471  ops/s
-BenchmarkUpdateColumnLU.sparse       0.01    500  thrpt    3  22459.524 ±  429.021  ops/s
-BenchmarkUpdateColumnLU.sparse       0.01   1000  thrpt    3   3333.277 ±   54.107  ops/s
-BenchmarkUpdateColumnLU.sparse       0.01   2000  thrpt    3    563.453 ±    9.687  ops/s
-BenchmarkUpdateColumnLU.sparse       0.02    500  thrpt    3  13808.485 ±   40.060  ops/s
-BenchmarkUpdateColumnLU.sparse       0.02   1000  thrpt    3   2677.103 ±    8.712  ops/s
-BenchmarkUpdateColumnLU.sparse       0.02   2000  thrpt    3    502.731 ±   45.767  ops/s
- * </pre>
- *
- * Sorted
- *
- * <pre>
-Benchmark                       (density)  (dim)   Mode  Cnt      Score      Error  Units
-BenchmarkUpdateColumnLU.dense       0.005    500  thrpt    3   5424.223 ±  459.031  ops/s
-BenchmarkUpdateColumnLU.raw         0.005    500  thrpt    3   8339.717 ±   19.000  ops/s
-BenchmarkUpdateColumnLU.sparse      0.005    500  thrpt    3  92339.697 ± 2506.696  ops/s
-
-BenchmarkUpdateColumnLU.dense       0.005   1000  thrpt    3   1322.074 ±  124.781  ops/s
-BenchmarkUpdateColumnLU.raw         0.005   1000  thrpt    3   1995.571 ±   79.612  ops/s
-BenchmarkUpdateColumnLU.sparse      0.005   1000  thrpt    3   5650.841 ±  842.956  ops/s
-
-BenchmarkUpdateColumnLU.dense       0.005   2000  thrpt    3    313.872 ±    2.482  ops/s
-BenchmarkUpdateColumnLU.raw         0.005   2000  thrpt    3    489.088 ±    4.421  ops/s
-BenchmarkUpdateColumnLU.sparse      0.005   2000  thrpt    3    738.278 ±   17.471  ops/s
-
-BenchmarkUpdateColumnLU.dense        0.01    500  thrpt    3   5386.049 ±   46.703  ops/s
-BenchmarkUpdateColumnLU.raw          0.01    500  thrpt    3   8346.718 ±  141.460  ops/s
-BenchmarkUpdateColumnLU.sparse       0.01    500  thrpt    3  22459.524 ±  429.021  ops/s
-
-BenchmarkUpdateColumnLU.dense        0.01   1000  thrpt    3   1326.845 ±   43.153  ops/s
-BenchmarkUpdateColumnLU.raw          0.01   1000  thrpt    3   2003.039 ±  107.751  ops/s
-BenchmarkUpdateColumnLU.sparse       0.01   1000  thrpt    3   3333.277 ±   54.107  ops/s
-
-BenchmarkUpdateColumnLU.dense        0.01   2000  thrpt    3    315.582 ±    7.197  ops/s
-BenchmarkUpdateColumnLU.raw          0.01   2000  thrpt    3    485.526 ±   62.020  ops/s
-BenchmarkUpdateColumnLU.sparse       0.01   2000  thrpt    3    563.453 ±    9.687  ops/s
-
-BenchmarkUpdateColumnLU.dense        0.02    500  thrpt    3   5378.188 ±   32.443  ops/s
-BenchmarkUpdateColumnLU.raw          0.02    500  thrpt    3   8334.504 ±   81.373  ops/s
-BenchmarkUpdateColumnLU.sparse       0.02    500  thrpt    3  13808.485 ±   40.060  ops/s
-
-BenchmarkUpdateColumnLU.dense        0.02   1000  thrpt    3   1317.328 ±  178.363  ops/s
-BenchmarkUpdateColumnLU.raw          0.02   1000  thrpt    3   2006.586 ±   11.834  ops/s
-BenchmarkUpdateColumnLU.sparse       0.02   1000  thrpt    3   2677.103 ±    8.712  ops/s
-
-BenchmarkUpdateColumnLU.dense        0.02   2000  thrpt    3    312.010 ±   45.731  ops/s
-BenchmarkUpdateColumnLU.raw          0.02   2000  thrpt    3    488.897 ±    1.049  ops/s
-BenchmarkUpdateColumnLU.sparse       0.02   2000  thrpt    3    502.731 ±   45.767  ops/s
- * </pre>
- *
- * Partial/temporary: combined permutation and eta transformations
- *
- * <pre>
-# Run complete. Total time: 00:15:13
+# Run complete. Total time: 00:45:38
 
 REMEMBER: The numbers below are just data. To gain reusable insights, you need to follow up on
 why the numbers are the way they are. Use profilers (see -prof, -lprof), design factorial
@@ -126,15 +44,63 @@ the benchmarking environment is safe on JVM/OS/HW level, ask for reviews from th
 Do not assume the numbers tell you what you want them to tell.
 
 Benchmark                       (density)  (dim)   Mode  Cnt       Score      Error  Units
-BenchmarkUpdateColumnLU.sparse      0.005    500  thrpt    3  113258.119 ± 9202.077  ops/s
-BenchmarkUpdateColumnLU.sparse      0.005   1000  thrpt    3    6068.011 ±  736.475  ops/s
-BenchmarkUpdateColumnLU.sparse      0.005   2000  thrpt    3     724.196 ±   13.024  ops/s
-BenchmarkUpdateColumnLU.sparse       0.01    500  thrpt    3   21758.028 ± 1015.265  ops/s
-BenchmarkUpdateColumnLU.sparse       0.01   1000  thrpt    3    3352.685 ±   20.619  ops/s
-BenchmarkUpdateColumnLU.sparse       0.01   2000  thrpt    3     580.287 ±   46.956  ops/s
-BenchmarkUpdateColumnLU.sparse       0.02    500  thrpt    3   13012.797 ±  610.773  ops/s
-BenchmarkUpdateColumnLU.sparse       0.02   1000  thrpt    3    2665.106 ±   21.400  ops/s
-BenchmarkUpdateColumnLU.sparse       0.02   2000  thrpt    3     505.826 ±   38.301  ops/s
+BenchmarkUpdateColumnLU.dense       0.005    500  thrpt    3    5393.930 ±   27.148  ops/s
+BenchmarkUpdateColumnLU.dense       0.005   1000  thrpt    3    1326.159 ±    7.707  ops/s
+BenchmarkUpdateColumnLU.dense       0.005   2000  thrpt    3     315.141 ±    2.796  ops/s
+BenchmarkUpdateColumnLU.dense        0.01    500  thrpt    3    5380.639 ±  321.954  ops/s
+BenchmarkUpdateColumnLU.dense        0.01   1000  thrpt    3    1328.569 ±    4.724  ops/s
+BenchmarkUpdateColumnLU.dense        0.01   2000  thrpt    3     313.675 ±    2.535  ops/s
+BenchmarkUpdateColumnLU.dense        0.02    500  thrpt    3    5384.512 ±   32.438  ops/s
+BenchmarkUpdateColumnLU.dense        0.02   1000  thrpt    3    1326.366 ±    1.525  ops/s
+BenchmarkUpdateColumnLU.dense        0.02   2000  thrpt    3     314.393 ±   23.420  ops/s
+BenchmarkUpdateColumnLU.raw         0.005    500  thrpt    3    8304.669 ±  190.305  ops/s
+BenchmarkUpdateColumnLU.raw         0.005   1000  thrpt    3    1997.867 ±  197.280  ops/s
+BenchmarkUpdateColumnLU.raw         0.005   2000  thrpt    3     484.455 ±   64.550  ops/s
+BenchmarkUpdateColumnLU.raw          0.01    500  thrpt    3    8320.706 ±  180.531  ops/s
+BenchmarkUpdateColumnLU.raw          0.01   1000  thrpt    3    2000.113 ±   15.744  ops/s
+BenchmarkUpdateColumnLU.raw          0.01   2000  thrpt    3     487.266 ±    3.254  ops/s
+BenchmarkUpdateColumnLU.raw          0.02    500  thrpt    3    8332.677 ±   72.716  ops/s
+BenchmarkUpdateColumnLU.raw          0.02   1000  thrpt    3    2005.974 ±    1.847  ops/s
+BenchmarkUpdateColumnLU.raw          0.02   2000  thrpt    3     487.717 ±    3.455  ops/s
+BenchmarkUpdateColumnLU.sparse      0.005    500  thrpt    3  100448.475 ± 8515.196  ops/s
+BenchmarkUpdateColumnLU.sparse      0.005   1000  thrpt    3    5649.611 ±  120.694  ops/s
+BenchmarkUpdateColumnLU.sparse      0.005   2000  thrpt    3     769.437 ±    8.479  ops/s
+BenchmarkUpdateColumnLU.sparse       0.01    500  thrpt    3   19901.066 ±  144.348  ops/s
+BenchmarkUpdateColumnLU.sparse       0.01   1000  thrpt    3    3555.723 ±   28.142  ops/s
+BenchmarkUpdateColumnLU.sparse       0.01   2000  thrpt    3     583.291 ±   14.344  ops/s
+BenchmarkUpdateColumnLU.sparse       0.02    500  thrpt    3   11981.005 ±   65.528  ops/s
+BenchmarkUpdateColumnLU.sparse       0.02   1000  thrpt    3    2641.026 ±    7.800  ops/s
+BenchmarkUpdateColumnLU.sparse       0.02   2000  thrpt    3     522.534 ±    2.073  ops/s
+ * </pre>
+ *
+ * Before:
+ *
+ * <pre>
+Benchmark                       (density)  (dim)   Mode  Cnt       Score      Error  Units
+BenchmarkUpdateColumnLU.sparse      0.005    500  thrpt    3  116935.027 ± 4419.610  ops/s
+BenchmarkUpdateColumnLU.sparse      0.005   1000  thrpt    3    5757.816 ±   18.891  ops/s
+BenchmarkUpdateColumnLU.sparse      0.005   2000  thrpt    3     804.840 ±   52.349  ops/s
+BenchmarkUpdateColumnLU.sparse       0.01    500  thrpt    3   19415.809 ± 4152.648  ops/s
+BenchmarkUpdateColumnLU.sparse       0.01   1000  thrpt    3    3256.046 ±  147.629  ops/s
+BenchmarkUpdateColumnLU.sparse       0.01   2000  thrpt    3     612.089 ±  224.765  ops/s
+BenchmarkUpdateColumnLU.sparse       0.02    500  thrpt    3   11972.875 ±  399.515  ops/s
+BenchmarkUpdateColumnLU.sparse       0.02   1000  thrpt    3    2627.650 ±  220.212  ops/s
+BenchmarkUpdateColumnLU.sparse       0.02   2000  thrpt    3     540.547 ±   32.974  ops/s
+ * </pre>
+ *
+ * After:
+ *
+ * <pre>
+Benchmark                       (density)  (dim)   Mode  Cnt      Score      Error  Units
+BenchmarkUpdateColumnLU.sparse      0.005    500  thrpt    3  99834.585 ± 1236.167  ops/s
+BenchmarkUpdateColumnLU.sparse      0.005   1000  thrpt    3   5493.401 ±  215.758  ops/s
+BenchmarkUpdateColumnLU.sparse      0.005   2000  thrpt    3    858.892 ±    7.239  ops/s
+BenchmarkUpdateColumnLU.sparse       0.01    500  thrpt    3  22373.056 ±  239.326  ops/s
+BenchmarkUpdateColumnLU.sparse       0.01   1000  thrpt    3   3361.485 ±  161.363  ops/s
+BenchmarkUpdateColumnLU.sparse       0.01   2000  thrpt    3    667.622 ±   15.321  ops/s
+BenchmarkUpdateColumnLU.sparse       0.02    500  thrpt    3  12654.919 ±   17.503  ops/s
+BenchmarkUpdateColumnLU.sparse       0.02   1000  thrpt    3   2689.259 ±   12.415  ops/s
+BenchmarkUpdateColumnLU.sparse       0.02   2000  thrpt    3    594.799 ±    6.564  ops/s
  * </pre>
  */
 @State(Scope.Benchmark)

@@ -76,6 +76,16 @@ public class ArrayZ016 extends PrimitiveArray {
     }
 
     @Override
+    public void add(final int index, final double addend) {
+        data[index] += (short) Math.round(addend);
+    }
+
+    @Override
+    public void add(final int index, final short addend) {
+        data[index] += addend;
+    }
+
+    @Override
     public byte byteValue(final int index) {
         return (byte) data[index];
     }
@@ -140,16 +150,6 @@ public class ArrayZ016 extends PrimitiveArray {
     @Override
     protected void add(final int index, final Comparable<?> addend) {
         data[index] += NumberDefinition.shortValue(addend);
-    }
-
-    @Override
-    protected void add(final int index, final double addend) {
-        data[index] += (short) Math.round(addend);
-    }
-
-    @Override
-    protected void add(final int index, final short addend) {
-        data[index] += addend;
     }
 
     @Override

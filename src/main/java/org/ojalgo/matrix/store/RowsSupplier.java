@@ -174,9 +174,7 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
         int a = Math.toIntExact(colA);
         int b = Math.toIntExact(colB);
         for (SparseArray<N> row : myRows) {
-            double temp = row.doubleValue(a);
-            row.set(a, row.doubleValue(b));
-            row.set(b, temp);
+            row.exchange(a, b);
         }
     }
 

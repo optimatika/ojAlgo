@@ -212,10 +212,12 @@ final class ProductFormInverse implements BasisRepresentation {
 
         if (Math.abs(diagonalElement) >= myScalingThreshold
                 && (Math.abs(diagonalElement) / myWork.aggregateAll(Aggregator.LARGEST).doubleValue()) >= myScalingThreshold) {
+
             myFactors.add(this.newFactor(myWork, col, diagonalElement));
+
         } else {
-            this.clearFactors();
-            myRoot.decompose(basis.transpose());
+
+            this.reset(basis);
         }
     }
 
@@ -238,28 +240,6 @@ final class ProductFormInverse implements BasisRepresentation {
         }
 
         return new ElementaryFactor(sparse, col, diagonalElement);
-    }
-
-    void reset() {
-        this.clearFactors();
-        myRoot.reset();
-    }
-
-    /**
-     * Update the product form inverse to reflect a replaced column.
-     *
-     * @param col    The column, of the basis, that was exchanged.
-     * @param values The (non zero) values of that column.
-     */
-    void update(final int col, final SparseArray<Double> values) {
-
-        values.supplyTo(myWork);
-
-        this.ftran(myWork);
-
-        double diagonalElement = myWork.doubleValue(col);
-
-        myFactors.add(this.newFactor(myWork, col, diagonalElement));
     }
 
 }

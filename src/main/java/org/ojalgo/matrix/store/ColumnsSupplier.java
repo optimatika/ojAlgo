@@ -209,9 +209,7 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixSto
         int a = Math.toIntExact(rowA);
         int b = Math.toIntExact(rowB);
         for (SparseArray<N> column : myColumns) {
-            double temp = column.doubleValue(a);
-            column.set(a, column.doubleValue(b));
-            column.set(b, temp);
+            column.exchange(a, b);
         }
     }
 

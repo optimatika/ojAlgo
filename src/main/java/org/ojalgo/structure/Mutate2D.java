@@ -87,7 +87,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
          * be the same as if the 'left' and 'right' matrices where expanded (repeated) so that all three where
          * of the same size, and then the operation was performed. The actual implementation may be more
          * efficient than that.
-         * 
+         *
          * @see https://se.mathworks.com/help/matlab/matlab_prog/compatible-array-sizes-for-basic-operations.html
          */
         default void fillCompatible(final Access2D<N> left, final BinaryFunction<N> operator, final Access2D<N> right) {
@@ -176,6 +176,42 @@ public interface Mutate2D extends Structure2D, Mutate1D {
     }
 
     interface Modifiable<N extends Comparable<N>> extends Structure2D, Mutate1D.Modifiable<N> {
+
+        @Override
+        default void add(final int index, final byte addend) {
+            int structure = this.getRowDim();
+            this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
+        }
+
+        @Override
+        default void add(final int index, final double addend) {
+            int structure = this.getRowDim();
+            this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
+        }
+
+        @Override
+        default void add(final int index, final float addend) {
+            int structure = this.getRowDim();
+            this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
+        }
+
+        @Override
+        default void add(final int index, final int addend) {
+            int structure = this.getRowDim();
+            this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
+        }
+
+        @Override
+        default void add(final int index, final long addend) {
+            int structure = this.getRowDim();
+            this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
+        }
+
+        @Override
+        default void add(final int index, final short addend) {
+            int structure = this.getRowDim();
+            this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
+        }
 
         @Override
         default void add(final long index, final byte addend) {
@@ -341,7 +377,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
         /**
          * The "compatible" part of the method name references MATLAB's terminology "Compatible Array Sizes".
          * Here the possible combinations are somewhat limited as 'this' is modified in-place.
-         * 
+         *
          * @see https://se.mathworks.com/help/matlab/matlab_prog/compatible-array-sizes-for-basic-operations.html
          */
         default void modifyCompatible(final Access2D<N> left, final BinaryFunction<N> operator) {

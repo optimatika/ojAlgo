@@ -33,7 +33,7 @@ import org.openjdk.jmh.runner.RunnerException;
 
 /**
  * <pre>
-# Run complete. Total time: 00:46:03
+# Run complete. Total time: 00:46:07
 
 REMEMBER: The numbers below are just data. To gain reusable insights, you need to follow up on
 why the numbers are the way they are. Use profilers (see -prof, -lprof), design factorial
@@ -41,57 +41,64 @@ experiments, perform baseline and negative tests that provide experimental contr
 the benchmarking environment is safe on JVM/OS/HW level, ask for reviews from the domain experts.
 Do not assume the numbers tell you what you want them to tell.
 
-Benchmark                    (density)  (dim)   Mode  Cnt     Score    Error  Units
-BenchmarkDecomposeLU.dense       0.005    500  thrpt    3    68.639 ± 27.708  ops/s
-BenchmarkDecomposeLU.dense       0.005   1000  thrpt    3    15.058 ±  1.300  ops/s
-BenchmarkDecomposeLU.dense       0.005   2000  thrpt    3     2.375 ±  0.156  ops/s
-BenchmarkDecomposeLU.dense        0.01    500  thrpt    3    68.311 ±  4.548  ops/s
-BenchmarkDecomposeLU.dense        0.01   1000  thrpt    3    14.936 ±  1.819  ops/s
-BenchmarkDecomposeLU.dense        0.01   2000  thrpt    3     2.288 ±  0.278  ops/s
-BenchmarkDecomposeLU.dense        0.02    500  thrpt    3    67.503 ±  2.879  ops/s
-BenchmarkDecomposeLU.dense        0.02   1000  thrpt    3    16.023 ±  1.422  ops/s
-BenchmarkDecomposeLU.dense        0.02   2000  thrpt    3     2.073 ±  1.379  ops/s
-BenchmarkDecomposeLU.raw         0.005    500  thrpt    3  2164.642 ± 57.630  ops/s
-BenchmarkDecomposeLU.raw         0.005   1000  thrpt    3    48.337 ± 11.419  ops/s
-BenchmarkDecomposeLU.raw         0.005   2000  thrpt    3     2.876 ±  0.581  ops/s
-BenchmarkDecomposeLU.raw          0.01    500  thrpt    3   386.084 ±  1.266  ops/s
-BenchmarkDecomposeLU.raw          0.01   1000  thrpt    3    23.168 ±  2.117  ops/s
-BenchmarkDecomposeLU.raw          0.01   2000  thrpt    3     2.013 ±  0.092  ops/s
-BenchmarkDecomposeLU.raw          0.02    500  thrpt    3   186.432 ±  4.092  ops/s
-BenchmarkDecomposeLU.raw          0.02   1000  thrpt    3    16.433 ±  3.751  ops/s
-BenchmarkDecomposeLU.raw          0.02   2000  thrpt    3     1.695 ±  0.208  ops/s
-BenchmarkDecomposeLU.sparse      0.005    500  thrpt    3   360.089 ±  3.198  ops/s
-BenchmarkDecomposeLU.sparse      0.005   1000  thrpt    3    12.464 ±  5.343  ops/s
-BenchmarkDecomposeLU.sparse      0.005   2000  thrpt    3     0.704 ±  0.121  ops/s
-BenchmarkDecomposeLU.sparse       0.01    500  thrpt    3    96.019 ±  1.470  ops/s
-BenchmarkDecomposeLU.sparse       0.01   1000  thrpt    3     5.875 ±  0.018  ops/s
-BenchmarkDecomposeLU.sparse       0.01   2000  thrpt    3     0.478 ±  0.067  ops/s
-BenchmarkDecomposeLU.sparse       0.02    500  thrpt    3    43.784 ±  3.590  ops/s
-BenchmarkDecomposeLU.sparse       0.02   1000  thrpt    3     4.334 ±  0.292  ops/s
-BenchmarkDecomposeLU.sparse       0.02   2000  thrpt    3     0.417 ±  0.007  ops/s
+Benchmark                    (density)  (dim)   Mode  Cnt     Score     Error  Units
+BenchmarkDecomposeLU.dense       0.005    500  thrpt    3    69.896 ±   0.863  ops/s
+BenchmarkDecomposeLU.dense       0.005   1000  thrpt    3    15.099 ±   0.493  ops/s
+BenchmarkDecomposeLU.dense       0.005   2000  thrpt    3     2.320 ±   0.316  ops/s
+BenchmarkDecomposeLU.dense        0.01    500  thrpt    3    68.774 ±   1.310  ops/s
+BenchmarkDecomposeLU.dense        0.01   1000  thrpt    3    16.232 ±   0.910  ops/s
+BenchmarkDecomposeLU.dense        0.01   2000  thrpt    3     2.278 ±   0.089  ops/s
+BenchmarkDecomposeLU.dense        0.02    500  thrpt    3    68.062 ±   6.053  ops/s
+BenchmarkDecomposeLU.dense        0.02   1000  thrpt    3    15.929 ±   1.324  ops/s
+BenchmarkDecomposeLU.dense        0.02   2000  thrpt    3     2.130 ±   0.064  ops/s
+BenchmarkDecomposeLU.raw         0.005    500  thrpt    3  2578.130 ± 151.817  ops/s
+BenchmarkDecomposeLU.raw         0.005   1000  thrpt    3    47.873 ±   6.020  ops/s
+BenchmarkDecomposeLU.raw         0.005   2000  thrpt    3     2.846 ±   0.079  ops/s
+BenchmarkDecomposeLU.raw          0.01    500  thrpt    3   347.626 ±   1.410  ops/s
+BenchmarkDecomposeLU.raw          0.01   1000  thrpt    3    24.648 ±   0.167  ops/s
+BenchmarkDecomposeLU.raw          0.01   2000  thrpt    3     2.024 ±   0.752  ops/s
+BenchmarkDecomposeLU.raw          0.02    500  thrpt    3   180.264 ±   0.879  ops/s
+BenchmarkDecomposeLU.raw          0.02   1000  thrpt    3    17.081 ±   0.058  ops/s
+BenchmarkDecomposeLU.raw          0.02   2000  thrpt    3     1.657 ±   0.032  ops/s
+BenchmarkDecomposeLU.sparse      0.005    500  thrpt    3   383.042 ±   2.270  ops/s
+BenchmarkDecomposeLU.sparse      0.005   1000  thrpt    3    12.545 ±   0.098  ops/s
+BenchmarkDecomposeLU.sparse      0.005   2000  thrpt    3     0.753 ±   0.007  ops/s
+BenchmarkDecomposeLU.sparse       0.01    500  thrpt    3    79.269 ±   1.839  ops/s
+BenchmarkDecomposeLU.sparse       0.01   1000  thrpt    3     5.747 ±   0.008  ops/s
+BenchmarkDecomposeLU.sparse       0.01   2000  thrpt    3     0.515 ±   0.010  ops/s
+BenchmarkDecomposeLU.sparse       0.02    500  thrpt    3    40.313 ±   0.123  ops/s
+BenchmarkDecomposeLU.sparse       0.02   1000  thrpt    3     4.194 ±   0.022  ops/s
+BenchmarkDecomposeLU.sparse       0.02   2000  thrpt    3     0.416 ±   0.027  ops/s
  * </pre>
  *
- * Partial/temporary: int indices in SparseArray
+ * Before:
  *
  * <pre>
-# Run complete. Total time: 00:15:45
-
-REMEMBER: The numbers below are just data. To gain reusable insights, you need to follow up on
-why the numbers are the way they are. Use profilers (see -prof, -lprof), design factorial
-experiments, perform baseline and negative tests that provide experimental control, make sure
-the benchmarking environment is safe on JVM/OS/HW level, ask for reviews from the domain experts.
-Do not assume the numbers tell you what you want them to tell.
-
 Benchmark                    (density)  (dim)   Mode  Cnt    Score   Error  Units
-BenchmarkDecomposeLU.sparse      0.005    500  thrpt    3  373.304 ± 2.486  ops/s
-BenchmarkDecomposeLU.sparse      0.005   1000  thrpt    3   11.757 ± 0.149  ops/s
-BenchmarkDecomposeLU.sparse      0.005   2000  thrpt    3    0.727 ± 0.018  ops/s
-BenchmarkDecomposeLU.sparse       0.01    500  thrpt    3   81.824 ± 0.307  ops/s
-BenchmarkDecomposeLU.sparse       0.01   1000  thrpt    3    5.619 ± 0.029  ops/s
-BenchmarkDecomposeLU.sparse       0.01   2000  thrpt    3    0.520 ± 0.016  ops/s
-BenchmarkDecomposeLU.sparse       0.02    500  thrpt    3   51.786 ± 1.594  ops/s
-BenchmarkDecomposeLU.sparse       0.02   1000  thrpt    3    4.093 ± 0.208  ops/s
-BenchmarkDecomposeLU.sparse       0.02   2000  thrpt    3    0.443 ± 0.011  ops/s
+BenchmarkDecomposeLU.sparse      0.005    500  thrpt    3  357.242 ± 2.529  ops/s
+BenchmarkDecomposeLU.sparse      0.005   1000  thrpt    3   12.148 ± 0.239  ops/s
+BenchmarkDecomposeLU.sparse      0.005   2000  thrpt    3    0.750 ± 0.015  ops/s
+BenchmarkDecomposeLU.sparse       0.01    500  thrpt    3   71.732 ± 4.215  ops/s
+BenchmarkDecomposeLU.sparse       0.01   1000  thrpt    3    5.790 ± 0.008  ops/s
+BenchmarkDecomposeLU.sparse       0.01   2000  thrpt    3    0.509 ± 0.021  ops/s
+BenchmarkDecomposeLU.sparse       0.02    500  thrpt    3   46.774 ± 4.869  ops/s
+BenchmarkDecomposeLU.sparse       0.02   1000  thrpt    3    4.149 ± 0.284  ops/s
+BenchmarkDecomposeLU.sparse       0.02   2000  thrpt    3    0.429 ± 0.037  ops/s
+ * </pre>
+ *
+ * After:
+ *
+ * <pre>
+Benchmark                    (density)  (dim)   Mode  Cnt    Score    Error  Units
+BenchmarkDecomposeLU.sparse      0.005    500  thrpt    3  670.441 ± 10.968  ops/s
+BenchmarkDecomposeLU.sparse      0.005   1000  thrpt    3   16.348 ±  0.064  ops/s
+BenchmarkDecomposeLU.sparse      0.005   2000  thrpt    3    0.850 ±  0.013  ops/s
+BenchmarkDecomposeLU.sparse       0.01    500  thrpt    3  117.709 ±  1.586  ops/s
+BenchmarkDecomposeLU.sparse       0.01   1000  thrpt    3    6.666 ±  0.040  ops/s
+BenchmarkDecomposeLU.sparse       0.01   2000  thrpt    3    0.612 ±  0.009  ops/s
+BenchmarkDecomposeLU.sparse       0.02    500  thrpt    3   52.653 ±  0.648  ops/s
+BenchmarkDecomposeLU.sparse       0.02   1000  thrpt    3    4.805 ±  0.195  ops/s
+BenchmarkDecomposeLU.sparse       0.02   2000  thrpt    3    0.519 ±  0.030  ops/s
  * </pre>
  */
 @State(Scope.Benchmark)

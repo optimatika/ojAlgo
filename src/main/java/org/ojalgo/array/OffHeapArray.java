@@ -84,6 +84,11 @@ public abstract class OffHeapArray extends DenseArray<Double> {
     }
 
     @Override
+    public final void add(final int index, final double addend) {
+        this.set(index, this.doubleValue(index) + addend);
+    }
+
+    @Override
     public final void add(final long index, final byte addend) {
         this.set(index, this.byteValue(index) + addend);
     }

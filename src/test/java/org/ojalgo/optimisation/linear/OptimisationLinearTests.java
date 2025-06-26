@@ -31,6 +31,13 @@ abstract class OptimisationLinearTests {
 
     static final boolean DEBUG = false;
 
+    // static final List<KeyValue<String, ExpressionsBasedModel.Integration<LinearSolver>>> INTEGRATIONS =
+    // List
+    // .of(KeyValue.of("Dual-Sparse", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+    // opt.linear().dual();
+    // opt.sparse = Boolean.TRUE;
+    // })));
+
     static final List<KeyValue<String, ExpressionsBasedModel.Integration<LinearSolver>>> INTEGRATIONS = List
             .of(KeyValue.of("Dual-Sparse", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
                 opt.linear().dual();

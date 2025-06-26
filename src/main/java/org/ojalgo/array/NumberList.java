@@ -53,11 +53,11 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
 
     public static final class ListFactory<N extends Comparable<N>> {
 
-        private final GrowthStrategy myGrowthStrategy;
+        private GrowthStrategy myGrowthStrategy;
         private final DenseArray.Factory<N, ?> myDenseFactory;
 
         ListFactory(final DenseArray.Factory<N, ?> denseFactory) {
-            myGrowthStrategy = new GrowthStrategy(denseFactory.getMathType());
+            myGrowthStrategy = GrowthStrategy.from(denseFactory.getMathType());
             myDenseFactory = denseFactory;
         }
 
@@ -68,7 +68,7 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
          * @return this
          */
         public ListFactory<N> chunk(final long chunk) {
-            myGrowthStrategy.chunk(chunk);
+            myGrowthStrategy = myGrowthStrategy.chunk(chunk);
             return this;
         }
 
@@ -77,12 +77,12 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
          * @return this
          */
         public ListFactory<N> initial(final long initial) {
-            myGrowthStrategy.initial(initial);
+            myGrowthStrategy = myGrowthStrategy.initial(initial);
             return this;
         }
 
         public NumberList<N> make() {
-            return new NumberList<>(myDenseFactory, this.myGrowthStrategy);
+            return new NumberList<>(myDenseFactory, myGrowthStrategy);
         }
 
         /**
@@ -92,7 +92,7 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
          * builder will enforce this for you.)
          */
         public ListFactory<N> segment(final long segment) {
-            myGrowthStrategy.segment(segment);
+            myGrowthStrategy = myGrowthStrategy.segment(segment);
             return this;
         }
 
