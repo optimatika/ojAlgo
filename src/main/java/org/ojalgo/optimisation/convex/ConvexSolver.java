@@ -301,8 +301,13 @@ public abstract class ConvexSolver extends GenericSolver {
 
             if (options.convex().isExtendedPrecision()) {
 
-                ConvexData<Quadruple> data = this.getConvexData(GenericStore.R128);
-                return new IterativeRefinementSolver(options, data);
+                if(options.experimental){
+                    ConvexData<Double> data = this.getConvexData(R064Store.FACTORY);
+                    return new IterativeRefinementSolverDouble(options, data);
+                }else{
+                    ConvexData<Quadruple> data = this.getConvexData(GenericStore.R128);
+                    return new IterativeRefinementSolver(options, data);
+                }
 
             } else {
 
@@ -358,6 +363,7 @@ public abstract class ConvexSolver extends GenericSolver {
 
     public static final class Configuration {
 
+        public boolean combinedScaleFactor = true;
         private boolean myExtendedPrecision = false;
         private NumberContext myIterative = NumberContext.of(10, 14).withMode(RoundingMode.HALF_DOWN);
         private double mySmallDiagonal = RELATIVELY_SMALL + MACHINE_EPSILON;
