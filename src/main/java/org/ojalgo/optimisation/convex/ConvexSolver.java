@@ -32,6 +32,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.ojalgo.array.ArrayR064;
+import org.ojalgo.array.ArrayR256;
+import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.matrix.decomposition.Cholesky;
@@ -371,6 +373,9 @@ public abstract class ConvexSolver extends GenericSolver {
          * bounds (modelled as inequality constraints).
          * <p>
          * This is an experimental feature!
+         * <p>
+         * Setting this to true you should most likely also set the {@link Optimisation.Options#solution} to
+         * something matching that allows for higher precision.
          */
         public Configuration extendedPrecision(final boolean extendedPrecision) {
             myExtendedPrecision = extendedPrecision;
@@ -488,12 +493,18 @@ public abstract class ConvexSolver extends GenericSolver {
             int nbFreeVars = freeVariables.size();
             int nbModelVars = model.countVariables();
 
-            ArrayR064 modelSolution = ArrayR064.make(nbModelVars);
-
-            for (int i = 0; i < nbFreeVars; i++) {
-                modelSolution.set(model.indexOf(freeVariables.get(i)), solverState.doubleValue(i));
+            BasicArray<?> modelSolution;
+            if (model.options.convex().isExtendedPrecision()) {
+                modelSolution = ArrayR256.make(nbModelVars);
+                for (int i = 0; i < nbFreeVars; i++) {
+                    modelSolution.set(model.indexOf(freeVariables.get(i)), solverState.get(i));
+                }
+            } else {
+                modelSolution = ArrayR064.make(nbModelVars);
+                for (int i = 0; i < nbFreeVars; i++) {
+                    modelSolution.set(model.indexOf(freeVariables.get(i)), solverState.doubleValue(i));
+                }
             }
-
             for (IntIndex fixed : fixedVariables) {
                 modelSolution.set(fixed.index, model.getVariable(fixed.index).getValue());
             }

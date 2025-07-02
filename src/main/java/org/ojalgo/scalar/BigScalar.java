@@ -156,7 +156,7 @@ public final class BigScalar implements Scalar<BigDecimal>, Enforceable<BigScala
 
     @Override
     public BigScalar divide(final BigDecimal arg) {
-        return new BigScalar(myNumber.divide(arg, BigScalar.CONTEXT.getMathContext()));
+        return new BigScalar(BigMath.DIVIDE.invoke(myNumber, arg));
     }
 
     @Override
@@ -233,6 +233,11 @@ public final class BigScalar implements Scalar<BigDecimal>, Enforceable<BigScala
     @Override
     public boolean isSmall(final double comparedTo) {
         return BigScalar.CONTEXT.isSmall(comparedTo, this.doubleValue());
+    }
+
+    @Override
+    public boolean isZero() {
+        return myNumber.compareTo(BigMath.ZERO) == 0;
     }
 
     @Override

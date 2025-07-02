@@ -312,7 +312,7 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
 
         myPatchedQ = false;
         myZeroQ = false;
-        if (!mySolverQ.compute(matrixQ)) {
+        if (!mySolverQ.isComputed() && !mySolverQ.compute(matrixQ)) {
             double largest = matrixQ.aggregateAll(Aggregator.LARGEST).doubleValue();
             double small = options.convex().smallDiagonal();
             if (largest > small) {
@@ -411,6 +411,13 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
 
     boolean isZeroQ() {
         return myZeroQ;
+    }
+
+    /**
+     * Specifically for use by {@link IterativeRefinementSolver2}
+     */
+    void update(final Access1D<?> mtrxC, final Access1D<?> mtrxBE, final Access1D<?> mtrxBI) {
+        myMatrices.update(mtrxC, mtrxBE, mtrxBI);
     }
 
 }

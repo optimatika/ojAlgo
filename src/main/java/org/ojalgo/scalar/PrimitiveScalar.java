@@ -224,6 +224,11 @@ public final class PrimitiveScalar implements Scalar<Double>, Enforceable<Primit
     }
 
     @Override
+    public boolean isZero() {
+        return myValue == PrimitiveMath.ZERO;
+    }
+
+    @Override
     public long longValue() {
         return (long) myValue;
     }

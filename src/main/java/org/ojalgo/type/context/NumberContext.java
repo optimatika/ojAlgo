@@ -180,7 +180,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         myMathContext = math;
 
         if (math.getPrecision() > 0) {
-            myRelativeError = Math.max(PrimitiveMath.MACHINE_EPSILON, Math.pow(PrimitiveMath.TEN, 1 - math.getPrecision()));
+            myRelativeError = Math.pow(PrimitiveMath.TEN, 1 - math.getPrecision());
         } else {
             myRelativeError = PrimitiveMath.MACHINE_EPSILON;
         }
@@ -188,7 +188,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         myScale = scale;
 
         if (scale > Integer.MIN_VALUE) {
-            myAbsoluteError = Math.max(PrimitiveMath.MACHINE_SMALLEST, PrimitiveMath.HALF * Math.pow(PrimitiveMath.TEN, -scale));
+            myAbsoluteError = PrimitiveMath.HALF * Math.pow(PrimitiveMath.TEN, -scale);
             myRoundingFactor = MissingMath.power(PrimitiveMath.TEN, scale);
         } else {
             myAbsoluteError = PrimitiveMath.MACHINE_SMALLEST;

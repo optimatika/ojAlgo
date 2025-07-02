@@ -115,7 +115,7 @@ public abstract class IterativeSolverTask implements SolverTask<Double> {
 
     }
 
-    static final NumberContext DEFAULT = NumberContext.ofMath(MathContext.DECIMAL128);
+    static final NumberContext DEFAULT = NumberContext.ofMath(MathContext.DECIMAL64);
 
     static List<Equation> toListOfRows(final Access2D<?> body, final Access2D<?> rhs) {
 

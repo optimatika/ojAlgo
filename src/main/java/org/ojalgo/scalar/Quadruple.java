@@ -97,9 +97,6 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
      */
     private static final double SPLIT = 134217729.0;
 
-    static final MathContext MATH_CONTEXT = MathContext.DECIMAL128;
-    static final NumberContext NUMBER_CONTEXT = NumberContext.ofMath(MATH_CONTEXT);
-
     public static boolean isAbsolute(final Quadruple value) {
         return value.isAbsolute();
     }
@@ -152,7 +149,16 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
     }
 
     public static Quadruple valueOf(final double value) {
-        return new Quadruple(value);
+
+        if (!Double.isFinite(value)) {
+            return new Quadruple(value);
+        }
+
+        double scaled = value * SPLIT;
+        double base = scaled - (scaled - value);
+        double remainder = value - base;
+
+        return new Quadruple(base, remainder);
     }
 
     /**
@@ -165,48 +171,6 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
         t1 = base1 + base2;
         e = t1 - base1;
         t2 = base2 - e + (base1 - (t1 - e)) + remainder1 + remainder2;
-
-        double base = t1 + t2;
-        double remainder = t2 - (base - t1);
-
-        return new Quadruple(base, remainder);
-    }
-
-    private static Quadruple divide(final Quadruple arg1, final Quadruple arg2) {
-
-        // TODO How to do this with only primitive double – same as multiply
-
-        BigDecimal decimal1 = arg1.toBigDecimal();
-        BigDecimal decimal2 = arg2.toBigDecimal();
-
-        BigDecimal quotient = MissingMath.divide(decimal1, decimal2);
-
-        return Quadruple.valueOf(quotient);
-    }
-
-    /**
-     * https://blog.cyclemap.link/2011-06-09-glsl-part2-emu/
-     */
-    private static Quadruple multiply(final double base1, final double remainder1, final double base2, final double remainder2) {
-
-        double c11, c21, c2, e, t1, t2;
-        double a1, a2, b1, b2, cona, conb;
-
-        cona = base1 * SPLIT;
-        conb = base2 * SPLIT;
-        a1 = cona - (cona - base1);
-        b1 = conb - (conb - base2);
-        a2 = base1 - a1;
-        b2 = base2 - b1;
-
-        c11 = base1 * base2;
-        c21 = a2 * b2 + (a2 * b1 + (a1 * b2 + (a1 * b1 - c11)));
-
-        c2 = base1 * remainder2 + remainder1 * base2;
-
-        t1 = c11 + c2;
-        e = t1 - c11;
-        t2 = remainder1 * remainder2 + (c2 - e + (c11 - (t1 - e))) + c21;
 
         double base = t1 + t2;
         double remainder = t2 - (base - t1);
@@ -254,6 +218,48 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
         return new Quadruple(base, remainder);
     }
 
+    private static Quadruple divide(final Quadruple arg1, final Quadruple arg2) {
+
+        // TODO How to do this with only primitive double – same as multiply
+
+        BigDecimal decimal1 = arg1.toBigDecimal();
+        BigDecimal decimal2 = arg2.toBigDecimal();
+
+        BigDecimal quotient = MissingMath.divide(decimal1, decimal2);
+
+        return Quadruple.valueOf(quotient);
+    }
+
+    /**
+     * https://blog.cyclemap.link/2011-06-09-glsl-part2-emu/
+     */
+    private static Quadruple multiply(final double base1, final double remainder1, final double base2, final double remainder2) {
+
+        double c11, c21, c2, e, t1, t2;
+        double a1, a2, b1, b2, cona, conb;
+
+        cona = base1 * SPLIT;
+        conb = base2 * SPLIT;
+        a1 = cona - (cona - base1);
+        b1 = conb - (conb - base2);
+        a2 = base1 - a1;
+        b2 = base2 - b1;
+
+        c11 = base1 * base2;
+        c21 = a2 * b2 + (a2 * b1 + (a1 * b2 + (a1 * b1 - c11)));
+
+        c2 = base1 * remainder2 + remainder1 * base2;
+
+        t1 = c11 + c2;
+        e = t1 - c11;
+        t2 = remainder1 * remainder2 + (c2 - e + (c11 - (t1 - e))) + c21;
+
+        double base = t1 + t2;
+        double remainder = t2 - (base - t1);
+
+        return new Quadruple(base, remainder);
+    }
+
     private final double myBase;
     private transient BigDecimal myDecimal = null;
     private final double myRemainder;
@@ -276,7 +282,12 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
 
     @Override
     public Quadruple add(final double arg) {
-        return new Quadruple(myBase + arg, myRemainder);
+
+        double scaled = arg * SPLIT;
+        double base = scaled - (scaled - arg);
+        double remainder = arg - base;
+
+        return Quadruple.add(myBase, myRemainder, base, remainder);
     }
 
     @Override
@@ -315,7 +326,12 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
 
     @Override
     public Quadruple divide(final double arg) {
-        return this.divide(Quadruple.valueOf(arg));
+
+        double scaled = arg * SPLIT;
+        double base = scaled - (scaled - arg);
+        double remainder = arg - base;
+
+        return Quadruple.divide(myBase, myRemainder, base, remainder);
     }
 
     @Override
@@ -325,7 +341,7 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
             return NaN;
         }
 
-        //   return Quadruple.divide(this, arg);
+        // return Quadruple.divide(this, arg);
 
         double base1 = this.getBase();
         double remainder1 = this.getRemainder();
@@ -404,13 +420,23 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
     }
 
     @Override
+    public boolean isZero() {
+        return myBase == PrimitiveMath.ZERO && myRemainder == PrimitiveMath.ZERO;
+    }
+
+    @Override
     public long longValue() {
         return Math.round(myBase + myRemainder);
     }
 
     @Override
     public Quadruple multiply(final double arg) {
-        return Quadruple.multiply(myBase, myRemainder, arg, 0.0);
+
+        double scaled = arg * SPLIT;
+        double base = scaled - (scaled - arg);
+        double remainder = arg - base;
+
+        return Quadruple.multiply(myBase, myRemainder, base, remainder);
     }
 
     @Override
@@ -468,7 +494,12 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
 
     @Override
     public Quadruple subtract(final double arg) {
-        return new Quadruple(myBase - arg, myRemainder);
+
+        double scaled = arg * SPLIT;
+        double base = scaled - (scaled - arg);
+        double remainder = arg - base;
+
+        return Quadruple.add(myBase, myRemainder, -base, -remainder);
     }
 
     @Override
@@ -498,14 +529,14 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
     @Override
     public BigDecimal toBigDecimal() {
         if (myDecimal == null) {
-            myDecimal = this.toBigDecimal(MATH_CONTEXT);
+            myDecimal = this.toBigDecimal(BigScalar.CONTEXT.getMathContext());
         }
         return myDecimal;
     }
 
     @Override
     public String toString() {
-        return "Quadruple [" + myBase + " + " + myRemainder + "]";
+        return this.toBigDecimal().toString();
     }
 
     @Override

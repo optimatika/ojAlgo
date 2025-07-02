@@ -162,7 +162,7 @@ public final class ComplexNumber
     /**
      * Static factory method returning a complex number from polar coordinates
      *
-     * @param norm the complex number's norm
+     * @param norm  the complex number's norm
      * @param phase the complex number's phase
      * @return a complex number
      */
@@ -226,7 +226,7 @@ public final class ComplexNumber
     /**
      * Static factory method returning a complex number from cartesian coordinates.
      *
-     * @param real the complex number's real part
+     * @param real      the complex number's real part
      * @param imaginary the complex number's imaginary part
      * @return a complex number
      */
@@ -411,16 +411,16 @@ public final class ComplexNumber
     @Override
     public double doubleValue(final int index) {
         switch (index) {
-            case 0:
-                return myRealValue;
-            case 1:
-                return i;
-            case 2:
-                return -i;
-            case 3:
-                return myRealValue;
-            default:
-                throw new ArrayIndexOutOfBoundsException();
+        case 0:
+            return myRealValue;
+        case 1:
+            return i;
+        case 2:
+            return -i;
+        case 3:
+            return myRealValue;
+        default:
+            throw new ArrayIndexOutOfBoundsException();
         }
     }
 
@@ -552,6 +552,11 @@ public final class ComplexNumber
     @Override
     public boolean isSmall(final double comparedTo) {
         return PrimitiveScalar.CONTEXT.isSmall(comparedTo, this.norm());
+    }
+
+    @Override
+    public boolean isZero() {
+        return myRealValue == PrimitiveMath.ZERO && i == PrimitiveMath.ZERO;
     }
 
     @Override

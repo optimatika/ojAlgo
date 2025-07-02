@@ -180,6 +180,11 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> implements SelfDec
     }
 
     @Override
+    public final boolean isZero() {
+        return myNumerator == 0L;
+    }
+
+    @Override
     public final long longValue() {
         return this.toBigDecimal().longValue();
     }

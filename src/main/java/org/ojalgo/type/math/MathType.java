@@ -68,16 +68,22 @@ public enum MathType {
     Q128(NumberSet.Q, 2, JavaType.LONG),
     /**
      * Real Number: float
+     * <p>
+     * Number of decimal digits: ~7.22
      */
     R032(NumberSet.R, 1, JavaType.FLOAT),
     /**
      * Real Number: double
+     * <p>
+     * Number of decimal digits: ~15.95
      */
     R064(NumberSet.R, 1, JavaType.DOUBLE),
     /**
      * Real Number: 2 * double
      * <p>
      * Quadruple precision emulated using a pair of double precision numbers
+     * <p>
+     * Number of decimal digits: ~34.02
      */
     R128(NumberSet.R, 2, JavaType.DOUBLE),
     /**
@@ -85,6 +91,8 @@ public enum MathType {
      * <p>
      * Refer to it as "256" since (the way it's used in ojAlgo) it roughly corresponds to binary 256 octuple
      * precision.
+     * <p>
+     * Number of decimal digits: ~71.34
      */
     R256(NumberSet.R, 1, JavaType.REFERENCE),
     /**

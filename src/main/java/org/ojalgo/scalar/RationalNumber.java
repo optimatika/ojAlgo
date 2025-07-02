@@ -177,10 +177,12 @@ public final class RationalNumber implements SelfDeclaringScalar<RationalNumber>
                 retDenom = retDenom.shiftRight(shift);
             }
 
-            //                final BigDecimal recreated = BigFunction.DIVIDE.invoke(new BigDecimal(retNumer), new BigDecimal(retDenom));
-            //                if (recreated.plus(MathContext.DECIMAL32).compareTo(tmpBigDecimal.plus(MathContext.DECIMAL32)) != 0) {
-            //                    BasicLogger.debug("{} != {}", tmpBigDecimal, recreated);
-            //                }
+            // final BigDecimal recreated = BigFunction.DIVIDE.invoke(new BigDecimal(retNumer), new
+            // BigDecimal(retDenom));
+            // if (recreated.plus(MathContext.DECIMAL32).compareTo(tmpBigDecimal.plus(MathContext.DECIMAL32))
+            // != 0) {
+            // BasicLogger.debug("{} != {}", tmpBigDecimal, recreated);
+            // }
 
             return new RationalNumber(retNumer.longValue(), retDenom.longValue());
         }
@@ -202,7 +204,8 @@ public final class RationalNumber implements SelfDeclaringScalar<RationalNumber>
         final int s = ((bits >> 63) == 0) ? 1 : -1;
         final int e = (int) ((bits >> 52) & 0x7ffL);
         long m = (e == 0) ? (bits & 0xfffffffffffffL) << 1 : (bits & 0xfffffffffffffL) | 0x10000000000000L;
-        // Now we're looking for s * m * 2^{e - 1075}, 1075 being bias of 1023 plus 52 positions of binary fraction
+        // Now we're looking for s * m * 2^{e - 1075}, 1075 being bias of 1023 plus 52 positions of binary
+        // fraction
 
         int exponent = e - 1075;
 
@@ -214,7 +217,8 @@ public final class RationalNumber implements SelfDeclaringScalar<RationalNumber>
             return new RationalNumber(s * numerator, 1L);
         }
 
-        // Since denominator is a power of 2, GCD can only be power of two, so we simplify by dividing by 2 repeatedly
+        // Since denominator is a power of 2, GCD can only be power of two, so we simplify by dividing by 2
+        // repeatedly
         while (((m & 1) == 0) && (exponent < 0)) {
             m >>= 1;
             exponent++;
@@ -496,12 +500,12 @@ public final class RationalNumber implements SelfDeclaringScalar<RationalNumber>
     public double doubleValue() {
         if (myDenominator == 0L) {
             switch (Long.compare(myNumerator, 0L)) {
-                case 1:
-                    return Double.POSITIVE_INFINITY;
-                case -1:
-                    return Double.NEGATIVE_INFINITY;
-                default:
-                    return Double.NaN;
+            case 1:
+                return Double.POSITIVE_INFINITY;
+            case -1:
+                return Double.NEGATIVE_INFINITY;
+            default:
+                return Double.NaN;
             }
         }
         return this.toBigDecimal().doubleValue();
@@ -563,6 +567,11 @@ public final class RationalNumber implements SelfDeclaringScalar<RationalNumber>
     @Override
     public boolean isSmall(final double comparedTo) {
         return BigScalar.CONTEXT.isSmall(comparedTo, this.doubleValue());
+    }
+
+    @Override
+    public boolean isZero() {
+        return myNumerator == 0L && myDenominator != 0L;
     }
 
     @Override

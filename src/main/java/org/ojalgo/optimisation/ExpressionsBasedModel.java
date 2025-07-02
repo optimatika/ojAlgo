@@ -213,7 +213,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
          * supplied index.
          *
          * @param ids Index of solver slack variable (If there are 3 slack variables this input argument
-         *        should be in the range [0.2].)
+         *            should be in the range [0.2].)
          */
         EntryPair<ModelEntity<?>, ConstraintType> getSlack(int ids);
 
@@ -441,7 +441,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
         /**
          * @param originalModel Baseline model.
-         * @param integration The integration used to translate between model and solver state.
+         * @param integration   The integration used to translate between model and solver state.
          * @param knownSolution Not just any feasible solution. It needs to be the optimal solution.
          */
         Validator(final ExpressionsBasedModel originalModel, final Optimisation.Integration<ExpressionsBasedModel, ?> integration, final Result knownSolution,
@@ -765,12 +765,10 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             } else {
                 return model.countVariables() > 50 || model.countExpressions() > 40;
             }
+        } else if (qp) {
+            return model.countVariables() > 200 || model.countExpressions() > 200;
         } else {
-            if (qp) {
-                return model.countVariables() > 200 || model.countExpressions() > 200;
-            } else {
-                return model.countVariables() > 500 || model.countExpressions() > 400;
-            }
+            return model.countVariables() > 500 || model.countExpressions() > 400;
         }
     }
 
@@ -792,12 +790,12 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     public static ExpressionsBasedModel parse(final InputStream input, final FileFormat format) {
         switch (format) {
-            case MPS:
-                return FileFormatMPS.read(input);
-            case EBM:
-                return FileFormatEBM.read(input);
-            default:
-                throw new IllegalArgumentException();
+        case MPS:
+            return FileFormatMPS.read(input);
+        case EBM:
+            return FileFormatEBM.read(input);
+        default:
+            throw new IllegalArgumentException();
         }
     }
 
@@ -943,9 +941,9 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      * </ol>
      *
      * @param orderedSet The set members in correct order. Each of these variables must be binary.
-     * @param min The minimum number of binary varibales in the set that must be "ON" (Set this to 0 if there
-     *        is no minimum.)
-     * @param max The SOS type or maximum number of binary varibales in the set that may be "ON"
+     * @param min        The minimum number of binary varibales in the set that must be "ON" (Set this to 0 if
+     *                   there is no minimum.)
+     * @param max        The SOS type or maximum number of binary varibales in the set that may be "ON"
      */
     public void addSpecialOrderedSet(final Collection<Variable> orderedSet, final int min, final int max) {
 
@@ -1427,7 +1425,8 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             if (tmpExpression.isObjective()) {
 
                 BigDecimal tmpContributionWeight = tmpExpression.getContributionWeight();
-                boolean tmpNotOne = tmpContributionWeight.compareTo(ONE) != 0; // To avoid multiplication by 1.0
+                boolean tmpNotOne = tmpContributionWeight.compareTo(ONE) != 0; // To avoid multiplication by
+                                                                               // 1.0
 
                 if (tmpExpression.isAnyLinearFactorNonZero()) {
                     for (IntIndex tmpKey : tmpExpression.getLinearKeySet()) {
@@ -1492,9 +1491,9 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     /**
      * @param soft If true the integer variables are still identified as such, but the model is flagged as
-     *        non-integer (will not use the {@link IntegerSolver}, but presolve and validation may still
-     *        recognise the variables' integer property). If false the integer property of any/all variables
-     *        are removed.
+     *             non-integer (will not use the {@link IntegerSolver}, but presolve and validation may still
+     *             recognise the variables' integer property). If false the integer property of any/all
+     *             variables are removed.
      */
     public void relax(final boolean soft) {
         if (soft) {
@@ -1522,7 +1521,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      * For test/validation during solver development.
      *
      * @param knownSolution The optimal solution
-     * @param handler What to do if validation fails
+     * @param handler       What to do if validation fails
      */
     public void setKnownSolution(final Optimisation.Result knownSolution, final BiConsumer<ExpressionsBasedModel, Access1D<BigDecimal>> handler) {
         Objects.requireNonNull(knownSolution);
@@ -1705,7 +1704,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             for (int i = 0, limit = myVariables.size(); i < limit; i++) {
                 Variable tmpVariable = myVariables.get(i);
                 if (!tmpVariable.isFixed()) {
-                    tmpVariable.setValue(options.solution.toBigDecimal(result.doubleValue(i)));
+                    tmpVariable.setValue(options.solution.enforce(result.get(i)));
                 }
             }
         }
@@ -1884,7 +1883,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     void presolve() {
 
-        //  myExpressions.values().forEach(expr -> expr.reset());
+        // myExpressions.values().forEach(expr -> expr.reset());
 
         boolean needToRepeat = false;
 

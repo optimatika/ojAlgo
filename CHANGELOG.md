@@ -17,12 +17,26 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - New `MatrixStore`:s compressed sparse column (CSC) and compressed sparse row (CSR) implementations named `R064CSC` and `R064CSR` (primitive double, R064, only). Any/all of the previously existing sparse `MatrixStore` implementations `SparseStore`, `RowsSupplier` and `ColumnsSupplier` can be converted to either of these new formats.
 
+#### org.ojalgo.scalar
+
+- The `Scalar` interface now defines a `isZero()` method.
+
 ### Changed
 
 #### org.ojalgo.array
 
 - Refactored the constructors, factories and builders for the classes in the `org.ojalgo.array` package. Most things should work as before, but the generics signature of `DenseArray.Factory` has changed. Instead of `DenseArray.Factory<ELEMENT_TYPE>` it is now `DenseArray.Factory<ELEMENT_TYPE, ARRAY_TYPE>`. What you may want to do is to instead use a subclass like `PrimitiveArray.Factory`.
 - `SparseArray` is now restricted to `Integer#MAX_VALUE` size (used to be `Long#MAX_VALUE`). There's been a number of changes internally in order to make it perform better at smaller sizes. Also added a bunch of new stuff to support sparse functionality in the `org.ojalgo.matrix` package.
+
+#### org.ojalgo.type
+
+- The relative error (epsilon) derived from the precision of a `NumberContext` was previously never smaller than the machine epsilon. Now it can be arbitrarily small depending only on the specified precision.
+
+### Fixed
+
+#### org.ojalgo.optimisation
+
+- When using extended precision with the `ConvexSolver` there was a problem when extracting the solution. The solver uses `Quadruple` and in the end the solution is using `BigDecimal` but at an intermediate step it was converted to `double`.
 
 ## [55.2.0] – 2025-04-25
 

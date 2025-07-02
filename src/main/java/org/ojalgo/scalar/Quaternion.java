@@ -135,7 +135,7 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
             tmpAngle += PrimitiveMath.TWO_PI;
         }
 
-        //  BasicLogger.debug("Koordinater: {} {} {}", norm, Arrays.toString(unitVector), phase);
+        // BasicLogger.debug("Koordinater: {} {} {}", norm, Arrays.toString(unitVector), phase);
 
         if (tmpAngle <= ARGUMENT_TOLERANCE) {
 
@@ -172,27 +172,38 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
     }
 
     /**
-     * Create a {@link Quaternion} that captures a rotation about the provided axis by the provided
-     * angle.
+     * Create a {@link Quaternion} that captures a rotation about the provided axis by the provided angle.
      * <p>
      * The quaternion representation of the rotation may be expressed as:
-     * <pre>q = cos(θ / 2) + sin(θ / 2) * (ub * i + uc * j + ud * k)</pre>
-     * where θ is the angle of rotation and <pre>[ub, uc, ud]</pre> is the axis of rotation.  This
-     * method accepts a single axis, so only a single imaginary component is populated.
+     *
+     * <pre>
+     * q = cos(θ / 2) + sin(θ / 2) * (ub * i + uc * j + ud * k)
+     * </pre>
+     *
+     * where θ is the angle of rotation and
+     *
+     * <pre>
+     * [ub, uc, ud]
+     * </pre>
+     *
+     * is the axis of rotation. This method accepts a single axis, so only a single imaginary component is
+     * populated.
      * <p>
      * To rotate in multiple axes, multiply multiple quaternions:
+     *
      * <pre>{@code
      * Quaternion xRotation = Quaternion.makeRotation(RotationAxis.X, Math.toRadians(-3));
      * Quaternion yRotation = Quaternion.makeRotation(RotationAxis.Y, Math.toRadians(2));
      * Quaternion zRotation = Quaternion.makeRotation(RotationAxis.Z, Math.toRadians(45));
      * Quaternion zyxRotation = zRotation.multiply(yRotation).multiply(xRotation);
      * }</pre>
+     *
      * This creates a rotation in ZYX order.
      *
      * @param axis  the axis to rotate about, non-null
      * @param angle the angle, in radians to rotate about the axis
      * @return the quaternion
-     */    
+     */
     public static Quaternion makeRotation(final RotationAxis axis, final double angle) {
 
         final double tmpHalfAngle = PrimitiveMath.DIVIDE.invoke(angle, 2);
@@ -204,24 +215,24 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
         switch (axis) {
 
-            case X:
+        case X:
 
-                tmpI = PrimitiveMath.SIN.invoke(tmpHalfAngle);
-                break;
+            tmpI = PrimitiveMath.SIN.invoke(tmpHalfAngle);
+            break;
 
-            case Y:
+        case Y:
 
-                tmpJ = PrimitiveMath.SIN.invoke(tmpHalfAngle);
-                break;
+            tmpJ = PrimitiveMath.SIN.invoke(tmpHalfAngle);
+            break;
 
-            case Z:
+        case Z:
 
-                tmpK = PrimitiveMath.SIN.invoke(tmpHalfAngle);
-                break;
+            tmpK = PrimitiveMath.SIN.invoke(tmpHalfAngle);
+            break;
 
-            default:
+        default:
 
-                throw new ProgrammingError("How could this happen?");
+            throw new ProgrammingError("How could this happen?");
         }
 
         return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
@@ -473,40 +484,40 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
     @Override
     public double doubleValue(final int index) {
         switch (index) {
-            case 0:
-                return myScalar;
-            case 1:
-                return i;
-            case 2:
-                return j;
-            case 3:
-                return k;
-            case 4:
-                return -i;
-            case 5:
-                return myScalar;
-            case 6:
-                return k;
-            case 7:
-                return -j;
-            case 8:
-                return -j;
-            case 9:
-                return -k;
-            case 10:
-                return myScalar;
-            case 11:
-                return i;
-            case 12:
-                return -k;
-            case 13:
-                return j;
-            case 14:
-                return -i;
-            case 15:
-                return myScalar;
-            default:
-                throw new ArrayIndexOutOfBoundsException();
+        case 0:
+            return myScalar;
+        case 1:
+            return i;
+        case 2:
+            return j;
+        case 3:
+            return k;
+        case 4:
+            return -i;
+        case 5:
+            return myScalar;
+        case 6:
+            return k;
+        case 7:
+            return -j;
+        case 8:
+            return -j;
+        case 9:
+            return -k;
+        case 10:
+            return myScalar;
+        case 11:
+            return i;
+        case 12:
+            return -k;
+        case 13:
+            return j;
+        case 14:
+            return -i;
+        case 15:
+            return myScalar;
+        default:
+            throw new ArrayIndexOutOfBoundsException();
         }
     }
 
@@ -652,6 +663,11 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
     @Override
     public boolean isSmall(final double comparedTo) {
         return PrimitiveScalar.CONTEXT.isSmall(comparedTo, this.norm());
+    }
+
+    @Override
+    public boolean isZero() {
+        return myScalar == PrimitiveMath.ZERO && i == PrimitiveMath.ZERO && j == PrimitiveMath.ZERO && k == PrimitiveMath.ZERO;
     }
 
     @Override

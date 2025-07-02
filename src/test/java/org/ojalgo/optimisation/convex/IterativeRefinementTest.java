@@ -29,10 +29,9 @@ import org.ojalgo.type.context.NumberContext;
 
 public class IterativeRefinementTest extends OptimisationConvexTests {
 
+    private static final PrimitiveFunction.Binary DIVIDE_SAFE = (arg1, arg2) -> Math.abs(arg2) < 1e-6 ? 0 : arg1 / arg2;
     private static final NumberContext HIGH_ACCURACY = NumberContext.of(9);
     private static final Factory<RationalNumber, GenericStore<RationalNumber>> Q128 = GenericStore.Q128;
-
-    public static final PrimitiveFunction.Binary DIVIDE_SAFE = (arg1, arg2) -> Math.abs(arg2) < 1e-6 ? 0 : arg1 / arg2;
 
     private static void doReimplementExample4(final boolean step1AsInExample) {
 
@@ -43,7 +42,8 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
             mtrxQ.set(1, 1, RationalNumber.ONE);
 
             GenericStore<RationalNumber> mtrxC = Q128.make(2, 1);
-            mtrxC.set(0, RationalNumber.ONE.negate()); // C-matrix negated to suit ojAlgo (simplify KKT system)
+            mtrxC.set(0, RationalNumber.ONE.negate()); // C-matrix negated to suit ojAlgo (simplify KKT
+                                                       // system)
             mtrxC.set(1, RationalNumber.parse("1.000001").negate());
 
             GenericStore<RationalNumber> mtrxAE = Q128.make(1, 2);
@@ -64,7 +64,8 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
              */
 
             GenericStore<RationalNumber> mtrxX = Q128.make(2, 1); // All zero primal solution
-            GenericStore<RationalNumber> mtrxL = Q128.make(1, 1); // Dual variable / Lagrange multiplier for the equality constraint == 1.0
+            GenericStore<RationalNumber> mtrxL = Q128.make(1, 1); // Dual variable / Lagrange multiplier for
+                                                                  // the equality constraint == 1.0
             mtrxL.set(0, RationalNumber.ONE);
 
             /*
@@ -217,6 +218,101 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
         double relativeComplementarySlackness = Math.max(relativeComplementarySlackness1, relativeComplementarySlackness2 * relativeComplementarySlackness2);
         Quadruple objectiveValue = Q.multiplyBoth(x).divide(2).subtract(x.transpose().multiply(C).get(0));
         return Math.max(relativeComplementarySlackness, Math.max(maxPrimalResidual, relativeGradientResidual));
+    }
+
+    /**
+     * Similar to {@link #testHighPrecisionObjective()} but the tiny offsets are enforced by constraints
+     * rather than required by the objective function.
+     */
+    @Test
+    public void testHighPrecisionConstraints() {
+
+        NumberContext accuracy = NumberContext.of(24);
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+        model.options.convex().extendedPrecision(true);
+        model.options.solution = accuracy; // Set high precision for solution
+
+        BigDecimal[] expectedSolution = { new BigDecimal("1.00000000000000000001"), new BigDecimal("0.99999999999999999999"),
+                new BigDecimal("2.00000000000000000002"), new BigDecimal("1.99999999999999999998"), new BigDecimal("0.500000000000000000005") };
+
+        Variable var0 = model.newVariable("x0").weight(BigMath.NEG).lower(expectedSolution[0]);
+        Variable var1 = model.newVariable("x1").weight(BigMath.NEG).upper(expectedSolution[1]);
+        Variable var2 = model.newVariable("x2").weight(BigMath.NEG).lower(expectedSolution[2]);
+        Variable var3 = model.newVariable("x3").weight(BigMath.NEG).upper(expectedSolution[3]);
+        Variable var4 = model.newVariable("x4").weight(expectedSolution[4].negate());
+
+        model.newExpression("Q").weight(BigMath.HALF).set(var0, var0, BigMath.ONE).set(var1, var1, BigMath.ONE).set(var2, var2, BigMath.ONE)
+                .set(var3, var3, BigMath.ONE).set(var4, var4, BigMath.ONE);
+
+        model.newExpression("1+1").set(var0, BigMath.ONE).set(var1, BigMath.ONE).level(BigMath.TWO);
+        model.newExpression("2+2").set(var2, BigMath.ONE).set(var3, BigMath.ONE).level(BigMath.FOUR);
+
+        if (DEBUG) {
+            BasicLogger.debug(model);
+        }
+
+        Result result = model.minimise();
+
+        if (DEBUG) {
+            BasicLogger.debug(result);
+        }
+
+        TestUtils.assertStateNotLessThanOptimal(result);
+
+        for (int i = 0; i < expectedSolution.length; i++) {
+            TestUtils.assertEquals(expectedSolution[i], result.get(i), accuracy);
+        }
+    }
+
+    /**
+     * Test the ultra-high precision capability of IterativeRefinementSolver2. This test creates a problem
+     * where the exact solution has extremely small differences that cannot be accurately represented in
+     * double precision, requiring Quadruple precision. The problem is designed so that the exact solution has
+     * offsets that are smaller than double precision can represent accurately, like 1.0 + 1e-20 instead of
+     * 1.0. The problem is designed so that the exact solution is: x = [1.0 + 1e-20, 1.0 - 1e-20, 2.0 + 2e-20,
+     * 2.0 - 2e-20, 0.5 + 5e-21] These tiny offsets are beyond double precision but can be distinguished with
+     * Quadruple precision.
+     */
+    @Test
+    public void testHighPrecisionObjective() {
+
+        NumberContext accuracy = NumberContext.of(24);
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+        model.options.convex().extendedPrecision(true);
+        model.options.solution = accuracy; // Set high precision for solution
+
+        BigDecimal[] expectedSolution = { new BigDecimal("1.00000000000000000001"), new BigDecimal("0.99999999999999999999"),
+                new BigDecimal("2.00000000000000000002"), new BigDecimal("1.99999999999999999998"), new BigDecimal("0.500000000000000000005") };
+
+        Variable var0 = model.newVariable("x0").weight(expectedSolution[0].negate());
+        Variable var1 = model.newVariable("x1").weight(expectedSolution[1].negate());
+        Variable var2 = model.newVariable("x2").weight(expectedSolution[2].negate());
+        Variable var3 = model.newVariable("x3").weight(expectedSolution[3].negate());
+        Variable var4 = model.newVariable("x4").weight(expectedSolution[4].negate());
+
+        model.newExpression("Q").weight(BigMath.HALF).set(var0, var0, BigMath.ONE).set(var1, var1, BigMath.ONE).set(var2, var2, BigMath.ONE)
+                .set(var3, var3, BigMath.ONE).set(var4, var4, BigMath.ONE);
+
+        model.newExpression("1+1").set(var0, BigMath.ONE).set(var1, BigMath.ONE).level(BigMath.TWO);
+        model.newExpression("2+2").set(var2, BigMath.ONE).set(var3, BigMath.ONE).level(BigMath.FOUR);
+
+        if (DEBUG) {
+            BasicLogger.debug(model);
+        }
+
+        Result result = model.minimise();
+
+        if (DEBUG) {
+            BasicLogger.debug(result);
+        }
+
+        TestUtils.assertStateNotLessThanOptimal(result);
+
+        for (int i = 0; i < expectedSolution.length; i++) {
+            TestUtils.assertEquals(expectedSolution[i], result.get(i), accuracy);
+        }
     }
 
     /**
@@ -454,7 +550,7 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
         MatrixStore<Double> yQ = R064Store.FACTORY.column(resultQuadruple.getMultipliers().get());
 
         double precisionQuadruple = IterativeRefinementTest.getResidualQuadruplePrecision(xQ, yQ, Q, C, AE, BE, AI, BI);
-        //        TestUtils.assertLessThan(1e-15, precision);
+        // TestUtils.assertLessThan(1e-15, precision);
 
         options.convex().extendedPrecision(false);
         ConvexSolver model = ConvexSolver.newBuilder().objective(Q, C).equalities(AE, BE).inequalities(AI, BI).build(options);

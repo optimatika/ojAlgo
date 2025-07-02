@@ -28,6 +28,7 @@ import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.optimisation.ConstraintsMetaData;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ModelEntity;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D.RowView;
 import org.ojalgo.type.keyvalue.EntryPair;
 
@@ -265,6 +266,12 @@ public final class ConvexData<N extends Comparable<N>> implements ExpressionsBas
 
     void setVariableIndices(final int indexInSolver, final int indexInModel) {
         myVariableIndices[indexInSolver] = indexInModel;
+    }
+
+    void update(final Access1D<?> mtrxC, final Access1D<?> mtrxBE, final Access1D<?> mtrxBI) {
+        myObjective.linear().fillMatching(mtrxC);
+        myBE.fillMatching(mtrxBE);
+        myBI.fillMatching(mtrxBI);
     }
 
 }
