@@ -20,8 +20,10 @@ import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
+import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.RationalNumber;
@@ -414,6 +416,37 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
         IterativeRefinementTest.doReimplementExample4(false);
     }
 
+    /**
+     * https://github.com/optimatika/ojAlgo/discussions/608
+     */
+    @Test
+    public void testZECEVIC2() {
+
+        ExpressionsBasedModel model = ModelFileTest.makeModel("marosmeszaros", "ZECEVIC2.SIF", false);
+
+        Result expected = Optimisation.Result.parse("OPTIMAL -4.125 @ { 1.75, 0.25 }");
+        Result initial = Optimisation.Result.of(State.FEASIBLE, 0.0, 0.0);
+
+        // Assert the initial solution is feasible
+        TestUtils.assertTrue(model.validate(initial));
+
+        if (DEBUG) {
+            model.options.debug(ConvexSolver.class);
+        }
+
+        ConvexData<Double> data = ConvexSolver.copy(model, R064Store.FACTORY);
+
+        BasePrimitiveSolver solver = BasePrimitiveSolver.newSolver(data, model.options);
+
+        Result actual = solver.solve(initial);
+        TestUtils.assertStateAndSolution(expected, actual, NumberContext.of(8));
+
+        model.options.convex().extendedPrecision(true);
+
+        actual = model.minimise(); // Very high precision (exact) solution
+        TestUtils.assertStateAndSolution(expected, actual, NumberContext.of(24));
+    }
+
     @Test
     void testQP1() {
 
@@ -574,4 +607,5 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
         yAbsolute.onMatching(DIVIDE_SAFE, yQ).supplyTo(yRelative);
         double largestRelativeDualDiff = yRelative.aggregateAll(Aggregator.LARGEST).doubleValue();
     }
+
 }

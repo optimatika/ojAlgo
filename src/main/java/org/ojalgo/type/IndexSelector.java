@@ -98,6 +98,7 @@ public final class IndexSelector {
         Arrays.fill(mySelector, false);
         myExcludedLength = mySelector.length;
         myIncludedLength = 0;
+        this.resetHistory();
     }
 
     public int[] getExcluded() {
@@ -186,6 +187,7 @@ public final class IndexSelector {
         Arrays.fill(mySelector, true);
         myIncludedLength = mySelector.length;
         myExcludedLength = 0;
+        this.resetHistory();
     }
 
     public boolean isExcluded(final int index) {
@@ -213,6 +215,15 @@ public final class IndexSelector {
     public void pivot(final int indexToExclude, final int indexToInclude) {
         this.exclude(indexToExclude);
         this.include(indexToInclude);
+    }
+
+    /**
+     * After bulk operations, like setting up some initial state, the history of last included and excluded is
+     * probably not relevant. It may be a good idea to reset it to prevent it from affecting following logic.
+     */
+    public void resetHistory() {
+        myLastExcluded = -1;
+        myLastIncluded = -1;
     }
 
     public void revertLastExclusion() {

@@ -92,7 +92,8 @@ final class IterativeASS extends ActiveSetSolver {
             int intCol = col;
 
             if (intCol >= myCountE) {
-                intCol = myCountE + IterativeASS.this.getIncluded(intCol - myCountE);
+                int[] included = IterativeASS.this.getIncluded();
+                intCol = myCountE + included[intCol - myCountE];
             }
 
             return super.doubleValue(intRow, intCol);
