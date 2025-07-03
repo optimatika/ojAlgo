@@ -143,6 +143,9 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                         if (this.isLogDebug()) {
                             this.log(1, "Best so far: {} @ {} ({}) ––– {} / {}.", stepLength, i, excluded[i], currentSlack, slackChange);
                         }
+                        if (stepLength == ZERO) {
+                            break;
+                        }
                     }
                 }
             }
@@ -188,10 +191,10 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         int toExclude = this.suggestConstraintToExclude();
 
         if (toExclude < 0) {
-            if (myShrinkSwitch) {
-                toExclude = this.suggestUsingLagrangeMagnitude();
-            } else {
+            if (myShrinkSwitch && this.getLastIncluded() >= 0) {
                 toExclude = this.suggestUsingVectorProjection();
+            } else {
+                toExclude = this.suggestUsingLagrangeMagnitude();
             }
             myShrinkSwitch = !myShrinkSwitch;
         }
@@ -400,8 +403,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     }
 
     /**
-     * Find the minimum (largest negative) lagrange multiplier - for the active inequalities - to
-     * potentially deactivate.
+     * Find the minimum (largest negative) lagrange multiplier - for the active inequalities - to potentially
+     * deactivate.
      */
     protected int suggestConstraintToExclude() {
 
@@ -468,8 +471,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
     /**
      * Find minimum (largest negative) slack - for the inactive inequalities - to potentially activate.
-     * Negative slack means the constraint is violated. Need to make sure it is enforced by activating
-     * it.
+     * Negative slack means the constraint is violated. Need to make sure it is enforced by activating it.
      */
     protected int suggestConstraintToInclude() {
         return this.getConstraintToInclude();
@@ -684,6 +686,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 }
             }
         }
+
+        myActivator.resetHistory();
     }
 
     void setConstraintToInclude(final int constraintToInclude) {
