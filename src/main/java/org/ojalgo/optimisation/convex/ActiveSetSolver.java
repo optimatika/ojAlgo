@@ -104,10 +104,11 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             if (excluded.length > 0) {
 
-                MatrixStore<Double> slack = this.getSlackI(excluded);
+                MatrixStore<Double> allIneqSlack = this.getSlackI();
 
                 if (this.isLogDebug()) {
 
+                    MatrixStore<Double> slack = allIneqSlack.rows(excluded);
                     MatrixStore<Double> change = this.getMatrixAI(excluded).get().multiply(iterX);
 
                     if (slack.count() != change.count()) {
@@ -122,11 +123,19 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                     this.log("Looking for the largest possible step length (smallest positive scalar) among these: {}).", steps.toRawCopy1D());
                 }
 
-                for (int i = 0; i < excluded.length; i++) {
+                int nbIneqs = this.countInequalityConstraints();
+                int testThisLast = Math.min(this.getLastIncluded(), this.getLastExcluded());
+                int base = Math.max(0, testThisLast + 1);
+                for (int ii = 0; ii < nbIneqs; ii++) {
+                    int i = (base + ii) % nbIneqs; // Wrap around to handle cyclically
 
-                    SparseArray<Double> excludedInequalityRow = this.getMatrixAI(excluded[i]);
+                    if (myActivator.isIncluded(i)) {
+                        continue; // Skip currently included rows
+                    }
 
-                    double currentSlack = slack.doubleValue(i);
+                    SparseArray<Double> excludedInequalityRow = this.getMatrixAI(i);
+
+                    double currentSlack = allIneqSlack.doubleValue(i);
                     double slackChange = excludedInequalityRow.dot(iterX);
                     double fraction = Math.abs(currentSlack) / slackChange;
                     // If the current slack is negative something has already gone wrong.
@@ -139,9 +148,12 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                     if (ZERO <= fraction && fraction < stepLength) {
                         stepLength = fraction;
-                        this.setConstraintToInclude(excluded[i]);
+                        this.setConstraintToInclude(i);
                         if (this.isLogDebug()) {
-                            this.log(1, "Best so far: {} @ {} ({}) ––– {} / {}.", stepLength, i, excluded[i], currentSlack, slackChange);
+                            this.log(1, "Best so far: {} @ {} ––– {} / {}.", stepLength, i, currentSlack, slackChange);
+                        }
+                        if (stepLength == ZERO) {
+                            break;
                         }
                         if (stepLength == ZERO) {
                             break;
@@ -282,19 +294,11 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         return myExcluded;
     }
 
-    protected int getExcluded(final int indexAmongExcluded) {
-        return this.getExcluded()[indexAmongExcluded];
-    }
-
     protected final int[] getIncluded() {
         if (myIncluded == null) {
             myIncluded = myActivator.getIncluded();
         }
         return myIncluded;
-    }
-
-    protected final int getIncluded(final int indexAmongIncluded) {
-        return this.getIncluded()[indexAmongIncluded];
     }
 
     protected final int getLastExcluded() {
