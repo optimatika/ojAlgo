@@ -33,17 +33,16 @@ import org.ojalgo.matrix.store.R064Store;
  */
 final class IterativeRefinementSolverDouble extends ConvexSolver {
 
-    private static Result buildResult(final MatrixStore<Double> Q0, final MatrixStore<Double> C0, final MatrixStore<Double> x0,
-            final MatrixStore<Double> y0, final State state) {
+    private static Result buildResult(final MatrixStore<Double> Q0, final MatrixStore<Double> C0, final MatrixStore<Double> x0, final MatrixStore<Double> y0,
+            final State state) {
         double objectiveValue = Q0.multiplyBoth(x0) / 2.0 - x0.dot(C0);
         Result result = new Result(state, objectiveValue, x0);
         result.multipliers(y0);
         return result;
     }
 
-    private static Result doIteration(final MatrixStore<Double> H, final MatrixStore<Double> g, final MatrixStore<Double> AE,
-            final MatrixStore<Double> BE, final MatrixStore<Double> AI, final MatrixStore<Double> BI, final Options options,
-            final Result startValue) {
+    private static Result doIteration(final MatrixStore<Double> H, final MatrixStore<Double> g, final MatrixStore<Double> AE, final MatrixStore<Double> BE,
+            final MatrixStore<Double> AI, final MatrixStore<Double> BI, final Options options, final Result startValue) {
 
         int nbVars = g.size();
         int nbEqus = BE.getRowDim();
@@ -81,15 +80,15 @@ final class IterativeRefinementSolverDouble extends ConvexSolver {
         return BasePrimitiveSolver.newSolver(data, options).solve(startValue);
     }
 
-    static Result doSolve(final MatrixStore<Double> Q_in, final MatrixStore<Double> C_in, final MatrixStore<Double> ae_in,
-            final MatrixStore<Double> be_in, final MatrixStore<Double> ai_in, final MatrixStore<Double> bi_in, final Options options) {
+    static Result doSolve(final MatrixStore<Double> Q_in, final MatrixStore<Double> C_in, final MatrixStore<Double> ae_in, final MatrixStore<Double> be_in,
+            final MatrixStore<Double> ai_in, final MatrixStore<Double> bi_in, final Options options) {
 
         // Required threshold for final residuals
         double threshold = options.solution.epsilon();
         double epsPrimal = threshold;
         double epsDual = threshold;
         double epsSlack = threshold;
-        boolean combinedScaleFactor = options.convex().combinedScaleFactor;
+        boolean combinedScaleFactor = options.convex().isCombinedScaleFactor();
 
         //  Constants to modify
         double maxZoomFactor = 1.0E12;
@@ -103,8 +102,8 @@ final class IterativeRefinementSolverDouble extends ConvexSolver {
         double C_Size = C_in.aggregateAll(Aggregator.LARGEST);
         C_Size = C_Size > 1.0 ? C_Size : 1;
         double Q_Size = Q_in.aggregateAll(Aggregator.LARGEST);
-        if(Q_Size < smallestNoneZeroHessian){
-//   Using dual parameters, do not work with tiny Hessians.
+        if (Q_Size < smallestNoneZeroHessian) {
+            //   Using dual parameters, do not work with tiny Hessians.
             combinedScaleFactor = true;
         }
 
@@ -155,8 +154,7 @@ final class IterativeRefinementSolverDouble extends ConvexSolver {
             // SUM_i ABS(C1_i * x_i) / |C1|
             double relativeComplementarySlackness1 = C1.multiply(x0).collect(R064Store.FACTORY).aggregateAll(Aggregator.LARGEST) / C_Size;
             // SUM_i ABS(y0_i * b_i) / |Be|
-            double relativeComplementarySlackness2 = y0.multiply(be1.below(bi1)).collect(R064Store.FACTORY)
-                    .aggregateAll(Aggregator.LARGEST) / be_Size;
+            double relativeComplementarySlackness2 = y0.multiply(be1.below(bi1)).collect(R064Store.FACTORY).aggregateAll(Aggregator.LARGEST) / be_Size;
             double relativeComplementarySlackness = Math.max(relativeComplementarySlackness1,
                     relativeComplementarySlackness2 * relativeComplementarySlackness2);
             double scaleD1 = Math.min(1 / maxGradientResidual, maxZoomFactor * scaleD0);
@@ -168,7 +166,7 @@ final class IterativeRefinementSolverDouble extends ConvexSolver {
             }
             if (combinedScaleFactor) {
                 scaleP1 = scaleD1 = Math.min(scaleP1, scaleD1);
-            }else{
+            } else {
                 double scaledHessianNorm = Q_Size * scaleD1 / scaleP1;
                 if (scaledHessianNorm < smallestNoneZeroHessian) {
                     //  Avoid ojAlgo classifying the Hessian matrix as zero.

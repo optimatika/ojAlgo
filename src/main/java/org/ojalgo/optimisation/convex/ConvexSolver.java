@@ -301,10 +301,10 @@ public abstract class ConvexSolver extends GenericSolver {
 
             if (options.convex().isExtendedPrecision()) {
 
-                if(options.experimental){
+                if (options.experimental) {
                     ConvexData<Double> data = this.getConvexData(R064Store.FACTORY);
                     return new IterativeRefinementSolverDouble(options, data);
-                }else{
+                } else {
                     ConvexData<Quadruple> data = this.getConvexData(GenericStore.R128);
                     return new IterativeRefinementSolver(options, data);
                 }
@@ -363,12 +363,29 @@ public abstract class ConvexSolver extends GenericSolver {
 
     public static final class Configuration {
 
-        public boolean combinedScaleFactor = true;
+        private boolean myCombinedScaleFactor = true;
         private boolean myExtendedPrecision = false;
         private NumberContext myIterative = NumberContext.of(10, 14).withMode(RoundingMode.HALF_DOWN);
         private double mySmallDiagonal = RELATIVELY_SMALL + MACHINE_EPSILON;
         private Function<Structure2D, MatrixDecomposition.Solver<Double>> mySolverGeneral = LU.R064::make;
         private Function<Structure2D, MatrixDecomposition.Solver<Double>> mySolverSPD = Cholesky.R064::make;
+
+        /**
+         * Only relevant with extended precision. With the extended precision solver the primal and dual
+         * variables are scaled (shift and zoom) to iteratively generate subproblems. In theory there are
+         * different scaling factors for the primal and dual variables, but forcing them to be the same
+         * enables simplifications resulting in significant performance gains.
+         * <p>
+         * The default is to use the same scaling factor for both primal and dual variables. By setting this
+         * to false, you switch to a slower more complex, but theoretically more accurate and flexible
+         * algorithm.
+         *
+         * @see #extendedPrecision(boolean)
+         */
+        public Configuration combinedScaleFactor(final boolean combinedScaleFactor) {
+            myCombinedScaleFactor = combinedScaleFactor;
+            return this;
+        }
 
         /**
          * With extended precision the usual solver is wrapped by a master algorithm, implemented in
@@ -386,6 +403,10 @@ public abstract class ConvexSolver extends GenericSolver {
         public Configuration extendedPrecision(final boolean extendedPrecision) {
             myExtendedPrecision = extendedPrecision;
             return this;
+        }
+
+        public boolean isCombinedScaleFactor() {
+            return myCombinedScaleFactor;
         }
 
         public boolean isExtendedPrecision() {
