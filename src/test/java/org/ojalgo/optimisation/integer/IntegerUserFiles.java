@@ -59,7 +59,10 @@ public class IntegerUserFiles extends OptimisationIntegerTests implements ModelF
      * <li>v51.3.0 ≈3.5min
      * <li>v55.0.0-SNAPSHOT ≈2.5min (first integer solution after 6s, optimal solution found after 1min,
      * solver returned after 2.5min)
+     * <li>v56.0.0-SNAPSHOT ≈2.5min (first integer solution after 4s, optimal solution found after 35s, solver
+     * returned after 2.5min)
      * </ul>
+     * MIP gap larger than NumberContext.of(7) misses the optimal solution.
      */
     @Test
     @Tag("slow")
@@ -76,6 +79,7 @@ public class IntegerUserFiles extends OptimisationIntegerTests implements ModelF
      * <li>v51.2.0 ≈ [gap 6 => 66s, gap 5 => 29s, gap 4 => 7s (sometimes wrong), gap 3 => wrong]
      * <li>v55.0.0-SNAPSHOT (New LP subsolver) ≈ [gap 6 => 5.4s, gap 5 => 2.9s, gap 4 => 0.5s, gap 3 => 0.5s
      * (no longer see a problem with coarse mip gap)]
+     * <li>v56.0.0-SNAPSHOT (Improved LP) ≈ [gap 6 => 2.0s, gap 5 => 1.2s, gap 4 => 0.4s, gap 3 => 0.4s]
      * </ul>
      */
     @Test
