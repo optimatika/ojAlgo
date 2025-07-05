@@ -26,7 +26,6 @@ import static org.ojalgo.function.constant.BigMath.*;
 import java.math.BigDecimal;
 import java.util.Optional;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
@@ -211,7 +210,8 @@ public class ConvexProblems extends OptimisationConvexTests {
 
     /**
      * <p>
-     * Quadratic model that fail in package org.ojalgo.matrix.store, ojAlgo, version 54.0
+     * Quadratic model that fail in package org.ojalgo.matrix.store, ojAlgo, version 54.0, but worked with
+     * v53.
      * <p>
      * v53: OPTIMAL -1.4162052484896982E24 @ { 1.406005993853654E-7, -7.895855702762938E-6, 714.3828764355712,
      * 1.682976677491224E12, -6017.883736346659, 4605.691058549535 }
@@ -222,11 +222,16 @@ public class ConvexProblems extends OptimisationConvexTests {
      * 1682976677491.224, -6017.883736346658, 4605.691058549564 }
      * <p>
      * EBM v55 (CPLEX): INFEASIBLE
+     * <p>
+     * It is the LP solver, used to find the initial feasible solution, that concludes the problem to be
+     * infeasible. Not sure exactly why this no longer works, but models with parameter magnitude differences
+     * like 1.6829766774912231E12 and 1.0244148343231408E-14 are problematic. The recommended way to solve any
+     * optimisation problem is to use {@link ExpressionsBasedModel}. That has a built-in presolve and
+     * parameter scaling, and with that it works.
      *
      * @see https://github.com/optimatika/ojAlgo/issues/587
      */
     @Test
-    @Disabled
     public void testGitHub587() {
 
         RawStore mtrxQ = RawStore.wrap(new double[][] { { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0, 0.0, 0.0, 0.0 },
@@ -256,6 +261,11 @@ public class ConvexProblems extends OptimisationConvexTests {
         // Convert to model to enable using its presolve and validation methods
         ExpressionsBasedModel model = OptimisationConvexTests.toModel(builder);
 
+        if (DEBUG) {
+            BasicLogger.debug("Original model");
+            BasicLogger.debug(model);
+        }
+
         // Verify that builder and model produce the same data
         ConvexData<Double> builderData = builder.getConvexData(R064Store.FACTORY);
         ConvexData<Double> modelData = ConvexSolver.copy(model, R064Store.FACTORY);
@@ -272,7 +282,14 @@ public class ConvexProblems extends OptimisationConvexTests {
         if (DEBUG) {
             model.options.debug(Optimisation.Solver.class);
         }
+
         Optimisation.Result resultModel = model.minimise();
+
+        if (DEBUG) {
+            BasicLogger.debug("Simplified model");
+            BasicLogger.debug(model);
+            BasicLogger.debug(resultModel);
+        }
 
         // Verify that the current version model solution is valid (feasible)
         model.validate(resultModel, NumberContext.of(13), BasicLogger.DEBUG);
@@ -283,20 +300,17 @@ public class ConvexProblems extends OptimisationConvexTests {
         Result resultBuilder = builder.build(model.options).solve();
 
         if (DEBUG) {
-            // Unfortunately this does not work
-            BasicLogger.debug(result53);
-            BasicLogger.debug(resultModel);
+
+            // This is what fails!
+
             BasicLogger.debug(resultBuilder);
-            // Problem when the LP solver looks for the initial feasible solution
+
+            // Verify that the current version builder solution is valid (feasible)
+            model.validate(resultBuilder, NumberContext.of(13), BasicLogger.DEBUG);
+
+            // Verify that the v53 and current version solutions are equal
+            TestUtils.assertStateAndSolution(result53, resultBuilder);
         }
-
-        // This is what fails!
-
-        // Verify that the current version builder solution is valid (feasible)
-        model.validate(resultBuilder, NumberContext.of(13), BasicLogger.DEBUG);
-
-        // Verify that the v53 and current version solutions are equal
-        TestUtils.assertStateAndSolution(result53, resultBuilder);
     }
 
     /**

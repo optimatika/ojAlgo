@@ -119,9 +119,9 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
 
     /**
      * Add this ({@link Variable} or {@link Expression}) to another {@link Expression}, scaled by a factor.
-     * 
+     *
      * @param target The target {@link Expression}
-     * @param scale The scaling factor
+     * @param scale  The scaling factor
      */
     public abstract void addTo(Expression target, BigDecimal scale);
 
