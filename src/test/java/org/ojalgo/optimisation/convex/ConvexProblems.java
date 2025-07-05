@@ -209,6 +209,74 @@ public class ConvexProblems extends OptimisationConvexTests {
     }
 
     /**
+     * https://github.com/optimatika/ojAlgo/issues/559
+     */
+    @Test
+    public void testGitHub559() {
+
+        R064Store Q = R064Store.FACTORY.rows(new double[][] { { 2.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0000000002, 0.0, 0.0, 0.0 },
+                { 0.0, 0.0, 0.0000000002, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0000000002, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 7.0 } });
+
+        R064Store C = R064Store.FACTORY.column(56.0, 5.6E-9, 5.6E-9, 5.6E-9, 196.0);
+        R064Store C_issue = R064Store.FACTORY.column(56.0, 5.6000000000000005E-9, 5.6000000000000005E-9, 5.6000000000000005E-9, 196.0);
+
+        R064Store AI = R064Store.FACTORY.rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 1.0 }, { 0.0, 1.0, 0.0, 0.0, 1.0 }, { 0.0, 0.0, 1.0, 0.0, 1.0 },
+                { 0.0, 0.0, 0.0, 1.0, 1.0 }, { -1.0, -0.0, -0.0, -0.0, -0.0 }, { -0.0, -1.0, -0.0, -0.0, -0.0 }, { -0.0, -0.0, -1.0, -0.0, -0.0 },
+                { -0.0, -0.0, -0.0, -1.0, -0.0 }, { -0.0, -0.0, -0.0, -0.0, -1.0 } });
+        R064Store BI = R064Store.FACTORY.column(28.0, 25.0, 25.0, 25.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+
+        Optimisation.Options options = new Optimisation.Options();
+        // options.debug(ConvexSolver.class);
+        // options.sparse = Boolean.FALSE;
+        //options.convex().extendedPrecision(true);
+
+        ConvexSolver solverOk = ConvexSolver.newBuilder().objective(Q, C).inequalities(AI, BI).build(options);
+        Result resultOk = solverOk.solve();
+
+        ConvexSolver solverNOk = ConvexSolver.newBuilder().objective(Q, C_issue).inequalities(AI, BI).build(options);
+        Result resultNOk = solverNOk.solve();
+
+        if (DEBUG) {
+            BasicLogger.debug("Result OK: " + resultOk);
+            BasicLogger.debug("Result NOK: " + resultNOk);
+        }
+
+        NumberContext accuracy = NumberContext.of(7);
+
+        TestUtils.assertTrue(resultOk.getState().isOptimal());
+        TestUtils.assertTrue(resultNOk.getState().isOptimal());
+
+        TestUtils.assertEquals(-2918.222222222222, resultOk.getValue(), accuracy);
+        TestUtils.assertEquals(-2918.222222222222, resultNOk.getValue(), accuracy);
+
+        TestUtils.assertStateAndSolution(resultOk, resultNOk, accuracy);
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x0 = model.addVariable().lower(0).weight(-56);
+        Variable x1 = model.addVariable().lower(0).weight(-5.6000000000000005E-9);
+        Variable x2 = model.addVariable().lower(0).weight(-5.6000000000000005E-9);
+        Variable x3 = model.addVariable().lower(0).weight(-5.6000000000000005E-9);
+        Variable x4 = model.addVariable().lower(0).weight(-196);
+
+        model.addExpression().set(x0, 1).set(x4, 1).upper(28);
+        model.addExpression().set(x1, 1).set(x4, 1).upper(25);
+        model.addExpression().set(x2, 1).set(x4, 1).upper(25);
+        model.addExpression().set(x3, 1).set(x4, 1).upper(25);
+
+        model.addExpression("Q").set(x0, x0, 2).set(x1, x1, 2E-10).set(x2, x2, 2E-10).set(x3, x3, 2E-10).set(x4, x4, 7).weight(0.5);
+
+        Result result = model.minimise();
+
+        if (DEBUG) {
+            BasicLogger.debug("Result EBM: " + result);
+            BasicLogger.debug("Model EBM: " + model);
+        }
+
+        TestUtils.assertStateAndSolution(resultOk, result, accuracy);
+    }
+
+    /**
      * <p>
      * Quadratic model that fail in package org.ojalgo.matrix.store, ojAlgo, version 54.0, but worked with
      * v53.

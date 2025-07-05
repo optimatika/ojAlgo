@@ -137,9 +137,9 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                     double currentSlack = allIneqSlack.doubleValue(i);
                     double slackChange = excludedInequalityRow.dot(iterX);
-                    double fraction = Math.abs(currentSlack) / slackChange;
+                    double fraction = Math.max(currentSlack, ZERO) / slackChange;
                     // If the current slack is negative something has already gone wrong.
-                    // Taking the abs value is to handle small negative values due to rounding errors
+                    // Taking the max value is to handle small negative values due to rounding errors
                     if (slackChange > ZERO && !SLACK.isZero(slackChange) && SLACK.isSmall(slackChange, currentSlack)) {
                         fraction = ZERO;
                     } else if (slackChange <= ZERO || SLACK.isZero(slackChange)) {
