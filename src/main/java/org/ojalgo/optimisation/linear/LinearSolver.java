@@ -336,7 +336,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return super.getUpperBounds(POSITIVE_INFINITY).data;
         }
 
-        SimplexStore newSimplexStore(final Function<LinearStructure, SimplexStore> storeFactory, final int... basis) {
+        <S extends SimplexStore> S newSimplexStore(final Function<LinearStructure, S> storeFactory, final int... basis) {
 
             MatrixStore<Double> builderC = this.getObjective().getLinearFactors(false);
             MatrixStore<Double> builderAE = this.getAE();
@@ -357,7 +357,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             LinearStructure structure = new LinearStructure(false, nbUpConstr + nbLoConstr, nbEqConstr, nbProbVars, 0, 0, nbSlckVars);
 
-            SimplexStore simplex = storeFactory.apply(structure);
+            S simplex = storeFactory.apply(structure);
 
             double[] lowerBounds = simplex.getLowerBounds();
             double[] upperBounds = simplex.getUpperBounds();

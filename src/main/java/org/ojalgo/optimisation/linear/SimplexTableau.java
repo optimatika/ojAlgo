@@ -441,6 +441,54 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
         };
     }
 
+    @Override
+    void updateDualEdgeWeights(final IterDescr iteration) {
+
+        int p = iteration.exit.index;
+        int j = iteration.enter.column();
+
+        double pivotElement = this.doubleValue(p, j);
+
+        if (Math.abs(pivotElement) > 1e-9) {
+
+            double w_p = edgeWeights[p];
+
+            for (int i = 0; i < included.length; i++) {
+
+                if (i != p) {
+                    double ratio = this.doubleValue(i, j) / pivotElement;
+                    edgeWeights[i] += ratio * ratio * w_p;
+                }
+            }
+
+            edgeWeights[p] = ONE;
+        }
+    }
+
+    @Override
+    void updatePrimalEdgeWeights(final IterDescr iteration) {
+
+        int i = iteration.exit.index;
+        int p = iteration.enter.index;
+
+        double pivotElement = this.doubleValue(i, excluded[p]);
+
+        if (Math.abs(pivotElement) > 1e-9) {
+
+            double w_p = edgeWeights[p];
+
+            for (int je = 0; je < excluded.length; je++) {
+
+                if (je != p) {
+                    double ratio = this.doubleValue(i, excluded[je]) / pivotElement;
+                    edgeWeights[je] += ratio * ratio * w_p;
+                }
+            }
+
+            edgeWeights[p] = ONE;
+        }
+    }
+
     /**
      * The current, phase 1 or 2, objective function value
      */

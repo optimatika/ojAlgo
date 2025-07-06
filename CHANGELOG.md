@@ -31,6 +31,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.optimisation
 
 - Tweaking to various parts of `ConvexSolver`.
+- Multiple changes and improvements to the `LinearSolver`.
 
 #### org.ojalgo.type
 

@@ -21,9 +21,10 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -101,6 +102,11 @@ abstract class SimplexStore {
     private final double[] myUpperBounds;
 
     /**
+     * Either the primal or dual devex edge weights, depending on the algorithm used. Sized so that it can
+     * hold either.
+     */
+    final double[] edgeWeights;
+    /**
      * excluded == not in the basis
      */
     final int[] excluded;
@@ -136,6 +142,8 @@ abstract class SimplexStore {
         myPartition = new EnumPartition<>(n, ColumnState.BASIS);
 
         myRemainingArtificials = linearStructure.nbArti;
+
+        edgeWeights = new double[Math.max(m, n - m)];
     }
 
     @Override
@@ -471,6 +479,10 @@ abstract class SimplexStore {
         myPartition.extract(ColumnState.BASIS, true, excluded);
     }
 
+    void resetEdgeWeights() {
+        Arrays.fill(edgeWeights, ONE);
+    }
+
     abstract void setupClassicPhase1Objective();
 
     abstract Primitive1D sliceBodyRow(final int row);
@@ -518,6 +530,16 @@ abstract class SimplexStore {
         included[exit] = exclEnter;
         excluded[enter] = inclExit;
     }
+
+    /**
+     * Update edge weights for basic (included) variables.
+     */
+    abstract void updateDualEdgeWeights(final IterDescr iteration);
+
+    /**
+     * Update edge weights for non-basic (excluded) variables.
+     */
+    abstract void updatePrimalEdgeWeights(final IterDescr iteration);
 
     boolean updateRange(final int index, final double lower, final double upper) {
         myLowerBounds[index] = lower;

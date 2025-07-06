@@ -381,4 +381,51 @@ final class RevisedStore extends SimplexStore {
         };
     }
 
+    @Override
+    void updateDualEdgeWeights(final IterDescr iteration) {
+
+        int p = iteration.exit.index;
+        int je = iteration.enter.index;
+
+        double pivotElement = a.doubleValue(je);
+
+        if (Math.abs(pivotElement) > 1e-9) {
+
+            double w_p = edgeWeights[p];
+
+            for (int i = 0; i < included.length; i++) {
+
+                if (i != p) {
+                    double ratio = y.doubleValue(i) / pivotElement;
+                    edgeWeights[i] += ratio * ratio * w_p;
+                }
+            }
+
+            edgeWeights[p] = ONE;
+        }
+    }
+
+    @Override
+    void updatePrimalEdgeWeights(final IterDescr iteration) {
+
+        int p = iteration.enter.index;
+
+        double pivotElement = a.doubleValue(p);
+
+        if (Math.abs(pivotElement) > 1e-9) {
+
+            double w_p = edgeWeights[p];
+
+            for (int je = 0; je < excluded.length; je++) {
+
+                if (je != p) {
+                    double ratio = a.doubleValue(je) / pivotElement;
+                    edgeWeights[je] += ratio * ratio * w_p;
+                }
+            }
+
+            edgeWeights[p] = ONE;
+        }
+    }
+
 }

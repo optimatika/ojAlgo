@@ -743,19 +743,21 @@ abstract class SimplexSolver extends LinearSolver {
             exit = iteration.exit;
         }
 
-        double largest = 1E-10;
+        double largest = MACHINE_SMALLEST;
         int[] included = mySimplex.included;
         for (int ji = included.length - 1; ji >= 0; ji--) {
             int j = included[ji];
 
             double candidate = mySimplex.getInfeasibility(ji);
             double magnitude = Math.abs(candidate);
+            double weight = mySimplex.edgeWeights[ji];
+            double score = (magnitude * magnitude) / weight;
 
             if (printable && this.isLogDebug()) {
                 this.log(1, "{}({}) {}", j, ji, candidate);
             }
 
-            if (magnitude > largest) {
+            if (magnitude > 1e-10 && score > largest) {
 
                 if (exit != null) {
 
@@ -770,11 +772,11 @@ abstract class SimplexSolver extends LinearSolver {
                     }
 
                     if (this.isLogDebug()) {
-                        this.log(2, "{} => {}", magnitude, exit);
+                        this.log(2, "{}/{}={} => {}", candidate, weight, score, exit);
                     }
                 }
 
-                largest = magnitude;
+                largest = score;
                 retVal = true;
             }
         }
@@ -818,7 +820,7 @@ abstract class SimplexSolver extends LinearSolver {
         }
 
         int n = mySimplex.structure.countVariables();
-        double largest = 1E-10;
+        double largest = MACHINE_SMALLEST;
         int[] excluded = mySimplex.excluded;
         for (int je = 0; je < excluded.length; je++) {
             int j = excluded[je];
@@ -827,12 +829,14 @@ abstract class SimplexSolver extends LinearSolver {
                 ColumnState columnState = mySimplex.getColumnState(j);
                 double candidate = mySimplex.getReducedCost(je);
                 double magnitude = Math.abs(candidate);
+                double weight = mySimplex.edgeWeights[je];
+                double score = (magnitude * magnitude) / weight;
 
                 if (printable && this.isLogDebug()) {
                     this.log(1, "{}({}) {} @ {}", j, je, candidate, columnState);
                 }
 
-                if (magnitude > largest) {
+                if (magnitude > 1e-10 && score > largest) {
 
                     if (candidate <= ZERO && columnState != ColumnState.UPPER) {
 
@@ -843,11 +847,11 @@ abstract class SimplexSolver extends LinearSolver {
                             enter.direction = Direction.INCREASE;
 
                             if (this.isLogDebug()) {
-                                this.log(2, "{} => {}", magnitude, enter);
+                                this.log(2, "{}/{}={} => {}", candidate, weight, score, enter);
                             }
                         }
 
-                        largest = magnitude;
+                        largest = score;
                         retVal = true;
 
                     } else if (candidate >= ZERO && columnState != ColumnState.LOWER) {
@@ -859,11 +863,11 @@ abstract class SimplexSolver extends LinearSolver {
                             enter.direction = Direction.DECREASE;
 
                             if (this.isLogDebug()) {
-                                this.log(2, "{} => {}", magnitude, enter);
+                                this.log(2, "{}/{}={} => {}", candidate, weight, score, enter);
                             }
                         }
 
-                        largest = magnitude;
+                        largest = score;
                         retVal = true;
                     }
                 }
@@ -1329,6 +1333,8 @@ abstract class SimplexSolver extends LinearSolver {
             this.verifyDualFeasibility();
         }
 
+        mySimplex.resetEdgeWeights();
+
         boolean done = false;
         while (this.isIterationAllowed() && !done) {
 
@@ -1342,6 +1348,7 @@ abstract class SimplexSolver extends LinearSolver {
 
                     if (iteration.isBasisUpdate()) {
                         mySimplex.calculatePrimalDirection(iteration.enter);
+                        mySimplex.updateDualEdgeWeights(iteration);
                     }
 
                     this.update(iteration);
@@ -1375,6 +1382,8 @@ abstract class SimplexSolver extends LinearSolver {
             this.verifyPrimalFeasibility();
         }
 
+        mySimplex.resetEdgeWeights();
+
         boolean done = false;
         while (this.isIterationAllowed() && !done) {
 
@@ -1388,6 +1397,7 @@ abstract class SimplexSolver extends LinearSolver {
 
                     if (iteration.isBasisUpdate()) {
                         mySimplex.calculateDualDirection(iteration.exit);
+                        mySimplex.updatePrimalEdgeWeights(iteration);
                     }
 
                     this.update(iteration);

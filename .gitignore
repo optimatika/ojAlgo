@@ -7,3 +7,4 @@
 /.apt_generated/
 .idea
 *.iml
+*.class

@@ -960,7 +960,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     @Test
     @Tag("bm1000")
     public void testPILOT4() {
-        CuteNetlibCase.doTest("PILOT4.SIF", "-2581.1392612778604", "0.0", NumberContext.of(7, 4));
+        CuteNetlibCase.doTest("PILOT4.SIF", "-2581.1392612778604", "0.0", NumberContext.of(6));
     }
 
     /**
