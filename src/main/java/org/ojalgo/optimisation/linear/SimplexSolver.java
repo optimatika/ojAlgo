@@ -259,7 +259,7 @@ abstract class SimplexSolver extends LinearSolver {
         public String toString() {
             if (this.isBasisUpdate()) {
                 return exit.toString() + " -> " + enter.toString();
-            } else if (this.isBoundSwitch()) {
+            } else if (this.isBoundFlip()) {
                 return enter.toString() + " -> " + exit.to;
             } else {
                 return "-";
@@ -281,15 +281,15 @@ abstract class SimplexSolver extends LinearSolver {
          * Change from {@link ColumnState#LOWER} to {@link ColumnState#UPPER} or vice versa. (No change in
          * basis.)
          */
-        boolean isBoundSwitch() {
+        boolean isBoundFlip() {
             return enter.index >= 0 && enter.direction != Direction.STAY && enter.direction == exit.direction;
         }
 
         boolean isNoOperation() {
-            return !this.isBasisUpdate() && !this.isBoundSwitch();
+            return !this.isBasisUpdate() && !this.isBoundFlip();
         }
 
-        void markAsBoundSwitch() {
+        void markAsBoundFlip() {
             exit.reset();
             if (enter.direction == Direction.INCREASE) {
                 exit.direction = Direction.INCREASE;
@@ -1186,14 +1186,14 @@ abstract class SimplexSolver extends LinearSolver {
                 this.log("Bound switch!");
             }
 
-            iteration.markAsBoundSwitch();
+            iteration.markAsBoundFlip();
         }
 
         if (this.isLogDebug()) {
             this.log("==>> {}", exit);
         }
 
-        return exit.index >= 0 || iteration.isBoundSwitch();
+        return exit.index >= 0 || iteration.isBoundFlip();
     }
 
     private void update(final IterDescr iteration) {
@@ -1222,7 +1222,7 @@ abstract class SimplexSolver extends LinearSolver {
             // mySimplex.calculateIterationOld(iteration, exitCol, enterCol, shift);
             mySimplex.calculateIteration(iteration, shift);
 
-        } else if (iteration.isBoundSwitch()) {
+        } else if (iteration.isBoundFlip()) {
 
             if (this.isLogDebug()) {
                 this.log();
