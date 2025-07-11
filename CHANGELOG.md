@@ -31,7 +31,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.optimisation
 
 - Tweaking to various parts of `ConvexSolver`.
-- Multiple changes and improvements to the `LinearSolver`.
+- Multiple changes and improvements to the `LinearSolver`. The number of industry standard netlib models that are solved (fast enough to be included) as junit tests cases increased from 45 to 78. The `LinearSolver` has actually been improved over several versions, but with this version we see a lot of that coming together and working quite well.
 
 #### org.ojalgo.type
 
