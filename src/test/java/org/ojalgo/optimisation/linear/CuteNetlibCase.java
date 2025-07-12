@@ -859,6 +859,17 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
+     * KEN-18 is an extremely large-scale linear programming problem with 105,127 rows and 154,699 columns
+     * that represents the largest member of the KEN family of optimization problems. This problem is
+     * particularly challenging because it tests the solver's ability to handle problems of massive scale,
+     * with over 100,000 constraints and 150,000 variables, making it one of the largest problems in the
+     * netlib collection. The problem structure includes various constraint types and coefficient patterns
+     * that can expose weaknesses in memory management, numerical algorithms, and computational efficiency
+     * when dealing with problems of this magnitude. KEN-18 serves as a benchmark for testing the absolute
+     * scalability limits of linear programming solvers and their ability to handle problems that approach the
+     * practical limits of current computational resources. The problem's size makes it particularly
+     * challenging for memory management and computational efficiency, testing the solver's ability to
+     * maintain numerical stability while processing enormous amounts of data.
      */
     @Test
     @Disabled
