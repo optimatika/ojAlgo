@@ -191,8 +191,6 @@ abstract class SimplexStore {
 
     abstract void calculateDualDirection(ExitInfo exit);
 
-    abstract void calculateIteration();
-
     abstract void calculateIteration(IterDescr iteration, double shift);
 
     abstract void calculatePrimalDirection(EnterInfo enter);

@@ -1461,15 +1461,13 @@ abstract class SimplexSolver extends LinearSolver {
 
     final IterDescr prepareToIterate() {
 
-        mySimplex.prepareToIterate();
-
         this.setup(mySimplex);
 
         if (mySimplex.m == 0) {
             this.solveUnconstrained(); // TODO return?
         }
 
-        mySimplex.calculateIteration();
+        mySimplex.prepareToIterate();
 
         this.resetIterationsCount();
 
@@ -1499,7 +1497,6 @@ abstract class SimplexSolver extends LinearSolver {
 
     void switchToPhase2() {
         mySimplex.removePhase1();
-        mySimplex.calculateIteration();
     }
 
 }

@@ -59,33 +59,87 @@ final class RevisedStore extends SimplexStore {
     }
 
     /**
-     * a(N) in Gurobi presentation - delta – reduced costs
+     * Pivot row for dual simplex. Contains coefficients of non-basic variables in the tableau row for the
+     * exiting basic variable. Updated incrementally with each dual simplex iteration.
      */
     private final PhysicalStore<Double> a;
+
     /**
-     * Reduced costs / dual slack
+     * Reduced costs for non-basic variables. Shows objective change per unit increase in a non-basic
+     * variable. Updated incrementally with each iteration and pivot.
      */
     private final R064Store d;
-    private final R064Store l;
-    private final MatrixStore<Double> myBasis;
-    private final ColumnsSupplier<Double> myConstraintsBody;
-    private final ColumnsSupplier.SingleView<Double> myConstraintsColumn;
-    private final R064Store myConstraintsRHS;
-    private final BasisRepresentation myInvBasis;
-    private final R064Store myObjective;
-    private R064Store myPhase1Objective = null;
+
     /**
-     * cost reducer
+     * Dual variables (Lagrange multipliers) for constraints. Computed as π = B^(-T) * c_B. Updated as needed
+     * for reporting or solution extraction.
+     */
+    private final R064Store l;
+
+    /**
+     * Current basis matrix B (columns of constraint matrix for basic variables). Not explicitly stored;
+     * computed from constraint matrix and current basis indices. Updated when the basis changes.
+     */
+    private final MatrixStore<Double> myBasis;
+
+    /**
+     * Complete constraint matrix A (all variables). Static during solve. Used for column access and basis
+     * updates.
+     */
+    private final ColumnsSupplier<Double> myConstraintsBody;
+
+    /**
+     * View of a single column from the constraint matrix. Reused for efficient access to columns during
+     * computations.
+     */
+    private final ColumnsSupplier.SingleView<Double> myConstraintsColumn;
+
+    /**
+     * Right-hand side vector b of Ax = b. Updated when bounds are shifted. Used to compute the current basic
+     * solution.
+     */
+    private final R064Store myConstraintsRHS;
+
+    /**
+     * Inverse of the current basis matrix B^(-1). Maintained and updated using factorization techniques.
+     * Updated when the basis changes or is reset.
+     */
+    private final BasisRepresentation myInvBasis;
+
+    /**
+     * Objective function coefficients c for all variables. Static during solve. Used to compute duals and
+     * objective value.
+     */
+    private final R064Store myObjective;
+
+    /**
+     * Phase-1 objective function (sum of artificial variables). Used only during phase-1. Created and set up
+     * at the start of phase-1, and set to null after phase-1.
+     */
+    private R064Store myPhase1Objective = null;
+
+    /**
+     * Temporary storage for reduced cost calculations. Used as intermediate storage during iterations and
+     * dual variable updates.
      */
     private final R064Store r;
+
     /**
-     * primal basic solution
+     * Current basic solution x_B. Values of basic variables in the current iteration. Updated incrementally
+     * with each iteration and pivot.
      */
     private final R064Store x;
+
     /**
-     * delta – primal basic solution
+     * Direction vector for entering variable in primal simplex. Shows how basic variables change when
+     * entering variable increases. Updated incrementally with each iteration.
      */
     private final R064Store y;
+
+    /**
+     * Temporary storage vector for various computations, especially rows of the inverse basis matrix. Reused
+     * to avoid memory allocation. Updated as needed for intermediate calculations.
+     */
     private final R064Store z;
 
     RevisedStore(final int mm, final int nn) {
@@ -131,7 +185,7 @@ final class RevisedStore extends SimplexStore {
         }
     }
 
-    private void updateDualVariables() {
+    private void updateDualsAndReducedCosts() {
         R064Store objective = myPhase1Objective != null ? myPhase1Objective : myObjective;
         myInvBasis.btran(objective.rows(included), l);
         this.doExclTranspMult(l, r);
@@ -159,21 +213,6 @@ final class RevisedStore extends SimplexStore {
     @Override
     void calculateDualDirection(final ExitInfo exit) {
         this.doBodyRow(exit.index, a);
-    }
-
-    @Override
-    void calculateIteration() {
-
-        R064Store objective = myPhase1Objective != null ? myPhase1Objective : myObjective;
-
-        myInvBasis.btran(objective.rows(included), l);
-        myInvBasis.ftran(myConstraintsRHS, x);
-
-        // ProcessingService.INSTANCE.run(() -> myInvBasis.btran(objective.rows(included), l), () ->
-        // myInvBasis.ftran(myConstraintsRHS, x));
-
-        this.doExclTranspMult(l, r);
-        d.fillMatching(objective.rows(excluded), SUBTRACT, r);
     }
 
     @Override
@@ -306,12 +345,14 @@ final class RevisedStore extends SimplexStore {
     @Override
     void prepareToIterate() {
         myInvBasis.reset(myBasis);
-
+        this.updateDualsAndReducedCosts();
+        myInvBasis.ftran(myConstraintsRHS, x);
     }
 
     @Override
     void removePhase1() {
         myPhase1Objective = null;
+        this.updateDualsAndReducedCosts();
     }
 
     @Override
@@ -359,7 +400,7 @@ final class RevisedStore extends SimplexStore {
     @Override
     Primitive1D sliceDualVariables() {
 
-        this.updateDualVariables(); // Add this line
+        this.updateDualsAndReducedCosts();
 
         return new Primitive1D() {
 
