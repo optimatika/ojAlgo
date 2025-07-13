@@ -910,8 +910,8 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
             this.exchange(tmpIndexA, tmpIndexB);
 
-            tmpIndexA += step;
-            tmpIndexB += step;
+            tmpIndexA += (int) step;
+            tmpIndexB += (int) step;
         }
     }
 
