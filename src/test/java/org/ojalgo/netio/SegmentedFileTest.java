@@ -32,6 +32,12 @@ import org.ojalgo.netio.SegmentedFile.Segment;
 
 public class SegmentedFileTest extends NetioTests {
 
+    /**
+     * On Windows the file is 280 bytes, on Mac/Linux it is 260 bytes - this is because of the line endings
+     * being modified by git when reading/writing from/to the repository. The numbers in the test case have
+     * been carefully chosen to match the number of lines in the file, so that the test will pass on all
+     * platforms.
+     */
     @Test
     public void testReading1BRC() {
 
@@ -41,7 +47,7 @@ public class SegmentedFileTest extends NetioTests {
 
         File file = new File("./src/test/resources/org/ojalgo/netio/1brc.txt");
 
-        try (SegmentedFile segmentedFile = SegmentedFile.newBuilder(file).parallelism(7).segmentBytes(18).build()) {
+        try (SegmentedFile segmentedFile = SegmentedFile.newBuilder(file).parallelism(7).segmentBytes(20).build()) {
 
             List<Segment> segments = segmentedFile.segments();
 
