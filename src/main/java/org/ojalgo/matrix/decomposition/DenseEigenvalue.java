@@ -23,7 +23,6 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.scalar.ComplexNumber;
@@ -31,35 +30,6 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 
 abstract class DenseEigenvalue<N extends Comparable<N>> extends AbstractDecomposition<N, DecompositionStore<N>> implements Eigenvalue<N> {
-
-    /**
-     * Sort eigenvalues and corresponding vectors.
-     */
-    static void sort(final double[] d, final ExchangeColumns mtrxV) {
-
-        int size = d.length;
-
-        for (int i = 0, limit = size - 1; i < limit; i++) {
-
-            int k = i;
-            double p = Math.abs(d[i]);
-
-            for (int j = i + 1; j < size; j++) {
-                double m = Math.abs(d[j]);
-                if (m > p) {
-                    k = j;
-                    p = m;
-                }
-            }
-
-            if (k != i) {
-                p = d[k];
-                d[k] = d[i];
-                d[i] = p;
-                mtrxV.exchangeColumns(i, k);
-            }
-        }
-    }
 
     private MatrixStore<N> myD = null;
     private Array1D<ComplexNumber> myEigenvalues = null;

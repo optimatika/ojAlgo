@@ -37,7 +37,7 @@ public final class HouseholderRight implements MatrixOperation {
     public static IntSupplier PARALLELISM = Parallelism.THREADS;
     public static int THRESHOLD = 256;
 
-    private static final DivideAndConquer.Divider DIVIDER = ProcessingService.INSTANCE.divider();
+    private static final DivideAndConquer.Divider DIVIDER = ProcessingService.INSTANCE.newDivider();
 
     public static void call(final double[] data, final int structure, final int first, final Householder.Primitive64 householder, final double[] work) {
 

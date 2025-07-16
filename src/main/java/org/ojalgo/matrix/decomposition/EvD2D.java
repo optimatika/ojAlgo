@@ -4,15 +4,33 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.type.context.NumberContext;
 
-public abstract class EvD2D {
+abstract class EvD2D {
 
     /**
-     * @param mtrxH Array for internal storage of nonsymmetric Hessenberg form.
-     * @param d TODO
-     * @param e TODO
+     * Complex scalar division.
+     */
+    private static void cdiv(final double xr, final double xi, final double yr, final double yi, final double[] cdiv) {
+        double r, d;
+        if (ABS.invoke(yr) > ABS.invoke(yi)) {
+            r = yi / yr;
+            d = yr + r * yi;
+            cdiv[0] = (xr + r * xi) / d;
+            cdiv[1] = (xi - r * xr) / d;
+        } else {
+            r = yr / yi;
+            d = yi + r * yr;
+            cdiv[0] = (r * xr + xi) / d;
+            cdiv[1] = (r * xi - xr) / d;
+        }
+    }
+
+    /**
+     * @param mtrxH  Array for internal storage of nonsymmetric Hessenberg form.
+     * @param d      TODO
+     * @param e      TODO
      * @param trnspV TODO
      */
-    public static void hqr2(final double[][] mtrxH, final double[] d, final double[] e, final double[][] trnspV) {
+    static void hqr2(final double[][] mtrxH, final double[] d, final double[] e, final double[][] trnspV) {
 
         //  This is derived from the Algol procedure hqr2,
         //  by Martin and Wilkinson, Handbook for Auto. Comp.,
@@ -448,10 +466,10 @@ public abstract class EvD2D {
     }
 
     /**
-     * @param mtrxH Array for internal storage of nonsymmetric Hessenberg form.
+     * @param mtrxH    Array for internal storage of nonsymmetric Hessenberg form.
      * @param vctrWork Temporary work storage
      */
-    public static void orthes(final double[][] mtrxH, final double[][] trnspV, final double[] vctrWork) {
+    static void orthes(final double[][] mtrxH, final double[][] trnspV, final double[] vctrWork) {
 
         final int size = vctrWork.length;
 
@@ -543,24 +561,6 @@ public abstract class EvD2D {
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * Complex scalar division.
-     */
-    private static void cdiv(final double xr, final double xi, final double yr, final double yi, final double[] cdiv) {
-        double r, d;
-        if (ABS.invoke(yr) > ABS.invoke(yi)) {
-            r = yi / yr;
-            d = yr + r * yi;
-            cdiv[0] = (xr + r * xi) / d;
-            cdiv[1] = (xi - r * xr) / d;
-        } else {
-            r = yr / yi;
-            d = yi + r * yr;
-            cdiv[0] = (r * xr + xi) / d;
-            cdiv[1] = (r * xi - xr) / d;
         }
     }
 

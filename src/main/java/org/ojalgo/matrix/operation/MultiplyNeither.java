@@ -60,7 +60,7 @@ public class MultiplyNeither implements MatrixOperation {
     public static IntSupplier PARALLELISM = Parallelism.THREADS;
     public static int THRESHOLD = 32;
 
-    private static final DivideAndConquer.Divider DIVIDER = ProcessingService.INSTANCE.divider();
+    private static final DivideAndConquer.Divider DIVIDER = ProcessingService.INSTANCE.newDivider();
 
     public static <N extends Scalar<N>> MultiplyNeither.Generic<N> newGeneric(final long rows, final long columns) {
         if (rows > THRESHOLD && columns > THRESHOLD) {

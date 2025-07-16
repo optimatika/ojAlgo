@@ -32,6 +32,8 @@ import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.DOT;
 import org.ojalgo.array.operation.FillMatchingSingle;
+import org.ojalgo.concurrent.DivideAndConquer;
+import org.ojalgo.concurrent.Parallelism;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
@@ -286,11 +288,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             for (int i = 0; i < dim; i++) {
                 double val = d[i];
                 max = MAX.invoke(max, ABS.invoke(val));
-                if (PrimitiveScalar.isSmall(max, val)) {
-                    for (int j = 0; j < dim; j++) {
-                        tmpMtrx.set(i, j, ZERO);
-                    }
-                } else {
+                if (!PrimitiveScalar.isSmall(max, val)) {
                     double[] colVi = myTransposedV[i];
                     for (int j = 0; j < dim; j++) {
                         tmpMtrx.set(i, j, colVi[j] / val);
@@ -298,10 +296,18 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                 }
             }
 
-            myInverse = this.getV().multiply(tmpMtrx);
+            preallocated.fillByMultiplying(this.getV(), tmpMtrx);
+
+            myInverse = preallocated;
+
+        } else {
+
+            // If the inverse has already been computed, just fill the preallocated store
+            // with the previously computed inverse.
+            preallocated.fillMatching(myInverse);
         }
 
-        return myInverse;
+        return preallocated;
     }
 
     public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
@@ -362,12 +368,10 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
             return this.getInverse().multiply(preallocated);
 
-        }
-        throw RecoverableCondition.newEquationSystemNotSolvable();
-    }
+        } else {
 
-    public MatrixStore<Double> solve(final MatrixStore<Double> rhs, final DecompositionStore<Double> preallocated) {
-        return null;
+            throw RecoverableCondition.newEquationSystemNotSolvable();
+        }
     }
 
     @Override
@@ -576,9 +580,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                 double[] tmp = data[colA];
                 data[colA] = data[colB];
                 data[colB] = tmp;
-
             };
-            DenseEigenvalue.sort(d, tmpExchangeColumns);
+            Eigenvalue.sort(d, tmpExchangeColumns);
         }
 
     }

@@ -107,11 +107,11 @@ public final class ProcessingService {
      * Will create at most {@code parallelism} tasks to work through the {@code work} items, processing them
      * with {@code computer} and collectiing the results in a {@link Map}.
      *
-     * @param <W> The work item type
-     * @param <R> The function return type
-     * @param work The collection of work items
+     * @param <W>         The work item type
+     * @param <R>         The function return type
+     * @param work        The collection of work items
      * @param parallelism The maximum number of concurrent workers that will process the work items
-     * @param computer The processing code
+     * @param computer    The processing code
      * @return A map of function input to output
      */
     public <W, R> Map<W, R> compute(final Collection<W> work, final int parallelism, final Function<W, R> computer) {
@@ -125,8 +125,12 @@ public final class ProcessingService {
         return this.compute(work, parallelism.getAsInt(), computer);
     }
 
+    /**
+     * @deprecated v56 Use {@link #newDivider()} or {@link Parallelism#newDivider(int)} instead
+     */
+    @Deprecated
     public DivideAndConquer.Divider divider() {
-        return new DivideAndConquer.Divider(myExecutor);
+        return this.newDivider();
     }
 
     /**
@@ -151,11 +155,11 @@ public final class ProcessingService {
      * therefore vital that the input type implements {@link Object#hashCode()} and
      * {@link Object#equals(Object)} properly.
      *
-     * @param <W> The input item type
-     * @param <R> The output item type
-     * @param work The collection of work items
+     * @param <W>         The input item type
+     * @param <R>         The output item type
+     * @param work        The collection of work items
      * @param parallelism The maximum number of concurrent workers that will process the work items
-     * @param mapper The mapper functiom
+     * @param mapper      The mapper functiom
      * @return The mapped results
      */
     public <W, R> Collection<R> map(final Collection<W> work, final int parallelism, final Function<W, R> mapper) {
@@ -167,6 +171,10 @@ public final class ProcessingService {
      */
     public <W, R> Collection<R> map(final Collection<W> work, final IntSupplier parallelism, final Function<W, R> mapper) {
         return this.map(work, parallelism.getAsInt(), mapper);
+    }
+
+    public DivideAndConquer.Divider newDivider() {
+        return new DivideAndConquer.Divider(myExecutor);
     }
 
     /**
@@ -182,10 +190,10 @@ public final class ProcessingService {
      * Will create at most {@code parallelism} tasks to work through the {@code work} items, processing them
      * with {@code processor}.
      *
-     * @param <W> The work item type
-     * @param work The collection of work items
+     * @param <W>         The work item type
+     * @param work        The collection of work items
      * @param parallelism The maximum number of concurrent workers that will process the work items
-     * @param processor The processing code
+     * @param processor   The processing code
      */
     public <W> void process(final Collection<? extends W> work, final int parallelism, final Consumer<W> processor) {
 
@@ -267,9 +275,9 @@ public final class ProcessingService {
      * Each {@link TwoStepMapper.Combineable} is only worked on by a single thread, and the results are
      * combined into a single instance. The instances are not reused.
      *
-     * @param work The collection of work items
+     * @param work        The collection of work items
      * @param parallelism The maximum number of concurrent workers that will process the work items
-     * @param reducer A {@link TwoStepMapper.Combineable} implementation that does what you want.
+     * @param reducer     A {@link TwoStepMapper.Combineable} implementation that does what you want.
      * @return The results...
      */
     public <W, R, A extends TwoStepMapper.Combineable<W, R, A>> R reduceCombineable(final Collection<W> work, final int parallelism,
@@ -324,9 +332,9 @@ public final class ProcessingService {
      * Each {@link TwoStepMapper.Mergeable} is only worked on by a single thread, and the results are combined
      * into a single instance. The instances are not reused.
      *
-     * @param work The collection of work items
+     * @param work        The collection of work items
      * @param parallelism The maximum number of concurrent workers that will process the work items
-     * @param reducer A {@link TwoStepMapper.Mergeable} implementation that does what you want.
+     * @param reducer     A {@link TwoStepMapper.Mergeable} implementation that does what you want.
      * @return The results...
      */
     public <W, R, A extends TwoStepMapper.Mergeable<W, R>> R reduceMergeable(final Collection<W> work, final int parallelism, final Supplier<A> reducer) {
@@ -376,7 +384,7 @@ public final class ProcessingService {
      * Will create precisely {@code parallelism} tasks that each execute the {@code processor}.
      *
      * @param parallelism The number of concurrent workers/threads that will run
-     * @param processor The processing code
+     * @param processor   The processing code
      */
     public void run(final int parallelism, final Runnable processor) {
 
@@ -394,6 +402,13 @@ public final class ProcessingService {
         }
     }
 
+    /**
+     * @see ProcessingService#run(int, Runnable)
+     */
+    public void run(final IntSupplier parallelism, final Runnable processor) {
+        this.run(parallelism.getAsInt(), processor);
+    }
+
     public void run(final Runnable task1, final Runnable task2) {
 
         Future<?> future1 = myExecutor.submit(task1);
@@ -408,13 +423,6 @@ public final class ProcessingService {
     }
 
     /**
-     * @see ProcessingService#run(int, Runnable)
-     */
-    public void run(final IntSupplier parallelism, final Runnable processor) {
-        this.run(parallelism.getAsInt(), processor);
-    }
-
-    /**
      * Will submit precisely {@code parallelism} tasks that each take from the {@code queue} feeding the items
      * to the {@code processor}. The tasks will continue to run until the returned {@link AtomicBoolean} is
      * set to {@code false} (or the thread is interrupted).
@@ -423,10 +431,10 @@ public final class ProcessingService {
      * them to finish before it exits. The default behaviour, using {@link #INSTANCE} or
      * {@link #newInstance(String)}, is to make use of ojAlgo's {@link DaemonPoolExecutor}.
      *
-     * @param <T> The work item type
-     * @param queue The queue to take from
+     * @param <T>         The work item type
+     * @param queue       The queue to take from
      * @param parallelism How many parallel workers to create
-     * @param processor What to do with each of the work items
+     * @param processor   What to do with each of the work items
      * @return A flag that can be used to signal the tasks to stop
      */
     @SuppressWarnings("unused")

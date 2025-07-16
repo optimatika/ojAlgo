@@ -241,6 +241,11 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     @Override
+    public PhysicalStore<Double> preallocate(final int nbEquations, final int nbVariables, final int nbSolutions) {
+        return this.makeZero(nbVariables, nbSolutions);
+    }
+
+    @Override
     public void reset() {
 
         super.reset();
@@ -545,11 +550,6 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         }
 
         return myPseudoinverse;
-    }
-
-    @Override
-    public PhysicalStore<Double> preallocate(final int nbEquations, final int nbVariables, final int nbSolutions) {
-        return this.makeZero(nbVariables, nbSolutions);
     }
 
 }

@@ -37,7 +37,7 @@ public final class HouseholderLeft implements MatrixOperation {
     public static IntSupplier PARALLELISM = Parallelism.THREADS;
     public static int THRESHOLD = 128;
 
-    private static final DivideAndConquer.Divider DIVIDER = ProcessingService.INSTANCE.divider();
+    private static final DivideAndConquer.Divider DIVIDER = ProcessingService.INSTANCE.newDivider();
 
     public static void call(final double[] data, final int structure, final int first, final double[] hVector, final int hFirst, final double hBeta) {
 

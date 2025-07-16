@@ -353,7 +353,7 @@ abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> 
 
     @Override
     public boolean isOrdered() {
-        return false;
+        return true;
     }
 
     @Override
@@ -412,7 +412,7 @@ abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> 
 
         if (this.isOrdered()) {
             ExchangeColumns tmpExchangeColumns = valuesOnly ? ExchangeColumns.NULL : myTridiagonal.getDecompositionQ();
-            DenseEigenvalue.sort(d, tmpExchangeColumns);
+            Eigenvalue.sort(d, tmpExchangeColumns);
         }
 
         if (!valuesOnly) {
@@ -445,4 +445,5 @@ abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> 
     protected MatrixStore<N> makeV() {
         return myTridiagonal.getQ();
     }
+
 }

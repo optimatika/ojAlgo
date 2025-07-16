@@ -24,6 +24,7 @@ package org.ojalgo.concurrent;
 import java.util.function.IntSupplier;
 
 import org.ojalgo.OjAlgoUtils;
+import org.ojalgo.concurrent.DivideAndConquer.Divider;
 import org.ojalgo.function.special.PowerOf2;
 
 @FunctionalInterface
@@ -76,6 +77,10 @@ public interface ParallelismSupplier extends IntSupplier {
 
     default ParallelismSupplier limit(final IntSupplier notMoreThan) {
         return () -> Math.min(this.getAsInt(), notMoreThan.getAsInt());
+    }
+
+    default Divider newDivider(final int threshold) {
+        return ProcessingService.INSTANCE.newDivider().parallelism(this).threshold(threshold);
     }
 
     default ParallelismSupplier require(final int atLeast) {

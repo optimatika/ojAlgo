@@ -25,7 +25,6 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.IntSupplier;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.concurrent.DivideAndConquer;
@@ -45,18 +44,17 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class ParallelGaussSeidelSolver extends StationaryIterativeSolver implements IterativeSolverTask.SparseDelegate {
 
-    private static final DivideAndConquer.Divider DIVIDER = ProcessingService.INSTANCE.divider();
-    private static final IntSupplier PARALLELISM = Parallelism.CORES;
-    private static final int THRESHOLD = 128;
+    private static final DivideAndConquer.Divider DIVIDER = ProcessingService.INSTANCE.newDivider().parallelism(Parallelism.CORES).threshold(128);
 
     private static void divide(final int nbEquations, final Conquerer conquerer) {
-        DIVIDER.parallelism(PARALLELISM).threshold(THRESHOLD).divide(0, nbEquations, conquerer);
+        DIVIDER.divide(0, nbEquations, conquerer);
     }
 
     public ParallelGaussSeidelSolver() {
         super();
     }
 
+    @Override
     public double resolve(final List<Equation> equations, final PhysicalStore<Double> solution) {
 
         int nbEquations = equations.size();
@@ -74,6 +72,7 @@ public final class ParallelGaussSeidelSolver extends StationaryIterativeSolver i
         return this.resolve(equations, solution, normRHS, iterationsCounter, 0, nbEquations);
     }
 
+    @Override
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> current) throws RecoverableCondition {
 
         List<Equation> equations = IterativeSolverTask.toListOfRows(body, rhs);

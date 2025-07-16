@@ -51,7 +51,7 @@ public class MultiplyBoth implements MatrixOperation {
     public static IntSupplier PARALLELISM = Parallelism.THREADS;
     public static int THRESHOLD = 8;
 
-    private static final DivideAndConquer.Divider DIVIDER = ProcessingService.INSTANCE.divider();
+    private static final DivideAndConquer.Divider DIVIDER = ProcessingService.INSTANCE.newDivider();
 
     public static <N extends Scalar<N>> MultiplyBoth.Generic<N> newGeneric(final int rows, final int columns) {
         if (rows > THRESHOLD && columns > THRESHOLD) {

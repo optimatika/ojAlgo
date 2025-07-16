@@ -31,6 +31,7 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.PlainArray;
 import org.ojalgo.matrix.Provider2D;
+import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -67,8 +68,8 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition<N>, MatrixDecomposition.Hermitian<N>, MatrixDecomposition.Determinant<N>,
-        MatrixDecomposition.Values<N>, Provider2D.Eigenpairs {
+public interface Eigenvalue<N extends Comparable<N>>
+        extends MatrixDecomposition.Hermitian<N>, MatrixDecomposition.Determinant<N>, MatrixDecomposition.Values<N>, Provider2D.Eigenpairs {
 
     public static class Eigenpair implements Comparable<Eigenpair> {
 
@@ -155,16 +156,23 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
         Eigenvalue<N> make(Structure2D typical, boolean hermitian);
 
         /**
-         * [A][V] = [B][V][D]
+         * Generalised: [A][V] = [B][V][D]
+         *
+         * @see #makeGeneralised(Structure2D, Eigenvalue.Generalisation)
+         * @deprecated v56 Use {@link #makeGeneralised(Structure2D, Eigenvalue.Generalisation)} instead, then
+         *             it's more clear what you're actually doing.
          */
+        @Deprecated
         default Eigenvalue.Generalised<N> makeGeneralised(final Structure2D typical) {
             return this.makeGeneralised(typical, Eigenvalue.Generalisation.A_B);
         }
 
         /**
+         * "Generalised" does NOT refer to general (as in not symmetric/hermitian) matrices, but to
+         * generalised eigenvalue problems.
          * <ul>
-         * <li>http://www.cmth.ph.ic.ac.uk/people/a.mackinnon/Lectures/compphys/node72.html</li>
-         * <li>https://www.netlib.org/lapack/lug/node54.html</li>
+         * <li>http://www.cmth.ph.ic.ac.uk/people/a.mackinnon/Lectures/compphys/node72.html
+         * <li>https://www.netlib.org/lapack/lug/node54.html
          * </ul>
          */
         Eigenvalue.Generalised<N> makeGeneralised(Structure2D typical, Eigenvalue.Generalisation type);
@@ -299,8 +307,9 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
         public Eigenvalue<Double> make(final Structure2D typical) {
             if (8192L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
                 return new DynamicEvD.R064();
+            } else {
+                return new RawEigenvalue.Dynamic();
             }
-            return new RawEigenvalue.Dynamic();
         }
 
         @Override
@@ -308,13 +317,16 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
             if (hermitian) {
                 if (8192L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
                     return new HermitianEvD.R064();
+                } else {
+                    return new RawEigenvalue.Symmetric();
                 }
-                return new RawEigenvalue.Symmetric();
+            } else {
+                if (8192L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
+                    return new GeneralEvD.R064();
+                } else {
+                    return new RawEigenvalue.General();
+                }
             }
-            if (8192L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
-                return new GeneralEvD.R064();
-            }
-            return new RawEigenvalue.General();
         }
 
         @Override
@@ -358,6 +370,38 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
         final MatrixStore<N> tmpStore2 = tmpV.multiply(tmpD);
 
         return Access2D.equals(tmpStore1, tmpStore2, context);
+    }
+
+    /**
+     * Sort eigenvalues and corresponding vectors.
+     *
+     * @param values         The eigenvalues to sort
+     * @param vectorExchange A function that can exchange the eigenvectors to follow the new order.
+     */
+    static void sort(final double[] values, final ExchangeColumns vectorExchange) {
+
+        int size = values.length;
+
+        for (int i = 0, limit = size - 1; i < limit; i++) {
+
+            int k = i;
+            double p = Math.abs(values[i]);
+
+            for (int j = i + 1; j < size; j++) {
+                double m = Math.abs(values[j]);
+                if (m > p) {
+                    k = j;
+                    p = m;
+                }
+            }
+
+            if (k != i) {
+                p = values[k];
+                values[k] = values[i];
+                values[i] = p;
+                vectorExchange.exchangeColumns(i, k);
+            }
+        }
     }
 
     private void copyEigenvector(final int index, final Array1D<ComplexNumber> destination) {
@@ -445,33 +489,6 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
      */
     Array1D<ComplexNumber> getEigenvalues();
 
-    /**
-     * @param realParts      An array that will receive the real parts of the eigenvalues
-     * @param imaginaryParts An optional array that, if present, will receive the imaginary parts of the
-     *                       eigenvalues
-     */
-    default void getEigenvalues(final double[] realParts, final Optional<double[]> imaginaryParts) {
-
-        ProgrammingError.throwIfNull(realParts, imaginaryParts);
-
-        final Array1D<ComplexNumber> values = this.getEigenvalues();
-
-        final int length = realParts.length;
-
-        if (imaginaryParts.isPresent()) {
-            final double[] imagParts = imaginaryParts.get();
-            for (int i = 0; i < length; i++) {
-                final ComplexNumber value = values.get(i);
-                realParts[i] = value.getReal();
-                imagParts[i] = value.getImaginary();
-            }
-        } else {
-            for (int i = 0; i < length; i++) {
-                realParts[i] = values.doubleValue(i);
-            }
-        }
-    }
-
     // /**
     // * @return The matrix exponential
     // */
@@ -502,6 +519,33 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
     //
     // return retVal;
     // }
+
+    /**
+     * @param realParts      An array that will receive the real parts of the eigenvalues
+     * @param imaginaryParts An optional array that, if present, will receive the imaginary parts of the
+     *                       eigenvalues
+     */
+    default void getEigenvalues(final double[] realParts, final Optional<double[]> imaginaryParts) {
+
+        ProgrammingError.throwIfNull(realParts, imaginaryParts);
+
+        final Array1D<ComplexNumber> values = this.getEigenvalues();
+
+        final int length = realParts.length;
+
+        if (imaginaryParts.isPresent()) {
+            final double[] imagParts = imaginaryParts.get();
+            for (int i = 0; i < length; i++) {
+                final ComplexNumber value = values.get(i);
+                realParts[i] = value.getReal();
+                imagParts[i] = value.getImaginary();
+            }
+        } else {
+            for (int i = 0; i < length; i++) {
+                realParts[i] = values.doubleValue(i);
+            }
+        }
+    }
 
     /**
      * @return A complex valued alternative to {@link #getV()}.
@@ -550,7 +594,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
 
     @Override
     default MatrixStore<N> reconstruct() {
-        final MatrixStore<N> mtrxV = this.getV();
+        MatrixStore<N> mtrxV = this.getV();
         MatrixStore<N> mtrxD = this.getD();
         return mtrxV.multiply(mtrxD).multiply(mtrxV.conjugate());
     }

@@ -29,10 +29,23 @@ import java.util.function.IntSupplier;
 import org.ojalgo.OjAlgoUtils;
 
 /**
+ * Divide an index (int) range into smaller parts, and conquer each part in parallel. There are two ways to
+ * use this class:
+ * <ul>
+ * <li>Extend it and implement the {@link #conquer(int, int)} method, and then invoke it with
+ * {@link #invoke(int, int, int)}.
+ * <li>Use the {@link Divider} to divide a range and provide a {@link Conquerer} that will be called with the
+ * range of indices to conquer. You can get a {@link Divider} from {@link ProcessingService#newDivider()} or
+ * from {@link Parallelism#newDivider(int)}.
+ * </ul>
+ *
  * @author apete
  */
 public abstract class DivideAndConquer {
 
+    /**
+     * A conquerer is a function that will be called with a range of indices to conquer.
+     */
     @FunctionalInterface
     public interface Conquerer {
 
@@ -40,6 +53,11 @@ public abstract class DivideAndConquer {
 
     }
 
+    /**
+     * A configurable divider that can be used to divide a range of indices and conquer each part in parallel.
+     * You can configure the divider with a maximum parallelism level and a threshold for the size of the
+     * parts to conquer.
+     */
     public static final class Divider {
 
         private final ExecutorService myExecutor;
