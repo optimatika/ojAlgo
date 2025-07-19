@@ -24,6 +24,7 @@ package org.ojalgo.optimisation;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.Objects;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.aggregator.AggregatorFunction;
@@ -35,9 +36,28 @@ import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * Model entities are identified and compared by their names only. Any/all other members/attributes are NOT
- * part of equals(), hashCode() or compareTo().
+ * ModelEntity is the abstract base class for optimization model components such as variables and expressions
+ * in ojAlgo's optimization framework.
+ * <p>
+ * A ModelEntity can serve as both a constraint and an objective function component:
+ * <ul>
+ * <li>As a constraint: Define feasible values using lower/upper bounds</li>
+ * <li>As an objective: Contribute to the objective function with a weight</li>
+ * </ul>
+ * <p>
+ * The class provides methods to:
+ * <ul>
+ * <li>Set and get lower/upper limits for constraints</li>
+ * <li>Set and get contribution weights for objective functions</li>
+ * <li>Handle integer restrictions</li>
+ * <li>Validate constraint satisfaction</li>
+ * <li>Apply scaling adjustments for numerical stability</li>
+ * </ul>
+ * <p>
+ * Implementations include {@link Variable} for decision variables and {@link Expression} for linear and
+ * quadratic expressions.
  *
+ * @param <ME> The concrete implementation type (for fluent interface returns)
  * @author apete
  */
 public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.Constraint, Optimisation.Objective, Comparable<ME> {
@@ -129,19 +149,17 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         return factor.movePointRight(this.getAdjustmentExponent());
     }
 
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
-    public final boolean equals(final Object obj) {
-
-        boolean retVal = false;
-
-        if (obj instanceof ModelEntity<?> && myName.equals(((ModelEntity<?>) obj).getName())) {
-            retVal = true;
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
         }
-
-        return retVal;
+        if (!(obj instanceof ModelEntity)) {
+            return false;
+        }
+        ModelEntity other = (ModelEntity) obj;
+        return Objects.equals(myContributionWeight, other.myContributionWeight) && Objects.equals(myLowerLimit, other.myLowerLimit)
+                && Objects.equals(myName, other.myName) && Objects.equals(myUpperLimit, other.myUpperLimit);
     }
 
     /**
@@ -215,8 +233,8 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     @Override
-    public final int hashCode() {
-        return myName.hashCode();
+    public int hashCode() {
+        return Objects.hash(myContributionWeight, myLowerLimit, myName, myUpperLimit);
     }
 
     @Override

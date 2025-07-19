@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 
 import org.ojalgo.ProgrammingError;
@@ -50,28 +51,50 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Primitive1D;
 import org.ojalgo.structure.Structure1D;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.structure.Structure2D.IntRowColumn;
 import org.ojalgo.type.context.NumberContext;
 
 /**
+ * Expression represents a mathematical expression in the optimization model that can serve as either a
+ * constraint or a component of the objective function.
  * <p>
- * Think of an Expression as one constraint or a component to the objective function. An expression becomes a
- * linear expression as soon as you set a linear factor. Setting a quadratic factor turns it into a quadratic
- * expression. If you set both linear and quadratic factors it is a compound expression, and if you set
- * neither it is an empty expression. Currently the solvers supplied by ojAlgo can only handle linear
- * constraint expressions. The objective function can be linear, quadratic or compound. Empty expressions
- * makes no sense...
- * </p>
+ * An Expression can be:
+ * <ul>
+ * <li>Linear: Contains only linear terms (variable coefficients)</li>
+ * <li>Quadratic: Contains quadratic terms (products of variables)</li>
+ * <li>Compound: Contains both linear and quadratic terms</li>
+ * </ul>
  * <p>
- * An expression is turned into a constraint by setting a lower and/or upper limit. Use
- * {@linkplain Expression#lower(Comparable)}, {@linkplain Expression#upper(Comparable)} or
- * {@linkplain Expression#level(Comparable)}. An expression is made part of (contributing to) the objective
- * function by setting a contribution weight. Use {@linkplain Expression#weight(Comparable)}. The contribution
- * weight can be set to anything except zero (0.0). Often you may just want to set it to one (1.0). Other
- * values can be used to balance multiple expressions contributing to the objective function.
- * </p>
+ * Basic usage:
+ * <ul>
+ * <li>Set coefficients for variables with {@link #set(Variable, Comparable)} or
+ * {@link #add(Variable, Comparable)} methods</li>
+ * <li>Create quadratic terms with {@link #set(Variable, Variable, Comparable)} methods</li>
+ * <li>Create constraints by setting lower/upper bounds using {@link #lower(Comparable)},
+ * {@link #upper(Comparable)}, or {@link #level(Comparable)} for equality constraints</li>
+ * <li>Contribute to the objective function by setting a weight using {@link #weight(Comparable)}</li>
+ * </ul>
+ * <p>
+ * Advanced features include:
+ * <ul>
+ * <li>Integer expression handling with automatic detection and constraint tightening</li>
+ * <li>Support for binary variables with specialized methods for detecting binary constraints</li>
+ * <li>Expression evaluation at specific variable values using {@link #evaluate(Access1D)}</li>
+ * <li>Compensation for fixed variables to simplify expressions during solving</li>
+ * <li>Numerical scaling for improved solver stability</li>
+ * <li>Convenient methods for creating common expression types (sums, distances, etc.)</li>
+ * <li>Conversion to various function types for integration with different solvers</li>
+ * </ul>
+ * <p>
+ * The Expression class provides a fluent interface for building expressions with method chaining. It also
+ * supports automatic handling of numerical stability issues through scaling adjustments.
+ * <p>
+ * Note that while the Expression class supports quadratic terms in constraints, some solvers may only support
+ * linear constraints. Quadratic, linear, or compound expressions can typically be used in the objective
+ * function depending on the solver capabilities.
  *
  * @author apete
  */
@@ -371,6 +394,22 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof Expression)) {
+            return false;
+        }
+        Expression other = (Expression) obj;
+        return Objects.equals(myConstant, other.myConstant) && Objects.equals(myLinear, other.myLinear) && Objects.equals(myQuadratic, other.myQuadratic)
+                && myShallowCopy == other.myShallowCopy;
+    }
+
     public BigDecimal evaluate(final Access1D<BigDecimal> point) {
 
         BigDecimal retVal = this.getConstant();
@@ -469,6 +508,14 @@ public final class Expression extends ModelEntity<Expression> {
 
     public Set<IntRowColumn> getQuadraticKeySet() {
         return myQuadratic.keySet();
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + Objects.hash(myConstant, myLinear, myQuadratic, myShallowCopy);
+        return result;
     }
 
     public boolean isAnyLinearFactorNonZero() {
@@ -620,7 +667,7 @@ public final class Expression extends ModelEntity<Expression> {
      * from the given point.
      *
      * @param variables The relevant variables
-     * @param point The point to measure from
+     * @param point     The point to measure from
      */
     public void setCompoundFactorsOffset(final List<Variable> variables, final Access1D<?> point) {
 
@@ -839,7 +886,7 @@ public final class Expression extends ModelEntity<Expression> {
 
         builder.append(this.getName());
         builder.append(": ");
-        builder.append(display.enforce(this.toFunction().invoke(Access1D.asPrimitive1D(solution))));
+        builder.append(display.enforce(this.toFunction().invoke(Primitive1D.wrap(solution))));
 
         if (this.isObjective()) {
             builder.append(" (");

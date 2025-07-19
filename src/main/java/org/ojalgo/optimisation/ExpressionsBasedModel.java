@@ -72,11 +72,12 @@ import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
  * <p>
  * Basic instructions:
  * <ol>
- * <li>Define (create) a set of variables. Set contribution weights and lower/upper limits as needed.</li>
- * <li>Create a model using that set of variables.</li>
- * <li>Add expressions to the model. The model is the expression factory. Set contribution weights and
- * lower/upper limits as needed.</li>
- * <li>Solve your problem using either minimise() or maximise()</li>
+ * <li>Create a model (new ExpressionsBasedModel()).
+ * <li>Define variables using model.addVariable() and set contribution weights and lower/upper limits as
+ * needed.
+ * <li>Add expressions to the model using model.addExpression() and set contribution weights and lower/upper
+ * limits as needed.
+ * <li>Solve your problem using model.minimise() or model.maximise()
  * </ol>
  * <p>
  * When using this class you do not need to worry about which solver will actually be used. The docs of the
@@ -94,8 +95,8 @@ import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
  * <li>It's the only way to access the integer solver.</li>
  * </ol>
  * <p>
- * Different solvers can be used, and ojAlgo comes with collection built in. The default built-in solvers can
- * handle anything you can model with a couple of restrictions:
+ * Different solvers can be used, and ojAlgo comes with a collection built in. The default built-in solvers
+ * can handle anything you can model with a couple of restrictions:
  * </p>
  * <ul>
  * <li>No quadratic constraints (The plan is that future versions should not have this limitation.)</li>

@@ -21,11 +21,11 @@
  */
 package org.ojalgo.optimisation;
 
-import static org.ojalgo.function.constant.BigMath.ONE;
-import static org.ojalgo.function.constant.BigMath.ZERO;
+import static org.ojalgo.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Objects;
 
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
@@ -36,7 +36,34 @@ import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * Variable
+ * Variable represents a decision variable in an optimization model.
+ * <p>
+ * Each variable has a unique index in the model and can have:
+ * </p>
+ * <ul>
+ * <li>Lower and upper bounds (constraints)</li>
+ * <li>A contribution weight in the objective function</li>
+ * <li>An integer or continuous domain</li>
+ * <li>A current value</li>
+ * </ul>
+ * <p>
+ * Variables can be configured as:
+ * </p>
+ * <ul>
+ * <li>Binary (0-1 integer variables)</li>
+ * <li>Integer (whole number values only)</li>
+ * <li>Continuous (any value within bounds)</li>
+ * <li>Fixed (equal lower and upper bounds)</li>
+ * <li>Unbounded (no effective limits)</li>
+ * </ul>
+ * <p>
+ * As a subclass of ModelEntity, a Variable can function both as a constraint (through lower/upper bounds) and
+ * as an objective function component (through its contribution weight).
+ * </p>
+ * <p>
+ * Variables are typically created and managed through {@link ExpressionsBasedModel}, which assigns their
+ * indices and incorporates them into the optimization problem.
+ * </p>
  *
  * @author apete
  */
@@ -82,6 +109,21 @@ public final class Variable extends ModelEntity<Variable> {
     @Override
     public int compareTo(final Variable obj) {
         return this.getIndex().compareTo(obj.getIndex());
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof Variable)) {
+            return false;
+        }
+        Variable other = (Variable) obj;
+        return Objects.equals(myIndex, other.myIndex) && myInteger == other.myInteger && Objects.equals(myValue, other.myValue);
     }
 
     public BigDecimal getLowerSlack() {
@@ -135,6 +177,14 @@ public final class Variable extends ModelEntity<Variable> {
             myValue = this.getLowerLimit();
         }
         return myValue;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + Objects.hash(myIndex, myInteger, myValue);
+        return result;
     }
 
     public Variable integer() {
