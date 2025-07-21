@@ -54,7 +54,7 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
 
     static Function<LinearStructure, SimplexTableau> newTableauFactory(final Optimisation.Options options) {
 
-        if (options.sparse != null && options.sparse.booleanValue()) {
+        if (Boolean.TRUE.equals(options.sparse)) {
             return SparseTableau::new;
         } else {
             return DenseTableau::new;

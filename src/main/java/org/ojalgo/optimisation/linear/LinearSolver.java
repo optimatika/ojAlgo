@@ -531,16 +531,9 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             Boolean dualOrPrimal = model.options.linear().getDualOrPrimal();
 
             boolean newerDualImpl = true;
+
             if (Boolean.FALSE.equals(dualOrPrimal)) {
                 newerDualImpl = false;
-            } else if (Boolean.TRUE.equals(dualOrPrimal)) {
-                newerDualImpl = true;
-            } else if (dualOrPrimal == null) {
-                if (model.countVariables() < 60 && model.countExpressions() < 30) {
-                    newerDualImpl = false;
-                } else {
-                    newerDualImpl = true;
-                }
             }
 
             this.setSwitch(model, ExpressionsBasedModel.IntegrationProperty.PRIMAL_OR_DUAL_LP, newerDualImpl);

@@ -249,6 +249,18 @@ final class LinearStructure implements ExpressionsBasedModel.EntityMap {
         return nbVars + nbNegs + nbSlck + nbIdty + nbArti;
     }
 
+    double getProblemRatio() {
+        double m = this.countConstraints();
+        double n = this.countVariablesTotally();
+        return n / m;
+    }
+
+    long getProblemSize() {
+        long m = this.countConstraints();
+        long n = this.countVariablesTotally();
+        return m * n;
+    }
+
     boolean isAnyArtificials() {
         return nbArti > 0;
     }

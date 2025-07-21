@@ -83,11 +83,19 @@ abstract class SimplexStore {
 
         return structure -> {
 
-            if (Boolean.TRUE.equals(options.sparse)
-                    || !Boolean.FALSE.equals(options.sparse) && Math.max(structure.countModelVariables(), structure.countConstraints()) > 2_000) {
+            long size = structure.getProblemSize();
+            double ratio = structure.getProblemRatio();
+
+            if (Boolean.TRUE.equals(options.sparse)) {
                 return new RevisedStore(structure);
-            } else {
+            } else if (Boolean.FALSE.equals(options.sparse)) {
                 return new DenseTableau(structure);
+            } else {
+                if ((size > 2_400_000L && ratio > 2.6) || size >= 100_000_000L || ratio >= 10.0) {
+                    return new RevisedStore(structure);
+                } else {
+                    return new DenseTableau(structure);
+                }
             }
         };
     }
