@@ -130,8 +130,11 @@ public class TestSolveAndInvert extends MatrixDecompositionTests {
                 BasicLogger.debugMatrix("inverse", decomp.getInverse());
             }
 
-            decomp.ftran(rhs, expected);
-            decomp.btran(rhs, actual);
+            rhs.supplyTo(expected);
+            decomp.ftran(expected);
+
+            rhs.supplyTo(actual);
+            decomp.btran(actual);
 
             TestUtils.assertEquals(name, expected, actual);
         }
@@ -159,18 +162,18 @@ public class TestSolveAndInvert extends MatrixDecompositionTests {
             }
 
             decomp.decompose(body);
-
-            decomp.ftran(rhs, actual);
+            rhs.supplyTo(actual);
+            decomp.ftran(actual);
 
             TestUtils.assertEquals(name, solution, actual);
 
             decomp.decompose(body.transpose());
-
-            decomp.ftran(rhs, expected);
+            rhs.supplyTo(expected);
+            decomp.ftran(expected);
 
             decomp.decompose(body);
-
-            decomp.btran(rhs, actual);
+            rhs.supplyTo(actual);
+            decomp.btran(actual);
 
             TestUtils.assertEquals(name, expected, actual);
         }

@@ -231,6 +231,11 @@ abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> 
     }
 
     @Override
+    public void ftran(final PhysicalStore<N> arg) {
+        arg.fillByMultiplying(this.getInverse(), arg.copy());
+    }
+
+    @Override
     public N getDeterminant() {
 
         AggregatorFunction<ComplexNumber> tmpVisitor = ComplexAggregator.getSet().product();

@@ -32,9 +32,11 @@ class BasisRepresentationTest {
             rep.reset(basis);
             rep.update(basis, 0, updateCol);
             PhysicalStore<Double> ftranResult = R064Store.FACTORY.make(dim, 1);
-            rep.ftran(vec, ftranResult);
+            vec.supplyTo(ftranResult);
+            rep.ftran(ftranResult);
             PhysicalStore<Double> btranResult = R064Store.FACTORY.make(dim, 1);
-            rep.btran(vec, btranResult);
+            vec.supplyTo(btranResult);
+            rep.btran(btranResult);
 
         }
     }
@@ -71,22 +73,26 @@ class BasisRepresentationTest {
 
             // ftran before update
             PhysicalStore<Double> ftranResult = R064Store.FACTORY.make(2, 1);
-            rep.ftran(vecBefore, ftranResult);
+            vecBefore.supplyTo(ftranResult);
+            rep.ftran(ftranResult);
 
             // btran before update
             PhysicalStore<Double> btranResult = R064Store.FACTORY.make(2, 1);
-            rep.btran(vecBefore, btranResult);
+            vecBefore.supplyTo(btranResult);
+            rep.btran(btranResult);
 
             // Update basis: replace column 0 with newCol
             rep.update(updatedBasis, 0, newCol);
 
             // ftran after update
             PhysicalStore<Double> ftranResult2 = R064Store.FACTORY.make(2, 1);
-            rep.ftran(vecAfter, ftranResult2);
+            vecAfter.supplyTo(ftranResult2);
+            rep.ftran(ftranResult2);
 
             // btran after update
             PhysicalStore<Double> btranResult2 = R064Store.FACTORY.make(2, 1);
-            rep.btran(vecAfter, btranResult2);
+            vecAfter.supplyTo(btranResult2);
+            rep.btran(btranResult2);
 
             // Reference solutions using LU (after update)
             PhysicalStore<Double> expectedFtran = R064Store.FACTORY.copy(vecAfter);

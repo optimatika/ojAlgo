@@ -75,35 +75,41 @@ public class ProductFormInverseTest extends OptimisationLinearTests {
         lu.decompose(expBase0);
         ProductFormInverse factors = new ProductFormInverse(3, 1E-32);
         factors.reset(expBase0);
-
-        lu.ftran(random, exp);
-        factors.ftran(random, act);
+        random.supplyTo(exp);
+        lu.ftran(exp);
+        random.supplyTo(act);
+        factors.ftran(act);
         TestUtils.assertEquals(exp, act);
-
-        lu.btran(random, exp);
-        factors.btran(random, act);
+        random.supplyTo(exp);
+        lu.btran(exp);
+        random.supplyTo(act);
+        factors.btran(act);
         TestUtils.assertEquals(exp, act);
 
         lu.decompose(expBase1);
         factors.update(expBase1, 2, arr0);
-
-        lu.ftran(random, exp);
-        factors.ftran(random, act);
+        random.supplyTo(exp);
+        lu.ftran(exp);
+        random.supplyTo(act);
+        factors.ftran(act);
         TestUtils.assertEquals(exp, act);
-
-        lu.btran(random, exp);
-        factors.btran(random, act);
+        random.supplyTo(exp);
+        lu.btran(exp);
+        random.supplyTo(act);
+        factors.btran(act);
         TestUtils.assertEquals(exp, act);
 
         lu.decompose(expBase2);
         factors.update(expBase2, 1, arr2);
-
-        lu.ftran(random, exp);
-        factors.ftran(random, act);
+        random.supplyTo(exp);
+        lu.ftran(exp);
+        random.supplyTo(act);
+        factors.ftran(act);
         TestUtils.assertEquals(exp, act);
-
-        lu.btran(random, exp);
-        factors.btran(random, act);
+        random.supplyTo(exp);
+        lu.btran(exp);
+        random.supplyTo(act);
+        factors.btran(act);
         TestUtils.assertEquals(exp, act);
     }
 

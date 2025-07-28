@@ -128,8 +128,8 @@ public class CaseLU extends MatrixDecompositionTests {
                 BasicLogger.debugMatrix("L", decomp.getL());
                 BasicLogger.debugMatrix("U", decomp.getU());
             }
-
-            decomp.ftran(rhs, actual);
+            rhs.supplyTo(actual);
+            decomp.ftran(actual);
 
             TestUtils.assertEquals(solution, actual);
 
@@ -140,8 +140,8 @@ public class CaseLU extends MatrixDecompositionTests {
                 BasicLogger.debugMatrix("L", decomp.getL());
                 BasicLogger.debugMatrix("U", decomp.getU());
             }
-
-            decomp.ftran(rhs, expected);
+            rhs.supplyTo(expected);
+            decomp.ftran(expected);
 
             decomp.decompose(body);
 
@@ -150,8 +150,8 @@ public class CaseLU extends MatrixDecompositionTests {
                 BasicLogger.debugMatrix("L", decomp.getL());
                 BasicLogger.debugMatrix("U", decomp.getU());
             }
-
-            decomp.btran(rhs, actual);
+            rhs.supplyTo(actual);
+            decomp.btran(actual);
 
             TestUtils.assertEquals(expected, actual);
         }

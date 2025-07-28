@@ -106,6 +106,11 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
     }
 
     @Override
+    public void ftran(final PhysicalStore<Double> arg) {
+        this.doSolve(arg);
+    }
+
+    @Override
     public Double getDeterminant() {
 
         double[][] tmpData = this.getInternalData();

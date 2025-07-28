@@ -93,7 +93,7 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
     }
 
     @Override
-    public final void btran(final PhysicalStore<N> arg) {
+    public void btran(final PhysicalStore<N> arg) {
 
         this.applyPivotOrder(myPivot, arg);
 
@@ -140,6 +140,11 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
     @Override
     public boolean decomposeWithoutPivoting(final Collectable<N, ? super TransformableRegion<N>> matrix) {
         return this.doDecompose(matrix, false);
+    }
+
+    @Override
+    public void ftran(final PhysicalStore<N> arg) {
+        this.getSolution(arg.copy(), arg);
     }
 
     @Override

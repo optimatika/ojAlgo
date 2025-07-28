@@ -89,12 +89,6 @@ final class RevisedStore extends SimplexStore {
     private final ColumnsSupplier<Double> myConstraintsBody;
 
     /**
-     * View of a single column from the constraint matrix. Reused for efficient access to columns during
-     * computations.
-     */
-    private final ColumnsSupplier.SingleView<Double> myConstraintsColumn;
-
-    /**
      * Right-hand side vector b of Ax = b. Updated when bounds are shifted. Used to compute the current basic
      * solution.
      */
@@ -154,8 +148,6 @@ final class RevisedStore extends SimplexStore {
         myConstraintsBody = RevisedStore.newMatrix(m, n);
         myConstraintsRHS = RevisedStore.newColumn(m);
 
-        myConstraintsColumn = myConstraintsBody.columns();
-
         x = RevisedStore.newColumn(m);
         y = RevisedStore.newColumn(m);
         z = RevisedStore.newColumn(m);
@@ -180,14 +172,20 @@ final class RevisedStore extends SimplexStore {
 
     private void doExclTranspMult(final MatrixStore<Double> lambda, final PhysicalStore<Double> results) {
         for (int je = 0; je < excluded.length; je++) {
-            myConstraintsColumn.goToColumn(excluded[je]);
-            results.set(je, myConstraintsColumn.dot(lambda));
+            int column = excluded[je];
+
+            // Skip artificial variables - they don't need correct/updated pivot row coefficients
+            if (!this.isArtificial(column)) {
+                results.set(je, myConstraintsBody.getColumn(column).dot(lambda));
+            }
+
         }
     }
 
     private void updateDualsAndReducedCosts() {
         R064Store objective = myPhase1Objective != null ? myPhase1Objective : myObjective;
-        myInvBasis.btran(objective.rows(included), l);
+        objective.rows(included).supplyTo(l);
+        myInvBasis.btran(l);
         this.doExclTranspMult(l, r);
         d.fillMatching(objective.rows(excluded), SUBTRACT, r);
     }
@@ -207,7 +205,8 @@ final class RevisedStore extends SimplexStore {
     protected void shiftColumn(final int col, final double shift) {
         super.shiftColumn(col, shift);
         myConstraintsBody.column(col).axpy(-shift, myConstraintsRHS);
-        myInvBasis.ftran(myConstraintsRHS, x);
+        myConstraintsRHS.supplyTo(x);
+        myInvBasis.ftran(x);
     }
 
     @Override
@@ -240,14 +239,15 @@ final class RevisedStore extends SimplexStore {
 
         } else {
 
-            myInvBasis.ftran(myConstraintsRHS, x);
+            myConstraintsRHS.supplyTo(x);
+            myInvBasis.ftran(x);
         }
     }
 
     @Override
     void calculatePrimalDirection(final EnterInfo enter) {
-        myConstraintsColumn.goToColumn(enter.column());
-        myInvBasis.ftran(myConstraintsColumn, y);
+        myConstraintsBody.getColumn(enter.column()).supplyTo(y);
+        myInvBasis.ftran(y);
     }
 
     @Override
@@ -346,7 +346,8 @@ final class RevisedStore extends SimplexStore {
     void prepareToIterate() {
         myInvBasis.reset(myBasis);
         this.updateDualsAndReducedCosts();
-        myInvBasis.ftran(myConstraintsRHS, x);
+        myConstraintsRHS.supplyTo(x);
+        myInvBasis.ftran(x);
     }
 
     @Override
@@ -460,8 +461,13 @@ final class RevisedStore extends SimplexStore {
             for (int je = 0; je < excluded.length; je++) {
 
                 if (je != p) {
-                    double ratio = a.doubleValue(je) / pivotElement;
-                    edgeWeights[je] += ratio * ratio * w_p;
+                    int column = excluded[je];
+                    // Skip artificial variables in edge weight updates to match doExclTranspMult optimization
+                    if (!this.isArtificial(column)) {
+                        double ratio = a.doubleValue(je) / pivotElement;
+                        edgeWeights[je] += ratio * ratio * w_p;
+                    }
+                    // Artificial variables keep their current edge weight (typically 1.0)
                 }
             }
 

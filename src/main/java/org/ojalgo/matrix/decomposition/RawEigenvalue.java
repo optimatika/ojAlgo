@@ -32,8 +32,6 @@ import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.DOT;
 import org.ojalgo.array.operation.FillMatchingSingle;
-import org.ojalgo.concurrent.DivideAndConquer;
-import org.ojalgo.concurrent.Parallelism;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
@@ -134,6 +132,11 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         @Override
         public void btran(final PhysicalStore<Double> arg) {
             arg.fillByMultiplying(this.getInverse(), arg.copy());
+        }
+
+        @Override
+        public void ftran(final PhysicalStore<Double> arg) {
+            this.getSolution(arg.copy(), arg);
         }
 
         @Override

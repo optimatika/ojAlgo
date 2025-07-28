@@ -316,16 +316,6 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
             return this.decompose(matrix) && this.isSolvable();
         }
 
-        @Override
-        default void ftran(final Access2D.Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> solution) {
-            this.getSolution(rhs, solution);
-        }
-
-        @Override
-        default void ftran(final PhysicalStore<N> arg) {
-            this.ftran(arg, arg);
-        }
-
         /**
          * The output must be a "right inverse" and a "generalised inverse".
          */

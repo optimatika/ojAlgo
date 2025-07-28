@@ -283,8 +283,8 @@ public class CaseQR extends MatrixDecompositionTests {
                 BasicLogger.debugMatrix("Q", decomp.getQ());
                 BasicLogger.debugMatrix("R", decomp.getR());
             }
-
-            decomp.ftran(rhs, actual);
+            rhs.supplyTo(actual);
+            decomp.ftran(actual);
 
             TestUtils.assertEquals(solution, actual);
 
@@ -294,8 +294,8 @@ public class CaseQR extends MatrixDecompositionTests {
                 BasicLogger.debugMatrix("Q", decomp.getQ());
                 BasicLogger.debugMatrix("R", decomp.getR());
             }
-
-            decomp.ftran(rhs, expected);
+            rhs.supplyTo(expected);
+            decomp.ftran(expected);
 
             decomp.decompose(body);
 
@@ -303,8 +303,8 @@ public class CaseQR extends MatrixDecompositionTests {
                 BasicLogger.debugMatrix("Q", decomp.getQ());
                 BasicLogger.debugMatrix("R", decomp.getR());
             }
-
-            decomp.btran(rhs, actual);
+            rhs.supplyTo(actual);
+            decomp.btran(actual);
 
             TestUtils.assertEquals(expected, actual);
         }
@@ -335,9 +335,10 @@ public class CaseQR extends MatrixDecompositionTests {
                 BasicLogger.debugMatrix("Q", mtrxQ);
                 BasicLogger.debugMatrix("R", mtrxR);
             }
-
-            decomp.ftran(rhs, expected);
-            decomp.btran(rhs, actual);
+            rhs.supplyTo(expected);
+            decomp.ftran(expected);
+            rhs.supplyTo(actual);
+            decomp.btran(actual);
 
             TestUtils.assertEquals(expected, actual);
         }

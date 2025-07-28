@@ -32,6 +32,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.matrix
 
 - For symmetric matrices the Eigenvalue decompositions are now always sorted. Previously it varied depending which implementation the factory returned. You should still always check `Eigenvalue.isOrdered()` – that a general rule for both eigenvalue and singular value decompositions.
+- Cleaned up the `InvertibleFactor` interface. The 2-arg ftran/btran alternatives are removed.
 
 #### org.ojalgo.optimisation
 

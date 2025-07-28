@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.transformation;
 
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
 
 /**
@@ -89,11 +88,6 @@ public interface InvertibleFactor<N extends Comparable<N>> extends Structure2D {
         return new IdentityFactor<>(dim);
     }
 
-    default void btran(final Collectable<N, ? super PhysicalStore<N>> lhs, final PhysicalStore<N> solution) {
-        lhs.supplyTo(solution);
-        this.btran(solution);
-    }
-
     /**
      * Backwards-transformation
      * <p>
@@ -103,11 +97,6 @@ public interface InvertibleFactor<N extends Comparable<N>> extends Structure2D {
      * @param arg [b] transformed into [x]
      */
     void btran(PhysicalStore<N> arg);
-
-    default void ftran(final Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> solution) {
-        rhs.supplyTo(solution);
-        this.ftran(solution);
-    }
 
     /**
      * Forward-transformation

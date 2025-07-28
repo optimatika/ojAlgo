@@ -26,6 +26,7 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.PlainArray;
 import org.ojalgo.matrix.Provider2D;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
@@ -147,6 +148,11 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
         }
 
         return retVal;
+    }
+
+    @Override
+    default void ftran(final PhysicalStore<N> arg) {
+        this.getSolution(arg.copy(), arg);
     }
 
     /**

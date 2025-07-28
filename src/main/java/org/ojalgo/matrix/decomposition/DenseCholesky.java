@@ -90,7 +90,7 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
     }
 
     @Override
-    public final void btran(final PhysicalStore<N> arg) {
+    public void btran(final PhysicalStore<N> arg) {
 
         DecompositionStore<N> body = this.getInPlace();
 
@@ -129,6 +129,15 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
     @Override
     public boolean decompose(final Access2D.Collectable<N, ? super TransformableRegion<N>> aStore) {
         return this.compute(aStore, false);
+    }
+
+    @Override
+    public void ftran(final PhysicalStore<N> arg) {
+
+        DecompositionStore<N> body = this.getInPlace();
+
+        arg.substituteForwards(body, false, false, false);
+        arg.substituteBackwards(body, false, true, false);
     }
 
     @Override

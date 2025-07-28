@@ -95,6 +95,12 @@ public class EdgeWeightTest extends OptimisationLinearTests {
 
         for (int je = 0; je < tableau.excluded.length; je++) {
 
+            // Skip artificial variables - they are not of interest for edge weight comparison
+            int column = tableau.excluded[je];
+            if (tableau.isArtificial(column)) {
+                continue;
+            }
+
             double tWeight = tableau.edgeWeights[je];
             double rWeight = revised.edgeWeights[je];
 
