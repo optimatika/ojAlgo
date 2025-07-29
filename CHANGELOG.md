@@ -16,7 +16,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.matrix
 
 - New `MatrixStore`:s compressed sparse column (CSC) and compressed sparse row (CSR) implementations named `R064CSC` and `R064CSR` (primitive double, R064, only). Any/all of the previously existing sparse `MatrixStore` implementations `SparseStore`, `RowsSupplier` and `ColumnsSupplier` can be converted to either of these new formats.
-- New utility `Eigenvalue#sort` function that allow to sort eigenvalue-vector pairs in descending order. This existed before as a private method, and was used internally. Now it's publicly available. 
+- New utility `Eigenvalue#sort` function that allow to sort eigenvalue-vector pairs in descending order. This existed before as a private method, and was used internally. Now it's publicly available.
+- New sparse `LU` decomposition, and it's updatable using Forrest-Tomlin.
+
+#### org.ojalgo.optimisation
+
+- Many improvements to the LP solvers (improved basis representation, candidate selection and more).
 
 #### org.ojalgo.scalar
 
