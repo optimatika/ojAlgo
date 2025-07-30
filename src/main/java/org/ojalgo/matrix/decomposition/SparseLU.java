@@ -49,23 +49,6 @@ import org.ojalgo.type.NumberDefinition;
 
 /**
  * A sparse, primitive double based, LU decomposition with support for incremental Forrest-Tomlin updates.
- * <p>
- * Performance priorities in this order:
- * <ol>
- * <li>FTRAN/BTRAN operations
- * <li>Column updates
- * <li>Full decomposition of (new) matrix
- * </ol>
- * <p>
- * Storage format:
- * <ul>
- * <li>L matrix stored in CSC (Compressed Sparse Column) format for efficient column operations
- * <li>U matrix stored in CSR (Compressed Sparse Row) format for efficient row operations
- * <li>Diagonal elements of U stored separately for quick access during updates
- * </ul>
- * <p>
- * The implementation uses the Forrest-Tomlin update algorithm with Suhl's improvement for efficient column
- * modifications.
  */
 final class SparseLU extends AbstractDecomposition<Double, R064Store> implements LU<Double> {
 

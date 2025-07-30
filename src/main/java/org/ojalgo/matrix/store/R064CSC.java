@@ -159,13 +159,25 @@ public final class R064CSC extends CompressedSparseR064 {
     }
 
     /**
-     * Assumes mtrxL is unit lower triangular, with the unit diagonal not stored.
+     * Assumes mtrxL is unit lower/left triangular, with the unit diagonal not stored.
      */
-    public static void ftranUnitLowerTriangular(final R064CSC mtrxL, final int n, final PhysicalStore<Double> arg) {
+    public static void btran(final R064CSC mtrxL, final int r, final PhysicalStore<Double> arg) {
+        for (int ij = r - 1; ij >= 0; ij--) {
+            double sum = arg.doubleValue(ij);
+            for (int k = mtrxL.pointers[ij], limit = mtrxL.pointers[ij + 1]; k < limit; k++) {
+                sum -= mtrxL.values[k] * arg.doubleValue(mtrxL.indices[k]);
+            }
+            arg.set(ij, sum);
+        }
+    }
 
-        for (int j = 0; j < n; j++) {
-            double argJ = -arg.doubleValue(j);
-            for (int k = mtrxL.pointers[j], limit = mtrxL.pointers[j + 1]; k < limit; k++) {
+    /**
+     * Assumes mtrxL is unit lower/left triangular, with the unit diagonal not stored.
+     */
+    public static void ftran(final R064CSC mtrxL, final int r, final PhysicalStore<Double> arg) {
+        for (int ij = 0; ij < r; ij++) {
+            double argJ = -arg.doubleValue(ij);
+            for (int k = mtrxL.pointers[ij], limit = mtrxL.pointers[ij + 1]; k < limit; k++) {
                 arg.add(mtrxL.indices[k], mtrxL.values[k] * argJ);
             }
         }
