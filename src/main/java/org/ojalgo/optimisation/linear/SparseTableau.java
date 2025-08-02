@@ -30,6 +30,7 @@ import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.operation.IndexOf;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.optimisation.linear.SimplexSolver.IterDescr;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Primitive1D;
@@ -193,6 +194,15 @@ final class SparseTableau extends SimplexTableau {
                 myRHS.add(i, -shift * element);
             }
         }
+    }
+
+    @Override
+    void calculateIteration(final IterDescr iteration, final double shift) {
+        // Temporarily disable incremental conversion to test if this is the source of the issue
+        // if (iteration.isBasisUpdate() && myPhase1Objective != null) {
+        //     int enterColumn = iteration.enter.column();
+        //     myPhase1Objective.set(enterColumn, myObjective.doubleValue(enterColumn));
+        // }
     }
 
     @Override

@@ -117,11 +117,6 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
     }
 
     @Override
-    void calculateIteration(final IterDescr iteration, final double shift) {
-        //
-    }
-
-    @Override
     final void calculatePrimalDirection(final EnterInfo enter) {
         // With a tableau all calculations are continuously done when pivoting
     }

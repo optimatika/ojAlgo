@@ -27,6 +27,7 @@ import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.CorePrimitiveOperation;
 import org.ojalgo.array.operation.IndexOf;
+import org.ojalgo.optimisation.linear.SimplexSolver.IterDescr;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Primitive1D;
@@ -125,6 +126,15 @@ final class DenseTableau extends SimplexTableau {
         super.shiftColumn(col, shift);
         for (int i = 0; i < m; i++) {
             myTableau[i][n] -= shift * myTableau[i][col];
+        }
+    }
+
+    @Override
+    void calculateIteration(final IterDescr iteration, final double shift) {
+
+        if (iteration.isBasisUpdate() && myPhase1Row != null) {
+            int enterColumn = iteration.enter.column();
+            myPhase1Row[enterColumn] = myTableau[m][enterColumn];
         }
     }
 

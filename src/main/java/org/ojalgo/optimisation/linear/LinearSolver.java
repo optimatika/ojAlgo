@@ -538,11 +538,12 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             this.setSwitch(model, ExpressionsBasedModel.IntegrationProperty.PRIMAL_OR_DUAL_LP, newerDualImpl);
 
-            if (newerDualImpl) {
-                return NEWER_DUAL_SOLVER.build(model);
-            } else {
-                return OLDER_PRIMAL_SOLVER.build(model);
-            }
+            return NEWER_DUAL_SOLVER.build(model);
+            //            if (newerDualImpl) {
+            //                return NEWER_DUAL_SOLVER.build(model);
+            //            } else {
+            //                return OLDER_PRIMAL_SOLVER.build(model);
+            //            }
         }
 
         @Override

@@ -92,11 +92,12 @@ abstract class SimplexStore {
             } else if (Boolean.FALSE.equals(options.sparse)) {
                 return new DenseTableau(structure);
             } else {
-                if ((size > 2_400_000L && ratio > 2.6) || size >= 100_000_000L || ratio >= 10.0) {
-                    return new RevisedStore(structure);
-                } else {
-                    return new DenseTableau(structure);
-                }
+                return new DenseTableau(structure);
+                //                if ((size > 2_400_000L && ratio > 2.6) || size >= 100_000_000L || ratio >= 10.0) {
+                //                    return new RevisedStore(structure);
+                //                } else {
+                //                    return new DenseTableau(structure);
+                //                }
             }
         };
     }
