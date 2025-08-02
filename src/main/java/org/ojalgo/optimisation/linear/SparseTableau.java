@@ -207,19 +207,23 @@ final class SparseTableau extends SimplexTableau {
 
         double retVal = -myValue;
 
-        int[] lower = this.getExcludedLower();
-        for (int i = 0; i < lower.length; i++) {
-            double bound = this.getLowerBound(lower[i]);
-            if (bound != ZERO) {
-                retVal += bound * myObjective.doubleValue(lower[i]);
-            }
-        }
+        for (int je = 0; je < excluded.length; je++) {
+            int j = excluded[je];
+            ColumnState columnState = this.getColumnState(j);
 
-        int[] upper = this.getExcludedUpper();
-        for (int i = 0; i < upper.length; i++) {
-            double bound = this.getUpperBound(upper[i]);
-            if (bound != ZERO) {
-                retVal += bound * myObjective.doubleValue(upper[i]);
+            if (columnState == ColumnState.LOWER) {
+
+                double lowerBound = this.getLowerBound(j);
+                if (lowerBound != ZERO) {
+                    retVal += lowerBound * myObjective.doubleValue(j);
+                }
+
+            } else if (columnState == ColumnState.UPPER) {
+
+                double upperBound = this.getUpperBound(j);
+                if (upperBound != ZERO) {
+                    retVal += upperBound * myObjective.doubleValue(j);
+                }
             }
         }
 

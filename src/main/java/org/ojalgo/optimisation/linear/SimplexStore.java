@@ -100,9 +100,6 @@ abstract class SimplexStore {
         };
     }
 
-    private transient int[] myExcludedLower = null;
-    private transient int[] myExcludedUnbounded = null;
-    private transient int[] myExcludedUpper = null;
     private final double[] myLowerBounds;
     private final EnumPartition<SimplexStore.ColumnState> myPartition;
     private int myRemainingArtificials;
@@ -226,25 +223,27 @@ abstract class SimplexStore {
 
         double[] retVal = new double[n];
 
-        int[] lower = this.getExcludedLower();
-        for (int i = 0; i < lower.length; i++) {
-            int j = lower[i];
-            double value = this.getLowerBound(j);
-            if (Double.isFinite(value)) {
-                retVal[j] = value;
-            } else {
-                retVal[j] = ZERO;
-            }
-        }
+        for (int je = 0; je < excluded.length; je++) {
+            int j = excluded[je];
+            ColumnState columnState = myPartition.get(j);
 
-        int[] upper = this.getExcludedUpper();
-        for (int i = 0; i < upper.length; i++) {
-            int j = upper[i];
-            double value = this.getUpperBound(j);
-            if (Double.isFinite(value)) {
-                retVal[j] = value;
-            } else {
-                retVal[j] = ZERO;
+            if (columnState == ColumnState.LOWER) {
+
+                double lowerBound = this.getLowerBound(j);
+                if (Double.isFinite(lowerBound)) {
+                    retVal[j] = lowerBound;
+                } else {
+                    retVal[j] = ZERO;
+                }
+
+            } else if (columnState == ColumnState.UPPER) {
+
+                double upperBound = this.getUpperBound(j);
+                if (Double.isFinite(upperBound)) {
+                    retVal[j] = upperBound;
+                } else {
+                    retVal[j] = ZERO;
+                }
             }
         }
 
@@ -308,42 +307,6 @@ abstract class SimplexStore {
      * The current (tableau) constraint RHS.
      */
     abstract double getCurrentRHS(int i);
-
-    /**
-     * Indices of columns/variables at their lower bounds.
-     */
-    final int[] getExcludedLower() {
-        int count = myPartition.count(ColumnState.LOWER);
-        if (myExcludedLower == null || myExcludedLower.length != count) {
-            myExcludedLower = new int[count];
-        }
-        myPartition.extract(ColumnState.LOWER, false, myExcludedLower);
-        return myExcludedLower;
-    }
-
-    /**
-     * Indices of unbounded columns/variables.
-     */
-    final int[] getExcludedUnbounded() {
-        int count = myPartition.count(ColumnState.UNBOUNDED);
-        if (myExcludedUnbounded == null || myExcludedUnbounded.length != count) {
-            myExcludedUnbounded = new int[count];
-        }
-        myPartition.extract(ColumnState.UNBOUNDED, false, myExcludedUnbounded);
-        return myExcludedUnbounded;
-    }
-
-    /**
-     * Indices of columns/variables at their upper bounds.
-     */
-    final int[] getExcludedUpper() {
-        int count = myPartition.count(ColumnState.UPPER);
-        if (myExcludedUpper == null || myExcludedUpper.length != count) {
-            myExcludedUpper = new int[count];
-        }
-        myPartition.extract(ColumnState.UPPER, false, myExcludedUpper);
-        return myExcludedUpper;
-    }
 
     abstract double getInfeasibility(int i);
 
