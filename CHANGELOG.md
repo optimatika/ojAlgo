@@ -50,6 +50,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Fixed
 
+#### org.ojalgo.matrix
+
+- Matrix multiplication performance using `RawStore` has been much improved.
+
 #### org.ojalgo.optimisation
 
 - When using extended precision with the `ConvexSolver` there was a problem when extracting the solution. The solver uses `Quadruple` and in the end the solution is using `BigDecimal` but at an intermediate step it was converted to `double`.

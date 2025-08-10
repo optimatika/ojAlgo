@@ -26,6 +26,7 @@ import java.util.function.IntSupplier;
 
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.DOT;
+import org.ojalgo.array.operation.FillAll;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.concurrent.DivideAndConquer.Conquerer;
 import org.ojalgo.concurrent.Parallelism;
@@ -61,6 +62,29 @@ public class MultiplyNeither implements MatrixOperation {
     public static int THRESHOLD = 32;
 
     private static final DivideAndConquer.Divider DIVIDER = ProcessingService.INSTANCE.newDivider();
+
+    public static void add(final double[][] product, final double[][] left, final double[][] right) {
+
+        DIVIDER.divide(product.length, (first, limit) -> {
+
+            for (int i = first; i < limit; i++) {
+                MultiplyNeither.doOneRow(product[i], left[i], right);
+            }
+        });
+    }
+
+    public static void fill(final double[][] product, final double[][] left, final double[][] right) {
+
+        DIVIDER.divide(product.length, (first, limit) -> {
+
+            for (int i = first; i < limit; i++) {
+                double[] prodRow = product[i];
+                FillAll.fill(prodRow, 0, prodRow.length, 1, 0D);
+                MultiplyNeither.doOneRow(prodRow, left[i], right);
+            }
+        });
+
+    }
 
     public static <N extends Scalar<N>> MultiplyNeither.Generic<N> newGeneric(final long rows, final long columns) {
         if (rows > THRESHOLD && columns > THRESHOLD) {
@@ -145,6 +169,13 @@ public class MultiplyNeither implements MatrixOperation {
                     product[i + j * nbRows] += left[i + c * nbRows] * right[c + j * complexity];
                 }
             }
+        }
+    }
+
+    private static void doOneRow(final double[] prodRow, final double[] leftRow, final double[][] right) {
+
+        for (int c = 0, complexity = leftRow.length; c < complexity; c++) {
+            AXPY.invoke(prodRow, leftRow[c], right[c]);
         }
     }
 

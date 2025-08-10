@@ -44,10 +44,18 @@ public abstract class AXPY implements ArrayOperation {
         }
     }
 
+    public static void invoke(final double[] y, final double a, final double[] x) {
+        AXPY.invoke(y, 0, a, x, 0, 0, Math.min(y.length, x.length));
+    }
+
     public static void invoke(final double[] y, final int basey, final double a, final double[] x, final int basex, final int first, final int limit) {
         for (int i = first; i < limit; i++) {
             y[basey + i] += a * x[basex + i];
         }
+    }
+
+    public static void invoke(final float[] y, final float a, final float[] x) {
+        AXPY.invoke(y, 0, a, x, 0, 0, Math.min(y.length, x.length));
     }
 
     public static void invoke(final float[] y, final int basey, final float a, final float[] x, final int basex, final int first, final int limit) {

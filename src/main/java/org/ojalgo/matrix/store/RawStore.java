@@ -39,6 +39,7 @@ import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.operation.MultiplyBoth;
+import org.ojalgo.matrix.operation.MultiplyNeither;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.PrimitiveScalar;
@@ -173,29 +174,6 @@ public final class RawStore implements PhysicalStore<Double>, Factory2D.Builder<
         }
 
         return retVal;
-    }
-
-    private static void multiply(final double[][] product, final double[][] left, final double[][] right) {
-
-        int tmpRowsCount = product.length;
-        int tmpComplexity = right.length;
-        int tmpColsCount = right[0].length;
-
-        double[] tmpRow;
-        double[] tmpColumn = new double[tmpComplexity];
-        for (int j = 0; j < tmpColsCount; j++) {
-            for (int k = 0; k < tmpComplexity; k++) {
-                tmpColumn[k] = right[k][j];
-            }
-            for (int i = 0; i < tmpRowsCount; i++) {
-                tmpRow = left[i];
-                double tmpVal = 0.0;
-                for (int k = 0; k < tmpComplexity; k++) {
-                    tmpVal += tmpRow[k] * tmpColumn[k];
-                }
-                product[i][j] = tmpVal;
-            }
-        }
     }
 
     static Rotation.Primitive cast(final Rotation<Double> aTransf) {
@@ -367,15 +345,13 @@ public final class RawStore implements PhysicalStore<Double>, Factory2D.Builder<
     @Override
     public void fillByMultiplying(final Access1D<Double> left, final Access1D<Double> right) {
 
-        int complexity = Math.toIntExact(left.count() / this.countRows());
-        if (complexity != Math.toIntExact(right.count() / this.countColumns())) {
+        int cmplxt = Math.toIntExact(left.count() / this.countRows());
+
+        if (cmplxt != Math.toIntExact(right.count() / this.countColumns())) {
             ProgrammingError.throwForMultiplicationNotPossible();
         }
 
-        double[][] rawLeft = RawStore.extract(left, this.getRowDim());
-        double[][] rawRight = RawStore.extract(right, complexity);
-
-        RawStore.multiply(data, rawLeft, rawRight);
+        MultiplyNeither.fill(data, RawStore.extract(left, this.getRowDim()), RawStore.extract(right, cmplxt));
     }
 
     @Override
@@ -623,15 +599,13 @@ public final class RawStore implements PhysicalStore<Double>, Factory2D.Builder<
     @Override
     public RawStore multiply(final MatrixStore<Double> right) {
 
-        int tmpRowDim = data.length;
-        int tmpComplexity = myNumberOfColumns;
-        int tmpColDim = (int) (right.count() / tmpComplexity);
+        int nbRows = data.length;
+        int cmplxt = myNumberOfColumns;
+        int nbCols = Math.toIntExact(right.count() / cmplxt);
 
-        RawStore retVal = new RawStore(tmpRowDim, tmpColDim);
+        RawStore retVal = new RawStore(nbRows, nbCols);
 
-        double[][] tmpRight = RawStore.extract(right, tmpComplexity);
-
-        RawStore.multiply(retVal.data, data, tmpRight);
+        MultiplyNeither.add(retVal.data, data, RawStore.extract(right, cmplxt));
 
         return retVal;
     }
@@ -871,11 +845,6 @@ public final class RawStore implements PhysicalStore<Double>, Factory2D.Builder<
         } else {
             this.modifyColumn(0, tmpHigh, PrimitiveMath.NEGATE);
         }
-    }
-
-    @Override
-    public MatrixStore<Double> transpose() {
-        return new TransposedStore<>(this);
     }
 
     @Override

@@ -26,7 +26,7 @@ import java.util.function.IntSupplier;
 import org.ojalgo.OjAlgoUtils;
 
 /**
- * A set of standard levels of parallelsim derived from the number of available cores and optionally capped by
+ * A set of standard levels of parallelism derived from the number of available cores and optionally capped by
  * reserving a specified amount of memory per thread. The info about available cores/threads/memory comes from
  * {@link OjAlgoUtils#ENVIRONMENT}.
  */
@@ -68,6 +68,7 @@ public enum Parallelism implements ParallelismSupplier {
         myValue = value;
     }
 
+    @Override
     public int getAsInt() {
         return myValue.getAsInt();
     }

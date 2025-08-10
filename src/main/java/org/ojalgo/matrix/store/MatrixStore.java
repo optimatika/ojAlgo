@@ -439,12 +439,12 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     @Override
     default MatrixStore<N> multiply(final MatrixStore<N> right) {
 
-        long tmpCountRows = this.countRows();
-        long tmpCountColumns = right.countColumns();
+        int nbRows = this.getRowDim();
+        int nbCols = right.getColDim();
 
-        PhysicalStore<N> retVal = this.physical().make(tmpCountRows, tmpCountColumns);
+        PhysicalStore<N> retVal = this.physical().make(nbRows, nbCols);
 
-        this.multiply(right, retVal);
+        retVal.fillByMultiplying(this, right);
 
         return retVal;
     }
