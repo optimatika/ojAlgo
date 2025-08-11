@@ -36,7 +36,10 @@ public class BasicMachine {
             return false;
         }
         BasicMachine other = (BasicMachine) obj;
-        if ((memory != other.memory) || (threads != other.threads)) {
+        if (memory != other.memory) {
+            return false;
+        }
+        if (threads != other.threads) {
             return false;
         }
         return true;
@@ -47,7 +50,8 @@ public class BasicMachine {
         final int prime = 31;
         int result = 1;
         result = prime * result + (int) (memory ^ (memory >>> 32));
-        return prime * result + threads;
+        result = prime * result + threads;
+        return result;
     }
 
     @Override
@@ -63,22 +67,23 @@ public class BasicMachine {
 
         switch (prefix) {
 
-            case 1:
+        case 1:
 
-                return measure + KILO + threads + ((threads == 1) ? THREAD : THREADS);
+            return measure + KILO + threads + ((threads == 1) ? THREAD : THREADS);
 
-            case 2:
+        case 2:
 
-                return measure + MEGA + threads + ((threads == 1) ? THREAD : THREADS);
+            return measure + MEGA + threads + ((threads == 1) ? THREAD : THREADS);
 
-            case 3:
+        case 3:
 
-                return measure + GIGA + threads + ((threads == 1) ? THREAD : THREADS);
+            return measure + GIGA + threads + ((threads == 1) ? THREAD : THREADS);
 
-            default:
+        default:
 
-                return memory + BYTES + threads + ((threads == 1) ? THREAD : THREADS);
+            return memory + BYTES + threads + ((threads == 1) ? THREAD : THREADS);
         }
 
     }
+
 }

@@ -1,6 +1,7 @@
 module ojalgo {
 
     requires java.management;
+    requires jdk.management;
     requires jdk.unsupported;
 
     requires transitive java.desktop;

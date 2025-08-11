@@ -41,28 +41,20 @@ public abstract class OjAlgoUtils {
 
     static {
 
-        String architecture = VirtualMachine.getArchitecture();
-        long memory = VirtualMachine.getMemory();
-        int threads = VirtualMachine.getThreads();
+        Hardware.Architecture architecture = Hardware.getArchitecture();
+        long memory = Hardware.getMemory();
+        int threads = Hardware.getThreads();
 
-        for (Hardware hw : Hardware.PREDEFINED) {
-            if (hw.architecture.equals(architecture) && (hw.threads == threads) && (hw.memory >= memory)) {
-                ENVIRONMENT = hw.virtualise();
-            }
-        }
+        try {
 
-        if (ENVIRONMENT == null) {
-            if (System.getProperty("shut.up.ojAlgo") == null) {
-                BasicLogger.debug("ojAlgo includes a small set of predefined hardware profiles,");
-                BasicLogger.debug("none of which were deemed suitable for the hardware you're currently using.");
-                BasicLogger.debug("A default hardware profile, that is perfectly usable, has been set for you.");
-                BasicLogger.debug("You may want to set org.ojalgo.OjAlgoUtils.ENVIRONMENT to something that");
-                BasicLogger.debug("better matches the hardware/OS/JVM you're running on, than the default.");
-                BasicLogger.debug("Additionally it would be appreciated if you contribute your hardware profile:");
-                BasicLogger.debug("https://github.com/optimatika/ojAlgo/issues");
-                BasicLogger.debug("Architecture={} Threads={} Memory={}", architecture, threads, memory);
-            }
-            ENVIRONMENT = Hardware.makeSimple(architecture, memory, threads).virtualise();
+            ENVIRONMENT = Hardware.make(architecture, memory, threads).virtualise();
+
+        } catch (Exception cause) {
+
+            BasicLogger.error(cause, "Hardware detection failed: {}, {} bytes, {} threads", architecture, memory, threads);
+
+            // Fallback to safe, common current parameters if hardware detection fails
+            ENVIRONMENT = Hardware.make(Hardware.Architecture.X86_64, 16L * 1024L * 1024L * 1024L, 4).virtualise();
         }
     }
 
@@ -141,6 +133,7 @@ public abstract class OjAlgoUtils {
     }
 
     public static void main(final String[] args) {
+
         BasicLogger.debug();
         BasicLogger.debug("####################################################################");
         BasicLogger.debug("#################### Welcome to oj! Algorithms #####################");
@@ -148,9 +141,9 @@ public abstract class OjAlgoUtils {
         BasicLogger.debug("{} version {} built by {}.", OjAlgoUtils.getTitle(), OjAlgoUtils.getVersion(), OjAlgoUtils.getVendor());
         BasicLogger.debug("####################################################################");
         BasicLogger.debug();
-        BasicLogger.debug("Machine Architecture: {}", VirtualMachine.getArchitecture());
-        BasicLogger.debug("Machine Threads: {}", VirtualMachine.getThreads());
-        BasicLogger.debug("Machine Memory: {}", VirtualMachine.getMemory());
+        BasicLogger.debug("Machine Architecture: {}", Hardware.getArchitecture());
+        BasicLogger.debug("Machine Memory: {} bytes", Hardware.getMemory());
+        BasicLogger.debug("Machine Threads: {}", Hardware.getThreads());
         BasicLogger.debug();
         BasicLogger.debug("ojAlgo Environment: {}", ENVIRONMENT);
         BasicLogger.debug();

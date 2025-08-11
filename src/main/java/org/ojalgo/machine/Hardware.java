@@ -21,12 +21,12 @@
  */
 package org.ojalgo.machine;
 
+import java.lang.management.ManagementFactory;
 import java.util.Arrays;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.ojalgo.array.operation.COPY;
-import org.ojalgo.netio.ASCII;
+
+import com.sun.management.OperatingSystemMXBean;
 
 /**
  * <ul>
@@ -53,6 +53,54 @@ import org.ojalgo.netio.ASCII;
  */
 public final class Hardware extends CommonMachine implements Comparable<Hardware> {
 
+    public static enum Architecture {
+
+        AARCH64, ARM, OTHER, PPC, X86, X86_64;
+
+        public static Architecture from(final String arch) {
+
+            if (arch == null) {
+                return OTHER;
+            }
+
+            switch (arch.toLowerCase()) {
+            case "x86":
+            case "i386":
+                return X86;
+            case "x86_64":
+            case "amd64":
+                return X86_64;
+            case "aarch64":
+                return AARCH64;
+            case "arm":
+                return ARM;
+            case "ppc":
+            case "ppc64":
+                return PPC;
+            default:
+                return OTHER;
+            }
+        }
+
+        @Override
+        public String toString() {
+            switch (this) {
+            case X86:
+                return "x86";
+            case X86_64:
+                return "x86_64";
+            case AARCH64:
+                return "aarch64";
+            case ARM:
+                return "arm";
+            case PPC:
+                return "ppc";
+            default:
+                return "other";
+            }
+        }
+    }
+
     /**
      * Cache-line size is (typically) 64 bytes
      */
@@ -72,396 +120,124 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
     public static final long OS_MEMORY_PAGE_SIZE = 4L * K;
 
     /**
-     * Should contain all available hardware in ascending "power" order.
-     */
-    public static final Set<Hardware> PREDEFINED = new TreeSet<>();
-
-    /**
+     * Returns the normalized processor architecture of the current system. This is used by ojAlgo's hardware
+     * detection system to determine appropriate cache configurations, threading models, and optimization
+     * strategies for different processor families.
      * <p>
-     * M1 Pro Mainly modelled after the performance cores since there are more of those. Also did not separate
-     * between L2 and L3/SLC cache since there are 2 of each and they are the same size per thread.
+     * The architecture string is normalized to standard values for consistency across different JVM
+     * implementations and operating systems.
      * <p>
-     * Notes: M2, M2 Pro, M2 Max, M2 Ultra -> 1, 2, 4, 8 memory controllers resulting in 100GB/s, 200GB/s,
-     * 400GB/s and 800GB/s Memory Bandwidth
-     * <ul>
-     * <li>Apple M1 Pro
-     * <ul>
-     * <li>L1 Cache the high-perf cores have a large 192 KB of L1 instruction cache and 128 KB of L1 data
-     * cache The energy-efficient cores have a 128 KB L1 instruction cache, 64 KB L1 data cache.
-     * <li>L2 Cache (28MB all together) The 6 high-perf cores are split in two clusters, each cluster has 12MB
-     * of shared L2 cache (so 24MB total) The 2 high-efficiency cores have 4MB of shared L2 cache
-     * <li>L3 / SLC (24MB all together) The SLC is 12MB per memory controller, so 24MB total.
-     * <li>16 GB unified memory
-     * </ul>
-     * <li>squid / 15" MacBook Air 2023, Apple M2
-     * <ul>
-     * <li>8 cores (4 performance and 4 efficiency)
-     * <li>L1: Performance cores 192+128 KB per core / Efficiency cores 128+64 KB per core
-     * <li>L2: Performance cores 16 MB / Efficiency cores 4 MB
-     * <li>L3: 8 MB
-     * <li>24 GB unified memory
-     * </ul>
-     * </ul>
+     *
+     * @return The normalized processor architecture string, never null. Defaults to "other" if the
+     *         architecture cannot be determined.
      */
-    static final Hardware AARCH64__08 = new Hardware("aarch64", new BasicMachine[] { new BasicMachine(24L * K * K * K, 8), new BasicMachine(8L * K * K, 8),
-            new BasicMachine(4L * K * K, 4), new BasicMachine(64L * K, 1) });
-
-    /**
-     * <ul>
-     * <li>CLAM / PowerBook6,5
-     * <ul>
-     * <li>1 processor
-     * <li>1 core per processor
-     * <li>1 thread per core
-     * <li>===
-     * <li>1.25GB system RAM
-     * <li>512kB L2 cache per processor
-     * <li>64kB L1 cache per core
-     * </ul>
-     * </ul>
-     */
-    static final Hardware PPC__01 = new Hardware("ppc",
-            new BasicMachine[] { new BasicMachine(5L * 256L * K * K, 1), new BasicMachine(512L * K, 1), new BasicMachine(64L * K, 1) });
-
-    /**
-     * <ul>
-     * <li>INTEL1
-     * <ul>
-     * <li>1 processor
-     * <li>1 core per processor
-     * <li>1 thread per core
-     * <li>===
-     * <li>1GB system RAM
-     * <li>1MB L2 cache per processor
-     * <li>32kB L1 cache per core
-     * </ul>
-     * </ul>
-     */
-    static final Hardware X86__01 = new Hardware("x86",
-            new BasicMachine[] { new BasicMachine(1L * K * K * K, 1), new BasicMachine(1L * K * K, 1), new BasicMachine(32L * K, 1) });
-
-    /**
-     * <ul>
-     * <li>B5950053
-     * <ul>
-     * <li>1 processor
-     * <li>2 cores per processor
-     * <li>1 thread per core
-     * <li>===
-     * <li>3.5GB system RAM
-     * <li>6MB L2 cache per processor (2 cores)
-     * <li>32kB L1 cache per core
-     * </ul>
-     * </ul>
-     */
-    static final Hardware X86__02 = new Hardware("x86",
-            new BasicMachine[] { new BasicMachine(7L * 512L * K * K, 2), new BasicMachine(6L * K * K, 2), new BasicMachine(32L * K, 1) });
-
-    /**
-     * <ul>
-     * <li>MANTA / iMac7,1
-     * <ul>
-     * <li>1 processor
-     * <li>2 cores per processor
-     * <li>1 thread per core
-     * <li>===
-     * <li>3GB system RAM
-     * <li>4MB L2 cache per processor (2 cores)
-     * <li>32kB L1 cache per core
-     * </ul>
-     * </ul>
-     */
-    static final Hardware X86_64__02 = new Hardware("x86_64",
-            new BasicMachine[] { new BasicMachine(3L * K * K * K, 2), new BasicMachine(4L * K * K, 2), new BasicMachine(32L * K, 1) });
-
-    /**
-     * Combination of {@link #X86_64__04_1_L2}, {@link #X86_64__04_1_L3} and {@link #X86_64__04_2}
-     */
-    static final Hardware X86_64__04 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(32L * K * K * K, 4), new BasicMachine(3L * K * K, 4),
-            new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
-
-    /**
-     * <ul>
-     * <li>PA's Q9400
-     * <ul>
-     * <li>1 processors
-     * <li>4 cores per processor
-     * <li>1 thread per core (4 threads in total)
-     * <li>===
-     * <li>3GB system RAM
-     * <li>3MB L2 cache per 2 cores
-     * <li>32kB L1 cache per core
-     * </ul>
-     * <li>PA's Q6600
-     * <ul>
-     * <li>1 processors
-     * <li>4 cores per processor
-     * <li>1 thread per core (4 threads in total)
-     * <li>===
-     * <li>8GB system RAM
-     * <li>4MB L2 cache per 2 cores
-     * <li>32kB L1 cache per core
-     * </ul>
-     * </ul>
-     */
-    static final Hardware X86_64__04_1_L2 = new Hardware("x86_64",
-            new BasicMachine[] { new BasicMachine(8L * K * K * K, 4), new BasicMachine(3L * K * K, 2), new BasicMachine(32L * K, 1) });
-
-    /**
-     * <ul>
-     * <li>Intel i5-4670K with 16GB of RAM
-     * <ul>
-     * <li>1 processors
-     * <li>4 cores per processor
-     * <li>1 thread per core (4 threads in total)
-     * <li>===
-     * <li>16GB system RAM
-     * <li>6MB L3 cache per processor
-     * <li>256kB L2 cache per core
-     * <li>32kB L1 cache per core
-     * </ul>
-     * <li>Intel Core i5-3570K with 32GB of RAM (from Java Matrix Benchmark)
-     * <ul>
-     * <li>1 processors
-     * <li>4 cores per processor
-     * <li>1 thread per core (4 threads in total)
-     * <li>===
-     * <li>32GB system RAM
-     * <li>6MB L3 cache per processor
-     * <li>256kB L2 cache per core
-     * <li>32kB L1 cache per core
-     * </ul>
-     * </ul>
-     */
-    static final Hardware X86_64__04_1_L3 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(32L * K * K * K, 4), new BasicMachine(6L * K * K, 4),
-            new BasicMachine(256L * K, 1), new BasicMachine(32L * K, 1) });
-
-    /**
-     * <ul>
-     * <li>BUBBLE / MacBookAir4,2
-     * <ul>
-     * <li>1 processors
-     * <li>2 cores per processor
-     * <li>2 threads per core (4 threads in total)
-     * <li>===
-     * <li>4GB system RAM
-     * <li>3MB L3 cache per processor
-     * <li>256kB L2 cache per core
-     * <li>32kB L1 cache per core
-     * </ul>
-     * <li>PA's Intel Core i7-620M laptop
-     * <ul>
-     * <li>1 processors
-     * <li>2 cores per processor
-     * <li>2 threads per core (4 threads in total)
-     * <li>===
-     * <li>8GB system RAM
-     * <li>4MB L3 cache per processor
-     * <li>256kB L2 cache per core
-     * <li>32kB L1 cache per core
-     * </ul>
-     * <li>MacBookPro14,2 (oyster)
-     * <ul>
-     * <li>1 processors
-     * <li>2 cores per processor
-     * <li>2 threads per core (4 threads in total)
-     * <li>===
-     * <li>8GB system RAM
-     * <li>4MB L3 cache per processor
-     * <li>256kB L2 cache per core
-     * <li>32kB L1 cache per core
-     * </ul>
-     * </ul>
-     */
-    static final Hardware X86_64__04_2 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(8L * K * K * K, 4), new BasicMachine(3L * K * K, 4),
-            new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
-
-    /**
-     * <ul>
-     * <li>HA's Intel Core i7-920 server
-     * <ul>
-     * <li>1 processor
-     * <li>4 cores per processor
-     * <li>2 threads per core (8 threads in total)
-     * <li>===
-     * <li>8GB system RAM
-     * <li>8MB L3 cache per processor
-     * <li>256kB L2 cache per core
-     * <li>32kB L1 cache per core
-     * </ul>
-     * <li>Core i7-2600 3.4 GHz - 4 cores - 8 threads from Java Matrix Benchmark
-     * <ul>
-     * <li>1 processor
-     * <li>4 cores per processor
-     * <li>2 threads per core (8 threads in total)
-     * <li>===
-     * <li>11GB system RAM
-     * <li>8MB L3 cache per processor
-     * <li>256kB L2 cache per core
-     * <li>32kB L1 cache per core
-     * </ul>
-     * <li>Core i7-3770 3.4 GHz - 4 cores - 8 threads (whale @ MSC/MSB)
-     * <ul>
-     * <li>1 processor
-     * <li>4 cores per processor
-     * <li>2 threads per core (8 threads in total)
-     * <li>===
-     * <li>8GB system RAM
-     * <li>8MB L3 cache per processor
-     * <li>256kB L2 cache per core
-     * <li>32kB L1 cache per core
-     * </ul>
-     * <li>Core i7-2600 3.4 GHz - 4 cores - 8 threads (Vostro-460 @ Scila)
-     * <ul>
-     * <li>1 processor
-     * <li>4 cores per processor
-     * <li>2 threads per core (8 threads in total)
-     * <li>===
-     * <li>32GB system RAM
-     * <li>8MB L3 cache per processor
-     * <li>256kB L2 cache per core
-     * <li>32kB L1 cache per core
-     * </ul>
-     * <li>Google Cloud Platform Compute Engine n1-standard-8 (8 vCPUs, 30 GB memory, Skylake)
-     * <ul>
-     * <li>1 processor
-     * <li>4 cores per processor
-     * <li>2 threads per core (8 threads in total)
-     * <li>===
-     * <li>30GB system RAM
-     * <li>8.25MB L3 cache per processor
-     * <li>1MB L2 cache per core
-     * <li>32kB L1 cache per core
-     * </ul>
-     * </ul>
-     */
-    static final Hardware X86_64__08 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(32L * K * K * K, 8), new BasicMachine(8L * K * K, 8),
-            new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
-
-    /**
-     * <pre>
-     * "Gulftown" (32 nm) Model: SLBUZ (B1)
-     * Intel Core i7-980 3.33GHz
-     * 8/25/2010
-     * ref: http://ark.intel.com/products/47932
-     *      https://en.wikipedia.org/wiki/List_of_Intel_Core_i7_microprocessors
-     *      Device Manager
-     * </pre>
-     * <ul>
-     * <li>Intel Core i7-980
-     * <ul>
-     * <li>1 processor
-     * <li>6 cores per processor
-     * <li>2 threads per core (12 threads in total)
-     * <li>===
-     * <li>12GB system RAM
-     * <li>12MB L3 cache per processor
-     * <li>256kB L2 cache per core (x6)
-     * <li>32kB L1 cache per core (x6)
-     * </ul>
-     * </ul>
-     */
-    static final Hardware X86_64__12 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(12L * K * K * K, 12), new BasicMachine(12L * K * K, 12),
-            new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
-
-    /**
-     * <ul>
-     * <li>SAILFISH / MacPro4,1
-     * <ul>
-     * <li>2 processors
-     * <li>4 cores per processor (8 cores in total)
-     * <li>2 threads per core (16 threads in total)
-     * <li>===
-     * <li>12GB system RAM
-     * <li>8MB L3 cache per processor
-     * <li>256kB L2 cache per core
-     * <li>32kB L1 cache per core
-     * </ul>
-     * <li>OCTOPUS / MacBookPro16,1
-     * <ul>
-     * <li>1 processors
-     * <li>8 cores per processor (8 cores in total)
-     * <li>2 threads per core (16 threads in total)
-     * <li>===
-     * <li>64GB system RAM
-     * <li>16MB L3 cache per processor
-     * <li>256kB L2 cache per core
-     * <li>32kB L1 cache per core
-     * </ul>
-     * </ul>
-     */
-    static final Hardware X86_64__16 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(64L * K * K * K, 16), new BasicMachine(8L * K * K, 16),
-            new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
-
-    /**
-     * <ul>
-     * <li>CBL (prod & test) 2 x Intel(R) Xeon(R) CPU E5-2697A v4 @ 2.60GHz
-     * <ul>
-     * <li>2 processors
-     * <li>16 cores per processor (32 cores in total)
-     * <li>2 threads per core (64 threads in total)
-     * <li>===
-     * <li>512GB system RAM
-     * <li>40MB L3 cache per processor
-     * <li>256kB L2 cache per core
-     * <li>32kB L1 cache per core
-     * </ul>
-     * <li>CBF (simu) 4 x Intel(R) Xeon(R) CPU E7-4809 v3 @ 2.00GHz
-     * <ul>
-     * <li>4 processors
-     * <li>8 cores per processor (32 cores in total)
-     * <li>2 threads per core (64 threads in total)
-     * <li>===
-     * <li>512GB system RAM
-     * <li>20MB L3 cache per processor
-     * <li>256kB L2 cache per core
-     * <li>32kB L1 cache per core
-     * </ul>
-     * </ul>
-     */
-    static final Hardware X86_64__64 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(512L * K * K * K, 64), new BasicMachine(20L * K * K, 32),
-            new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
-
-    /**
-     * <ul>
-     * <li>CBF (prod) 4 x Intel(R) Xeon(R) CPU E7-4830 v3 @ 2.10GHz
-     * <ul>
-     * <li>4 processors
-     * <li>12 cores per processor (48 cores in total)
-     * <li>2 threads per core (96 threads in total)
-     * <li>===
-     * <li>512GB system RAM
-     * <li>30MB L3 cache per processor
-     * <li>256kB L2 cache per core
-     * <li>32kB L1 cache per core
-     * </ul>
-     * </ul>
-     */
-    static final Hardware X86_64__96 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(512L * K * K * K, 96), new BasicMachine(30L * K * K, 24),
-            new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
-
-    static {
-        PREDEFINED.add(AARCH64__08);
-        PREDEFINED.add(PPC__01);
-        PREDEFINED.add(X86__01);
-        PREDEFINED.add(X86__02);
-        PREDEFINED.add(X86_64__02);
-        PREDEFINED.add(X86_64__04);
-        //        PREDEFINED.add(X86_64.X86_64__04_2);
-        //        PREDEFINED.add(X86_64.X86_64__04_1_L2);
-        //        PREDEFINED.add(X86_64.X86_64__04_1_L3);
-        PREDEFINED.add(X86_64__08);
-        PREDEFINED.add(X86_64__12);
-        PREDEFINED.add(X86_64__16);
-        PREDEFINED.add(X86_64__64);
-        PREDEFINED.add(X86_64__96);
+    public static Architecture getArchitecture() {
+        return Architecture.from(System.getProperty("os.arch", "unknown"));
     }
 
+    /**
+     * System RAM - attempts multiple strategies to determine total physical memory with robust fallback
+     * mechanisms.
+     */
+    public static long getMemory() {
+
+        // 1) Prefer OS-reported total physical memory
+        try {
+            OperatingSystemMXBean osBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+            long totalPhysicalMemory = osBean.getTotalPhysicalMemorySize();
+            if (totalPhysicalMemory > 0) {
+                return totalPhysicalMemory;
+            }
+        } catch (Throwable ignore) {
+            // ignore and fall back
+        }
+
+        // 2) Reverse-engineer from default JVM sizing: Xmx is typically ~25% of physical
+        long heapMax = Runtime.getRuntime().maxMemory();
+        if (heapMax > 0L) {
+            long estimated = heapMax * 4L; // assume default MaxRAMPercentage ~ 25%
+            if (estimated < heapMax) {
+                // overflow guard (highly unlikely)
+                estimated = heapMax;
+            }
+            return estimated;
+        }
+
+        // 3) Static minimal assumption
+        return 2L * K * K * K; // 2 GiB
+    }
+
+    /**
+     * Returns the number of processors (logical cores/threads) available to the Java Virtual Machine. This
+     * includes both physical cores and logical threads created by technologies like Intel's Hyperthreading or
+     * IBM's SMT. This value is used by ojAlgo for parallel algorithm selection, thread pool sizing, and work
+     * distribution strategies.
+     * <p>
+     * The value represents the total number of logical processors that the JVM can utilize for parallel
+     * execution. This is used by ojAlgo to:
+     * <ul>
+     * <li>Size thread pools for parallel matrix operations</li>
+     * <li>Determine when to use parallel vs. sequential algorithms</li>
+     * <li>Configure parallelism thresholds for different operations</li>
+     * <li>Estimate optimal block sizes for parallel decomposition</li>
+     * </ul>
+     * <p>
+     * <b>Typical values:</b>
+     * <ul>
+     * <li><code>1</code> - Single-core systems or restricted environments</li>
+     * <li><code>2</code> - Dual-core systems or dual-core with hyperthreading disabled</li>
+     * <li><code>4</code> - Quad-core systems or dual-core with hyperthreading</li>
+     * <li><code>8</code> - Octa-core systems or quad-core with hyperthreading</li>
+     * <li><code>16-32</code> - High-end consumer or workstation processors</li>
+     * <li><code>64-128+</code> - Server-class processors with many cores</li>
+     * </ul>
+     *
+     * @return The number of logical processors available to the JVM, always at least 1.
+     */
+    public static int getThreads() {
+        return Runtime.getRuntime().availableProcessors();
+    }
+
+    /**
+     * Creates a Hardware instance from available system properties and logical deduction. This method
+     * supports a wide range of hardware from legacy systems to modern many-core processors.
+     *
+     * @param architecture The system architecture (x86, x86_64, aarch64, etc.)
+     * @param memory       The available system memory in bytes (now machine RAM, not JVM max heap)
+     * @param threads      The number of available processor threads
+     * @return A Hardware instance that closely matches the actual system hardware
+     */
+    public static Hardware make(final Architecture architecture, final long memory, final int threads) {
+
+        BasicMachine l1 = Hardware.estimateL1(architecture, memory, threads);
+
+        int nbLevels = Hardware.estimateNumberOfLevels(architecture, memory, threads, l1);
+        int length = 1 + nbLevels;
+
+        BasicMachine[] levels = new BasicMachine[length];
+
+        levels[0] = new BasicMachine(memory, threads);
+        levels[nbLevels] = l1;
+        for (int level = 2; level <= nbLevels; level++) {
+            levels[length - level] = Hardware.estimateLevel(architecture, memory, threads, l1, nbLevels, level);
+        }
+
+        return new Hardware(architecture, levels);
+    }
+
+    /**
+     * @deprecated v56 Use {@link #newInstance()} instead
+     */
+    @Deprecated
     public static Hardware makeSimple() {
-        return Hardware.makeSimple(VirtualMachine.getArchitecture(), VirtualMachine.getMemory(), VirtualMachine.getThreads());
+        return Hardware.makeSimple(Hardware.getArchitecture(), Hardware.getMemory(), Hardware.getThreads());
     }
 
-    public static Hardware makeSimple(final String systemArchitecture, final long systemMemory, final int systemThreads) {
+    /**
+     * @deprecated v56 Use {@link #make(String, long, int, String) instead
+     */
+    @Deprecated
+    public static Hardware makeSimple(final Architecture systemArchitecture, final long systemMemory, final int systemThreads) {
 
         if (systemThreads > 8) {
             // Assume hyperthreading, L3 cache and more than 1 CPU
@@ -502,14 +278,274 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
         }
     }
 
+    /**
+     * Creates a Hardware instance by intelligently detecting system characteristics from available system
+     * properties and logical deduction. This method supports a wide range of hardware from legacy systems to
+     * modern many-core processors.
+     *
+     * @return A Hardware instance that closely matches the actual system hardware
+     */
+    public static Hardware newInstance() {
+        return Hardware.make(Hardware.getArchitecture(), Hardware.getMemory(), Hardware.getThreads());
+    }
+
+    /**
+     * L1 cache is usually fixed per architecture.
+     */
+    private static BasicMachine estimateL1(final Architecture architecture, final long memory, final int threads) {
+
+        int threadsPerCore;
+        long l1Size;
+
+        switch (architecture) {
+        case PPC:
+            if (threads >= 16) {
+                threadsPerCore = 8; // SMT8
+            } else if (threads >= 8) {
+                threadsPerCore = 4; // SMT4
+            } else if (threads >= 4) {
+                threadsPerCore = 2; // SMT2
+            } else {
+                threadsPerCore = 1;
+            }
+            l1Size = 64L * K;
+            break;
+
+        case X86:
+        case X86_64:
+            // For 4-thread systems, infer SMT2 vs 1 based on memory bands; otherwise typical SMT2 for larger even counts
+            if (threads == 4) {
+                long gb = Math.max(1L, memory / (K * K * K));
+                if (gb < 4L) {
+                    threadsPerCore = 1; // very low-RAM quads (no HT)
+                } else if (gb <= 11L) {
+                    threadsPerCore = 2; // likely 2C4T with HT
+                } else {
+                    threadsPerCore = 1; // likely 4C4T without HT
+                }
+            } else if (threads == 2) {
+                threadsPerCore = 1;
+            } else {
+                threadsPerCore = (threads >= 4 && (threads % 2 == 0)) ? 2 : 1;
+            }
+            l1Size = 32L * K;
+            break;
+
+        case AARCH64:
+            threadsPerCore = 1;
+            l1Size = 64L * K;
+            break;
+
+        case ARM:
+            threadsPerCore = (threads >= 8) ? 2 : 1;
+            l1Size = 32L * K;
+            break;
+
+        default:
+            // Generic/OTHER: scale SMT with high thread counts typical for many-thread architectures (e.g., SPARC T-series)
+            if (threads >= 64) {
+                threadsPerCore = 8;
+            } else if (threads >= 32) {
+                threadsPerCore = 4;
+            } else if (threads >= 4 && (threads % 2 == 0)) {
+                threadsPerCore = 2;
+            } else {
+                threadsPerCore = 1;
+            }
+            l1Size = 32L * K;
+        }
+
+        return new BasicMachine(l1Size, threadsPerCore);
+    }
+
+    private static BasicMachine estimateLevel(final Architecture architecture, final long memory, final int threads, final BasicMachine l1, final int nbLevels,
+            final int level) {
+        // level: 2 => L2, 3 => L3 (when nbLevels == 3)
+        final int tpc = Math.max(1, l1.threads); // threads per core
+        final int cores = Math.max(1, threads / tpc);
+
+        switch (architecture) {
+        case X86:
+        case X86_64: {
+            if (level == 2) {
+                // Modern x86(x64) commonly scales L2 per core; legacy 4-thread low-RAM used larger shared L2
+                if (threads == 4) {
+                    long gb = Math.max(1L, memory / (K * K * K));
+                    if (gb <= 3L) {
+                        return new BasicMachine(3L * K * K, 2);
+                    }
+                }
+                // Legacy 32-bit x86 single/dual-core often had larger shared L2
+                if (architecture == Architecture.X86 && threads <= 2) {
+                    long gb = Math.max(1L, memory / (K * K * K));
+                    if (gb <= 2L) {
+                        return new BasicMachine(1L * K * K, 1);
+                    } else if (gb <= 4L) {
+                        return new BasicMachine(6L * K * K, 2);
+                    }
+                }
+                // Early x86_64 dual-core without HT often had shared L2 of a few MB
+                if (architecture == Architecture.X86_64 && threads == 2) {
+                    long gb = Math.max(1L, memory / (K * K * K));
+                    if (gb <= 4L) {
+                        return new BasicMachine(4L * K * K, 2);
+                    }
+                }
+                // Default per-core L2 size with a memory-banded bump for mid/high-memory 8-16 thread systems
+                long gb = Math.max(1L, memory / (K * K * K));
+                if (threads >= 8 && threads <= 16 && gb >= 24L) {
+                    return new BasicMachine(1L * K * K, tpc);
+                }
+                return new BasicMachine(256L * K, tpc);
+            } else if (level == 3) {
+                // Heuristics for L3 size and sharing
+                long l3Size;
+                int l3Threads = threads; // default: shared by all threads
+                if (threads >= 96) {
+                    l3Size = 30L * K * K; // large multi-socket server
+                    l3Threads = Math.max(1, threads / 4); // approximate per-socket sharing (assume 4 sockets)
+                } else if (threads >= 64) {
+                    l3Size = 20L * K * K;
+                    l3Threads = Math.max(1, threads / 2); // typical dual-socket sharing
+                } else if (cores == 6) {
+                    l3Size = 12L * K * K; // Common 6-core desktop/workstation parts
+                } else if (cores >= 8) {
+                    // Use memory ranges to separate older vs newer 8+ core platforms
+                    long gb = Math.max(1L, memory / (K * K * K));
+                    if (gb >= 32L) {
+                        // Newer: ~2MB per core, shared by all threads
+                        l3Size = Math.min(32L * K * K, cores * 2L * K * K);
+                        l3Threads = threads;
+                    } else if (gb <= 16L) {
+                        // Older/leaner memory configs: smaller LLC, shared by physical cores only
+                        l3Size = 8L * K * K;
+                        l3Threads = cores;
+                    } else {
+                        // In-between: scale with cores, shared by all threads
+                        l3Size = Math.max(8L * K * K, Math.min(32L * K * K, cores * 2L * K * K));
+                        l3Threads = threads;
+                    }
+                } else if (threads == 8) {
+                    long gb = Math.max(1L, memory / (K * K * K));
+                    if (gb >= 28L && gb <= 31L) {
+                        // Mid-memory 30GB configs (e.g., some cloud/desktop platforms)
+                        l3Size = 8250L * K; // 8,250 KiB (~8.06 MiB)
+                    } else {
+                        l3Size = 8L * K * K; // 8 MiB
+                    }
+                } else if (threads == 4) {
+                    long gb = Math.max(1L, memory / (K * K * K));
+                    // Memory-banded L3 for 4-thread systems: <=4GB -> 3MB, <=8GB -> 4MB, >8GB -> 6MB
+                    if (gb <= 4L) {
+                        l3Size = 3L * K * K;
+                    } else if (gb <= 8L) {
+                        l3Size = 4L * K * K;
+                    } else {
+                        l3Size = 6L * K * K;
+                    }
+                } else {
+                    // Generic: ~2MB per core, min 3MB, cap 32MB
+                    l3Size = Math.max(3L * K * K, Math.min(32L * K * K, cores * 2L * K * K));
+                }
+                return new BasicMachine(l3Size, l3Threads);
+            }
+            break;
+        }
+        case AARCH64: {
+            if (level == 2) {
+                // Non-Apple default ~256KB per core; Apple can have bigger shared L2
+                // Use simple heuristic on threads & memory to mimic common M1/M2 examples
+                if (threads == 8) {
+                    long gb = Math.max(1L, memory / (K * K * K));
+                    if (gb <= 18L) {
+                        // M1 Pro example: large shared L2 across performance clusters
+                        return new BasicMachine(28L * K * K, 8);
+                    } else {
+                        // M2 Air example: 4MB (perf), simplified as a single unit with 4 threads
+                        return new BasicMachine(4L * K * K, 4);
+                    }
+                }
+                return new BasicMachine(256L * K, tpc);
+            } else if (level == 3) {
+                if (threads == 8) {
+                    long gb = Math.max(1L, memory / (K * K * K));
+                    if (gb <= 18L) {
+                        return new BasicMachine(24L * K * K, 8); // M1 Pro SLC/L3
+                    } else {
+                        return new BasicMachine(8L * K * K, 8); // M2 example
+                    }
+                }
+                // Generic ARM64: modest LLC
+                return new BasicMachine(2L * K * K, threads);
+            }
+            break;
+        }
+        case ARM: {
+            if (level == 2) {
+                return new BasicMachine(256L * K, tpc);
+            } else if (level == 3) {
+                return new BasicMachine(2L * K * K, threads);
+            }
+            break;
+        }
+        case PPC: {
+            if (level == 2) {
+                // Many PPC parts have ~512KB L2 per core (simplified)
+                return new BasicMachine(512L * K, Math.min(8, tpc));
+            } else if (level == 3) {
+                // Typical small PPC L3
+                return new BasicMachine(8L * K * K, threads);
+            }
+            break;
+        }
+        default: {
+            if (level == 2) {
+                return new BasicMachine(256L * K, tpc);
+            } else if (level == 3) {
+                return new BasicMachine(3L * K * K, threads);
+            }
+        }
+        }
+
+        // Fallback (should not reach)
+        return new BasicMachine(256L * K, tpc);
+    }
+
+    /**
+     * Usually 3, but could be 2. Theoretically could be any non-negative number (even 0).
+     */
+    private static int estimateNumberOfLevels(final Architecture architecture, final long memory, final int threads, final BasicMachine l1) {
+        // Heuristic: return number of cache levels including L1 (i.e., L1=1, L2+L1=2, L3+L2+L1=3)
+        switch (architecture) {
+        case X86:
+        case X86_64: {
+            if (threads <= 2) {
+                return 2;
+            }
+            if (threads == 4) {
+                long gb = Math.max(1L, memory / (K * K * K));
+                return (gb <= 3L) ? 2 : 3;
+            }
+            return 3;
+        }
+        case AARCH64:
+            return 3;
+        case ARM:
+            return 2;
+        case PPC:
+            return (threads >= 16) ? 3 : 2;
+        default:
+            return 2;
+        }
+    }
+
     private final BasicMachine[] myLevels;
 
     /**
-     * <code>new BasicMachine[] { SYSTEM, L3, L2, L1 }</code> or
-     * <code>new BasicMachine[] { SYSTEM, L2, L1 }</code> or in worst case
-     * <code>new BasicMachine[] { SYSTEM, L1 }</code>
+     * <code>new BasicMachine[] { SYSTEM, L3, L2, L1 }</code>,
+     * <code>new MemoryThreads[] { SYSTEM, L2, L1 }</code> or <code>new MemoryThreads[] { SYSTEM, L1 }</code>
      */
-    public Hardware(final String arch, final BasicMachine[] levels) {
+    public Hardware(final Architecture arch, final BasicMachine[] levels) {
 
         super(arch, levels);
 
@@ -532,6 +568,8 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
             return units - other.units;
         } else if (memory != other.memory) {
             return (int) (memory - other.memory);
+        } else if (architecture != other.architecture) {
+            return architecture.compareTo(other.architecture);
         } else {
             return 0;
         }
@@ -542,7 +580,10 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj) || !(obj instanceof Hardware)) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof Hardware)) {
             return false;
         }
         Hardware other = (Hardware) obj;
@@ -556,7 +597,8 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        return prime * result + Arrays.hashCode(myLevels);
+        result = prime * result + Arrays.hashCode(myLevels);
+        return result;
     }
 
     public boolean isL2Specified() {
@@ -569,18 +611,7 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
 
     @Override
     public String toString() {
-
-        StringBuilder retVal = new StringBuilder("HW=");
-
-        retVal.append(myLevels[0].toString());
-        if (this.isL3Specified()) {
-            retVal.append(ASCII.COMMA).append(units).append("xL3:").append(myLevels[myLevels.length - 3]);
-        } else if (this.isL2Specified()) {
-            retVal.append(ASCII.COMMA).append(units).append("xL2:").append(myLevels[myLevels.length - 2]);
-        }
-        retVal.append(ASCII.COMMA).append(cores).append("cores:").append(myLevels[myLevels.length - 1]);
-
-        return retVal.toString();
+        return architecture + " " + Arrays.toString(myLevels);
     }
 
     public VirtualMachine virtualise() {

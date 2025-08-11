@@ -21,6 +21,8 @@
  */
 package org.ojalgo.machine;
 
+import java.util.Objects;
+
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.netio.ASCII;
@@ -28,30 +30,8 @@ import org.ojalgo.netio.BasicLogger;
 
 public final class VirtualMachine extends CommonMachine {
 
-    private static final String AMD64 = "amd64";
-    private static final String I386 = "i386";
-    private static final String X86 = "x86";
-    private static final String X86_64 = "x86_64";
-
-    public static String getArchitecture() {
-
-        String tmpProperty = System.getProperty("os.arch").toLowerCase();
-
-        if (I386.equals(tmpProperty)) {
-            return X86;
-        } else if (AMD64.equals(tmpProperty)) {
-            return X86_64;
-        } else {
-            return tmpProperty;
-        }
-    }
-
     public static long getMemory() {
         return Runtime.getRuntime().maxMemory();
-    }
-
-    public static int getThreads() {
-        return Runtime.getRuntime().availableProcessors();
     }
 
     private final Hardware myHardware;
@@ -97,25 +77,14 @@ public final class VirtualMachine extends CommonMachine {
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj) || !(obj instanceof VirtualMachine)) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof VirtualMachine)) {
             return false;
         }
         VirtualMachine other = (VirtualMachine) obj;
-        if (myHardware == null) {
-            if (other.myHardware != null) {
-                return false;
-            }
-        } else if (!myHardware.equals(other.myHardware)) {
-            return false;
-        }
-        if (myRuntime == null) {
-            if (other.myRuntime != null) {
-                return false;
-            }
-        } else if (!myRuntime.equals(other.myRuntime)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(myHardware, other.myHardware) && Objects.equals(myRuntime, other.myRuntime);
     }
 
     public int getAvailableDim1D(final long elementSize) {
@@ -139,8 +108,8 @@ public final class VirtualMachine extends CommonMachine {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((myHardware == null) ? 0 : myHardware.hashCode());
-        return prime * result + ((myRuntime == null) ? 0 : myRuntime.hashCode());
+        result = prime * result + Objects.hash(myHardware, myRuntime);
+        return result;
     }
 
     /**

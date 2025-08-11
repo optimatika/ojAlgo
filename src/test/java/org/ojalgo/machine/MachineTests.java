@@ -23,6 +23,8 @@ package org.ojalgo.machine;
 
 abstract class MachineTests {
 
+    static final long K = 1024L;
+
     static final boolean DEBUG = false;
 
 }

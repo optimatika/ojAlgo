@@ -36,6 +36,10 @@ ojAlgo is now modularised into a JPMS named module, and that module is named "oj
 - Refactored the constructors, factories and builders for the classes in the `org.ojalgo.array` package. Most things should work as before, but the generics signature of `DenseArray.Factory` has changed. Instead of `DenseArray.Factory<ELEMENT_TYPE>` it is now `DenseArray.Factory<ELEMENT_TYPE, ARRAY_TYPE>`. What you may want to do is to instead use a subclass like `PrimitiveArray.Factory`.
 - `SparseArray` is now restricted to `Integer#MAX_VALUE` size (used to be `Long#MAX_VALUE`). There's been a number of changes internally in order to make it perform better at smaller sizes. Also added a bunch of new stuff to support sparse functionality in the `org.ojalgo.matrix` package.
 
+#### org.ojalgo.machine
+
+- The (use of the) system property "shut.up.ojAlgo" is removed. Users will no longer be warned about missing hardware profiles. Instead this is now always estimated. The previous fallback estimation logic has been improved and promoted to be the primary solution. Users are still encouraged to provide hardware profile instances, but these are now instead used as test cases for the estimation logic.
+
 #### org.ojalgo.matrix
 
 - For symmetric matrices the Eigenvalue decompositions are now always sorted. Previously it varied depending which implementation the factory returned. You should still always check `Eigenvalue.isOrdered()` – that a general rule for both eigenvalue and singular value decompositions.

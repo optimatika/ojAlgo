@@ -26,7 +26,7 @@ package org.ojalgo.machine;
  *
  * @author apete
  */
-public abstract class CommonMachine extends BasicMachine {
+abstract class CommonMachine extends BasicMachine {
 
     static final long K = 1024L;
 
@@ -34,7 +34,7 @@ public abstract class CommonMachine extends BasicMachine {
         return availableMemory / elementSize;
     }
 
-    public final String architecture;//x86_64
+    public final Hardware.Architecture architecture;//x86_64
 
     /**
      * The size of one top level (L3 or L2) cache unit in bytes.
@@ -50,7 +50,7 @@ public abstract class CommonMachine extends BasicMachine {
      */
     public final int units;
 
-    protected CommonMachine(final Hardware hardware, final Runtime runtime) {
+    CommonMachine(final Hardware hardware, final Runtime runtime) {
 
         super(Math.min(hardware.memory, runtime.maxMemory()), Math.min(hardware.threads, runtime.availableProcessors()));
 
@@ -67,7 +67,7 @@ public abstract class CommonMachine extends BasicMachine {
      * <code>new MemoryThreads[] { SYSTEM, L2, L1 }</code> or in worst case
      * <code>new MemoryThreads[] { SYSTEM, L1 }</code>
      */
-    protected CommonMachine(final String arch, final BasicMachine[] levels) {
+    CommonMachine(final Hardware.Architecture arch, final BasicMachine[] levels) {
 
         super(levels[0].memory, levels[0].threads);
 
@@ -76,6 +76,14 @@ public abstract class CommonMachine extends BasicMachine {
         cores = threads / levels[levels.length - 1].threads;
         cache = levels[1].memory;
         units = threads / levels[1].threads;
+    }
+
+    CommonMachine(final long memoryBytes, final int nbThreads, final Hardware.Architecture arch, final long cacheBytes, final int nbCores, final int nbUnits) {
+        super(memoryBytes, nbThreads);
+        architecture = arch;
+        cache = cacheBytes;
+        cores = nbCores;
+        units = nbUnits;
     }
 
     CommonMachine(final VirtualMachine base, final int modUnits, final int modCores, final int modThreads) {
@@ -98,7 +106,10 @@ public abstract class CommonMachine extends BasicMachine {
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj) || !(obj instanceof CommonMachine)) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof CommonMachine)) {
             return false;
         }
         CommonMachine other = (CommonMachine) obj;
@@ -109,7 +120,13 @@ public abstract class CommonMachine extends BasicMachine {
         } else if (!architecture.equals(other.architecture)) {
             return false;
         }
-        if (cache != other.cache || cores != other.cores || units != other.units) {
+        if (cache != other.cache) {
+            return false;
+        }
+        if (cores != other.cores) {
+            return false;
+        }
+        if (units != other.units) {
             return false;
         }
         return true;
@@ -119,10 +136,11 @@ public abstract class CommonMachine extends BasicMachine {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + (architecture == null ? 0 : architecture.hashCode());
-        result = prime * result + (int) (cache ^ cache >>> 32);
+        result = prime * result + ((architecture == null) ? 0 : architecture.hashCode());
+        result = prime * result + (int) (cache ^ (cache >>> 32));
         result = prime * result + cores;
-        return prime * result + units;
+        result = prime * result + units;
+        return result;
     }
 
     public final boolean isMultiCore() {
