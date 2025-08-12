@@ -22,9 +22,6 @@
 package org.ojalgo.data.domain.finance.series;
 
 import java.util.List;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.PrimitiveMath;
@@ -45,14 +42,13 @@ public abstract class FinanceSeriesTests {
     static {
 
         if (DEBUG) {
-
-            ConsoleHandler handler = new ConsoleHandler();
-            handler.setLevel(Level.FINE);
-
-            Logger logger = Logger.getLogger("");
-            logger.setLevel(Level.FINE);
-            logger.setUseParentHandlers(false);
-            logger.addHandler(handler);
+            //            ConsoleHandler handler = new ConsoleHandler();
+            //            handler.setLevel(Level.FINE);
+            //
+            //            Logger logger = Logger.getLogger("");
+            //            logger.setLevel(Level.FINE);
+            //            logger.setUseParentHandlers(false);
+            //            logger.addHandler(handler);
         }
     }
 

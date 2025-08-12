@@ -1,36 +1,36 @@
 module ojalgo {
-    requires java.desktop;
+
     requires java.management;
     requires jdk.unsupported;
-    // Required by the test classes:
-    requires java.logging;
 
+    requires transitive java.desktop;
     requires transitive java.net.http;
 
     exports org.ojalgo;
     exports org.ojalgo.algebra;
     exports org.ojalgo.ann;
     exports org.ojalgo.array;
-//    exports org.ojalgo.array.operation;
     exports org.ojalgo.concurrent;
     exports org.ojalgo.data;
     exports org.ojalgo.data.batch;
+    exports org.ojalgo.data.cluster;
     exports org.ojalgo.data.domain.finance;
     exports org.ojalgo.data.domain.finance.portfolio;
     exports org.ojalgo.data.domain.finance.portfolio.simulator;
     exports org.ojalgo.data.domain.finance.series;
+    exports org.ojalgo.data.image;
+    exports org.ojalgo.data.transform;
     exports org.ojalgo.equation;
     exports org.ojalgo.function;
     exports org.ojalgo.function.aggregator;
     exports org.ojalgo.function.constant;
     exports org.ojalgo.function.multiary;
     exports org.ojalgo.function.polynomial;
+    exports org.ojalgo.function.series;
     exports org.ojalgo.function.special;
     exports org.ojalgo.machine;
     exports org.ojalgo.matrix;
     exports org.ojalgo.matrix.decomposition;
-    exports org.ojalgo.matrix.decomposition.function;
-//    exports org.ojalgo.matrix.operation;
     exports org.ojalgo.matrix.store;
     exports org.ojalgo.matrix.task;
     exports org.ojalgo.matrix.task.iterative;
@@ -58,4 +58,5 @@ module ojalgo {
     exports org.ojalgo.type.keyvalue;
     exports org.ojalgo.type.management;
     exports org.ojalgo.type.math;
+
 }
