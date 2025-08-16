@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation.integer;
 
-import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -386,12 +386,13 @@ public final class IntegerSolver extends GenericSolver {
 
         strategy.markInteger(key, result);
 
-        BigDecimal bestIntegerSolutionValue = BigDecimal.valueOf(myBestResultSoFar.getValue());
+        double bestIntegerSolutionValue = myBestResultSoFar.getValue();
+        double nudge = strategy.getGapTolerance().error(bestIntegerSolutionValue);
 
         if (myIntegerModel.getOptimisationSense() != Optimisation.Sense.MAX) {
-            myIntegerModel.limitObjective(null, bestIntegerSolutionValue);
+            myIntegerModel.limitObjective(null, BigDecimal.valueOf(bestIntegerSolutionValue - nudge));
         } else {
-            myIntegerModel.limitObjective(bestIntegerSolutionValue, null);
+            myIntegerModel.limitObjective(BigDecimal.valueOf(bestIntegerSolutionValue + nudge), null);
         }
     }
 
@@ -462,7 +463,8 @@ public final class IntegerSolver extends GenericSolver {
                 return myNodeStatistics.failed();
             }
             // return true;
-            strategy.markInfeasible(nodeKey, myBestResultSoFar != null);
+            double incumbentValue = myBestResultSoFar != null ? myBestResultSoFar.getValue() : Double.NaN;
+            strategy.markInfeasible(nodeKey, myBestResultSoFar != null, incumbentValue);
             return myNodeStatistics.infeasible();
         }
 
@@ -490,15 +492,31 @@ public final class IntegerSolver extends GenericSolver {
             return myNodeStatistics.infeasible();
         }
 
+        double nodeValue = this.evaluateFunction(nodeResult);
+        // Update pseudo-costs based on this child outcome (relative to its parent)
+        strategy.onNodeSolved(nodeKey, nodeResult, nodeValue, myMinimisation);
+
         int branchIntegerIndex = this.identifyNonIntegerVariable(nodeResult, nodeKey, strategy);
-        double tmpSolutionValue = this.evaluateFunction(nodeResult);
 
         if (branchIntegerIndex == -1) {
             if (this.isLogDebug()) {
                 nodePrinter.println("Integer solution! Store it among the others, and stop this branch!");
             }
 
-            Optimisation.Result tmpIntegerSolutionResult = new Optimisation.Result(Optimisation.State.FEASIBLE, tmpSolutionValue, nodeResult);
+            // Extra guard: validate candidate integer solution against the original model
+            // This catches rare cases where numerical issues produce an apparently better but infeasible point.
+            if (!myIntegerModel.validate(nodeResult)) {
+                if (this.isLogDebug()) {
+                    nodePrinter.println("Candidate integer solution is infeasible for the original model. Discarding.");
+                    IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
+                }
+                double incumbentValue = myBestResultSoFar != null ? myBestResultSoFar.getValue() : Double.NaN;
+                strategy.markInfeasible(nodeKey, myBestResultSoFar != null, incumbentValue);
+                nodeSolver.dispose();
+                return myNodeStatistics.infeasible();
+            }
+
+            Optimisation.Result tmpIntegerSolutionResult = new Optimisation.Result(Optimisation.State.FEASIBLE, nodeValue, nodeResult);
 
             this.markInteger(nodeKey, tmpIntegerSolutionResult, strategy);
 
@@ -515,12 +533,12 @@ public final class IntegerSolver extends GenericSolver {
 
         }
         if (this.isLogDebug()) {
-            nodePrinter.println("Not an Integer Solution: " + tmpSolutionValue);
+            nodePrinter.println("Not an Integer Solution: " + nodeValue);
         }
 
         double variableValue = nodeResult.doubleValue(strategy.getIndex(branchIntegerIndex));
 
-        if (!strategy.isGoodEnough(myBestResultSoFar, tmpSolutionValue)) {
+        if (!strategy.isGoodEnough(myBestResultSoFar, nodeValue)) {
             if (this.isLogDebug()) {
                 nodePrinter.println("Can't find better integer solutions - stop this branch!");
                 IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
@@ -546,32 +564,16 @@ public final class IntegerSolver extends GenericSolver {
             }
         }
 
-        NodeKey lowerBranch = nodeKey.createLowerBranch(branchIntegerIndex, variableValue, tmpSolutionValue);
-        NodeKey upperBranch = nodeKey.createUpperBranch(branchIntegerIndex, variableValue, tmpSolutionValue);
+        NodeKey lowerBranch = nodeKey.createLowerBranch(branchIntegerIndex, variableValue, nodeValue);
+        NodeKey upperBranch = nodeKey.createUpperBranch(branchIntegerIndex, variableValue, nodeValue);
 
-        if (!strategy.isDirect(lowerBranch, myBestResultSoFar != null)) {
-            myDeferredNodes.add(lowerBranch);
-            lowerBranch = null;
-        }
-        if (lowerBranch != null || !strategy.isDirect(upperBranch, myBestResultSoFar != null)) {
+        if (lowerBranch.displacement < upperBranch.displacement) {
             myDeferredNodes.add(upperBranch);
-            upperBranch = null;
+            return this.compute(lowerBranch, nodeSolver, nodePrinter, strategy);
+        } else {
+            myDeferredNodes.add(lowerBranch);
+            return this.compute(upperBranch, nodeSolver, nodePrinter, strategy);
         }
-
-        if (lowerBranch != null && upperBranch != null) {
-            // Node model data is reused when continuing down in the same thread.
-            // Can't do 2 branches in the same thread, using the same parent model.
-            throw new IllegalStateException();
-        }
-
-        boolean retVal = true;
-        if (lowerBranch != null) {
-            retVal = retVal && this.compute(lowerBranch, nodeSolver, nodePrinter, strategy);
-        }
-        if (upperBranch != null) {
-            retVal = retVal && this.compute(upperBranch, nodeSolver, nodePrinter, strategy);
-        }
-        return retVal;
     }
 
     /**
@@ -583,25 +585,26 @@ public final class IntegerSolver extends GenericSolver {
 
         int retVal = -1;
 
-        double displacement;
-        double comparableDisplacement = ZERO;
+        double comparableScore = ZERO;
         double maxComparable = ZERO;
 
         for (int i = 0, limit = strategy.countIntegerVariables(); i < limit; i++) {
 
             int globalIndex = strategy.getIndex(i);
 
-            displacement = nodeKey.getMinimumDisplacement(i, nodeResult.doubleValue(globalIndex));
-            // [0, 0.5]
+            double value = nodeResult.doubleValue(globalIndex);
+
+            double distanceDown = value - Math.floor(value); // in [0,1)
+            double distanceUp = ONE - distanceDown; // in [0,1)
+            double displacement = Math.min(distanceDown, distanceUp); // [0,0.5]
 
             if (!strategy.getIntegralityTolerance().isZero(displacement)) {
                 // This variable not integer
+                comparableScore = strategy.scoreBranch(i, distanceDown, distanceUp, myBestResultSoFar != null);
 
-                comparableDisplacement = strategy.toComparable(i, displacement, myBestResultSoFar != null);
-
-                if (comparableDisplacement > maxComparable) {
+                if (comparableScore > maxComparable) {
                     retVal = i;
-                    maxComparable = comparableDisplacement;
+                    maxComparable = comparableScore;
                 }
             }
         }

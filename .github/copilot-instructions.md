@@ -25,8 +25,9 @@ Testing
 Logging and diagnostics
 - Use BasicLogger for output/logging. Do not use System.out or System.err.
 - Keep logs terse; avoid logging in tight loops unless gated.
+- Line comments inside methods only, otherwise use proper javadoc.
 
-Linear/Integer Programming specifics
+Linear/Convex/Integer Optimisation specifics
 - When relevant, compare design/behavior with high-quality open-source solvers (HiGHS, GLOP, CLP, SCIP, CBC).
 - Document notable differences and rationale in code comments (short) or commit/PR descriptions.
 - Strive for numerically robust implementations (scaling, presolve, pivot rules, tolerance handling) with measured impact.

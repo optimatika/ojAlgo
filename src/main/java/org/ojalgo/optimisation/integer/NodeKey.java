@@ -38,6 +38,8 @@ import org.ojalgo.type.context.NumberContext;
 
 public final class NodeKey implements Comparable<NodeKey> {
 
+    static final double MINIMUM_DISPLACEMENT = 1E-9;
+
     static final class IntArrayPool extends ObjectPool<int[]> {
 
         private final int myArrayLength;
@@ -59,6 +61,7 @@ public final class NodeKey implements Comparable<NodeKey> {
 
     }
 
+    public static final Comparator<NodeKey> BREADTH_FIRST_SEARCH = Comparator.comparingInt((final NodeKey nk) -> nk.depth).thenComparingLong(nk -> nk.sequence);
     public static final Comparator<NodeKey> DEPTH_FIRST_SEARCH = Comparator.comparingInt((final NodeKey nk) -> nk.depth).reversed()
             .thenComparing(Comparator.comparingLong((final NodeKey nk) -> nk.sequence).reversed());
     public static final Comparator<NodeKey> FIFO_SEQUENCE = Comparator.comparingLong((final NodeKey nk) -> nk.sequence);
@@ -68,7 +71,6 @@ public final class NodeKey implements Comparable<NodeKey> {
             .thenComparingInt(nk -> nk.depth).thenComparingDouble(nk -> nk.displacement);
     public static final Comparator<NodeKey> MIN_OBJECTIVE = Comparator.comparingDouble((final NodeKey nk) -> nk.objective).thenComparingInt(nk -> nk.depth)
             .thenComparingDouble(nk -> nk.displacement);
-    public static final Comparator<NodeKey> BREADTH_FIRST_SEARCH = Comparator.comparingInt((final NodeKey nk) -> nk.depth).thenComparingLong(nk -> nk.sequence);
     public static final Comparator<NodeKey> SMALL_DISPLACEMENT = Comparator.comparingDouble((final NodeKey nk) -> nk.displacement);
 
     /**
@@ -109,9 +111,12 @@ public final class NodeKey implements Comparable<NodeKey> {
     private final int[] myLowerBounds;
     private final boolean mySignChanged;
     private final int[] myUpperBounds;
+    // Indicates whether this node was created by branching UP (true) or DOWN (false)
+    private final boolean myUpperBranch;
 
     private NodeKey(final int[] lowerBounds, final int[] upperBounds, final long parentSequenceNumber, final int parentDepth, final int integerIndexBranchedOn,
-            final double branchVariableDisplacement, final double parentObjectiveFunctionValue, final boolean signChanged, final IntArrayPool pool) {
+            final double branchVariableDisplacement, final double parentObjectiveFunctionValue, final boolean signChanged, final boolean upperBranch,
+            final IntArrayPool pool) {
 
         super();
 
@@ -123,10 +128,11 @@ public final class NodeKey implements Comparable<NodeKey> {
         parent = parentSequenceNumber;
         depth = parentDepth + 1;
         index = integerIndexBranchedOn;
-        displacement = branchVariableDisplacement;
+        displacement = Math.max(branchVariableDisplacement, MINIMUM_DISPLACEMENT);
         objective = parentObjectiveFunctionValue;
 
         mySignChanged = signChanged;
+        myUpperBranch = upperBranch;
 
         myIntArrayPool = pool;
     }
@@ -170,6 +176,7 @@ public final class NodeKey implements Comparable<NodeKey> {
         objective = NaN;
 
         mySignChanged = false;
+        myUpperBranch = false; // Root node: no direction
     }
 
     @Override
@@ -288,7 +295,7 @@ public final class NodeKey implements Comparable<NodeKey> {
 
         boolean changed = oldVal > 0 && newVal <= 0;
 
-        return new NodeKey(tmpLBs, tmpUBs, sequence, depth, branchIntegerIndex, value - floorValue, objVal, changed, myIntArrayPool);
+        return new NodeKey(tmpLBs, tmpUBs, sequence, depth, branchIntegerIndex, value - floorValue, objVal, changed, false, myIntArrayPool);
     }
 
     NodeKey createUpperBranch(final int branchIntegerIndex, final double value, final double objVal) {
@@ -310,7 +317,7 @@ public final class NodeKey implements Comparable<NodeKey> {
 
         boolean changed = oldVal < 0 && newVal >= 0;
 
-        return new NodeKey(tmpLBs, tmpUBs, sequence, depth, branchIntegerIndex, ceilValue - value, objVal, changed, myIntArrayPool);
+        return new NodeKey(tmpLBs, tmpUBs, sequence, depth, branchIntegerIndex, ceilValue - value, objVal, changed, true, myIntArrayPool);
     }
 
     void dispose() {
@@ -386,8 +393,16 @@ public final class NodeKey implements Comparable<NodeKey> {
         return null;
     }
 
+    boolean isLowerBranch() {
+        return !myUpperBranch;
+    }
+
     boolean isSignChanged() {
         return mySignChanged;
+    }
+
+    boolean isUpperBranch() {
+        return myUpperBranch;
     }
 
     void setNodeState(final ExpressionsBasedModel model, final ModelStrategy strategy) {

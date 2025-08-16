@@ -29,7 +29,6 @@ import java.util.List;
 
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.multiary.MultiaryFunction;
-import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
@@ -70,17 +69,27 @@ public abstract class ModelStrategy implements IntegerStrategy {
 
     static final class DefaultStrategy extends ModelStrategy {
 
+        private static final double DEFAULT_INFEASIBLE_PENALTY = TEN;
+        private static final int RELIABILITY_MIN = 2;
         private static final NumberContext ROUGHLY = NumberContext.of(2);
 
+        private static double productScore(final double wDown, final double wUp, final double distDn, final double distUp) {
+            // Clamp pseudo-costs to avoid zero scores
+            double u = wUp > NodeKey.MINIMUM_DISPLACEMENT ? wUp : NodeKey.MINIMUM_DISPLACEMENT;
+            double d = wDown > NodeKey.MINIMUM_DISPLACEMENT ? wDown : NodeKey.MINIMUM_DISPLACEMENT;
+            return (u * distUp) * (d * distDn);
+        }
+
+        private final int[] myLowerCount;
         /**
-         * The latest found integer solution.
+         * Pseudo-costs when down
          */
-        private Access1D<?> myIterationPoint = null;
+        private final double[] myLowerPseudoWeight;
+        private final int[] myUpperCount;
         /**
-         * Try to keep track of how different values of integer variables relates to the objective function
-         * value.
+         * Pseudo-costs when up
          */
-        private final double[] mySignificances;
+        private final double[] myUpperPseudoWeight;
 
         DefaultStrategy(final ExpressionsBasedModel model, final IntegerStrategy strategy) {
 
@@ -89,11 +98,34 @@ public abstract class ModelStrategy implements IntegerStrategy {
             List<Variable> integerVariables = model.getIntegerVariables();
             int nbIntegers = integerVariables.size();
 
-            mySignificances = new double[nbIntegers];
+            myUpperPseudoWeight = new double[nbIntegers];
+            myLowerPseudoWeight = new double[nbIntegers];
+            myUpperCount = new int[nbIntegers];
+            myLowerCount = new int[nbIntegers];
         }
 
-        private void addSignificance(final int idx, final double significance) {
-            mySignificances[idx] = MissingMath.hypot(mySignificances[idx], significance);
+        private void updatePseudo(final int idx, final boolean upper, final double observation) {
+
+            if (upper) {
+
+                synchronized (myUpperPseudoWeight) {
+
+                    int n = myUpperCount[idx];
+                    double mean = myUpperPseudoWeight[idx];
+                    myUpperPseudoWeight[idx] = (mean * n + observation) / (n + 1);
+                    myUpperCount[idx] = n + 1;
+                }
+
+            } else {
+
+                synchronized (myLowerPseudoWeight) {
+
+                    int n = myLowerCount[idx];
+                    double mean = myLowerPseudoWeight[idx];
+                    myLowerPseudoWeight[idx] = (mean * n + observation) / (n + 1);
+                    myLowerCount[idx] = n + 1;
+                }
+            }
         }
 
         /**
@@ -102,7 +134,10 @@ public abstract class ModelStrategy implements IntegerStrategy {
         @Override
         protected ModelStrategy initialise(final MultiaryFunction.TwiceDifferentiable<Double> function, final Access1D<?> point) {
 
-            Arrays.fill(mySignificances, ONE);
+            Arrays.fill(myUpperPseudoWeight, ZERO);
+            Arrays.fill(myLowerPseudoWeight, ZERO);
+            Arrays.fill(myUpperCount, 0);
+            Arrays.fill(myLowerCount, 0);
 
             int nbIntegers = this.countIntegerVariables();
 
@@ -113,14 +148,22 @@ public abstract class ModelStrategy implements IntegerStrategy {
             if (!ROUGHLY.isZero(largest)) {
                 for (int i = 0; i < nbIntegers; i++) {
                     int globalIndex = this.getIndex(i);
-                    double partial = gradient.doubleValue(globalIndex);
+                    double partial = Math.abs(gradient.doubleValue(globalIndex));
+                    double seed = 0.0;
                     if (!ROUGHLY.isZero(partial)) {
-                        this.addSignificance(i, partial / largest);
+                        seed = partial / largest;
                     }
+                    // Ensure strictly positive seeds to avoid zero product
+                    myUpperPseudoWeight[i] = Math.max(seed, NodeKey.MINIMUM_DISPLACEMENT);
+                    myLowerPseudoWeight[i] = Math.max(seed, NodeKey.MINIMUM_DISPLACEMENT);
+                }
+            } else {
+                // No gradient available; seed with small positive values
+                for (int i = 0; i < nbIntegers; i++) {
+                    myUpperPseudoWeight[i] = NodeKey.MINIMUM_DISPLACEMENT;
+                    myLowerPseudoWeight[i] = NodeKey.MINIMUM_DISPLACEMENT;
                 }
             }
-
-            myIterationPoint = iterationPoint;
 
             return this;
         }
@@ -133,48 +176,71 @@ public abstract class ModelStrategy implements IntegerStrategy {
             return false;
         }
 
+        /**
+         * scale-aware infeasible update using any available cutoff (incumbent or best bound)
+         */
         @Override
-        protected boolean isDirect(final NodeKey node, final boolean found) {
-            return found ? node.displacement < THIRD : node.displacement < HALF;
-        }
+        protected void markInfeasible(final NodeKey key, final boolean found, final double incumbentValue) {
 
-        @Override
-        protected void markInfeasible(final NodeKey key, final boolean found) {
             int index = key.index;
             if (index >= 0) {
-                this.addSignificance(index, found ? 0.2 : 0.1);
+                double dist = key.displacement;
+                double obs;
+                if (Double.isFinite(incumbentValue) && Double.isFinite(key.objective)) {
+                    double gap = this.isMinimisation() ? (incumbentValue - key.objective) : (key.objective - incumbentValue);
+                    if (gap < ZERO) {
+                        gap = ZERO;
+                    }
+                    obs = (gap <= NodeKey.MINIMUM_DISPLACEMENT ? DEFAULT_INFEASIBLE_PENALTY : gap) / dist;
+                } else {
+                    obs = DEFAULT_INFEASIBLE_PENALTY / dist;
+                }
+                this.updatePseudo(index, key.isUpperBranch(), obs);
             }
         }
 
-        /**
-         * Update the integer significances, based on new integer solution found.
-         */
         @Override
         protected void markInteger(final NodeKey key, final Optimisation.Result result) {
-
-            if (myIterationPoint != null) {
-
-                for (int i = 0, limit = this.countIntegerVariables(); i < limit; i++) {
-                    int globalIndex = this.getIndex(i);
-                    double diff = result.doubleValue(globalIndex) - myIterationPoint.doubleValue(globalIndex);
-                    if (!ROUGHLY.isZero(diff)) {
-                        this.addSignificance(i, ONE / diff);
-                    }
-                }
-            }
-
-            myIterationPoint = result;
+            // No-op for pseudo-costs. Updates happen when child nodes are solved or infeasible.
         }
 
-        /**
-         * If not yet found integer solution then compare the remaining/reversed (larger) fraction, otherwise
-         * the fraction scaled by the significance.
-         *
-         * @see org.ojalgo.optimisation.integer.ModelStrategy#toComparable(int, double, boolean)
-         */
         @Override
-        protected double toComparable(final int idx, final double displacement, final boolean found) {
-            return found ? displacement * mySignificances[idx] : ONE - displacement;
+        protected void onNodeSolved(final NodeKey key, final Optimisation.Result result, final double objective, final boolean minimisation) {
+
+            int index = key.index;
+
+            if (index >= 0) {
+
+                // only count degradation, not improvements
+                double deg = Math.max(ZERO, minimisation ? (objective - key.objective) : (key.objective - objective));
+
+                double dist = key.displacement;
+
+                double obs = deg / dist;
+
+                this.updatePseudo(index, key.isUpperBranch(), obs);
+            }
+        }
+
+        @Override
+        protected double scoreBranch(final int idx, final double displaceDown, final double displaceUp, final boolean found) {
+
+            int nbDn = myLowerCount[idx];
+            int nbUp = myUpperCount[idx];
+
+            boolean reliable = Math.min(nbUp, nbDn) >= RELIABILITY_MIN;
+            if (!reliable && !found) {
+                // Original behaviour before any incumbent: closest-to-integer first
+                return Math.max(displaceDown, displaceUp);
+            }
+            double base = displaceDown * displaceUp;
+            double prod = DefaultStrategy.productScore(myLowerPseudoWeight[idx], myUpperPseudoWeight[idx], displaceDown, displaceUp);
+
+            double alpha = reliable ? ONE - TENTH : Math.min(ONE, (nbUp + nbDn) / (TWO * RELIABILITY_MIN));
+
+            // Blend lightly with base to avoid degeneracy
+            return alpha * prod + (ONE - alpha) * base;
+            // Ramp-in blending until reliable (after an incumbent exists)
         }
 
     }
@@ -262,37 +328,14 @@ public abstract class ModelStrategy implements IntegerStrategy {
         return myIndices.length;
     }
 
-    /**
-     * The variable's global index
-     *
-     * @param idx Index among the integer variables
-     */
     protected int getIndex(final int idx) {
         return myIndices[idx];
     }
 
-    /**
-     * Called, once, at the very beginning of the solve process.
-     */
     protected abstract ModelStrategy initialise(final MultiaryFunction.TwiceDifferentiable<Double> function, final Access1D<?> point);
 
     protected abstract boolean isCutRatherThanBranch(double displacement, boolean found);
 
-    /**
-     * This method will be called twice when branching – once for each of the new nodes created by branching.
-     * In most cases you only want to return true for (at most) one of those new branches. Always returning
-     * true for both the new nodes will cause excessive memory consumption.
-     *
-     * @param node  The node to check
-     * @param found Is an integer solution already found?
-     * @return true if this node should be evaluated directly (not deferred)
-     */
-    protected abstract boolean isDirect(NodeKey node, boolean found);
-
-    /**
-     * Is the node's result good enough to continue branching? (Compare the node's objective function value
-     * with the that of the best integer solution found so far.)
-     */
     protected boolean isGoodEnough(final Result bestResultSoFar, final double relaxedNodeValue) {
 
         if (bestResultSoFar == null) {
@@ -317,29 +360,19 @@ public abstract class ModelStrategy implements IntegerStrategy {
         return false;
     }
 
-    /**
-     * Called everytime a node/subproblem is found to be infeasible
-     */
-    protected abstract void markInfeasible(NodeKey key, boolean found);
+    protected abstract void markInfeasible(NodeKey key, boolean found, double incumbentValue);
 
-    /**
-     * Called everytime a new integer solution is found
-     */
     protected abstract void markInteger(NodeKey key, Optimisation.Result result);
 
     /**
-     * Convert the fraction to something "comparable" used to determine which variable to branch on. If a
-     * variable is at an integer value or not is determined by the {@link Optimisation.Options#feasibility}
-     * property. If an integer variable is not at an integer value, then this method is invoked to obtain a
-     * value that is then used to copare with that of other integer variables with fractional values. The
-     * variable with the max "comparable" is picked for branching.
-     *
-     * @param idx          Integer variable index
-     * @param displacement variable's fractional value
-     * @param found        Is an integer solution already found?
-     * @return Value used to compare variables when determining which to branch on. Larger value means more
-     *         likelyn to branch on this.
+     * Hook to update pseudo-costs after a node is solved.
      */
-    protected abstract double toComparable(int idx, double displacement, boolean found);
+    protected abstract void onNodeSolved(final NodeKey key, final Optimisation.Result child, final double childObj, final boolean minimisation);
+
+    protected abstract double scoreBranch(final int idx, final double displaceDown, final double displaceUp, final boolean found);
+
+    boolean isMinimisation() {
+        return myOptimisationSense == Optimisation.Sense.MIN;
+    }
 
 }

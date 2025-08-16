@@ -401,6 +401,10 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         return NumberContext.isZero(value, myAbsoluteError);
     }
 
+    public double error(final double value) {
+        return Math.max(Math.abs(value) * myRelativeError, myAbsoluteError);
+    }
+
     /**
      * Will create an "enforced" BigDecimal instance.
      */
