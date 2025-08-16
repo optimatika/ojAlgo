@@ -37,6 +37,7 @@ import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.Sense;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Primitive1D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -105,7 +106,7 @@ public abstract class ModelStrategy implements IntegerStrategy {
 
             int nbIntegers = this.countIntegerVariables();
 
-            Access1D<Double> iterationPoint = Access1D.asPrimitive1D(point);
+            Access1D<Double> iterationPoint = Primitive1D.wrap(point);
             MatrixStore<Double> gradient = function.getGradient(iterationPoint);
             double largest = gradient.aggregateAll(Aggregator.LARGEST).doubleValue();
 
@@ -194,7 +195,7 @@ public abstract class ModelStrategy implements IntegerStrategy {
 
     protected ModelStrategy(final ExpressionsBasedModel model, final IntegerStrategy strategy) {
 
-        myOptimisationSense = model.getOptimisationSense() != Optimisation.Sense.MAX ? Sense.MIN : Sense.MAX;
+        myOptimisationSense = model.getOptimisationSense();
 
         myStrategy = strategy;
 
@@ -209,6 +210,17 @@ public abstract class ModelStrategy implements IntegerStrategy {
         }
 
         myWorkerPriorities = strategy.getWorkerPriorities();
+
+        for (int i = 0; i < myWorkerPriorities.size(); i++) {
+            Comparator<NodeKey> prio = myWorkerPriorities.get(i);
+            if (prio == NodeKey.MIN_OBJECTIVE || prio == NodeKey.MAX_OBJECTIVE) {
+                if (myOptimisationSense == Optimisation.Sense.MIN) {
+                    myWorkerPriorities.set(i, NodeKey.MIN_OBJECTIVE);
+                } else if (myOptimisationSense == Optimisation.Sense.MAX) {
+                    myWorkerPriorities.set(i, NodeKey.MAX_OBJECTIVE);
+                }
+            }
+        }
     }
 
     @Override
@@ -271,7 +283,7 @@ public abstract class ModelStrategy implements IntegerStrategy {
      * In most cases you only want to return true for (at most) one of those new branches. Always returning
      * true for both the new nodes will cause excessive memory consumption.
      *
-     * @param node The node to check
+     * @param node  The node to check
      * @param found Is an integer solution already found?
      * @return true if this node should be evaluated directly (not deferred)
      */
@@ -322,9 +334,9 @@ public abstract class ModelStrategy implements IntegerStrategy {
      * value that is then used to copare with that of other integer variables with fractional values. The
      * variable with the max "comparable" is picked for branching.
      *
-     * @param idx Integer variable index
+     * @param idx          Integer variable index
      * @param displacement variable's fractional value
-     * @param found Is an integer solution already found?
+     * @param found        Is an integer solution already found?
      * @return Value used to compare variables when determining which to branch on. Larger value means more
      *         likelyn to branch on this.
      */

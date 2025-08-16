@@ -59,11 +59,16 @@ public final class NodeKey implements Comparable<NodeKey> {
 
     }
 
+    public static final Comparator<NodeKey> DEPTH_FIRST_SEARCH = Comparator.comparingInt((final NodeKey nk) -> nk.depth).reversed()
+            .thenComparing(Comparator.comparingLong((final NodeKey nk) -> nk.sequence).reversed());
     public static final Comparator<NodeKey> FIFO_SEQUENCE = Comparator.comparingLong((final NodeKey nk) -> nk.sequence);
     public static final Comparator<NodeKey> LARGE_DISPLACEMENT = Comparator.comparingDouble((final NodeKey nk) -> nk.displacement).reversed();
     public static final Comparator<NodeKey> LIFO_SEQUENCE = Comparator.comparingLong((final NodeKey nk) -> nk.sequence).reversed();
-    public static final Comparator<NodeKey> MAX_OBJECTIVE = Comparator.comparingDouble((final NodeKey nk) -> nk.objective).reversed();
-    public static final Comparator<NodeKey> MIN_OBJECTIVE = Comparator.comparingDouble((final NodeKey nk) -> nk.objective);
+    public static final Comparator<NodeKey> MAX_OBJECTIVE = Comparator.comparingDouble((final NodeKey nk) -> nk.objective).reversed()
+            .thenComparingInt(nk -> nk.depth).thenComparingDouble(nk -> nk.displacement);
+    public static final Comparator<NodeKey> MIN_OBJECTIVE = Comparator.comparingDouble((final NodeKey nk) -> nk.objective).thenComparingInt(nk -> nk.depth)
+            .thenComparingDouble(nk -> nk.displacement);
+    public static final Comparator<NodeKey> BREADTH_FIRST_SEARCH = Comparator.comparingInt((final NodeKey nk) -> nk.depth).thenComparingLong(nk -> nk.sequence);
     public static final Comparator<NodeKey> SMALL_DISPLACEMENT = Comparator.comparingDouble((final NodeKey nk) -> nk.displacement);
 
     /**
@@ -71,8 +76,13 @@ public final class NodeKey implements Comparable<NodeKey> {
      * algorithm.
      */
     private static final NumberContext FEASIBILITY = NumberContext.of(8, 6);
+
     private static final AtomicLong SEQUENCE_GENERATOR = new AtomicLong();
 
+    /**
+     * How far have we branched from the root
+     */
+    public final int depth;
     /**
      * How much the branched on variable must be displaced because of the new constraint introduced with this
      * node (each node introduces precisely 1 new upper or lower bound).
@@ -100,7 +110,7 @@ public final class NodeKey implements Comparable<NodeKey> {
     private final boolean mySignChanged;
     private final int[] myUpperBounds;
 
-    private NodeKey(final int[] lowerBounds, final int[] upperBounds, final long parentSequenceNumber, final int integerIndexBranchedOn,
+    private NodeKey(final int[] lowerBounds, final int[] upperBounds, final long parentSequenceNumber, final int parentDepth, final int integerIndexBranchedOn,
             final double branchVariableDisplacement, final double parentObjectiveFunctionValue, final boolean signChanged, final IntArrayPool pool) {
 
         super();
@@ -111,6 +121,7 @@ public final class NodeKey implements Comparable<NodeKey> {
         myUpperBounds = upperBounds;
 
         parent = parentSequenceNumber;
+        depth = parentDepth + 1;
         index = integerIndexBranchedOn;
         displacement = branchVariableDisplacement;
         objective = parentObjectiveFunctionValue;
@@ -124,7 +135,7 @@ public final class NodeKey implements Comparable<NodeKey> {
 
         super();
 
-        sequence = 0L;
+        sequence = SEQUENCE_GENERATOR.longValue();
 
         List<Variable> integerVariables = integerModel.getIntegerVariables();
         int nbIntegerVariables = integerVariables.size();
@@ -153,6 +164,7 @@ public final class NodeKey implements Comparable<NodeKey> {
         }
 
         parent = sequence;
+        depth = 0;
         index = -1;
         displacement = NaN;
         objective = NaN;
@@ -276,7 +288,7 @@ public final class NodeKey implements Comparable<NodeKey> {
 
         boolean changed = oldVal > 0 && newVal <= 0;
 
-        return new NodeKey(tmpLBs, tmpUBs, sequence, branchIntegerIndex, value - floorValue, objVal, changed, myIntArrayPool);
+        return new NodeKey(tmpLBs, tmpUBs, sequence, depth, branchIntegerIndex, value - floorValue, objVal, changed, myIntArrayPool);
     }
 
     NodeKey createUpperBranch(final int branchIntegerIndex, final double value, final double objVal) {
@@ -298,7 +310,7 @@ public final class NodeKey implements Comparable<NodeKey> {
 
         boolean changed = oldVal < 0 && newVal >= 0;
 
-        return new NodeKey(tmpLBs, tmpUBs, sequence, branchIntegerIndex, ceilValue - value, objVal, changed, myIntArrayPool);
+        return new NodeKey(tmpLBs, tmpUBs, sequence, depth, branchIntegerIndex, ceilValue - value, objVal, changed, myIntArrayPool);
     }
 
     void dispose() {

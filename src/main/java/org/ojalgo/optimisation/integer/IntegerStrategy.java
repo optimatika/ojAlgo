@@ -107,15 +107,11 @@ public interface IntegerStrategy {
 
             int nbWorkers = myParallelism.getAsInt();
             int nbDefinitions = myPriorityDefinitions.length;
-            int nbRepetions = (nbWorkers + nbDefinitions - 1) / nbDefinitions;
 
-            List<Comparator<NodeKey>> retVal = new ArrayList<>(nbRepetions * nbDefinitions);
+            List<Comparator<NodeKey>> retVal = new ArrayList<>(nbWorkers);
 
-            for (int d = 0; d < nbDefinitions; d++) {
-                Comparator<NodeKey> prioDef = myPriorityDefinitions[d];
-                for (int r = 0; r < nbRepetions; r++) {
-                    retVal.add(prioDef);
-                }
+            for (int w = 0; w < nbWorkers; w++) {
+                retVal.add(myPriorityDefinitions[w % nbDefinitions]);
             }
 
             return retVal;
@@ -208,14 +204,14 @@ public interface IntegerStrategy {
 
     static ConfigurableStrategy newConfigurable() {
 
-        Comparator<NodeKey>[] definitions = (Comparator<NodeKey>[]) new Comparator<?>[] { NodeKey.FIFO_SEQUENCE, NodeKey.SMALL_DISPLACEMENT,
-                NodeKey.LIFO_SEQUENCE, NodeKey.LARGE_DISPLACEMENT };
+        Comparator<NodeKey>[] definitions = (Comparator<NodeKey>[]) new Comparator<?>[] { NodeKey.MIN_OBJECTIVE, NodeKey.DEPTH_FIRST_SEARCH,
+                NodeKey.BREADTH_FIRST_SEARCH, NodeKey.LARGE_DISPLACEMENT, NodeKey.SMALL_DISPLACEMENT };
 
-            NumberContext integrality = NumberContext.of(12, 8);
-            NumberContext gap = NumberContext.of(7, 8);
+        NumberContext integrality = NumberContext.of(12, 8);
+        NumberContext gap = NumberContext.of(7, 8);
 
-            return new ConfigurableStrategy(Parallelism.CORES.require(definitions.length), definitions, integrality, gap, DefaultStrategy::new,
-                    new GMICutConfiguration());
+        return new ConfigurableStrategy(Parallelism.CORES.require(definitions.length), definitions, integrality, gap, DefaultStrategy::new,
+                new GMICutConfiguration());
     }
 
     int countUniqueStrategies();
