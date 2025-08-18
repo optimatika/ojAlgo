@@ -1,0 +1,19 @@
+The Collection Set											
+"Instances tagged with the Collection Set. Objective values of
+open instances are marked with ’*’."											
+InstanceInst.	StatusStat.	VariablesVari.	BinariesBina.	IntegersInte.	ContinuousCont.	ConstraintsCons.	Nonz.Nonz.	SubmitterSubm.	GroupGrou.	ObjectiveObje.	TagsTags.
+ej	easy	3	0	3	0	1	3	Timo Berthold	–	25508	numerics general_linear
+flugpl	easy	18	0	11	7	18	46	MIPLIB submission pool	–	1201500	aggregations variable_bound general_linear
+supportcase21i	easy	27	24	3	0	7540	95325	Michael Winkler	–	20	indicator numerics set_covering invariant_knapsack general_linear
+gen-ip016	easy	28	0	28	0	24	672	Simon Bowly	generated	-9476,155197	general_linear
+gen-ip036	easy	29	0	29	0	46	1303	Simon Bowly	generated	-4606,67961	benchmark_suitable general_linear
+gen-ip054	easy	30	0	30	0	27	532	Simon Bowly	generated	6840,965642	benchmark benchmark_suitable variable_bound general_linear
+markshare_4_0	easy	34	30	0	4	4	123	G. Cornuéjols, M. Dawande	markshare	1	benchmark benchmark_suitable integer_knapsack general_linear
+gen-ip021	easy	35	0	35	0	28	945	Simon Bowly	generated	2361,454195	benchmark_suitable general_linear
+gen-ip002	easy	41	0	41	0	24	922	Simon Bowly	generated	-4783,733392	benchmark benchmark_suitable general_linear
+markshare_5_0	easy	45	40	0	5	5	203	G. Cornuéjols, M. Dawande	markshare	1	benchmark_suitable integer_knapsack general_linear
+gr4x6	easy	48	24	0	24	34	96	MIPLIB submission pool	–	202,35	variable_bound mixed_binary
+markshare1	easy	62	50	0	12	6	312	G. Cornuéjols, M. Dawande	markshare	1	benchmark_suitable integer_knapsack general_linear
+neos5	easy	63	53	0	10	63	2016	NEOS Server Submission	neos-pseudoapplication-21	15	benchmark benchmark_suitable mixed_binary
+pk1	easy	86	55	0	31	45	915	MIPLIB submission pool	–	11	benchmark benchmark_suitable precedence mixed_binary
+b-ball	easy	100	88	0	12	30	209	Christopher Cullenbine	–	-1,5	benchmark_suitable precedence cardinality mixed_binary
