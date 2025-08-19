@@ -38,8 +38,6 @@ import org.ojalgo.type.context.NumberContext;
 
 public final class NodeKey implements Comparable<NodeKey> {
 
-    static final double MINIMUM_DISPLACEMENT = 1E-9;
-
     static final class IntArrayPool extends ObjectPool<int[]> {
 
         private final int myArrayLength;
@@ -60,6 +58,8 @@ public final class NodeKey implements Comparable<NodeKey> {
         }
 
     }
+
+    static final double MINIMUM_DISPLACEMENT = 1E-9;
 
     public static final Comparator<NodeKey> BREADTH_FIRST_SEARCH = Comparator.comparingInt((final NodeKey nk) -> nk.depth).thenComparingLong(nk -> nk.sequence);
     public static final Comparator<NodeKey> DEPTH_FIRST_SEARCH = Comparator.comparingInt((final NodeKey nk) -> nk.depth).reversed()
@@ -225,14 +225,23 @@ public final class NodeKey implements Comparable<NodeKey> {
         retVal.append(' ');
         retVal.append('[');
 
-        if (myLowerBounds.length > 0) {
-            this.append(retVal, 0);
-        }
+        if (myLowerBounds.length <= 100) {
 
-        for (int i = 1; i < myLowerBounds.length; i++) {
-            retVal.append(',');
-            retVal.append(' ');
-            this.append(retVal, i);
+            if (myLowerBounds.length > 0) {
+                this.append(retVal, 0);
+            }
+
+            for (int i = 1; i < myLowerBounds.length; i++) {
+                retVal.append(',');
+                retVal.append(' ');
+                this.append(retVal, i);
+            }
+
+        } else {
+
+            retVal.append('.');
+            retVal.append('.');
+            retVal.append('.');
         }
 
         return retVal.append(']').toString();
