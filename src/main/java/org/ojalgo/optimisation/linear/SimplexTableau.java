@@ -179,7 +179,9 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
     abstract boolean fixVariable(int index, double value);
 
     /**
-     * Simplified version of {@link #generateCutCandidates(boolean[], NumberContext, double, double[])}.
+     * Simplified version of {@link #generateCutCandidates(boolean[], NumberContext, double, double[])} for
+     * specific use with {@link SimplexTableauSolver}. {@link SimplexSolver} and {@link SimplexTableauSolver}
+     * can both use {@link SimplexTableau}, but they use them differently.
      */
     final Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality) {
 

@@ -35,6 +35,7 @@ import org.ojalgo.equation.Equation;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Options;
+import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.optimisation.linear.SimplexSolver.EnterInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.ExitInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.IterDescr;
@@ -254,6 +255,10 @@ abstract class SimplexStore {
 
     abstract double extractValue();
 
+    /**
+     * When {@link SimplexSolver} is used as node solver for {@link IntegerSolver} this method generates cut
+     * candidates.
+     */
     final Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality, final double[] shift) {
 
         if (myRemainingArtificials > 0) {

@@ -80,6 +80,18 @@ public abstract class ModelStrategy implements IntegerStrategy {
             return (u * distUp) * (d * distDn);
         }
 
+        /**
+         * Adaptive cut generation state
+         */
+        private volatile int myCutFailedStreak = 0;
+        /**
+         * Adaptive cut generation state
+         */
+        private volatile int myCutLastDepth = -1;
+        /**
+         * Adaptive cut generation state
+         */
+        private volatile long myCutNodesSinceLastSuccess = 0L;
         private final int[] myLowerCount;
         /**
          * Pseudo-costs when down
@@ -169,11 +181,41 @@ public abstract class ModelStrategy implements IntegerStrategy {
         }
 
         @Override
-        protected boolean isCutRatherThanBranch(final double displacement, final boolean found) {
-            if (cutting && found) {
-                return displacement > 0.49;
+        protected boolean isCutRatherThanBranch(final NodeKey nodeKey, final int branchIntegerIndex, final double variableValue, final double nodeValue,
+                final Optimisation.Result bestResultSoFar) {
+
+            if (!cutting) {
+                return false;
             }
-            return false;
+
+            // Count each branching decision considered for cutting
+            myCutNodesSinceLastSuccess++;
+
+            // Always allow at root
+            if (nodeKey.depth == 0) {
+                return true;
+            } else if (bestResultSoFar == null) {
+                return false;
+            }
+
+            // Spacing: depth and number of nodes since last successful cut
+            if (myCutLastDepth >= 0 && nodeKey.depth - myCutLastDepth < 5) {
+                return false;
+            }
+            if (myCutNodesSinceLastSuccess < 100) {
+                return false;
+            }
+
+            if (THIRD > nodeKey.getMinimumDisplacement(branchIntegerIndex, variableValue)) {
+                return false;
+            }
+
+            // Back off after repeated failed attempts
+            if (myCutFailedStreak >= 3) {
+                return false;
+            }
+
+            return true;
         }
 
         /**
@@ -204,6 +246,25 @@ public abstract class ModelStrategy implements IntegerStrategy {
             // No-op for pseudo-costs. Updates happen when child nodes are solved or infeasible.
         }
 
+        /**
+         * Called after a failed cut generation attempt (no cuts added). Original behaviour was to disable.
+         */
+        @Override
+        protected void onCutFailure() {
+            myCutFailedStreak++;
+            if (myCutFailedStreak >= 5) {
+                cutting = false; // Permanently disable after several failures
+            }
+        }
+
+        /** Called after a successful cut generation attempt. */
+        @Override
+        protected void onCutSuccess(final NodeKey nodeKey) {
+            myCutNodesSinceLastSuccess = 0L;
+            myCutLastDepth = nodeKey.depth;
+            myCutFailedStreak = 0;
+        }
+
         @Override
         protected void onNodeSolved(final NodeKey key, final Optimisation.Result result, final double objective, final boolean minimisation) {
 
@@ -223,7 +284,7 @@ public abstract class ModelStrategy implements IntegerStrategy {
         }
 
         @Override
-        protected double scoreBranch(final int idx, final double displaceDown, final double displaceUp, final boolean found) {
+        protected double scoreBranch(final int idx, final double distanceDown, final double distanceUp, final boolean found) {
 
             int nbDn = myLowerCount[idx];
             int nbUp = myUpperCount[idx];
@@ -231,16 +292,40 @@ public abstract class ModelStrategy implements IntegerStrategy {
             boolean reliable = Math.min(nbUp, nbDn) >= RELIABILITY_MIN;
             if (!reliable && !found) {
                 // Original behaviour before any incumbent: closest-to-integer first
-                return Math.max(displaceDown, displaceUp);
+                return Math.max(distanceDown, distanceUp);
             }
-            double base = displaceDown * displaceUp;
-            double prod = DefaultStrategy.productScore(myLowerPseudoWeight[idx], myUpperPseudoWeight[idx], displaceDown, displaceUp);
+            double base = distanceDown * distanceUp;
+            double prod = DefaultStrategy.productScore(myLowerPseudoWeight[idx], myUpperPseudoWeight[idx], distanceDown, distanceUp);
 
             double alpha = reliable ? ONE - TENTH : Math.min(ONE, (nbUp + nbDn) / (TWO * RELIABILITY_MIN));
 
             // Blend lightly with base to avoid degeneracy
             return alpha * prod + (ONE - alpha) * base;
             // Ramp-in blending until reliable (after an incumbent exists)
+        }
+
+        @Override
+        protected double scoreBranchDown(final int idx, final double distanceDown, final boolean found) {
+
+            boolean reliable = Math.min(myUpperCount[idx], myLowerCount[idx]) >= RELIABILITY_MIN;
+            if (!reliable && !found) {
+                // Before reliability and without an incumbent, prefer closest-to-integer (maximize score)
+                return ONE - distanceDown;
+            }
+
+            return myLowerPseudoWeight[idx] * distanceDown;
+        }
+
+        @Override
+        protected double scoreBranchUp(final int idx, final double distanceUp, final boolean found) {
+
+            boolean reliable = Math.min(myUpperCount[idx], myLowerCount[idx]) >= RELIABILITY_MIN;
+            if (!reliable && !found) {
+                // Before reliability and without an incumbent, prefer closest-to-integer (maximize score)
+                return ONE - distanceUp;
+            }
+
+            return myUpperPseudoWeight[idx] * distanceUp;
         }
 
     }
@@ -334,7 +419,11 @@ public abstract class ModelStrategy implements IntegerStrategy {
 
     protected abstract ModelStrategy initialise(final MultiaryFunction.TwiceDifferentiable<Double> function, final Access1D<?> point);
 
-    protected abstract boolean isCutRatherThanBranch(double displacement, boolean found);
+    /**
+     * Decide if cuts should be attempted at this node.
+     */
+    protected abstract boolean isCutRatherThanBranch(NodeKey nodeKey, int branchIntegerIndex, double variableValue, double nodeValue,
+            Optimisation.Result bestResultSoFar);
 
     protected boolean isGoodEnough(final Result bestResultSoFar, final double relaxedNodeValue) {
 
@@ -365,11 +454,25 @@ public abstract class ModelStrategy implements IntegerStrategy {
     protected abstract void markInteger(NodeKey key, Optimisation.Result result);
 
     /**
+     * Called when cut generation produced no cuts (default: disable further cutting).
+     */
+    protected abstract void onCutFailure();
+
+    /**
+     * Called when cut generation added at least one cut (default: no-op).
+     */
+    protected abstract void onCutSuccess(final NodeKey nodeKey);
+
+    /**
      * Hook to update pseudo-costs after a node is solved.
      */
-    protected abstract void onNodeSolved(final NodeKey key, final Optimisation.Result child, final double childObj, final boolean minimisation);
+    protected abstract void onNodeSolved(NodeKey key, Optimisation.Result child, double childObj, boolean minimisation);
 
-    protected abstract double scoreBranch(final int idx, final double displaceDown, final double displaceUp, final boolean found);
+    protected abstract double scoreBranch(int idx, double distanceDown, double distanceUp, boolean found);
+
+    protected abstract double scoreBranchDown(int idx, double distanceDown, boolean found);
+
+    protected abstract double scoreBranchUp(int idx, double distanceUp, boolean found);
 
     boolean isMinimisation() {
         return myOptimisationSense == Optimisation.Sense.MIN;

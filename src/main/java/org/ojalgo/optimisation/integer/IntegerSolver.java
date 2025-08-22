@@ -206,13 +206,6 @@ public final class IntegerSolver extends GenericSolver {
 
         this.resetIterationsCount();
 
-        if (strategy.cutting) {
-            ExpressionsBasedModel cutModel = myIntegerModel.snapshot();
-            NodeSolver cutSolver = cutModel.prepare(NodeSolver::new);
-            Result cutResult = cutSolver.solve();
-            cutSolver.generateCuts(strategy, myIntegerModel);
-        }
-
         NodeKey rootNode = new NodeKey(myIntegerModel);
         ExpressionsBasedModel rootModel = myIntegerModel.snapshot();
         rootNode.setNodeState(rootModel, strategy);
@@ -554,32 +547,35 @@ public final class IntegerSolver extends GenericSolver {
             IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
         }
 
-        if (strategy.cutting && nodeKey.sequence % 100L == 0L) {
-            double displacement = nodeKey.getMinimumDisplacement(branchIntegerIndex, variableValue);
-            if (strategy.isCutRatherThanBranch(displacement, myBestResultSoFar != null)) {
-                if (nodeSolver.generateCuts(strategy, nodeKey)) {
-                    return this.compute(nodeKey, nodeSolver, nodePrinter, strategy);
-                }
-                strategy.cutting = false;
+        if (strategy.isCutRatherThanBranch(nodeKey, branchIntegerIndex, variableValue, nodeValue, myBestResultSoFar)) {
+            if (nodeSolver.generateCuts(strategy, nodeKey)) {
+                strategy.onCutSuccess(nodeKey);
+                return this.compute(nodeKey, nodeSolver, nodePrinter, strategy);
+            } else {
+                strategy.onCutFailure();
             }
         }
 
         NodeKey lowerBranch = nodeKey.createLowerBranch(branchIntegerIndex, variableValue, nodeValue);
         NodeKey upperBranch = nodeKey.createUpperBranch(branchIntegerIndex, variableValue, nodeValue);
 
-        if (lowerBranch.displacement < upperBranch.displacement) {
+        if (lowerBranch.score(strategy, myBestResultSoFar != null) > upperBranch.score(strategy, myBestResultSoFar != null)) {
             myDeferredNodes.add(upperBranch);
-            return this.compute(lowerBranch, nodeSolver, nodePrinter, strategy);
+            boolean ok = this.compute(lowerBranch, nodeSolver, nodePrinter, strategy);
+            lowerBranch.dispose();
+            return ok;
         } else {
             myDeferredNodes.add(lowerBranch);
-            return this.compute(upperBranch, nodeSolver, nodePrinter, strategy);
+            boolean ok = this.compute(upperBranch, nodeSolver, nodePrinter, strategy);
+            upperBranch.dispose();
+            return ok;
         }
     }
 
     /**
      * Should return the index of the (best) integer variable to branch on. Returning a negative index means
      * an integer solution has been found (no further branching). Does NOT return a global variable index -
-     * it's the index among the ineteger variable.
+     * it's the index among the integer variable.
      */
     int identifyNonIntegerVariable(final Optimisation.Result nodeResult, final NodeKey nodeKey, final ModelStrategy strategy) {
 
@@ -611,5 +607,4 @@ public final class IntegerSolver extends GenericSolver {
 
         return retVal;
     }
-
 }

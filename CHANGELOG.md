@@ -50,6 +50,7 @@ ojAlgo is now modularised into a JPMS named module, and that module is named "oj
 - Tweaking to various parts of `ConvexSolver`.
 - Multiple changes and improvements to the `LinearSolver`. The number of industry standard netlib models that are solved (fast enough to be included) as junit tests cases increased from 45 to 78. The `LinearSolver` has actually been improved over several versions, but with this version we see a lot of that coming together and working quite well.
 - Reworked the `IntegerSolver`'s branching strategy. It now uses pseudo-costs when selecting which variable to branch on. The `NodeKey` now keeps track of the branch depth. This is used to implement proper depth-first and breadth-first strategies for the deferred nodes. The default set of node worker priorities have changed.
+- Reworked the `IntegerSolver`'s cut generation strategy. 
 
 #### org.ojalgo.type
 

@@ -141,7 +141,7 @@ public final class NodeKey implements Comparable<NodeKey> {
 
         super();
 
-        sequence = SEQUENCE_GENERATOR.longValue();
+        sequence = 0L;
 
         List<Variable> integerVariables = integerModel.getIntegerVariables();
         int nbIntegerVariables = integerVariables.size();
@@ -412,6 +412,14 @@ public final class NodeKey implements Comparable<NodeKey> {
 
     boolean isUpperBranch() {
         return myUpperBranch;
+    }
+
+    double score(final ModelStrategy strategy, final boolean found) {
+        if (myUpperBranch) {
+            return strategy.scoreBranchUp(index, displacement, found);
+        } else {
+            return strategy.scoreBranchDown(index, displacement, found);
+        }
     }
 
     void setNodeState(final ExpressionsBasedModel model, final ModelStrategy strategy) {

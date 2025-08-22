@@ -74,7 +74,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public abstract class TestUtils /* extends Assertions */ {
 
-    private static final NumberContext EQUALS = NumberContext.of(12);
+    private static final NumberContext EQUALS = NumberContext.of(10);
 
     public static void assertArrayEquals(final byte[] expected, final byte[] actual) {
         Assertions.assertArrayEquals(expected, actual);
