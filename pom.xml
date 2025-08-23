@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ojalgo</groupId>
     <artifactId>ojalgo</artifactId>
-    <version>56.0.0-SNAPSHOT</version>
+    <version>56.0.0</version>
     <name>ojAlgo</name>
     <description>oj! Algorithms - ojAlgo - is Open Source Java code that has to
         do with mathematics, linear algebra and optimisation.</description>
@@ -41,11 +41,12 @@
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
         <repository>
             <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <url>
+                https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
     <properties>
@@ -185,14 +186,12 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.7.0</version>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.8.0</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                    <publishingServerId>central</publishingServerId>
                 </configuration>
             </plugin>
         </plugins>

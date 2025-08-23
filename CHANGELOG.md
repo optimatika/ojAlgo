@@ -11,6 +11,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [56.0.0] – 2025-08-23
+
 ojAlgo is now modularised into a JPMS named module, and that module is named "ojalgo".
 
 ### Added
