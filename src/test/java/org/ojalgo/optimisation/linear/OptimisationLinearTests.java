@@ -29,7 +29,7 @@ import org.ojalgo.type.keyvalue.KeyValue;
 
 abstract class OptimisationLinearTests {
 
-    static final boolean DEBUG = false;
+    static final boolean DEBUG = true;
 
     // static final List<KeyValue<String, ExpressionsBasedModel.Integration<LinearSolver>>> INTEGRATIONS =
     // List

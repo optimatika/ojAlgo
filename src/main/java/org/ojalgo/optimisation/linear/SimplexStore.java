@@ -191,8 +191,8 @@ abstract class SimplexStore {
     }
 
     protected void shiftColumn(final int col, final double shift) {
-        myLowerBounds[col] -= shift;
-        myUpperBounds[col] -= shift;
+        //        myLowerBounds[col] -= shift;
+        //        myUpperBounds[col] -= shift;
     }
 
     abstract void calculateDualDirection(ExitInfo exit);
@@ -297,6 +297,24 @@ abstract class SimplexStore {
     }
 
     abstract double getCost(int i);
+
+    double getCurrentBound(final int j) {
+
+        double retVal = NaN;
+        // For basic variables this method returns NaN
+
+        ColumnState columnState = myPartition.get(j);
+
+        if (columnState == ColumnState.LOWER) {
+            retVal = myLowerBounds[j];
+        } else if (columnState == ColumnState.UPPER) {
+            retVal = myUpperBounds[j];
+        } else if (columnState == ColumnState.UNBOUNDED) {
+            retVal = ZERO;
+        }
+
+        return retVal;
+    }
 
     /**
      * The current (tableau) constraint body element.
