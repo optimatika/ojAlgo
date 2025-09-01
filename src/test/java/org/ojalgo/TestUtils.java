@@ -72,7 +72,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public abstract class TestUtils /* extends Assertions */ {
+public abstract class TestUtils {
 
     private static final NumberContext EQUALS = NumberContext.of(10);
 
@@ -171,6 +171,14 @@ public abstract class TestUtils /* extends Assertions */ {
 
     public static void assertEquals(final double expected, final double actual, final NumberContext context) {
         TestUtils.assertEquals("double != double", expected, actual, context);
+    }
+
+    public static void assertEquals(final double expected, final double actual, final String message) {
+        TestUtils.assertEquals(message, expected, actual);
+    }
+
+    public static void assertEquals(final Double expected, final Double actual) {
+        TestUtils.assertEquals(expected, actual, EQUALS);
     }
 
     public static void assertEquals(final double[] expected, final Access1D<?> actual, final NumberContext accuracy) {

@@ -4,12 +4,13 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.data.cluster.Point.Factory;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.FromFileReader;
@@ -79,6 +80,18 @@ public class KaggleTest extends ClusterTests {
 
     }
 
+    static void describe(final List<Map<KaggleTest.MallCustomer, float[]>> clusters) {
+        Factory newFactory = Point.newFactory();
+        List<Point> points = clusters.stream().flatMap(c -> c.values().stream()).map(c -> newFactory.newPoint(c)).collect(Collectors.toList());
+        KaggleTest.describe(points);
+    }
+
+    static void describe(final Map<KaggleTest.MallCustomer, float[]> cluster) {
+        Factory newFactory = Point.newFactory();
+        List<Point> points = cluster.values().stream().map(c -> newFactory.newPoint(c)).collect(Collectors.toList());
+        KaggleTest.describe(points);
+    }
+
     /**
      * https://www.kaggle.com/datasets/vjchoudhary7/customer-segmentation-tutorial-in-python/data
      * <p>
@@ -92,28 +105,24 @@ public class KaggleTest extends ClusterTests {
 
             List<MallCustomer> customers = reader.stream().collect(Collectors.toList());
 
-            Function<MallCustomer, float[]> converter = customer -> new float[] { customer.gender ? 10 : 0, customer.age, customer.annualIncome,
+            Function<MallCustomer, float[]> extractor = customer -> new float[] { customer.gender ? 10 : 0, customer.age, customer.annualIncome,
                     customer.spendingScore };
 
-            List<Point> points = Point.convert(customers, converter);
-
-            TestUtils.assertEquals(200, points.size());
-
-            List<Set<Point>> clusters = Point.cluster(points);
+            List<Map<MallCustomer, float[]>> clusters = FeatureBasedClusterer.newAutomatic().cluster(customers, extractor);
 
             TestUtils.assertEquals(5, clusters.size());
-            TestUtils.assertEquals(200, clusters.stream().mapToInt(Set::size).sum());
+            TestUtils.assertEquals(200, clusters.stream().mapToInt(Map<MallCustomer, float[]>::size).sum());
 
-            clusters.sort(Comparator.comparing(Set<Point>::size).reversed());
+            clusters.sort(Comparator.comparing(Map<MallCustomer, float[]>::size).reversed());
 
             if (DEBUG) {
                 BasicLogger.debug();
                 BasicLogger.debug("Complete data set");
                 BasicLogger.debug("============================================");
-                KaggleTest.describe(points);
+                KaggleTest.describe(clusters);
                 BasicLogger.debug("Clusters (ordered by decreasing size)");
                 BasicLogger.debug("============================================");
-                for (Set<Point> cluster : clusters) {
+                for (Map<MallCustomer, float[]> cluster : clusters) {
                     KaggleTest.describe(cluster);
                 }
             }
