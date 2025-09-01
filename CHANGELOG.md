@@ -13,6 +13,13 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Added
 
+#### org.ojalgo.data
+
+- New package `org.ojalgo.data.proximity` containing various distance and similarity calculation utilities.
+- Spectral clustering: New `org.ojalgo.data.cluster.SpectralClusterer` implementing spectral clustering over feature vectors using an RBF similarity graph and the symmetric normalised Laplacian. Factory methods `FeatureBasedClusterer.newSpectral(int)` and `newSpectral(DistanceMeasure,int)` create instances.
+- Clustering facade: New `org.ojalgo.data.cluster.FeatureBasedClusterer` facade with factory methods `newAutomatic(...)`, `newGreedy(...)`, `newKMeans(...)`, and `newSpectral(...)`. Adds a generic `cluster(Collection<T>, Function<T,float[]>)` that maps arbitrary items to feature vectors and returns clusters as `List<Map<T,float[]>>`.
+- Automatic k selection: New `org.ojalgo.data.cluster.AutomaticClusterer` that derives thresholds from distance statistics to seed/refine clusters (k-means under the hood).
+
 #### org.ojalgo.matrix
 
 - Spectral decomposition: New `Eigenvalue.Spectral` interface (extends both `Eigenvalue` and `SingularValue`) and factory convenience `Eigenvalue.Factory#makeSpectral(int)` for normal (in particular symmetric / Hermitian) matrices, exposing a decomposition that can simultaneously be treated as an eigenvalue- and singular value decomposition. Includes `isSPD()` convenience check.
@@ -21,6 +28,11 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 ### Changed
 
 #### org.ojalgo.matrix
+
+#### org.ojalgo.data
+
+- Clustering refactor and performance: Greedy and k-means implementations now share a `PointDistanceCache` for pairwise distances, centroids and initialisation (median-based threshold), reducing allocations and repeated work.
+- Consistent factories and results: All clusterers are constructed via `FeatureBasedClusterer` factories and return clusters sorted by decreasing size when using the generic `cluster(Collection<T>, Function<T,float[]>)` entry point.
 
 - Singular Value Decomposition API now uses standard nomenclature: diagonal singular value matrix accessor changed from `getD()` to `getS()` (see Deprecated). Internal implementations (`DenseSingularValue`, `RawSingularValue`) updated accordingly.
 - Performance & allocation improvements in `DenseSingularValue` and `RawSingularValue`: direct use of internal singular value array (`s[]`), deferred/cached construction of `S` and inverse, centralised solve/invert logic reducing temporary object creation.

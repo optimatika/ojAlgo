@@ -20,7 +20,7 @@ public class BasicTest extends ClusterTests {
 
         super();
 
-        Point.Factory factory = Point.newFactory(K);
+        Point.Factory factory = Point.newFactory();
         cluster1 = Set.of(factory.newPoint(1, 0), factory.newPoint(1, 4), factory.newPoint(1, 3), factory.newPoint(1, 1), factory.newPoint(1, 2));
         cluster2 = Set.of(factory.newPoint(9, 0), factory.newPoint(9, -4), factory.newPoint(9, -3), factory.newPoint(9, -1), factory.newPoint(9, -2));
 
@@ -31,7 +31,9 @@ public class BasicTest extends ClusterTests {
     @Test
     void testAuto() {
 
-        List<Set<Point>> autoconfig = Point.cluster(points);
+        FeatureBasedClusterer auto = FeatureBasedClusterer.newAutomatic();
+
+        List<Set<Point>> autoconfig = auto.cluster(points);
         if (DEBUG) {
             this.printClusters("autoconfig", autoconfig);
         }
@@ -46,7 +48,7 @@ public class BasicTest extends ClusterTests {
         double threshold = 18.0;
         // max sum of squares within cluster is 4^2 = 16.0
         // min sum of squares between clusters is 8^2 = 64.0
-        List<Set<Point>> greedy = Point.newGreedyClusterer(threshold).cluster(points);
+        List<Set<Point>> greedy = FeatureBasedClusterer.newGreedy(threshold).cluster(points);
 
         if (DEBUG) {
             this.printClusters("greedy", greedy);
@@ -59,7 +61,7 @@ public class BasicTest extends ClusterTests {
     @Test
     void testKMeans() {
 
-        List<Set<Point>> kmeans = Point.newKMeansClusterer(K).cluster(points);
+        List<Set<Point>> kmeans = FeatureBasedClusterer.newKMeans(K).cluster(points);
 
         if (DEBUG) {
             this.printClusters("k-means", kmeans);
