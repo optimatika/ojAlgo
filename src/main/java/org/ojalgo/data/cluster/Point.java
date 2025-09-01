@@ -1,35 +1,53 @@
+/*
+ * Copyright 1997-2025 Optimatika
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.ojalgo.data.cluster;
 
-import java.util.ArrayList;
+import static org.ojalgo.function.constant.PrimitiveMath.ONE;
+
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 
-import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.data.proximity.Distance;
+import org.ojalgo.data.proximity.DistanceMeasure;
 
+/**
+ * Immutable coordinate point used by the clustering utilities. A {@code Point} wraps a {@code float[]} (to
+ * minimise memory footprint) and an id. Distance calculations are central to most algorithms.
+ */
 public final class Point implements Comparable<Point> {
 
     /**
-     * Primarily used when constructing test cases and similar. For real world applications you should
-     * probably use {@link Point#convert(List, Function)} instead.
+     * Simple factory that generates consecutive ids and ensures consistent dimensionality.
      */
     public static final class Factory {
 
-        private final int myDimensions;
         private final AtomicInteger myNextID = new AtomicInteger();
 
-        public Factory(final int dimensions) {
+        public Factory() {
             super();
-            myDimensions = dimensions;
         }
 
         public Point newPoint(final float... coordinates) {
-            if (coordinates.length != myDimensions) {
-                throw new IllegalArgumentException();
-            }
             return new Point(myNextID.getAndIncrement(), coordinates);
         }
 
@@ -39,95 +57,52 @@ public final class Point implements Comparable<Point> {
 
     }
 
-    /**
-     * Essentially works like this:
-     * <ol>
-     * <li>Calculate, and store, distances between all the points (to enable statistical analysis, and speed
-     * up the following steps)
-     * <li>Perform statistical analysis of the distances to determine a suitable distance threshold for greedy
-     * clustering
-     * <li>Perform greedy clustering to get an initial set of centroids
-     * <li>Filter out centroids/clusters corresponding to extremely small clusters (This determines the 'k')
-     * <li>Perform k-means clustering to refine the clusters and centroids
-     * </ol>
-     */
-    public static List<Set<Point>> cluster(final Collection<Point> input) {
+    public static double[] mean(final Collection<Point> points) {
 
-        PointDistanceCache cache = new PointDistanceCache();
-        cache.setup(input, Point::distance);
-
-        GeneralisedKMeans<Point> clusterar = new GeneralisedKMeans<>(cache::initialiser, cache::centroid, cache::distance);
-
-        return clusterar.cluster(input);
-    }
-
-    /**
-     * Converts a list of objects to a list of points using the provided converter to derive the coordinates.
-     * There will be one point for each object in the input list, at matching positions. Further the point id
-     * will be the index of the object in the input list.
-     *
-     * @param <T> The type of the objects in the input list
-     * @param input The list of objects to convert
-     * @param converter The function to convert the objects to coordinates
-     * @return A list of points
-     */
-    public static <T> List<Point> convert(final List<T> input, final Function<T, float[]> converter) {
-        int size = input.size();
-        List<Point> points = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            points.add(new Point(i, converter.apply(input.get(i))));
-        }
-        return points;
-    }
-
-    public static Point mean(final Collection<Point> points) {
-
-        double[] sum = null;
+        double[] retVal = null;
         int length = 0;
         for (Point point : points) {
-            if (sum == null) {
+            if (retVal == null) {
                 length = point.coordinates.length;
-                sum = new double[length];
+                retVal = new double[length];
             }
             for (int i = 0; i < length; i++) {
-                sum[i] += point.coordinates[i];
+                retVal[i] += point.coordinates[i];
             }
         }
 
-        float[] retVal = new float[length];
-
-        for (int i = 0; i < length; i++) {
-            retVal[i] = (float) (sum[i] / points.size());
+        if (retVal == null) {
+            retVal = new double[0];
+        } else {
+            double scale = ONE / points.size();
+            for (int i = 0; i < length; i++) {
+                retVal[i] *= scale;
+            }
         }
 
-        return new Point(-1, retVal);
+        return retVal;
     }
 
-    public static Point.Factory newFactory(final int dimensions) {
-        return new Point.Factory(dimensions);
-    }
-
-    /**
-     * Greedy algorithm. The distance measurement is the same as for k-means ({@link #distance(Point)}) and
-     * the threshold must match that.
-     */
-    public static ClusteringAlgorithm<Point> newGreedyClusterer(final double distanceThreshold) {
-        return new GreedyClustering<>(Point::mean, Point::distance, distanceThreshold);
+    public static Point.Factory newFactory() {
+        return new Point.Factory();
     }
 
     /**
-     * Standard k-means clustering
+     * Creates a point with the supplied id and coordinates (no defensive copy). Caller must ensure the
+     * coordinate array is not mutated afterwards if logical immutability is desired.
      */
-    public static ClusteringAlgorithm<Point> newKMeansClusterer(final int k) {
-        RandomClustering<Point> initialiser = new RandomClustering<>(k);
-        return new GeneralisedKMeans<>(initialiser::centroids, Point::mean, Point::distance);
-    }
-
     public static Point of(final int id, final float... coordinates) {
         return new Point(id, coordinates);
     }
 
+    /**
+     * Features
+     */
     public final float[] coordinates;
+
+    /**
+     * Index/Key
+     */
     public final int id;
 
     Point(final int id, final float[] coordinates) {
@@ -142,22 +117,35 @@ public final class Point implements Comparable<Point> {
     }
 
     /**
-     * The sum of the squared differences between the coordinates of this and the other point. (Not the
-     * Euclidean distance. This is the squared Euclidean distance.)
+     * Distance using the supplied {@link DistanceMeasure}.
      */
-    public double distance(final Point other) {
-
-        double retVal = PrimitiveMath.ZERO;
-
-        int limit = Math.min(coordinates.length, other.coordinates.length);
-
-        float diff;
-        for (int i = 0; i < limit; i++) {
-            diff = coordinates[i] - other.coordinates[i];
-            retVal += diff * diff;
+    public double distance(final DistanceMeasure measure, final Point other) {
+        switch (measure) {
+        case CHEBYSHEV:
+            return Distance.chebyshev(coordinates, other.coordinates);
+        case COSINE:
+            return Distance.cosine(coordinates, other.coordinates);
+        case ANGULAR:
+            return Distance.angular(coordinates, other.coordinates);
+        case CORRELATION:
+            return Distance.correlation(coordinates, other.coordinates);
+        case EUCLIDEAN:
+            return Distance.euclidean(coordinates, other.coordinates);
+        case CANBERRA:
+            return Distance.canberra(coordinates, other.coordinates);
+        case HAMMING:
+            return Distance.hamming(coordinates, other.coordinates);
+        case HELLINGER:
+            return Distance.hellinger(coordinates, other.coordinates);
+        case JACCARD:
+            return Distance.jaccard(coordinates, other.coordinates);
+        case MANHATTAN:
+            return Distance.manhattan(coordinates, other.coordinates);
+        case SQUARED_EUCLIDEAN:
+            return Distance.squaredEuclidean(coordinates, other.coordinates);
+        default:
+            throw new IllegalArgumentException("Unknown measure: " + measure);
         }
-
-        return retVal;
     }
 
     @Override

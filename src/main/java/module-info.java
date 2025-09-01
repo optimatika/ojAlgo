@@ -20,6 +20,7 @@ module ojalgo {
     exports org.ojalgo.data.domain.finance.portfolio.simulator;
     exports org.ojalgo.data.domain.finance.series;
     exports org.ojalgo.data.image;
+    exports org.ojalgo.data.proximity;
     exports org.ojalgo.data.transform;
     exports org.ojalgo.equation;
     exports org.ojalgo.function;
