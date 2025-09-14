@@ -223,7 +223,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         tmpSVD.decompose(tmpA);
 
         if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debugMatrix("D", tmpSVD.getD(), NumberContext.of(7, 6));
+            BasicLogger.debugMatrix("D", tmpSVD.getS(), NumberContext.of(7, 6));
             BasicLogger.debugMatrix("Q1", tmpSVD.getU(), NumberContext.of(7, 6));
             BasicLogger.debugMatrix("Q2", tmpSVD.getV(), NumberContext.of(7, 6));
         }

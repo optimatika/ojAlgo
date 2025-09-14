@@ -131,7 +131,7 @@ public class SVDbyEvD extends MatrixDecompositionTests {
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
             BasicLogger.debug("Experimental  S: {}.", tmpExperimental.getSingularValues());
-            BasicLogger.debugMatrix("D", tmpExperimental.getD(), CONTEXT);
+            BasicLogger.debugMatrix("D", tmpExperimental.getS(), CONTEXT);
             BasicLogger.debugMatrix("Q1", tmpExperimental.getU(), CONTEXT);
             BasicLogger.debugMatrix("Q2", tmpExperimental.getV(), CONTEXT);
         }

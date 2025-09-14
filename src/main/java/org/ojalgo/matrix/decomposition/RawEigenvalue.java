@@ -32,6 +32,8 @@ import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.DOT;
 import org.ojalgo.array.operation.FillMatchingSingle;
+import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
@@ -41,7 +43,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.type.context.NumberContext;
@@ -123,7 +125,11 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
     }
 
-    static final class Symmetric extends RawEigenvalue implements MatrixDecomposition.Solver<Double> {
+    static final class Symmetric extends RawEigenvalue implements Eigenvalue.Spectral<Double> {
+
+        private transient MatrixStore<Double> myInverse = null;
+        private transient MatrixStore<Double> myS = null;
+        private transient MatrixStore<Double> myU = null;
 
         Symmetric() {
             super();
@@ -135,8 +141,221 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
 
         @Override
+        public int countSignificant(final double threshold) {
+
+            double[] d = this.getRealParts();
+
+            int significant = 0;
+            for (int i = 0; i < d.length; i++) {
+                if (Math.abs(d[i]) > threshold) {
+                    significant++;
+                }
+            }
+            return significant;
+        }
+
+        @Override
         public void ftran(final PhysicalStore<Double> arg) {
             this.getSolution(arg.copy(), arg);
+        }
+
+        @Override
+        public double getCondition() {
+            double[] d = this.getRealParts();
+            return Math.abs(d[0]) / Math.abs(d[d.length - 1]);
+        }
+
+        @Override
+        public MatrixStore<Double> getCovariance() {
+
+            MatrixStore<Double> v = this.getV();
+            Access1D<Double> values = this.getD().sliceDiagonal();
+
+            int rank = this.getRank();
+
+            BinaryFunction<Double> divide = this.function().divide();
+
+            MatrixStore<Double> tmp = v.limits(-1, rank).onColumns(divide, values).collect(v.physical());
+
+            return tmp.multiply(tmp.transpose());
+        }
+
+        @Override
+        public double getFrobeniusNorm() {
+
+            double[] d = this.getRealParts();
+
+            double retVal = ZERO;
+
+            double tmpVal;
+            for (int i = d.length - 1; i >= 0; i--) {
+                tmpVal = d[i];
+                retVal += tmpVal * tmpVal;
+            }
+
+            return SQRT.invoke(retVal);
+        }
+
+        @Override
+        public MatrixStore<Double> getInverse() {
+
+            if (myInverse == null) {
+                int dim = this.getRowDim();
+                PhysicalStore<Double> preallocated = this.preallocate(dim, dim, dim);
+                myInverse = SingularValue.invert(this, preallocated);
+            }
+
+            return myInverse;
+        }
+
+        @Override
+        public MatrixStore<Double> getInverse(final PhysicalStore<Double> preallocated) {
+
+            if (myInverse == null) {
+                myInverse = SingularValue.invert(this, preallocated);
+            }
+
+            return myInverse;
+        }
+
+        @Override
+        public double getKyFanNorm(final int k) {
+
+            double[] d = this.getRealParts();
+
+            double retVal = ZERO;
+
+            for (int i = Math.min(d.length, k) - 1; i >= 0; i--) {
+                retVal += Math.abs(d[i]);
+            }
+
+            return retVal;
+        }
+
+        @Override
+        public double getOperatorNorm() {
+            double[] d = this.getRealParts();
+            return Math.abs(d[0]);
+        }
+
+        @Override
+        public double getRankThreshold() {
+            double[] d = this.getRealParts();
+            return Math.max(MACHINE_SMALLEST, Math.abs(d[0])) * this.getDimensionalEpsilon();
+        }
+
+        @Override
+        public MatrixStore<Double> getS() {
+
+            if (this.isComputed() && myS == null) {
+
+                double[] d = this.getRealParts();
+                boolean negative = false;
+                for (int i = 0; i < d.length && !negative; i++) {
+                    negative = d[i] < ZERO;
+                }
+
+                if (negative) {
+                    if (myS == null) {
+                        double[] abs = new double[d.length];
+                        for (int i = 0; i < d.length; i++) {
+                            abs[i] = Math.abs(d[i]);
+                        }
+                        myS = this.makeDiagonal(ArrayR064.wrap(abs)).get();
+                    }
+                } else {
+                    myS = this.getD();
+                }
+            }
+
+            return myS;
+        }
+
+        @Override
+        public Array1D<Double> getSingularValues() {
+            double[] d = this.getRealParts();
+            double[] abs = new double[d.length];
+            for (int i = 0; i < d.length; i++) {
+                abs[i] = Math.abs(d[i]);
+            }
+            return Array1D.R064.wrap(ArrayR064.wrap(abs));
+        }
+
+        @Override
+        public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
+
+            MatrixStore<Double> mRHS = this.collect(rhs);
+
+            if (myInverse != null) {
+                preallocated.fillByMultiplying(myInverse, mRHS);
+                return preallocated;
+            }
+
+            if (this.isComputed() && !this.isValuesOnly()) {
+
+                return SingularValue.solve(this, mRHS, preallocated);
+
+            } else {
+
+                throw new IllegalStateException();
+            }
+        }
+
+        @Override
+        public double getTraceNorm() {
+            double[] d = this.getRealParts();
+            return this.getKyFanNorm(d.length);
+        }
+
+        @Override
+        public MatrixStore<Double> getU() {
+
+            if (this.isComputed() && myU == null) {
+
+                double[] d = this.getRealParts();
+                boolean negative = false;
+                for (int i = 0; i < d.length && !negative; i++) {
+                    negative = d[i] < ZERO;
+                }
+
+                MatrixStore<Double> v = this.getV();
+
+                if (negative) {
+                    PhysicalStore<Double> u = v.copy();
+                    UnaryFunction<Double> negate = this.function().negate();
+                    for (int j = 0; j < d.length; j++) {
+                        if (d[j] < ZERO) {
+                            u.modifyColumn(0L, j, negate);
+                        }
+                    }
+                    myU = u;
+                } else {
+                    myU = v;
+                }
+            }
+
+            return myU;
+        }
+
+        @Override
+        public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
+
+            double[][] tmpData = this.reset(original, false);
+
+            this.getInternalStore().fillMatching(original);
+
+            this.doDecompose(tmpData, false);
+
+            if (this.isSolvable()) {
+                return this.getInverse(preallocated);
+            } else {
+                throw RecoverableCondition.newMatrixNotInvertible();
+            }
+        }
+
+        @Override
+        public boolean isFullSize() {
+            return true;
         }
 
         @Override
@@ -155,8 +374,43 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
 
         @Override
+        public boolean isSPD() {
+
+            double[] d = this.getRealParts();
+            for (int i = 0; i < d.length; i++) {
+                if (d[i] <= 0) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        @Override
         public PhysicalStore<Double> preallocate(final int nbEquations, final int nbVariables, final int nbSolutions) {
             return this.makeZero(nbEquations, nbSolutions);
+        }
+
+        @Override
+        public MatrixStore<Double> reconstruct() {
+            return super.reconstruct();
+        }
+
+        @Override
+        public void reset() {
+            super.reset();
+            myS = null;
+            myU = null;
+            myInverse = null;
+        }
+
+        @Override
+        public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
+            this.decompose(this.wrap(body));
+            if (this.isSolvable()) {
+                return this.getSolution(rhs.asCollectable2D(), preallocated);
+            } else {
+                throw RecoverableCondition.newEquationSystemNotSolvable();
+            }
         }
 
         @Override
@@ -180,13 +434,14 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      * @serial internal storage of eigenvalues.
      */
     private double[] d = null, e = null;
-    private transient MatrixStore<Double> myInverse = null;
+    private transient MatrixStore<Double> myD = null;
     /**
      * Array for internal storage of eigenvectors.
      *
      * @serial internal storage of eigenvectors.
      */
     private double[][] myTransposedV = null;
+    private transient MatrixStore<Double> myV = null;
 
     protected RawEigenvalue() {
         super();
@@ -231,7 +486,10 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      */
     @Override
     public MatrixStore<Double> getD() {
-        return this.makeD(d, e);
+        if (this.isComputed() && myD == null) {
+            myD = this.makeD(d, e);
+        }
+        return myD;
     }
 
     @Override
@@ -273,51 +531,6 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
     }
 
-    public MatrixStore<Double> getInverse() {
-        int n = this.getRowDim();
-        return this.getInverse(this.makeZero(n, n));
-    }
-
-    public MatrixStore<Double> getInverse(final PhysicalStore<Double> preallocated) {
-
-        if (myInverse == null) {
-
-            int dim = d.length;
-
-            RawStore tmpMtrx = this.newRawStore(dim, dim);
-
-            double max = ONE;
-
-            for (int i = 0; i < dim; i++) {
-                double val = d[i];
-                max = MAX.invoke(max, ABS.invoke(val));
-                if (!PrimitiveScalar.isSmall(max, val)) {
-                    double[] colVi = myTransposedV[i];
-                    for (int j = 0; j < dim; j++) {
-                        tmpMtrx.set(i, j, colVi[j] / val);
-                    }
-                }
-            }
-
-            preallocated.fillByMultiplying(this.getV(), tmpMtrx);
-
-            myInverse = preallocated;
-
-        } else {
-
-            // If the inverse has already been computed, just fill the preallocated store
-            // with the previously computed inverse.
-            preallocated.fillMatching(myInverse);
-        }
-
-        return preallocated;
-    }
-
-    public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
-        preallocated.fillByMultiplying(this.getInverse(), this.collect(rhs));
-        return preallocated;
-    }
-
     @Override
     public ComplexNumber getTrace() {
 
@@ -335,46 +548,17 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      */
     @Override
     public MatrixStore<Double> getV() {
-        return this.wrap(myTransposedV).transpose();
-    }
-
-    public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
-
-        double[][] tmpData = this.reset(original, false);
-
-        this.getInternalStore().fillMatching(original);
-
-        this.doDecompose(tmpData, false);
-
-        if (this.isSolvable()) {
-            return this.getInverse(preallocated);
+        if (this.isComputed() && myV == null) {
+            myV = this.wrap(myTransposedV).transpose();
         }
-        throw RecoverableCondition.newMatrixNotInvertible();
+        return myV;
     }
 
     @Override
     public void reset() {
-        myInverse = null;
-    }
-
-    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
-
-        double[][] tmpData = this.reset(body, false);
-
-        this.getInternalStore().fillMatching(body);
-
-        this.doDecompose(tmpData, false);
-
-        if (this.isSolvable()) {
-
-            preallocated.fillMatching(rhs);
-
-            return this.getInverse().multiply(preallocated);
-
-        } else {
-
-            throw RecoverableCondition.newEquationSystemNotSolvable();
-        }
+        super.reset();
+        myD = null;
+        myV = null;
     }
 
     @Override
@@ -605,6 +789,10 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      */
     double[] getRealParts() {
         return d;
+    }
+
+    boolean isValuesOnly() {
+        return myTransposedV == null;
     }
 
     // public MatrixStore<Double> getExponential() {
