@@ -32,8 +32,6 @@ import org.ojalgo.matrix.decomposition.function.NegateColumn;
 import org.ojalgo.matrix.decomposition.function.RotateRight;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.R064Store;
-import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
@@ -62,7 +60,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
      * Calculation row and column dimensions, possibly transposed from the input
      */
     private int m, n;
-    private transient R064Store myPseudoinverse = null;
+    private transient MatrixStore<Double> myInverse = null;
     private boolean myTransposed;
     /**
      * Arrays for internal storage of U and V.
@@ -127,9 +125,13 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return tmp.multiply(tmp.transpose());
     }
 
+    /**
+     * @deprecated Use {@link #getS()} instead
+     */
+    @Deprecated
     @Override
     public MatrixStore<Double> getD() {
-        return this.makeDiagonal(this.getSingularValues()).get();
+        return this.getS();
     }
 
     @Override
@@ -147,8 +149,26 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     @Override
+    public MatrixStore<Double> getInverse() {
+
+        if (myInverse == null) {
+            int nbRows = this.getRowDim();
+            int nbCols = this.getColDim();
+            PhysicalStore<Double> preallocated = this.preallocate(nbRows, nbCols, nbRows);
+            myInverse = SingularValue.invert(this, preallocated);
+        }
+
+        return myInverse;
+    }
+
+    @Override
     public MatrixStore<Double> getInverse(final PhysicalStore<Double> preallocated) {
-        return this.doGetInverse((R064Store) preallocated);
+
+        if (myInverse == null) {
+            myInverse = SingularValue.invert(this, preallocated);
+        }
+
+        return myInverse;
     }
 
     @Override
@@ -179,6 +199,11 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     @Override
+    public MatrixStore<Double> getS() {
+        return this.makeDiagonal(this.getSingularValues()).get();
+    }
+
+    @Override
     public Array1D<Double> getSingularValues() {
         return Array1D.R064.copy(s);
     }
@@ -190,8 +215,22 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
     @Override
     public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
-        preallocated.fillByMultiplying(this.getInverse(), this.collect(rhs));
-        return preallocated;
+
+        MatrixStore<Double> mRHS = this.collect(rhs);
+
+        if (myInverse != null) {
+            preallocated.fillByMultiplying(myInverse, mRHS);
+            return preallocated;
+        }
+
+        if (this.isComputed() && myUt != null && myVt != null) {
+
+            return SingularValue.solve(this, mRHS, preallocated);
+
+        } else {
+
+            throw new IllegalStateException();
+        }
     }
 
     @Override
@@ -250,7 +289,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
         super.reset();
 
-        myPseudoinverse = null;
+        myInverse = null;
     }
 
     @Override
@@ -520,36 +559,6 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         DenseSingularValue.toDiagonal(s, e, q1RotR, q2RotR, q1XchgCols, q2XchgCols, q2NegCol);
 
         return this.computed(true);
-    }
-
-    MatrixStore<Double> doGetInverse(final R064Store preallocated) {
-
-        if (myPseudoinverse == null) {
-
-            final double[][] tmpQ1t = myTransposed ? myVt : myUt;
-            final double[] tmpSingular = s;
-
-            final RawStore tmpMtrx = this.newRawStore(tmpSingular.length, tmpQ1t[0].length);
-            final double[][] tmpMtrxData = tmpMtrx.data;
-
-            final double small = this.getRankThreshold();
-
-            for (int i = 0; i < tmpSingular.length; i++) {
-                final double tmpVal = tmpSingular[i];
-                if (tmpVal > small) {
-                    final double[] tmpRow = tmpMtrxData[i];
-                    for (int j = 0; j < tmpRow.length; j++) {
-                        tmpRow[j] = tmpQ1t[i][j] / tmpVal;
-                    }
-                }
-            }
-
-            MatrixStore<Double> mtrxQ2 = this.getV();
-            preallocated.fillByMultiplying(mtrxQ2, tmpMtrx);
-            myPseudoinverse = preallocated;
-        }
-
-        return myPseudoinverse;
     }
 
 }

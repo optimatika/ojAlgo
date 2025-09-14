@@ -177,6 +177,9 @@ public interface Eigenvalue<N extends Comparable<N>>
          */
         Eigenvalue.Generalised<N> makeGeneralised(Structure2D typical, Eigenvalue.Generalisation type);
 
+        default Eigenvalue.Spectral<N> makeSpectral(final int typical) {
+            return (Spectral<N>) this.make(typical, true);
+        }
     }
 
     /**
@@ -229,6 +232,31 @@ public interface Eigenvalue<N extends Comparable<N>>
         }
 
         boolean prepare(Access2D.Collectable<N, ? super TransformableRegion<N>> matrixB);
+
+    }
+
+    /**
+     * “Spectral decomposition” refers specifically to the orthogonal/unitary eigen-decomposition of a normal
+     * matrix (most commonly Hermitian / symmetric).
+     * <p>
+     * Eigenvalue decomposition of a normal matrix = spectral decomposition.
+     * <P>
+     * If, in addition to the matrix being normal, all eigenvalues are real and nonnegative, then the matrix
+     * is positive semidefinite, and the decomposition coincides with the SVD. If some eigenvalues are
+     * negative, the decomposition is still valid, and can be tweaked to yield a valid SVD by taking absolute
+     * values of the eigenvalues and adjusting the signs of the corresponding eigenvectors (on one side).
+     */
+    interface Spectral<N extends Comparable<N>> extends Eigenvalue<N>, SingularValue<N> {
+
+        /**
+         * A symmetric (Hermitian) matrix is positive definite if all its eigenvalues are positive.
+         */
+        boolean isSPD();
+
+        @Override
+        default MatrixStore<N> reconstruct() {
+            return Eigenvalue.super.reconstruct();
+        }
 
     }
 
@@ -372,6 +400,12 @@ public interface Eigenvalue<N extends Comparable<N>>
         return Access2D.equals(tmpStore1, tmpStore2, context);
     }
 
+    static <N extends Comparable<N>> MatrixStore<N> reconstruct(final Eigenvalue<N> decomposition) {
+        MatrixStore<N> mtrxV = decomposition.getV();
+        MatrixStore<N> mtrxD = decomposition.getD();
+        return mtrxV.multiply(mtrxD).multiply(mtrxV.conjugate());
+    }
+
     /**
      * Sort eigenvalues and corresponding vectors.
      *
@@ -475,20 +509,6 @@ public interface Eigenvalue<N extends Comparable<N>>
         return retVal;
     }
 
-    /**
-     * <p>
-     * Even for real matrices the eigenvalues (and eigenvectors) are potentially complex numbers. Typically
-     * they need to be expressed as complex numbers when [A] is not symmetric.
-     * </p>
-     * <p>
-     * The values should be in the same order as the matrices "V" and "D", and if they is ordered or not is
-     * indicated by the {@link #isOrdered()} method.
-     * </p>
-     *
-     * @return The eigenvalues.
-     */
-    Array1D<ComplexNumber> getEigenvalues();
-
     // /**
     // * @return The matrix exponential
     // */
@@ -519,6 +539,20 @@ public interface Eigenvalue<N extends Comparable<N>>
     //
     // return retVal;
     // }
+
+    /**
+     * <p>
+     * Even for real matrices the eigenvalues (and eigenvectors) are potentially complex numbers. Typically
+     * they need to be expressed as complex numbers when [A] is not symmetric.
+     * </p>
+     * <p>
+     * The values should be in the same order as the matrices "V" and "D", and if they are ordered or not is
+     * indicated by the {@link #isOrdered()} method.
+     * </p>
+     *
+     * @return The eigenvalues.
+     */
+    Array1D<ComplexNumber> getEigenvalues();
 
     /**
      * @param realParts      An array that will receive the real parts of the eigenvalues
@@ -594,9 +628,7 @@ public interface Eigenvalue<N extends Comparable<N>>
 
     @Override
     default MatrixStore<N> reconstruct() {
-        MatrixStore<N> mtrxV = this.getV();
-        MatrixStore<N> mtrxD = this.getD();
-        return mtrxV.multiply(mtrxD).multiply(mtrxV.conjugate());
+        return Eigenvalue.reconstruct(this);
     }
 
 }

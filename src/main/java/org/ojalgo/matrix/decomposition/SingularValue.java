@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.PlainArray;
+import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.matrix.Provider2D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -31,22 +32,23 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * Singular Value: [A] = [U][D][V]<sup>T</sup> Decomposes [this] into [U], [D] and [V] where:
+ * Singular Value: [A] = [U][S][V]<sup>T</sup> Decomposes [this] into [U], [S] and [V] where:
  * <ul>
  * <li>[U] is an orthogonal matrix. The columns are the left, orthonormal, singular vectors of [this]. Its
  * columns are the eigenvectors of [A][A]<sup>T</sup>, and therefore has the same number of rows as [this].
  * </li>
- * <li>[D] is a diagonal matrix. The elements on the diagonal are the singular values of [this]. It is either
+ * <li>[S] is a diagonal matrix. The elements on the diagonal are the singular values of [this]. It is either
  * square or has the same dimensions as [this]. The singular values of [this] are the square roots of the
  * nonzero eigenvalues of [A][A]<sup>T</sup> and [A]<sup>T</sup>[A] (they are the same)</li>
  * <li>[V] is an orthogonal matrix. The columns are the right, orthonormal, singular vectors of [this]. Its
  * columns are the eigenvectors of [A][A]<sup>T</sup>, and therefore has the same number of rows as [this] has
  * columns.</li>
- * <li>[this] = [U][D][V]<sup>T</sup></li>
+ * <li>[this] = [U][S][V]<sup>T</sup></li>
  * </ul>
  * A singular values decomposition always exists.
  *
@@ -74,6 +76,8 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
 
     Factory<Quaternion> H256 = (typical, fullSize) -> new DenseSingularValue.H256(fullSize);
 
+    Factory<RationalNumber> Q128 = (typical, fullSize) -> new DenseSingularValue.Q128(fullSize);
+
     Factory<Double> R064 = (typical, fullSize) -> {
         if (fullSize || 1024L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
             return new DenseSingularValue.R064(fullSize);
@@ -81,8 +85,6 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
             return new RawSingularValue();
         }
     };
-
-    Factory<RationalNumber> Q128 = (typical, fullSize) -> new DenseSingularValue.Q128(fullSize);
 
     Factory<Quadruple> R128 = (typical, fullSize) -> new DenseSingularValue.R128(fullSize);
 
@@ -92,7 +94,7 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
         int nbCols = matrix.getColDim();
 
         MatrixStore<N> tmpU = decomposition.getU();
-        MatrixStore<N> tmpD = decomposition.getD();
+        MatrixStore<N> tmpD = decomposition.getS();
         MatrixStore<N> tmpV = decomposition.getV();
 
         MatrixStore<N> tmpThis;
@@ -100,7 +102,7 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
 
         boolean retVal = nbRows == tmpU.countRows() && tmpV.countRows() == nbCols;
 
-        // Check that [A][V] == [U][D]
+        // Check that [A][V] == [U][S]
         if (retVal) {
 
             tmpThis = matrix.multiply(tmpV);
@@ -150,6 +152,73 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
         return retVal;
     }
 
+    static <N extends Comparable<N>> MatrixStore<N> invert(final SingularValue<N> decomposition, final PhysicalStore<N> preallocated) {
+
+        PhysicalStore.Factory<N, ?> factory = preallocated.physical();
+        Scalar.Factory<N> scalar = factory.scalar();
+
+        int rank = decomposition.getRank();
+
+        if (rank == 0) {
+
+            preallocated.fillAll(scalar.zero().get());
+
+        } else {
+
+            PhysicalStore<N> work = decomposition.getV().limits(-1, rank).collect(factory);
+
+            BinaryFunction<N> multiply = factory.function().multiply();
+
+            Array1D<Double> singularValues = decomposition.getSingularValues();
+
+            for (int j = 0; j < rank; j++) {
+                N factor = scalar.cast(1.0 / singularValues.doubleValue(j));
+                work.modifyColumn(0, j, multiply.by(factor));
+            }
+
+            preallocated.fillByMultiplying(work, decomposition.getU().limits(-1, rank).conjugate());
+        }
+
+        return preallocated;
+    }
+
+    static <N extends Comparable<N>> MatrixStore<N> reconstruct(final SingularValue<N> decomposition) {
+        MatrixStore<N> mtrxQ1 = decomposition.getU();
+        MatrixStore<N> mtrxD = decomposition.getS();
+        MatrixStore<N> mtrxQ2 = decomposition.getV();
+        return mtrxQ1.multiply(mtrxD).multiply(mtrxQ2.conjugate());
+    }
+
+    static <N extends Comparable<N>> MatrixStore<N> solve(final SingularValue<N> decomposition, final MatrixStore<N> rhs, final PhysicalStore<N> preallocated) {
+
+        PhysicalStore.Factory<N, ?> factory = preallocated.physical();
+        Scalar.Factory<N> scalar = factory.scalar();
+
+        int rank = decomposition.getRank();
+
+        if (rank == 0) {
+
+            preallocated.fillAll(scalar.zero().get());
+
+        } else {
+
+            PhysicalStore<N> work = decomposition.getU().limits(-1, rank).conjugate().multiply(rhs).copy();
+
+            BinaryFunction<N> multiply = factory.function().multiply();
+
+            Array1D<Double> singularValues = decomposition.getSingularValues();
+
+            for (int i = 0; i < rank; i++) {
+                N factor = scalar.cast(1.0 / singularValues.doubleValue(i));
+                work.modifyRow(i, 0, multiply.by(factor));
+            }
+
+            preallocated.fillByMultiplying(decomposition.getV().limits(-1, rank), work);
+        }
+
+        return preallocated;
+    }
+
     @Override
     default void ftran(final PhysicalStore<N> arg) {
         this.getSolution(arg.copy(), arg);
@@ -170,7 +239,9 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
 
     /**
      * @return The diagonal matrix of singular values.
+     * @deprecated Use {@link #getS()} instead
      */
+    @Deprecated
     MatrixStore<N> getD();
 
     /**
@@ -198,6 +269,11 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
      * @return 2-norm
      */
     double getOperatorNorm();
+
+    /**
+     * @return The diagonal matrix of singular values.
+     */
+    MatrixStore<N> getS();
 
     /**
      * @return The singular values ordered in descending order.
@@ -243,10 +319,7 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
 
     @Override
     default MatrixStore<N> reconstruct() {
-        MatrixStore<N> mtrxQ1 = this.getU();
-        MatrixStore<N> mtrxD = this.getD();
-        MatrixStore<N> mtrxQ2 = this.getV();
-        return mtrxQ1.multiply(mtrxD).multiply(mtrxQ2.conjugate());
+        return SingularValue.reconstruct(this);
     }
 
     default MatrixStore<N> reconstruct(final int k) {
@@ -254,7 +327,7 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
         int limit = Math.min(k, this.getRank());
 
         MatrixStore<N> mtrxQ1 = this.getU().limits(-1, limit);
-        MatrixStore<N> mtrxD = this.getD().limits(limit, limit);
+        MatrixStore<N> mtrxD = this.getS().limits(limit, limit);
         MatrixStore<N> mtrxQ2 = this.getV().limits(-1, limit);
 
         return mtrxQ1.multiply(mtrxD).multiply(mtrxQ2.conjugate());

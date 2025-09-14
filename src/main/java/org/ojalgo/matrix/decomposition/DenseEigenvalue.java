@@ -156,6 +156,10 @@ abstract class DenseEigenvalue<N extends Comparable<N>> extends AbstractDecompos
 
     protected abstract MatrixStore<N> makeV();
 
+    boolean isValuesOnly() {
+        return myValuesOnly;
+    }
+
     final void setD(final MatrixStore<N> newD) {
         myD = newD;
     }
