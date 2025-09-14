@@ -111,7 +111,7 @@ public class PrimitiveOrRawSingularValue extends AbstractPrimitiveOrRaw<Singular
         primitive.getU();
         primitive.getV();
 
-        return primitive.getD();
+        return primitive.getS();
     }
 
     @Override
@@ -123,7 +123,7 @@ public class PrimitiveOrRawSingularValue extends AbstractPrimitiveOrRaw<Singular
         raw.getU();
         raw.getV();
 
-        return raw.getD();
+        return raw.getS();
     }
 
     @Override

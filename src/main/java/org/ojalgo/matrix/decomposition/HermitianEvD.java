@@ -30,6 +30,7 @@ import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
@@ -61,7 +62,7 @@ import org.ojalgo.structure.Access2D.Collectable;
  * V may be badly conditioned, or even singular, so the validity of the equation A = V*D*inverse(V) depends
  * upon V.cond().
  **/
-abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> implements MatrixDecomposition.Solver<N> {
+abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> implements Eigenvalue.Spectral<N> {
 
     static final class C128 extends HermitianEvD<ComplexNumber> {
 
@@ -202,7 +203,10 @@ abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> 
     private double[] d;
     private double[] e;
     private transient MatrixStore<N> myInverse;
+    private transient MatrixStore<N> myS = null;
+    private transient Array1D<Double> mySingularValues = null;
     private final DenseTridiagonal<N> myTridiagonal;
+    private transient MatrixStore<N> myU = null;
 
     @SuppressWarnings("unused")
     private HermitianEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory) {
@@ -231,8 +235,42 @@ abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> 
     }
 
     @Override
+    public int countSignificant(final double threshold) {
+
+        int significant = 0;
+        for (int i = 0; i < d.length; i++) {
+            if (Math.abs(d[i]) > threshold) {
+                significant++;
+            }
+        }
+        return significant;
+    }
+
+    @Override
     public void ftran(final PhysicalStore<N> arg) {
         arg.fillByMultiplying(this.getInverse(), arg.copy());
+    }
+
+    @Override
+    public double getCondition() {
+        double largest = Math.abs(d[0]);
+        double smallest = Math.abs(d[d.length - 1]);
+        return largest / smallest;
+    }
+
+    @Override
+    public MatrixStore<N> getCovariance() {
+
+        MatrixStore<N> v = this.getV();
+        Access1D<N> values = this.getD().sliceDiagonal();
+
+        int rank = this.getRank();
+
+        BinaryFunction<N> divide = this.function().divide();
+
+        MatrixStore<N> tmp = v.limits(-1, rank).onColumns(divide, values).collect(v.physical());
+
+        return tmp.multiply(tmp.transpose());
     }
 
     @Override
@@ -258,29 +296,26 @@ abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> 
     }
 
     @Override
+    public double getFrobeniusNorm() {
+
+        double retVal = ZERO;
+
+        double tmpVal;
+        for (int i = d.length - 1; i >= 0; i--) {
+            tmpVal = d[i];
+            retVal += tmpVal * tmpVal;
+        }
+
+        return SQRT.invoke(retVal);
+    }
+
+    @Override
     public MatrixStore<N> getInverse() {
 
         if (myInverse == null) {
-
-            MatrixStore<N> tmpV = this.getV();
-            MatrixStore<N> tmpD = this.getD();
-
-            int tmpDim = (int) tmpD.countRows();
-
-            PhysicalStore<N> tmpMtrx = tmpV.conjugate().copy();
-
-            N tmpZero = this.scalar().zero().get();
-            BinaryFunction<N> tmpDivide = this.function().divide();
-
-            for (int i = 0; i < tmpDim; i++) {
-                if (tmpD.isSmall(i, i, ONE)) {
-                    tmpMtrx.fillRow(i, 0, tmpZero);
-                } else {
-                    tmpMtrx.modifyRow(i, 0, tmpDivide.second(tmpD.get(i, i)));
-                }
-            }
-
-            myInverse = tmpV.multiply(tmpMtrx);
+            int dim = this.getRowDim();
+            PhysicalStore<N> preallocated = this.preallocate(dim, dim, dim);
+            myInverse = SingularValue.invert(this, preallocated);
         }
 
         return myInverse;
@@ -290,47 +325,143 @@ abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> 
     public MatrixStore<N> getInverse(final PhysicalStore<N> preallocated) {
 
         if (myInverse == null) {
-
-            MatrixStore<N> tmpV = this.getV();
-            MatrixStore<N> tmpD = this.getD();
-
-            int tmpDim = (int) tmpD.countRows();
-
-            PhysicalStore<N> tmpMtrx = preallocated;
-            // tmpMtrx.fillMatching(new TransposedStore<N>(tmpV));
-            tmpMtrx.fillMatching(tmpV.transpose());
-
-            N tmpZero = this.scalar().zero().get();
-            BinaryFunction<N> tmpDivide = this.function().divide();
-
-            for (int i = 0; i < tmpDim; i++) {
-                if (tmpD.isSmall(i, i, ONE)) {
-                    tmpMtrx.fillRow(i, 0, tmpZero);
-                } else {
-                    tmpMtrx.modifyRow(i, 0, tmpDivide.second(tmpD.get(i, i)));
-                }
-            }
-
-            myInverse = tmpV.multiply(tmpMtrx);
+            myInverse = SingularValue.invert(this, preallocated);
         }
 
         return myInverse;
     }
 
     @Override
+    public double getKyFanNorm(final int k) {
+
+        double retVal = ZERO;
+
+        for (int i = Math.min(d.length, k) - 1; i >= 0; i--) {
+            retVal += Math.abs(d[i]);
+        }
+
+        return retVal;
+    }
+
+    @Override
+    public double getOperatorNorm() {
+        return Math.abs(d[0]);
+    }
+
+    @Override
+    public double getRankThreshold() {
+        return Math.max(MACHINE_SMALLEST, Math.abs(d[0])) * this.getDimensionalEpsilon();
+    }
+
+    /**
+     * If there are no negative eigenvalues this method will simply reuse the eigenvalue diagonal (D)
+     */
+    @Override
+    public MatrixStore<N> getS() {
+
+        if (this.isComputed() && myS == null) {
+
+            boolean negative = false;
+            for (int i = 0; i < d.length && !negative; i++) {
+                negative = d[i] < ZERO;
+            }
+
+            if (negative) {
+                double[] abs = new double[d.length];
+                for (int i = 0; i < d.length; i++) {
+                    abs[i] = Math.abs(d[i]);
+                }
+                myS = this.makeDiagonal(ArrayR064.wrap(abs)).get();
+            } else {
+                myS = this.getD();
+            }
+        }
+
+        return myS;
+    }
+
+    @Override
+    public Array1D<Double> getSingularValues() {
+
+        if (this.isComputed() && mySingularValues == null) {
+            double[] abs = new double[d.length];
+            for (int i = 0; i < d.length; i++) {
+                abs[i] = Math.abs(d[i]);
+            }
+            mySingularValues = Array1D.R064.wrap(ArrayR064.wrap(abs));
+        }
+
+        return mySingularValues;
+    }
+
+    @Override
     public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
-        preallocated.fillByMultiplying(this.getInverse(), this.collect(rhs));
-        return preallocated;
+
+        MatrixStore<N> mRHS = this.collect(rhs);
+
+        if (myInverse != null) {
+            preallocated.fillByMultiplying(myInverse, mRHS);
+            return preallocated;
+        }
+
+        if (this.isComputed() && !this.isValuesOnly()) {
+
+            return SingularValue.solve(this, mRHS, preallocated);
+
+        } else {
+
+            throw new IllegalStateException();
+        }
     }
 
     @Override
     public ComplexNumber getTrace() {
 
-        AggregatorFunction<ComplexNumber> tmpVisitor = ComplexAggregator.getSet().sum();
+        double sum = ZERO;
+        if (d != null) {
+            for (double v : d) {
+                sum += v;
+            }
+        }
 
-        this.getEigenvalues().visitAll(tmpVisitor);
+        return ComplexNumber.valueOf(sum);
+    }
 
-        return tmpVisitor.get();
+    @Override
+    public double getTraceNorm() {
+        return this.getKyFanNorm(d.length);
+    }
+
+    /**
+     * For SPD matrices U == V; for indefinite we must absorb eigenvalue sign into U
+     */
+    @Override
+    public MatrixStore<N> getU() {
+
+        if (this.isComputed() && myU == null) {
+
+            boolean negative = false;
+            for (int i = 0; i < d.length && !negative; i++) {
+                negative = d[i] < ZERO;
+            }
+
+            MatrixStore<N> v = this.getV();
+
+            if (negative) {
+                PhysicalStore<N> u = v.copy();
+                UnaryFunction<N> negate = this.function().negate();
+                for (int j = 0; j < d.length; j++) {
+                    if (d[j] < ZERO) {
+                        u.modifyColumn(0L, j, negate);
+                    }
+                }
+                myU = u;
+            } else {
+                myU = v;
+            }
+        }
+
+        return myU;
     }
 
     @Override
@@ -352,6 +483,11 @@ abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> 
     }
 
     @Override
+    public boolean isFullSize() {
+        return true;
+    }
+
+    @Override
     public boolean isHermitian() {
         return true;
     }
@@ -367,8 +503,28 @@ abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> 
     }
 
     @Override
+    public boolean isSPD() {
+
+        if (this.isComputed()) {
+            for (double value : d) {
+                if (value <= 0) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
     public PhysicalStore<N> preallocate(final int nbEquations, final int nbVariables, final int nbSolutions) {
         return this.makeZero(nbEquations, nbSolutions);
+    }
+
+    @Override
+    public MatrixStore<N> reconstruct() {
+        return super.reconstruct();
     }
 
     @Override
@@ -379,6 +535,9 @@ abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> 
         myTridiagonal.reset();
 
         myInverse = null;
+        myS = null; // clear adjusted caches
+        myU = null;
+        mySingularValues = null;
     }
 
     @Override
@@ -450,5 +609,4 @@ abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> 
     protected MatrixStore<N> makeV() {
         return myTridiagonal.getQ();
     }
-
 }

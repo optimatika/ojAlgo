@@ -278,13 +278,13 @@ public class DesignCase extends MatrixDecompositionTests {
 
         SingularValue<Double> tmpOldDecomp = new DenseSingularValue.R064();
         tmpOldDecomp.decompose(tmpOriginalMatrix);
-        tmpOldDecomp.getD();
+        tmpOldDecomp.getS();
         tmpOldDecomp.getU();
         tmpOldDecomp.getV();
 
         SingularValue<Double> tmpNewDecomp = new RawSingularValue();
         tmpNewDecomp.decompose(tmpOriginalMatrix);
-        tmpNewDecomp.getD();
+        tmpNewDecomp.getS();
         tmpNewDecomp.getU();
         tmpNewDecomp.getV();
 

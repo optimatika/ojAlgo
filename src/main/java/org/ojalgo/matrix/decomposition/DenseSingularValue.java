@@ -41,7 +41,6 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
-import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
@@ -335,7 +334,6 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
 
     private double[] e = null;
     private final DenseBidiagonal<N> myBidiagonal;
-    private transient MatrixStore<N> myD = null;
     private final boolean myFullSize;
     private final Structure2D myInputStructure = new Structure2D() {
 
@@ -350,6 +348,7 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
         }
     };
     private transient MatrixStore<N> myInverse = null;
+    private transient MatrixStore<N> myS = null;
     private transient Array1D<Double> mySingularValues = null;
     private boolean myTransposed = false;
     private transient MatrixStore<N> myU = null;
@@ -399,17 +398,14 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
 
     @Override
     public double getCondition() {
-
-        final Array1D<Double> tmpSingularValues = this.getSingularValues();
-
-        return tmpSingularValues.doubleValue(0) / tmpSingularValues.doubleValue(tmpSingularValues.length - 1);
+        return s[0] / s[s.length - 1];
     }
 
     @Override
     public MatrixStore<N> getCovariance() {
 
         MatrixStore<N> v = this.getV();
-        MatrixStore<N> d = this.getD();
+        MatrixStore<N> d = this.getS();
         Access1D<N> values = d.sliceDiagonal();
 
         int rank = this.getRank();
@@ -421,14 +417,13 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
         return tmp.multiply(tmp.transpose());
     }
 
+    /**
+     * @deprecated Use {@link #getS()} instead
+     */
+    @Deprecated
     @Override
     public MatrixStore<N> getD() {
-
-        if (this.isComputed() && myD == null) {
-            myD = this.makeD();
-        }
-
-        return myD;
+        return this.getS();
     }
 
     @Override
@@ -436,11 +431,9 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
 
         double retVal = ZERO;
 
-        final Array1D<Double> tmpSingularValues = this.getSingularValues();
         double tmpVal;
-
-        for (int i = tmpSingularValues.size() - 1; i >= 0; i--) {
-            tmpVal = tmpSingularValues.doubleValue(i);
+        for (int i = s.length - 1; i >= 0; i--) {
+            tmpVal = s[i];
             retVal += tmpVal * tmpVal;
         }
 
@@ -449,30 +442,22 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
 
     @Override
     public MatrixStore<N> getInverse() {
-        return this.getInverse(this.preallocate(myInputStructure));
+
+        if (myInverse == null) {
+            int nbRows = this.getRowDim();
+            int nbCols = this.getColDim();
+            PhysicalStore<N> preallocated = this.preallocate(nbRows, nbCols, nbRows);
+            myInverse = SingularValue.invert(this, preallocated);
+        }
+
+        return myInverse;
     }
 
     @Override
     public MatrixStore<N> getInverse(final PhysicalStore<N> preallocated) {
 
         if (myInverse == null) {
-
-            int rank = this.getRank();
-
-            MatrixStore<N> tmpV = this.getV();
-            PhysicalStore<N> tmpMtrx = tmpV.limits(-1, rank).collect(tmpV.physical());
-
-            Scalar.Factory<N> scalar = this.scalar();
-            BinaryFunction<N> divide = this.function().divide();
-
-            Array1D<Double> singularValues = this.getSingularValues();
-            for (int j = 0; j < rank; j++) {
-                tmpMtrx.modifyColumn(0L, j, divide.by(scalar.cast(singularValues.doubleValue(j))));
-            }
-
-            preallocated.fillByMultiplying(tmpMtrx, this.getU().limits(-1, rank).conjugate());
-
-            myInverse = preallocated;
+            myInverse = SingularValue.invert(this, preallocated);
         }
 
         return myInverse;
@@ -481,12 +466,10 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
     @Override
     public double getKyFanNorm(final int k) {
 
-        final Array1D<Double> tmpSingularValues = this.getSingularValues();
-
         double retVal = ZERO;
 
-        for (int i = Math.min(tmpSingularValues.size(), k) - 1; i >= 0; i--) {
-            retVal += tmpSingularValues.doubleValue(i);
+        for (int i = Math.min(s.length, k) - 1; i >= 0; i--) {
+            retVal += s[i];
         }
 
         return retVal;
@@ -494,7 +477,7 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
 
     @Override
     public double getOperatorNorm() {
-        return this.getSingularValues().doubleValue(0);
+        return s[0];
     }
 
     @Override
@@ -505,6 +488,16 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
     @Override
     public int getRowDim() {
         return myTransposed ? myBidiagonal.getColDim() : myBidiagonal.getRowDim();
+    }
+
+    @Override
+    public MatrixStore<N> getS() {
+
+        if (this.isComputed() && myS == null) {
+            myS = this.makeD();
+        }
+
+        return myS;
     }
 
     @Override
@@ -519,13 +512,27 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
 
     @Override
     public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
-        preallocated.fillByMultiplying(this.getInverse(), this.collect(rhs));
-        return preallocated;
+
+        MatrixStore<N> mRHS = this.collect(rhs);
+
+        if (myInverse != null) {
+            preallocated.fillByMultiplying(myInverse, mRHS);
+            return preallocated;
+        }
+
+        if (this.isComputed() && !myValuesOnly) {
+
+            return SingularValue.solve(this, mRHS, preallocated);
+
+        } else {
+
+            throw new IllegalStateException();
+        }
     }
 
     @Override
     public double getTraceNorm() {
-        return this.getKyFanNorm(this.getSingularValues().size());
+        return this.getKyFanNorm(s.length);
     }
 
     @Override
@@ -546,7 +553,7 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
     @Override
     public MatrixStore<N> getV() {
 
-        if (!myValuesOnly && this.isComputed() && myV == null) {
+        if (this.isComputed() && !myValuesOnly && myV == null) {
             if (myTransposed) {
                 myV = myBidiagonal.doGetLQ();
             } else {
@@ -612,7 +619,7 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
 
         myBidiagonal.reset();
 
-        myD = null;
+        myS = null;
         myU = null;
         myV = null;
         mySingularValues = null;
@@ -760,14 +767,6 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
 
     protected Array1D<Double> makeSingularValues() {
         return Array1D.R064.wrap(ArrayR064.wrap(s));
-    }
-
-    void setD(final MatrixStore<N> someD) {
-        myD = someD;
-    }
-
-    void setSingularValues(final Array1D<Double> singularValues) {
-        mySingularValues = singularValues;
     }
 
 }
