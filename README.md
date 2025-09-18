@@ -1,7 +1,7 @@
 # oj! Algorithms
 [![Build Status](https://github.com/optimatika/ojAlgo/actions/workflows/maven.yml/badge.svg)](https://github.com/optimatika/ojAlgo/actions/workflows/maven.yml)
 [![CodeQL](https://github.com/optimatika/ojAlgo/workflows/CodeQL/badge.svg)](https://github.com/optimatika/ojAlgo/actions/workflows/codeql-analysis.yml)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.ojalgo/ojalgo/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.ojalgo/ojalgo/)
+[![Maven Central](https://img.shields.io/maven-central/v/org.ojalgo/ojalgo.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.ojalgo%22%20AND%20a:%22ojalgo%22)
 
 oj! Algorithms - ojAlgo - is Open Source Java code that has to do with mathematics, linear algebra and optimisation.
 
