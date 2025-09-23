@@ -5,10 +5,14 @@ package org.ojalgo.matrix.task.iterative;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.type.context.NumberContext;
 
@@ -39,7 +43,7 @@ public class QMRSolverTest {
         double resQMR = residualNorm(A, xQMR, b);
         double resLU = residualNorm(A, xLU, b);
 
-        TestUtils.assertTrue(resQMR <= 1e-6 || resQMR <= 20 * resLU,
+        TestUtils.assertTrue(resQMR <= 1e-15 || resQMR <= 20 * resLU,
                 "QMR residual not sufficiently small: " + resQMR + " vs LU " + resLU);
     }
 
@@ -58,7 +62,7 @@ public class QMRSolverTest {
         MatrixStore<Double> xQMR = solver.solve(A, b).get();
 
         double resQMR = residualNorm(A, xQMR, b);
-        TestUtils.assertTrue(resQMR < 1e-5, "Residual too large: " + resQMR);
+        TestUtils.assertTrue(resQMR < 1e-12, "Residual too large: " + resQMR);
     }
 
     @Test
@@ -77,7 +81,7 @@ public class QMRSolverTest {
                 MatrixStore<Double> xQMR = solver.solve(A, b).get();
 
                 double resQMR = residualNorm(A, xQMR, b);
-                TestUtils.assertTrue(resQMR <= 2e-5,
+                TestUtils.assertTrue(resQMR <= 4e-10,
                         "QMR residual too large for n=" + n + ", trial=" + trial + ": " + resQMR);
             }
         }
@@ -139,7 +143,7 @@ public class QMRSolverTest {
                 continue;
             }
 
-            TestUtils.assertTrue(resQMR <= Math.max(1e-6, 400 * resLU),
+            TestUtils.assertTrue(resQMR <= Math.max(1e-9, 400 * resLU),
                     "QMR residual too large on nearly singular (eps=1e-" + exp + "): " + resQMR + " vs LU " + resLU);
         }
     }
@@ -165,6 +169,83 @@ public class QMRSolverTest {
         double resQMR = residualNorm(A, xQMR, b);
         TestUtils.assertTrue(elapsedMs < 1000, "QMR solve exceeded time budget: " + elapsedMs + " ms");
         TestUtils.assertTrue(resQMR <= 1e-4, "QMR residual too large on moderate size: " + resQMR);
+    }
+
+    @Test //Quadratic model that fail in package org.ojalgo.matrix.store, ojAlgo, version 56.1
+    public void quadraticTest(){
+
+        double[][] q_ = new double[][]
+                { { 52376.074545264215,	154256.51217212676,	1705.561292552271 },
+                        { 154256.51217212676,	1.6421719350013012E8,	-97037.53141387558 },
+                        { 1705.561292552271,	-97037.53141387558,	51821.80732179031 } };
+
+        MatrixStore<Double> q = RawStore.wrap(q_);
+
+        double[][] l_ = new double[][]
+                { { 28143.10628459914 },
+                        { -265258.1426397235 },
+                        { 16688.44367610407 } };
+
+        MatrixStore<Double> l = RawStore.wrap(l_);
+
+        double[][] ae_ = new double[][]
+                { { 1.0,	0.0,	0.0 },
+                        { 0.0,	1.0,	1.0 } };
+
+        MatrixStore<Double> ae = RawStore.wrap(ae_);
+
+        double[][] be_ = new double[][]
+                { { 0.0 },
+                        { 0.0 } };
+
+        MatrixStore<Double> be = RawStore.wrap(be_);
+
+        double[][] ai_ = new double[][]
+                { { -1.0,	-0.0,	-0.0 },
+                        { -0.0,	-1.0,	-0.0 },
+                        { -0.0,	-0.0,	-1.0 } };
+
+        MatrixStore<Double> ai = RawStore.wrap(ai_);
+
+        double[][] bi_ = new double[][]
+                { { 0.050000000000000044 },
+                        { 1.2148895509567436E-4 },
+                        { 0.050000000000000044 } };
+
+        MatrixStore<Double> bi = RawStore.wrap(bi_);
+
+        ConvexSolver.Builder builder = ConvexSolver.newBuilder();
+        builder.objective(q, l);
+        if (ae != null && be != null) {
+            builder.equalities(ae, be);
+        }
+        if (ai != null && bi != null) {
+            builder.inequalities(ai, bi);
+        }
+        Optimisation.Options options = new Optimisation.Options();
+        options.iterations_abort = 100000;
+        options.iterations_suffice = 10000;
+        options.time_abort = 10000;
+        options.time_suffice = 1000;
+        options.sparse=true;
+        options.validate=true;
+        ConvexSolver.Configuration convex = options.convex();
+        NumberContext present = convex.iterative();
+        convex.iterative(NumberContext.of(8));
+        convex.solverSPD(Cholesky.R064::make).solverGeneral(LU.R064::make).iterative(NumberContext.of(12));
+        convex.extendedPrecision(false);
+        convex.setIterativeSolver(new QMRSolver());
+        final ConvexSolver convexModel = builder.build(options);
+        Optimisation.Result startValue = Optimisation.Result.of(0, Optimisation.State.APPROXIMATE, new double[q.getColDim()]);
+
+        Optimisation.Result firstResult = null;
+        try {
+            firstResult = convexModel.solve(startValue);
+        } catch (Exception e) {
+            firstResult = convexModel.solve(startValue);
+        }
+        TestUtils.assertTrue(firstResult.getState().isSuccess());
+
     }
 
     private static R064Store hilbert(int n) {

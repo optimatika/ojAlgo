@@ -44,6 +44,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.task.iterative.ConjugateGradientSolver;
+import org.ojalgo.matrix.task.iterative.IterativeSolverTask.SparseDelegate;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
@@ -366,6 +367,7 @@ public abstract class ConvexSolver extends GenericSolver {
         private boolean myCombinedScaleFactor = true;
         private boolean myExtendedPrecision = false;
         private NumberContext myIterative = NumberContext.of(10, 14).withMode(RoundingMode.HALF_DOWN);
+        private SparseDelegate myIterativeSolver = new ConjugateGradientSolver();
         private double mySmallDiagonal = RELATIVELY_SMALL + MACHINE_EPSILON;
         private Function<Structure2D, MatrixDecomposition.Solver<Double>> mySolverGeneral = LU.R064::make;
         private Function<Structure2D, MatrixDecomposition.Solver<Double>> mySolverSPD = Cholesky.R064::make;
@@ -426,6 +428,21 @@ public abstract class ConvexSolver extends GenericSolver {
             Objects.requireNonNull(accuracy);
             myIterative = accuracy;
             return this;
+        }
+
+        /**
+         * Select which iterative linear system solver to use for the Schur-complement step in IterativeASS.
+         * Default is {@link ConjugateGradientSolver}. You may set e.g. new {@code QMRSolver()}.
+         */
+        public Configuration setIterativeSolver(final SparseDelegate solver) {
+            Objects.requireNonNull(solver);
+            myIterativeSolver = solver;
+            return this;
+        }
+
+        /** Returns the configured iterative solver */
+        public SparseDelegate getIterativeSolver() {
+            return myIterativeSolver;
         }
 
         public MatrixDecomposition.Solver<Double> newSolverGeneral(final Structure2D structure) {
