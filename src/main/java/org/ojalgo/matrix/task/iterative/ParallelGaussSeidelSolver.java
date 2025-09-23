@@ -72,16 +72,6 @@ public final class ParallelGaussSeidelSolver extends StationaryIterativeSolver i
         return this.resolve(equations, solution, normRHS, iterationsCounter, 0, nbEquations);
     }
 
-    @Override
-    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> current) throws RecoverableCondition {
-
-        List<Equation> equations = IterativeSolverTask.toListOfRows(body, rhs);
-
-        this.resolve(equations, current);
-
-        return current;
-    }
-
     private double resolve(final List<Equation> equations, final PhysicalStore<Double> solution, final double normRHS, final AtomicInteger iterationsCounter,
             final int first, final int last) {
 

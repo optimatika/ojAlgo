@@ -34,7 +34,7 @@ import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
-import org.ojalgo.matrix.task.iterative.ConjugateGradientSolver;
+import org.ojalgo.matrix.task.iterative.IterativeSolverTask;
 import org.ojalgo.matrix.task.iterative.MutableSolver;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.scalar.PrimitiveScalar;
@@ -60,7 +60,7 @@ final class IterativeASS extends ActiveSetSolver {
      *
      * @author apete
      */
-    final class SchurComplementSolver extends MutableSolver<ConjugateGradientSolver> implements MatrixStore<Double> {
+    final class SchurComplementSolver extends MutableSolver<IterativeSolverTask.SparseDelegate> implements MatrixStore<Double> {
 
         private final int myCountE = IterativeASS.this.countEqualityConstraints();
         private final SparseArrayPool myEquationBodyPool;
@@ -69,7 +69,7 @@ final class IterativeASS extends ActiveSetSolver {
 
         SchurComplementSolver() {
 
-            super(new ConjugateGradientSolver(), IterativeASS.this.countEqualityConstraints() + IterativeASS.this.countInequalityConstraints());
+            super(options.convex().getIterativeSolver(), IterativeASS.this.countEqualityConstraints() + IterativeASS.this.countInequalityConstraints());
 
             // GaussSeidel
             //this.setTerminationContext(NumberContext.getMath(MathContext.DECIMAL64).newPrecision(13));
