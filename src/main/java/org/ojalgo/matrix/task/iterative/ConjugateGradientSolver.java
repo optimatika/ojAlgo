@@ -145,16 +145,6 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
         return normErr / normRHS;
     }
 
-    @Override
-    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
-
-        List<Equation> equations = IterativeSolverTask.toListOfRows(body, rhs);
-
-        this.resolve(equations, preallocated);
-
-        return preallocated;
-    }
-
     private R064Store direction(final Structure1D structure) {
         if (myDirection == null || myDirection.count() != structure.count()) {
             myDirection = R064Store.FACTORY.make(structure.count(), 1L);

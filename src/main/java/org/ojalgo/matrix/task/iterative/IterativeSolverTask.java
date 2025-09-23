@@ -94,7 +94,7 @@ public abstract class IterativeSolverTask implements SolverTask<Double> {
 
     }
 
-    public interface SparseDelegate {
+    public interface SparseDelegate extends SolverTask<Double>{
 
         double resolve(List<Equation> equations, PhysicalStore<Double> solution);
 
@@ -111,6 +111,15 @@ public abstract class IterativeSolverTask implements SolverTask<Double> {
             }
 
             return this.resolve(equations, solution);
+        }
+
+        default MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
+
+            List<Equation> equations = IterativeSolverTask.toListOfRows(body, rhs);
+
+            this.resolve(equations, preallocated);
+
+            return preallocated;
         }
 
     }

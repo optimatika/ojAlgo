@@ -39,7 +39,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public abstract class MutableSolver<D extends IterativeSolverTask & IterativeSolverTask.SparseDelegate> extends IterativeSolverTask {
+public abstract class MutableSolver<D extends IterativeSolverTask.SparseDelegate> extends IterativeSolverTask {
 
     private final D myDelegate;
     private final List<Equation> myRows = new ArrayList<>();
@@ -109,19 +109,25 @@ public abstract class MutableSolver<D extends IterativeSolverTask & IterativeSol
     @Override
     protected void setAccuracyContext(final NumberContext accuracyContext) {
         super.setAccuracyContext(accuracyContext);
-        myDelegate.setAccuracyContext(accuracyContext);
+        if (myDelegate instanceof IterativeSolverTask) {
+            ((IterativeSolverTask) myDelegate).setAccuracyContext(accuracyContext);
+        }
     }
 
     @Override
     protected void setDebugPrinter(final BasicLogger debugPrinter) {
         super.setDebugPrinter(debugPrinter);
-        myDelegate.setDebugPrinter(debugPrinter);
+        if (myDelegate instanceof IterativeSolverTask) {
+            ((IterativeSolverTask) myDelegate).setDebugPrinter(debugPrinter);
+        }
     }
 
     @Override
     protected void setIterationsLimit(final int iterationsLimit) {
         super.setIterationsLimit(iterationsLimit);
-        myDelegate.setIterationsLimit(iterationsLimit);
+        if (myDelegate instanceof IterativeSolverTask) {
+            ((IterativeSolverTask) myDelegate).setIterationsLimit(iterationsLimit);
+        }
     }
 
 }
