@@ -1,4 +1,5 @@
 name: ojalgo-custom-queries
 version: 1.0.0
-libraryPathDependencies: codeql-java
+dependencies:
+  codeql/java-all: "*"
 extractor: java

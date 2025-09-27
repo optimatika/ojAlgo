@@ -1,0 +1,9 @@
+name: ojAlgo CodeQL config
+paths:
+  - 'src/main/**'
+paths-ignore:
+  - '**/src/test/**'
+  - '**/test/**'
+  - '**/*Test.java'
+  - '**/*Tests.java'
+  - '**/*IT.java'
