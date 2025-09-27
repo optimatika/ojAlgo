@@ -25,11 +25,8 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.List;
 
-import org.ojalgo.RecoverableCondition;
 import org.ojalgo.equation.Equation;
-import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -37,49 +34,65 @@ import org.ojalgo.type.context.NumberContext;
  * <p>
  * To guarantee convergence [A] needs to be either strictly diagonally dominant, or symmetric and positive
  * definite.
+ * <p>
+ * When to use:
+ * <ul>
+ * <li>Diagonally dominant or SPD systems where a simple stationary method suffices.
+ * <li>Prefer over Jacobi when sequential in-place updates improve convergence speed.
+ * <li>Useful as a smoother/pre-relaxation in multilevel schemes.
+ * <li>For large SPD systems, prefer ConjugateGradientSolver for faster convergence.
+ * <li>If you need fully synchronous updates (or trivial parallelism), prefer Jacobi.
+ * </ul>
  *
  * @author apete
  * @see https://en.wikipedia.org/wiki/Gauss–Seidel_method
  */
-public final class GaussSeidelSolver extends StationaryIterativeSolver implements IterativeSolverTask.SparseDelegate {
+public final class GaussSeidelSolver extends IterativeSolverTask {
 
     public GaussSeidelSolver() {
         super();
     }
 
+    @Override
     public double resolve(final List<Equation> equations, final PhysicalStore<Double> solution) {
 
-        double tmpNormErr = POSITIVE_INFINITY;
-        double tmpNormRHS = ZERO;
-
-        final int tmpCountRows = equations.size();
-        for (int r = 0; r < tmpCountRows; r++) {
-            tmpNormRHS = HYPOT.invoke(tmpNormRHS, equations.get(r).getRHS());
+        if (this.isDebugPrinterSet()) {
+            this.debug(0, NaN, solution);
         }
 
-        int tmpIterations = 0;
-        final int tmpLimit = this.getIterationsLimit();
-        final NumberContext tmpCntxt = this.getAccuracyContext();
-        final double tmpRelaxationFactor = this.getRelaxationFactor();
+        int m = equations.size();
+
+        int nbIterations = 0;
+        int iterationsLimit = this.getIterationsLimit();
+
+        NumberContext accuracy = this.getAccuracyContext();
+
+        double normErr = POSITIVE_INFINITY;
+        double normRHS = ZERO;
+
+        for (int r = 0; r < m; r++) {
+            normRHS = HYPOT.invoke(normRHS, equations.get(r).getRHS());
+        }
+
+        double relaxationFactor = this.getRelaxationFactor();
 
         do {
 
-            tmpNormErr = ZERO;
+            normErr = ZERO;
 
-            for (int r = 0; r < tmpCountRows; r++) {
-                tmpNormErr = HYPOT.invoke(tmpNormErr, equations.get(r).adjust(solution, tmpRelaxationFactor));
+            for (int r = 0; r < m; r++) {
+                normErr = HYPOT.invoke(normErr, equations.get(r).adjust(solution, relaxationFactor));
             }
 
-            tmpIterations++;
+            nbIterations++;
 
             if (this.isDebugPrinterSet()) {
-                this.debug(tmpIterations, tmpNormErr / tmpNormRHS, solution);
+                this.debug(nbIterations, normErr / normRHS, solution);
             }
 
-        } while ((tmpIterations < tmpLimit) && !tmpCntxt.isSmall(tmpNormRHS, tmpNormErr));
+        } while (nbIterations < iterationsLimit && !Double.isNaN(normErr) && !accuracy.isSmall(normRHS, normErr));
 
-        return tmpNormErr / tmpNormRHS;
+        return accuracy.isZero(normRHS) ? normErr : normErr / normRHS;
     }
-
 
 }

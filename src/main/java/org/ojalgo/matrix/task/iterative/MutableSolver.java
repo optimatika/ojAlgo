@@ -24,35 +24,63 @@ package org.ojalgo.matrix.task.iterative;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
-import org.ojalgo.type.context.NumberContext;
 
 /**
- * Maintains a list of {@link Equation}:s and delegates to a {@link SparseDelegate}.
- *
- * @author apete
+ * Lightweight mutable wrapper around a list of {@link Equation} rows that delegates solving to an
+ * {@link IterativeSolverTask}.
+ * <p>
+ * Purpose:
+ * <ul>
+ * <li>Build and update an equation system incrementally by adding/removing {@link Equation} rows.
+ * <li>Reuse an iterative solver across solves without rebuilding matrices.
+ * <li>Support workflows where the active rows/columns change between iterations.
+ * </ul>
+ * <p>
+ * How it works:
+ * <ul>
+ * <li>You construct a subclass that knows the problem size and supplies a delegate
+ * {@link IterativeSolverTask}.
+ * <li>Call {@link #add(Equation)} and {@link #remove(Equation)} to maintain the active set of rows. Rows are
+ * kept sorted by their {@link Equation#index}.
+ * <li>Call {@link #resolve(PhysicalStore)} (or {@link #resolve(PhysicalStore, Access1D)}) to solve [A][x]=[b]
+ * using the current rows and right-hand sides stored in each {@link Equation}.
+ * <li>All methods that solve or preallocate simply forward to the delegate.
+ * </ul>
+ * <p>
+ * Contract:
+ * <ul>
+ * <li>Every added {@link Equation} must have {@link Equation#size()} equal to the problem size passed to the
+ * constructor; otherwise an {@link IllegalArgumentException} is thrown.
+ * <li>The provided {@code solution} vector represents the active variable subspace; residuals are formed
+ * against that vector and the current row bodies only.
+ * <li>Thread-safety: instances are not thread-safe; do not mutate the row set while solving.
+ * </ul>
+ * <p>
+ * Example usage:
+ * <ul>
+ * <li>See {@code org.ojalgo.optimisation.convex.IterativeASS.SchurComplementSolver}, which extends
+ * {@code MutableSolver} and also implements {@link MatrixStore}. It dynamically assembles the (negated)
+ * Schur-complement system by adding/removing rows as constraints enter/leave the active set, and then calls
+ * {@link #resolve(PhysicalStore)} to compute Lagrange multipliers.
+ * </ul>
  */
-public abstract class MutableSolver<D extends IterativeSolverTask.SparseDelegate> extends IterativeSolverTask {
+public abstract class MutableSolver implements SolverTask<Double> {
 
-    private final D myDelegate;
+    private final IterativeSolverTask myDelegate;
     private final List<Equation> myRows = new ArrayList<>();
-    private final long mySize;
+    private final int mySize;
 
-    @SuppressWarnings("unused")
-    private MutableSolver() {
-        super();
-        myDelegate = null;
-        mySize = 0L;
-    }
-
-    protected MutableSolver(final D delegate, final long size) {
+    protected MutableSolver(final IterativeSolverTask delegate, final int size) {
 
         super();
 
@@ -61,8 +89,8 @@ public abstract class MutableSolver<D extends IterativeSolverTask.SparseDelegate
     }
 
     public boolean add(final Equation row) {
-        if (row.count() != mySize) {
-            BasicLogger.error("row.count(): {} != mySize: {}", row.count(), mySize);
+        if (row.size() != mySize) {
+            BasicLogger.error("row.count(): {} != mySize: {}", row.size(), mySize);
             throw new IllegalArgumentException();
         }
         boolean retVal = myRows.add(row);
@@ -74,8 +102,9 @@ public abstract class MutableSolver<D extends IterativeSolverTask.SparseDelegate
         myRows.clear();
     }
 
-    public double[] getRHS() {
-        return myRows.stream().mapToDouble(Equation::getRHS).toArray();
+    @Override
+    public PhysicalStore<Double> preallocate(final int nbEquations, final int nbVariables, final int nbSolutions) {
+        return myDelegate.preallocate(nbEquations, nbVariables, nbSolutions);
     }
 
     public boolean remove(final Equation row) {
@@ -83,17 +112,22 @@ public abstract class MutableSolver<D extends IterativeSolverTask.SparseDelegate
     }
 
     /**
-     * A variation of {@linkplain #solve(Access2D, Access2D, PhysicalStore)} where you do not supply the
-     * equation system <code>body</code>. It is assumed to have been set up beforehand.
+     * A variation of {@linkplain #solve(Access2D, Access2D, PhysicalStore)} where the system body has already
+     * been set up using {@link #add(Equation)}. Solves the current [A][x]=[b] using the delegate iterative
+     * solver.
      */
-    public final double resolve(final PhysicalStore<Double> solution) {
+    public double resolve(final PhysicalStore<Double> solution) {
         return myDelegate.resolve(myRows, solution);
     }
 
-    public final double resolve(final PhysicalStore<Double> solution, final Access1D<?> rhs) {
+    /**
+     * Same as {@link #resolve(PhysicalStore)} but replaces the RHS values before solving.
+     */
+    public double resolve(final PhysicalStore<Double> solution, final Access1D<?> rhs) {
         return myDelegate.resolve(myRows, solution, rhs);
     }
 
+    @Override
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> current) throws RecoverableCondition {
         return myDelegate.solve(body, rhs, current);
     }
@@ -102,32 +136,12 @@ public abstract class MutableSolver<D extends IterativeSolverTask.SparseDelegate
         return myRows.get(row).doubleValue(col);
     }
 
-    protected final D getDelegate() {
+    protected Stream<Equation> equations() {
+        return myRows.stream();
+    }
+
+    protected final IterativeSolverTask getDelegate() {
         return myDelegate;
-    }
-
-    @Override
-    protected void setAccuracyContext(final NumberContext accuracyContext) {
-        super.setAccuracyContext(accuracyContext);
-        if (myDelegate instanceof IterativeSolverTask) {
-            ((IterativeSolverTask) myDelegate).setAccuracyContext(accuracyContext);
-        }
-    }
-
-    @Override
-    protected void setDebugPrinter(final BasicLogger debugPrinter) {
-        super.setDebugPrinter(debugPrinter);
-        if (myDelegate instanceof IterativeSolverTask) {
-            ((IterativeSolverTask) myDelegate).setDebugPrinter(debugPrinter);
-        }
-    }
-
-    @Override
-    protected void setIterationsLimit(final int iterationsLimit) {
-        super.setIterationsLimit(iterationsLimit);
-        if (myDelegate instanceof IterativeSolverTask) {
-            ((IterativeSolverTask) myDelegate).setIterationsLimit(iterationsLimit);
-        }
     }
 
 }

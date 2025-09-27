@@ -24,10 +24,9 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Spectral decomposition: New `Eigenvalue.Spectral` interface (extends both `Eigenvalue` and `SingularValue`) and factory convenience `Eigenvalue.Factory#makeSpectral(int)` for normal (in particular symmetric / Hermitian) matrices, exposing a decomposition that can simultaneously be treated as an eigenvalue- and singular value decomposition. Includes `isSPD()` convenience check.
 - Static utility helpers: `Eigenvalue.reconstruct(Eigenvalue)` plus `SingularValue.invert(...)`, `SingularValue.solve(...)` and `SingularValue.reconstruct(...)` centralise pseudoinverse / solve / reconstruction logic.
+- New Quasi-Minimal Residual (QMR) iterative solver for general nonsymmetric square systems. Contributed by @Programmer-Magnus.
 
 ### Changed
-
-#### org.ojalgo.matrix
 
 #### org.ojalgo.data
 
@@ -37,6 +36,14 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - Singular Value Decomposition API now uses standard nomenclature: diagonal singular value matrix accessor changed from `getD()` to `getS()` (see Deprecated). Internal implementations (`DenseSingularValue`, `RawSingularValue`) updated accordingly.
 - Performance & allocation improvements in `DenseSingularValue` and `RawSingularValue`: direct use of internal singular value array (`s[]`), deferred/cached construction of `S` and inverse, centralised solve/invert logic reducing temporary object creation.
 - Eigenvalue decomposition updated to integrate spectral variant; minor javadoc clarifications and shared reconstruction via new static helper.
+
+#### org.ojalgo.matrix
+
+- Internal refactoring in the `org.ojalgo.matrix.task.iterative` package. If you only used what was there these changes shouldn't affect you, but if you have implemented your own solver it does.
+
+#### org.ojalgo.optimisation
+
+- In `ConvexSolver`, the iterative Schur complement solver used in the active set solver, is now configurable (which implementation to use). Use either the `ConjugateGradientSolver` or `QMRSolver`, or some other implementation.
 
 ### Deprecated
 
