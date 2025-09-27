@@ -24,6 +24,7 @@ package org.ojalgo.optimisation.convex;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.BasicArray;
@@ -34,7 +35,6 @@ import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
-import org.ojalgo.matrix.task.iterative.IterativeSolverTask;
 import org.ojalgo.matrix.task.iterative.MutableSolver;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.scalar.PrimitiveScalar;
@@ -60,7 +60,7 @@ final class IterativeASS extends ActiveSetSolver {
      *
      * @author apete
      */
-    final class SchurComplementSolver extends MutableSolver<IterativeSolverTask.SparseDelegate> implements MatrixStore<Double> {
+    final class SchurComplementSolver extends MutableSolver {
 
         private final int myCountE = IterativeASS.this.countEqualityConstraints();
         private final SparseArrayPool myEquationBodyPool;
@@ -69,54 +69,11 @@ final class IterativeASS extends ActiveSetSolver {
 
         SchurComplementSolver() {
 
-            super(options.convex().getIterativeSolver(), IterativeASS.this.countEqualityConstraints() + IterativeASS.this.countInequalityConstraints());
-
-            // GaussSeidel
-            //this.setTerminationContext(NumberContext.getMath(MathContext.DECIMAL64).newPrecision(13));
-            //this.getDelegate().setRelaxationFactor(1.5);
-
-            // ConjugateGradient
-            this.setAccuracyContext(options.convex().iterative());
-            this.setIterationsLimit(myFullDim + myFullDim);
-
-            // this.setDebugPrinter(BasicLogger.DEBUG);
+            super(options.convex().newIterativeSolver(2 * (IterativeASS.this.countEqualityConstraints() + IterativeASS.this.countInequalityConstraints())),
+                    IterativeASS.this.countEqualityConstraints() + IterativeASS.this.countInequalityConstraints());
 
             myEquationBodyPool = new SparseArrayPool(myFullDim);
             myIterationRows = new Equation[myFullDim];
-        }
-
-        @Override
-        public double doubleValue(final int row, final int col) {
-
-            int intRow = row;
-            int intCol = col;
-
-            if (intCol >= myCountE) {
-                int[] included = IterativeASS.this.getIncluded();
-                intCol = myCountE + included[intCol - myCountE];
-            }
-
-            return super.doubleValue(intRow, intCol);
-        }
-
-        @Override
-        public Double get(final int row, final int col) {
-            return Double.valueOf(this.doubleValue(row, col));
-        }
-
-        @Override
-        public int getColDim() {
-            return IterativeASS.this.countEqualityConstraints() + IterativeASS.this.countIncluded();
-        }
-
-        @Override
-        public int getRowDim() {
-            return IterativeASS.this.countEqualityConstraints() + IterativeASS.this.countIncluded();
-        }
-
-        @Override
-        public PhysicalStore.Factory<Double, ?> physical() {
-            return MATRIX_FACTORY;
         }
 
         void add(final int j, final Access1D<Double> column, final double rhs) {
@@ -156,6 +113,10 @@ final class IterativeASS extends ActiveSetSolver {
             }
 
             tmpNewRow.initialise(IterativeASS.this.getSolutionL());
+        }
+
+        double[] getRHS() {
+            return this.equations().mapToDouble(Equation::getRHS).toArray();
         }
 
         void remove(final int i) {

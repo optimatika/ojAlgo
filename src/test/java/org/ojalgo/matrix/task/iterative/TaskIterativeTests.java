@@ -21,27 +21,11 @@
  */
 package org.ojalgo.matrix.task.iterative;
 
-import static org.ojalgo.function.constant.PrimitiveMath.ONE;
-
 /**
- * @see https://en.wikipedia.org/wiki/Iterative_method#Stationary_iterative_methods
- * @see https://mathworld.wolfram.com/StationaryIterativeMethod.html
  * @author apete
  */
-public abstract class StationaryIterativeSolver extends IterativeSolverTask {
+abstract class TaskIterativeTests {
 
-    private double myRelaxationFactor = ONE;
-
-    StationaryIterativeSolver() {
-        super();
-    }
-
-    public final double getRelaxationFactor() {
-        return myRelaxationFactor;
-    }
-
-    public final void setRelaxationFactor(final double relaxation) {
-        myRelaxationFactor = relaxation;
-    }
+    static final boolean DEBUG = false;
 
 }

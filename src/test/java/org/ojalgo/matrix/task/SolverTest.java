@@ -36,6 +36,7 @@ import org.ojalgo.matrix.task.iterative.ConjugateGradientSolver;
 import org.ojalgo.matrix.task.iterative.GaussSeidelSolver;
 import org.ojalgo.matrix.task.iterative.JacobiSolver;
 import org.ojalgo.matrix.task.iterative.ParallelGaussSeidelSolver;
+import org.ojalgo.matrix.task.iterative.QMRSolver;
 import org.ojalgo.random.Uniform;
 
 public class SolverTest extends MatrixTaskTests {
@@ -48,19 +49,22 @@ public class SolverTest extends MatrixTaskTests {
         MatrixStore<Double> tmpA = RawStore.wrap(new double[][] { { 4, 1 }, { 1, 3 } });
         MatrixStore<Double> tmpB = R064Store.FACTORY.column(1, 2);
 
-        MatrixStore<Double> tmpExpected = R064Store.FACTORY.column(1.0 / 11.0, 7.0 / 11.0);
+        MatrixStore<Double> expected = R064Store.FACTORY.column(1.0 / 11.0, 7.0 / 11.0);
 
         JacobiSolver tmpJacobiSolver = new JacobiSolver();
-        TestUtils.assertEquals(tmpExpected, tmpJacobiSolver.solve(tmpA, tmpB).get());
+        TestUtils.assertEquals(expected, tmpJacobiSolver.solve(tmpA, tmpB).get());
 
         GaussSeidelSolver tmpGaussSeidelSolver = new GaussSeidelSolver();
-        TestUtils.assertEquals(tmpExpected, tmpGaussSeidelSolver.solve(tmpA, tmpB).get());
+        TestUtils.assertEquals(expected, tmpGaussSeidelSolver.solve(tmpA, tmpB).get());
 
         ParallelGaussSeidelSolver tmpParallelGaussSeidelSolver = new ParallelGaussSeidelSolver();
-        TestUtils.assertEquals(tmpExpected, tmpParallelGaussSeidelSolver.solve(tmpA, tmpB).get());
+        TestUtils.assertEquals(expected, tmpParallelGaussSeidelSolver.solve(tmpA, tmpB).get());
 
         ConjugateGradientSolver tmpConjugateGradientSolver = new ConjugateGradientSolver();
-        TestUtils.assertEquals(tmpExpected, tmpConjugateGradientSolver.solve(tmpA, tmpB).get());
+        TestUtils.assertEquals(expected, tmpConjugateGradientSolver.solve(tmpA, tmpB).get());
+
+        QMRSolver tmpQMRSolver = new QMRSolver();
+        TestUtils.assertEquals(expected, tmpQMRSolver.solve(tmpA, tmpB).get());
     }
 
     @Test
@@ -89,16 +93,19 @@ public class SolverTest extends MatrixTaskTests {
         MatrixStore<Double> tmpA = RawStore.wrap(new double[][] { { 4, 2, 3 }, { 3, -5, 2 }, { -2, 3, 8 } });
         MatrixStore<Double> tmpB = R064Store.FACTORY.column(8, -14, 27);
 
-        MatrixStore<Double> tmpExpected = R064Store.FACTORY.column(-1, 3, 2);
+        MatrixStore<Double> expected = R064Store.FACTORY.column(-1, 3, 2);
 
         JacobiSolver tmpJacobiSolver = new JacobiSolver();
-        TestUtils.assertEquals(tmpExpected, tmpJacobiSolver.solve(tmpA, tmpB).get());
+        TestUtils.assertEquals(expected, tmpJacobiSolver.solve(tmpA, tmpB).get());
 
         GaussSeidelSolver tmpGaussSeidelSolver = new GaussSeidelSolver();
-        TestUtils.assertEquals(tmpExpected, tmpGaussSeidelSolver.solve(tmpA, tmpB).get());
+        TestUtils.assertEquals(expected, tmpGaussSeidelSolver.solve(tmpA, tmpB).get());
 
         ParallelGaussSeidelSolver tmpParallelGaussSeidelSolver = new ParallelGaussSeidelSolver();
-        TestUtils.assertEquals(tmpExpected, tmpParallelGaussSeidelSolver.solve(tmpA, tmpB).get());
+        TestUtils.assertEquals(expected, tmpParallelGaussSeidelSolver.solve(tmpA, tmpB).get());
+
+        QMRSolver tmpQMRSolver = new QMRSolver();
+        TestUtils.assertEquals(expected, tmpQMRSolver.solve(tmpA, tmpB).get());
     }
 
     @Test

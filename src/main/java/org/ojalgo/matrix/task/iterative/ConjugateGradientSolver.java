@@ -25,25 +25,31 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.List;
 
-import org.ojalgo.RecoverableCondition;
 import org.ojalgo.equation.Equation;
-import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Structure1D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
  * For solving [A][x]=[b] when [A] is symmetric and positive-definite.
  * <p>
  * This implementation is (Jacobi) preconditioned – using the diagonal elements to scale the residual.
+ * <p>
+ * When to use:
+ * <ul>
+ * <li>Large, sparse systems with symmetric positive-definite A.
+ * <li>When fast convergence is desired compared to Jacobi/Gauss–Seidel for SPD problems.
+ * <li>When only matrix–vector products with A are available (no need for A^T).
+ * <li>Prefer over stationary methods as a general default for SPD systems, especially with reasonable
+ * conditioning.
+ * <li>Not suitable for nonsymmetric or indefinite systems (use QMR or a different Krylov method).
+ * </ul>
  *
  * @author apete
  * @see https://en.wikipedia.org/wiki/Conjugate_gradient_method
  * @see https://optimization.cbe.cornell.edu/index.php?title=Conjugate_gradient_methods
  */
-public final class ConjugateGradientSolver extends KrylovSubspaceSolver implements IterativeSolverTask.SparseDelegate {
+public final class ConjugateGradientSolver extends IterativeSolverTask {
 
     private transient R064Store myDirection = null;
     private transient R064Store myPreconditioned = null;
@@ -61,19 +67,21 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
             this.debug(0, NaN, solution);
         }
 
-        int nbEquations = equations.size();
+        int m = equations.size();
+        int n = solution.size();
 
-        int iterations = 0;
-        int limit = this.getIterationsLimit();
+        int nbIterations = 0;
+        int iterationsLimit = this.getIterationsLimit();
+
         NumberContext accuracy = this.getAccuracyContext();
 
         double normErr = POSITIVE_INFINITY;
-        double normRHS = ONE;
+        double normRHS = ZERO;
 
-        R064Store residual = this.residual(solution);
-        R064Store direction = this.direction(solution);
-        R064Store preconditioned = this.preconditioned(solution);
-        R064Store vector = this.vector(solution);
+        R064Store residual = myResidual = IterativeSolverTask.worker(myResidual, n);
+        R064Store direction = myDirection = IterativeSolverTask.worker(myDirection, n);
+        R064Store preconditioned = myPreconditioned = IterativeSolverTask.worker(myPreconditioned, n);
+        R064Store vector = myVector = IterativeSolverTask.worker(myVector, n);
 
         double stepLength; // alpha
         double gradientCorrectionFactor; // beta
@@ -82,7 +90,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
         double zr1;
         double pAp0 = 0;
 
-        for (int r = 0; r < nbEquations; r++) {
+        for (int r = 0; r < m; r++) {
             Equation row = equations.get(r);
             double tmpVal = row.getRHS();
             normRHS = HYPOT.invoke(normRHS, tmpVal);
@@ -100,7 +108,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
 
             zr0 = zr1;
 
-            for (int i = 0; i < nbEquations; i++) {
+            for (int i = 0; i < m; i++) {
                 Equation row = equations.get(i);
                 vector.set(row.index, row.dot(direction));
             }
@@ -118,7 +126,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
 
             normErr = ZERO;
 
-            for (int r = 0; r < nbEquations; r++) {
+            for (int r = 0; r < m; r++) {
                 Equation row = equations.get(r);
                 double tmpVal = residual.doubleValue(row.index);
                 normErr = HYPOT.invoke(normErr, tmpVal);
@@ -132,53 +140,15 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
             direction.modifyAll(MULTIPLY.second(gradientCorrectionFactor));
             direction.modifyMatching(ADD, preconditioned);
 
-            iterations++;
+            nbIterations++;
 
             if (this.isDebugPrinterSet()) {
-                this.debug(iterations, normErr / normRHS, solution);
+                this.debug(nbIterations, normErr / normRHS, solution);
             }
 
-        } while (iterations < limit && !Double.isNaN(normErr) && !accuracy.isSmall(normRHS, normErr));
+        } while (nbIterations < iterationsLimit && !Double.isNaN(normErr) && !accuracy.isSmall(normRHS, normErr));
 
-        // BasicLogger.debug("Done in {} iterations on problem size {}", iterations, solution.count());
-
-        return normErr / normRHS;
-    }
-
-    private R064Store direction(final Structure1D structure) {
-        if (myDirection == null || myDirection.count() != structure.count()) {
-            myDirection = R064Store.FACTORY.make(structure.count(), 1L);
-        } else {
-            myDirection.fillAll(ZERO);
-        }
-        return myDirection;
-    }
-
-    private R064Store preconditioned(final Structure1D structure) {
-        if (myPreconditioned == null || myPreconditioned.count() != structure.count()) {
-            myPreconditioned = R064Store.FACTORY.make(structure.count(), 1L);
-        } else {
-            myPreconditioned.fillAll(ZERO);
-        }
-        return myPreconditioned;
-    }
-
-    private R064Store residual(final Structure1D structure) {
-        if (myResidual == null || myResidual.count() != structure.count()) {
-            myResidual = R064Store.FACTORY.make(structure.count(), 1L);
-        } else {
-            myResidual.fillAll(ZERO);
-        }
-        return myResidual;
-    }
-
-    private R064Store vector(final Structure1D structure) {
-        if (myVector == null || myVector.count() != structure.count()) {
-            myVector = R064Store.FACTORY.make(structure.count(), 1L);
-        } else {
-            myVector.fillAll(ZERO);
-        }
-        return myVector;
+        return accuracy.isZero(normRHS) ? normErr : normErr / normRHS;
     }
 
 }

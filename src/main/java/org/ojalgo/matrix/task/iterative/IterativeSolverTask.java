@@ -21,6 +21,8 @@
  */
 package org.ojalgo.matrix.task.iterative;
 
+import static org.ojalgo.function.constant.PrimitiveMath.*;
+
 import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,20 +46,40 @@ import org.ojalgo.structure.ElementView2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * For solving very large sparse equation systems – [A][x]=[b].
- *
- * @author apete
+ * Base class for iterative solvers of large linear systems [A][x]=[b]. Subclasses implement specific
+ * stationary or Krylov methods, but share input conversion, configuration, and stopping logic.
+ * <p>
+ * Design goals:
+ * <ul>
+ * <li>Handle both sparse and dense inputs by converting the system to a {@code List<Equation>} that rows can
+ * iterate over efficiently.
+ * <li>Minimise allocations in hot loops by reusing buffers and operating directly on {@link PhysicalStore}
+ * and {@link R064Store} vectors.
+ * <li>Provide a common configuration and termination policy via {@link NumberContext} and an iteration limit.
+ * </ul>
+ * <p>
+ * Selected/reordered rows and columns:
+ * <ul>
+ * <li>Implementations must work when the effective system is a selected or reordered subset of the original
+ * problem. The equation list may represent only some rows, and column indices may need to be remapped or
+ * compacted.
+ * <li>Do not assume a dense, contiguous column space. Always form row products using
+ * {@link Equation#dot(Access1D)} and access the diagonal through {@link Equation#getPivot()}.
+ * <li>The provided {@code solution} vector defines the active variable subspace; form residuals against that
+ * vector and the current row bodies only.
+ * <li>RHS values are carried by each {@link Equation}; use {@link #resolve(List, PhysicalStore, Access1D)} to
+ * update RHS between solves.
+ * </ul>
+ * <p>
+ * Subclasses should measure a residual norm and stop when {@link NumberContext#isSmall(double, double)} deems
+ * it small relative to the RHS norm (or absolutely small when RHS is zero), or when the iteration limit is
+ * reached.
  */
 public abstract class IterativeSolverTask implements SolverTask<Double> {
 
     public static final class Configurator {
 
         private final IterativeSolverTask mySolver;
-
-        @SuppressWarnings("unused")
-        private Configurator() {
-            this(null);
-        }
 
         Configurator(final IterativeSolverTask solver) {
             super();
@@ -92,34 +114,12 @@ public abstract class IterativeSolverTask implements SolverTask<Double> {
             return this;
         }
 
-    }
-
-    public interface SparseDelegate extends SolverTask<Double>{
-
-        double resolve(List<Equation> equations, PhysicalStore<Double> solution);
-
-        default double resolve(final List<Equation> equations, final PhysicalStore<Double> solution, final Access1D<?> rhs) {
-
-            int nbEquations = equations.size();
-
-            if (rhs.size() != nbEquations) {
-                throw new IllegalArgumentException();
-            }
-
-            for (int i = 0; i < nbEquations; i++) {
-                equations.get(i).setRHS(rhs.doubleValue(i));
-            }
-
-            return this.resolve(equations, solution);
-        }
-
-        default MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
-
-            List<Equation> equations = IterativeSolverTask.toListOfRows(body, rhs);
-
-            this.resolve(equations, preallocated);
-
-            return preallocated;
+        /**
+         * Relaxation factor (only used by some solvers)
+         */
+        public Configurator relaxation(final double factor) {
+            mySolver.setRelaxationFactor(factor);
+            return this;
         }
 
     }
@@ -185,30 +185,71 @@ public abstract class IterativeSolverTask implements SolverTask<Double> {
         return retVal;
     }
 
+    static R064Store worker(final R064Store vector, final int size) {
+        if (vector == null || vector.size() != size) {
+            return R064Store.FACTORY.make(size, 1);
+        } else {
+            vector.fillAll(ZERO);
+            return vector;
+        }
+    }
+
     private NumberContext myAccuracyContext = DEFAULT;
+    private transient Configurator myConfigurator = null;
     private BasicLogger myDebugPrinter = null;
     private int myIterationsLimit = Integer.MAX_VALUE;
+    private double myRelaxationFactor = ONE;
 
     IterativeSolverTask() {
         super();
     }
 
     public final Configurator configurator() {
-        return new Configurator(this);
+        if (myConfigurator == null) {
+            myConfigurator = new Configurator(this);
+        }
+        return myConfigurator;
     }
 
     @Override
-    public PhysicalStore<Double> preallocate(final int nbEquations, final int nbVariables, final int nbSolutions) {
+    public final PhysicalStore<Double> preallocate(final int nbEquations, final int nbVariables, final int nbSolutions) {
         if (nbSolutions != 1) {
             throw new IllegalArgumentException("The RHS must have precisely 1 column!");
+        } else {
+            return R064Store.FACTORY.make(nbVariables, nbSolutions);
         }
-        return R064Store.FACTORY.make(nbVariables, nbSolutions);
+    }
+
+    public final double resolve(final List<Equation> equations, final PhysicalStore<Double> solution, final Access1D<?> rhs) {
+
+        int nbEquations = equations.size();
+
+        if (rhs.size() != nbEquations) {
+            throw new IllegalArgumentException();
+        }
+
+        for (int i = 0; i < nbEquations; i++) {
+            equations.get(i).setRHS(rhs.doubleValue(i));
+        }
+
+        return this.resolve(equations, solution);
+    }
+
+    @Override
+    public final MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated)
+            throws RecoverableCondition {
+
+        List<Equation> equations = IterativeSolverTask.toListOfRows(body, rhs);
+
+        this.resolve(equations, preallocated);
+
+        return preallocated;
     }
 
     public final Optional<MatrixStore<Double>> solve(final MatrixStore<Double> body, final MatrixStore<Double> rhs) {
         try {
             return Optional.of(this.solve(body, rhs, this.preallocate(body, rhs)));
-        } catch (RecoverableCondition xcptn) {
+        } catch (RecoverableCondition cause) {
             return Optional.empty();
         }
     }
@@ -227,20 +268,30 @@ public abstract class IterativeSolverTask implements SolverTask<Double> {
         return myIterationsLimit;
     }
 
+    protected final double getRelaxationFactor() {
+        return myRelaxationFactor;
+    }
+
     protected final boolean isDebugPrinterSet() {
         return myDebugPrinter != null;
     }
 
-    protected void setAccuracyContext(final NumberContext accuracyContext) {
+    protected final void setAccuracyContext(final NumberContext accuracyContext) {
         myAccuracyContext = accuracyContext;
     }
 
-    protected void setDebugPrinter(final BasicLogger debugPrinter) {
+    protected final void setDebugPrinter(final BasicLogger debugPrinter) {
         myDebugPrinter = debugPrinter;
     }
 
-    protected void setIterationsLimit(final int iterationsLimit) {
+    protected final void setIterationsLimit(final int iterationsLimit) {
         myIterationsLimit = iterationsLimit;
     }
+
+    protected final void setRelaxationFactor(final double relaxation) {
+        myRelaxationFactor = relaxation;
+    }
+
+    abstract double resolve(List<Equation> equations, PhysicalStore<Double> solution);
 
 }

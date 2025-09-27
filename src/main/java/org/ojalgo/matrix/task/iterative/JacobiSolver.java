@@ -23,79 +23,92 @@ package org.ojalgo.matrix.task.iterative;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.RecoverableCondition;
-import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.matrix.store.MatrixStore;
+import java.util.List;
+
+import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
-import org.ojalgo.matrix.store.TransformableRegion;
-import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
  * For solving [A][x]=[b] where [A] has non-zero elements on the diagonal.
  * <p>
  * It's most likely better to instead use {@link GaussSeidelSolver} or {@link ConjugateGradientSolver}.
+ * <p>
+ * When to use:
+ * <ul>
+ * <li>Simple baseline or educational purposes; easiest stationary method to reason about.
+ * <li>When you need fully synchronous updates (no in-place coupling) or trivial parallelisation across rows.
+ * <li>Diagonally dominant systems where convergence is acceptable and simplicity/parallelism is preferred.
+ * <li>If sequential in-place updates are fine and you want faster convergence, prefer GaussSeidelSolver.
+ * <li>For large SPD systems, prefer ConjugateGradientSolver for speed and robustness.
+ * </ul>
  *
  * @author apete
  * @see https://en.wikipedia.org/wiki/Jacobi_method
  */
-public final class JacobiSolver extends StationaryIterativeSolver {
+public final class JacobiSolver extends IterativeSolverTask {
+
+    R064Store myIncrement = null;
 
     public JacobiSolver() {
         super();
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> current) throws RecoverableCondition {
+    double resolve(final List<Equation> equations, final PhysicalStore<Double> solution) {
 
-        MatrixStore<Double> tmpBody = null;
-        if (body instanceof MatrixStore<?> && body.get(0L) instanceof Double) {
-            tmpBody = (MatrixStore<Double>) body;
-        } else {
-            tmpBody = R064Store.FACTORY.makeWrapper(body);
-        }
-        MatrixStore<Double> tmpBodyDiagonal = R064Store.FACTORY.column(tmpBody.sliceDiagonal());
-
-        MatrixStore<Double> tmpRHS = null;
-        if (rhs instanceof MatrixStore<?> && rhs.get(0L) instanceof Double) {
-            tmpRHS = (MatrixStore<Double>) rhs;
-        } else {
-            tmpRHS = R064Store.FACTORY.makeWrapper(rhs);
+        if (this.isDebugPrinterSet()) {
+            this.debug(0, NaN, solution);
         }
 
-        PhysicalStore<Double> tmpIncrement = this.preallocate(body, rhs);
-        TransformableRegion<Double> incremetReceiver = body.isFat() ? tmpIncrement.regionByLimits((int) body.countRows(), 1) : tmpIncrement;
+        int m = equations.size();
+        int n = solution.size();
 
-        double tmpNormErr = POSITIVE_INFINITY;
-        double tmpNormRHS = tmpRHS.aggregateAll(Aggregator.NORM2);
+        int nbIterations = 0;
+        int iterationsLimit = this.getIterationsLimit();
 
-        int tmpIterations = 0;
-        int tmpLimit = this.getIterationsLimit();
-        NumberContext tmpCntxt = this.getAccuracyContext();
-        double tmpRelaxation = this.getRelaxationFactor();
+        NumberContext accuracy = this.getAccuracyContext();
+
+        // Compute ||b|| once outside the loop
+        double normRHS = ZERO;
+        for (int r = 0; r < m; r++) {
+            normRHS = HYPOT.invoke(normRHS, equations.get(r).getRHS());
+        }
+
+        // Scratch vector for simultaneous Jacobi updates (delta x)
+        R064Store increment = myIncrement = IterativeSolverTask.worker(myIncrement, n);
+
+        double relaxation = this.getRelaxationFactor();
+
+        double normErr = POSITIVE_INFINITY;
+
         do {
 
-            current.premultiply(tmpBody).onMatching(tmpRHS, SUBTRACT).supplyTo(incremetReceiver);
-            tmpNormErr = tmpIncrement.aggregateAll(Aggregator.NORM2);
-            tmpIncrement.modifyMatching(DIVIDE, tmpBodyDiagonal);
+            normErr = ZERO;
 
-            if (this.getAccuracyContext().isDifferent(ONE, tmpRelaxation)) {
-                tmpIncrement.multiply(tmpRelaxation);
+            // Build residual and increments using "old" solution values
+            for (int r = 0; r < m; r++) {
+                Equation row = equations.get(r);
+                double ri = row.getRHS() - row.dot(solution); // residual component
+                normErr = HYPOT.invoke(normErr, ri);
+                // Jacobi increment: delta_i = r_i / a_ii
+                double pivot = row.getPivot();
+                increment.set(row.index, ri / pivot);
             }
 
-            current.modifyMatching(ADD, tmpIncrement);
+            // Optional relaxation: x += omega * D^{-1} * r
+            increment.axpy(relaxation, solution);
 
-            tmpIterations++;
+            nbIterations++;
 
             if (this.isDebugPrinterSet()) {
-                this.debug(tmpIterations, tmpNormErr / tmpNormRHS, current);
+                this.debug(nbIterations, normErr / normRHS, solution);
             }
 
-        } while (tmpIterations < tmpLimit && !tmpCntxt.isSmall(tmpNormRHS, tmpNormErr));
+        } while (nbIterations < iterationsLimit && !Double.isNaN(normErr) && !accuracy.isSmall(normRHS, normErr));
 
-        return current;
+        return accuracy.isZero(normRHS) ? normErr : normErr / normRHS;
     }
 
 }

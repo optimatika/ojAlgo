@@ -26,23 +26,31 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.ojalgo.RecoverableCondition;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.concurrent.DivideAndConquer.Conquerer;
 import org.ojalgo.concurrent.Parallelism;
 import org.ojalgo.concurrent.ProcessingService;
 import org.ojalgo.equation.Equation;
-import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
  * Experimental parallelised version of {@link GaussSeidelSolver}.
+ * <p>
+ * When to use:
+ * <ul>
+ * <li>Diagonally dominant or SPD systems where Gauss–Seidel is appropriate but you want to utilise multiple
+ * cores.
+ * <li>When you can tolerate slight differences from strictly sequential updates and want higher throughput.
+ * <li>As a smoother/pre-relaxation where approximate iterations are acceptable.
+ * <li>For tough SPD systems where convergence speed and robustness matter more than parallelism, prefer
+ * ConjugateGradientSolver.
+ * <li>For fully synchronous updates (and trivial parallelism), prefer Jacobi.
+ * </ul>
  *
  * @author apete
  */
-public final class ParallelGaussSeidelSolver extends StationaryIterativeSolver implements IterativeSolverTask.SparseDelegate {
+public final class ParallelGaussSeidelSolver extends IterativeSolverTask {
 
     private static final DivideAndConquer.Divider DIVIDER = ProcessingService.INSTANCE.newDivider().parallelism(Parallelism.CORES).threshold(128);
 
@@ -57,27 +65,33 @@ public final class ParallelGaussSeidelSolver extends StationaryIterativeSolver i
     @Override
     public double resolve(final List<Equation> equations, final PhysicalStore<Double> solution) {
 
-        int nbEquations = equations.size();
+        if (this.isDebugPrinterSet()) {
+            this.debug(0, NaN, solution);
+        }
+
+        int m = equations.size();
+
+        AtomicInteger iterationsCounter = new AtomicInteger();
 
         double tmpNorm = ZERO;
-        for (int r = 0; r < nbEquations; r++) {
+        for (int r = 0; r < m; r++) {
             tmpNorm = HYPOT.invoke(tmpNorm, equations.get(r).getRHS());
         }
         double normRHS = tmpNorm;
 
-        AtomicInteger iterationsCounter = new AtomicInteger();
+        ParallelGaussSeidelSolver.divide(m, (first, limit) -> this.resolve(equations, solution, normRHS, iterationsCounter, first, limit));
 
-        ParallelGaussSeidelSolver.divide(nbEquations, (first, last) -> this.resolve(equations, solution, normRHS, iterationsCounter, first, last));
-
-        return this.resolve(equations, solution, normRHS, iterationsCounter, 0, nbEquations);
+        return this.resolve(equations, solution, normRHS, iterationsCounter, 0, m);
     }
 
     private double resolve(final List<Equation> equations, final PhysicalStore<Double> solution, final double normRHS, final AtomicInteger iterationsCounter,
-            final int first, final int last) {
+            final int first, final int limit) {
 
         int iterationsLimit = this.getIterationsLimit();
+
         NumberContext accuracy = this.getAccuracyContext();
-        double relaxationFactor = this.getRelaxationFactor();
+
+        double relaxation = this.getRelaxationFactor();
 
         double normErr = POSITIVE_INFINITY;
 
@@ -85,8 +99,8 @@ public final class ParallelGaussSeidelSolver extends StationaryIterativeSolver i
 
             normErr = ZERO;
 
-            for (int r = first; r < last; r++) {
-                normErr = HYPOT.invoke(normErr, equations.get(r).adjust(solution, relaxationFactor));
+            for (int r = first; r < limit; r++) {
+                normErr = HYPOT.invoke(normErr, equations.get(r).adjust(solution, relaxation));
             }
 
             iterationsCounter.incrementAndGet();
@@ -95,9 +109,9 @@ public final class ParallelGaussSeidelSolver extends StationaryIterativeSolver i
                 this.debug(iterationsCounter.intValue(), normErr / normRHS, solution);
             }
 
-        } while ((iterationsCounter.intValue() < iterationsLimit) && !accuracy.isSmall(normRHS, normErr));
+        } while (iterationsCounter.intValue() < iterationsLimit && !Double.isNaN(normErr) && !accuracy.isSmall(normRHS, normErr));
 
-        return normErr / normRHS;
+        return accuracy.isZero(normRHS) ? normErr : normErr / normRHS;
     }
 
 }
