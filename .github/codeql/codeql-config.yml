@@ -1,0 +1,32 @@
+name: ojAlgo CodeQL config
+paths:
+  - 'src/main/**'
+paths-ignore:
+  - '**/src/test/**'
+  - '**/test/**'
+  - '**/*Test.java'
+  - '**/*Tests.java'
+  - '**/*IT.java'
+
+# Reduce noisy findings while keeping high-signal security + custom checks
+query-filters:
+  # Keep only the most serious problems (certain + high impact)
+  - exclude:
+      problem.severity: recommendation
+  - exclude:
+      problem.severity: warning
+  - exclude:
+      precision: medium
+  - exclude:
+      precision: low
+  # Drop lower security severities
+  - exclude:
+      tags contain:
+        - 'security-severity:low'
+        - 'security-severity:medium'
+  # Exclude non-security quality buckets
+  - exclude:
+      tags contain:
+        - maintainability
+        - readability
+        - style
