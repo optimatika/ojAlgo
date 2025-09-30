@@ -51,6 +51,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - `SingularValue#getD()` deprecated; use `getS()` instead. (Existing code continues to work; plan to remove in a future major release.)
 
+### Fixed
+
+#### org.ojalgo.optimisation
+
+- Fixed a couple of presolve issues with `ExpressionsBasedModel` and quadratic constraints.
+
 ## [56.0.0] – 2025-08-23
 
 ojAlgo is now modularised into a JPMS named module, and that module is named "ojalgo".

@@ -906,6 +906,17 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
+    /**
+     * Add all indices of referenced variables to the supplied {@link Set}.
+     */
+    void addAll(final Set<IntIndex> referenced) {
+        referenced.addAll(this.getLinearKeySet());
+        for (IntRowColumn quad : this.getQuadraticKeySet()) {
+            referenced.add(quad.row());
+            referenced.add(quad.column());
+        }
+    }
+
     void addObjectiveConstant(final BigDecimal value) {
 
         BigDecimal weight = this.getContributionWeight();

@@ -4,9 +4,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.Sense;
 
-public final class OptimisationCase {
-
-    private static final boolean DEBUG = false;
+public final class OptimisationCase extends OptimisationTests {
 
     public static OptimisationCase of(final ExpressionsBasedModel model, final Sense sense, final Result result) {
         return new OptimisationCase(model, sense, result);

@@ -1,12 +1,12 @@
 package org.ojalgo.optimisation;
 
-import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
-
 import java.io.IOException;
 import java.io.InputStream;
 
-class FileFormatEBMTest {
+import org.junit.jupiter.api.Test;
+import org.ojalgo.TestUtils;
+
+class FileFormatEBMTest extends OptimisationTests {
 
     @Test
     void testEBMParserWithEmptyLinesAndComments() {

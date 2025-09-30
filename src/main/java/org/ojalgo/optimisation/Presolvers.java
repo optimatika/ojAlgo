@@ -233,14 +233,14 @@ public abstract class Presolvers {
                 final NumberContext precision) {
 
             switch (remaining.size()) {
-                case 0:
-                    return Presolvers.doCase0(expression, remaining, lower, upper, precision);
-                case 1:
-                    return Presolvers.doCase1(expression, remaining, lower, upper, precision);
-                case 2:
-                    return Presolvers.doCase2(expression, remaining, lower, upper, precision);
-                default: // 3 or more
-                    return Presolvers.doCaseN(expression, remaining, lower, upper, precision);
+            case 0:
+                return Presolvers.doCase0(expression, remaining, lower, upper, precision);
+            case 1:
+                return Presolvers.doCase1(expression, remaining, lower, upper, precision);
+            case 2:
+                return Presolvers.doCase2(expression, remaining, lower, upper, precision);
+            default: // 3 or more
+                return Presolvers.doCaseN(expression, remaining, lower, upper, precision);
             }
         }
     };
@@ -257,14 +257,17 @@ public abstract class Presolvers {
     }
 
     /**
-     * Checks if the potential {@link Expression} is similar to any in the current collection.
+     * Checks if the potential {@link Expression} is similar to any in the current collection. Only works for
+     * linear expressions. If the potential expression to check has any quadratic term, nothing more is
+     * checked, and false is returned.
      *
      * @return true, if the potential {@link Expression} is found to be similar and marked as redundant by
      *         this method.
      */
     public static boolean checkSimilarity(final Collection<Expression> current, final Expression potential) {
 
-        if (potential.isConstraint() && !potential.isRedundant()) {
+        if (potential.isConstraint() && !potential.isRedundant() && !potential.isAnyQuadraticFactorNonZero()) {
+
             Set<IntIndex> potentialLinearKeySet = potential.getLinearKeySet();
 
             for (Expression expression : current) {

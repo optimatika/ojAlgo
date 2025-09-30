@@ -1724,22 +1724,27 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
         boolean anyVarInt = this.isAnyVariableInteger();
 
-        for (Expression tmpExpr : myExpressions.values()) {
+        Set<IntIndex> allVars = new HashSet<>();
 
-            Set<IntIndex> allVars = tmpExpr.getLinearKeySet();
-            BigDecimal lower = tmpExpr.getLowerLimit();
-            BigDecimal upper = tmpExpr.getUpperLimit();
+        for (Expression expr : myExpressions.values()) {
 
-            if (tmpExpr.isObjective()) {
-                Presolvers.LINEAR_OBJECTIVE.simplify(tmpExpr, allVars, lower, upper, options.feasibility);
+            expr.addAll(allVars);
+
+            BigDecimal lower = expr.getLowerLimit();
+            BigDecimal upper = expr.getUpperLimit();
+
+            if (expr.isObjective()) {
+                Presolvers.LINEAR_OBJECTIVE.simplify(expr, allVars, lower, upper, options.feasibility);
             }
 
-            if (tmpExpr.isConstraint()) {
+            if (expr.isConstraint()) {
                 if (anyVarInt) {
-                    tmpExpr.isInteger();
+                    expr.isInteger();
                 }
-                Presolvers.ZERO_ONE_TWO.simplify(tmpExpr, allVars, lower, upper, options.feasibility);
+                Presolvers.ZERO_ONE_TWO.simplify(expr, allVars, lower, upper, options.feasibility);
             }
+
+            allVars.clear();
         }
 
         for (Variable tmpVar : myVariables) {
