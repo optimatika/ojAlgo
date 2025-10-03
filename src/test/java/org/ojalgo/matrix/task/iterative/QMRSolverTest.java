@@ -108,6 +108,81 @@ public class QMRSolverTest extends TaskIterativeTests {
         TestUtils.assertTrue(firstResult.getState().isSuccess());
     }
 
+    /**
+     * Quadratic model that failed, using the new QMRSolver, version 56.1
+     */
+    @Test
+    public void quadraticTest2() {
+
+        double[][] q_ = new double[][] { { 6668.278705650674, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 6.315929943942014E12, 0.0, 0.0, 0.0, 0.0 },
+                { 0.0, 0.0, 2.3988688378282965E13, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 6.359204638050388E15, 0.0, 0.0 },
+                { 0.0, 0.0, 0.0, 0.0, 6.129604959867126E15, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0, 2660643.1998935738 } };
+
+        MatrixStore<Double> q = R064Store.FACTORY.makeWrapper(RawStore.wrap(q_));
+
+        double[][] l_ = new double[][] { { -476147.7777069725 }, { -300667.6690518168 }, { -153392.19762707502 }, { -178047.70825643447 },
+                { -59521.3068376414 }, { 4965004.705644156 } };
+
+        MatrixStore<Double> l = R064Store.FACTORY.makeWrapper(RawStore.wrap(l_));
+
+        double[][] ae_ = new double[][] { { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 } };
+
+        MatrixStore<Double> ae = R064Store.FACTORY.makeWrapper(RawStore.wrap(ae_));
+
+        double[][] be_ = new double[][] { { -2.220446049250313E-16 } };
+
+        MatrixStore<Double> be = R064Store.FACTORY.makeWrapper(RawStore.wrap(be_));
+
+        double[][] ai_ = new double[][] { { -1.0, -0.0, -0.0, -0.0, -0.0, -0.0 }, { -0.0, -1.0, -0.0, -0.0, -0.0, -0.0 },
+                { -0.0, -0.0, -1.0, -0.0, -0.0, -0.0 }, { -0.0, -0.0, -0.0, -1.0, -0.0, -0.0 }, { -0.0, -0.0, -0.0, -0.0, -1.0, -0.0 },
+                { -0.0, -0.0, -0.0, -0.0, -0.0, -1.0 } };
+
+        MatrixStore<Double> ai = R064Store.FACTORY.makeWrapper(RawStore.wrap(ai_));
+
+        double[][] bi_ = new double[][] { { 0.050000000000000044 }, { 1.0521478434747294E-9 }, { 2.7628102075066857E-10 }, { 4.5981121632729495E-14 },
+                { 8.51609595643812E-14 }, { 0.0024937500000995 } };
+
+        MatrixStore<Double> bi = R064Store.FACTORY.makeWrapper(RawStore.wrap(bi_));
+
+        ConvexSolver.Builder builder = ConvexSolver.newBuilder();
+        builder.objective(q, l);
+        if (ae != null && be != null) {
+            builder.equalities(ae, be);
+        }
+        if (ai != null && bi != null) {
+            builder.inequalities(ai, bi);
+        }
+        Optimisation.Options options = new Optimisation.Options();
+        //        options.iterations_abort = 100000;
+        //        options.iterations_suffice = 10000;
+        //        options.time_abort = 10000;
+        //        options.time_suffice = 1000;
+        options.sparse = true;
+        options.validate = true;
+        ConvexSolver.Configuration convex = options.convex();
+        // NumberContext present = convex.iterative();
+        // convex.iterative(NumberContext.of(8));
+        //convex.iterative(ConjugateGradientSolver::new, NumberContext.of(8));
+        convex.iterative(QMRSolver::new, NumberContext.of(8));
+        convex.solverSPD(Cholesky.R064::make).solverGeneral(LU.R064::make).iterative(NumberContext.of(12));
+        convex.extendedPrecision(false);
+        // convex.setIterativeSolver(new QMRSolver());
+        final ConvexSolver convexModel = builder.build(options);
+        Optimisation.Result startValue = Optimisation.Result.of(0, Optimisation.State.APPROXIMATE, new double[q.getColDim()]);
+
+        Optimisation.Result firstResult = null;
+        try {
+            firstResult = convexModel.solve(startValue);
+        } catch (Exception e) {
+            firstResult = convexModel.solve(startValue);
+        }
+        for (int i = 0; i < firstResult.size(); i++) {
+            TestUtils.assertTrue(Double.isFinite(firstResult.doubleValue(i)));
+        }
+        TestUtils.assertTrue(Double.isFinite(firstResult.getValue()));
+        TestUtils.assertTrue(firstResult.getState().isSuccess());
+    }
+
     @Test
     public void testDense3x3AgainstLU() {
         final int n = 3;
@@ -250,4 +325,5 @@ public class QMRSolverTest extends TaskIterativeTests {
             }
         }
     }
+
 }

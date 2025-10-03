@@ -24,7 +24,6 @@ package org.ojalgo.optimisation.convex;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
-import java.util.stream.Stream;
 
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.BasicArray;
@@ -87,7 +86,7 @@ final class IterativeASS extends ActiveSetSolver {
             if (myCountE > 0) {
                 for (int i = 0; i < myCountE; i++) {
                     double tmpVal = IterativeASS.this.getMatrixAE(i).dot(column);
-                    if (!PrimitiveScalar.isSmall(ONE, tmpVal)) {
+                    if (!PrimitiveScalar.isSmall(ONE, tmpVal) || (i == j)) {
                         Equation tmpRowE = myIterationRows[i];
                         if (tmpRowE != null) {
                             tmpRowE.set(j, tmpVal);
@@ -100,8 +99,8 @@ final class IterativeASS extends ActiveSetSolver {
             if (incl.length > 0) {
                 for (int _i = 0; _i < incl.length; _i++) {
                     double tmpVal = IterativeASS.this.getMatrixAI(incl[_i]).dot(column);
-                    if (!PrimitiveScalar.isSmall(ONE, tmpVal)) {
-                        int i = myCountE + incl[_i];
+                    int i = myCountE + incl[_i];
+                    if (!PrimitiveScalar.isSmall(ONE, tmpVal) || (i == j)) {
                         Equation tmpRowI = myIterationRows[i];
                         if (tmpRowI != null) {
                             tmpRowI.set(j, tmpVal);

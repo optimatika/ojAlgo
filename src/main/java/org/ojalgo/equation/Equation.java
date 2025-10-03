@@ -154,6 +154,8 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
 
     /**
      * Will perform a (relaxed) GaussSeidel update.
+     * <p>
+     * This call will not work if the pivot (the element at {@link #index}) is zero!
      *
      * @param x          The current solution (one element will be updated)
      * @param relaxation Typically 1.0 but could be anything (Most likely should be between 0.0 and 2.0).
@@ -232,6 +234,13 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         return prime * result + index;
     }
 
+    /**
+     * Initialises the solution vector's element at {@link #index} to the value that would solve this equation
+     * if the RHS was zero and all other elements in the solution vector unchanged.
+     *
+     * @param <T> The solution vector type
+     * @param x   The solution vector to be initialised
+     */
     public <T extends Access1D<Double> & Mutate1D.Modifiable<Double>> void initialise(final T x) {
         this.calculate(x, ZERO, ONE);
     }

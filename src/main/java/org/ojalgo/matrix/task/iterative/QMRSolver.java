@@ -117,10 +117,6 @@ public final class QMRSolver extends IterativeSolverTask {
             normErr = HYPOT.invoke(normErr, ri);
         }
 
-        if (this.isDebugPrinterSet()) {
-            this.debug(0, NaN, x);
-        }
-
         if (normErr == ZERO) {
             return ZERO;
         }
