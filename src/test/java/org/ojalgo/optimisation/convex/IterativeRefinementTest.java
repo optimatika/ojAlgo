@@ -62,7 +62,7 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
             mtrxBI.set(1, RationalNumber.ZERO); // -0.0
 
             /*
-             * The example states an initail (slightly infeasible) solution that is:
+             * The example states an initial (slightly infeasible) solution that is:
              */
 
             GenericStore<RationalNumber> mtrxX = Q128.make(2, 1); // All zero primal solution

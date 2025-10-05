@@ -33,7 +33,8 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * For solving [A][x]=[b] when [A] is symmetric and positive-definite.
  * <p>
- * This implementation is (Jacobi) preconditioned – using the diagonal elements to scale the residual.
+ * This implementation is Jacobi preconditioned by default – using the diagonal elements to scale the residual.
+ * You can change that by calling {@link #setPreconditioner(Preconditioner)} with a different implementation.
  * <p>
  * When to use:
  * <ul>
@@ -51,13 +52,14 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class ConjugateGradientSolver extends IterativeSolverTask {
 
-    private transient R064Store myDirection = null;
-    private transient R064Store myPreconditioned = null;
-    private transient R064Store myResidual = null;
-    private transient R064Store myVector = null;
+    private transient R064Store myDirection = null; // p
+    private transient R064Store myPreconditioned = null; // z = M^{-1} r
+    private transient R064Store myResidual = null; // r
+    private transient R064Store myVector = null; // q = A p
 
     public ConjugateGradientSolver() {
         super();
+        this.setPreconditioner(new JacobiPreconditioner());
     }
 
     @Override
@@ -83,6 +85,9 @@ public final class ConjugateGradientSolver extends IterativeSolverTask {
         R064Store preconditioned = myPreconditioned = IterativeSolverTask.worker(myPreconditioned, n);
         R064Store vector = myVector = IterativeSolverTask.worker(myVector, n);
 
+        Preconditioner preconditioner = this.getPreconditioner();
+        preconditioner.prepare(equations, n);
+
         double stepLength; // alpha
         double gradientCorrectionFactor; // beta
 
@@ -90,24 +95,27 @@ public final class ConjugateGradientSolver extends IterativeSolverTask {
         double zr1;
         double pAp0 = 0;
 
+        // r0 = b - A x0  and accumulate ||b||
         for (int r = 0; r < m; r++) {
             Equation row = equations.get(r);
-            double tmpVal = row.getRHS();
-            normRHS = HYPOT.invoke(normRHS, tmpVal);
-            tmpVal -= row.dot(solution);
-            residual.set(row.index, tmpVal);
-            double pivot = row.getPivot();
-            preconditioned.set(row.index, tmpVal / pivot);
+            double bi = row.getRHS();
+            normRHS = HYPOT.invoke(normRHS, bi);
+            double ri = bi - row.dot(solution);
+            residual.set(row.index, ri);
         }
+        // z0 = M^{-1} r0
+        preconditioner.apply(residual, preconditioned);
 
+        // p0 = z0
         direction.fillMatching(preconditioned);
 
-        zr1 = preconditioned.dot(residual);
+        zr1 = preconditioned.dot(residual); // (r,z)
 
         do {
 
             zr0 = zr1;
 
+            // vector = A * p
             for (int i = 0; i < m; i++) {
                 Equation row = equations.get(i);
                 vector.set(row.index, row.dot(direction));
@@ -115,28 +123,28 @@ public final class ConjugateGradientSolver extends IterativeSolverTask {
 
             pAp0 = direction.dot(vector);
 
-            stepLength = zr0 / pAp0;
+            stepLength = zr0 / pAp0; // alpha
 
             if (!Double.isNaN(stepLength)) {
-
+                // x = x + alpha * p
                 direction.axpy(stepLength, solution);
-
+                // r = r - alpha * A p
                 vector.axpy(-stepLength, residual);
             }
 
+            // Compute normErr = ||r|| and apply preconditioner: z = M^{-1} r
             normErr = ZERO;
-
             for (int r = 0; r < m; r++) {
                 Equation row = equations.get(r);
-                double tmpVal = residual.doubleValue(row.index);
-                normErr = HYPOT.invoke(normErr, tmpVal);
-                double pivot = row.getPivot();
-                preconditioned.set(row.index, tmpVal / pivot);
+                double ri = residual.doubleValue(row.index);
+                normErr = HYPOT.invoke(normErr, ri);
             }
+            preconditioner.apply(residual, preconditioned);
 
-            zr1 = preconditioned.dot(residual);
-            gradientCorrectionFactor = zr1 / zr0;
+            zr1 = preconditioned.dot(residual); // (r_{k+1}, z_{k+1})
+            gradientCorrectionFactor = zr1 / zr0; // beta
 
+            // p = z + beta * p (done in-place: p = beta*p ; p += z)
             direction.modifyAll(MULTIPLY.second(gradientCorrectionFactor));
             direction.modifyMatching(ADD, preconditioned);
 

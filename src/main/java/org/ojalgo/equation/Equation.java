@@ -33,6 +33,7 @@ import org.ojalgo.array.PlainArray;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.type.NumberDefinition;
 
@@ -178,6 +179,68 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
     @Override
     public double dot(final Access1D<?> vector) {
         return myBody.dot(vector);
+    }
+
+    /**
+     * Efficiently compute sum_{j < pivot} a_{ij} * x_j (excludes the pivot). Uses direct sparse iteration
+     * when available to avoid O(n) random access scans.
+     */
+    public double dotLower(final Access1D<?> x) {
+
+        double retVal = ZERO;
+
+        if (myBody instanceof SparseArray) {
+
+            for (ElementView1D<?, ?> nz : myBody.nonzeros()) {
+                int j = (int) nz.index();
+                if (j >= index) {
+                    break;
+                }
+                retVal += nz.doubleValue() * x.doubleValue(j);
+            }
+
+        } else {
+
+            for (int j = 0; j < index; j++) {
+                double aij = myBody.doubleValue(j);
+                if (aij != ZERO) {
+                    retVal += aij * x.doubleValue(j);
+                }
+            }
+        }
+
+        return retVal;
+    }
+
+    /**
+     * Efficiently compute sum_{j > pivot} a_{ij} * x_j (excludes the pivot). Uses direct sparse iteration
+     * when available to avoid O(n) random access scans.
+     */
+    public double dotUpper(final Access1D<?> x) {
+
+        double retVal = ZERO;
+
+        if (myBody instanceof SparseArray) {
+
+            for (ElementView1D<?, ?> nz : myBody.nonzeros()) {
+                int j = (int) nz.index();
+                if (j <= index) {
+                    continue;
+                }
+                retVal += nz.doubleValue() * x.doubleValue(j);
+            }
+
+        } else {
+
+            for (int j = index + 1, limit = myBody.size(); j < limit; j++) {
+                double aij = myBody.doubleValue(j);
+                if (aij != ZERO) {
+                    retVal += aij * x.doubleValue(j);
+                }
+            }
+        }
+
+        return retVal;
     }
 
     @Override

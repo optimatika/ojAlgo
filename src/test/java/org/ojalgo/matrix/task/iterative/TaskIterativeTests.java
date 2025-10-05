@@ -21,11 +21,54 @@
  */
 package org.ojalgo.matrix.task.iterative;
 
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+
+import java.util.List;
+import java.util.function.Supplier;
+
+import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.structure.Access1D;
+
 /**
  * @author apete
  */
 abstract class TaskIterativeTests {
 
     static final boolean DEBUG = false;
+
+    static final List<Supplier<Preconditioner>> PRECONDITIONERS = List.of(Preconditioner::newIdentity, Preconditioner::newJacobi,
+            Preconditioner::newSymmetricGaussSeidel, Preconditioner.getSSOR(0.000001), Preconditioner.getSSOR(1.999999));
+
+    /**
+     * Utility to build the RHS vector b = A * x for tests.
+     * <p>
+     * Allocates a new dense column vector and performs a straightforward row-wise dot product to minimise
+     * surprises and avoid any dependency on more elaborate multiplication paths (keeping test intent
+     * explicit). Size mismatch results in an IllegalArgumentException.
+     */
+    static R064Store rhs(final MatrixStore<Double> A, final Access1D<?> x) {
+
+        int rows = A.getRowDim();
+        int cols = A.getColDim();
+        if (x.size() != cols) {
+            throw new IllegalArgumentException("Incompatible dimensions: A is " + rows + "x" + cols + ", x has length " + x.size());
+        }
+
+        R064Store b = R064Store.FACTORY.make(rows, 1);
+
+        for (int i = 0; i < rows; i++) {
+            double sum = ZERO;
+            for (int j = 0; j < cols; j++) {
+                double aij = A.doubleValue(i, j);
+                if (aij != ZERO) { // skip obvious zeroes (many test matrices are sparse/structured)
+                    sum += aij * x.doubleValue(j);
+                }
+            }
+            b.set(i, sum);
+        }
+
+        return b;
+    }
 
 }

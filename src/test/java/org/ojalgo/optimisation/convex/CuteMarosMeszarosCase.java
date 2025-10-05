@@ -136,7 +136,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
      * The optimal objective function value is given with 8 digits in the file 00README.QP, but they don't
      * seem to be exact.
      */
-    private static final NumberContext ACCURACY = NumberContext.of(6, 8);
+    private static final NumberContext ACCURACY = NumberContext.of(6);
 
     private static final Map<String, ModelInfo> MODEL_INFO;
 

@@ -96,7 +96,7 @@ public class QMRSolverTest extends TaskIterativeTests {
         convex.solverSPD(Cholesky.R064::make).solverGeneral(LU.R064::make).iterative(NumberContext.of(12));
         convex.extendedPrecision(false);
         convex.iterative(QMRSolver::new, NumberContext.of(8));
-        final ConvexSolver convexModel = builder.build(options);
+        ConvexSolver convexModel = builder.build(options);
         Optimisation.Result startValue = Optimisation.Result.of(0, Optimisation.State.APPROXIMATE, new double[q.getColDim()]);
 
         Optimisation.Result firstResult = null;
@@ -167,7 +167,7 @@ public class QMRSolverTest extends TaskIterativeTests {
         convex.solverSPD(Cholesky.R064::make).solverGeneral(LU.R064::make).iterative(NumberContext.of(12));
         convex.extendedPrecision(false);
         // convex.setIterativeSolver(new QMRSolver());
-        final ConvexSolver convexModel = builder.build(options);
+        ConvexSolver convexModel = builder.build(options);
         Optimisation.Result startValue = Optimisation.Result.of(0, Optimisation.State.APPROXIMATE, new double[q.getColDim()]);
 
         Optimisation.Result firstResult = null;
@@ -185,12 +185,12 @@ public class QMRSolverTest extends TaskIterativeTests {
 
     @Test
     public void testDense3x3AgainstLU() {
-        final int n = 3;
-        final Uniform rnd = new Uniform();
+        int n = 3;
+        Uniform rnd = new Uniform();
         rnd.setSeed(1L);
-        final R064Store A = R064Store.FACTORY.makeFilled(n, n, rnd);
-        final R064Store xTrue = R064Store.FACTORY.makeFilled(n, 1, rnd);
-        final MatrixStore<Double> b = A.multiply(xTrue);
+        R064Store A = R064Store.FACTORY.makeFilled(n, n, rnd);
+        R064Store xTrue = R064Store.FACTORY.makeFilled(n, 1, rnd);
+        R064Store b = TaskIterativeTests.rhs(A, xTrue);
 
         QMRSolver solver = new QMRSolver();
         solver.configurator().accuracy(NumberContext.of(7, 12)).iterations(2000);
@@ -210,12 +210,12 @@ public class QMRSolverTest extends TaskIterativeTests {
 
     @Test
     public void testDense5x5Random() {
-        final int n = 5;
-        final Uniform rnd = new Uniform();
+        int n = 5;
+        Uniform rnd = new Uniform();
         rnd.setSeed(2L);
-        final R064Store A = R064Store.FACTORY.makeFilled(n, n, rnd);
-        final R064Store xTrue = R064Store.FACTORY.makeFilled(n, 1, rnd);
-        final MatrixStore<Double> b = A.multiply(xTrue);
+        R064Store A = R064Store.FACTORY.makeFilled(n, n, rnd);
+        R064Store xTrue = R064Store.FACTORY.makeFilled(n, 1, rnd);
+        R064Store b = TaskIterativeTests.rhs(A, xTrue);
 
         QMRSolver solver = new QMRSolver();
         solver.configurator().accuracy(NumberContext.of(7, 12)).iterations(4000);
@@ -233,7 +233,7 @@ public class QMRSolverTest extends TaskIterativeTests {
         Uniform rnd = new Uniform();
         rnd.setSeed(4L);
         R064Store xTrue = R064Store.FACTORY.makeFilled(n, 1, rnd);
-        MatrixStore<Double> b = A.multiply(xTrue);
+        R064Store b = TaskIterativeTests.rhs(A, xTrue);
 
         QMRSolver solver = new QMRSolver();
         solver.configurator().accuracy(NumberContext.of(7, 12)).iterations(10000);
@@ -258,7 +258,7 @@ public class QMRSolverTest extends TaskIterativeTests {
 
             RawStore A = RawStore.wrap(new double[][] { { 1.0, 1.0, 1.0 }, { 1.0, 1.0, 1.0 + eps }, { 1.0, 1.0 + eps, 1.0 } });
             R064Store xTrue = R064Store.FACTORY.column(1.0, 1.0, 1.0);
-            MatrixStore<Double> b = A.multiply(xTrue);
+            R064Store b = TaskIterativeTests.rhs(A, xTrue);
 
             QMRSolver solver = new QMRSolver();
             solver.configurator().accuracy(NumberContext.of(7, 12)).iterations(15000);
@@ -292,7 +292,7 @@ public class QMRSolverTest extends TaskIterativeTests {
             A.add(i, i, n);
         }
         R064Store xTrue = R064Store.FACTORY.makeFilled(n, 1, rnd);
-        MatrixStore<Double> b = A.multiply(xTrue);
+        R064Store b = TaskIterativeTests.rhs(A, xTrue);
 
         long t0 = System.nanoTime();
         QMRSolver solver = new QMRSolver();
@@ -316,7 +316,7 @@ public class QMRSolverTest extends TaskIterativeTests {
             for (int trial = 0; trial < NUM_RANDOM_MATRICES; trial++) {
                 R064Store A = R064Store.FACTORY.makeFilled(n, n, rnd);
                 R064Store xTrue = R064Store.FACTORY.makeFilled(n, 1, rnd);
-                MatrixStore<Double> b = A.multiply(xTrue);
+                R064Store b = TaskIterativeTests.rhs(A, xTrue);
 
                 MatrixStore<Double> xQMR = solver.solve(A, b).get();
 
