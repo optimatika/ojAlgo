@@ -40,6 +40,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.matrix
 
 - Internal refactoring in the `org.ojalgo.matrix.task.iterative` package. If you only used what was there these changes shouldn't affect you, but if you have implemented your own solver it does.
+- Created a `Preconditioner` interface. Factored the Jacobi-presolving out of the `ConjugateGradientSolver` and additionally implemented a Symmetric Successive Over-Relaxation (SSOR) preconditioner.
 
 #### org.ojalgo.optimisation
 

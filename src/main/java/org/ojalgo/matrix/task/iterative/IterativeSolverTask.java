@@ -115,6 +115,15 @@ public abstract class IterativeSolverTask implements SolverTask<Double> {
         }
 
         /**
+         * Preconditioner for Krylov/stationary methods that support it. Defaults to
+         * {@link Preconditioner#IDENTITY}.
+         */
+        public Configurator preconditioner(final Preconditioner preconditioner) {
+            mySolver.setPreconditioner(preconditioner != null ? preconditioner : Preconditioner.IDENTITY);
+            return this;
+        }
+
+        /**
          * Relaxation factor (only used by some solvers)
          */
         public Configurator relaxation(final double factor) {
@@ -199,6 +208,7 @@ public abstract class IterativeSolverTask implements SolverTask<Double> {
     private BasicLogger myDebugPrinter = null;
     private int myIterationsLimit = Integer.MAX_VALUE;
     private double myRelaxationFactor = ONE;
+    private Preconditioner myPreconditioner = Preconditioner.IDENTITY;
 
     IterativeSolverTask() {
         super();
@@ -219,6 +229,8 @@ public abstract class IterativeSolverTask implements SolverTask<Double> {
             return R064Store.FACTORY.make(nbVariables, nbSolutions);
         }
     }
+
+    public abstract double resolve(List<Equation> equations, PhysicalStore<Double> solution);
 
     public final double resolve(final List<Equation> equations, final PhysicalStore<Double> solution, final Access1D<?> rhs) {
 
@@ -268,6 +280,10 @@ public abstract class IterativeSolverTask implements SolverTask<Double> {
         return myIterationsLimit;
     }
 
+    protected final Preconditioner getPreconditioner() {
+        return myPreconditioner;
+    }
+
     protected final double getRelaxationFactor() {
         return myRelaxationFactor;
     }
@@ -288,10 +304,12 @@ public abstract class IterativeSolverTask implements SolverTask<Double> {
         myIterationsLimit = iterationsLimit;
     }
 
+    protected final void setPreconditioner(final Preconditioner preconditioner) {
+        myPreconditioner = preconditioner != null ? preconditioner : Preconditioner.IDENTITY;
+    }
+
     protected final void setRelaxationFactor(final double relaxation) {
         myRelaxationFactor = relaxation;
     }
-
-    abstract double resolve(List<Equation> equations, PhysicalStore<Double> solution);
 
 }

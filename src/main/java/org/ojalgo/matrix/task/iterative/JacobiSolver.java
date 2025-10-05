@@ -49,14 +49,14 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class JacobiSolver extends IterativeSolverTask {
 
-    R064Store myIncrement = null;
+    private transient R064Store myIncrement = null;
 
     public JacobiSolver() {
         super();
     }
 
     @Override
-    double resolve(final List<Equation> equations, final PhysicalStore<Double> solution) {
+    public double resolve(final List<Equation> equations, final PhysicalStore<Double> solution) {
 
         if (this.isDebugPrinterSet()) {
             this.debug(0, NaN, solution);
