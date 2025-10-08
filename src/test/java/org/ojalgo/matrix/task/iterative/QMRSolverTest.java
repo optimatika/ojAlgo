@@ -3,6 +3,7 @@
  */
 package org.ojalgo.matrix.task.iterative;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
@@ -324,6 +325,95 @@ public class QMRSolverTest extends TaskIterativeTests {
                 TestUtils.assertTrue(resQMR <= 4e-10, "QMR residual too large for n=" + n + ", trial=" + trial + ": " + resQMR);
             }
         }
+    }
+
+    @Test
+    @Disabled
+    public void laplacian2DComparisonTest() {
+        final int MAX_GRID_SIZE = 15;
+
+        // Create array of preconditioners to compare
+        Preconditioner[] preconditioners = new Preconditioner[] {
+                Preconditioner.newIdentity(),
+                Preconditioner.newJacobi(),
+                Preconditioner.newSymmetricGaussSeidel(),
+                Preconditioner.newSSOR(1.25)
+        };
+
+        System.out.println("2D Laplacian Preconditioner Comparison");
+        System.out.println("========================================");
+
+        // Loop from increasing matrix size
+        for (int n = 1; n <= MAX_GRID_SIZE; n++) {
+            System.out.println("\nGrid size: " + n + "x" + n + " (Matrix size: " + (n*n) + "x" + (n*n) + ")");
+
+            // Create 2D Laplacian matrix and RHS
+            MatrixStore<Double> A = create2DLaplacianMatrix(n);
+            MatrixStore<Double> b = create2DLaplacianRHS(n);
+
+            // Test each preconditioner
+            for (Preconditioner P : preconditioners) {
+
+                IterativeSolverTask solver = getSolver();
+                solver.configurator().accuracy(NumberContext.of(14)).iterations(200).preconditioner(P);
+                solver.setDebugPrinter(BasicLogger.DEBUG);
+                MatrixStore<Double> solution = solver.solve(A, b).get();
+
+                double residualNorm = QMRSolverTest.residualNorm(A, solution, b);
+                System.out.println("  " + P.getClass().getSimpleName() + ": residual = " + residualNorm);
+            }
+        }
+    }
+
+    /**
+     * Creates a 2D Laplacian matrix with Dirichlet boundary conditions
+     * @param n Grid dimension (n x n grid)
+     * @return R064Store containing the Laplacian matrix
+     */
+    public static R064Store create2DLaplacianMatrix(int n) {
+        int N = n * n; // Total number of unknowns
+        R064Store A = R064Store.FACTORY.make(N, N);
+
+        // Construct the 2D Laplacian matrix with Dirichlet boundary conditions
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                int idx = i * n + j;
+                A.set(idx, idx, 4.0);
+
+                // Left neighbor
+                if (j > 0) A.set(idx, idx - 1, -1.0);
+                // Right neighbor
+                if (j < n - 1) A.set(idx, idx + 1, -1.0);
+                // Top neighbor
+                if (i > 0) A.set(idx, idx - n, -1.0);
+                // Bottom neighbor
+                if (i < n - 1) A.set(idx, idx + n, -1.0);
+            }
+        }
+
+        return A;
+    }
+
+    /**
+     * Creates the RHS vector for the 2D Laplacian problem
+     * @param n Grid dimension (n x n grid)
+     * @return R064Store containing the RHS vector
+     */
+    public static R064Store create2DLaplacianRHS(int n) {
+        int N = n * n; // Total number of unknowns
+        R064Store b = R064Store.FACTORY.make(N, 1);
+
+        // Set RHS value
+        for (int i = 0; i < N; i++) {
+            b.set(i, 0, 1.0);
+        }
+
+        return b;
+    }
+
+    private static IterativeSolverTask getSolver() {
+        return new QMRSolver();
+//        return new ConjugateGradientSolver();
     }
 
 }

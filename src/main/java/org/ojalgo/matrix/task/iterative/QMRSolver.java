@@ -35,8 +35,8 @@ import org.ojalgo.type.context.NumberContext;
  * Quasi-Minimal Residual (QMR) solver for general nonsymmetric square systems.
  * <p>
  * This is a Java port of SciPy's qmr() reference implementation. It is almost a straight line-by-line
- * translation from SciPy. Implemented here in an unpreconditioned form and using ojAlgo's dense MatrixStore
- * operations for matrix–vector products with A and A^T.
+ * translation from SciPy. Implemented here with right-preconditioning only (M1 = I, M2 != I),
+ * and using ojAlgo's dense MatrixStore operations for matrix–vector products with A and A^T.
  * <p>
  * When to use:
  * <ul>
@@ -48,7 +48,7 @@ import org.ojalgo.type.context.NumberContext;
  * Characteristics:
  * <ul>
  * <li>Requires both A·x and A^T·x products (transpose appears in the recurrences).
- * <li>No preconditioning (M1=M2=I).
+ * <li>Right-preconditioning only (M1 = I, M2 != I).
  * <li>This version does not work with complex numbers.
  * <li>The stopping criterion follows ojAlgo style: terminate when NumberContext.isSmall(||b||, ||r||).
  * <li>Designed for square systems; Throw IllegalArgumentException for non-square inputs.
@@ -86,15 +86,22 @@ public final class QMRSolver extends IterativeSolverTask {
         x.modifyAll(MULTIPLY.by(alpha));
     }
 
-    private R064Store d;
+    private static void axpby(final double alpha, final R064Store src, final double beta, final R064Store dst) {
+        for (int i = 0; i < src.getRowDim(); i++) {
+            dst.set(i, alpha * src.doubleValue(i) + beta * dst.doubleValue(i));
+        }
+    }
 
-    private R064Store p;
-
-    private R064Store q;
-
-    private R064Store y;
-
-    private R064Store z;
+    private R064Store r;        // residual r
+    private R064Store vtilde;   // v~
+    private R064Store wtilde;   // w~
+    private R064Store v;        // v
+    private R064Store z;        // z
+    private R064Store p;        // p
+    private R064Store q;        // q
+    private R064Store ptilde;   // A p
+    private R064Store d;        // d (solution direction accumulation)
+    private R064Store s;        // s (residual update accumulation)
 
     public QMRSolver() {
         super();
@@ -103,55 +110,71 @@ public final class QMRSolver extends IterativeSolverTask {
     @Override
     public double resolve(final List<Equation> equations, final PhysicalStore<Double> x) {
 
-        if (this.isDebugPrinterSet()) {
-            this.debug(0, NaN, x);
-        }
 
-        int m = equations.size();
-        int n = x.size();
+        final int m = equations.size();
+        final int n = x.size();
 
         int nbIterations = 0;
-        int iterationsLimit = this.getIterationsLimit();
+        final int iterationsLimit = this.getIterationsLimit();
 
-        NumberContext accuracy = this.getAccuracyContext();
+        final NumberContext accuracy = this.getAccuracyContext();
 
         // Scratch vectors
-        y = IterativeSolverTask.worker(y, n);
+        r = IterativeSolverTask.worker(r, n);
+        vtilde = IterativeSolverTask.worker(vtilde, n);
+        wtilde = IterativeSolverTask.worker(wtilde, n);
+        v = IterativeSolverTask.worker(v, n);
         z = IterativeSolverTask.worker(z, n);
         p = IterativeSolverTask.worker(p, n);
         q = IterativeSolverTask.worker(q, n);
+        ptilde = IterativeSolverTask.worker(ptilde, n);
         d = IterativeSolverTask.worker(d, n);
+        s = IterativeSolverTask.worker(s, n);
 
-        // r = b - A*x and norms
-        double normRHS = ZERO;
-        double normErr = ZERO;
+        // Prepare preconditioner (right-only)
+        final Preconditioner rightPreconditioner = this.getPreconditioner();
+        rightPreconditioner.prepare(equations, n);
+
+        // r = b - A*x  and accumulate norms
+        double normRHS = ZERO; // ||b||
+        double normErr = ZERO; // ||r||
         for (int i = 0; i < m; i++) {
-            Equation row = equations.get(i);
-            double bi = row.getRHS();
+            final Equation row = equations.get(i);
+            final double bi = row.getRHS();
             normRHS = HYPOT.invoke(normRHS, bi);
-            double ri = bi - row.dot(x);
-            y.set(row.index, ri);
-            z.set(row.index, ri);
+            // ri = bi - (A_i * x)
+            final double ri = bi - row.dot(x); // matrix–vector product A*x (row dot x)
+            r.set(row.index, ri);
+            vtilde.set(row.index, ri);
+            wtilde.set(row.index, ri);
+            // normErr = hypot(normErr, ri)
             normErr = HYPOT.invoke(normErr, ri);
+        }
+
+        if (this.isDebugPrinterSet()) {
+            this.debug(nbIterations, normErr / normRHS, x);
         }
 
         if (normErr == ZERO) {
             return ZERO;
         }
 
-        // Initialisations (no preconditioning: M1=M2=I)
-        double rho = QMRSolver.norm2(y);
-        double xi = rho;
+        // y = vtilde (M1 = I)  and  z = M2^{-T} wtilde
+        rightPreconditioner.applyTranspose(wtilde, z); // z = (M2^T)^{-1} * wtilde
+
+        // rho = ||v~|| ; xi = ||z||
+        double rho = QMRSolver.norm2(vtilde);
+        double xi = QMRSolver.norm2(z);
         double gamma = ONE;
         double eta = NEG;
         double theta = ZERO;
-        double epsilon = ZERO; // dummy init
+        double epsilon = ONE; // dummy init
 
         do {
 
             // Convergence check on residual relative to RHS
             if (accuracy.isSmall(normRHS, normErr)) {
-                break; // convergence
+                break; // converged
             }
 
             if (Math.abs(rho) == ZERO) {
@@ -161,79 +184,84 @@ public final class QMRSolver extends IterativeSolverTask {
                 break; // xi breakdown
             }
 
-            // v = vtilde / rho ; y = y / rho
-            QMRSolver.scaleInPlace(y, ONE / rho);
+            // v = vtilde / rho
+            QMRSolver.scaleCopy(vtilde, ONE / rho, v);
 
-            // w = wtilde / xi ; z = z / xi
-            QMRSolver.scaleInPlace(z, ONE / xi);
+            // z = z / xi
+            QMRSolver.scaleInPlace(z, ONE / xi); // z *= 1/xi
 
-            double delta = z.dot(y);
+            // delta = z^T v  (since y = v when M1 = I)
+            final double delta = z.dot(v);
             if (Math.abs(delta) == ZERO) {
                 break; // delta breakdown
             }
 
-            // Unpreconditioned: update p and q in-place
+            // ytilde = M2^{-1} * v  (since y = v when M1 = I)
+            rightPreconditioner.apply(v, vtilde); //reuse vtilde as ytilde
+
             if (nbIterations > 0) {
-                // p = y - (xi * delta / epsilon) * p  (in-place)
-                double factor = (xi * delta / epsilon);
-                QMRSolver.scaleInPlace(p, -factor);
-                QMRSolver.axpy(ONE, y, p);
-                // q = z - (rho * (delta / epsilon)) * q  (in-place)
-                double factor2 = (rho * (delta / epsilon));
-                QMRSolver.scaleInPlace(q, -factor2);
-                QMRSolver.axpy(ONE, z, q);
+                // p = ytilde - (xi * delta / epsilon) * p
+                QMRSolver.axpby(ONE, vtilde, -(xi * delta / epsilon), p);
+                // q = z - (rho * (delta / epsilon)) * q
+                QMRSolver.axpby(ONE, z, -(rho * (delta / epsilon)), q); // q += z
             } else {
-                p.fillMatching(y);
-                q.fillMatching(z);
+                // First iteration initialisation
+                p.fillMatching(vtilde); // p = ytilde (reused vtilde)
+                q.fillMatching(z); // q = z
             }
 
-            // Compute epsilon = q dot (A * p) without allocating ptilde
-            double eps = ZERO;
+            // ptilde = A * p  (matrix–vector product)
             for (int i = 0; i < m; i++) {
-                Equation row = equations.get(i);
-                double aip_dot_p = row.dot(p);
-                eps += q.doubleValue(row.index) * aip_dot_p;
+                final Equation row = equations.get(i);
+                final double aip_dot_p = row.dot(p); // row dot p
+                ptilde.set(row.index, aip_dot_p);
             }
-            epsilon = eps;
+
+            // epsilon = q^T ptilde  (dot product)
+            epsilon = q.dot(ptilde);
             if (Math.abs(epsilon) == ZERO) {
                 break; // epsilon breakdown
             }
 
-            double beta = epsilon / delta;
+            final double beta = epsilon / delta;
             if (Math.abs(beta) == ZERO) {
                 break; // beta breakdown
             }
 
-            // y = (A * p) - beta * y  (in-place, since M1=I); accumulate A*p directly into y
-            QMRSolver.scaleInPlace(y, -beta);
-            for (int i = 0; i < m; i++) {
-                Equation row = equations.get(i);
-                double aip_dot_p = row.dot(p);
-                y.add(row.index, aip_dot_p);
-            }
+            // vtilde = ptilde - beta * v  (in-place into vtilde)
+            vtilde.fillMatching(ptilde); // vtilde = ptilde
+            QMRSolver.axpy(-beta, v, vtilde); // vtilde += (-beta) * v
 
-            double rho_prev = rho;
-            rho = QMRSolver.norm2(y);
+            // rho update: rho = ||v~||
+            final double rho_prev = rho;
+            rho = QMRSolver.norm2(vtilde);
 
-            // z = -beta * z + A^T * q  (in-place, since M2^T=I)
-            QMRSolver.scaleInPlace(z, -beta);
-            // accumulate A^T * q directly into z (dense accumulation from rows)
+            // wtilde = (-beta/xi) * wtilde + A^T * q  (compute into wtilde)
+            QMRSolver.scaleInPlace(wtilde, (-beta / xi));
+            // A^T * q accumulation using row structure
             for (int i = 0; i < m; i++) {
-                Equation row = equations.get(i);
-                double qi = q.doubleValue(row.index);
+                final Equation row = equations.get(i);
+                final double qi = q.doubleValue(row.index);
                 if (qi != ZERO) {
+                    // z_j += qi * a_ij  (accumulate into wtilde as A^T*q)
                     for (int j = 0; j < row.size(); j++) {
-                        double aij = row.doubleValue(j);
+                        final double aij = row.doubleValue(j);
                         if (aij != ZERO) {
-                            z.add(j, qi * aij);
+                            wtilde.add(j, qi * aij); // wtilde_j += qi * a_ij
                         }
                     }
                 }
             }
+
+            // z = (M2^T)^{-1} * wtilde
+            rightPreconditioner.applyTranspose(wtilde, z);
+
+            // xi update: xi = ||z||
             xi = QMRSolver.norm2(z);
 
-            double gamma_prev = gamma;
-            double theta_prev = theta;
+            // theta/gamma updates
+            final double gamma_prev = gamma;
+            final double theta_prev = theta;
             theta = rho / (gamma_prev * Math.abs(beta));
             gamma = ONE / Math.sqrt(ONE + theta * theta);
             if (Math.abs(gamma) == ZERO) {
@@ -244,32 +272,32 @@ public final class QMRSolver extends IterativeSolverTask {
 
             if (nbIterations > 0) {
                 // d = (theta_prev * gamma)^2 * d + eta * p
-                QMRSolver.scaleInPlace(d, (theta_prev * gamma) * (theta_prev * gamma));
-                QMRSolver.axpy(eta, p, d);
+                double factor = (theta_prev * gamma) * (theta_prev * gamma);
+                QMRSolver.axpby(eta, p, factor, d);
+
+                // s = (theta_prev * gamma)^2 * s + eta * ptilde
+                QMRSolver.axpby(eta, ptilde, factor, s);
             } else {
+                // d = eta * p ; s = eta * ptilde
                 QMRSolver.scaleCopy(p, eta, d);
+                QMRSolver.scaleCopy(ptilde, eta, s);
             }
 
-            // x += d
+            // x += d  (solution update)
             QMRSolver.axpy(ONE, d, x);
 
-            // True residual using rows
-            normErr = ZERO;
-            for (int i = 0; i < m; i++) {
-                Equation row = equations.get(i);
-                double ri = row.getRHS() - row.dot(x);
-                normErr = HYPOT.invoke(normErr, ri);
-            }
+            // r -= s  (residual update)
+            QMRSolver.axpy(NEG, s, r);
+
+            // Recompute residual norm for convergence check: ||r||
+            normErr = QMRSolver.norm2(r);
 
             nbIterations++;
-
             if (this.isDebugPrinterSet()) {
                 this.debug(nbIterations, normErr / normRHS, x);
             }
 
-        } while (nbIterations < iterationsLimit && !Double.isNaN(normErr) && !accuracy.isSmall(normRHS, normErr));
-
+        } while (nbIterations < iterationsLimit && !Double.isNaN(normErr));
         return accuracy.isZero(normRHS) ? normErr : normErr / normRHS;
     }
-
 }
