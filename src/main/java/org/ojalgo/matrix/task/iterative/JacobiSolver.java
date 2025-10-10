@@ -31,21 +31,24 @@ import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * For solving [A][x]=[b] where [A] has non-zero elements on the diagonal.
+ * Stationary Jacobi iteration for solving [A][x]=[b] with non-zero diagonal entries.
  * <p>
- * It's most likely better to instead use {@link GaussSeidelSolver} or {@link ConjugateGradientSolver}.
- * <p>
- * When to use:
+ * Convergence
  * <ul>
- * <li>Simple baseline or educational purposes; easiest stationary method to reason about.
- * <li>When you need fully synchronous updates (no in-place coupling) or trivial parallelisation across rows.
- * <li>Diagonally dominant systems where convergence is acceptable and simplicity/parallelism is preferred.
- * <li>If sequential in-place updates are fine and you want faster convergence, prefer GaussSeidelSolver.
- * <li>For large SPD systems, prefer ConjugateGradientSolver for speed and robustness.
+ * <li>Converges for strictly diagonally dominant systems and for SPD matrices under suitable conditions.
+ * <li>Updates are fully synchronous (per-iteration), making it straightforward to parallelise across rows.
  * </ul>
- *
- * @author apete
- * @see https://en.wikipedia.org/wiki/Jacobi_method
+ * Configuration
+ * <ul>
+ * <li>Ignores any configured {@link Preconditioner}; use the relaxation factor to control convergence speed.
+ * </ul>
+ * When to use
+ * <ul>
+ * <li>As a simple baseline or where synchronous updates and trivial parallelism are desirable.
+ * <li>When sequential in-place coupling is acceptable and faster convergence is needed, an in-place
+ * stationary method may be preferable.
+ * <li>For large SPD problems needing faster/robuster convergence, Krylov methods often perform better.
+ * </ul>
  */
 public final class JacobiSolver extends IterativeSolverTask {
 

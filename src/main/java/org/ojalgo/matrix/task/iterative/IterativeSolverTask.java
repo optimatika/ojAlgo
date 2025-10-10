@@ -46,34 +46,47 @@ import org.ojalgo.structure.ElementView2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * Base class for iterative solvers of large linear systems [A][x]=[b]. Subclasses implement specific
- * stationary or Krylov methods, but share input conversion, configuration, and stopping logic.
- * <p>
- * Design goals:
+ * Base class for iterative solvers of large linear systems [A][x]=[b]. Subclasses provide concrete stationary
+ * or Krylov algorithms while sharing input conversion, configuration, and stopping logic. Characteristics
  * <ul>
- * <li>Handle both sparse and dense inputs by converting the system to a {@code List<Equation>} that rows can
- * iterate over efficiently.
- * <li>Minimise allocations in hot loops by reusing buffers and operating directly on {@link PhysicalStore}
+ * <li>Accepts both sparse and dense inputs by converting the system to a {@code List<Equation>} where rows
+ * can be iterated efficiently without assuming dense, contiguous storage.
+ * <li>Minimises allocations in hot loops by reusing buffers and operating directly on {@link PhysicalStore}
  * and {@link R064Store} vectors.
- * <li>Provide a common configuration and termination policy via {@link NumberContext} and an iteration limit.
+ * <li>Provides a common configuration and termination policy via {@link NumberContext} and an iteration
+ * limit.
  * </ul>
- * <p>
- * Selected/reordered rows and columns:
+ * Selected/reordered rows and columns
  * <ul>
  * <li>Implementations must work when the effective system is a selected or reordered subset of the original
  * problem. The equation list may represent only some rows, and column indices may need to be remapped or
  * compacted.
  * <li>Do not assume a dense, contiguous column space. Always form row products using
- * {@link Equation#dot(Access1D)} and access the diagonal through {@link Equation#getPivot()}.
+ * {@link Equation#dot(org.ojalgo.structure.Access1D)} and access the diagonal through
+ * {@link Equation#getPivot()}.
  * <li>The provided {@code solution} vector defines the active variable subspace; form residuals against that
  * vector and the current row bodies only.
- * <li>RHS values are carried by each {@link Equation}; use {@link #resolve(List, PhysicalStore, Access1D)} to
- * update RHS between solves.
+ * <li>RHS values are carried by each {@link Equation}; use
+ * {@link #resolve(List, PhysicalStore, org.ojalgo.structure.Access1D)} to update RHS between solves.
  * </ul>
- * <p>
- * Subclasses should measure a residual norm and stop when {@link NumberContext#isSmall(double, double)} deems
- * it small relative to the RHS norm (or absolutely small when RHS is zero), or when the iteration limit is
- * reached.
+ * Preconditioners and solver compatibility
+ * <ul>
+ * <li>Left-preconditioned Krylov methods may apply the configured {@link Preconditioner} on residuals or
+ * intermediate vectors. The preconditioner should be symmetric positive-definite when the algorithm assumes
+ * this (e.g., for SPD problems).
+ * <li>Right-preconditioned Krylov methods may call both
+ * {@link Preconditioner#apply(org.ojalgo.structure.Access1D, PhysicalStore)} and
+ * {@link Preconditioner#applyTranspose(org.ojalgo.structure.Access1D, PhysicalStore)}. If the preconditioner
+ * is not symmetric, override the transpose variant.
+ * <li>Stationary (fixed-point) methods typically ignore preconditioners; use the relaxation factor to control
+ * convergence.
+ * </ul>
+ * Stopping criterion
+ * <ul>
+ * <li>Subclasses should measure a residual norm and stop when {@link NumberContext#isSmall(double, double)}
+ * deems it small relative to the RHS norm (or absolutely small when the RHS is zero), or when the iteration
+ * limit is reached.
+ * </ul>
  */
 public abstract class IterativeSolverTask implements SolverTask<Double> {
 
@@ -115,8 +128,7 @@ public abstract class IterativeSolverTask implements SolverTask<Double> {
         }
 
         /**
-         * Preconditioner for Krylov/stationary methods that support it. Defaults to
-         * {@link Preconditioner#IDENTITY}.
+         * Preconditioner for methods that support it. Defaults to {@link Preconditioner#IDENTITY}.
          */
         public Configurator preconditioner(final Preconditioner preconditioner) {
             mySolver.setPreconditioner(preconditioner != null ? preconditioner : Preconditioner.IDENTITY);

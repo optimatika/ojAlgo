@@ -33,32 +33,19 @@ import org.ojalgo.structure.Access1D;
 /**
  * Symmetric Successive Over-Relaxation (SSOR) preconditioner with relaxation factor omega (ω).
  * <p>
- * For ω = 1 this reduces to a symmetric Gauss–Seidel (forward + backward) sweep – often an effective
- * preconditioner for SPD systems with suitable variable ordering.
+ * For ω = 1 this reduces to a symmetric Gauss–Seidel (forward + backward) sweep – a common choice for SPD
+ * systems with suitable variable ordering.
  * <p>
- * The (left) preconditioning effect applied is an (approximate) application of M^{-1} where (classic form):
- *
- * <pre>
- *   M = (D/ω + L) D^{-1} (D/ω + U) * (2 - ω)/ω
- * </pre>
- *
- * D is the diagonal of A, L (strictly) lower and U (strictly) upper parts. Application performs:
- * <ol>
- * <li>Forward substitution: (D/ω + L) y = r
- * <li>Scale: d = D y
- * <li>Backward substitution: (D/ω + U) z = d
- * <li>z = (ω / (2 - ω)) * z
- * </ol>
- * For ω = 1 the scalings simplify and the implementation elides redundant multiplies.
+ * The applied effect is an approximate M^{-1} with the classic form (D/ω + L) D^{-1} (D/ω + U) scaled by (2 -
+ * ω)/ω, implemented via forward and backward triangular sweeps.
  * <p>
- * Notes & limitations:
+ * Compatibility and guidance
  * <ul>
- * <li>Assumes the system matrix is represented by {@link Equation} rows where {@code row.index} gives the
- * pivot/diagonal position and {@link Equation#getPivot()} returns the diagonal element a_{ii}.
- * <li>Iteration over the full column span (row.size()) – suitable for reasonably sparse (or modest sized)
- * problems; otherwise consider a specialised sparse structure.
- * <li>No reordering or scaling heuristics; those should be performed externally if desired.
- * <li>If a diagonal pivot is zero it is treated as 1.0 (effectively skipping that row in the factor solve).
+ * <li>Symmetric by construction; typically positive-definite for SPD A when 0 < ω < 2.
+ * <li>Useful for methods that expect a symmetric (often SPD) preconditioner.
+ * <li>Can be used as a right-preconditioner in methods for general nonsymmetric systems where symmetry of M
+ * is acceptable or desired.
+ * <li>Stationary fixed-point methods that ignore preconditioners will not use this.
  * </ul>
  */
 public final class SSORPreconditioner implements Preconditioner {

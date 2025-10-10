@@ -35,20 +35,24 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * Experimental parallelised version of {@link GaussSeidelSolver}.
+ * Experimental parallelised stationary iteration based on Gauss–Seidel-style in-place updates.
  * <p>
- * When to use:
+ * Concurrency and convergence
  * <ul>
- * <li>Diagonally dominant or SPD systems where Gauss–Seidel is appropriate but you want to utilise multiple
- * cores.
- * <li>When you can tolerate slight differences from strictly sequential updates and want higher throughput.
- * <li>As a smoother/pre-relaxation where approximate iterations are acceptable.
- * <li>For tough SPD systems where convergence speed and robustness matter more than parallelism, prefer
- * ConjugateGradientSolver.
- * <li>For fully synchronous updates (and trivial parallelism), prefer Jacobi.
+ * <li>Targets systems where diagonal dominance or SPD structure makes Gauss–Seidel-type updates effective.
+ * <li>Parallel execution may introduce small differences compared to strictly sequential updates.
  * </ul>
- *
- * @author apete
+ * Configuration
+ * <ul>
+ * <li>Ignores any configured {@link Preconditioner}; use the relaxation factor to influence convergence.
+ * </ul>
+ * When to use
+ * <ul>
+ * <li>To utilise multiple cores for simple in-place iterative sweeps.
+ * <li>As a smoother or pre-relaxation when approximate iterations are acceptable.
+ * <li>For challenging SPD problems prioritising convergence speed/robustness, Krylov methods are often
+ * preferable.
+ * </ul>
  */
 public final class ParallelGaussSeidelSolver extends IterativeSolverTask {
 

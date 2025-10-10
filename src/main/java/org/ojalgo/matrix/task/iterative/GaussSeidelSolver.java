@@ -30,22 +30,26 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * For solving [A][x]=[b] where [A] has non-zero elements on the diagonal.
+ * Stationary Gauss–Seidel iteration for solving [A][x]=[b] with non-zero diagonal entries.
  * <p>
- * To guarantee convergence [A] needs to be either strictly diagonally dominant, or symmetric and positive
- * definite.
- * <p>
- * When to use:
+ * Convergence
  * <ul>
- * <li>Diagonally dominant or SPD systems where a simple stationary method suffices.
- * <li>Prefer over Jacobi when sequential in-place updates improve convergence speed.
- * <li>Useful as a smoother/pre-relaxation in multilevel schemes.
- * <li>For large SPD systems, prefer ConjugateGradientSolver for faster convergence.
- * <li>If you need fully synchronous updates (or trivial parallelism), prefer Jacobi.
+ * <li>Converges for strictly diagonally dominant systems and for symmetric positive-definite (SPD) matrices.
+ * <li>Behaviour depends on ordering and scaling; preconditioning is not applied in this stationary method.
  * </ul>
- *
- * @author apete
- * @see https://en.wikipedia.org/wiki/Gauss–Seidel_method
+ * Configuration
+ * <ul>
+ * <li>Ignores any configured {@link Preconditioner}; use the relaxation factor to control convergence speed.
+ * </ul>
+ * <p>
+ * When to use
+ * <ul>
+ * <li>As a simple in-place fixed-point iteration when sequential updates are acceptable.
+ * <li>Prefer over fully synchronous updates when in-place coupling improves convergence.
+ * <li>For large SPD problems needing faster convergence, Krylov methods often perform better.
+ * <li>If fully synchronous updates or trivial parallelism are required, consider a synchronous fixed-point
+ * method.
+ * </ul>
  */
 public final class GaussSeidelSolver extends IterativeSolverTask {
 

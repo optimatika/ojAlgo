@@ -26,7 +26,6 @@ import java.util.function.Supplier;
 
 import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.structure.Access1D;
 
 /**
@@ -35,10 +34,28 @@ import org.ojalgo.structure.Access1D;
  * Contract:
  * <ul>
  * <li>Call {@link #prepare(List, int)} once per system before iterations to (re)initialise internal state.
- * <li>{@link #apply(Access1D, PhysicalStore)} applies an approximation of {@code M^{-1}} to a vector. For
- * left-preconditioned methods this is used on residuals and matrix-vector products.
- * <li>{@link #applyTranspose(Access1D, PhysicalStore)} defaults to the same as
- * {@link #apply(Access1D, PhysicalStore)}; override if a distinct transpose action is required.
+ * <li>{@link #apply(Access1D, PhysicalStore)} should approximate {@code M^{-1}} applied to a vector. Solvers
+ * that use left-preconditioning will apply this to residuals or intermediate vectors.
+ * <li>{@link #applyTranspose(Access1D, PhysicalStore)} should approximate {@code (M^T)^{-1}}. By default it
+ * delegates to {@link #apply(Access1D, PhysicalStore)}; override if the preconditioner is not symmetric.
+ * </ul>
+ * Preconditioning modes (solver perspective):
+ * <ul>
+ * <li>Left preconditioning: solver forms {@code M^{-1} A x = M^{-1} b} and calls {@link #apply} on vectors.
+ * <li>Right preconditioning: solver forms {@code A M^{-1} y = b}, then recovers {@code x = M^{-1} y}; may
+ * require both {@link #apply} and {@link #applyTranspose}.
+ * <li>Symmetric preconditioners ({@code M = M^T}): implementations can usually provide only
+ * {@link #apply(Access1D, PhysicalStore)} and rely on the default transpose behaviour.
+ * </ul>
+ * Compatibility guidelines:
+ * <ul>
+ * <li>Methods requiring symmetric positive-definite preconditioning (e.g., for SPD systems) expect {@code M}
+ * to be symmetric positive-definite.
+ * <li>Methods for general nonsymmetric systems that use right-preconditioning may require a meaningful
+ * transpose action; override {@link #applyTranspose(Access1D, PhysicalStore)} when {@code M} is not
+ * symmetric.
+ * <li>Some stationary (fixed-point) methods ignore preconditioners entirely and instead use a relaxation
+ * factor.
  * </ul>
  */
 public interface Preconditioner {
@@ -90,7 +107,7 @@ public interface Preconditioner {
     void apply(Access1D<Double> src, PhysicalStore<Double> dst);
 
     /**
-     * Apply (M^T)^{-1} to a vector. Defaults to {@link #apply(Access1D, R064Store)}.
+     * Apply (M^T)^{-1} to a vector. Defaults to {@link #apply(Access1D, PhysicalStore)}.
      */
     default void applyTranspose(final Access1D<Double> src, final PhysicalStore<Double> dst) {
         this.apply(src, dst);

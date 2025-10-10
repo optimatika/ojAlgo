@@ -31,19 +31,24 @@ import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * For solving [A][x]=[b] when [A] is symmetric and positive-definite.
+ * Conjugate Gradient solver for symmetric positive-definite systems [A][x]=[b].
  * <p>
- * This implementation is Jacobi preconditioned by default – using the diagonal elements to scale the residual.
- * You can change that by calling {@link #setPreconditioner(Preconditioner)} with a different implementation.
- * <p>
- * When to use:
+ * Preconditioning
+ * <ul>
+ * <li>Requires a symmetric positive-definite preconditioner. Typical choices include the identity (no
+ * preconditioning), diagonal scaling, or symmetric Gauss–Seidel/SSOR variants. Using a non-symmetric or
+ * indefinite preconditioner invalidates the CG assumptions.
+ * <li>Diagonal entries that are zero (or deemed unusable) should be treated in a numerically safe way by the
+ * chosen preconditioner, commonly defaulting to an identity action on those positions.
+ * </ul>
+ * When to use
  * <ul>
  * <li>Large, sparse systems with symmetric positive-definite A.
- * <li>When fast convergence is desired compared to Jacobi/Gauss–Seidel for SPD problems.
- * <li>When only matrix–vector products with A are available (no need for A^T).
- * <li>Prefer over stationary methods as a general default for SPD systems, especially with reasonable
- * conditioning.
- * <li>Not suitable for nonsymmetric or indefinite systems (use QMR or a different Krylov method).
+ * <li>When only matrix–vector products are available and factorisations are undesirable.
+ * <li>As a robust default for SPD problems when faster convergence than simple stationary iterations is
+ * needed.
+ * <li>Not applicable to nonsymmetric or indefinite systems; use a method designed for general square systems
+ * in those cases.
  * </ul>
  *
  * @author apete

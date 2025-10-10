@@ -27,6 +27,16 @@ import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.structure.Access1D;
 
+/**
+ * Identity (no-op) preconditioner.
+ * <p>
+ * Characteristics and usage
+ * <ul>
+ * <li>Works with any iterative method and serves as a baseline when no preconditioning is desired.
+ * <li>Safe choice for methods that require symmetry/positive-definiteness of the preconditioner.
+ * <li>Often used to measure the effect of adding a non-trivial preconditioner.
+ * </ul>
+ */
 final class IdentityPreconditioner implements Preconditioner {
 
     @Override

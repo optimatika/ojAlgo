@@ -32,6 +32,15 @@ import org.ojalgo.structure.Access1D;
 
 /**
  * Simple diagonal (Jacobi) preconditioner: M = diag(A), apply M^{-1} x = x ./ diag(A).
+ * <p>
+ * Compatibility
+ * <ul>
+ * <li>Well-suited as a lightweight, symmetry-preserving choice for methods that benefit from SPD
+ * preconditioning when A has positive diagonal entries.
+ * <li>Usable as a right-preconditioner in methods for general nonsymmetric systems where a transpose action
+ * equals the forward action.
+ * <li>Ignored by stationary fixed-point methods that do not use preconditioners.
+ * </ul>
  */
 public final class JacobiPreconditioner implements Preconditioner {
 

@@ -10,6 +10,12 @@ General style
 - Keep changes small and focused. Maintain binary compatibility; deprecate before removal.
 - Be critical of existing code. If something can be simpler/faster/clearer, propose and implement it with evidence.
 
+Javadoc
+- Use HTML for layout but keep it tidy and readable in source.
+- Avoid unnecessary end tags like </p> and </li>.
+- Comment classes, methods, fields, and constants as proper Javadoc; avoid unattached line or block comments.
+- Prefer concise lists and paragraphs; link APIs with {@link ...} where it adds clarity.
+
 Performance
 - Minimize allocations and object churn. Prefer primitives and ojAlgo’s specialised data structures (array/matrix stores) over boxed types or generic collections in hot paths.
 - Avoid streams/Optionals in critical loops; consider loop unrolling and vectorization where it pays off.

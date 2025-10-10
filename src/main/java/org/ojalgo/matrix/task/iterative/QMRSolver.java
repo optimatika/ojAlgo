@@ -35,34 +35,36 @@ import org.ojalgo.type.context.NumberContext;
  * Quasi-Minimal Residual (QMR) solver for general nonsymmetric square systems.
  * <p>
  * This is a Java port of SciPy's qmr() reference implementation. It is almost a straight line-by-line
- * translation from SciPy. Implemented here with right-preconditioning only (M1 = I, M2 != I),
- * and using ojAlgo's dense MatrixStore operations for matrix–vector products with A and A^T.
+ * translation from SciPy. Implemented here with right-preconditioning only (M1 = I, M2 != I), and using
+ * ojAlgo's dense MatrixStore operations for matrix–vector products with A and A^T.
  * <p>
- * When to use:
+ * Characteristics
  * <ul>
- * <li>Nonsymmetric or indefinite systems where ConjugateGradient is not applicable.</li>
- * <li>When you can provide both A·x and A^T·x products and need a robust Krylov method.</li>
- * <li>Prefer over Jacobi/Gauss–Seidel for difficult nonsymmetric problems requiring better convergence.</li>
- * <li>If A^T is unavailable or too costly, consider BiCGSTAB or GMRES (not provided here).</li>
+ * <li>Operates on matrix–vector products with both A and A^T.
+ * <li>Right-preconditioning is used; both forward and transpose applications of the preconditioner may be
+ * invoked.
+ * <li>Stops when the residual norm is small relative to the RHS norm (or absolutely small when RHS is zero),
+ * or when the iteration limit is reached.
  * </ul>
- * Characteristics:
+ * When to use
  * <ul>
- * <li>Requires both A·x and A^T·x products (transpose appears in the recurrences).
- * <li>Right-preconditioning only (M1 = I, M2 != I).
- * <li>This version does not work with complex numbers.
- * <li>The stopping criterion follows ojAlgo style: terminate when NumberContext.isSmall(||b||, ||r||).
- * <li>Designed for square systems; Throw IllegalArgumentException for non-square inputs.
+ * <li>For nonsymmetric or indefinite problems where SPD-specific methods are inapplicable.
+ * <li>When a robust Krylov method is preferred over simple stationary iterations.
+ * <li>If A^T is unavailable or too costly, consider alternatives that avoid explicit transpose products.
  * </ul>
- * References:
+ * References
  * <ul>
- * <li>SciPy 1.16.1 implementation: scipy.sparse.linalg._isolve.iterative.qmr
- * <li>https://www.netlib.org/templates/templates.pdf, Figure 2.8.
- * (https://github.com/scipy/scipy/blob/0cf8e9541b1a2457992bf4ec2c0c669da373e497/scipy/sparse/linalg/_isolve/iterative.py#L849-L1051)
- * <li>Freund, Roland W., and Noël M. Nachtigal. "QMR: a quasi-minimal residual method for non-Hermitian
- * linear systems." Numerische Mathematik 60 (1991): 315–339. https://doi.org/10.1007/BF01385726
+ * <li>Templates for the Solution of Linear Systems, Barrett et al., Figure 2.8.
+ * <li>Freund & Nachtigal (1991), QMR: a quasi-minimal residual method for non-Hermitian linear systems.
  * </ul>
  */
 public final class QMRSolver extends IterativeSolverTask {
+
+    private static void axpby(final double alpha, final R064Store src, final double beta, final R064Store dst) {
+        for (int i = 0; i < src.getRowDim(); i++) {
+            dst.set(i, alpha * src.doubleValue(i) + beta * dst.doubleValue(i));
+        }
+    }
 
     private static void axpy(final double alpha, final R064Store x, final Mutate1D.Modifiable<?> y) {
         x.axpy(alpha, y);
@@ -86,22 +88,16 @@ public final class QMRSolver extends IterativeSolverTask {
         x.modifyAll(MULTIPLY.by(alpha));
     }
 
-    private static void axpby(final double alpha, final R064Store src, final double beta, final R064Store dst) {
-        for (int i = 0; i < src.getRowDim(); i++) {
-            dst.set(i, alpha * src.doubleValue(i) + beta * dst.doubleValue(i));
-        }
-    }
-
-    private R064Store r;        // residual r
-    private R064Store vtilde;   // v~
-    private R064Store wtilde;   // w~
-    private R064Store v;        // v
-    private R064Store z;        // z
-    private R064Store p;        // p
-    private R064Store q;        // q
-    private R064Store ptilde;   // A p
-    private R064Store d;        // d (solution direction accumulation)
-    private R064Store s;        // s (residual update accumulation)
+    private R064Store r; // residual r
+    private R064Store vtilde; // v~
+    private R064Store wtilde; // w~
+    private R064Store v; // v
+    private R064Store z; // z
+    private R064Store p; // p
+    private R064Store q; // q
+    private R064Store ptilde; // A p
+    private R064Store d; // d (solution direction accumulation)
+    private R064Store s; // s (residual update accumulation)
 
     public QMRSolver() {
         super();
@@ -109,7 +105,6 @@ public final class QMRSolver extends IterativeSolverTask {
 
     @Override
     public double resolve(final List<Equation> equations, final PhysicalStore<Double> x) {
-
 
         final int m = equations.size();
         final int n = x.size();

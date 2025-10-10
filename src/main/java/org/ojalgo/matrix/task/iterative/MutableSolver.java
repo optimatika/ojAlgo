@@ -39,25 +39,22 @@ import org.ojalgo.structure.Access2D;
  * Lightweight mutable wrapper around a list of {@link Equation} rows that delegates solving to an
  * {@link IterativeSolverTask}.
  * <p>
- * Purpose:
+ * Purpose
  * <ul>
  * <li>Build and update an equation system incrementally by adding/removing {@link Equation} rows.
  * <li>Reuse an iterative solver across solves without rebuilding matrices.
  * <li>Support workflows where the active rows/columns change between iterations.
  * </ul>
- * <p>
- * How it works:
+ * How it works
  * <ul>
- * <li>You construct a subclass that knows the problem size and supplies a delegate
- * {@link IterativeSolverTask}.
+ * <li>Subclass to define the problem size and to provide the delegate iterative solver.
  * <li>Call {@link #add(Equation)} and {@link #remove(Equation)} to maintain the active set of rows. Rows are
  * kept sorted by their {@link Equation#index}.
  * <li>Call {@link #resolve(PhysicalStore)} (or {@link #resolve(PhysicalStore, Access1D)}) to solve [A][x]=[b]
  * using the current rows and right-hand sides stored in each {@link Equation}.
  * <li>All methods that solve or preallocate simply forward to the delegate.
  * </ul>
- * <p>
- * Contract:
+ * Contract
  * <ul>
  * <li>Every added {@link Equation} must have {@link Equation#size()} equal to the problem size passed to the
  * constructor; otherwise an {@link IllegalArgumentException} is thrown.
@@ -65,13 +62,10 @@ import org.ojalgo.structure.Access2D;
  * against that vector and the current row bodies only.
  * <li>Thread-safety: instances are not thread-safe; do not mutate the row set while solving.
  * </ul>
- * <p>
- * Example usage:
+ * Example usage
  * <ul>
- * <li>See {@code org.ojalgo.optimisation.convex.IterativeASS.SchurComplementSolver}, which extends
- * {@code MutableSolver} and also implements {@link MatrixStore}. It dynamically assembles the (negated)
- * Schur-complement system by adding/removing rows as constraints enter/leave the active set, and then calls
- * {@link #resolve(PhysicalStore)} to compute Lagrange multipliers.
+ * <li>A subclass can also implement {@link MatrixStore} and dynamically assemble a Schur-complement-style
+ * system by adding/removing rows, and then call {@link #resolve(PhysicalStore)} to compute the unknowns.
  * </ul>
  */
 public abstract class MutableSolver implements SolverTask<Double> {
