@@ -107,9 +107,25 @@ public abstract class DivideAndConquer {
 
             try {
                 DivideAndConquer.call(executor, split, limit, threshold, nextWorkers, conquerer);
+            } catch (RuntimeException | Error t) {
+                firstPart.cancel(true);
+                throw t;
+            }
+            try {
                 firstPart.get();
-            } catch (final InterruptedException | ExecutionException cause) {
-                throw new RuntimeException(cause);
+            } catch (InterruptedException ie) {
+                firstPart.cancel(true);
+                Thread.currentThread().interrupt();
+                throw new RuntimeException(ie);
+            } catch (ExecutionException ee) {
+                Throwable cause = ee.getCause();
+                if (cause instanceof RuntimeException) {
+                    throw (RuntimeException) cause;
+                }
+                if (cause instanceof Error) {
+                    throw (Error) cause;
+                }
+                throw new RuntimeException(cause != null ? cause : ee);
             }
 
         } else {

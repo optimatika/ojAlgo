@@ -21,12 +21,12 @@
  */
 package org.ojalgo.concurrent;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.PriorityBlockingQueue;
 
 /**
@@ -38,6 +38,7 @@ import java.util.concurrent.PriorityBlockingQueue;
  * effect.
  * <li>{@link PrioritisedView#poll()} from each of the views as needed.
  * </ol>
+ * Polling skips stale entries that no longer exist in the backing set.
  *
  * @author apete
  */
@@ -99,7 +100,7 @@ public final class MultiviewSet<T> {
     }
 
     private final Set<T> myCommonSet = ConcurrentHashMap.newKeySet();
-    private final Collection<PrioritisedView> myViews = new ArrayList<>();
+    private final Collection<PrioritisedView> myViews = new CopyOnWriteArrayList<>();
 
     public MultiviewSet() {
         super();
@@ -154,7 +155,8 @@ public final class MultiviewSet<T> {
     }
 
     /**
-     * Remove an entry from the common {@link Set}.
+     * Remove an entry from the common {@link Set}. Entries already present in view queues are considered
+     * stale and will be skipped during {@link PrioritisedView#poll()}.
      */
     public boolean remove(final T entry) {
         return myCommonSet.remove(entry);

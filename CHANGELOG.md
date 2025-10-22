@@ -26,6 +26,22 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - Static utility helpers: `Eigenvalue.reconstruct(Eigenvalue)` plus `SingularValue.invert(...)`, `SingularValue.solve(...)` and `SingularValue.reconstruct(...)` centralise pseudoinverse / solve / reconstruction logic.
 - New Quasi-Minimal Residual (QMR) iterative solver for general nonsymmetric square systems. Contributed by @Programmer-Magnus.
 
+#### org.ojalgo.concurrent
+
+- Execute tasks in a separate JVM: New `ExternalProcessExecutor` that runs a specified static method or a `Serializable` `Callable`/`Runnable` in an external OS process (child JVM). Provides:
+  - Hard cancellation and timeouts by killing the process tree.
+  - Binary IPC framing (MAGIC/VER/LEN/CRC32) over stdio; stdout is reserved for protocol frames to avoid corruption.
+  - Configurable `ProcessOptions` builder for heap (`-Xmx`), additional JVM args, system properties, environment and classpath; sensible defaults for Maven/Gradle test/main classpaths.
+  - Overloads `execute(...)`, `call(...)` and `run(...)` to target methods by `Method`, `MethodDescriptor` or owner/name/parameter types.
+  - `ProcessWorker` main class (child entrypoint) and `MethodDescriptor` describing methods across classloaders.
+  - `ProcessAwareThread` and a process-aware thread factory used so that interrupting an owner thread forcibly tears down the child process.
+- Thread factory: `DaemonPoolExecutor` exposes an internal process-aware `ThreadFactory` used by `ExternalProcessExecutor` (threads remain daemon and identifiably named).
+- Collections: `MultiviewSet` adds `isAnyContents()` to cheaply detect if any backed priority view still has queued entries.
+
+#### org.ojalgo.machine
+
+- `JavaType` adds utilities `box(Class<?>)`, `unbox(Class<?>)` and `resolveType(String)` to convert between primitive/wrapper types and resolve primitive/array/class names (e.g. "int[]", "java.lang.String[]").
+
 ### Changed
 
 #### org.ojalgo.data
@@ -46,11 +62,21 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - In `ConvexSolver`, the iterative Schur complement solver used in the active set solver, is now configurable (which implementation to use). Use either the `ConjugateGradientSolver` or `QMRSolver`, or some other implementation.
 
+#### org.ojalgo.concurrent
+
+- `DivideAndConquer` now uses a safer split-and-join: sibling tasks are cancelled on failure, causes are propagated, and interruption is preserved. The configurable `Divider` exposes `threshold(int)` and `parallelism(IntSupplier)`; `ProcessingService#newDivider()` returns one bound to its executor. Default worker count uses `OjAlgoUtils.ENVIRONMENT.threads` consistently.
+- `ProcessingService#divider()` is deprecated in favour of `newDivider()` (same behaviour); javadocs clarified for `compute/map/reduce*` regarding uniqueness and hashing requirements.
+- `DaemonPoolExecutor`: internal addition of a process-aware thread factory; no behavioural change for existing `new*ThreadPool(...)` helpers.
+
 ### Deprecated
 
 #### org.ojalgo.matrix
 
 - `SingularValue#getD()` deprecated; use `getS()` instead. (Existing code continues to work; plan to remove in a future major release.)
+
+#### org.ojalgo.concurrent
+
+- `ProcessingService#divider()` in favour of `newDivider()`.
 
 ### Fixed
 

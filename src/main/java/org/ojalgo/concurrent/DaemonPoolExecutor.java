@@ -105,6 +105,16 @@ public final class DaemonPoolExecutor extends ThreadPoolExecutor {
         };
     }
 
+    /**
+     * Create a {@link ThreadFactory} producing {@link ProcessAwareThread}s. These threads are daemon threads
+     * and can be used to "own" an external process: if the thread is interrupted, the process is forcibly
+     * destroyed.
+     */
+    static ThreadFactory newProcessAwareThreadFactory(final String name) {
+        String prefix = name.endsWith("-") ? name : name + "-";
+        return target -> new ProcessAwareThread(GROUP, target, prefix + COUNTER.incrementAndGet());
+    }
+
     DaemonPoolExecutor(final int corePoolSize, final int maximumPoolSize, final long keepAliveTime, final TimeUnit unit,
             final BlockingQueue<Runnable> workQueue) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
