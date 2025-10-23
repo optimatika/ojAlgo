@@ -38,14 +38,557 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.zip.CRC32;
 
 import org.ojalgo.machine.JavaType;
 
 /**
- * Execute each submitted task/method in a separate JVM (separate/external OS process) with arbitrary
- * {@link Serializable} arguments/return. Provides hard cancellation/timeout via process kill.
+ * Execute submitted tasks/methods in external JVM processes with arbitrary {@link Serializable}
+ * arguments/return. Provides hard cancellation/timeout via process kill. Each executor thread owns a
+ * persistent child process kept alive across tasks until the owner thread is interrupted or the process is
+ * killed due to failure/timeout. This enables reusing JVM warm state for a sequence of tasks.
  */
 public final class ExternalProcessExecutor {
+
+    private static final class ProcessTask<T> implements Future<T>, Runnable {
+
+        private static final ThreadLocal<WorkerChannel> WORKER = new ThreadLocal<>();
+
+        private static WorkerChannel ensureWorker(final ProcessOptions opts) throws Exception {
+            WorkerChannel wc = WORKER.get();
+            if (wc == null || !wc.isAlive() || !ProcessTask.sameOptions(wc.options(), opts)) {
+                if (wc != null) {
+                    try {
+                        wc.kill();
+                    } catch (Throwable ignore) {
+                    }
+                }
+                wc = WorkerChannel.start(opts);
+                WORKER.set(wc);
+            }
+            return wc;
+        }
+
+        private static boolean sameOptions(final ProcessOptions opt1, final ProcessOptions opt2) {
+            if (opt1 == opt2) {
+                return true;
+            }
+            if (opt1 == null || opt2 == null) {
+                return false;
+            }
+            return Objects.equals(opt1.classpath, opt2.classpath) && opt1.enableNativeAccessAllUnnamed == opt2.enableNativeAccessAllUnnamed
+                    && Objects.equals(opt1.env, opt2.env) && Objects.equals(opt1.jvmArgs, opt2.jvmArgs)
+                    && Objects.equals(opt1.systemProperties, opt2.systemProperties) && Objects.equals(opt1.xmx, opt2.xmx);
+        }
+
+        private final Object[] myArguments;
+
+        private final AtomicBoolean myCancelled = new AtomicBoolean(false);
+        private final AtomicBoolean myDone = new AtomicBoolean(false);
+        private volatile Throwable myError;
+        private final Object myLock = new Object();
+        private final MethodDescriptor myMethod;
+        private final ProcessOptions myOptions;
+        private volatile T myResult;
+        private volatile WorkerChannel myWorker;
+
+        ProcessTask(final MethodDescriptor spec, final Object[] args, final ProcessOptions opts) {
+            myMethod = spec;
+            myArguments = args;
+            myOptions = opts;
+        }
+
+        @Override
+        public boolean cancel(final boolean mayInterruptIfRunning) {
+            if (myDone.get()) {
+                return false;
+            }
+            myCancelled.set(true);
+            WorkerChannel wc = myWorker;
+            if (wc != null) {
+                try {
+                    wc.kill();
+                } catch (Throwable ignore) {
+                }
+            }
+            synchronized (myLock) {
+                myDone.set(true);
+                myLock.notifyAll();
+            }
+            return true;
+        }
+
+        @Override
+        public T get() throws InterruptedException, ExecutionException {
+            synchronized (myLock) {
+                while (!myDone.get()) {
+                    myLock.wait();
+                }
+            }
+            if (myCancelled.get()) {
+                throw new CancellationException();
+            }
+            if (myError != null) {
+                throw new ExecutionException(myError);
+            }
+            return myResult;
+        }
+
+        @Override
+        public T get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+            long timeoutNanos = Math.max(1L, unit.toNanos(timeout));
+            long deadline = System.nanoTime() + timeoutNanos;
+            synchronized (myLock) {
+                while (!myDone.get()) {
+                    long remaining = deadline - System.nanoTime();
+                    if (remaining <= 0L) {
+                        break;
+                    }
+                    long millis = remaining / 1_000_000L;
+                    int nanos = (int) (remaining - millis * 1_000_000L);
+                    myLock.wait(millis, nanos);
+                }
+            }
+            if (!myDone.get()) {
+                throw new TimeoutException();
+            }
+            if (myCancelled.get()) {
+                throw new CancellationException();
+            }
+            if (myError != null) {
+                throw new ExecutionException(myError);
+            }
+            return myResult;
+        }
+
+        @Override
+        public boolean isCancelled() {
+            return myCancelled.get();
+        }
+
+        @Override
+        public boolean isDone() {
+            return myDone.get();
+        }
+
+        @Override
+        public void run() {
+            try {
+                if (myCancelled.get()) {
+                    return;
+                }
+                ProcessOptions procOpts = myOptions != null ? myOptions : ProcessOptions.DEFAULT;
+                WorkerChannel wc = ProcessTask.ensureWorker(procOpts);
+                myWorker = wc;
+
+                ProcessRequest req = new ProcessRequest(myMethod, myArguments);
+                ProcessResponse resp = wc.transact(req, procOpts.timeout);
+
+                if (resp.error != null) {
+                    myError = resp.error;
+                } else {
+                    Object value = resp.result;
+                    if (value == null) {
+                        myResult = null;
+                    } else {
+                        myResult = (T) JavaType.box(myMethod.getMethod().getReturnType()).cast(value);
+                    }
+                }
+
+            } catch (TimeoutException te) {
+                WorkerChannel wc = myWorker;
+                if (wc != null) {
+                    try {
+                        wc.kill();
+                    } catch (Throwable ignore) {
+                    }
+                }
+                myError = te;
+            } catch (Throwable t) {
+                WorkerChannel wc = myWorker;
+                String msg = null;
+                if (wc != null) {
+                    try {
+                        msg = wc.getCapturedStderr();
+                    } catch (Throwable ignore) {
+                    }
+                    try {
+                        wc.kill();
+                    } catch (Throwable ignore) {
+                    }
+                }
+                if (msg != null && !msg.isEmpty()) {
+                    myError = new IOException(t.getMessage() + " | child-stderr: " + msg, t);
+                } else {
+                    myError = t;
+                }
+            } finally {
+                synchronized (myLock) {
+                    myDone.set(true);
+                    myLock.notifyAll();
+                }
+            }
+        }
+
+        ProcessTask<T> start(final ExecutorService executor) {
+            executor.submit(this);
+            return this;
+        }
+    }
+
+    /**
+     * Ring buffer OutputStream that retains only the last N bytes written. toString() decodes using the
+     * platform default charset (consistent with previous ByteArrayOutputStream#toString()).
+     */
+    private static final class RingBufferOutput extends OutputStream {
+        private final byte[] buf;
+        private int pos = 0;
+        private int size = 0;
+
+        RingBufferOutput(final int capacity) {
+            buf = new byte[Math.max(1, capacity)];
+        }
+
+        @Override
+        public void close() throws IOException {
+            // no-op
+        }
+
+        @Override
+        public void flush() throws IOException {
+            // no-op
+        }
+
+        @Override
+        public synchronized String toString() {
+            if (size == 0) {
+                return "";
+            }
+            byte[] out = new byte[size];
+            int start = (pos - size + buf.length) % buf.length;
+            int first = Math.min(size, buf.length - start);
+            System.arraycopy(buf, start, out, 0, first);
+            if (first < size) {
+                System.arraycopy(buf, 0, out, first, size - first);
+            }
+            return new String(out);
+        }
+
+        @Override
+        public synchronized void write(final byte[] b, final int off, final int len) throws IOException {
+            int remaining = len;
+            int idx = off;
+            while (remaining > 0) {
+                int chunk = Math.min(remaining, buf.length - pos);
+                System.arraycopy(b, idx, buf, pos, chunk);
+                pos = (pos + chunk) % buf.length;
+                idx += chunk;
+                remaining -= chunk;
+                size = Math.min(buf.length, size + chunk);
+            }
+        }
+
+        @Override
+        public synchronized void write(final int b) throws IOException {
+            buf[pos] = (byte) b;
+            pos = (pos + 1) % buf.length;
+            if (size < buf.length) {
+                size++;
+            }
+        }
+    }
+
+    /**
+     * A per-thread, persistent channel to a child JVM. Not thread-safe; each instance must only be used from
+     * its owning thread. Kills and restarts the underlying process on demand.
+     */
+    private static final class WorkerChannel {
+
+        private static final int STDERR_MAX_BYTES = 64 * 1024;
+
+        private static void destroyProcessTree(final Process proc) {
+            try {
+                ProcessHandle handle = proc.toHandle();
+                handle.descendants().forEach(ph -> {
+                    try {
+                        ph.destroyForcibly();
+                    } catch (Throwable ignore) {
+                    }
+                });
+                handle.destroyForcibly();
+            } catch (Throwable ignore) {
+                try {
+                    proc.destroyForcibly();
+                } catch (Throwable ignore2) {
+                }
+            }
+        }
+
+        static WorkerChannel start(final ProcessOptions options) throws Exception {
+            List<String> cmd = new ArrayList<>();
+            String javaBin = System.getProperty("java.home") + "/bin/java";
+            cmd.add(javaBin);
+            if (options.xmx != null) {
+                cmd.add("-Xmx" + options.xmx);
+            }
+            if (options.enableNativeAccessAllUnnamed) {
+                cmd.add("--enable-native-access=ALL-UNNAMED");
+            }
+            try {
+                String parentLibPath = System.getProperty("java.library.path");
+                if (parentLibPath != null && (options.systemProperties == null || !options.systemProperties.containsKey("java.library.path"))) {
+                    cmd.add("-Djava.library.path=" + parentLibPath);
+                }
+            } catch (Throwable ignore) {
+                // ignore
+            }
+            if (options.systemProperties != null) {
+                for (Map.Entry<String, String> e : options.systemProperties.entrySet()) {
+                    cmd.add("-D" + e.getKey() + "=" + e.getValue());
+                }
+            }
+            if (options.jvmArgs != null && !options.jvmArgs.isEmpty()) {
+                cmd.addAll(options.jvmArgs);
+            }
+            cmd.add("-cp");
+            String testCp = System.getProperty("surefire.test.class.path");
+            String mainCp = System.getProperty("java.class.path");
+            String pathSep = File.pathSeparator;
+            String effectiveCp;
+            if (options.classpath != null && !options.classpath.isEmpty()) {
+                effectiveCp = options.classpath;
+            } else if (testCp != null && !testCp.isEmpty()) {
+                effectiveCp = testCp;
+            } else if (mainCp != null && !mainCp.isEmpty()) {
+                effectiveCp = mainCp;
+            } else {
+                effectiveCp = null;
+            }
+            if ((testCp == null || testCp.isEmpty())) {
+                try {
+                    String userDir = System.getProperty("user.dir");
+                    List<String> candidates = new ArrayList<>(8);
+                    candidates.add(userDir + File.separator + "target" + File.separator + "test-classes");
+                    candidates.add(userDir + File.separator + "target" + File.separator + "classes");
+                    candidates.add(userDir + File.separator + "build" + File.separator + "classes" + File.separator + "java" + File.separator + "test");
+                    candidates.add(userDir + File.separator + "build" + File.separator + "classes" + File.separator + "java" + File.separator + "main");
+                    StringBuilder sb = new StringBuilder(effectiveCp == null ? 64 : effectiveCp.length() + 128);
+                    boolean any = false;
+                    for (String c : candidates) {
+                        File f = new File(c);
+                        if (f.isDirectory() && f.exists()) {
+                            if (!any) {
+                                any = true;
+                            }
+                            sb.append(f.getAbsolutePath()).append(pathSep);
+                        }
+                    }
+                    if (effectiveCp != null && !effectiveCp.isEmpty()) {
+                        sb.append(effectiveCp);
+                    }
+                    String alt = sb.toString();
+                    if (any) {
+                        effectiveCp = alt;
+                    }
+                } catch (Throwable ignore) {
+                }
+            }
+            try {
+                java.net.URL loc = ProcessWorker.class.getProtectionDomain().getCodeSource().getLocation();
+                if (loc != null) {
+                    String workerPath = new java.io.File(loc.toURI()).getAbsolutePath();
+                    if (effectiveCp == null || effectiveCp.isEmpty()) {
+                        effectiveCp = workerPath;
+                    } else if (!effectiveCp.contains(workerPath)) {
+                        effectiveCp = workerPath + File.pathSeparator + effectiveCp;
+                    }
+                }
+            } catch (Throwable ignore) {
+            }
+            cmd.add(effectiveCp);
+            cmd.add("org.ojalgo.concurrent.ProcessWorker");
+
+            ProcessBuilder pb = new ProcessBuilder(cmd);
+            if (options.env != null) {
+                pb.environment().putAll(options.env);
+            }
+
+            final Process proc = pb.start();
+            Thread owner = Thread.currentThread();
+            if (owner instanceof ProcessAwareThread) {
+                ((ProcessAwareThread) owner).setProcess(proc);
+            }
+
+            final OutputStream toChild = proc.getOutputStream();
+            final InputStream fromChild = proc.getInputStream();
+            final InputStream childErr = proc.getErrorStream();
+
+            final RingBufferOutput errBuf = new RingBufferOutput(STDERR_MAX_BYTES);
+            final OutputStream capped = errBuf;
+            Thread errDrainer = DaemonPoolExecutor.newThreadFactory("ojAlgo-proc-stderr").newThread(() -> {
+                try {
+                    childErr.transferTo(capped);
+                } catch (IOException ignore) {
+                } finally {
+                    try {
+                        capped.close();
+                    } catch (IOException ignore) {
+                    }
+                    try {
+                        childErr.close();
+                    } catch (IOException ignore) {
+                    }
+                }
+            });
+            errDrainer.start();
+
+            return new WorkerChannel(effectiveCp, options, owner, proc, toChild, fromChild, childErr, errDrainer, errBuf);
+        }
+
+        private InputStream myChildErr;
+        private final String myEffectiveClasspath;
+        private final RingBufferOutput myErrBuffer;
+        private Thread myErrDrainer;
+        private InputStream myFromChild;
+        private final ProcessOptions myOptions;
+        private final Thread myOwnerThread;
+
+        private Process myProcess;
+
+        private OutputStream myToChild;
+
+        private WorkerChannel(final String effectiveCp, final ProcessOptions options, final Thread owner, final Process proc, final OutputStream toChild,
+                final InputStream fromChild, final InputStream err, final Thread errDrainer, final RingBufferOutput errBuffer) {
+            myEffectiveClasspath = effectiveCp;
+            myOptions = options;
+            myOwnerThread = owner;
+            myProcess = proc;
+            myToChild = toChild;
+            myFromChild = fromChild;
+            myChildErr = err;
+            myErrDrainer = errDrainer;
+            myErrBuffer = errBuffer;
+        }
+
+        String getCapturedStderr() {
+            synchronized (myErrBuffer) {
+                return myErrBuffer.toString();
+            }
+        }
+
+        boolean isAlive() {
+            return myProcess != null && myProcess.isAlive();
+        }
+
+        void kill() {
+            if (myProcess != null) {
+                try {
+                    WorkerChannel.destroyProcessTree(myProcess);
+                } catch (Throwable ignore) {
+                }
+            }
+            try {
+                if (myToChild != null) {
+                    myToChild.close();
+                }
+            } catch (IOException ignore) {
+            }
+            try {
+                if (myFromChild != null) {
+                    myFromChild.close();
+                }
+            } catch (IOException ignore) {
+            }
+            try {
+                if (myChildErr != null) {
+                    myChildErr.close();
+                }
+            } catch (IOException ignore) {
+            }
+            if (myErrDrainer != null) {
+                try {
+                    myErrDrainer.join(100L);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+            if (myOwnerThread instanceof ProcessAwareThread) {
+                ((ProcessAwareThread) myOwnerThread).setProcess(null);
+            }
+            myProcess = null;
+            myToChild = null;
+            myFromChild = null;
+            myChildErr = null;
+            myErrDrainer = null;
+        }
+
+        ProcessOptions options() {
+            return myOptions;
+        }
+
+        ProcessResponse transact(final ProcessRequest req, final Duration timeout) throws Exception {
+            if (!this.isAlive()) {
+                throw new IOException("Worker process not alive");
+            }
+            // Send request
+            IPC.writeFrame(myToChild, req);
+            myToChild.flush();
+
+            final AtomicBoolean done = new AtomicBoolean(false);
+            final AtomicBoolean timedOut = new AtomicBoolean(false);
+            Thread watchdog = null;
+            if (timeout != null && !timeout.isZero() && timeout.compareTo(Duration.ZERO) > 0) {
+                long millis = Math.max(1L, timeout.toMillis());
+                watchdog = DaemonPoolExecutor.newThreadFactory("ojAlgo-proc-watchdog").newThread(() -> {
+                    try {
+                        Thread.sleep(millis);
+                        if (!done.get()) {
+                            timedOut.set(true);
+                            WorkerChannel.destroyProcessTree(myProcess);
+                        }
+                    } catch (InterruptedException ignore) {
+                        Thread.currentThread().interrupt();
+                    }
+                });
+                watchdog.start();
+            }
+
+            ProcessResponse resp = null;
+            Throwable readError = null;
+            try {
+                resp = IPC.readFrame(myFromChild, ProcessResponse.class);
+            } catch (Throwable t) {
+                readError = t;
+            } finally {
+                done.set(true);
+            }
+
+            if (watchdog != null) {
+                try {
+                    watchdog.join(50L);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+
+            if (timedOut.get()) {
+                throw new TimeoutException("External process request timed out");
+            }
+            if (readError != null) {
+                if (readError instanceof EOFException) {
+                    throw new IOException("Child process terminated unexpectedly");
+                }
+                if (readError instanceof ClassNotFoundException) {
+                    throw (ClassNotFoundException) readError;
+                }
+                if (readError instanceof IOException) {
+                    throw (IOException) readError;
+                }
+                throw new IOException(readError);
+            }
+            return resp;
+        }
+    }
 
     /**
      * Inter-Process Communication
@@ -75,13 +618,6 @@ public final class ExternalProcessExecutor {
             return ((b[0] & 0xFF) << 24) | ((b[1] & 0xFF) << 16) | ((b[2] & 0xFF) << 8) | (b[3] & 0xFF);
         }
 
-        private static long readLong(final InputStream in) throws IOException {
-            byte[] b = new byte[8];
-            IPC.readFully(in, b, 0, 8);
-            return ((long) (b[0] & 0xFF) << 56) | ((long) (b[1] & 0xFF) << 48) | ((long) (b[2] & 0xFF) << 40) | ((long) (b[3] & 0xFF) << 32)
-                    | ((long) (b[4] & 0xFF) << 24) | ((long) (b[5] & 0xFF) << 16) | ((long) (b[6] & 0xFF) << 8) | (b[7] & 0xFF);
-        }
-
         private static void writeInt(final OutputStream out, final int v) throws IOException {
             out.write(new byte[] { (byte) (v >>> 24), (byte) (v >>> 16), (byte) (v >>> 8), (byte) (v) });
         }
@@ -92,7 +628,6 @@ public final class ExternalProcessExecutor {
         }
 
         static <T> T readFrame(final java.io.InputStream in, final Class<T> type) throws java.io.IOException, ClassNotFoundException {
-            // Scan for MAGIC to resync even if stdout is polluted
             final InputStream bin = in;
             long window = 0L;
             int seen = 0;
@@ -109,7 +644,6 @@ public final class ExternalProcessExecutor {
                     break;
                 }
             }
-            // Version
             int ver = bin.read();
             if (ver < 0) {
                 throw new EOFException("EOF after MAGIC");
@@ -117,15 +651,12 @@ public final class ExternalProcessExecutor {
             if (ver != VERSION) {
                 throw new IOException("Unsupported IPC version: " + ver);
             }
-            // Length
             int len = IPC.readInt(bin);
             if (len < 0 || len > MAX_FRAME_SIZE) {
                 throw new IOException("Invalid frame length: " + len);
             }
-            // Payload
             byte[] payload = new byte[len];
             IPC.readFully(bin, payload, 0, len);
-            // CRC32
             int crcRead = IPC.readInt(bin);
             java.util.zip.CRC32 crc = new java.util.zip.CRC32();
             crc.update(payload);
@@ -133,15 +664,17 @@ public final class ExternalProcessExecutor {
             if ((crcRead & 0xFFFFFFFFL) != crcCalc) {
                 throw new IOException("CRC32 mismatch");
             }
-            // Deserialize
             try (ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(payload))) {
-                // Directly deserialize without ObjectInputFilter
                 try {
                     Object obj = ois.readObject();
                     return type.cast(obj);
                 } catch (Throwable deserialiseProblem) {
-                    if (deserialiseProblem instanceof IOException) throw (IOException) deserialiseProblem;
-                    if (deserialiseProblem instanceof ClassNotFoundException) throw (ClassNotFoundException) deserialiseProblem;
+                    if (deserialiseProblem instanceof IOException) {
+                        throw (IOException) deserialiseProblem;
+                    }
+                    if (deserialiseProblem instanceof ClassNotFoundException) {
+                        throw (ClassNotFoundException) deserialiseProblem;
+                    }
                     throw new IOException(deserialiseProblem);
                 }
             }
@@ -153,11 +686,9 @@ public final class ExternalProcessExecutor {
                 oos.writeObject(obj);
             }
             byte[] payload = bos.toByteArray();
-            java.util.zip.CRC32 crc = new java.util.zip.CRC32();
+            CRC32 crc = new CRC32();
             crc.update(payload);
             int crc32 = (int) crc.getValue();
-            // Write header + payload + crc
-            // Note: deliberately not wrapping with DataOutputStream to avoid accidentally writing Java serialization headers
             IPC.writeLong(out, MAGIC);
             out.write((byte) (VERSION & 0xFF));
             IPC.writeInt(out, payload.length);
@@ -223,345 +754,17 @@ public final class ExternalProcessExecutor {
 
     }
 
-    static final class ProcessTask<T> implements Future<T>, Runnable {
-
-        private static void destroyProcessTree(final Process proc) {
-            try {
-                // Destroy all descendants first, then the process itself
-                ProcessHandle handle = proc.toHandle();
-                handle.descendants().forEach(ph -> {
-                    try {
-                        ph.destroyForcibly();
-                    } catch (Throwable ignore) {
-                    }
-                });
-                handle.destroyForcibly();
-            } catch (Throwable ignore) {
-                try {
-                    proc.destroyForcibly();
-                } catch (Throwable ignore2) {
-                }
-            }
-        }
-
-        private final Object[] myArguments;
-        private final AtomicBoolean myCancelled = new AtomicBoolean(false);
-        private final AtomicBoolean myDone = new AtomicBoolean(false);
-        private volatile Throwable myError;
-        private final Object myLock = new Object();
-        private final MethodDescriptor myMethod;
-        private final ProcessOptions myOptions;
-        private volatile Process myProcess;
-
-        private volatile T myResult;
-
-        ProcessTask(final MethodDescriptor spec, final Object[] args, final ProcessOptions opts) {
-            myMethod = spec;
-            myArguments = args;
-            myOptions = opts;
-        }
-
-        @Override
-        public boolean cancel(final boolean mayInterruptIfRunning) {
-            if (myDone.get()) {
-                return false;
-            }
-            myCancelled.set(true);
-            if (myProcess != null) {
-                try {
-                    ProcessTask.destroyProcessTree(myProcess);
-                } catch (Throwable ignore) {
-                }
-            }
-            synchronized (myLock) {
-                myDone.set(true);
-                myLock.notifyAll();
-            }
-            return true;
-        }
-
-        @Override
-        public T get() throws InterruptedException, ExecutionException {
-            synchronized (myLock) {
-                while (!myDone.get()) {
-                    myLock.wait();
-                }
-            }
-            if (myCancelled.get()) {
-                throw new CancellationException();
-            }
-            if (myError != null) {
-                throw new ExecutionException(myError);
-            }
-            return myResult;
-        }
-
-        @Override
-        public T get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-            // Use monotonic clock for relative timeout calculations
-            long timeoutNanos = Math.max(1L, unit.toNanos(timeout));
-            long deadline = System.nanoTime() + timeoutNanos;
-            synchronized (myLock) {
-                while (!myDone.get()) {
-                    long remaining = deadline - System.nanoTime();
-                    if (remaining <= 0L) {
-                        break;
-                    }
-                    long millis = remaining / 1_000_000L;
-                    int nanos = (int) (remaining - millis * 1_000_000L);
-                    myLock.wait(millis, nanos);
-                }
-            }
-            if (!myDone.get()) {
-                throw new TimeoutException();
-            }
-            if (myCancelled.get()) {
-                throw new CancellationException();
-            }
-            if (myError != null) {
-                throw new ExecutionException(myError);
-            }
-            return myResult;
-        }
-
-        @Override
-        public boolean isCancelled() {
-            return myCancelled.get();
-        }
-
-        @Override
-        public boolean isDone() {
-            return myDone.get();
-        }
-
-        @Override
-        public void run() {
-            List<String> cmd = new ArrayList<>();
-            String javaBin = System.getProperty("java.home") + "/bin/java";
-            cmd.add(javaBin);
-            if (myOptions.xmx != null) {
-                cmd.add("-Xmx" + myOptions.xmx);
-            }
-            if (myOptions.enableNativeAccessAllUnnamed) {
-                cmd.add("--enable-native-access=ALL-UNNAMED");
-            }
-            if (myOptions.systemProperties != null) {
-                for (Map.Entry<String, String> e : myOptions.systemProperties.entrySet()) {
-                    cmd.add("-D" + e.getKey() + "=" + e.getValue());
-                }
-            }
-            if (myOptions.jvmArgs != null && !myOptions.jvmArgs.isEmpty()) {
-                cmd.addAll(myOptions.jvmArgs);
-            }
-            cmd.add("-cp");
-            String testCp = System.getProperty("surefire.test.class.path");
-            String mainCp = System.getProperty("java.class.path");
-            String pathSep = File.pathSeparator;
-            String effectiveCp;
-            if (myOptions.classpath != null && !myOptions.classpath.isEmpty()) {
-                effectiveCp = myOptions.classpath;
-            } else if (testCp != null && !testCp.isEmpty()) {
-                // Combine test and main classpaths to be safe
-                effectiveCp = mainCp != null && !mainCp.isEmpty() ? (testCp + pathSep + mainCp) : testCp;
-            } else {
-                effectiveCp = mainCp;
-            }
-            // Try to include local build output dirs when running outside Surefire/Gradle
-            try {
-                String userDir = System.getProperty("user.dir");
-                List<String> candidates = new ArrayList<>(8);
-                // Maven
-                candidates.add(userDir + File.separator + "target" + File.separator + "test-classes");
-                candidates.add(userDir + File.separator + "target" + File.separator + "classes");
-                // Gradle
-                candidates.add(userDir + File.separator + "build" + File.separator + "classes" + File.separator + "java" + File.separator + "test");
-                candidates.add(userDir + File.separator + "build" + File.separator + "classes" + File.separator + "java" + File.separator + "main");
-                StringBuilder sb = new StringBuilder(effectiveCp == null ? 64 : effectiveCp.length() + 128);
-                boolean any = false;
-                for (String c : candidates) {
-                    File f = new File(c);
-                    if (f.isDirectory() && f.exists()) {
-                        if (!any) {
-                            any = true;
-                        }
-                        sb.append(f.getAbsolutePath()).append(pathSep);
-                    }
-                }
-                if (effectiveCp != null && !effectiveCp.isEmpty()) {
-                    sb.append(effectiveCp);
-                }
-                String alt = sb.toString();
-                if (any) {
-                    effectiveCp = alt;
-                }
-            } catch (Throwable ignore) {
-            }
-            try {
-                java.net.URL loc = ProcessWorker.class.getProtectionDomain().getCodeSource().getLocation();
-                if (loc != null) {
-                    String workerPath = new java.io.File(loc.toURI()).getAbsolutePath();
-                    if (effectiveCp == null || effectiveCp.isEmpty()) {
-                        effectiveCp = workerPath;
-                    } else if (!effectiveCp.contains(workerPath)) {
-                        effectiveCp = workerPath + pathSep + effectiveCp;
-                    }
-                }
-            } catch (Throwable ignore) {
-            }
-            cmd.add(effectiveCp);
-            cmd.add("org.ojalgo.concurrent.ProcessWorker");
-
-            ProcessBuilder pb = new ProcessBuilder(cmd);
-            if (myOptions.env != null) {
-                pb.environment().putAll(myOptions.env);
-            }
-
-            final StringBuilder stderrBuf = new StringBuilder(1024);
-            try {
-                myProcess = pb.start();
-                // Bind this process to the executing thread so an interrupt kills it
-                Thread t = Thread.currentThread();
-                if (t instanceof ProcessAwareThread) {
-                    ((ProcessAwareThread) t).setProcess(myProcess);
-                }
-
-                // Watchdog for timeout
-                final Thread watchdog;
-                if (!myOptions.timeout.isZero() && myOptions.timeout.compareTo(Duration.ZERO) > 0) {
-                    watchdog = DaemonPoolExecutor.newThreadFactory("ojAlgo-proc-watchdog").newThread(() -> {
-                        try {
-                            long millis = Math.max(1L, myOptions.timeout.toMillis());
-                            boolean finished = myProcess.waitFor(millis, TimeUnit.MILLISECONDS);
-                            if (!finished) {
-                                ProcessTask.destroyProcessTree(myProcess);
-                            }
-                        } catch (InterruptedException ignore) {
-                            Thread.currentThread().interrupt();
-                        }
-                    });
-                    watchdog.start();
-                } else {
-                    watchdog = null;
-                }
-
-                // Send request
-                OutputStream childIn = myProcess.getOutputStream();
-                IPC.writeFrame(childIn, new ProcessRequest(myMethod, myArguments));
-                childIn.flush();
-                childIn.close();
-
-                // Drain stderr asynchronously to avoid pipe blocking and capture it
-                final InputStream childErr = myProcess.getErrorStream();
-                Thread errDrainer = DaemonPoolExecutor.newThreadFactory("ojAlgo-proc-stderr").newThread(() -> {
-                    // Capture up to 64 KiB to avoid unbounded growth
-                    final int MAX_BYTES = 64 * 1024;
-                    final ByteArrayOutputStream baos = new ByteArrayOutputStream(Math.min(4096, MAX_BYTES));
-                    final OutputStream capped = new OutputStream() {
-                        private int written = 0;
-
-                        @Override
-                        public void close() throws IOException {
-                            baos.close();
-                        }
-
-                        @Override
-                        public void flush() throws IOException {
-                            baos.flush();
-                        }
-
-                        @Override
-                        public void write(final byte[] b, final int off, final int len) throws IOException {
-                            int toWrite = Math.min(len, Math.max(0, MAX_BYTES - written));
-                            if (toWrite > 0) {
-                                baos.write(b, off, toWrite);
-                                written += toWrite;
-                            }
-                        }
-
-                        @Override
-                        public void write(final int b) throws IOException {
-                            if (written < MAX_BYTES) {
-                                baos.write(b);
-                                written++;
-                            }
-                        }
-                    };
-                    try {
-                        childErr.transferTo(capped);
-                    } catch (IOException ignore) {
-                    } finally {
-                        try {
-                            capped.close();
-                        } catch (IOException ignore) {
-                        }
-                        try {
-                            childErr.close();
-                        } catch (IOException ignore) {
-                        }
-                        synchronized (stderrBuf) {
-                            stderrBuf.append(new String(baos.toByteArray()));
-                        }
-                    }
-                });
-                errDrainer.start();
-
-                // Read response (blocks until child writes)
-                ProcessResponse resp = IPC.readFrame(myProcess.getInputStream(), ProcessResponse.class);
-
-                if (resp.error != null) {
-                    myError = resp.error;
-                } else {
-                    Object value = resp.result;
-                    if (value == null) {
-                        myResult = null;
-                    } else {
-                        myResult = (T) JavaType.box(myMethod.getMethod().getReturnType()).cast(value);
-                    }
-                }
-
-                // Ensure process exit
-                try {
-                    myProcess.waitFor(100, TimeUnit.MILLISECONDS);
-                } catch (InterruptedException ignore) {
-                    Thread.currentThread().interrupt();
-                }
-
-            } catch (Throwable t) {
-                // If cancelled, prefer cancellation outcome
-                if (!myCancelled.get()) {
-                    String msg;
-                    synchronized (stderrBuf) {
-                        msg = stderrBuf.toString();
-                    }
-                    myError = msg.isEmpty() ? t : new IOException(t.getMessage() + " | child-stderr: " + msg, t);
-                }
-            } finally {
-                if (myProcess != null && myProcess.isAlive()) {
-                    try {
-                        ProcessTask.destroyProcessTree(myProcess);
-                    } catch (Throwable ignore) {
-                    }
-                }
-                // Clear any binding if present
-                Thread t = Thread.currentThread();
-                if (t instanceof ProcessAwareThread) {
-                    ((ProcessAwareThread) t).setProcess(null);
-                }
-                synchronized (myLock) {
-                    myDone.set(true);
-                    myLock.notifyAll();
-                }
-            }
-        }
-
-        ProcessTask<T> start(final ExecutorService executor) {
-            executor.submit(this);
-            return this;
-        }
-    }
-
     public static ExternalProcessExecutor newInstance() {
         return new ExternalProcessExecutor(Executors.newCachedThreadPool(DaemonPoolExecutor.newProcessAwareThreadFactory("external-process-executor")));
+    }
+
+    /**
+     * Create an executor backed by a fixed-size pool. The pool size effectively caps the number of persistent
+     * worker processes running concurrently.
+     */
+    public static ExternalProcessExecutor newInstance(final int nThreads) {
+        return new ExternalProcessExecutor(
+                Executors.newFixedThreadPool(nThreads, DaemonPoolExecutor.newProcessAwareThreadFactory("external-process-executor")));
     }
 
     private final ExecutorService myExecutorService;
