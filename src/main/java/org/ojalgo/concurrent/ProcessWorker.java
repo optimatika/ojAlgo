@@ -29,12 +29,11 @@ import java.util.concurrent.Callable;
 import org.ojalgo.concurrent.ExternalProcessExecutor.IPC;
 import org.ojalgo.concurrent.ExternalProcessExecutor.ProcessRequest;
 import org.ojalgo.concurrent.ExternalProcessExecutor.ProcessResponse;
-import org.ojalgo.netio.BasicLogger;
 
 /**
- * Child JVM entrypoint. Reads a single ProcessRequest from stdin, invokes the specified method via
- * reflection, and writes a ProcessResponse to stdout. Stdout is reserved for IPC. Any normal System.out
- * printing is redirected to stderr to avoid corrupting the binary protocol.
+ * Child JVM entrypoint. Reads {@link ProcessRequest}s from stdin, invokes the specified method via
+ * reflection, and writes a {@link ProcessResponse} to stdout for each request. Stdout is reserved for IPC.
+ * Any normal System.out printing is redirected to stderr to avoid corrupting the binary protocol.
  */
 public abstract class ProcessWorker {
 
@@ -51,20 +50,26 @@ public abstract class ProcessWorker {
         }
 
         try {
-
-            ProcessRequest request = IPC.readFrame(inputIPC, ProcessRequest.class);
-            Object result = null;
-            Throwable error = null;
-            try {
-                result = request.invoke();
-            } catch (Throwable problem) {
-                error = problem;
+            // Serve multiple requests until EOF or fatal error
+            while (true) {
+                ProcessRequest request;
+                try {
+                    request = IPC.readFrame(inputIPC, ProcessRequest.class);
+                } catch (java.io.EOFException eof) {
+                    // Normal shutdown when parent closes stdin
+                    break;
+                }
+                Object result = null;
+                Throwable error = null;
+                try {
+                    result = request.invoke();
+                } catch (Throwable problem) {
+                    error = problem;
+                }
+                IPC.writeFrame(outputIPC, error == null ? ProcessResponse.ok(result) : ProcessResponse.fail(error));
+                outputIPC.flush();
             }
-            IPC.writeFrame(outputIPC, error == null ? ProcessResponse.ok(result) : ProcessResponse.fail(error));
-            outputIPC.flush();
-
         } catch (Throwable problem) {
-
             try {
                 IPC.writeFrame(outputIPC, ProcessResponse.fail(problem));
                 outputIPC.flush();
@@ -78,13 +83,8 @@ public abstract class ProcessWorker {
         System.exit(0);
     }
 
-    static <T, C extends Callable<T> & Serializable> T call(final C callable) {
-        try {
-            return callable.call();
-        } catch (Exception cause) {
-            BasicLogger.error(cause, "Callable failed!");
-            return null;
-        }
+    static <T, C extends Callable<T> & Serializable> T call(final C callable) throws Exception {
+        return callable.call();
     }
 
     static <R extends Runnable & Serializable> void run(final R runnable) {
