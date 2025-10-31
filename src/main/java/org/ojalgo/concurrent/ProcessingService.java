@@ -34,6 +34,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedTransferQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -198,6 +199,33 @@ public final class ProcessingService {
         return new DivideAndConquer.Divider(myExecutor);
     }
 
+    public <T> AtomicBoolean poll(final BlockingQueue<T> queue, final int parallelism, final Consumer<T> processor) {
+
+        AtomicBoolean active = new AtomicBoolean(true);
+
+        for (int i = 0; i < parallelism; i++) {
+            myExecutor.submit(() -> {
+                while (active.get()) {
+                    try {
+                        T item = queue.poll(100L, TimeUnit.MILLISECONDS);
+                        if (item != null) {
+                            processor.accept(item);
+                        }
+                    } catch (InterruptedException cause) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+                }
+            });
+        }
+
+        return active;
+    }
+
+    public <T> AtomicBoolean poll(final BlockingQueue<T> queue, final IntSupplier parallelism, final Consumer<T> processor) {
+        return this.poll(queue, parallelism.getAsInt(), processor);
+    }
+
     /**
      * Using parallelism {@link Parallelism#CORES}.
      *
@@ -228,14 +256,25 @@ public final class ProcessingService {
         }
 
         try {
-            for (Future<Boolean> future : myExecutor.invokeAll(tasks)) {
-                future.get();
+            List<Future<Boolean>> futures = myExecutor.invokeAll(tasks);
+            for (int i = 0; i < concurrency; i++) {
+                try {
+                    futures.get(i).get();
+                } catch (InterruptedException | ExecutionException cause) {
+                    for (int j = 0; j < concurrency; j++) {
+                        if (j != i) {
+                            futures.get(j).cancel(true);
+                        }
+                    }
+                    if (cause instanceof InterruptedException) {
+                        Thread.currentThread().interrupt();
+                    }
+                    throw new RuntimeException(cause);
+                }
             }
-        } catch (InterruptedException | ExecutionException cause) {
-            if (cause instanceof InterruptedException) {
-                Thread.currentThread().interrupt();
-            }
-            throw new RuntimeException(cause);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
         }
     }
 
@@ -319,16 +358,27 @@ public final class ProcessingService {
         A totalResults = reducer.get();
 
         try {
-            for (Future<TwoStepMapper<W, R>> future : myExecutor.invokeAll(tasks)) {
-                A partialResults = (A) future.get();
-                totalResults.combine(partialResults);
-                partialResults.reset();
+            List<Future<TwoStepMapper<W, R>>> futures = myExecutor.invokeAll(tasks);
+            for (int i = 0; i < concurrency; i++) {
+                try {
+                    A partialResults = (A) futures.get(i).get();
+                    totalResults.combine(partialResults);
+                    partialResults.reset();
+                } catch (InterruptedException | ExecutionException cause) {
+                    for (int j = 0; j < concurrency; j++) {
+                        if (j != i) {
+                            futures.get(j).cancel(true);
+                        }
+                    }
+                    if (cause instanceof InterruptedException) {
+                        Thread.currentThread().interrupt();
+                    }
+                    throw new RuntimeException(cause);
+                }
             }
-        } catch (InterruptedException | ExecutionException cause) {
-            if (cause instanceof InterruptedException) {
-                Thread.currentThread().interrupt();
-            }
-            throw new RuntimeException(cause);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
         }
 
         return totalResults.getResults();
@@ -378,16 +428,27 @@ public final class ProcessingService {
         A totalResults = reducer.get();
 
         try {
-            for (Future<TwoStepMapper<W, R>> future : myExecutor.invokeAll(tasks)) {
-                TwoStepMapper<W, R> partialResults = future.get();
-                totalResults.merge(partialResults.getResults());
-                partialResults.reset();
+            List<Future<TwoStepMapper<W, R>>> futures = myExecutor.invokeAll(tasks);
+            for (int i = 0; i < concurrency; i++) {
+                try {
+                    TwoStepMapper<W, R> partialResults = futures.get(i).get();
+                    totalResults.merge(partialResults.getResults());
+                    partialResults.reset();
+                } catch (InterruptedException | ExecutionException cause) {
+                    for (int j = 0; j < concurrency; j++) {
+                        if (j != i) {
+                            futures.get(j).cancel(true);
+                        }
+                    }
+                    if (cause instanceof InterruptedException) {
+                        Thread.currentThread().interrupt();
+                    }
+                    throw new RuntimeException(cause);
+                }
             }
-        } catch (InterruptedException | ExecutionException cause) {
-            if (cause instanceof InterruptedException) {
-                Thread.currentThread().interrupt();
-            }
-            throw new RuntimeException(cause);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
         }
 
         return totalResults.getResults();
@@ -424,14 +485,25 @@ public final class ProcessingService {
         }
 
         try {
-            for (Future<Object> future : myExecutor.invokeAll(tasks)) {
-                future.get();
+            List<Future<Object>> futures = myExecutor.invokeAll(tasks);
+            for (int i = 0; i < parallelism; i++) {
+                try {
+                    futures.get(i).get();
+                } catch (InterruptedException | ExecutionException cause) {
+                    for (int j = 0; j < parallelism; j++) {
+                        if (j != i) {
+                            futures.get(j).cancel(true);
+                        }
+                    }
+                    if (cause instanceof InterruptedException) {
+                        Thread.currentThread().interrupt();
+                    }
+                    throw new RuntimeException(cause);
+                }
             }
-        } catch (InterruptedException | ExecutionException cause) {
-            if (cause instanceof InterruptedException) {
-                Thread.currentThread().interrupt();
-            }
-            throw new RuntimeException(cause);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
         }
     }
 
@@ -451,6 +523,8 @@ public final class ProcessingService {
             future1.get();
             future2.get();
         } catch (InterruptedException | ExecutionException cause) {
+            future1.cancel(true);
+            future2.cancel(true);
             if (cause instanceof InterruptedException) {
                 Thread.currentThread().interrupt();
             }
@@ -466,6 +540,10 @@ public final class ProcessingService {
      * If the threads of the underlying {@link ExecutorService} are daemon threads, the JVM will not wait for
      * them to finish before it exits. The default behaviour, using {@link #INSTANCE} or
      * {@link #newInstance(String)}, is to make use of ojAlgo's {@link DaemonPoolExecutor}.
+     * <p>
+     * Although the method name is {@code take}, it is using {@link BlockingQueue#poll(long, TimeUnit)}
+     * internally. This is to ensure that the tasks periodically check the {@link AtomicBoolean} flag, and can
+     * be terminated.
      *
      * @param <T>         The work item type
      * @param queue       The queue to take from
@@ -473,14 +551,11 @@ public final class ProcessingService {
      * @param processor   What to do with each of the work items
      * @return A flag that can be used to signal the tasks to stop
      */
-    @SuppressWarnings("unused")
-    public <T> AtomicBoolean take(final BlockingQueue<T> queue, final int parallelism, final Consumer<T> processor) {
-
-        AtomicBoolean active = new AtomicBoolean(true);
+    public <T> void take(final BlockingQueue<T> queue, final int parallelism, final Consumer<T> processor) {
 
         for (int i = 0; i < parallelism; i++) {
             myExecutor.submit(() -> {
-                while (active.get()) {
+                while (true) {
                     try {
                         processor.accept(queue.take());
                     } catch (InterruptedException cause) {
@@ -490,15 +565,13 @@ public final class ProcessingService {
                 }
             });
         }
-
-        return active;
     }
 
     /**
      * @see ProcessingService#take(BlockingQueue, int, Consumer)
      */
-    public <T> AtomicBoolean take(final BlockingQueue<T> queue, final IntSupplier parallelism, final Consumer<T> processor) {
-        return this.take(queue, parallelism.getAsInt(), processor);
+    public <T> void take(final BlockingQueue<T> queue, final IntSupplier parallelism, final Consumer<T> processor) {
+        this.take(queue, parallelism.getAsInt(), processor);
     }
 
 }

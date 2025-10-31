@@ -70,7 +70,6 @@ public abstract class ProcessWorker {
                 IPC.writeFrame(outputIPC, ProcessResponse.fail(problem));
                 outputIPC.flush();
             } catch (Throwable ignore) {
-                // ignored
             }
             System.exit(2);
             return;

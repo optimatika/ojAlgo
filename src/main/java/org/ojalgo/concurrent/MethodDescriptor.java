@@ -23,6 +23,7 @@ package org.ojalgo.concurrent;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Objects;
 
 import org.ojalgo.machine.JavaType;
@@ -50,9 +51,14 @@ public final class MethodDescriptor implements Serializable {
      * Create a descriptor from a reflective {@link Method}. Parameter types are taken as declared (including
      * varargs represented as an array type). The return type is intentionally not included as it is not used
      * for reflective lookup.
+     * <p>
+     * The method must be {@code static} when used with {@link ExternalProcessExecutor}.
      */
     public static MethodDescriptor of(final Method method) {
         Objects.requireNonNull(method);
+        if (!Modifier.isStatic(method.getModifiers())) {
+            throw new IllegalArgumentException("Method must be static: " + method);
+        }
         return MethodDescriptor.of(method.getDeclaringClass(), method.getName(), method.getParameterTypes());
     }
 

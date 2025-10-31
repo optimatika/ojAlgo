@@ -350,20 +350,19 @@ public final class ExternalProcessExecutor {
             if (options.jvmArgs != null && !options.jvmArgs.isEmpty()) {
                 cmd.addAll(options.jvmArgs);
             }
-            cmd.add("-cp");
+
             String testCp = System.getProperty("surefire.test.class.path");
             String mainCp = System.getProperty("java.class.path");
             String pathSep = File.pathSeparator;
-            String effectiveCp;
+            String effectiveCp = null;
             if (options.classpath != null && !options.classpath.isEmpty()) {
                 effectiveCp = options.classpath;
             } else if (testCp != null && !testCp.isEmpty()) {
                 effectiveCp = testCp;
             } else if (mainCp != null && !mainCp.isEmpty()) {
                 effectiveCp = mainCp;
-            } else {
-                effectiveCp = null;
             }
+
             if ((testCp == null || testCp.isEmpty())) {
                 try {
                     String userDir = System.getProperty("user.dir");
@@ -377,22 +376,21 @@ public final class ExternalProcessExecutor {
                     for (String c : candidates) {
                         File f = new File(c);
                         if (f.isDirectory() && f.exists()) {
-                            if (!any) {
-                                any = true;
-                            }
+                            any = true;
                             sb.append(f.getAbsolutePath()).append(pathSep);
                         }
                     }
                     if (effectiveCp != null && !effectiveCp.isEmpty()) {
                         sb.append(effectiveCp);
+                        any = true;
                     }
-                    String alt = sb.toString();
                     if (any) {
-                        effectiveCp = alt;
+                        effectiveCp = sb.toString();
                     }
                 } catch (Throwable ignore) {
                 }
             }
+
             try {
                 java.net.URL loc = ProcessWorker.class.getProtectionDomain().getCodeSource().getLocation();
                 if (loc != null) {
@@ -405,6 +403,14 @@ public final class ExternalProcessExecutor {
                 }
             } catch (Throwable ignore) {
             }
+            if (effectiveCp == null || effectiveCp.isEmpty()) {
+
+                effectiveCp = System.getProperty("java.class.path");
+                if (effectiveCp == null || effectiveCp.isEmpty()) {
+                    effectiveCp = ".";
+                }
+            }
+            cmd.add("-cp");
             cmd.add(effectiveCp);
             cmd.add("org.ojalgo.concurrent.ProcessWorker");
 
@@ -442,24 +448,20 @@ public final class ExternalProcessExecutor {
             });
             errDrainer.start();
 
-            return new WorkerChannel(effectiveCp, options, owner, proc, toChild, fromChild, childErr, errDrainer, errBuf);
+            return new WorkerChannel(options, owner, proc, toChild, fromChild, childErr, errDrainer, errBuf);
         }
 
         private InputStream myChildErr;
-        private final String myEffectiveClasspath;
         private final RingBufferOutput myErrBuffer;
         private Thread myErrDrainer;
         private InputStream myFromChild;
         private final ProcessOptions myOptions;
         private final Thread myOwnerThread;
-
         private Process myProcess;
-
         private OutputStream myToChild;
 
-        private WorkerChannel(final String effectiveCp, final ProcessOptions options, final Thread owner, final Process proc, final OutputStream toChild,
-                final InputStream fromChild, final InputStream err, final Thread errDrainer, final RingBufferOutput errBuffer) {
-            myEffectiveClasspath = effectiveCp;
+        private WorkerChannel(final ProcessOptions options, final Thread owner, final Process proc, final OutputStream toChild, final InputStream fromChild,
+                final InputStream err, final Thread errDrainer, final RingBufferOutput errBuffer) {
             myOptions = options;
             myOwnerThread = owner;
             myProcess = proc;
@@ -530,7 +532,6 @@ public final class ExternalProcessExecutor {
             if (!this.isAlive()) {
                 throw new IOException("Worker process not alive");
             }
-            // Send request
             IPC.writeFrame(myToChild, req);
             myToChild.flush();
 
@@ -575,16 +576,36 @@ public final class ExternalProcessExecutor {
                 throw new TimeoutException("External process request timed out");
             }
             if (readError != null) {
-                if (readError instanceof EOFException) {
-                    throw new IOException("Child process terminated unexpectedly");
-                }
                 if (readError instanceof ClassNotFoundException) {
                     throw (ClassNotFoundException) readError;
                 }
-                if (readError instanceof IOException) {
-                    throw (IOException) readError;
+                StringBuilder msg = new StringBuilder();
+                msg.append("IPC failure");
+                if (readError instanceof EOFException) {
+                    msg.append(": child process terminated unexpectedly");
                 }
-                throw new IOException(readError);
+
+                Integer exit = null;
+                try {
+                    if (!myProcess.isAlive()) {
+                        exit = myProcess.exitValue();
+                    }
+                } catch (Throwable ignore) {
+                }
+                String stderrTail = null;
+                try {
+                    stderrTail = this.getCapturedStderr();
+                } catch (Throwable ignore) {
+                }
+                if (exit != null) {
+                    msg.append(" | exit=").append(exit);
+                }
+                if (stderrTail != null && !stderrTail.isEmpty()) {
+                    msg.append(" | child-stderr: ").append(stderrTail);
+                }
+                if (readError instanceof IOException) {
+                }
+                throw new IOException(msg.toString(), readError);
             }
             return resp;
         }
@@ -597,8 +618,8 @@ public final class ExternalProcessExecutor {
      */
     static abstract class IPC {
 
-        private static final long MAGIC = 0x6F4A414C474F4950L; // ASCII-ish: 'oJALGOIP'
-        private static final int MAX_FRAME_SIZE = 64 * 1024 * 1024; // 64 MiB safety cap
+        private static final long MAGIC = 0x6F4A414C474F4950L;
+        private static final int MAX_FRAME_SIZE = 64 * 1024 * 1024;
         private static final int VERSION = 1;
 
         private static void readFully(final InputStream in, final byte[] buf, final int off, final int len) throws IOException {
@@ -744,7 +765,6 @@ public final class ExternalProcessExecutor {
         }
 
         final Throwable error;
-
         final Object result;
 
         ProcessResponse(final Object result, final Throwable error) {
