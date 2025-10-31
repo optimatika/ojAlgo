@@ -155,11 +155,11 @@ public final class ProcessOptions implements Serializable {
 
     public final String classpath;
     public final boolean enableNativeAccessAllUnnamed;
-    public final Map<String, String> env; // unmodifiable
-    public final List<String> jvmArgs; // unmodifiable
-    public final Map<String, String> systemProperties; // unmodifiable
-    public final Duration timeout; // zero => no timeout
-    public final String xmx; // nullable
+    public final Map<String, String> env;
+    public final List<String> jvmArgs;
+    public final Map<String, String> systemProperties;
+    public final Duration timeout;
+    public final String xmx;
 
     private ProcessOptions(final List<String> jvmArgs, final Map<String, String> env, final Duration timeout, final String classpath, final String xmx,
             final boolean enableNativeAccessAllUnnamed, final Map<String, String> systemProperties) {
