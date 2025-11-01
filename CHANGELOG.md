@@ -24,7 +24,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Spectral decomposition: New `Eigenvalue.Spectral` interface (extends both `Eigenvalue` and `SingularValue`) and factory convenience `Eigenvalue.Factory#makeSpectral(int)` for normal (in particular symmetric / Hermitian) matrices, exposing a decomposition that can simultaneously be treated as an eigenvalue- and singular value decomposition. Includes `isSPD()` convenience check.
 - Static utility helpers: `Eigenvalue.reconstruct(Eigenvalue)` plus `SingularValue.invert(...)`, `SingularValue.solve(...)` and `SingularValue.reconstruct(...)` centralise pseudoinverse / solve / reconstruction logic.
-- New Quasi-Minimal Residual (QMR) iterative solver for general nonsymmetric square systems. Contributed by @Programmer-Magnus.
+- New Quasi-Minimal Residual (QMR) and Minimal Residual (MINRES) iterative solvers for general nonsymmetric square and symmetric (possibly indefinite) systems, respectively. Contributed by @Programmer-Magnus.
 
 #### org.ojalgo.concurrent
 
