@@ -67,7 +67,7 @@ import org.ojalgo.type.math.MathType;
  */
 public final class R064Store extends ArrayR064 implements PhysicalStore<Double>, DecompositionStore<Double>, Factory2D.Builder<R064Store> {
 
-    public static final PhysicalStore.Factory<Double, R064Store> FACTORY = new PrimitiveFactory<>() {
+    public static final PrimitiveFactory<R064Store> FACTORY = new PrimitiveFactory<>() {
 
         @Override
         public R064Store copy(final Access2D<?> source) {

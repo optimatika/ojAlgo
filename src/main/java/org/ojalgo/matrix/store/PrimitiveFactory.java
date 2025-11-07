@@ -34,7 +34,7 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Factory2D;
 
-abstract class PrimitiveFactory<I extends PhysicalStore<Double> & Factory2D.Builder<I>> implements PhysicalStore.Factory<Double, I> {
+public abstract class PrimitiveFactory<I extends PhysicalStore<Double> & Factory2D.Builder<I>> implements PhysicalStore.Factory<Double, I> {
 
     @Override
     public final AggregatorSet<Double> aggregator() {

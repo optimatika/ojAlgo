@@ -11,6 +11,14 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [56.1.1] – 2025-11-09
+
+### Added
+
+#### org.ojalgo.matrix
+
+- There was a problem with `GenericStore` factory type declarations and usage.
+
 ## [56.1.0] – 2025-11-04
 
 ### Added

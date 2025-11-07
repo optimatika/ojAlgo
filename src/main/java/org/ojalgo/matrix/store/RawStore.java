@@ -47,6 +47,7 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Mutate1D;
+import org.ojalgo.structure.Primitive1D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.math.MathType;
@@ -58,7 +59,7 @@ import org.ojalgo.type.math.MathType;
  */
 public final class RawStore implements PhysicalStore<Double>, Factory2D.Builder<RawStore> {
 
-    public static final PhysicalStore.Factory<Double, RawStore> FACTORY = new PrimitiveFactory<>() {
+    public static final PrimitiveFactory<RawStore> FACTORY = new PrimitiveFactory<>() {
 
         @Override
         public RawStore copy(final Access2D<?> source) {
@@ -671,7 +672,7 @@ public final class RawStore implements PhysicalStore<Double>, Factory2D.Builder<
 
     @Override
     public Access1D<Double> sliceRow(final long row) {
-        return Access1D.wrap(data[Math.toIntExact(row)]);
+        return Primitive1D.of(data[Math.toIntExact(row)]);
     }
 
     @Override

@@ -69,7 +69,7 @@ import org.ojalgo.type.math.MathType;
 public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
         implements PhysicalStore<N>, DecompositionStore<N>, Factory2D.Builder<GenericStore<N>> {
 
-    static final class Factory<N extends Scalar<N>> implements PhysicalStore.Factory<N, GenericStore<N>> {
+    public static final class Factory<N extends Scalar<N>> implements PhysicalStore.Factory<N, GenericStore<N>> {
 
         private final ScalarArray.Factory<N> myDenseArrayFactory;
 
@@ -215,10 +215,10 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
 
     }
 
-    public static final PhysicalStore.Factory<ComplexNumber, GenericStore<ComplexNumber>> C128 = new GenericStore.Factory<>(ArrayC128.FACTORY);
-    public static final PhysicalStore.Factory<Quaternion, GenericStore<Quaternion>> H256 = new GenericStore.Factory<>(ArrayH256.FACTORY);
-    public static final PhysicalStore.Factory<RationalNumber, GenericStore<RationalNumber>> Q128 = new GenericStore.Factory<>(ArrayQ128.FACTORY);
-    public static final PhysicalStore.Factory<Quadruple, GenericStore<Quadruple>> R128 = new GenericStore.Factory<>(ArrayR128.FACTORY);
+    public static final GenericStore.Factory<ComplexNumber> C128 = new GenericStore.Factory<>(ArrayC128.FACTORY);
+    public static final GenericStore.Factory<Quaternion> H256 = new GenericStore.Factory<>(ArrayH256.FACTORY);
+    public static final GenericStore.Factory<RationalNumber> Q128 = new GenericStore.Factory<>(ArrayQ128.FACTORY);
+    public static final GenericStore.Factory<Quadruple> R128 = new GenericStore.Factory<>(ArrayR128.FACTORY);
 
     public static <N extends Scalar<N>> GenericStore<N> wrap(final GenericStore.Factory<N> factory, final N... data) {
         return new GenericStore<>(factory, data.length, 1, data);
