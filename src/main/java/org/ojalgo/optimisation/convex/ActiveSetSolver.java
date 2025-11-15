@@ -155,9 +155,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                         if (stepLength == ZERO) {
                             break;
                         }
-                        if (stepLength == ZERO) {
-                            break;
-                        }
                     }
                 }
             }
