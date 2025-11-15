@@ -76,35 +76,61 @@ final class IterativeASS extends ActiveSetSolver {
         }
 
         void add(final int j, final Access1D<Double> column, final double rhs) {
-
             int[] incl = IterativeASS.this.getIncluded();
-
             Equation tmpNewRow = Equation.wrap(myEquationBodyPool.borrow(), j, rhs);
             myIterationRows[j] = tmpNewRow;
             this.add(tmpNewRow);
 
+            // Compute the diagonal value for the new row j: a_j · (invQ * a_j^T)
+            double diagJ;
+            if (j < myCountE) {
+                diagJ = IterativeASS.this.getMatrixAE(j).dot(column);
+            } else {
+                int ineqIndex = j - myCountE;
+                int aiRow = (ineqIndex < incl.length) ? incl[ineqIndex] : -1;
+                diagJ = aiRow >= 0 ? IterativeASS.this.getMatrixAI(aiRow).dot(column) : 0.0;
+            }
+            if (Double.isFinite(diagJ) && diagJ > mySchurDiagMax) mySchurDiagMax = diagJ;
+            if (Double.isFinite(diagJ) && diagJ > 0.0 && diagJ < mySchurDiagMin) mySchurDiagMin = diagJ;
+
+            // Possibly increase rho based on updated diag stats
+            double rhoNew = DualRegularisation.strategy().compute(mySchurDiagMax, mySchurDiagMin, myFullDim, options.convex().isExtendedPrecision(), IterativeASS.this.isZeroQ());
+            if (rhoNew > mySchurRho) {
+                double delta = rhoNew - mySchurRho;
+                // Bump existing diagonals to keep uniform +rho across the Schur
+                for (int i = 0; i < myIterationRows.length; i++) {
+                    Equation row = myIterationRows[i];
+                    if (row != null && i != j) {
+                        double current = row.get(i);
+                        row.set(i, current + delta);
+                    }
+                }
+                mySchurRho = rhoNew;
+            }
+
+            boolean apply = mySchurRho != 0.0;
+            if (apply) DualRegMetrics.recordSchur(mySchurRho);
+
+            // Fill row/column j
             if (myCountE > 0) {
                 for (int i = 0; i < myCountE; i++) {
                     double tmpVal = IterativeASS.this.getMatrixAE(i).dot(column);
                     if (i == j || !PrimitiveScalar.isSmall(ONE, tmpVal)) {
+                        if (apply && i == j) tmpVal += mySchurRho;
                         Equation tmpRowE = myIterationRows[i];
-                        if (tmpRowE != null) {
-                            tmpRowE.set(j, tmpVal);
-                        }
+                        if (tmpRowE != null) tmpRowE.set(j, tmpVal);
                         tmpNewRow.set(i, tmpVal);
                     }
                 }
             }
-
             if (incl.length > 0) {
                 for (int _i = 0; _i < incl.length; _i++) {
                     double tmpVal = IterativeASS.this.getMatrixAI(incl[_i]).dot(column);
                     int i = myCountE + incl[_i];
                     if (i == j || !PrimitiveScalar.isSmall(ONE, tmpVal)) {
+                        if (apply && i == j) tmpVal += mySchurRho;
                         Equation tmpRowI = myIterationRows[i];
-                        if (tmpRowI != null) {
-                            tmpRowI.set(j, tmpVal);
-                        }
+                        if (tmpRowI != null) tmpRowI.set(j, tmpVal);
                         tmpNewRow.set(i, tmpVal);
                     }
                 }
@@ -160,6 +186,10 @@ final class IterativeASS extends ActiveSetSolver {
      * multipliers.
      */
     private final SchurComplementSolver myS;
+
+    private double mySchurDiagMax = 1.0;
+    private double mySchurDiagMin = Double.POSITIVE_INFINITY;
+    private double mySchurRho = 0.0;
 
     IterativeASS(final ConvexData<Double> convexData, final Optimisation.Options optimisationOptions) {
 
@@ -279,14 +309,28 @@ final class IterativeASS extends ActiveSetSolver {
             MatrixStore<Double> iterA = this.getIterationA();
             MatrixStore<Double> iterB = this.getIterationB();
 
-            MatrixStore<Double> tmpCols = this.getSolutionQ(iterA.transpose());
-            MatrixStore<Double> tmpRHS = this.getInvQC().premultiply(iterA).onMatching(SUBTRACT, iterB).collect(MATRIX_FACTORY);
-
+            MatrixStore<Double> invQAt = this.getSolutionQ(iterA.transpose());
+            // Compute Schur diag stats for current set
+            mySchurDiagMax = 1.0;
+            mySchurDiagMin = Double.POSITIVE_INFINITY;
             for (int j = 0; j < nbEqus; j++) {
-                myS.add(j, tmpCols.sliceColumn(j), tmpRHS.doubleValue(j));
+                double sii = this.getMatrixAE(j).dot(invQAt.sliceColumn(j));
+                if (Double.isFinite(sii) && sii > mySchurDiagMax) mySchurDiagMax = sii;
+                if (Double.isFinite(sii) && sii > 0.0 && sii < mySchurDiagMin) mySchurDiagMin = sii;
+            }
+            for (int k = 0; k < incl.length; k++) {
+                double sii = this.getMatrixAI(incl[k]).dot(invQAt.sliceColumn(nbEqus + k));
+                if (Double.isFinite(sii) && sii > mySchurDiagMax) mySchurDiagMax = sii;
+                if (Double.isFinite(sii) && sii > 0.0 && sii < mySchurDiagMin) mySchurDiagMin = sii;
+            }
+            mySchurRho = DualRegularisation.strategy().compute(mySchurDiagMax, mySchurDiagMin, nbEqus + incl.length, options.convex().isExtendedPrecision(), this.isZeroQ());
+
+            MatrixStore<Double> tmpRHS = this.getInvQC().premultiply(iterA).onMatching(SUBTRACT, iterB).collect(MATRIX_FACTORY);
+            for (int j = 0; j < nbEqus; j++) {
+                myS.add(j, invQAt.sliceColumn(j), tmpRHS.doubleValue(j));
             }
             for (int j = 0; j < incl.length; j++) {
-                myS.add(nbEqus + incl[j], tmpCols.sliceColumn(nbEqus + j), tmpRHS.doubleValue(nbEqus + j));
+                myS.add(nbEqus + incl[j], invQAt.sliceColumn(nbEqus + j), tmpRHS.doubleValue(nbEqus + j));
             }
         }
 

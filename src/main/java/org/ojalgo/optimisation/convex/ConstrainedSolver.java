@@ -21,6 +21,9 @@
  */
 package org.ojalgo.optimisation.convex;
 
+import static org.ojalgo.function.constant.PrimitiveMath.ADD;
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
@@ -62,6 +65,25 @@ abstract class ConstrainedSolver extends BasePrimitiveSolver {
     protected Collectable<Double, ? super TransformableRegion<Double>> getIterationKKT() {
         MatrixStore<Double> iterQ = this.getIterationQ();
         MatrixStore<Double> iterA = this.getIterationA();
+        boolean ext = options.convex().isExtendedPrecision();
+        int m = (int) iterA.countRows();
+        double diagMax = 1.0;
+        double diagMin = Double.POSITIVE_INFINITY;
+        for (int r = 0; r < m; r++) {
+            double rowNorm = 0.0;
+            for (int c = 0; c < iterA.countColumns(); c++) {
+                rowNorm += Math.abs(iterA.doubleValue(r, c));
+            }
+            if (rowNorm > diagMax) diagMax = rowNorm;
+            if (rowNorm > 0.0 && rowNorm < diagMin) diagMin = rowNorm;
+        }
+        double rho = DualRegularisation.strategy().compute(diagMax, diagMin, m, ext, this.isZeroQ());
+        if (rho != 0.0) {
+            PhysicalStore<Double> dualBlock = MATRIX_FACTORY.make(m, m);
+            dualBlock.fillAll(ZERO);
+            dualBlock.modifyDiagonal(ADD.by(-rho));
+            return iterQ.right(iterA.transpose()).below(iterA.right(dualBlock));
+        }
         return iterQ.right(iterA.transpose()).below(iterA);
     }
 

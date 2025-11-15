@@ -88,18 +88,25 @@ final class DirectASS extends ActiveSetSolver {
                 MatrixStore<Double> iterC = this.getIterationC();
 
                 MatrixStore<Double> invQAt = this.getSolutionQ(iterA.transpose());
-                // TODO Only 1 column change inbetween active set iterations (add or remove 1 column)
-                if (this.isLogDebug()) {
-                    this.log("invQAt", invQAt);
+                // Negated Schur complement S = A inv(Q) A^T
+                R064Store schur = invQAt.premultiply(iterA).collect(MATRIX_FACTORY);
+                // Compute diag scale from actual Schur diag
+                double diagMax = 1.0;
+                double diagMin = Double.POSITIVE_INFINITY;
+                for (int i = 0; i < numbConstr; i++) {
+                    double sii = schur.doubleValue(i, i);
+                    if (Double.isFinite(sii) && sii > diagMax) diagMax = sii;
+                    if (Double.isFinite(sii) && sii > 0.0 && sii < diagMin) diagMin = sii;
                 }
-
-                // Negated Schur complement
-                ElementsSupplier<Double> tmpS = invQAt.premultiply(iterA);
-                // TODO Symmetric, only need to calculate half the Schur complement, and only 1 row/column changes per iteration
-
-                if (this.isLogDebug()) {
-                    this.log("Negated Schur complement: " + Arrays.toString(incl), tmpS.collect(MATRIX_FACTORY));
+                double rho = DualRegularisation.strategy().compute(diagMax, diagMin, numbConstr, options.convex().isExtendedPrecision(), this.isZeroQ());
+                if (rho != 0.0) {
+                    DualRegMetrics.recordSchur(rho);
+                    schur.modifyDiagonal(ADD.by(rho));
                 }
+                if (this.isLogDebug()) {
+                    this.log("Negated Schur complement: " + Arrays.toString(incl), schur);
+                }
+                ElementsSupplier<Double> tmpS = schur;
 
                 if (solved = this.computeGeneral(tmpS)) {
 
