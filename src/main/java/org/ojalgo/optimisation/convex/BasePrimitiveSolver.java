@@ -55,12 +55,31 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
 
     static BasePrimitiveSolver newSolver(final ConvexData<Double> data, final Optimisation.Options options) {
 
-        if (data.countInequalityConstraints() > 0) {
-            if (options.sparse == null || options.sparse.booleanValue()) {
+        int nbVars = data.countVariables();
+        int nbEqus = data.countEqualityConstraints();
+        int nbInes = data.countInequalityConstraints();
+
+        if (nbInes > 0) {
+
+            if (Boolean.TRUE.equals(options.sparse)) {
+
                 return new IterativeASS(data, options);
-            } else {
+
+            } else if (Boolean.FALSE.equals(options.sparse)) {
+
                 return new DirectASS(data, options);
+
+            } else {
+
+                double density = data.density();
+
+                if ((nbVars >= 200 && density >= THIRD) || (nbVars >= 500 && (nbEqus + nbInes) >= 1_000)) {
+                    return new DirectASS(data, options);
+                } else {
+                    return new IterativeASS(data, options);
+                }
             }
+
         } else if (data.countEqualityConstraints() > 0) {
             return new QPESolver(data, options);
         } else {

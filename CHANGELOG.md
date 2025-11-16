@@ -11,6 +11,20 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.optimisation
+
+- New `NullSpaceProjection` and `NullSpaceASS`. Modifies the problem before delegating to `ActiveSetSolver` eliminating equality constraints and reducing the number of variables. Turn this feature On/Off via configuration option. The default is to use when the model is big enough and has a significant number equality constraints.
+
+### Changed
+
+#### org.ojalgo.optimisation
+
+- Modified to the active set in `ActiveSetSolver` is initialised – limited the number of inequalities that can be set to active.
+- Tweaked the default behaviour when selecting either dense/direct or sparse/iterative `ActiveSetSolver` – now favour dense/direct in some cases. Previously always chose sparse/iterative. 
+
+
 ## [56.1.1] – 2025-11-09
 
 ### Added

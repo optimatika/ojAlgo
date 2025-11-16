@@ -36,6 +36,7 @@ import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.optimisation.integer.IntegerStrategy;
 import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Primitive1D;
 import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.TypeUtils;
@@ -439,7 +440,7 @@ public interface Optimisation {
         }
 
         public static Result of(final Optimisation.State state, final double... solution) {
-            return new Result(state, Double.NaN, Access1D.wrap(solution));
+            return new Result(state, Double.NaN, Primitive1D.of(solution));
         }
 
         /**

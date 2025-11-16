@@ -665,11 +665,13 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         int nbEqus = this.countEqualityConstraints();
         int nbVars = this.countVariables();
 
-        int maxToInclude = nbVars - nbEqus;
+        int remaining = nbVars - nbEqus;
 
-        if (this.isLogDebug() && maxToInclude < 0) {
+        if (this.isLogDebug() && remaining < 0) {
             this.log("Redundant contraints!");
         }
+
+        int maxToInclude = Math.abs((nbVars / 2) - nbEqus);
 
         if (nbInes > 0 && maxToInclude > 0) {
 

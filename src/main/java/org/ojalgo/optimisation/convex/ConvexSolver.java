@@ -45,9 +45,9 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.task.iterative.ConjugateGradientSolver;
-import org.ojalgo.matrix.task.iterative.JacobiPreconditioner;
 import org.ojalgo.matrix.task.iterative.IterativeSolverTask;
 import org.ojalgo.matrix.task.iterative.Preconditioner;
+import org.ojalgo.matrix.task.iterative.SSORPreconditioner;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
@@ -368,9 +368,10 @@ public abstract class ConvexSolver extends GenericSolver {
     public static final class Configuration {
 
         private boolean myCombinedScaleFactor = true;
+        private Boolean myProjection = null;
         private boolean myExtendedPrecision = false;
-        private NumberContext myIterativeAccuracy = NumberContext.of(10, 14).withMode(RoundingMode.HALF_DOWN);
-        private Supplier<Preconditioner> myIterativePreconditioner = JacobiPreconditioner::new;
+        private NumberContext myIterativeAccuracy = NumberContext.of(10, 16).withMode(RoundingMode.HALF_DOWN);
+        private Supplier<Preconditioner> myIterativePreconditioner = SSORPreconditioner::new;
         private Supplier<IterativeSolverTask> myIterativeSolver = ConjugateGradientSolver::new;
         private double mySmallDiagonal = RELATIVELY_SMALL + MACHINE_EPSILON;
         private Function<Structure2D, MatrixDecomposition.Solver<Double>> mySolverGeneral = LU.R064::make;
@@ -450,6 +451,14 @@ public abstract class ConvexSolver extends GenericSolver {
             return this;
         }
 
+        public Configuration iterative(final Supplier<IterativeSolverTask> solver, final Supplier<Preconditioner> preconditioner) {
+            Objects.requireNonNull(solver);
+            Objects.requireNonNull(preconditioner);
+            myIterativeSolver = solver;
+            myIterativePreconditioner = preconditioner;
+            return this;
+        }
+
         public Configuration iterative(final Supplier<IterativeSolverTask> solver, final Supplier<Preconditioner> preconditioner,
                 final NumberContext accuracy) {
             Objects.requireNonNull(solver);
@@ -477,6 +486,17 @@ public abstract class ConvexSolver extends GenericSolver {
 
         public MatrixDecomposition.Solver<Double> newSolverSPD(final Structure2D structure) {
             return mySolverSPD.apply(structure);
+        }
+
+        /**
+         * Null-Space projection. (Eliminating equality constraints and reducing the number of variables.)
+         * <p>
+         * TRUE means yes, FALSE NO, and NULL auto. Even if configured to TRUE there must also be both
+         * equality and inequality constraints for this to actually be used.
+         */
+        public Configuration projection(final Boolean projection) {
+            myProjection = projection;
+            return this;
         }
 
         public double smallDiagonal() {
@@ -517,6 +537,10 @@ public abstract class ConvexSolver extends GenericSolver {
             return this;
         }
 
+        Boolean getProjection() {
+            return myProjection;
+        }
+
     }
 
     public static final class ModelIntegration extends ExpressionsBasedModel.Integration<ConvexSolver> {
@@ -540,13 +564,33 @@ public abstract class ConvexSolver extends GenericSolver {
             } else {
 
                 ConvexData<Double> data = ConvexSolver.copy(model, R064Store.FACTORY);
-                BasePrimitiveSolver solver = BasePrimitiveSolver.newSolver(data, options);
 
-                if (model.options.validate) {
-                    solver.setValidator(this.newValidator(model));
+                int nbVars = data.countVariables();
+                int nbEqus = data.countEqualityConstraints();
+                int nbInes = data.countInequalityConstraints();
+
+                Boolean projection = options.convex().getProjection();
+
+                if (nbEqus > 0 && nbInes > 0 && (Boolean.TRUE.equals(projection) || (projection == null && (nbVars >= 80) && (nbVars / nbEqus <= 2)))) {
+
+                    ConvexSolver solver = new NullSpaceASS(options, data);
+
+                    if (model.options.validate) {
+                        solver.setValidator(this.newValidator(model));
+                    }
+
+                    return solver;
+
+                } else {
+
+                    BasePrimitiveSolver solver = BasePrimitiveSolver.newSolver(data, options);
+
+                    if (model.options.validate) {
+                        solver.setValidator(this.newValidator(model));
+                    }
+
+                    return solver;
                 }
-
-                return solver;
             }
         }
 
