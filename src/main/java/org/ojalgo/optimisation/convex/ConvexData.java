@@ -21,7 +21,10 @@
  */
 package org.ojalgo.optimisation.convex;
 
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+
 import org.ojalgo.array.SparseArray;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RowsSupplier;
@@ -49,7 +52,7 @@ public final class ConvexData<N extends Comparable<N>> implements ExpressionsBas
     private final ConvexObjectiveFunction<N> myObjective;
     private final int[] myVariableIndices;
 
-    ConvexData(final boolean inclMap, final PhysicalStore.Factory<N, ?> factory, final int nbVars, final int nbEqus, final int nbIneq) {
+    ConvexData(final boolean inclMap, final PhysicalStore.Factory<N, ?> factory, final int nbVars, final int nbEqus, final int nbInes) {
 
         super();
 
@@ -60,11 +63,11 @@ public final class ConvexData<N extends Comparable<N>> implements ExpressionsBas
         myBE = factory.make(nbEqus, 1);
 
         myAI = factory.makeRowsSupplier(nbVars);
-        myAI.addRows(nbIneq);
-        myBI = factory.make(nbIneq, 1);
+        myAI.addRows(nbInes);
+        myBI = factory.make(nbInes, 1);
 
         myVariableIndices = new int[nbVars];
-        myConstraintsMetaData = ConstraintsMetaData.newInstance(nbEqus + nbIneq, inclMap);
+        myConstraintsMetaData = ConstraintsMetaData.newInstance(nbEqus + nbInes, inclMap);
     }
 
     @Override
@@ -179,6 +182,34 @@ public final class ConvexData<N extends Comparable<N>> implements ExpressionsBas
         myObjective.quadratic().add(row, col, value);
     }
 
+    /**
+     * The density of the constraints body (AE and AI combined).
+     */
+    double density() {
+
+        int nbEqus = this.countEqualityConstraints();
+        int nbInes = this.countInequalityConstraints();
+
+        if (nbEqus + nbInes == 0) {
+
+            return ZERO;
+
+        } else {
+
+            double totalCount = ZERO;
+            double nonzerosCount = ZERO;
+            if (nbEqus > 0) {
+                totalCount += myAE.count();
+                nonzerosCount += myAE.countNonzeros();
+            }
+            if (nbInes > 0) {
+                totalCount += myAI.count();
+                nonzerosCount += myAI.countNonzeros();
+            }
+            return nonzerosCount / totalCount;
+        }
+    }
+
     SparseArray<N> getAE(final int row) {
         return myAE.getRow(row);
     }
@@ -204,6 +235,20 @@ public final class ConvexData<N extends Comparable<N>> implements ExpressionsBas
 
     ConstraintsMetaData getConstraintsMetaData() {
         return myConstraintsMetaData;
+    }
+
+    /**
+     * Equality constraints body: [AE][X] == [BE]
+     */
+    ElementsSupplier<N> getSupplierAE() {
+        return myAE;
+    }
+
+    /**
+     * Inequality constraints body: [AI][X] == [BI]
+     */
+    ElementsSupplier<N> getSupplierAI() {
+        return myAI;
     }
 
     void reset() {

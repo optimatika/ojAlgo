@@ -45,9 +45,9 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.task.iterative.ConjugateGradientSolver;
-import org.ojalgo.matrix.task.iterative.JacobiPreconditioner;
 import org.ojalgo.matrix.task.iterative.IterativeSolverTask;
 import org.ojalgo.matrix.task.iterative.Preconditioner;
+import org.ojalgo.matrix.task.iterative.SSORPreconditioner;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
@@ -369,8 +369,8 @@ public abstract class ConvexSolver extends GenericSolver {
 
         private boolean myCombinedScaleFactor = true;
         private boolean myExtendedPrecision = false;
-        private NumberContext myIterativeAccuracy = NumberContext.of(10, 14).withMode(RoundingMode.HALF_DOWN);
-        private Supplier<Preconditioner> myIterativePreconditioner = JacobiPreconditioner::new;
+        private NumberContext myIterativeAccuracy = NumberContext.of(10, 16).withMode(RoundingMode.HALF_DOWN);
+        private Supplier<Preconditioner> myIterativePreconditioner = SSORPreconditioner::new;
         private Supplier<IterativeSolverTask> myIterativeSolver = ConjugateGradientSolver::new;
         private double mySmallDiagonal = RELATIVELY_SMALL + MACHINE_EPSILON;
         private Function<Structure2D, MatrixDecomposition.Solver<Double>> mySolverGeneral = LU.R064::make;
@@ -447,6 +447,14 @@ public abstract class ConvexSolver extends GenericSolver {
             Objects.requireNonNull(accuracy);
             myIterativeAccuracy = accuracy;
             myIterativeSolver = solver;
+            return this;
+        }
+
+        public Configuration iterative(final Supplier<IterativeSolverTask> solver, final Supplier<Preconditioner> preconditioner) {
+            Objects.requireNonNull(solver);
+            Objects.requireNonNull(preconditioner);
+            myIterativeSolver = solver;
+            myIterativePreconditioner = preconditioner;
             return this;
         }
 
@@ -540,13 +548,32 @@ public abstract class ConvexSolver extends GenericSolver {
             } else {
 
                 ConvexData<Double> data = ConvexSolver.copy(model, R064Store.FACTORY);
-                BasePrimitiveSolver solver = BasePrimitiveSolver.newSolver(data, options);
 
-                if (model.options.validate) {
-                    solver.setValidator(this.newValidator(model));
+                int nbVars = data.countVariables();
+                int nbEqus = data.countInequalityConstraints();
+                int nbInes = data.countEqualityConstraints();
+
+                if (options.experimental && nbEqus > 0 && nbInes > 0 && (nbVars >= 100) && ((nbVars - nbEqus) <= 2_000) && (nbVars / nbEqus <= 20)
+                        && (nbVars / nbInes <= 20)) {
+
+                    ConvexSolver solver = new EqualityEliminatingASS(options, data);
+
+                    if (model.options.validate) {
+                        solver.setValidator(this.newValidator(model));
+                    }
+
+                    return solver;
+
+                } else {
+
+                    BasePrimitiveSolver solver = BasePrimitiveSolver.newSolver(data, options);
+
+                    if (model.options.validate) {
+                        solver.setValidator(this.newValidator(model));
+                    }
+
+                    return solver;
                 }
-
-                return solver;
             }
         }
 
