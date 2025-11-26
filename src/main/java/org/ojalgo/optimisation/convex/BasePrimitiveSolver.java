@@ -80,7 +80,7 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
                 }
             }
 
-        } else if (data.countEqualityConstraints() > 0) {
+        } else if (nbEqus > 0) {
             return new QPESolver(data, options);
         } else {
             return new UnconstrainedSolver(data, options);

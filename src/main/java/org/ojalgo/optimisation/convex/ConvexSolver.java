@@ -571,7 +571,8 @@ public abstract class ConvexSolver extends GenericSolver {
 
                 Boolean projection = options.convex().getProjection();
 
-                if (nbEqus > 0 && nbInes > 0 && (Boolean.TRUE.equals(projection) || (projection == null && (nbVars >= 80) && (nbVars / nbEqus <= 2)))) {
+                if (nbEqus > 0 && nbInes > 0 && nbEqus <= nbVars
+                        && (Boolean.TRUE.equals(projection) || (projection == null && (nbVars >= 80) && (nbVars / nbEqus <= 2)))) {
 
                     ConvexSolver solver = new NullSpaceASS(options, data);
 
