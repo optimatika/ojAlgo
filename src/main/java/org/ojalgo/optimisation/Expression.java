@@ -1208,21 +1208,26 @@ public final class Expression extends ModelEntity<Expression> {
      */
     boolean isNegativeOn(final Set<IntIndex> subset) {
 
-        if (!this.isAnyQuadraticFactorNonZero()) {
+        if (this.isAnyQuadraticFactorNonZero()) {
+
+            return false;
+
+        } else {
+
             for (IntIndex index : subset) {
                 Variable setVar = myModel.getVariable(index);
                 int signum = myLinear.get(index).signum();
                 if (signum < 0 && setVar.isLowerLimitSet() && setVar.getLowerLimit().signum() >= 0) {
-
+                    continue;
                 } else if (signum > 0 && setVar.isUpperLimitSet() && setVar.getUpperLimit().signum() <= 0) {
-
+                    continue;
                 } else {
                     return false;
                 }
             }
-        }
 
-        return true;
+            return true;
+        }
     }
 
     /**
@@ -1232,21 +1237,26 @@ public final class Expression extends ModelEntity<Expression> {
      */
     boolean isPositiveOn(final Set<IntIndex> subset) {
 
-        if (!this.isAnyQuadraticFactorNonZero()) {
+        if (this.isAnyQuadraticFactorNonZero()) {
+
+            return false;
+
+        } else {
+
             for (IntIndex index : subset) {
                 Variable setVar = myModel.getVariable(index);
                 int signum = myLinear.get(index).signum();
                 if (signum > 0 && setVar.isLowerLimitSet() && setVar.getLowerLimit().signum() >= 0) {
-
+                    continue;
                 } else if (signum < 0 && setVar.isUpperLimitSet() && setVar.getUpperLimit().signum() <= 0) {
-
+                    continue;
                 } else {
                     return false;
                 }
             }
-        }
 
-        return true;
+            return true;
+        }
     }
 
     boolean isRedundant() {
