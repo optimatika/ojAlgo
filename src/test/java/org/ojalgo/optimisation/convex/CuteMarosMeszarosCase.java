@@ -210,7 +210,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
 
             // model.options.debug(Optimisation.Solver.class);
             // model.options.debug(IntegerSolver.class);
-            model.options.debug(ConvexSolver.class);
+            // model.options.debug(ConvexSolver.class);
             // model.options.convex().extendedPrecision(true);
             // model.options.debug(LinearSolver.class);
             // model.options.progress(IntegerSolver.class);

@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Arrays;
+import java.util.Set;
 import java.util.function.IntSupplier;
 
 import org.junit.jupiter.api.Assertions;
@@ -444,6 +445,12 @@ public abstract class TestUtils {
         }
     }
 
+    public static <T> void assertInSet(final Set<T> allowed, final T actual) {
+        if (!allowed.contains(actual)) {
+            Assertions.fail(actual + " not contained in " + allowed);
+        }
+    }
+
     public static void assertLessThan(final double reference, final double actual) {
         if (actual >= reference) {
             Assertions.fail(actual + " !< " + reference);
@@ -470,6 +477,10 @@ public abstract class TestUtils {
         if (actual > reference) {
             Assertions.fail(actual + " !<= " + reference);
         }
+    }
+
+    public static void assertNotNull(final Object obj) {
+        Assertions.assertNotNull(obj);
     }
 
     public static void assertNotNullOrEmpty(final String actual) {

@@ -21,6 +21,8 @@
  */
 package org.ojalgo.optimisation;
 
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -984,6 +986,43 @@ public final class Expression extends ModelEntity<Expression> {
 
     int countQuadraticFactors() {
         return myQuadratic.size();
+    }
+
+    double density() {
+
+        int nbVars = myModel.countVariables();
+
+        if (nbVars == 0) {
+
+            return ZERO;
+
+        } else {
+
+            if (this.isAnyQuadraticFactorNonZero()) {
+
+                int nbQuads = this.countQuadraticFactors();
+
+                double denom = nbVars * nbVars;
+
+                double numer = nbQuads;
+
+                return numer / denom;
+
+            } else if (this.isAnyLinearFactorNonZero()) {
+
+                int nbLins = this.countLinearFactors();
+
+                double denom = nbVars;
+
+                double numer = nbLins;
+
+                return numer / denom;
+
+            } else {
+
+                return ZERO;
+            }
+        }
     }
 
     @Override

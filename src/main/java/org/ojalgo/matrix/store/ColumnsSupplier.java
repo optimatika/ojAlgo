@@ -313,28 +313,7 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixSto
 
     @Override
     public R064CSC toCSC() {
-
-        int nbRows = this.getRowDim();
-        int nbCols = this.getColDim();
-        int nbNz = this.countNonzeros();
-
-        double[] values = new double[nbNz];
-        int[] rowIndices = new int[nbNz];
-        int[] colPointers = new int[nbCols + 1];
-
-        int pos = 0;
-        for (int j = 0; j < nbCols; j++) {
-            colPointers[j] = pos;
-            SparseArray<N> col = myColumns.get(j);
-            for (SparseArray.NonzeroView<N> nz : col.nonzeros()) {
-                values[pos] = nz.doubleValue();
-                rowIndices[pos] = (int) nz.index();
-                pos++;
-            }
-        }
-        colPointers[nbCols] = pos;
-
-        return new R064CSC(nbRows, nbCols, values, rowIndices, colPointers);
+        return this.toCSC(this.getRowDim(), this.getColDim(), this.countNonzeros());
     }
 
     @Override
@@ -388,6 +367,27 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixSto
         } else {
             return null;
         }
+    }
+
+    R064CSC toCSC(final int nbRows, final int nbCols, final int nbNz) {
+
+        double[] values = new double[nbNz];
+        int[] rowIndices = new int[nbNz];
+        int[] colPointers = new int[nbCols + 1];
+
+        int pos = 0;
+        for (int j = 0; j < nbCols; j++) {
+            colPointers[j] = pos;
+            SparseArray<N> col = myColumns.get(j);
+            for (SparseArray.NonzeroView<N> nz : col.nonzeros()) {
+                values[pos] = nz.doubleValue();
+                rowIndices[pos] = (int) nz.index();
+                pos++;
+            }
+        }
+        colPointers[nbCols] = pos;
+
+        return new R064CSC(nbRows, nbCols, values, rowIndices, colPointers);
     }
 
 }

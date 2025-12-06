@@ -17,6 +17,11 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - New `NullSpaceProjection` and `NullSpaceASS`. Modifies the problem before delegating to `ActiveSetSolver` eliminating equality constraints and reducing the number of variables. Turn this feature On/Off via configuration option. The default is to use when the model is big enough and has a significant number equality constraints.
 
+#### org.ojalgo.matrix
+
+- New sparse quadratic programming decomposition `SparseQDLDL` based on the QDLDL factorisation algorithm. Designed for large, sparse KKT systems in convex QP problems and integrates with the existing decomposition/factorisation APIs.
+- Improved sparse matrix infrastructure for R064 CSC/CSR stores and suppliers: `RowsSupplier`/`ColumnsSupplier` and compressed sparse stores (`R064CSC`, `R064CSR`, `CompressedSparseR064`) now support more efficient copying and supply operations, reducing temporary allocations when building or transforming sparse matrices.
+
 ### Changed
 
 #### org.ojalgo.optimisation

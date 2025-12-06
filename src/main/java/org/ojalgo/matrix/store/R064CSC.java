@@ -26,6 +26,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 
+import org.ojalgo.array.operation.COPY;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView2D;
 import org.ojalgo.structure.Structure2D;
@@ -36,21 +37,55 @@ import org.ojalgo.structure.Structure2D;
  * <p>
  * The CSC format uses three arrays to store the matrix:
  * <ul>
- * <li>values[] - stores the non-zero values</li>
- * <li>rowIndices[] - stores the row index for each non-zero value</li>
- * <li>columnPointers[] - stores the starting position in values/rowIndices arrays for each column</li>
+ * <li>values[] - stores the non-zero values
+ * <li>rowIndices[] - stores the row index for each non-zero value
+ * <li>columnPointers[] - stores the starting position in values/rowIndices arrays for each column
  * </ul>
  * <p>
  * This format is particularly efficient for:
  * <ul>
- * <li>Column-wise access and operations</li>
- * <li>Matrix-vector multiplication</li>
- * <li>Iterating over non-zero elements column by column</li>
+ * <li>Column-wise access and operations
+ * <li>Matrix-vector multiplication
+ * <li>Iterating over non-zero elements column by column
  * </ul>
+ * Other sparse types are more dynamic and may be used as CSC builders. Each of {@link SparseStore},
+ * {@link RowsSupplier} and {@link ColumnsSupplier} feature direct conversion to {@link R064CSC}. In
+ * particular {@link ColumnsSupplier} could be of interest in this case. Furthermore, {@link R064CSC.Builder}
+ * is provided for incrementally constructing a CSC matrix.
  *
  * @author apete
  */
 public final class R064CSC extends CompressedSparseR064 {
+
+    /**
+     * A builder for constructing {@link R064CSR} instances. The dimensions of the matrix are dynamically
+     * adjusted as elements are added.
+     */
+    public static final class Builder extends CompressedSparseR064.Builder<R064CSC> {
+
+        private final ColumnsSupplier<Double> myColumns = R064Store.FACTORY.makeColumnsSupplier(Integer.MAX_VALUE);
+
+        @Override
+        public R064CSC build() {
+            return myColumns.toCSC(this.getRowDim(), this.getColDim(), myColumns.countNonzeros());
+        }
+
+        @Override
+        public void reset() {
+            super.reset();
+            myColumns.reset();
+        }
+
+        @Override
+        public void set(final int row, final int col, final double value) {
+            if (col >= myColumns.getColDim()) {
+                myColumns.addColumns(1 + col - myColumns.getColDim());
+            }
+            myColumns.set(row, col, value);
+            this.update(row, col);
+        }
+
+    }
 
     public static final class NonZeroView implements ElementView2D<Double, NonZeroView> {
 
@@ -183,6 +218,10 @@ public final class R064CSC extends CompressedSparseR064 {
         }
     }
 
+    public static R064CSC.Builder newBuilder() {
+        return new R064CSC.Builder();
+    }
+
     /**
      * Creates a new CSC matrix store.
      *
@@ -192,8 +231,24 @@ public final class R064CSC extends CompressedSparseR064 {
      * @param rowIndices     The row index for each non-zero value
      * @param columnPointers The starting position in elementValues/rowIndices for each column
      */
-    R064CSC(final int nbRows, final int nbCols, final double[] elementValues, final int[] rowIndices, final int[] columnPointers) {
+    public R064CSC(final int nbRows, final int nbCols, final double[] elementValues, final int[] rowIndices, final int[] columnPointers) {
         super(nbRows, nbCols, elementValues, rowIndices, columnPointers);
+    }
+
+    /**
+     * @param nbRows   The number of rows
+     * @param nbCols   The number of columns
+     * @param capacity The maximum number of non-zero elements
+     */
+    public R064CSC(final int nbRows, final int nbCols, final int capacity) {
+        super(nbRows, nbCols, new double[capacity], new int[capacity], new int[nbCols + 1]);
+    }
+
+    /**
+     * Creates a deep copy of this CSC matrix store.
+     */
+    public R064CSC copyCSC() {
+        return new R064CSC(this.getRowDim(), this.getColDim(), COPY.copyOf(values), COPY.copyOf(indices), COPY.copyOf(pointers));
     }
 
     /**
@@ -342,6 +397,11 @@ public final class R064CSC extends CompressedSparseR064 {
         }
 
         return new R064CSR(nbRows, nbCols, valuesCSR, colIndicesCSR, rowPointers);
+    }
+
+    @Override
+    public R064CSR transpose() {
+        return new R064CSR(this.getColDim(), this.getRowDim(), values, indices, pointers);
     }
 
 }

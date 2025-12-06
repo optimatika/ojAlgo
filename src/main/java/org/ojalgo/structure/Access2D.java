@@ -92,22 +92,28 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
     }
 
     public static class ColumnView<N extends Comparable<N>> implements Access1D<N>, Iterable<ColumnView<N>>, Iterator<ColumnView<N>>,
-            Spliterator<ColumnView<N>>, Comparable<ColumnView<N>>, Access1D.Collectable<N, Mutate1D> {
+            Spliterator<ColumnView<N>>, Comparable<ColumnView<N>>, Access1D.Collectable<N, Mutate1D>, Mutate1D {
 
         static final int CHARACTERISTICS = Spliterator.CONCURRENT | Spliterator.DISTINCT | Spliterator.IMMUTABLE | Spliterator.NONNULL | Spliterator.ORDERED
                 | Spliterator.SIZED | Spliterator.SORTED | Spliterator.SUBSIZED;
 
+        private final Access2D<N> myAccess2D;
         private long myColumn = -1L;
-        private final Access2D<N> myDelegate2D;
         private final long myLastColumn;
+        private final Mutate2D myMutate2D;
 
         private ColumnView(final Access2D<N> access, final long column, final long lastColumn) {
 
             super();
 
-            myDelegate2D = access;
-            myLastColumn = lastColumn;
+            myAccess2D = access;
+            if (access instanceof Mutate2D) {
+                myMutate2D = (Mutate2D) access;
+            } else {
+                myMutate2D = null;
+            }
 
+            myLastColumn = lastColumn;
             myColumn = column;
         }
 
@@ -135,12 +141,12 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
 
         @Override
         public long count() {
-            return myDelegate2D.countRows();
+            return myAccess2D.countRows();
         }
 
         @Override
         public double doubleValue(final int index) {
-            return myDelegate2D.doubleValue(index, myColumn);
+            return myAccess2D.doubleValue(index, myColumn);
         }
 
         @Override
@@ -155,7 +161,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
 
         @Override
         public N get(final long index) {
-            return myDelegate2D.get(index, myColumn);
+            return myAccess2D.get(index, myColumn);
         }
 
         public void goToColumn(final long column) {
@@ -173,7 +179,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
 
         @Override
         public ColumnView<N> iterator() {
-            return new ColumnView<>(myDelegate2D);
+            return new ColumnView<>(myAccess2D);
         }
 
         @Override
@@ -192,9 +198,36 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
             ProgrammingError.throwForUnsupportedOptionalOperation();
         }
 
+        /**
+         * @see Mutate1D#set(long, Comparable)
+         */
+        @Override
+        public void set(final int index, final double value) {
+            if (myMutate2D != null) {
+                myMutate2D.set(index, myColumn, value);
+            } else {
+                throw new UnsupportedOperationException();
+            }
+        }
+
+        /**
+         * Optional operation.
+         *
+         * @throws UnsupportedOperationException if the underlying {@link Access2D} is not also a
+         *                                       {@link Mutate2D}.
+         */
+        @Override
+        public void set(final long index, final Comparable<?> value) {
+            if (myMutate2D != null) {
+                myMutate2D.set(index, myColumn, value);
+            } else {
+                throw new UnsupportedOperationException();
+            }
+        }
+
         @Override
         public int size() {
-            return myDelegate2D.getRowDim();
+            return myAccess2D.getRowDim();
         }
 
         public Stream<ColumnView<N>> stream() {
@@ -203,8 +236,8 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
 
         @Override
         public void supplyTo(final Mutate1D receiver) {
-            for (long i = 0L, limit = Math.min(myDelegate2D.countRows(), receiver.count()); i < limit; i++) {
-                receiver.set(i, myDelegate2D.get(i, myColumn));
+            for (long i = 0L, limit = Math.min(myAccess2D.countRows(), receiver.count()); i < limit; i++) {
+                receiver.set(i, myAccess2D.get(i, myColumn));
             }
         }
 
@@ -232,7 +265,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
 
                 final long split = myColumn + remaining / 2L;
 
-                final ColumnView<N> retVal = new ColumnView<>(myDelegate2D, myColumn, split);
+                final ColumnView<N> retVal = new ColumnView<>(myAccess2D, myColumn, split);
 
                 myColumn = split;
 
@@ -345,22 +378,28 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
     }
 
     public static class RowView<N extends Comparable<N>> implements Access1D<N>, Iterable<RowView<N>>, Iterator<RowView<N>>, Spliterator<RowView<N>>,
-            Comparable<RowView<N>>, Access1D.Collectable<N, Mutate1D> {
+            Comparable<RowView<N>>, Access1D.Collectable<N, Mutate1D>, Mutate1D {
 
         static final int CHARACTERISTICS = Spliterator.CONCURRENT | Spliterator.DISTINCT | Spliterator.IMMUTABLE | Spliterator.NONNULL | Spliterator.ORDERED
                 | Spliterator.SIZED | Spliterator.SORTED | Spliterator.SUBSIZED;
 
-        private final Access2D<N> myDelegate2D;
+        private final Access2D<N> myAccess2D;
         private final long myLastRow;
+        private final Mutate2D myMutate2D;
         private long myRow = -1L;
 
         private RowView(final Access2D<N> access, final long row, final long lastRow) {
 
             super();
 
-            myDelegate2D = access;
-            myLastRow = lastRow;
+            myAccess2D = access;
+            if (access instanceof Mutate2D) {
+                myMutate2D = (Mutate2D) access;
+            } else {
+                myMutate2D = null;
+            }
 
+            myLastRow = lastRow;
             myRow = row;
         }
 
@@ -384,12 +423,12 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
 
         @Override
         public long count() {
-            return myDelegate2D.countColumns();
+            return myAccess2D.countColumns();
         }
 
         @Override
         public double doubleValue(final int index) {
-            return myDelegate2D.doubleValue(myRow, index);
+            return myAccess2D.doubleValue(myRow, index);
         }
 
         @Override
@@ -404,7 +443,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
 
         @Override
         public N get(final long index) {
-            return myDelegate2D.get(myRow, index);
+            return myAccess2D.get(myRow, index);
         }
 
         public void goToRow(final long row) {
@@ -422,7 +461,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
 
         @Override
         public RowView<N> iterator() {
-            return new RowView<>(myDelegate2D);
+            return new RowView<>(myAccess2D);
         }
 
         @Override
@@ -445,9 +484,36 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
             return myRow;
         }
 
+        /**
+         * @see Mutate1D#set(long, Comparable)
+         */
+        @Override
+        public void set(final int index, final double value) {
+            if (myMutate2D != null) {
+                myMutate2D.set(myRow, index, value);
+            } else {
+                throw new UnsupportedOperationException();
+            }
+        }
+
+        /**
+         * Optional operation.
+         *
+         * @throws UnsupportedOperationException if the underlying {@link Access2D} is not also a
+         *                                       {@link Mutate2D}.
+         */
+        @Override
+        public void set(final long index, final Comparable<?> value) {
+            if (myMutate2D != null) {
+                myMutate2D.set(myRow, index, value);
+            } else {
+                throw new UnsupportedOperationException();
+            }
+        }
+
         @Override
         public int size() {
-            return myDelegate2D.getColDim();
+            return myAccess2D.getColDim();
         }
 
         public Stream<RowView<N>> stream() {
@@ -456,8 +522,8 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
 
         @Override
         public void supplyTo(final Mutate1D receiver) {
-            for (long j = 0L, limit = Math.min(myDelegate2D.countColumns(), receiver.count()); j < limit; j++) {
-                receiver.set(j, myDelegate2D.get(myRow, j));
+            for (long j = 0L, limit = Math.min(myAccess2D.countColumns(), receiver.count()); j < limit; j++) {
+                receiver.set(j, myAccess2D.get(myRow, j));
             }
         }
 
@@ -485,7 +551,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
 
                 final long split = myRow + remaining / 2L;
 
-                final RowView<N> retVal = new RowView<>(myDelegate2D, myRow, split);
+                final RowView<N> retVal = new RowView<>(myAccess2D, myRow, split);
 
                 myRow = split;
 

@@ -96,7 +96,7 @@ public abstract class MatrixDecompositionTests {
     }
 
     public static LDL<?>[] getAnyLDL() {
-        return new LDL<?>[] { new DenseLDL.C128(), new DenseLDL.R064(), new DenseLDL.H256(), new DenseLDL.Q128(), new DenseLDL.R128() };
+        return new LDL<?>[] { new DenseLDL.C128(), new DenseLDL.R064(), new DenseLDL.H256(), new DenseLDL.Q128(), new DenseLDL.R128(), new SparseQDLDL() };
     }
 
     public static LU<?>[] getAnyLU() {
@@ -199,7 +199,7 @@ public abstract class MatrixDecompositionTests {
     }
 
     public static LDL<Double>[] getPrimitiveLDL() {
-        return (LDL<Double>[]) new LDL<?>[] { new DenseLDL.R064() };
+        return (LDL<Double>[]) new LDL<?>[] { new DenseLDL.R064(), new SparseQDLDL() };
     }
 
     public static LU<Double>[] getPrimitiveLU() {

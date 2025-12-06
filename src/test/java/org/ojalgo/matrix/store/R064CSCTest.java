@@ -7,8 +7,11 @@ import java.util.NoSuchElementException;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.structure.ElementView2D;
+import org.ojalgo.type.context.NumberContext;
 
 public class R064CSCTest extends MatrixStoreTests {
+
+    private static final NumberContext ACCURACY = NumberContext.of(12);
 
     private static void validateStructure(final R064CSC matrix) {
 
@@ -37,6 +40,38 @@ public class R064CSCTest extends MatrixStoreTests {
         // Check row indices are within bounds
         for (int i = 0; i < matrix.indices.length; i++) {
             TestUtils.assertTrue(matrix.indices[i] >= 0 && matrix.indices[i] < matrix.getRowDim());
+        }
+    }
+
+    @Test
+    public void testCSCTransposeMatchesDense() {
+
+        // Matrix A (3x4):
+        // [ 1 0 2 0 ]
+        // [ 0 3 0 0 ]
+        // [ 4 0 5 6 ]
+        double[][] dense = { { 1.0, 0.0, 2.0, 0.0 }, { 0.0, 3.0, 0.0, 0.0 }, { 4.0, 0.0, 5.0, 6.0 } };
+
+        // CSC representation of A
+        double[] values = { 1, 4, 3, 2, 5, 6 };
+        int[] rowIdx = { 0, 2, 1, 0, 2, 2 };
+        int[] colPtr = { 0, 2, 3, 5, 6 };
+
+        R064CSC csc = new R064CSC(3, 4, values, rowIdx, colPtr);
+
+        // Dense transpose A^T
+        int rowsT = 4;
+        int colsT = 3;
+
+        // Sparse transpose implementation
+        R064CSR csrT = csc.transpose();
+
+        for (int i = 0; i < rowsT; i++) {
+            for (int j = 0; j < colsT; j++) {
+                double expected = dense[j][i];
+                double actual = csrT.doubleValue(i, j);
+                TestUtils.assertEquals("Mismatch at (" + i + "," + j + ")", expected, actual, ACCURACY);
+            }
         }
     }
 

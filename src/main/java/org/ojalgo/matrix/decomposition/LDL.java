@@ -74,6 +74,7 @@ public interface LDL<N extends Comparable<N>> extends LDU<N>, MatrixDecompositio
             myThreshold = threshold;
         }
 
+        @Override
         public LDL<N> make(final Structure2D typical) {
             LDL<N> retVal = myDelegate.make(typical);
             if (myThreshold != null && retVal instanceof DenseLDL) {
@@ -88,11 +89,15 @@ public interface LDL<N extends Comparable<N>> extends LDU<N>, MatrixDecompositio
 
     Factory<Quaternion> H256 = typical -> new DenseLDL.H256();
 
+    Factory<RationalNumber> Q128 = typical -> new DenseLDL.Q128();
+
     Factory<Double> R064 = typical -> new DenseLDL.R064();
 
     Factory<Quadruple> R128 = typical -> new DenseLDL.R128();
 
-    Factory<RationalNumber> Q128 = typical -> new DenseLDL.Q128();
+    public static LDL<Double> newSparseR064() {
+        return new SparseQDLDL();
+    }
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final LDL<N> decomposition, final NumberContext context) {
         return Access2D.equals(matrix, decomposition.reconstruct(), context);
@@ -127,6 +132,7 @@ public interface LDL<N extends Comparable<N>> extends LDU<N>, MatrixDecompositio
         return this.getL().conjugate();
     }
 
+    @Override
     default MatrixStore<N> reconstruct() {
 
         MatrixStore<N> mtrxL = this.getL();
@@ -137,4 +143,5 @@ public interface LDL<N extends Comparable<N>> extends LDU<N>, MatrixDecompositio
 
         return mtrxL.multiply(mtrxD).multiply(mtrxR).rows(reverseOrder).columns(reverseOrder);
     }
+
 }

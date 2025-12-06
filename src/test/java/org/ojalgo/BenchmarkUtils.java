@@ -33,7 +33,7 @@ import org.openjdk.jmh.runner.options.TimeValue;
 public abstract class BenchmarkUtils {
 
     public static ChainedOptionsBuilder options() {
-        return new OptionsBuilder().forks(1).measurementIterations(3).warmupIterations(7).mode(Mode.Throughput).timeUnit(TimeUnit.SECONDS)
+        return new OptionsBuilder().forks(1).measurementIterations(3).warmupIterations(2).mode(Mode.Throughput).timeUnit(TimeUnit.SECONDS)
                 .timeout(new TimeValue(1L, TimeUnit.MINUTES)).jvmArgs("-Xmx8g");
     }
 

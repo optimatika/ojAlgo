@@ -22,8 +22,11 @@
 package org.ojalgo.array.operation;
 
 import java.lang.reflect.Array;
+import java.util.List;
 
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Mutate1D;
 
 /**
  * The ?copy routines perform a vector-vector operation defined as y = x, where x and y are vectors.
@@ -68,7 +71,6 @@ public abstract class COPY implements ArrayOperation {
         return retVal;
     }
 
-    @SuppressWarnings("unchecked")
     public static <T> T[] copyOf(final T[] original) {
         int tmpLength = original.length;
         T[] retVal = (T[]) Array.newInstance(original.getClass().getComponentType(), tmpLength);
@@ -76,10 +78,34 @@ public abstract class COPY implements ArrayOperation {
         return retVal;
     }
 
+    public static void invoke(final Access1D<?> source, final double[] destination) {
+        for (int i = 0, limit = Math.min(source.size(), destination.length); i < limit; i++) {
+            destination[i] = source.doubleValue(i);
+        }
+    }
+
+    public static void invoke(final double[] source, final Mutate1D destination) {
+        for (int i = 0, limit = Math.min(source.length, destination.size()); i < limit; i++) {
+            destination.set(i, source[i]);
+        }
+    }
+
     public static int[] invoke(final int[] source, final int[] destination) {
         int limit = Math.min(source.length, destination.length);
         System.arraycopy(source, 0, destination, 0, limit);
         return destination;
+    }
+
+    public static void invoke(final List<? extends Number> source, final double[] destination) {
+        for (int i = 0, limit = Math.min(source.size(), destination.length); i < limit; i++) {
+            destination[i] = source.get(i).doubleValue();
+        }
+    }
+
+    public static void negate(final List<? extends Number> source, final double[] destination) {
+        for (int i = 0, limit = Math.min(source.size(), destination.length); i < limit; i++) {
+            destination[i] = -source.get(i).doubleValue();
+        }
     }
 
     public static void row(final Access2D<?> source, final long row, final double[] destination, final int first, final int limit) {

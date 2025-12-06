@@ -140,8 +140,9 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
             for (int i = 0; i < dim; i++) {
                 random[i] = Math.random();
                 for (int j = 0; j < i; j++) {
-                    retVal.set(i, j, random[i] * random[j]);
-                    retVal.set(j, i, random[j] * random[i]);
+                    double value = random[i] * random[j];
+                    retVal.set(i, j, value);
+                    retVal.set(j, i, value);
                 }
                 retVal.set(i, i, random[i] + 1.0);
             }

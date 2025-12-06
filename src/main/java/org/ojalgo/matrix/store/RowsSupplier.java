@@ -385,10 +385,23 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
 
     @Override
     public R064CSR toCSR() {
+        return this.toCSR(this.getRowDim(), this.getColDim(), this.countNonzeros());
+    }
 
-        int nbRows = this.getRowDim();
-        int nbCols = this.getColDim();
-        int nbNz = this.countNonzeros();
+    @Override
+    public String toString() {
+        return Access2D.toString(this);
+    }
+
+    SparseArray<N> addRow(final SparseArray<N> rowToAdd) {
+        if (myRows.add(rowToAdd)) {
+            return rowToAdd;
+        } else {
+            return null;
+        }
+    }
+
+    R064CSR toCSR(final int nbRows, final int nbCols, final int nbNz) {
 
         double[] values = new double[nbNz];
         int[] colIndices = new int[nbNz];
@@ -407,19 +420,6 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
         rowPointers[nbRows] = pos;
 
         return new R064CSR(nbRows, nbCols, values, colIndices, rowPointers);
-    }
-
-    @Override
-    public String toString() {
-        return Access2D.toString(this);
-    }
-
-    SparseArray<N> addRow(final SparseArray<N> rowToAdd) {
-        if (myRows.add(rowToAdd)) {
-            return rowToAdd;
-        } else {
-            return null;
-        }
     }
 
 }

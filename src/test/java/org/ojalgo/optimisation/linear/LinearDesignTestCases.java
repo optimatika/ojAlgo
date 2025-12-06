@@ -28,10 +28,10 @@ import java.math.BigDecimal;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.ArrayR256;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.matrix.MatrixQ128;
-import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RawStore;
@@ -46,9 +46,12 @@ import org.ojalgo.optimisation.Optimisation.Sense;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.OptimisationCase;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.keyvalue.KeyValue;
 
 public class LinearDesignTestCases extends OptimisationLinearTests {
+
+    private static final NumberContext ACCURACY = NumberContext.of(8);
 
     static ExpressionsBasedModel buildOldKnapsackTestModel() {
 
@@ -462,13 +465,11 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
             model.options.debug(LinearSolver.class);
         }
 
-        Optimisation.Result tmpResult = model.maximise();
-        MatrixQ128 tmpSolution = MatrixQ128.FACTORY.column(tmpResult);
+        ArrayR064 expected = ArrayR064.wrap(0.0, 0.0, 0.1846, 0.0, 0.0, 0.0, 0.8154, 0.0);
 
-        MatrixStore<Double> tmpExpX = RawStore.wrap(new double[][] { { 0.0 }, { 0.0 }, { 0.1846 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.8154 }, { 0.0 } });
-        MatrixStore<Double> tmpActX = R064Store.FACTORY.copy(tmpSolution.rows(0, 1, 2, 3, 4, 5, 6, 7));
+        Optimisation.Result actual = model.maximise();
 
-        TestUtils.assertEquals(tmpExpX, tmpActX);
+        TestUtils.assertEquals(expected, actual, ACCURACY);
     }
 
     @Test
@@ -480,13 +481,11 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
             model.options.debug(LinearSolver.class);
         }
 
-        Optimisation.Result tmpResult = model.minimise();
-        MatrixQ128 tmpSolution = MatrixQ128.FACTORY.column(tmpResult);
+        ArrayR064 expected = ArrayR064.wrap(0.0, 0.8154, 0.1846, 0.0, 0.0, 0.0, 0.0, 0.0);
 
-        MatrixStore<Double> tmpExpX = RawStore.wrap(new double[][] { { 0.0 }, { 0.8154 }, { 0.1846 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 } });
-        MatrixStore<Double> tmpActX = R064Store.FACTORY.copy(tmpSolution.rows(0, 1, 2, 3, 4, 5, 6, 7));
+        Optimisation.Result actual = model.minimise();
 
-        TestUtils.assertEquals(tmpExpX, tmpActX);
+        TestUtils.assertEquals(expected, actual, ACCURACY);
     }
 
     /**
