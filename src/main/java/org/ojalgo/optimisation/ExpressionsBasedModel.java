@@ -818,6 +818,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     private final Map<String, Expression> myExpressions = new HashMap<>();
     private final Set<IntIndex> myFixedVariables = new HashSet<>();
+    private transient ExpressionsBasedModel.Integration<?> myForcedIntegration = null;
     private transient boolean myInfeasible = false;
     private final EnumBitSet<IntegrationProperty> myIntegrationProperties = new EnumBitSet<>();
     private Optimisation.Result myKnownSolution = null;
@@ -1360,18 +1361,20 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     @Override
     public Optimisation.Result maximise() {
+        return this.optimise(Optimisation.Sense.MAX, null);
+    }
 
-        this.setOptimisationSense(Optimisation.Sense.MAX);
-
-        return this.optimise();
+    public <S extends Optimisation.Solver> Optimisation.Result maximise(final Integration<S> forcedIntegration) {
+        return this.optimise(Optimisation.Sense.MAX, forcedIntegration);
     }
 
     @Override
     public Optimisation.Result minimise() {
+        return this.optimise(Optimisation.Sense.MIN, null);
+    }
 
-        this.setOptimisationSense(Optimisation.Sense.MIN);
-
-        return this.optimise();
+    public <S extends Optimisation.Solver> Optimisation.Result minimise(final Integration<S> forcedIntegration) {
+        return this.optimise(Optimisation.Sense.MIN, forcedIntegration);
     }
 
     public Expression newExpression(final String name) {
@@ -1689,7 +1692,10 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         }
     }
 
-    private Optimisation.Result optimise() {
+    private Optimisation.Result optimise(final Optimisation.Sense sense, final Integration<?> forcedIntegration) {
+
+        this.setOptimisationSense(sense);
+        myForcedIntegration = forcedIntegration;
 
         if (!myShallowCopy && PRESOLVERS.size() > 0) {
             this.scanEntities();
@@ -1787,12 +1793,14 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     ExpressionsBasedModel.Integration<?> getIntegration() {
 
-        ExpressionsBasedModel.Integration<?> retVal = null;
+        ExpressionsBasedModel.Integration<?> retVal = myForcedIntegration;
 
-        for (final ExpressionsBasedModel.Integration<?> preferred : INTEGRATIONS) {
-            if (preferred.isCapable(this)) {
-                retVal = preferred;
-                break;
+        if (retVal == null) {
+            for (ExpressionsBasedModel.Integration<?> preferred : INTEGRATIONS) {
+                if (preferred.isCapable(this)) {
+                    retVal = preferred;
+                    break;
+                }
             }
         }
 
