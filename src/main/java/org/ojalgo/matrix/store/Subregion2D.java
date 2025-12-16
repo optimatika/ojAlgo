@@ -51,6 +51,11 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
         }
 
         @Override
+        public void add(final int row, final int col, final double addend) {
+            myBase.add(row, myColumns[col], addend);
+        }
+
+        @Override
         public void add(final long row, final long col, final Comparable<?> addend) {
             myBase.add(row, myColumns[(int) col], addend);
         }
@@ -170,6 +175,11 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
         }
 
         @Override
+        public void add(final int row, final int col, final double addend) {
+            myBase.add(row, col, addend);
+        }
+
+        @Override
         public void add(final long row, final long col, final Comparable<?> addend) {
             myBase.add(row, col, addend);
         }
@@ -268,6 +278,11 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
             myBase = base;
             myRowOffset = rowOffset;
             myColumnOffset = columnOffset;
+        }
+
+        @Override
+        public void add(final int row, final int col, final double addend) {
+            myBase.add(myRowOffset + row, myColumnOffset + col, addend);
         }
 
         @Override
@@ -438,6 +453,11 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
         }
 
         @Override
+        public void add(final int row, final int col, final double addend) {
+            myBase.add(myRows[row], col, addend);
+        }
+
+        @Override
         public void add(final long row, final long col, final Comparable<?> addend) {
             myBase.add(myRows[(int) row], col, addend);
         }
@@ -556,6 +576,11 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
         @Override
         public synchronized void accept(final Access2D<?> supplied) {
             myDelegate.accept(supplied);
+        }
+
+        @Override
+        public synchronized void add(final int row, final int col, final double addend) {
+            myDelegate.add(row, col, addend);
         }
 
         @Override
@@ -1350,6 +1375,11 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
         }
 
         @Override
+        public void add(final int row, final int col, final double addend) {
+            myBase.add(col, row, addend);
+        }
+
+        @Override
         public void add(final long row, final long col, final Comparable<?> addend) {
             myBase.add(col, row, addend);
         }
@@ -1497,6 +1527,11 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
         }
 
         @Override
+        public void add(final int row, final int col, final double addend) {
+            myBase.add(row, col, addend);
+        }
+
+        @Override
         public void add(final long row, final long col, final Comparable<?> addend) {
             myBase.add(row, col, addend);
         }
@@ -1570,11 +1605,6 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
     }
 
     private final TransformableRegion.FillByMultiplying<N> myMultiplier;
-
-    @SuppressWarnings("unused")
-    private Subregion2D() {
-        this(null, 0L, 0L);
-    }
 
     @SuppressWarnings("unchecked")
     Subregion2D(final TransformableRegion.FillByMultiplying<N> multiplier, final long rows, final long columns) {

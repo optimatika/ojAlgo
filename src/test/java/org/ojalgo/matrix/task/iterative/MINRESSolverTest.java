@@ -104,8 +104,8 @@ public class MINRESSolverTest {
         final int MAX_GRID_SIZE = 15;
 
         // Create array of preconditioners to compare
-        Preconditioner[] preconditioners = new Preconditioner[] { Preconditioner.newIdentity(), Preconditioner.newJacobi(),
-                Preconditioner.newSymmetricGaussSeidel(), Preconditioner.newSSOR(1.25) };
+        Preconditioner[] preconditioners = { Preconditioner.newIdentity(), Preconditioner.newJacobi(), Preconditioner.newSymmetricGaussSeidel(),
+                Preconditioner.newSSOR(1.25) };
 
         //        BasicLogger.debug("2D Laplacian Preconditioner Comparison");
         //        BasicLogger.debug("========================================");
@@ -138,28 +138,28 @@ public class MINRESSolverTest {
     @Test
     public void quadraticTest() {
 
-        double[][] q_ = new double[][] { { 52376.074545264215, 154256.51217212676, 1705.561292552271 },
-                { 154256.51217212676, 1.6421719350013012E8, -97037.53141387558 }, { 1705.561292552271, -97037.53141387558, 51821.80732179031 } };
+        double[][] q_ = { { 52376.074545264215, 154256.51217212676, 1705.561292552271 }, { 154256.51217212676, 1.6421719350013012E8, -97037.53141387558 },
+                { 1705.561292552271, -97037.53141387558, 51821.80732179031 } };
 
         MatrixStore<Double> q = RawStore.wrap(q_);
 
-        double[][] l_ = new double[][] { { 28143.10628459914 }, { -265258.1426397235 }, { 16688.44367610407 } };
+        double[][] l_ = { { 28143.10628459914 }, { -265258.1426397235 }, { 16688.44367610407 } };
 
         MatrixStore<Double> l = RawStore.wrap(l_);
 
-        double[][] ae_ = new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 1.0 } };
+        double[][] ae_ = { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 1.0 } };
 
         MatrixStore<Double> ae = RawStore.wrap(ae_);
 
-        double[][] be_ = new double[][] { { 0.0 }, { 0.0 } };
+        double[][] be_ = { { 0.0 }, { 0.0 } };
 
         MatrixStore<Double> be = RawStore.wrap(be_);
 
-        double[][] ai_ = new double[][] { { -1.0, -0.0, -0.0 }, { -0.0, -1.0, -0.0 }, { -0.0, -0.0, -1.0 } };
+        double[][] ai_ = { { -1.0, -0.0, -0.0 }, { -0.0, -1.0, -0.0 }, { -0.0, -0.0, -1.0 } };
 
         MatrixStore<Double> ai = RawStore.wrap(ai_);
 
-        double[][] bi_ = new double[][] { { 0.050000000000000044 }, { 1.2148895509567436E-4 }, { 0.050000000000000044 } };
+        double[][] bi_ = { { 0.050000000000000044 }, { 1.2148895509567436E-4 }, { 0.050000000000000044 } };
 
         MatrixStore<Double> bi = RawStore.wrap(bi_);
 
@@ -197,32 +197,31 @@ public class MINRESSolverTest {
     @Test
     public void quadraticTest2() {
 
-        double[][] q_ = new double[][] { { 6668.278705650674, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 6.315929943942014E12, 0.0, 0.0, 0.0, 0.0 },
+        double[][] q_ = { { 6668.278705650674, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 6.315929943942014E12, 0.0, 0.0, 0.0, 0.0 },
                 { 0.0, 0.0, 2.3988688378282965E13, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 6.359204638050388E15, 0.0, 0.0 },
                 { 0.0, 0.0, 0.0, 0.0, 6.129604959867126E15, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0, 2660643.1998935738 } };
 
         MatrixStore<Double> q = R064Store.FACTORY.makeWrapper(RawStore.wrap(q_));
 
-        double[][] l_ = new double[][] { { -476147.7777069725 }, { -300667.6690518168 }, { -153392.19762707502 }, { -178047.70825643447 },
-                { -59521.3068376414 }, { 4965004.705644156 } };
+        double[][] l_ = { { -476147.7777069725 }, { -300667.6690518168 }, { -153392.19762707502 }, { -178047.70825643447 }, { -59521.3068376414 },
+                { 4965004.705644156 } };
 
         MatrixStore<Double> l = R064Store.FACTORY.makeWrapper(RawStore.wrap(l_));
 
-        double[][] ae_ = new double[][] { { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 } };
+        double[][] ae_ = { { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 } };
 
         MatrixStore<Double> ae = R064Store.FACTORY.makeWrapper(RawStore.wrap(ae_));
 
-        double[][] be_ = new double[][] { { -2.220446049250313E-16 } };
+        double[][] be_ = { { -2.220446049250313E-16 } };
 
         MatrixStore<Double> be = R064Store.FACTORY.makeWrapper(RawStore.wrap(be_));
 
-        double[][] ai_ = new double[][] { { -1.0, -0.0, -0.0, -0.0, -0.0, -0.0 }, { -0.0, -1.0, -0.0, -0.0, -0.0, -0.0 },
-                { -0.0, -0.0, -1.0, -0.0, -0.0, -0.0 }, { -0.0, -0.0, -0.0, -1.0, -0.0, -0.0 }, { -0.0, -0.0, -0.0, -0.0, -1.0, -0.0 },
-                { -0.0, -0.0, -0.0, -0.0, -0.0, -1.0 } };
+        double[][] ai_ = { { -1.0, -0.0, -0.0, -0.0, -0.0, -0.0 }, { -0.0, -1.0, -0.0, -0.0, -0.0, -0.0 }, { -0.0, -0.0, -1.0, -0.0, -0.0, -0.0 },
+                { -0.0, -0.0, -0.0, -1.0, -0.0, -0.0 }, { -0.0, -0.0, -0.0, -0.0, -1.0, -0.0 }, { -0.0, -0.0, -0.0, -0.0, -0.0, -1.0 } };
 
         MatrixStore<Double> ai = R064Store.FACTORY.makeWrapper(RawStore.wrap(ai_));
 
-        double[][] bi_ = new double[][] { { 0.050000000000000044 }, { 1.0521478434747294E-9 }, { 2.7628102075066857E-10 }, { 4.5981121632729495E-14 },
+        double[][] bi_ = { { 0.050000000000000044 }, { 1.0521478434747294E-9 }, { 2.7628102075066857E-10 }, { 4.5981121632729495E-14 },
                 { 8.51609595643812E-14 }, { 0.0024937500000995 } };
 
         MatrixStore<Double> bi = R064Store.FACTORY.makeWrapper(RawStore.wrap(bi_));
@@ -299,7 +298,7 @@ public class MINRESSolverTest {
 
     @Test
     public void testIllConditionedNearlySingularSmall() {
-        int[] exponents = new int[] { 10, 12, 14, 16 };
+        int[] exponents = { 10, 12, 14, 16 };
         for (int exp : exponents) {
             double eps = Math.pow(10, -exp);
 
@@ -358,7 +357,7 @@ public class MINRESSolverTest {
                 R064Store A = R064Store.FACTORY.makeFilled(n, n, rnd);
                 A = MINRESSolverTest.symmetrize(A);
                 for (int i = 0; i < n; i++) {
-                    A.add(i, i, n);
+                    A.add(i, i, (double) n);
                 }
                 R064Store xTrue = R064Store.FACTORY.makeFilled(n, 1, rnd);
                 R064Store b = R064Store.FACTORY.copy(A.multiply(xTrue));

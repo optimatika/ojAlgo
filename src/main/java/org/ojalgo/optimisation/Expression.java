@@ -116,14 +116,6 @@ public final class Expression extends ModelEntity<Expression> {
      */
     private final boolean myShallowCopy;
 
-    @SuppressWarnings("unused")
-    private Expression(final Expression entityToCopy) {
-
-        this(entityToCopy, null, false);
-
-        ProgrammingError.throwForIllegalInvocation();
-    }
-
     protected Expression(final Expression expressionToCopy, final ExpressionsBasedModel destinationModel, final boolean deep) {
 
         super(expressionToCopy);
@@ -516,8 +508,7 @@ public final class Expression extends ModelEntity<Expression> {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + Objects.hash(myConstant, myLinear, myQuadratic, myShallowCopy);
-        return result;
+        return prime * result + Objects.hash(myConstant, myLinear, myQuadratic, myShallowCopy);
     }
 
     public boolean isAnyLinearFactorNonZero() {
@@ -1033,14 +1024,31 @@ public final class Expression extends ModelEntity<Expression> {
         }
 
         AggregatorSet<BigDecimal> aggregators = BigAggregator.getSet();
-        AggregatorFunction<BigDecimal> largest = aggregators.largest();
-        AggregatorFunction<BigDecimal> smallest = aggregators.smallest();
+        AggregatorFunction<BigDecimal> largest = aggregators.maximum();
+        AggregatorFunction<BigDecimal> smallest = aggregators.minimum();
+
+        BigDecimal factor;
 
         if (this.isAnyQuadraticFactorNonZero()) {
 
-            for (BigDecimal quadraticFactor : myQuadratic.values()) {
-                largest.invoke(quadraticFactor);
-                smallest.invoke(quadraticFactor);
+            boolean onDiagonal = false;
+
+            for (Entry<IntRowColumn, BigDecimal> quadraticEntry : myQuadratic.entrySet()) {
+                IntRowColumn key = quadraticEntry.getKey();
+                if (key.row == key.column) {
+                    onDiagonal = true;
+                    factor = quadraticEntry.getValue().abs();
+                    largest.invoke(factor);
+                    smallest.invoke(factor);
+                }
+            }
+
+            if (!onDiagonal) {
+                for (BigDecimal quadraticFactor : myQuadratic.values()) {
+                    factor = quadraticFactor.abs();
+                    largest.invoke(factor);
+                    smallest.invoke(factor);
+                }
             }
 
             return ModelEntity.deriveAdjustmentExponent(largest, smallest, RANGE);
@@ -1048,8 +1056,9 @@ public final class Expression extends ModelEntity<Expression> {
         } else if (this.isAnyLinearFactorNonZero()) {
 
             for (BigDecimal linearFactor : myLinear.values()) {
-                largest.invoke(linearFactor);
-                smallest.invoke(linearFactor);
+                factor = linearFactor.abs();
+                largest.invoke(factor);
+                smallest.invoke(factor);
             }
 
             return ModelEntity.deriveAdjustmentExponent(largest, smallest, RANGE);

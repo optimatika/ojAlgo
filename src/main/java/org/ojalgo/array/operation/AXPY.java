@@ -24,6 +24,7 @@ package org.ojalgo.array.operation;
 import java.math.BigDecimal;
 
 import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Mutate1D;
 
@@ -46,6 +47,12 @@ public abstract class AXPY implements ArrayOperation {
 
     public static void invoke(final double[] y, final double a, final double[] x) {
         AXPY.invoke(y, 0, a, x, 0, 0, Math.min(y.length, x.length));
+    }
+
+    public static void invoke(final double[] data, final double a, final double[] x, final double[] y) {
+        for (int i = 0, limit = MissingMath.min(data.length, x.length, y.length); i < limit; i++) {
+            data[i] = a * x[i] + y[i];
+        }
     }
 
     public static void invoke(final double[] y, final int basey, final double a, final double[] x, final int basex, final int first, final int limit) {

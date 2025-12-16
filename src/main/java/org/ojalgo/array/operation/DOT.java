@@ -78,6 +78,10 @@ public abstract class DOT implements ArrayOperation {
         return retVal;
     }
 
+    public static double invoke(final double[] array1, final double[] array2) {
+        return DOT.plain(array1, 0, array2, 0, 0, Math.min(array1.length, array2.length));
+    }
+
     public static double invoke(final double[] array1, final int offset1, final Access1D<?> array2, final int offset2, final int first, final int limit) {
         double retVal = PrimitiveMath.ZERO;
         for (int i = first; i < limit; i++) {

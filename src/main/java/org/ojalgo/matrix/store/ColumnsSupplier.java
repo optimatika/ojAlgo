@@ -90,6 +90,11 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixSto
     }
 
     @Override
+    public void add(final int row, final int col, final double addend) {
+        myColumns.get(col).add(row, addend);
+    }
+
+    @Override
     public void add(final long row, final long col, final Comparable<?> addend) {
         myColumns.get((int) col).add(row, addend);
     }

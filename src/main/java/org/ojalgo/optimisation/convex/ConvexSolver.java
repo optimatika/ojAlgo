@@ -34,7 +34,6 @@ import java.util.stream.Collectors;
 
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.ArrayR256;
-import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.matrix.decomposition.Cholesky;
@@ -603,45 +602,16 @@ public abstract class ConvexSolver extends GenericSolver {
         @Override
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
 
-            List<Variable> freeVariables = model.getFreeVariables();
-            Set<IntIndex> fixedVariables = model.getFixedVariables();
-            int nbFreeVars = freeVariables.size();
-            int nbModelVars = model.countVariables();
-
-            BasicArray<?> modelSolution;
             if (model.options.convex().isExtendedPrecision()) {
-                modelSolution = ArrayR256.make(nbModelVars);
-                for (int i = 0; i < nbFreeVars; i++) {
-                    modelSolution.set(model.indexOf(freeVariables.get(i)), solverState.get(i));
-                }
+                return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR256.FACTORY);
             } else {
-                modelSolution = ArrayR064.make(nbModelVars);
-                for (int i = 0; i < nbFreeVars; i++) {
-                    modelSolution.set(model.indexOf(freeVariables.get(i)), solverState.doubleValue(i));
-                }
+                return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR064.FACTORY);
             }
-            for (IntIndex fixed : fixedVariables) {
-                modelSolution.set(fixed.index, model.getVariable(fixed.index).getValue());
-            }
-
-            return solverState.withSolution(modelSolution);
         }
 
         @Override
         public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
-
-            List<Variable> freeVariables = model.getFreeVariables();
-            int nbFreeVars = freeVariables.size();
-
-            ArrayR064 solverSolution = ArrayR064.make(nbFreeVars);
-
-            for (int i = 0; i < nbFreeVars; i++) {
-                Variable variable = freeVariables.get(i);
-                int modelIndex = model.indexOf(variable);
-                solverSolution.set(i, modelState.doubleValue(modelIndex));
-            }
-
-            return modelState.withSolution(solverSolution);
+            return ExpressionsBasedModel.Integration.reduceFullToFree(modelState, model, ArrayR064.FACTORY);
         }
 
     }

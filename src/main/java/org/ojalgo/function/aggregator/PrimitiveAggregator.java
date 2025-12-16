@@ -32,25 +32,29 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
 
     static abstract class PrimitiveAggregatorFunction implements AggregatorFunction<Double> {
 
+        @Override
         public final Double get() {
             return Double.valueOf(this.doubleValue());
         }
 
+        @Override
         public final void invoke(final Double arg) {
             this.invoke(arg.doubleValue());
         }
 
+        @Override
         public final void invoke(final float arg) {
             this.invoke((double) arg);
         }
 
+        @Override
         public final Scalar<Double> toScalar() {
             return PrimitiveScalar.of(this.doubleValue());
         }
 
     }
 
-    private static final ThreadLocal<AggregatorFunction<Double>> AVERAGE = new ThreadLocal<AggregatorFunction<Double>>() {
+    private static final ThreadLocal<AggregatorFunction<Double>> AVERAGE = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<Double> initialValue() {
@@ -59,19 +63,23 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                 private int myCount = 0;
                 private double myValue = ZERO;
 
+                @Override
                 public double doubleValue() {
                     return myValue / myCount;
                 }
 
+                @Override
                 public int intValue() {
                     return (int) this.doubleValue();
                 }
 
+                @Override
                 public void invoke(final double anArg) {
                     myCount++;
                     myValue += anArg;
                 }
 
+                @Override
                 public AggregatorFunction<Double> reset() {
                     myCount = 0;
                     myValue = ZERO;
@@ -82,7 +90,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<Double>> CARDINALITY = new ThreadLocal<AggregatorFunction<Double>>() {
+    private static final ThreadLocal<AggregatorFunction<Double>> CARDINALITY = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<Double> initialValue() {
@@ -90,20 +98,24 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
 
                 private int myCount = 0;
 
+                @Override
                 public double doubleValue() {
                     return myCount;
                 }
 
+                @Override
                 public int intValue() {
                     return myCount;
                 }
 
+                @Override
                 public void invoke(final double anArg) {
                     if (!PrimitiveScalar.isSmall(PrimitiveMath.ONE, anArg)) {
                         myCount++;
                     }
                 }
 
+                @Override
                 public AggregatorFunction<Double> reset() {
                     myCount = 0;
                     return this;
@@ -113,7 +125,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<Double>> LARGEST = new ThreadLocal<AggregatorFunction<Double>>() {
+    private static final ThreadLocal<AggregatorFunction<Double>> LARGEST = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<Double> initialValue() {
@@ -121,18 +133,22 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
 
                 private double myValue = ZERO;
 
+                @Override
                 public double doubleValue() {
                     return myValue;
                 }
 
+                @Override
                 public int intValue() {
                     return (int) this.doubleValue();
                 }
 
+                @Override
                 public void invoke(final double anArg) {
                     myValue = PrimitiveMath.MAX.invoke(myValue, PrimitiveMath.ABS.invoke(anArg));
                 }
 
+                @Override
                 public AggregatorFunction<Double> reset() {
                     myValue = ZERO;
                     return this;
@@ -142,7 +158,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<Double>> MAX = new ThreadLocal<AggregatorFunction<Double>>() {
+    private static final ThreadLocal<AggregatorFunction<Double>> MAX = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<Double> initialValue() {
@@ -150,18 +166,22 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
 
                 private double myValue = NEGATIVE_INFINITY;
 
+                @Override
                 public double doubleValue() {
                     return myValue;
                 }
 
+                @Override
                 public int intValue() {
                     return (int) this.doubleValue();
                 }
 
+                @Override
                 public void invoke(final double anArg) {
                     myValue = PrimitiveMath.MAX.invoke(myValue, anArg);
                 }
 
+                @Override
                 public AggregatorFunction<Double> reset() {
                     myValue = NEGATIVE_INFINITY;
                     return this;
@@ -171,7 +191,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<Double>> MIN = new ThreadLocal<AggregatorFunction<Double>>() {
+    private static final ThreadLocal<AggregatorFunction<Double>> MIN = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<Double> initialValue() {
@@ -179,6 +199,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
 
                 private double myValue = POSITIVE_INFINITY;
 
+                @Override
                 public double doubleValue() {
                     if (Double.isInfinite(myValue)) {
                         return ZERO;
@@ -186,14 +207,17 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                     return myValue;
                 }
 
+                @Override
                 public int intValue() {
                     return (int) this.doubleValue();
                 }
 
+                @Override
                 public void invoke(final double anArg) {
                     myValue = PrimitiveMath.MIN.invoke(myValue, anArg);
                 }
 
+                @Override
                 public AggregatorFunction<Double> reset() {
                     myValue = POSITIVE_INFINITY;
                     return this;
@@ -203,7 +227,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<Double>> NORM1 = new ThreadLocal<AggregatorFunction<Double>>() {
+    private static final ThreadLocal<AggregatorFunction<Double>> NORM1 = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<Double> initialValue() {
@@ -211,18 +235,22 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
 
                 private double myValue = ZERO;
 
+                @Override
                 public double doubleValue() {
                     return myValue;
                 }
 
+                @Override
                 public int intValue() {
                     return (int) this.doubleValue();
                 }
 
+                @Override
                 public void invoke(final double anArg) {
                     myValue += PrimitiveMath.ABS.invoke(anArg);
                 }
 
+                @Override
                 public AggregatorFunction<Double> reset() {
                     myValue = ZERO;
                     return this;
@@ -232,7 +260,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<Double>> NORM2 = new ThreadLocal<AggregatorFunction<Double>>() {
+    private static final ThreadLocal<AggregatorFunction<Double>> NORM2 = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<Double> initialValue() {
@@ -240,18 +268,22 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
 
                 private double myValue = ZERO;
 
+                @Override
                 public double doubleValue() {
                     return PrimitiveMath.SQRT.invoke(myValue);
                 }
 
+                @Override
                 public int intValue() {
                     return (int) this.doubleValue();
                 }
 
+                @Override
                 public void invoke(final double anArg) {
                     myValue += anArg * anArg;
                 }
 
+                @Override
                 public AggregatorFunction<Double> reset() {
                     myValue = ZERO;
                     return this;
@@ -261,7 +293,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<Double>> PRODUCT = new ThreadLocal<AggregatorFunction<Double>>() {
+    private static final ThreadLocal<AggregatorFunction<Double>> PRODUCT = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<Double> initialValue() {
@@ -269,18 +301,22 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
 
                 private double myValue = ONE;
 
+                @Override
                 public double doubleValue() {
                     return myValue;
                 }
 
+                @Override
                 public int intValue() {
                     return (int) this.doubleValue();
                 }
 
+                @Override
                 public void invoke(final double anArg) {
                     myValue *= anArg;
                 }
 
+                @Override
                 public AggregatorFunction<Double> reset() {
                     myValue = ONE;
                     return this;
@@ -290,7 +326,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<Double>> PRODUCT2 = new ThreadLocal<AggregatorFunction<Double>>() {
+    private static final ThreadLocal<AggregatorFunction<Double>> PRODUCT2 = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<Double> initialValue() {
@@ -298,18 +334,22 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
 
                 private double myValue = ONE;
 
+                @Override
                 public double doubleValue() {
                     return myValue;
                 }
 
+                @Override
                 public int intValue() {
                     return (int) this.doubleValue();
                 }
 
+                @Override
                 public void invoke(final double anArg) {
                     myValue *= anArg * anArg;
                 }
 
+                @Override
                 public AggregatorFunction<Double> reset() {
                     myValue = ONE;
                     return this;
@@ -321,7 +361,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
 
     private static final PrimitiveAggregator SET = new PrimitiveAggregator();
 
-    private static final ThreadLocal<AggregatorFunction<Double>> SMALLEST = new ThreadLocal<AggregatorFunction<Double>>() {
+    private static final ThreadLocal<AggregatorFunction<Double>> SMALLEST = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<Double> initialValue() {
@@ -329,6 +369,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
 
                 private double myValue = POSITIVE_INFINITY;
 
+                @Override
                 public double doubleValue() {
                     if (Double.isInfinite(myValue)) {
                         return ZERO;
@@ -336,10 +377,12 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                     return myValue;
                 }
 
+                @Override
                 public int intValue() {
                     return (int) this.doubleValue();
                 }
 
+                @Override
                 public void invoke(final double anArg) {
                     final double tmpArg = PrimitiveMath.ABS.invoke(anArg);
                     if (NumberContext.compare(tmpArg, ZERO) != 0) {
@@ -347,6 +390,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                     }
                 }
 
+                @Override
                 public AggregatorFunction<Double> reset() {
                     myValue = POSITIVE_INFINITY;
                     return this;
@@ -356,7 +400,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<Double>> SUM = new ThreadLocal<AggregatorFunction<Double>>() {
+    private static final ThreadLocal<AggregatorFunction<Double>> SUM = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<Double> initialValue() {
@@ -364,18 +408,22 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
 
                 private double myValue = ZERO;
 
+                @Override
                 public double doubleValue() {
                     return myValue;
                 }
 
+                @Override
                 public int intValue() {
                     return (int) this.doubleValue();
                 }
 
+                @Override
                 public void invoke(final double anArg) {
                     myValue += anArg;
                 }
 
+                @Override
                 public AggregatorFunction<Double> reset() {
                     myValue = ZERO;
                     return this;
@@ -385,7 +433,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<Double>> SUM2 = new ThreadLocal<AggregatorFunction<Double>>() {
+    private static final ThreadLocal<AggregatorFunction<Double>> SUM2 = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<Double> initialValue() {
@@ -393,18 +441,22 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
 
                 private double myValue = ZERO;
 
+                @Override
                 public double doubleValue() {
                     return myValue;
                 }
 
+                @Override
                 public int intValue() {
                     return (int) this.doubleValue();
                 }
 
+                @Override
                 public void invoke(final double anArg) {
                     myValue += anArg * anArg;
                 }
 
+                @Override
                 public AggregatorFunction<Double> reset() {
                     myValue = ZERO;
                     return this;

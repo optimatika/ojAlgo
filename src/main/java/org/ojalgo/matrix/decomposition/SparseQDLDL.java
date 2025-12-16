@@ -28,8 +28,10 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
 
     /**
      * Symbolic elimination tree
+     * <p>
+     * It's public so that you can cache it, but no need to access the internals.
      */
-    static final class EliminationTree {
+    public static final class EliminationTree {
 
         /**
          * The number of non-zeros in each column of L
@@ -51,18 +53,35 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
         }
     }
 
-    private static final int UNKNOWN = -1;
-    private static final boolean UNUSED = false;
-    private static final boolean USED = true;
+    private static final class WorkerCache {
 
-    static EliminationTree computeEliminationTree(final int n, final int[] pointers, final int[] indices) {
+        int[] yIdx = null;
+        int[] elimBuffer = null;
+        int[] LNextSpaceInCol = null;
+        double[] yVals = null;
+        boolean[] yMarkers = null;
+
+        void reset(final int n) {
+
+            if (yIdx == null || yIdx.length != n) {
+                yIdx = new int[n];
+                elimBuffer = new int[n];
+                LNextSpaceInCol = new int[n];
+                yVals = new double[n];
+                yMarkers = new boolean[n];
+            }
+        }
+
+    }
+
+    private static EliminationTree computeEliminationTree(final int n, final int[] pointers, final int[] indices) {
 
         int[] work = new int[n];
         int[] tree = new int[n];
         int[] colNz = new int[n];
         int totNz = 0;
 
-        Arrays.fill(tree, UNKNOWN);
+        Arrays.fill(tree, -1);
 
         int pj, pj1, i;
         for (int j = 0; j < n; j++) {
@@ -80,7 +99,7 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
                     throw new IllegalStateException();
                 }
                 while (work[i] != j) {
-                    if (tree[i] == UNKNOWN) {
+                    if (tree[i] < 0) {
                         tree[i] = j;
                     }
                     colNz[i]++;
@@ -94,14 +113,14 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
         return new EliminationTree(colNz, tree, totNz);
     }
 
-    static void solveD(final int n, final double[] inv, final double[] x) {
-        for (int i = 0; i < n; i++) {
+    private static void solveD(final double[] inv, final double[] x) {
+        for (int i = 0, n = x.length; i < n; i++) {
             x[i] *= inv[i]; // inv(D)
         }
     }
 
-    static void solveL(final int n, final int[] pointers, final int[] indices, final double[] values, final double[] x) {
-        for (int j = 0; j < n; j++) {
+    private static void solveL(final int[] pointers, final int[] indices, final double[] values, final double[] x) {
+        for (int j = 0, n = x.length; j < n; j++) {
             double xj = x[j];
             for (int ji = pointers[j], jm = pointers[j + 1]; ji < jm; ji++) {
                 x[indices[ji]] -= values[ji] * xj;
@@ -109,8 +128,8 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
         }
     }
 
-    static void solveU(final int n, final int[] pointers, final int[] indices, final double[] values, final double[] x) {
-        for (int j = n - 1; j >= 0; j--) {
+    private static void solveU(final int[] pointers, final int[] indices, final double[] values, final double[] x) {
+        for (int j = x.length - 1; j >= 0; j--) {
             double dxj = ZERO;
             for (int ji = pointers[j], jm = pointers[j + 1]; ji < jm; ji++) {
                 dxj -= values[ji] * x[indices[ji]];
@@ -123,6 +142,7 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
     private double[] myDinv;
     private R064CSC myL;
     private int myPositiveValuesInD;
+    private final WorkerCache myWorkerCache = new WorkerCache();
 
     public SparseQDLDL() {
         super(R064Store.FACTORY);
@@ -131,10 +151,10 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
     @Override
     public void btran(final PhysicalStore<Double> arg) {
         if (arg instanceof R064Store) {
-            this.solveOneColumn(((R064Store) arg).data);
+            this.ftran(((R064Store) arg).data);
         } else {
             double[] x = arg.toRawCopy1D();
-            this.solveOneColumn(x);
+            this.ftran(x);
             COPY.invoke(x, arg);
         }
     }
@@ -143,6 +163,26 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
     public Double calculateDeterminant(final Access2D<?> matrix) {
         this.decompose(this.wrap(matrix));
         return this.getDeterminant();
+    }
+
+    public EliminationTree computeEliminationTree(final R064CSC matrix) {
+
+        int n = matrix.getColDim();
+
+        EliminationTree eTree = SparseQDLDL.computeEliminationTree(n, matrix.pointers, matrix.indices);
+
+        if (myL == null || myL.getColDim() != n || myL.countNonzeros() != eTree.totNz) {
+            myL = new R064CSC(n, n, eTree.totNz);
+        }
+
+        if (myD == null || myD.length != n) {
+            myD = new double[n];
+            myDinv = new double[n];
+        }
+
+        myWorkerCache.reset(n);
+
+        return eTree;
     }
 
     @Override
@@ -192,21 +232,35 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
      * (numerically) zero. Indefinite or near-singular matrices may still factorise, but will typically yield
      * {@code isSolvable() == false} and are not suitable for use as quasi-definite systems when solving or
      * inverting.
+     * <p>
+     * This method performs both the symbolic analysis (elimination tree) and numeric factorisation. For
+     * repeated factorisations with identical sparsity patterns and updated values, callers may instead use
+     * {@link #factor(R064CSC, EliminationTree)} together with a cached symbolic tree obtained from
+     * {@link #getSymbolic()}.
      */
     public boolean factor(final R064CSC matrix) {
         this.reset();
-        EliminationTree eTree = SparseQDLDL.computeEliminationTree(matrix.getColDim(), matrix.pointers, matrix.indices);
-        boolean ok = this.decompose(matrix, eTree);
-        return this.computed(ok);
+        EliminationTree eTree = this.computeEliminationTree(matrix);
+        return this.decompose(matrix, eTree, myL, myD, myDinv, myWorkerCache);
+    }
+
+    /**
+     * Convenience for callers that have already computed the symbolic structure for a given sparsity pattern.
+     * The caller is responsible for ensuring that the supplied {@link EliminationTree} matches the pattern of
+     * {@code matrix}; behaviour is undefined if they do not.
+     */
+    public boolean factor(final R064CSC matrix, final EliminationTree eTree) {
+        this.reset();
+        return this.decompose(matrix, eTree, myL, myD, myDinv, myWorkerCache);
     }
 
     @Override
     public void ftran(final PhysicalStore<Double> arg) {
         if (arg instanceof R064Store) {
-            this.solveOneColumn(((R064Store) arg).data);
+            this.ftran(((R064Store) arg).data);
         } else {
             double[] x = arg.toRawCopy1D();
-            this.solveOneColumn(x);
+            this.ftran(x);
             COPY.invoke(x, arg);
         }
     }
@@ -255,7 +309,7 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
 
     @Override
     public MatrixStore<Double> getL() {
-        return myL;
+        return myL.triangular(false, true);
     }
 
     @Override
@@ -305,14 +359,14 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
         if (n == 1) {
 
             COPY.invoke(preallocated, x);
-            this.solveOneColumn(x);
+            this.ftran(x);
             COPY.invoke(x, preallocated);
 
         } else {
 
             for (ColumnView<Double> column : preallocated.columns()) {
                 COPY.invoke(column, x);
-                this.solveOneColumn(x);
+                this.ftran(x);
                 COPY.invoke(x, column);
             }
         }
@@ -362,47 +416,53 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
 
         double[] x = b.clone();
 
-        this.solveOneColumn(x);
+        this.ftran(x);
 
         return x;
     }
 
-    private boolean decompose(final R064CSC matrix, final EliminationTree eTree) {
+    /**
+     * In this method, variable names are deliberately kept close to what they are in the original c-code.
+     */
+    private boolean decompose(final R064CSC matrix, final EliminationTree eTree, final R064CSC decomp, final double[] D, final double[] Dinv,
+            final WorkerCache workers) {
+
+        int n = matrix.getColDim();
 
         int[] Lnz = eTree.colNz;
         int[] etree = eTree.tree;
-        int n = matrix.getColDim();
-        int m = matrix.getRowDim();
+
         int[] Ap = matrix.pointers;
         int[] Ai = matrix.indices;
         double[] Ax = matrix.values;
-        int[] Lp = new int[n + 1];
-        int[] Li = new int[eTree.totNz];
-        double[] Lx = new double[eTree.totNz];
-        double[] D = new double[n];
-        double[] Dinv = new double[n];
+
+        int[] Lp = decomp.pointers;
+        int[] Li = decomp.indices;
+        double[] Lx = decomp.values;
 
         int i, j, k, nnzY, bidx, cidx, nextIdx, nnzE, tmpIdx;
-        int[] yIdx = new int[n];
-        int[] elimBuffer = new int[n];
-        int[] LNextSpaceInCol = new int[n];
-        double[] yVals = new double[n];
+
+        int[] yIdx = workers.yIdx;
+        int[] elimBuffer = workers.elimBuffer;
+        int[] LNextSpaceInCol = workers.LNextSpaceInCol;
+        double[] yVals = workers.yVals;
+        boolean[] yMarkers = workers.yMarkers;
+
         double yVals_cidx;
-        boolean[] yMarkers = new boolean[n];
+
         int positiveValuesInD = 0;
-        double maxAbsD = ZERO;
 
         Lp[0] = 0;
         for (i = 0; i < n; i++) {
             Lp[i + 1] = Lp[i] + Lnz[i];
-            yMarkers[i] = UNUSED;
+            yMarkers[i] = false;
             yVals[i] = ZERO;
             D[i] = ZERO;
             LNextSpaceInCol[i] = Lp[i];
         }
 
         D[0] = Ax[0];
-        maxAbsD = Math.abs(D[0]);
+        double maxAbsD = Math.abs(D[0]);
         if (D[0] == ZERO) {
             return false;
         }
@@ -429,20 +489,20 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
 
                 nextIdx = bidx;
 
-                if (yMarkers[nextIdx] == UNUSED) {
+                if (!yMarkers[nextIdx]) {
 
-                    yMarkers[nextIdx] = USED;
+                    yMarkers[nextIdx] = true;
                     elimBuffer[0] = nextIdx;
                     nnzE = 1;
 
                     nextIdx = etree[bidx];
 
-                    while (nextIdx != UNKNOWN && nextIdx < k) {
-                        if (yMarkers[nextIdx] == USED) {
+                    while (nextIdx >= 0 && nextIdx < k) {
+                        if (yMarkers[nextIdx]) {
                             break;
                         }
 
-                        yMarkers[nextIdx] = USED;
+                        yMarkers[nextIdx] = true;
                         elimBuffer[nnzE] = nextIdx;
                         nnzE++;
                         nextIdx = etree[nextIdx];
@@ -453,7 +513,6 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
                         yIdx[nnzY++] = elimBuffer[--nnzE];
                     }
                 }
-
             }
 
             for (i = nnzY - 1; i >= 0; i--) {
@@ -473,8 +532,7 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
                 LNextSpaceInCol[cidx]++;
 
                 yVals[cidx] = ZERO;
-                yMarkers[cidx] = UNUSED;
-
+                yMarkers[cidx] = false;
             }
 
             maxAbsD = Math.max(maxAbsD, Math.abs(D[k]));
@@ -489,37 +547,32 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
             }
 
             Dinv[k] = ONE / D[k];
-
         }
 
-        myL = new R064CSC(n, m, Lx, Li, Lp);
-        myD = D;
-        myDinv = Dinv;
         myPositiveValuesInD = positiveValuesInD;
 
-        return true;
-    }
-
-    /**
-     * Solve A x = b in-place for one column/vector x. Initially x holds b, on exit x holds the solution.
-     */
-    private void solveOneColumn(final double[] x) {
-
-        int n = myL.getColDim();
-        int[] pointers = myL.pointers;
-        int[] indices = myL.indices;
-        double[] values = myL.values;
-
-        SparseQDLDL.solveL(n, pointers, indices, values, x);
-
-        SparseQDLDL.solveD(n, myDinv, x);
-
-        SparseQDLDL.solveU(n, pointers, indices, values, x);
+        return this.computed(true);
     }
 
     @Override
     protected boolean checkSolvability() {
         return myD != null && myPositiveValuesInD == myD.length;
+    }
+
+    /**
+     * Solve A x = b in-place for one column/vector x. Initially x holds b, on exit x holds the solution.
+     */
+    void ftran(final double[] x) {
+
+        int[] pointers = myL.pointers;
+        int[] indices = myL.indices;
+        double[] values = myL.values;
+
+        SparseQDLDL.solveL(pointers, indices, values, x);
+
+        SparseQDLDL.solveD(myDinv, x);
+
+        SparseQDLDL.solveU(pointers, indices, values, x);
     }
 
 }

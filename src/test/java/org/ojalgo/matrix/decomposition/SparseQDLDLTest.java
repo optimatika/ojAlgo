@@ -7,6 +7,8 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064CSC;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.type.context.NumberContext;
 
 public class SparseQDLDLTest extends MatrixDecompositionTests {
 
@@ -412,6 +414,40 @@ public class SparseQDLDLTest extends MatrixDecompositionTests {
 
         SparseQDLDL ldl = new SparseQDLDL();
         TestUtils.assertTrue(ldl.factor(A));
+    }
+
+    /**
+     * Reconstruct and verify against the original matrix.
+     */
+    @Test
+    public void testReconstructMatchesOriginal() {
+
+        // 3x3 SPD example: A = [[4,1,0],[1,3,1],[0,1,2]] stored as a full dense matrix
+        R064Store mtrxA = R064Store.FACTORY.make(3, 3);
+        mtrxA.set(0, 0, 4.0);
+        mtrxA.set(0, 1, 1.0);
+        mtrxA.set(1, 0, 1.0);
+        mtrxA.set(1, 1, 3.0);
+        mtrxA.set(1, 2, 1.0);
+        mtrxA.set(2, 1, 1.0);
+        mtrxA.set(2, 2, 2.0);
+
+        SparseQDLDL ldl = new SparseQDLDL();
+        TestUtils.assertTrue(ldl.decompose(mtrxA));
+
+        MatrixStore<Double> reconstructed = ldl.reconstruct();
+
+        if (DEBUG) {
+            BasicLogger.debugMatrix("Original", mtrxA);
+            BasicLogger.debugMatrix("L", ldl.getL());
+            BasicLogger.debugMatrix("D", ldl.getD());
+            BasicLogger.debugMatrix("R", ldl.getR());
+            BasicLogger.debugMatrix("Reconstructed", reconstructed);
+        }
+
+        TestUtils.assertEquals(mtrxA, ldl, NumberContext.of(12));
+
+        TestUtils.assertEquals(mtrxA, reconstructed);
     }
 
     /**

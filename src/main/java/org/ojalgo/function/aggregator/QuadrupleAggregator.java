@@ -31,18 +31,22 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
 
     static abstract class QuadrupleAggregatorFunction implements AggregatorFunction<Quadruple> {
 
+        @Override
         public final double doubleValue() {
             return this.get().doubleValue();
         }
 
+        @Override
         public final void invoke(final double anArg) {
             this.invoke(Quadruple.valueOf(anArg));
         }
 
+        @Override
         public final void invoke(final float anArg) {
             this.invoke(Quadruple.valueOf(anArg));
         }
 
+        @Override
         public final Scalar<Quadruple> toScalar() {
             return this.get();
         }
@@ -59,19 +63,23 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
 
                 private Quadruple myNumber = Quadruple.ZERO;
 
+                @Override
                 public Quadruple get() {
                     return myNumber.divide(myCount);
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final Quadruple anArg) {
                     myCount++;
                     myNumber = myNumber.add(anArg);
                 }
 
+                @Override
                 public AggregatorFunction<Quadruple> reset() {
                     myCount = 0;
                     myNumber = Quadruple.ZERO;
@@ -90,20 +98,24 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
 
                 private int myCount = 0;
 
+                @Override
                 public Quadruple get() {
                     return Quadruple.valueOf(myCount);
                 }
 
+                @Override
                 public int intValue() {
                     return myCount;
                 }
 
+                @Override
                 public void invoke(final Quadruple anArg) {
                     if (!PrimitiveScalar.isSmall(PrimitiveMath.ONE, PrimitiveMath.ABS.invoke(anArg.doubleValue()))) {
                         myCount++;
                     }
                 }
 
+                @Override
                 public AggregatorFunction<Quadruple> reset() {
                     myCount = 0;
                     return this;
@@ -121,18 +133,22 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
 
                 private Quadruple myNumber = Quadruple.ZERO;
 
+                @Override
                 public Quadruple get() {
                     return myNumber;
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final Quadruple anArg) {
                     myNumber = QuadrupleMath.MAX.invoke(myNumber, QuadrupleMath.ABS.invoke(anArg));
                 }
 
+                @Override
                 public AggregatorFunction<Quadruple> reset() {
                     myNumber = Quadruple.ZERO;
                     return this;
@@ -150,18 +166,22 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
 
                 private Quadruple myNumber = Quadruple.NEGATIVE_INFINITY;
 
+                @Override
                 public Quadruple get() {
                     return myNumber;
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final Quadruple anArg) {
                     myNumber = QuadrupleMath.MAX.invoke(myNumber, anArg);
                 }
 
+                @Override
                 public AggregatorFunction<Quadruple> reset() {
                     myNumber = Quadruple.NEGATIVE_INFINITY;
                     return this;
@@ -179,6 +199,7 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
 
                 private Quadruple myNumber = Quadruple.POSITIVE_INFINITY;
 
+                @Override
                 public Quadruple get() {
                     if (Quadruple.isInfinite(myNumber)) {
                         return Quadruple.ZERO;
@@ -186,14 +207,17 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
                     return myNumber;
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final Quadruple anArg) {
                     myNumber = QuadrupleMath.MIN.invoke(myNumber, anArg);
                 }
 
+                @Override
                 public AggregatorFunction<Quadruple> reset() {
                     myNumber = Quadruple.POSITIVE_INFINITY;
                     return this;
@@ -211,18 +235,22 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
 
                 private Quadruple myNumber = Quadruple.ZERO;
 
+                @Override
                 public Quadruple get() {
                     return myNumber;
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final Quadruple anArg) {
                     myNumber = myNumber.add(PrimitiveMath.ABS.invoke(anArg.doubleValue()));
                 }
 
+                @Override
                 public AggregatorFunction<Quadruple> reset() {
                     myNumber = Quadruple.ZERO;
                     return this;
@@ -240,19 +268,23 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
 
                 private Quadruple myNumber = Quadruple.ZERO;
 
+                @Override
                 public Quadruple get() {
                     return Quadruple.valueOf(PrimitiveMath.SQRT.invoke(PrimitiveMath.ABS.invoke(myNumber.doubleValue())));
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final Quadruple anArg) {
                     final double tmpMod = PrimitiveMath.ABS.invoke(anArg.doubleValue());
                     myNumber = myNumber.add(tmpMod * tmpMod);
                 }
 
+                @Override
                 public AggregatorFunction<Quadruple> reset() {
                     myNumber = Quadruple.ZERO;
                     return this;
@@ -270,18 +302,22 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
 
                 private Quadruple myNumber = Quadruple.ONE;
 
+                @Override
                 public Quadruple get() {
                     return myNumber;
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final Quadruple anArg) {
                     myNumber = myNumber.multiply(anArg);
                 }
 
+                @Override
                 public AggregatorFunction<Quadruple> reset() {
                     myNumber = Quadruple.ONE;
                     return this;
@@ -299,18 +335,22 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
 
                 private Quadruple myNumber = Quadruple.ONE;
 
+                @Override
                 public Quadruple get() {
                     return myNumber;
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final Quadruple anArg) {
                     myNumber = myNumber.multiply(anArg.multiply(anArg));
                 }
 
+                @Override
                 public AggregatorFunction<Quadruple> reset() {
                     myNumber = Quadruple.ONE;
                     return this;
@@ -330,6 +370,7 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
 
                 private Quadruple myNumber = Quadruple.POSITIVE_INFINITY;
 
+                @Override
                 public Quadruple get() {
                     if (Quadruple.isInfinite(myNumber)) {
                         return Quadruple.ZERO;
@@ -337,16 +378,19 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
                     return myNumber;
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final Quadruple anArg) {
                     if (!Quadruple.isSmall(PrimitiveMath.ONE, anArg)) {
                         myNumber = QuadrupleMath.MIN.invoke(myNumber, QuadrupleMath.ABS.invoke(anArg));
                     }
                 }
 
+                @Override
                 public AggregatorFunction<Quadruple> reset() {
                     myNumber = Quadruple.POSITIVE_INFINITY;
                     return this;
@@ -364,18 +408,22 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
 
                 private Quadruple myNumber = Quadruple.ZERO;
 
+                @Override
                 public Quadruple get() {
                     return myNumber;
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final Quadruple anArg) {
                     myNumber = myNumber.add(anArg);
                 }
 
+                @Override
                 public AggregatorFunction<Quadruple> reset() {
                     myNumber = Quadruple.ZERO;
                     return this;
@@ -393,18 +441,22 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
 
                 private Quadruple myNumber = Quadruple.ZERO;
 
+                @Override
                 public Quadruple get() {
                     return myNumber;
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final Quadruple anArg) {
                     myNumber = myNumber.add(anArg.multiply(anArg));
                 }
 
+                @Override
                 public AggregatorFunction<Quadruple> reset() {
                     myNumber = Quadruple.ZERO;
                     return this;

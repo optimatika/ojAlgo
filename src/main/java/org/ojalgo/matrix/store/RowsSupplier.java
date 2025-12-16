@@ -91,6 +91,11 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
     }
 
     @Override
+    public void add(final int row, final int col, final double addend) {
+        myRows.get(row).add(col, addend);
+    }
+
+    @Override
     public void add(final long row, final long col, final Comparable<?> addend) {
         myRows.get((int) row).add(col, addend);
     }

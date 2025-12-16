@@ -169,6 +169,11 @@ public final class Array2D<N extends Comparable<N>>
     }
 
     @Override
+    public void add(final int row, final int col, final double addend) {
+        myDelegate.add(Structure2D.index(myRowsCount, row, col), addend);
+    }
+
+    @Override
     public void add(final long index, final byte addend) {
         myDelegate.add(index, addend);
     }

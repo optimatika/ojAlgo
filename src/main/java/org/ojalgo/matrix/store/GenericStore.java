@@ -265,6 +265,11 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
     }
 
     @Override
+    public void add(final int row, final int col, final double addend) {
+        myUtility.add(row, col, addend);
+    }
+
+    @Override
     public void add(final long row, final long col, final Comparable<?> addend) {
         myUtility.add(row, col, addend);
     }

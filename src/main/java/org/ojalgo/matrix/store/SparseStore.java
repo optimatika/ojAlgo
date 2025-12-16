@@ -301,6 +301,12 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
     }
 
     @Override
+    public void add(final int row, final int col, final double addend) {
+        myElements.add(Structure2D.index(myFirsts.length, row, col), addend);
+        this.updateNonZeros(row, col);
+    }
+
+    @Override
     public void add(final long row, final long col, final Comparable<?> addend) {
         myElements.add(Structure2D.index(myFirsts.length, row, col), addend);
         this.updateNonZeros(row, col);

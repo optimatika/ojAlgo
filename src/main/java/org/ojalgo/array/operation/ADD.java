@@ -21,14 +21,14 @@
  */
 package org.ojalgo.array.operation;
 
-/**
- * The ?scal routines perform a vector operation defined as x = a*x where: a is a scalar, x is an n-element
- * vector.
- *
- * @author apete
- */
-public abstract class SCAL implements ArrayOperation {
+public abstract class ADD implements ArrayOperation {
 
-    public static int THRESHOLD = 128;
+    public static void invoke(final double[] data, final double right) {
+        CorePrimitiveOperation.add(data, 0, data.length, 1, data, right);
+    }
+
+    public static void invoke(final double[] data, final double[] right) {
+        CorePrimitiveOperation.add(data, 0, Math.min(data.length, right.length), 1, data, right);
+    }
 
 }

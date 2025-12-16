@@ -178,40 +178,12 @@ public interface Mutate2D extends Structure2D, Mutate1D {
     interface Modifiable<N extends Comparable<N>> extends Structure2D, Mutate1D.Modifiable<N> {
 
         @Override
-        default void add(final int index, final byte addend) {
-            int structure = this.getRowDim();
-            this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
-        }
-
-        @Override
         default void add(final int index, final double addend) {
             int structure = this.getRowDim();
             this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
         }
 
-        @Override
-        default void add(final int index, final float addend) {
-            int structure = this.getRowDim();
-            this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
-        }
-
-        @Override
-        default void add(final int index, final int addend) {
-            int structure = this.getRowDim();
-            this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
-        }
-
-        @Override
-        default void add(final int index, final long addend) {
-            int structure = this.getRowDim();
-            this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
-        }
-
-        @Override
-        default void add(final int index, final short addend) {
-            int structure = this.getRowDim();
-            this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
-        }
+        void add(int row, int col, double addend);
 
         @Override
         default void add(final long index, final byte addend) {
@@ -255,7 +227,9 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
         void add(long row, long col, Comparable<?> addend);
 
-        void add(long row, long col, double addend);
+        default void add(final long row, final long col, final double addend) {
+            this.add(Math.toIntExact(row), Math.toIntExact(col), addend);
+        }
 
         default void add(final long row, final long col, final float addend) {
             this.add(row, col, (double) addend);

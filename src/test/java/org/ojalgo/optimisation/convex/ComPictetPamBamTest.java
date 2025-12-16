@@ -21,8 +21,7 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.function.constant.BigMath.ONE;
-import static org.ojalgo.function.constant.BigMath.TWO;
+import static org.ojalgo.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -34,30 +33,33 @@ import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * @author pauslaender
  */
 public class ComPictetPamBamTest extends OptimisationConvexTests {
 
+    /**
+     * ojAlgo can handle higher accuracy, but the test is also used for various 3:d party solvers
+     */
+    private static final NumberContext ACCURACY = NumberContext.of(7);
+
     static void assertStateValidationConsistency(final ExpressionsBasedModel model) {
 
         Optimisation.Result result = model.minimise();
 
-        boolean resultFeasible = result.getState().isFeasible();
-        boolean validated = model.validate(result);
-        String message = "State: " + result.getState() + ", validated: " + validated;
+        boolean feasible = result.getState().isFeasible();
+        boolean valid = model.validate(result, ACCURACY);
+        String message = "State: " + result.getState() + ", validated: " + valid;
 
-        if (resultFeasible) {
-            TestUtils.assertTrue(message, validated);
+        if (feasible) {
+            TestUtils.assertTrue(message, valid);
         } else {
-            TestUtils.assertFalse(message, validated);
+            TestUtils.assertFalse(message, valid);
         }
 
-        //        model.options.debug(ConvexSolver.class);
-        //        model.options.validate = false;
-
-        OptimisationConvexTests.assertDirectAndIterativeEquals(model, null);
+        OptimisationConvexTests.assertDirectAndIterativeEquals(model, ACCURACY);
     }
 
     private ExpressionsBasedModel model;

@@ -33,25 +33,29 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
 
     static abstract class BigAggregatorFunction implements AggregatorFunction<BigDecimal> {
 
+        @Override
         public final double doubleValue() {
             return this.get().doubleValue();
         }
 
+        @Override
         public final void invoke(final double anArg) {
             this.invoke(new BigDecimal(anArg));
         }
 
+        @Override
         public final void invoke(final float anArg) {
             this.invoke(new BigDecimal(anArg));
         }
 
+        @Override
         public final Scalar<BigDecimal> toScalar() {
             return BigScalar.of(this.get());
         }
 
     }
 
-    private static final ThreadLocal<AggregatorFunction<BigDecimal>> AVERAGE = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
+    private static final ThreadLocal<AggregatorFunction<BigDecimal>> AVERAGE = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<BigDecimal> initialValue() {
@@ -60,19 +64,23 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 private int myCount = 0;
                 private BigDecimal myNumber = ZERO;
 
+                @Override
                 public BigDecimal get() {
                     return BigMath.DIVIDE.invoke(myNumber, BigDecimal.valueOf(myCount));
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final BigDecimal anArg) {
                     myCount++;
                     myNumber = BigMath.ADD.invoke(myNumber, anArg);
                 }
 
+                @Override
                 public AggregatorFunction<BigDecimal> reset() {
                     myCount = 0;
                     myNumber = ZERO;
@@ -83,7 +91,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<BigDecimal>> CARDINALITY = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
+    private static final ThreadLocal<AggregatorFunction<BigDecimal>> CARDINALITY = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<BigDecimal> initialValue() {
@@ -91,20 +99,24 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
 
                 private int myCount = 0;
 
+                @Override
                 public BigDecimal get() {
                     return new BigDecimal(myCount);
                 }
 
+                @Override
                 public int intValue() {
                     return myCount;
                 }
 
+                @Override
                 public void invoke(final BigDecimal anArg) {
                     if (anArg.signum() != 0) {
                         myCount++;
                     }
                 }
 
+                @Override
                 public AggregatorFunction<BigDecimal> reset() {
                     myCount = 0;
                     return this;
@@ -114,7 +126,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<BigDecimal>> LARGEST = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
+    private static final ThreadLocal<AggregatorFunction<BigDecimal>> LARGEST = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<BigDecimal> initialValue() {
@@ -122,18 +134,22 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
 
                 private BigDecimal myNumber = ZERO;
 
+                @Override
                 public BigDecimal get() {
                     return myNumber;
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final BigDecimal anArg) {
                     myNumber = BigMath.MAX.invoke(myNumber, BigMath.ABS.invoke(anArg));
                 }
 
+                @Override
                 public AggregatorFunction<BigDecimal> reset() {
                     myNumber = ZERO;
                     return this;
@@ -143,7 +159,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<BigDecimal>> MAX = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
+    private static final ThreadLocal<AggregatorFunction<BigDecimal>> MAX = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<BigDecimal> initialValue() {
@@ -151,18 +167,22 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
 
                 private BigDecimal myNumber = VERY_NEGATIVE;
 
+                @Override
                 public BigDecimal get() {
                     return myNumber;
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final BigDecimal anArg) {
-                    myNumber = BigMath.MAX.invoke(myNumber, anArg);
+                    myNumber = myNumber.max(anArg);
                 }
 
+                @Override
                 public AggregatorFunction<BigDecimal> reset() {
                     myNumber = VERY_NEGATIVE;
                     return this;
@@ -172,7 +192,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<BigDecimal>> MIN = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
+    private static final ThreadLocal<AggregatorFunction<BigDecimal>> MIN = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<BigDecimal> initialValue() {
@@ -180,6 +200,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
 
                 private BigDecimal myNumber = VERY_POSITIVE;
 
+                @Override
                 public BigDecimal get() {
                     if (myNumber.compareTo(VERY_POSITIVE) == 0) {
                         return ZERO;
@@ -187,14 +208,17 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                     return myNumber;
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final BigDecimal anArg) {
-                    myNumber = BigMath.MIN.invoke(myNumber, anArg);
+                    myNumber = myNumber.min(anArg);
                 }
 
+                @Override
                 public AggregatorFunction<BigDecimal> reset() {
                     myNumber = VERY_POSITIVE;
                     return this;
@@ -204,7 +228,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<BigDecimal>> NORM1 = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
+    private static final ThreadLocal<AggregatorFunction<BigDecimal>> NORM1 = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<BigDecimal> initialValue() {
@@ -212,18 +236,22 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
 
                 private BigDecimal myNumber = ZERO;
 
+                @Override
                 public BigDecimal get() {
                     return myNumber;
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final BigDecimal anArg) {
                     myNumber = BigMath.ADD.invoke(myNumber, anArg.abs());
                 }
 
+                @Override
                 public AggregatorFunction<BigDecimal> reset() {
                     myNumber = ZERO;
                     return this;
@@ -233,7 +261,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<BigDecimal>> NORM2 = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
+    private static final ThreadLocal<AggregatorFunction<BigDecimal>> NORM2 = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<BigDecimal> initialValue() {
@@ -241,18 +269,22 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
 
                 private BigDecimal myNumber = ZERO;
 
+                @Override
                 public BigDecimal get() {
                     return BigMath.SQRT.invoke(myNumber);
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final BigDecimal anArg) {
                     myNumber = BigMath.ADD.invoke(myNumber, BigMath.MULTIPLY.invoke(anArg, anArg));
                 }
 
+                @Override
                 public AggregatorFunction<BigDecimal> reset() {
                     myNumber = ZERO;
                     return this;
@@ -262,7 +294,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<BigDecimal>> PRODUCT = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
+    private static final ThreadLocal<AggregatorFunction<BigDecimal>> PRODUCT = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<BigDecimal> initialValue() {
@@ -270,18 +302,22 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
 
                 private BigDecimal myNumber = ONE;
 
+                @Override
                 public BigDecimal get() {
                     return myNumber;
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final BigDecimal anArg) {
                     myNumber = BigMath.MULTIPLY.invoke(myNumber, anArg);
                 }
 
+                @Override
                 public AggregatorFunction<BigDecimal> reset() {
                     myNumber = ONE;
                     return this;
@@ -291,7 +327,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<BigDecimal>> PRODUCT2 = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
+    private static final ThreadLocal<AggregatorFunction<BigDecimal>> PRODUCT2 = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<BigDecimal> initialValue() {
@@ -299,18 +335,22 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
 
                 private BigDecimal myNumber = ONE;
 
+                @Override
                 public BigDecimal get() {
                     return myNumber;
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final BigDecimal anArg) {
                     myNumber = BigMath.MULTIPLY.invoke(myNumber, BigMath.MULTIPLY.invoke(anArg, anArg));
                 }
 
+                @Override
                 public AggregatorFunction<BigDecimal> reset() {
                     myNumber = ONE;
                     return this;
@@ -322,7 +362,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
 
     private static final BigAggregator SET = new BigAggregator();
 
-    private static final ThreadLocal<AggregatorFunction<BigDecimal>> SMALLEST = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
+    private static final ThreadLocal<AggregatorFunction<BigDecimal>> SMALLEST = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<BigDecimal> initialValue() {
@@ -330,6 +370,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
 
                 private BigDecimal myNumber = VERY_POSITIVE;
 
+                @Override
                 public BigDecimal get() {
                     if (myNumber.compareTo(VERY_POSITIVE) == 0) {
                         return ZERO;
@@ -337,16 +378,19 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                     return myNumber;
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final BigDecimal anArg) {
                     if (anArg.signum() != 0) {
                         myNumber = BigMath.MIN.invoke(myNumber, BigMath.ABS.invoke(anArg));
                     }
                 }
 
+                @Override
                 public AggregatorFunction<BigDecimal> reset() {
                     myNumber = VERY_POSITIVE;
                     return this;
@@ -356,7 +400,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<BigDecimal>> SUM = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
+    private static final ThreadLocal<AggregatorFunction<BigDecimal>> SUM = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<BigDecimal> initialValue() {
@@ -364,18 +408,22 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
 
                 private BigDecimal myNumber = ZERO;
 
+                @Override
                 public BigDecimal get() {
                     return myNumber;
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final BigDecimal anArg) {
                     myNumber = BigMath.ADD.invoke(myNumber, anArg);
                 }
 
+                @Override
                 public AggregatorFunction<BigDecimal> reset() {
                     myNumber = ZERO;
                     return this;
@@ -385,7 +433,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<BigDecimal>> SUM2 = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
+    private static final ThreadLocal<AggregatorFunction<BigDecimal>> SUM2 = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<BigDecimal> initialValue() {
@@ -393,18 +441,22 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
 
                 private BigDecimal myNumber = ZERO;
 
+                @Override
                 public BigDecimal get() {
                     return myNumber;
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final BigDecimal anArg) {
                     myNumber = BigMath.ADD.invoke(myNumber, BigMath.MULTIPLY.invoke(anArg, anArg));
                 }
 
+                @Override
                 public AggregatorFunction<BigDecimal> reset() {
                     myNumber = ZERO;
                     return this;

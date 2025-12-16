@@ -35,14 +35,7 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
-import org.ojalgo.matrix.decomposition.Bidiagonal;
-import org.ojalgo.matrix.decomposition.Cholesky;
-import org.ojalgo.matrix.decomposition.Eigenvalue;
-import org.ojalgo.matrix.decomposition.Hessenberg;
-import org.ojalgo.matrix.decomposition.LU;
-import org.ojalgo.matrix.decomposition.QR;
-import org.ojalgo.matrix.decomposition.SingularValue;
-import org.ojalgo.matrix.decomposition.Tridiagonal;
+import org.ojalgo.matrix.decomposition.*;
 import org.ojalgo.matrix.operation.MatrixOperation;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -84,6 +77,10 @@ public abstract class TestUtils {
     public static void assertArrayEquals(final double[] expected, final double[] actual) {
         Assertions.assertArrayEquals(expected, actual);
 
+    }
+
+    public static void assertArrayEquals(final double[] expected, final double[] actual, final double tolerance) {
+        Assertions.assertArrayEquals(expected, actual, tolerance);
     }
 
     public static void assertArrayEquals(final long[] expected, final long[] actual) {
@@ -244,6 +241,12 @@ public abstract class TestUtils {
     public static <N extends Comparable<N>> void assertEquals(final MatrixStore<N> expected, final Hessenberg<N> actual, final NumberContext context) {
         if (!Hessenberg.equals(expected, actual, context)) {
             Assertions.fail(() -> "Hessenberg<N> failed for " + expected);
+        }
+    }
+
+    public static <N extends Comparable<N>> void assertEquals(final MatrixStore<N> expected, final LDL<N> actual, final NumberContext context) {
+        if (!LDL.equals(expected, actual, context)) {
+            Assertions.fail(() -> "LDL<N> failed for " + expected);
         }
     }
 

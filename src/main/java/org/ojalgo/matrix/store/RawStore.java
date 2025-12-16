@@ -223,6 +223,11 @@ public final class RawStore implements PhysicalStore<Double>, Factory2D.Builder<
     }
 
     @Override
+    public void add(final int row, final int col, final double addend) {
+        data[Math.toIntExact(row)][Math.toIntExact(col)] += addend;
+    }
+
+    @Override
     public void add(final long row, final long col, final Comparable<?> addend) {
         data[Math.toIntExact(row)][Math.toIntExact(col)] += NumberDefinition.doubleValue(addend);
     }

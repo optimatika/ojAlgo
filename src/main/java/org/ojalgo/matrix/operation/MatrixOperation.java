@@ -123,7 +123,6 @@ public interface MatrixOperation extends ArrayOperation {
         ROTG.THRESHOLD = Math.min(max, ROTG.THRESHOLD);
         ROTM.THRESHOLD = Math.min(max, ROTM.THRESHOLD);
         ROTMG.THRESHOLD = Math.min(max, ROTMG.THRESHOLD);
-        SCAL.THRESHOLD = Math.min(max, SCAL.THRESHOLD);
         SDOT.THRESHOLD = Math.min(max, SDOT.THRESHOLD);
         SortAll.THRESHOLD = Math.min(max, SortAll.THRESHOLD);
         SubstituteBackwards.THRESHOLD = Math.min(max, SubstituteBackwards.THRESHOLD);
@@ -178,7 +177,6 @@ public interface MatrixOperation extends ArrayOperation {
         ROTG.THRESHOLD = Math.max(min, ROTG.THRESHOLD);
         ROTM.THRESHOLD = Math.max(min, ROTM.THRESHOLD);
         ROTMG.THRESHOLD = Math.max(min, ROTMG.THRESHOLD);
-        SCAL.THRESHOLD = Math.max(min, SCAL.THRESHOLD);
         SDOT.THRESHOLD = Math.max(min, SDOT.THRESHOLD);
         SortAll.THRESHOLD = Math.max(min, SortAll.THRESHOLD);
         SubstituteBackwards.THRESHOLD = Math.max(min, SubstituteBackwards.THRESHOLD);

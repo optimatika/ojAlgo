@@ -57,6 +57,14 @@ abstract class DenseMutator2D<N extends Comparable<N>, M extends BasicMatrix<N, 
     }
 
     @Override
+    public void add(final int row, final int col, final double value) {
+        if (!mySafe) {
+            throw new IllegalStateException();
+        }
+        myDelegate.add(row, col, value);
+    }
+
+    @Override
     public void add(final long index, final Comparable<?> addend) {
         if (!mySafe) {
             throw new IllegalStateException();

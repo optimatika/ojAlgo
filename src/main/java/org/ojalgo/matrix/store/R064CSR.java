@@ -66,6 +66,15 @@ public final class R064CSR extends CompressedSparseR064 {
         private final RowsSupplier<Double> myRows = R064Store.FACTORY.makeRowsSupplier(Integer.MAX_VALUE);
 
         @Override
+        public void add(final int row, final int col, final double addend) {
+            if (row >= myRows.getRowDim()) {
+                myRows.addRows(1 + row - myRows.getRowDim());
+            }
+            myRows.add(row, col, addend);
+            this.update(row, col);
+        }
+
+        @Override
         public R064CSR build() {
             return myRows.toCSR(this.getRowDim(), this.getColDim(), myRows.countNonzeros());
         }
@@ -193,6 +202,12 @@ public final class R064CSR extends CompressedSparseR064 {
 
     public static R064CSR.Builder newBuilder() {
         return new R064CSR.Builder();
+    }
+
+    public static R064CSR.Builder newBuilder(final int nbRows, final int nbCols) {
+        R064CSR.Builder builder = R064CSR.newBuilder();
+        builder.set(nbRows - 1, nbCols - 1, ZERO);
+        return builder;
     }
 
     /**

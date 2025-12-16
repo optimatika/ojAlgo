@@ -28,6 +28,7 @@ import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.integer.IntegerStrategy.GMICutConfiguration;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Primitive1D;
 
 /**
  * An alternative MIP solver using Gomory Mixed Integer (GMI) cuts – purely iterative with no branching. This
@@ -116,7 +117,7 @@ public final class GomorySolver extends GenericSolver {
 
     protected double evaluateFunction(final Access1D<?> solution) {
         if (myFunction != null && solution != null && myFunction.arity() == solution.count()) {
-            return myFunction.invoke(Access1D.asPrimitive1D(solution)).doubleValue();
+            return myFunction.invoke(Primitive1D.wrap(solution)).doubleValue();
         }
         return Double.NaN;
     }

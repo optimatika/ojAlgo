@@ -66,6 +66,15 @@ public final class R064CSC extends CompressedSparseR064 {
         private final ColumnsSupplier<Double> myColumns = R064Store.FACTORY.makeColumnsSupplier(Integer.MAX_VALUE);
 
         @Override
+        public void add(final int row, final int col, final double addend) {
+            if (col >= myColumns.getColDim()) {
+                myColumns.addColumns(1 + col - myColumns.getColDim());
+            }
+            myColumns.add(row, col, addend);
+            this.update(row, col);
+        }
+
+        @Override
         public R064CSC build() {
             return myColumns.toCSC(this.getRowDim(), this.getColDim(), myColumns.countNonzeros());
         }
@@ -206,6 +215,54 @@ public final class R064CSC extends CompressedSparseR064 {
         }
     }
 
+    public static void calculateInfinityColumnNorms(final R064CSC matrix, final double[] norms) {
+
+        for (int j = 0, n = matrix.getColDim(); j < n; j++) {
+            int p0 = matrix.pointers[j];
+            int pm = matrix.pointers[j + 1];
+            double norm = ZERO;
+            for (int p = p0; p < pm; p++) {
+                norm = Math.max(Math.abs(matrix.values[p]), norm);
+            }
+            norms[j] = norm;
+        }
+    }
+
+    public static void calculateInfinityRowNorms(final R064CSC matrix, final double[] norms) {
+
+        Arrays.fill(norms, ZERO);
+
+        for (int j = 0, n = matrix.getColDim(); j < n; j++) {
+            int p0 = matrix.pointers[j];
+            int pm = matrix.pointers[j + 1];
+            for (int p = p0; p < pm; p++) {
+                int i = matrix.indices[p];
+                norms[i] = Math.max(Math.abs(matrix.values[p]), norms[i]);
+            }
+        }
+    }
+
+    /**
+     * Algorithm assumes that the matrix is symmetric, and only a triangular part is stored.
+     */
+    public static void calculateInfinitySymmetricNorms(final R064CSC matrix, final double[] norms) {
+
+        Arrays.fill(norms, ZERO);
+
+        for (int j = 0, n = matrix.getColDim(); j < n; j++) {
+            int p0 = matrix.pointers[j];
+            int pm = matrix.pointers[j + 1];
+            for (int p = p0; p < pm; p++) {
+                int i = matrix.indices[p];
+                double abs = Math.abs(matrix.values[p]);
+                norms[j] = Math.max(abs, norms[j]);
+                if (i != j) {
+                    norms[i] = Math.max(abs, norms[i]);
+                }
+            }
+        }
+    }
+
     /**
      * Assumes mtrxL is unit lower/left triangular, with the unit diagonal not stored.
      */
@@ -220,6 +277,42 @@ public final class R064CSC extends CompressedSparseR064 {
 
     public static R064CSC.Builder newBuilder() {
         return new R064CSC.Builder();
+    }
+
+    public static R064CSC.Builder newBuilder(final int nbRows, final int nbCols) {
+        R064CSC.Builder builder = R064CSC.newBuilder();
+        builder.set(nbRows - 1, nbCols - 1, ZERO);
+        return builder;
+    }
+
+    /**
+     * Scales all non-zero entries of a sparse matrix by a scalar.
+     */
+    public static void scale(final R064CSC matrix, final double scalar) {
+        for (int i = 0, limit = matrix.values.length; i < limit; i++) {
+            matrix.values[i] *= scalar;
+        }
+    }
+
+    public static void scaleColumns(final R064CSC matrix, final double[] scalars) {
+        for (int j = 0, n = matrix.getColDim(); j < n; j++) {
+            double scalar = scalars[j];
+            int p0 = matrix.pointers[j];
+            int pm = matrix.pointers[j + 1];
+            for (int p = p0; p < pm; p++) {
+                matrix.values[p] *= scalar;
+            }
+        }
+    }
+
+    public static void scaleRows(final R064CSC matrix, final double[] scalars) {
+        for (int j = 0, n = matrix.getColDim(); j < n; j++) {
+            int p0 = matrix.pointers[j];
+            int pm = matrix.pointers[j + 1];
+            for (int p = p0; p < pm; p++) {
+                matrix.values[p] *= scalars[matrix.indices[p]];
+            }
+        }
     }
 
     /**

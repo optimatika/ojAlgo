@@ -220,8 +220,9 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        Variable[] tmpVariables = { model.newVariable("X1").lower(ZERO).weight(THREE), model.newVariable("X2").lower(ZERO).weight(ZERO),
-                model.newVariable("X3").lower(ZERO).weight(ONE) };
+        model.newVariable("X1").lower(ZERO).weight(THREE);
+        model.newVariable("X2").lower(ZERO).weight(ZERO);
+        model.newVariable("X3").lower(ZERO).weight(ONE);
 
         Expression tmpExprC1 = model.newExpression("C1");
         for (int i = 0; i < model.countVariables(); i++) {
@@ -256,7 +257,8 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        Variable[] tmpVariables = { model.newVariable("X1").lower(ZERO).weight(TEN.add(FIVE)), model.newVariable("X2").lower(ZERO).weight(TEN) };
+        model.newVariable("X1").lower(ZERO).weight(TEN.add(FIVE));
+        model.newVariable("X2").lower(ZERO).weight(TEN);
 
         Expression tmpExprC1 = model.newExpression("C1");
         for (int i = 0; i < model.countVariables(); i++) {
@@ -308,7 +310,8 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        Variable[] tmpVariables = { model.newVariable("X1").lower(ZERO).weight(TWO), model.newVariable("X2").lower(ZERO).weight(THREE) };
+        model.newVariable("X1").lower(ZERO).weight(TWO);
+        model.newVariable("X2").lower(ZERO).weight(THREE);
 
         Expression tmpExprC1 = model.newExpression("C1");
         for (int i = 0; i < model.countVariables(); i++) {
@@ -349,8 +352,9 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        Variable[] tmpVariables = { model.newVariable("X1").lower(ZERO).weight(ONE), model.newVariable("X2").lower(ZERO).weight(TWO),
-                model.newVariable("X3").lower(ZERO).weight(THREE) };
+        model.newVariable("X1").lower(ZERO).weight(ONE);
+        model.newVariable("X2").lower(ZERO).weight(TWO);
+        model.newVariable("X3").lower(ZERO).weight(THREE);
 
         if (DEBUG) {
             model.options.debug(LinearSolver.class);
@@ -369,7 +373,8 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        Variable[] variables = { model.newVariable("X1").lower(ZERO).weight(TWO), model.newVariable("X2").lower(ZERO).weight(THREE) };
+        model.newVariable("X1").lower(ZERO).weight(TWO);
+        model.newVariable("X2").lower(ZERO).weight(THREE);
 
         BigDecimal[] paramC1 = { ONE, ONE };
         Expression exprC1 = model.newExpression("C1");
@@ -437,8 +442,9 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        Variable[] tmpVariables = { model.newVariable("X1").lower(ONE).weight(ONE), model.newVariable("X2").lower(ONE).weight(TWO),
-                model.newVariable("X3").lower(ONE).weight(THREE) };
+        model.newVariable("X1").lower(ONE).weight(ONE);
+        model.newVariable("X2").lower(ONE).weight(TWO);
+        model.newVariable("X3").lower(ONE).weight(THREE);
 
         Expression tmpExprC1 = model.newExpression("C1");
         for (int i = 0; i < model.countVariables(); i++) {
@@ -485,6 +491,8 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         Optimisation.Result actual = model.minimise();
 
+        // It's not ojAlgo that has the accuracy problem
+        // Use this test with 3:d party solvers as well, and some are not very accurate
         TestUtils.assertEquals(expected, actual, ACCURACY);
     }
 

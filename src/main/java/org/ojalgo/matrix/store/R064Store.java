@@ -272,6 +272,11 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
     }
 
     @Override
+    public void add(final int row, final int col, final double addend) {
+        myUtility.add(row, col, addend);
+    }
+
+    @Override
     public void add(final long row, final long col, final Comparable<?> addend) {
         myUtility.add(row, col, addend);
     }

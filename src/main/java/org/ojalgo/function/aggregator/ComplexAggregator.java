@@ -31,25 +31,29 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
 
     static abstract class ComplexAggregatorFunction implements AggregatorFunction<ComplexNumber> {
 
+        @Override
         public final double doubleValue() {
             return this.get().doubleValue();
         }
 
+        @Override
         public final void invoke(final double anArg) {
             this.invoke(ComplexNumber.valueOf(anArg));
         }
 
+        @Override
         public final void invoke(final float anArg) {
             this.invoke(ComplexNumber.valueOf(anArg));
         }
 
+        @Override
         public final Scalar<ComplexNumber> toScalar() {
             return this.get();
         }
 
     }
 
-    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> AVERAGE = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> AVERAGE = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<ComplexNumber> initialValue() {
@@ -58,19 +62,23 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
                 private int myCount = 0;
                 private ComplexNumber myNumber = ComplexNumber.ZERO;
 
+                @Override
                 public ComplexNumber get() {
                     return myNumber.divide(myCount);
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final ComplexNumber anArg) {
                     myCount++;
                     myNumber = myNumber.add(anArg);
                 }
 
+                @Override
                 public AggregatorFunction<ComplexNumber> reset() {
                     myCount = 0;
                     myNumber = ComplexNumber.ZERO;
@@ -81,7 +89,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> CARDINALITY = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> CARDINALITY = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<ComplexNumber> initialValue() {
@@ -89,20 +97,24 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
 
                 private int myCount = 0;
 
+                @Override
                 public ComplexNumber get() {
                     return ComplexNumber.valueOf(myCount);
                 }
 
+                @Override
                 public int intValue() {
                     return myCount;
                 }
 
+                @Override
                 public void invoke(final ComplexNumber anArg) {
                     if (!PrimitiveScalar.isSmall(PrimitiveMath.ONE, anArg.norm())) {
                         myCount++;
                     }
                 }
 
+                @Override
                 public AggregatorFunction<ComplexNumber> reset() {
                     myCount = 0;
                     return this;
@@ -112,7 +124,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> LARGEST = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> LARGEST = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<ComplexNumber> initialValue() {
@@ -120,18 +132,22 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
 
                 private ComplexNumber myNumber = ComplexNumber.ZERO;
 
+                @Override
                 public ComplexNumber get() {
                     return myNumber;
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final ComplexNumber anArg) {
                     myNumber = ComplexMath.MAX.invoke(myNumber, ComplexMath.ABS.invoke(anArg));
                 }
 
+                @Override
                 public AggregatorFunction<ComplexNumber> reset() {
                     myNumber = ComplexNumber.ZERO;
                     return this;
@@ -141,7 +157,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> MAX = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> MAX = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<ComplexNumber> initialValue() {
@@ -149,18 +165,22 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
 
                 private ComplexNumber myNumber = ComplexNumber.ZERO;
 
+                @Override
                 public ComplexNumber get() {
                     return myNumber;
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final ComplexNumber anArg) {
                     myNumber = ComplexMath.MAX.invoke(myNumber, anArg);
                 }
 
+                @Override
                 public AggregatorFunction<ComplexNumber> reset() {
                     myNumber = ComplexNumber.ZERO;
                     return this;
@@ -170,7 +190,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> MIN = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> MIN = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<ComplexNumber> initialValue() {
@@ -178,6 +198,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
 
                 private ComplexNumber myNumber = ComplexNumber.INFINITY;
 
+                @Override
                 public ComplexNumber get() {
                     if (ComplexNumber.isInfinite(myNumber)) {
                         return ComplexNumber.ZERO;
@@ -185,14 +206,17 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
                     return myNumber;
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final ComplexNumber anArg) {
                     myNumber = ComplexMath.MIN.invoke(myNumber, anArg);
                 }
 
+                @Override
                 public AggregatorFunction<ComplexNumber> reset() {
                     myNumber = ComplexNumber.INFINITY;
                     return this;
@@ -202,7 +226,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> NORM1 = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> NORM1 = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<ComplexNumber> initialValue() {
@@ -210,18 +234,22 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
 
                 private ComplexNumber myNumber = ComplexNumber.ZERO;
 
+                @Override
                 public ComplexNumber get() {
                     return myNumber;
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final ComplexNumber anArg) {
                     myNumber = myNumber.add(anArg.norm());
                 }
 
+                @Override
                 public AggregatorFunction<ComplexNumber> reset() {
                     myNumber = ComplexNumber.ZERO;
                     return this;
@@ -231,7 +259,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> NORM2 = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> NORM2 = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<ComplexNumber> initialValue() {
@@ -239,19 +267,23 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
 
                 private ComplexNumber myNumber = ComplexNumber.ZERO;
 
+                @Override
                 public ComplexNumber get() {
                     return ComplexNumber.valueOf(PrimitiveMath.SQRT.invoke(myNumber.norm()));
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final ComplexNumber anArg) {
                     final double tmpMod = anArg.norm();
                     myNumber = myNumber.add(tmpMod * tmpMod);
                 }
 
+                @Override
                 public AggregatorFunction<ComplexNumber> reset() {
                     myNumber = ComplexNumber.ZERO;
                     return this;
@@ -261,7 +293,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> PRODUCT = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> PRODUCT = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<ComplexNumber> initialValue() {
@@ -269,18 +301,22 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
 
                 private ComplexNumber myNumber = ComplexNumber.ONE;
 
+                @Override
                 public ComplexNumber get() {
                     return myNumber;
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final ComplexNumber anArg) {
                     myNumber = myNumber.multiply(anArg);
                 }
 
+                @Override
                 public AggregatorFunction<ComplexNumber> reset() {
                     myNumber = ComplexNumber.ONE;
                     return this;
@@ -290,7 +326,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> PRODUCT2 = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> PRODUCT2 = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<ComplexNumber> initialValue() {
@@ -298,18 +334,22 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
 
                 private ComplexNumber myNumber = ComplexNumber.ONE;
 
+                @Override
                 public ComplexNumber get() {
                     return myNumber;
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final ComplexNumber anArg) {
                     myNumber = myNumber.multiply(anArg.multiply(anArg));
                 }
 
+                @Override
                 public AggregatorFunction<ComplexNumber> reset() {
                     myNumber = ComplexNumber.ONE;
                     return this;
@@ -321,7 +361,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
 
     private static final ComplexAggregator SET = new ComplexAggregator();
 
-    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> SMALLEST = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> SMALLEST = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<ComplexNumber> initialValue() {
@@ -329,6 +369,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
 
                 private ComplexNumber myNumber = ComplexNumber.INFINITY;
 
+                @Override
                 public ComplexNumber get() {
                     if (ComplexNumber.isInfinite(myNumber)) {
                         return ComplexNumber.ZERO;
@@ -336,16 +377,19 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
                     return myNumber;
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final ComplexNumber anArg) {
                     if (!ComplexNumber.isSmall(PrimitiveMath.ONE, anArg)) {
                         myNumber = ComplexMath.MIN.invoke(myNumber, ComplexMath.ABS.invoke(anArg));
                     }
                 }
 
+                @Override
                 public AggregatorFunction<ComplexNumber> reset() {
                     myNumber = ComplexNumber.INFINITY;
                     return this;
@@ -355,7 +399,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> SUM = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> SUM = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<ComplexNumber> initialValue() {
@@ -363,18 +407,22 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
 
                 private ComplexNumber myNumber = ComplexNumber.ZERO;
 
+                @Override
                 public ComplexNumber get() {
                     return myNumber;
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final ComplexNumber anArg) {
                     myNumber = myNumber.add(anArg);
                 }
 
+                @Override
                 public AggregatorFunction<ComplexNumber> reset() {
                     myNumber = ComplexNumber.ZERO;
                     return this;
@@ -384,7 +432,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
-    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> SUM2 = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> SUM2 = new ThreadLocal<>() {
 
         @Override
         protected AggregatorFunction<ComplexNumber> initialValue() {
@@ -392,18 +440,22 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
 
                 private ComplexNumber myNumber = ComplexNumber.ZERO;
 
+                @Override
                 public ComplexNumber get() {
                     return myNumber;
                 }
 
+                @Override
                 public int intValue() {
                     return this.get().intValue();
                 }
 
+                @Override
                 public void invoke(final ComplexNumber anArg) {
                     myNumber = myNumber.add(anArg.multiply(anArg));
                 }
 
+                @Override
                 public AggregatorFunction<ComplexNumber> reset() {
                     myNumber = ComplexNumber.ZERO;
                     return this;

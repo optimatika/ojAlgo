@@ -22,6 +22,7 @@
 package org.ojalgo.array.operation;
 
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.special.MissingMath;
 
 /**
  * Given a vector x, the i?amin functions return the position of the vector element x[i] that has the smallest
@@ -34,6 +35,12 @@ import org.ojalgo.function.constant.PrimitiveMath;
 public abstract class AMIN implements ArrayOperation {
 
     public static int THRESHOLD = 128;
+
+    public static void invoke(final double[] data, final double[] array1, final double[] array2) {
+        for (int i = 0, limit = MissingMath.min(data.length, array1.length, array2.length); i < limit; i++) {
+            data[i] = Math.min(array1[i], array2[i]);
+        }
+    }
 
     public static int invoke(final double[] data, final int first, final int limit, final int step) {
 

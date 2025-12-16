@@ -51,7 +51,7 @@ Logging and diagnostics
 - Line comments inside methods only, otherwise use proper javadoc.
 
 Linear/Convex/Integer Optimisation specifics
-- When relevant, compare design/behavior with high-quality open-source solvers (HiGHS, GLOP, CLP, SCIP, CBC, OSQP, CLARABEL).
+- When relevant, compare design/behavior with high-quality open-source solvers (HiGHS, GLOP, CLP, SCIP, CBC, OSQP, CLARABEL, qpOASES).
 - Document notable differences and rationale in code comments (short) or commit/PR descriptions.
 - Strive for numerically robust implementations (scaling, presolve, pivot rules, tolerance handling) with measured impact.
 

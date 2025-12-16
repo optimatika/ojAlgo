@@ -30,10 +30,42 @@ import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
  */
 public abstract class NRMINF implements ArrayOperation {
 
+    public static double difference(final double[] array1, final double[] array2) {
+        double retVal = ZERO;
+        double tmp;
+        for (int i = 0, limit = Math.min(array1.length, array2.length); i < limit; i++) {
+            tmp = Math.abs(array1[i] - array2[i]);
+            if (tmp > retVal) {
+                retVal = tmp;
+            }
+        }
+        return retVal;
+    }
+
+    public static double invoke(final double[] data) {
+        return NRMINF.invoke(data, 0, data.length);
+    }
+
     public static double invoke(final double[] data, final int first, final int limit) {
         double retVal = ZERO;
+        double tmp;
         for (int i = first; i < limit; i++) {
-            retVal = Math.max(retVal, Math.abs(data[i]));
+            tmp = Math.abs(data[i]);
+            if (tmp > retVal) {
+                retVal = tmp;
+            }
+        }
+        return retVal;
+    }
+
+    public static double product(final double[] array1, final double[] array2) {
+        double retVal = ZERO;
+        double tmp;
+        for (int i = 0, limit = Math.min(array1.length, array2.length); i < limit; i++) {
+            tmp = Math.abs(array1[i] * array2[i]);
+            if (tmp > retVal) {
+                retVal = tmp;
+            }
         }
         return retVal;
     }

@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 
 import org.ojalgo.array.PlainArray;
 import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure2D;
@@ -92,6 +93,12 @@ public abstract class AMAX implements ArrayOperation {
         }
 
         return retVal;
+    }
+
+    public static void invoke(final double[] data, final double[] array1, final double[] array2) {
+        for (int i = 0, limit = MissingMath.min(data.length, array1.length, array2.length); i < limit; i++) {
+            data[i] = Math.max(array1[i], array2[i]);
+        }
     }
 
     public static int invoke(final double[] data, final int first, final int limit, final int step) {
