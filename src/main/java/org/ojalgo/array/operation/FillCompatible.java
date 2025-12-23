@@ -28,7 +28,7 @@ import org.ojalgo.structure.*;
 /**
  * https://se.mathworks.com/help/matlab/matlab_prog/compatible-array-sizes-for-basic-operations.html
  */
-public class FillCompatible {
+public class FillCompatible implements ArrayOperation {
 
     public static void invoke(final double[] target, final int structure, final Access2D<?> left, final BinaryFunction<?> operator, final Access2D<?> right) {
 

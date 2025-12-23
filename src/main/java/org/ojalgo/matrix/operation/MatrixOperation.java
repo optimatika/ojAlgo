@@ -96,8 +96,6 @@ public interface MatrixOperation extends ArrayOperation {
         CABS1.THRESHOLD = Math.min(max, CABS1.THRESHOLD);
         COPY.THRESHOLD = Math.min(max, COPY.THRESHOLD);
         DOT.THRESHOLD = Math.min(max, DOT.THRESHOLD);
-        DOTC.THRESHOLD = Math.min(max, DOTC.THRESHOLD);
-        DOTU.THRESHOLD = Math.min(max, DOTU.THRESHOLD);
         FillAll.THRESHOLD = Math.min(max, FillAll.THRESHOLD);
         FillMatchingDual.THRESHOLD = Math.min(max, FillMatchingDual.THRESHOLD);
         FillMatchingSingle.THRESHOLD = Math.min(max, FillMatchingSingle.THRESHOLD);
@@ -123,7 +121,6 @@ public interface MatrixOperation extends ArrayOperation {
         ROTG.THRESHOLD = Math.min(max, ROTG.THRESHOLD);
         ROTM.THRESHOLD = Math.min(max, ROTM.THRESHOLD);
         ROTMG.THRESHOLD = Math.min(max, ROTMG.THRESHOLD);
-        SDOT.THRESHOLD = Math.min(max, SDOT.THRESHOLD);
         SortAll.THRESHOLD = Math.min(max, SortAll.THRESHOLD);
         SubstituteBackwards.THRESHOLD = Math.min(max, SubstituteBackwards.THRESHOLD);
         SubstituteForwards.THRESHOLD = Math.min(max, SubstituteForwards.THRESHOLD);
@@ -150,8 +147,6 @@ public interface MatrixOperation extends ArrayOperation {
         CABS1.THRESHOLD = Math.max(min, CABS1.THRESHOLD);
         COPY.THRESHOLD = Math.max(min, COPY.THRESHOLD);
         DOT.THRESHOLD = Math.max(min, DOT.THRESHOLD);
-        DOTC.THRESHOLD = Math.max(min, DOTC.THRESHOLD);
-        DOTU.THRESHOLD = Math.max(min, DOTU.THRESHOLD);
         FillAll.THRESHOLD = Math.max(min, FillAll.THRESHOLD);
         FillMatchingDual.THRESHOLD = Math.max(min, FillMatchingDual.THRESHOLD);
         FillMatchingSingle.THRESHOLD = Math.max(min, FillMatchingSingle.THRESHOLD);
@@ -177,7 +172,6 @@ public interface MatrixOperation extends ArrayOperation {
         ROTG.THRESHOLD = Math.max(min, ROTG.THRESHOLD);
         ROTM.THRESHOLD = Math.max(min, ROTM.THRESHOLD);
         ROTMG.THRESHOLD = Math.max(min, ROTMG.THRESHOLD);
-        SDOT.THRESHOLD = Math.max(min, SDOT.THRESHOLD);
         SortAll.THRESHOLD = Math.max(min, SortAll.THRESHOLD);
         SubstituteBackwards.THRESHOLD = Math.max(min, SubstituteBackwards.THRESHOLD);
         SubstituteForwards.THRESHOLD = Math.max(min, SubstituteForwards.THRESHOLD);
