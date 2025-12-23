@@ -24,6 +24,7 @@ package org.ojalgo.optimisation;
 import static org.ojalgo.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.Collections;
 
 import org.junit.jupiter.api.Disabled;
@@ -38,10 +39,10 @@ import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
 
-public class ExpressionsBasedModelTest extends OptimisationTests {
+class ExpressionsBasedModelTest extends OptimisationTests {
 
     @Test
-    public void testAddingVariableToExpression() {
+    void testAddingVariableToExpression() {
         ExpressionsBasedModel model = new ExpressionsBasedModel();
         Variable x1 = model.newVariable("x1").lower(0).upper(20).weight(1);
         Expression expr = model.newExpression("10 * x1 = 100").lower(100).upper(100);
@@ -52,12 +53,62 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
         TestUtils.assertEquals(BigDecimal.valueOf(10), x1Result);
     }
 
+    @Test
+    void testCombingExpressions() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable varCorn = model.newVariable("corn").weight(2).lower(0);
+        Variable varFat = model.newVariable("fat").weight(1).lower(0);
+
+        Expression expCa = model.newExpression("calcium");
+        expCa.add(varCorn, 0.8);
+        expCa.add(varFat, 0.2);
+
+        Expression expP = model.newExpression("phosphorus");
+        expP.add(varCorn, 1.5);
+        expP.add(varFat, 15);
+
+        Expression expKg = model.newExpression("1Kg").level(1);
+        expKg.add(varCorn, 1);
+        expKg.add(varFat, 1);
+
+        // Now we model a Ca/P ratio constraint
+        // 0.15 <= Ca/P
+        // 0.15*P <= Ca
+        // 0.0 <= Ca - 0.15*P
+        // 0.0 <= 100*Ca - 15*P
+        Expression expRatio = model.newExpression("ratio").lower(0);
+        expRatio.add(100L, expCa);
+        expRatio.add(-15L, expP);
+        // We transformed the ratio to a weighted difference of the two nutrients.
+        // "Ca" and "P" doesn't have to be simple numbers, they can be the existing
+        // expressions for those nutrients. Mathematically this works because neither
+        // the amounts of the ingredients (corn, fat) nor the the expressions for
+        // the nutrients (Ca and P) can be negative.
+
+        Optimisation.Result result = model.minimise();
+
+        if (DEBUG) {
+            BasicLogger.debug(result);
+            BasicLogger.debug(model);
+        }
+
+        TestUtils.assertStateNotLessThanOptimal(result);
+
+        BigDecimal valCa = expCa.evaluate(result);
+        BigDecimal valP = expP.evaluate(result);
+        double ratio = valCa.divide(valP, MathContext.DECIMAL32).doubleValue();
+        // Be wary of rounding errors
+        TestUtils.assertTrue(ratio >= 0.15);
+    }
+
     /**
      * https://github.com/optimatika/ojAlgo-extensions/issues/3 <br>
      * "compensating" didn't work because of an incorrectly used stream - did peek(...) instead of map(...).
      */
     @Test
-    public void testCompensate() {
+    void testCompensate() {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
         model.newVariable("X1").lower(0).upper(5).weight(1);
@@ -80,7 +131,7 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
     }
 
     @Test
-    public void testExpressionSetAdd() {
+    void testExpressionSetAdd() {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
@@ -111,7 +162,7 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
      * integration
      */
     @Test
-    public void testFixedVariables() {
+    void testFixedVariables() {
 
         ExpressionsBasedModel test = new ExpressionsBasedModel();
         test.newVariable("V1").level(0.5);
@@ -145,7 +196,7 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
     @Test
     @Tag("unstable")
     @Disabled
-    public void testGitHubIssue2() {
+    void testGitHubIssue2() {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
@@ -166,7 +217,7 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
     }
 
     @Test
-    public void testIntegerRounding() {
+    void testIntegerRounding() {
 
         ExpressionsBasedModel ebm = new ExpressionsBasedModel();
         Variable var1 = ebm.newVariable("X1").integer();
@@ -204,7 +255,7 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
     }
 
     @Test
-    public void testMPStestprob() {
+    void testMPStestprob() {
 
         ExpressionsBasedModel tmpModel = new ExpressionsBasedModel();
 
@@ -266,7 +317,7 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
     }
 
     @Test
-    public void testPresolverCase2() {
+    void testPresolverCase2() {
 
         NumberContext precision = NumberContext.of(14, 12);
         Collections.emptySet();
@@ -310,7 +361,7 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
      * https://github.com/optimatika/ojAlgo/issues/415
      */
     @Test
-    public void testSimpleInfeasibleSimplification() {
+    void testSimpleInfeasibleSimplification() {
 
         //
 
@@ -348,7 +399,7 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
     }
 
     @Test
-    public void testSimplyLowerAndUpperBounds() {
+    void testSimplyLowerAndUpperBounds() {
 
         double precision = 0.00001;
 

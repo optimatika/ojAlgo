@@ -17,6 +17,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - New `NullSpaceProjection` and `NullSpaceASS`. Modifies the problem before delegating to `ActiveSetSolver` eliminating equality constraints and reducing the number of variables. Turn this feature On/Off via configuration option. The default is to use when the model is big enough and has a significant number equality constraints.
 - It is now possible to call `maximise` or `minimise` on an `ExpressionsBasedModel` explicitly supplying the `ExpressionsBasedModel.Integration` to use, bypassing the usual mechanism of selecting this.
+- `Expression`:s can now be constructed as weigthed combinations of other `Expression`:s –  a convenience that makes it much easier to reason about how to construct certain types of constraints.
 
 #### org.ojalgo.matrix
 

@@ -164,6 +164,31 @@ public final class Expression extends ModelEntity<Expression> {
     }
 
     /**
+     * Adds the scaled values from another Expression to this Expression. The lower and upper limits/bounds,
+     * of either involved Expression, are not affected. Nor is the objective weight. Only the factors (linear
+     * and quadratic) are scaled and added.
+     * <P>
+     * This allows for constructs like:
+     *
+     * <pre>
+     * Expression expr1 = model.newExpression("Expr1");
+     * Expression expr2 = model.newExpression("Expr2");
+     * ...
+     * model.newExpression("Expr3").add(2.0, expr1).add(-3.0, expr2).lower(0.0);
+     * </pre>
+     */
+    public Expression add(final Comparable<?> scale, final Expression values) {
+        return this.doAdd(ModelEntity.toBigDecimal(scale), values);
+    }
+
+    /**
+     * @see #add(Comparable, Expression)
+     */
+    public Expression add(final double scale, final Expression values) {
+        return this.doAdd(BigDecimal.valueOf(scale), values);
+    }
+
+    /**
      * @see #add(Variable, Comparable)
      */
     public Expression add(final int index, final Comparable<?> value) {
@@ -203,6 +228,13 @@ public final class Expression extends ModelEntity<Expression> {
      */
     public Expression add(final int index, final long value) {
         return this.doAdd(this.toIntIndex(index), BigDecimal.valueOf(value));
+    }
+
+    /**
+     * @see #add(Comparable, Expression)
+     */
+    public Expression add(final long scale, final Expression values) {
+        return this.doAdd(BigDecimal.valueOf(scale), values);
     }
 
     /**
@@ -767,6 +799,16 @@ public final class Expression extends ModelEntity<Expression> {
         }
 
         return value;
+    }
+
+    private Expression doAdd(final BigDecimal scale, final Expression values) {
+        for (Entry<IntIndex, BigDecimal> entry : values.getLinearEntrySet()) {
+            this.doAdd(entry.getKey(), entry.getValue().multiply(scale));
+        }
+        for (Entry<IntRowColumn, BigDecimal> entry : values.getQuadraticEntrySet()) {
+            this.doAdd(entry.getKey(), entry.getValue().multiply(scale));
+        }
+        return this;
     }
 
     private Expression doAdd(final IntIndex key, final BigDecimal value) {
