@@ -73,6 +73,10 @@ abstract class CompressedSparseR064 extends FactoryStore<Double> implements Spar
         pointers = majorPointers;
     }
 
+    public final int capacity() {
+        return this.countNonzeros();
+    }
+
     @Override
     public final int countNonzeros() {
         return values.length;

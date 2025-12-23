@@ -523,11 +523,6 @@ public abstract class GenericSolver implements Optimisation.Solver {
     private final Stopwatch myStopwatch = new Stopwatch();
     private ExpressionsBasedModel.Validator myValidator = null;
 
-    @SuppressWarnings("unused")
-    private GenericSolver() {
-        this(new Optimisation.Options());
-    }
-
     protected GenericSolver(final Optimisation.Options optimisationOptions) {
 
         super();

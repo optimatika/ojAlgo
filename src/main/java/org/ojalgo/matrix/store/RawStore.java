@@ -224,7 +224,7 @@ public final class RawStore implements PhysicalStore<Double>, Factory2D.Builder<
 
     @Override
     public void add(final int row, final int col, final double addend) {
-        data[Math.toIntExact(row)][Math.toIntExact(col)] += addend;
+        data[row][col] += addend;
     }
 
     @Override

@@ -23,7 +23,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - New sparse quadratic programming decomposition `SparseQDLDL` based on the QDLDL factorisation algorithm. Designed for large, sparse KKT systems in convex QP problems and integrates with the existing decomposition/factorisation APIs.
 - Improved sparse matrix infrastructure for R064 CSC/CSR stores and suppliers: `RowsSupplier`/`ColumnsSupplier` and compressed sparse stores (`R064CSC`, `R064CSR`, `CompressedSparseR064`) now support more efficient copying and supply operations, reducing temporary allocations when building or transforming sparse matrices.
-- An approximate Minimum Degree calculator – not quite a full/correct Approximate Minimum Degree (AMD) implementation, but an approximation.
+- An approximate Minimum Degree calculator – not quite a full/correct Approximate Minimum Degree (AMD) implementation, but a simplified alternative.
 
 ### Changed
 
@@ -32,6 +32,11 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - Modified to the active set in `ActiveSetSolver` is initialised – limited the number of inequalities that can be set to active.
 - Tweaked the default behaviour when selecting either dense/direct or sparse/iterative `ActiveSetSolver` – now favour dense/direct in some cases. Previously always chose sparse/iterative.
 - Slight change to how quadratic expressions are scaled when constructing solver data. Now primarily uses the diagonal elements.
+- The default preconditioner is now SSORPreconditioner rather than JacobiPreconditioner.
+
+#### org.ojalgo.structure
+
+- `ColumnView` and `RowView` now support directly updating the underlying data structure (provided that implements `Mutate2D`).
 
 ### Fixed
 

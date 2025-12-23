@@ -59,22 +59,27 @@ public interface Mutate1D extends Structure1D {
         }
 
         /**
-         * <p>
          * Will fill the elements of [this] with the corresponding input values, and in the process (if
-         * necessary) convert the elements to the correct type:
-         * </p>
-         * <code>this(i) = values(i)</code>
+         * necessary) convert the elements to the correct type: <code>this(i) = values(i)</code>
          */
         default void fillMatching(final Access1D<?> values) {
             for (long i = 0L, limit = Math.min(this.count(), values.count()); i < limit; i++) {
-                Comparable<?> value = values.get(i);
-                this.set(i, value);
+                this.set(i, values.get(i));
             }
         }
 
         default void fillMatching(final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
             for (long i = 0L, limit = Math.min(left.count(), right.count()); i < limit; i++) {
                 this.set(i, function.invoke(left.get(i), right.get(i)));
+            }
+        }
+
+        /**
+         * Will fill the elements of [this] with the corresponding input values.
+         */
+        default void fillMatching(final double[] values) {
+            for (int i = 0, limit = Math.min(this.size(), values.length); i < limit; i++) {
+                this.set(i, values[i]);
             }
         }
 

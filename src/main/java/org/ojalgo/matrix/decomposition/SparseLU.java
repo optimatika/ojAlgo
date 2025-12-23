@@ -345,9 +345,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
 
         } else {
 
-            for (int col = 0; col < nbSolutions; col++) {
-                this.ftranInternal(preallocated);
-            }
+            this.ftranInternal(preallocated);
         }
 
         if (myColPivot != null) {

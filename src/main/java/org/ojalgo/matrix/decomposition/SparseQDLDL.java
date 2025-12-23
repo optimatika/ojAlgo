@@ -113,13 +113,13 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
         return new EliminationTree(colNz, tree, totNz);
     }
 
-    private static void solveD(final double[] inv, final double[] x) {
+    private static void ftranD(final double[] inv, final double[] x) {
         for (int i = 0, n = x.length; i < n; i++) {
             x[i] *= inv[i]; // inv(D)
         }
     }
 
-    private static void solveL(final int[] pointers, final int[] indices, final double[] values, final double[] x) {
+    private static void ftranL(final int[] pointers, final int[] indices, final double[] values, final double[] x) {
         for (int j = 0, n = x.length; j < n; j++) {
             double xj = x[j];
             for (int ji = pointers[j], jm = pointers[j + 1]; ji < jm; ji++) {
@@ -128,7 +128,7 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
         }
     }
 
-    private static void solveU(final int[] pointers, final int[] indices, final double[] values, final double[] x) {
+    private static void ftranU(final int[] pointers, final int[] indices, final double[] values, final double[] x) {
         for (int j = x.length - 1; j >= 0; j--) {
             double dxj = ZERO;
             for (int ji = pointers[j], jm = pointers[j + 1]; ji < jm; ji++) {
@@ -568,11 +568,11 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
         int[] indices = myL.indices;
         double[] values = myL.values;
 
-        SparseQDLDL.solveL(pointers, indices, values, x);
+        SparseQDLDL.ftranL(pointers, indices, values, x);
 
-        SparseQDLDL.solveD(myDinv, x);
+        SparseQDLDL.ftranD(myDinv, x);
 
-        SparseQDLDL.solveU(pointers, indices, values, x);
+        SparseQDLDL.ftranU(pointers, indices, values, x);
     }
 
 }
