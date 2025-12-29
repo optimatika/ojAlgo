@@ -11,6 +11,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [56.2.0] – 2025-12-29
+
 ### Added
 
 #### org.ojalgo.optimisation
@@ -21,7 +23,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 #### org.ojalgo.matrix
 
-- New sparse quadratic programming decomposition `SparseQDLDL` based on the QDLDL factorisation algorithm. Designed for large, sparse KKT systems in convex QP problems and integrates with the existing decomposition/factorisation APIs.
+- New sparse LDL decomposition `SparseQDLDL` based on the QDLDL factorisation algorithm. Designed for large, sparse KKT systems in convex QP problems and integrates with the existing decomposition/factorisation APIs.
 - Improved sparse matrix infrastructure for R064 CSC/CSR stores and suppliers: `RowsSupplier`/`ColumnsSupplier` and compressed sparse stores (`R064CSC`, `R064CSR`, `CompressedSparseR064`) now support more efficient copying and supply operations, reducing temporary allocations when building or transforming sparse matrices.
 - An approximate Minimum Degree calculator – not quite a full/correct Approximate Minimum Degree (AMD) implementation, but a simplified alternative.
 - `InvertibleFactor` now has overloaded `ftran` and `btran` methods with `double[]` arguments.
