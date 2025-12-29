@@ -76,12 +76,32 @@ final class ProductFormInverse implements BasisRepresentation {
         }
 
         @Override
+        public void btran(final double[] arg) {
+
+            double f = -arg[myIndex];
+
+            for (NonzeroView<Double> nz : myColumn.nonzeros()) {
+                int index = (int) nz.index();
+                if (index != myIndex) {
+                    f += nz.doubleValue() * arg[index];
+                }
+            }
+
+            if (f != ZERO) {
+                f /= myNegatedDiagonal;
+                arg[myIndex] = f;
+            } else {
+                arg[myIndex] = ZERO;
+            }
+        }
+
+        @Override
         public void btran(final PhysicalStore<Double> arg) {
 
             double f = -arg.doubleValue(myIndex);
 
             for (NonzeroView<Double> nz : myColumn.nonzeros()) {
-                long index = nz.index();
+                int index = (int) nz.index();
                 if (index != myIndex) {
                     f += nz.doubleValue() * arg.doubleValue(index);
                 }
@@ -92,6 +112,27 @@ final class ProductFormInverse implements BasisRepresentation {
                 arg.set(myIndex, f);
             } else {
                 arg.set(myIndex, ZERO);
+            }
+        }
+
+        @Override
+        public void ftran(final double[] arg) {
+
+            double d = arg[myIndex];
+
+            if (d == ZERO) {
+                return;
+            }
+
+            d /= myNegatedDiagonal;
+
+            for (NonzeroView<Double> nz : myColumn.nonzeros()) {
+                int index = (int) nz.index();
+                if (index == myIndex) {
+                    arg[index] = -d;
+                } else {
+                    arg[index] += nz.doubleValue() * d;
+                }
             }
         }
 
@@ -107,7 +148,7 @@ final class ProductFormInverse implements BasisRepresentation {
             d /= myNegatedDiagonal;
 
             for (NonzeroView<Double> nz : myColumn.nonzeros()) {
-                long index = nz.index();
+                int index = (int) nz.index();
                 if (index == myIndex) {
                     arg.set(index, -d);
                 } else {
@@ -151,6 +192,17 @@ final class ProductFormInverse implements BasisRepresentation {
     }
 
     @Override
+    public void btran(final double[] arg) {
+
+        for (int i = myFactors.size() - 1; i >= 0; i--) {
+            myFactors.get(i).btran(arg);
+        }
+        if (myRoot.isComputed()) {
+            myRoot.ftran(arg);
+        }
+    }
+
+    @Override
     public void btran(final PhysicalStore<Double> arg) {
 
         for (int i = myFactors.size() - 1; i >= 0; i--) {
@@ -158,6 +210,17 @@ final class ProductFormInverse implements BasisRepresentation {
         }
         if (myRoot.isComputed()) {
             myRoot.ftran(arg);
+        }
+    }
+
+    @Override
+    public void ftran(final double[] arg) {
+
+        if (myRoot.isComputed()) {
+            myRoot.btran(arg);
+        }
+        for (InvertibleFactor<Double> factor : myFactors) {
+            factor.ftran(arg);
         }
     }
 

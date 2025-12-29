@@ -221,6 +221,13 @@ abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> 
     }
 
     @Override
+    public void btran(final double[] arg) {
+        DecompositionStore<N> x = this.copyRow(arg);
+        this.btran(x);
+        x.supplyTo(arg);
+    }
+
+    @Override
     public final void btran(final PhysicalStore<N> arg) {
         arg.fillByMultiplying(this.getInverse(), arg.copy());
     }
@@ -244,6 +251,13 @@ abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> 
             }
         }
         return significant;
+    }
+
+    @Override
+    public void ftran(final double[] arg) {
+        DecompositionStore<N> x = this.copyColumn(arg);
+        this.ftran(x);
+        x.supplyTo(arg);
     }
 
     @Override
@@ -609,4 +623,5 @@ abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> 
     protected MatrixStore<N> makeV() {
         return myTridiagonal.getQ();
     }
+
 }

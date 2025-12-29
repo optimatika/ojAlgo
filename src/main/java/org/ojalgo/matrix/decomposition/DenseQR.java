@@ -112,6 +112,13 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
     }
 
     @Override
+    public void btran(final double[] arg) {
+        DecompositionStore<N> x = this.copyRow(arg);
+        this.btran(x);
+        x.supplyTo(arg);
+    }
+
+    @Override
     public void btran(final PhysicalStore<N> arg) {
 
         DecompositionStore<N> body = this.getInPlace();
@@ -171,6 +178,13 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
         }
 
         return this.computed(true);
+    }
+
+    @Override
+    public void ftran(final double[] arg) {
+        DecompositionStore<N> x = this.copyColumn(arg);
+        this.ftran(x);
+        x.supplyTo(arg);
     }
 
     @Override

@@ -82,6 +82,13 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     @Override
+    public void btran(final double[] arg) {
+        DecompositionStore<Double> x = this.copyRow(arg);
+        this.btran(x);
+        x.supplyTo(arg);
+    }
+
+    @Override
     public void btran(final PhysicalStore<Double> arg) {
         arg.fillByMultiplying(this.getInverse().transpose(), arg.copy());
     }
@@ -105,6 +112,13 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     @Override
     public boolean decompose(final Access2D.Collectable<Double, ? super TransformableRegion<Double>> matrix) {
         return this.doDecompose(matrix, true);
+    }
+
+    @Override
+    public void ftran(final double[] arg) {
+        DecompositionStore<Double> x = this.copyColumn(arg);
+        this.ftran(x);
+        x.supplyTo(arg);
     }
 
     @Override

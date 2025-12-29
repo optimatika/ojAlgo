@@ -32,6 +32,14 @@ final class DecomposedInverse implements BasisRepresentation {
         myDecomposition = sparse ? LU.newSparseR064() : LU.R064.make(dim, dim);
     }
 
+    @Override
+    public void btran(final double[] arg) {
+
+        if (myDecomposition.isComputed()) {
+            myDecomposition.btran(arg);
+        }
+    }
+
     /**
      * Solves the transposed system B^T x = b, overwriting the right-hand side with the solution. Used to
      * compute dual variables (shadow prices) in the simplex method.
@@ -41,6 +49,14 @@ final class DecomposedInverse implements BasisRepresentation {
 
         if (myDecomposition.isComputed()) {
             myDecomposition.btran(arg);
+        }
+    }
+
+    @Override
+    public void ftran(final double[] arg) {
+
+        if (myDecomposition.isComputed()) {
+            myDecomposition.ftran(arg);
         }
     }
 

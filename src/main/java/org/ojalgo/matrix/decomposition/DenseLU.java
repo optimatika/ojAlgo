@@ -94,6 +94,13 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
     }
 
     @Override
+    public void btran(final double[] arg) {
+        DecompositionStore<N> x = this.copyRow(arg);
+        this.btran(x);
+        x.supplyTo(arg);
+    }
+
+    @Override
     public void btran(final PhysicalStore<N> arg) {
 
         if (myColPivot != null) {
@@ -138,6 +145,13 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
     @Override
     public boolean decomposeWithoutPivoting(final Collectable<N, ? super TransformableRegion<N>> matrix) {
         return this.doDecompose(matrix, false);
+    }
+
+    @Override
+    public void ftran(final double[] arg) {
+        DecompositionStore<N> x = this.copyColumn(arg);
+        this.ftran(x);
+        x.supplyTo(arg);
     }
 
     @Override

@@ -47,6 +47,13 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
     }
 
     @Override
+    public void btran(final double[] arg) {
+        DecompositionStore<Double> x = this.copyRow(arg);
+        this.btran(x);
+        x.supplyTo(arg);
+    }
+
+    @Override
     public void btran(final PhysicalStore<Double> arg) {
         this.doSolve(arg);
     }
@@ -103,6 +110,13 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         matrix.supplyTo(tmpRawInPlaceStore);
 
         return this.doDecompose(retVal, tmpRawInPlaceStore);
+    }
+
+    @Override
+    public void ftran(final double[] arg) {
+        DecompositionStore<Double> x = this.copyColumn(arg);
+        this.ftran(x);
+        x.supplyTo(arg);
     }
 
     @Override

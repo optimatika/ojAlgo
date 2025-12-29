@@ -63,7 +63,17 @@ public interface InvertibleFactor<N extends Comparable<N>> extends Structure2D {
         }
 
         @Override
+        public void btran(final double[] arg) {
+            // No-op
+        }
+
+        @Override
         public void btran(final PhysicalStore<N> arg) {
+            // No-op
+        }
+
+        @Override
+        public void ftran(final double[] arg) {
             // No-op
         }
 
@@ -89,6 +99,11 @@ public interface InvertibleFactor<N extends Comparable<N>> extends Structure2D {
     }
 
     /**
+     * @see IdentityFactor#btran(PhysicalStore)
+     */
+    void btran(double[] arg);
+
+    /**
      * Backwards-transformation
      * <p>
      * Solve [x]<sup>T</sup>[A] = [b]<sup>T</sup> (equivalent to [A]<sup>T</sup>[x] = [b]) by transforming [b]
@@ -97,6 +112,11 @@ public interface InvertibleFactor<N extends Comparable<N>> extends Structure2D {
      * @param arg [b] transformed into [x]
      */
     void btran(PhysicalStore<N> arg);
+
+    /**
+     * @see IdentityFactor#ftran(PhysicalStore)
+     */
+    void ftran(double[] arg);
 
     /**
      * Forward-transformation

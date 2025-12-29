@@ -116,6 +116,14 @@ abstract class AbstractDecomposition<N extends Comparable<N>, M extends Physical
         return myComputed = computed;
     }
 
+    final M copyColumn(final double[] column) {
+        return myFactory.column(column);
+    }
+
+    final M copyRow(final double[] row) {
+        return myFactory.row(row);
+    }
+
     final FunctionSet<N> function() {
         return myFactory.function();
     }

@@ -169,7 +169,7 @@ public final class MinimumDegree {
 
         int[] order = myPermutation.getOrder();
 
-        for (int j = 0, n = Math.min(destination.length, source.length); j < n; j++) {
+        for (int j = 0, n = Math.min(destination.length, order.length); j < n; j++) {
             destination[j] = source[order[j]];
         }
     }
@@ -248,7 +248,7 @@ public final class MinimumDegree {
 
         int[] order = myPermutation.getOrder();
 
-        for (int j = 0, n = Math.min(destination.length, source.length); j < n; j++) {
+        for (int j = 0, n = Math.min(order.length, source.length); j < n; j++) {
             destination[order[j]] = source[j];
         }
     }

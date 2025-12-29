@@ -55,11 +55,11 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
 
     private static final class WorkerCache {
 
-        int[] yIdx = null;
         int[] elimBuffer = null;
         int[] LNextSpaceInCol = null;
-        double[] yVals = null;
+        int[] yIdx = null;
         boolean[] yMarkers = null;
+        double[] yVals = null;
 
         void reset(final int n) {
 
@@ -149,14 +149,13 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
     }
 
     @Override
+    public void btran(final double[] arg) {
+        this.ftran(arg);
+    }
+
+    @Override
     public void btran(final PhysicalStore<Double> arg) {
-        if (arg instanceof R064Store) {
-            this.ftran(((R064Store) arg).data);
-        } else {
-            double[] x = arg.toRawCopy1D();
-            this.ftran(x);
-            COPY.invoke(x, arg);
-        }
+        this.ftran(arg);
     }
 
     @Override
@@ -252,6 +251,23 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
     public boolean factor(final R064CSC matrix, final EliminationTree eTree) {
         this.reset();
         return this.decompose(matrix, eTree, myL, myD, myDinv, myWorkerCache);
+    }
+
+    /**
+     * Solve A x = b in-place for one column/vector x. Initially x holds b, on exit x holds the solution.
+     */
+    @Override
+    public void ftran(final double[] x) {
+
+        int[] pointers = myL.pointers;
+        int[] indices = myL.indices;
+        double[] values = myL.values;
+
+        SparseQDLDL.ftranL(pointers, indices, values, x);
+
+        SparseQDLDL.ftranD(myDinv, x);
+
+        SparseQDLDL.ftranU(pointers, indices, values, x);
     }
 
     @Override
@@ -557,22 +573,6 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
     @Override
     protected boolean checkSolvability() {
         return myD != null && myPositiveValuesInD == myD.length;
-    }
-
-    /**
-     * Solve A x = b in-place for one column/vector x. Initially x holds b, on exit x holds the solution.
-     */
-    void ftran(final double[] x) {
-
-        int[] pointers = myL.pointers;
-        int[] indices = myL.indices;
-        double[] values = myL.values;
-
-        SparseQDLDL.ftranL(pointers, indices, values, x);
-
-        SparseQDLDL.ftranD(myDinv, x);
-
-        SparseQDLDL.ftranU(pointers, indices, values, x);
     }
 
 }

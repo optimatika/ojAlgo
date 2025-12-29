@@ -279,6 +279,10 @@ public final class R064CSC extends CompressedSparseR064 {
         return new R064CSC.Builder();
     }
 
+    public static R064CSC.Builder newBuilder(final int dim) {
+        return R064CSC.newBuilder(dim, dim);
+    }
+
     public static R064CSC.Builder newBuilder(final int nbRows, final int nbCols) {
         R064CSC.Builder builder = R064CSC.newBuilder();
         builder.set(nbRows - 1, nbCols - 1, ZERO);

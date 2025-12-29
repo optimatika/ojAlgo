@@ -298,35 +298,35 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
 
             switch (kase) { // Perform the task indicated by kase.
 
-            // s[p] and e[k-1] are negligible and k<p
-            case 1: // Deflate negligible s[p]
+                // s[p] and e[k-1] are negligible and k<p
+                case 1: // Deflate negligible s[p]
 
-                DenseSingularValue.doCase1(s, e, p, k, q2RotR);
-                break;
+                    DenseSingularValue.doCase1(s, e, p, k, q2RotR);
+                    break;
 
-            // s[k] is negligible and k<p
-            case 2: // Split at negligible s[k]
+                // s[k] is negligible and k<p
+                case 2: // Split at negligible s[k]
 
-                DenseSingularValue.doCase2(s, e, p, k, q1RotR);
-                break;
+                    DenseSingularValue.doCase2(s, e, p, k, q1RotR);
+                    break;
 
-            // e[k-1] is negligible, k<p, and s(k)...s(p) are not negligible
-            case 3: // Perform QR-step.
+                // e[k-1] is negligible, k<p, and s(k)...s(p) are not negligible
+                case 3: // Perform QR-step.
 
-                DenseSingularValue.doCase3(s, e, p, k, q1RotR, q2RotR);
-                break;
+                    DenseSingularValue.doCase3(s, e, p, k, q1RotR, q2RotR);
+                    break;
 
-            // e[p-1] is negligible
-            case 4: // Convergence
+                // e[p-1] is negligible
+                case 4: // Convergence
 
-                DenseSingularValue.doCase4(s, k, q2NegCol, q1XchgCols, q2XchgCols);
-                p--;
-                break;
+                    DenseSingularValue.doCase4(s, k, q2NegCol, q1XchgCols, q2XchgCols);
+                    p--;
+                    break;
 
-            // Should never happen
-            default:
+                // Should never happen
+                default:
 
-                throw new IllegalStateException();
+                    throw new IllegalStateException();
 
             } // switch
         } // while
@@ -366,6 +366,13 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
     }
 
     @Override
+    public void btran(final double[] arg) {
+        DecompositionStore<N> x = this.copyRow(arg);
+        this.btran(x);
+        x.supplyTo(arg);
+    }
+
+    @Override
     public final void btran(final PhysicalStore<N> arg) {
         arg.fillByMultiplying(this.getInverse().transpose(), arg.copy());
     }
@@ -389,6 +396,13 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
     @Override
     public boolean decompose(final Access2D.Collectable<N, ? super TransformableRegion<N>> matrix) {
         return this.compute(matrix, false, this.isFullSize());
+    }
+
+    @Override
+    public void ftran(final double[] arg) {
+        DecompositionStore<N> x = this.copyColumn(arg);
+        this.ftran(x);
+        x.supplyTo(arg);
     }
 
     @Override

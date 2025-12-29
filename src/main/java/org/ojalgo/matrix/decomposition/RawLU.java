@@ -53,6 +53,13 @@ final class RawLU extends RawDecomposition implements LU<Double> {
     }
 
     @Override
+    public void btran(final double[] arg) {
+        DecompositionStore<Double> x = this.copyRow(arg);
+        this.btran(x);
+        x.supplyTo(arg);
+    }
+
+    @Override
     public void btran(final PhysicalStore<Double> arg) {
 
         if (myColPivot != null) {
@@ -113,6 +120,13 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         matrix.supplyTo(this.getInternalStore());
 
         return this.doDecompose(data, false);
+    }
+
+    @Override
+    public void ftran(final double[] arg) {
+        DecompositionStore<Double> x = this.copyColumn(arg);
+        this.ftran(x);
+        x.supplyTo(arg);
     }
 
     @Override

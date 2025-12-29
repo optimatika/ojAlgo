@@ -68,6 +68,21 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
         }
 
         @Override
+        public void btran(final double[] arg) {
+
+            double rowValue = arg[myTo];
+            for (NonzeroView<Double> nz : myElements.nonzeros()) {
+                arg[(int) nz.index()] += nz.doubleValue() * rowValue;
+            }
+
+            double tmp = arg[myTo];
+            for (int i = myTo; i > myFrom; i--) {
+                arg[i] = arg[i - 1];
+            }
+            arg[myFrom] = tmp;
+        }
+
+        @Override
         public void btran(final PhysicalStore<Double> arg) {
 
             double rowValue = arg.doubleValue(myTo);
@@ -80,6 +95,22 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
                 arg.set(i, arg.doubleValue(i - 1));
             }
             arg.set(myFrom, tmp);
+        }
+
+        @Override
+        public void ftran(final double[] arg) {
+
+            double tmp = arg[myFrom];
+            for (int i = myFrom; i < myTo; i++) {
+                arg[i] = arg[i + 1];
+            }
+            arg[myTo] = tmp;
+
+            double sum = ZERO;
+            for (NonzeroView<Double> nz : myElements.nonzeros()) {
+                sum += nz.doubleValue() * arg[(int) nz.index()];
+            }
+            arg[myTo] += sum;
         }
 
         @Override
@@ -152,6 +183,13 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
 
         myPivot = new Pivot();
         myColPivot = null;
+    }
+
+    @Override
+    public void btran(final double[] arg) {
+        DecompositionStore<Double> x = this.copyRow(arg);
+        this.btran(x);
+        x.supplyTo(arg);
     }
 
     @Override
@@ -256,6 +294,13 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
         }
 
         return this.computed(true);
+    }
+
+    @Override
+    public void ftran(final double[] arg) {
+        DecompositionStore<Double> x = this.copyColumn(arg);
+        this.ftran(x);
+        x.supplyTo(arg);
     }
 
     @Override

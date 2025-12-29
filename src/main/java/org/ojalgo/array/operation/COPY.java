@@ -102,12 +102,6 @@ public abstract class COPY implements ArrayOperation {
         }
     }
 
-    public static void negate(final List<? extends Number> source, final double[] destination) {
-        for (int i = 0, limit = Math.min(source.size(), destination.length); i < limit; i++) {
-            destination[i] = -source.get(i).doubleValue();
-        }
-    }
-
     public static void row(final Access2D<?> source, final long row, final double[] destination, final int first, final int limit) {
         for (int j = first; j < limit; j++) {
             destination[j] = source.doubleValue(row, j);

@@ -69,6 +69,13 @@ final class RawQR extends RawDecomposition implements QR<Double> {
     }
 
     @Override
+    public void btran(final double[] arg) {
+        DecompositionStore<Double> x = this.copyRow(arg);
+        this.btran(x);
+        x.supplyTo(arg);
+    }
+
+    @Override
     public void btran(final PhysicalStore<Double> arg) {
 
         R064Store preallocated = (R064Store) arg;
@@ -158,6 +165,13 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         }
 
         return this.doDecompose(retVal);
+    }
+
+    @Override
+    public void ftran(final double[] arg) {
+        DecompositionStore<Double> x = this.copyColumn(arg);
+        this.ftran(x);
+        x.supplyTo(arg);
     }
 
     @Override
@@ -291,6 +305,11 @@ final class RawQR extends RawDecomposition implements QR<Double> {
     }
 
     @Override
+    public PhysicalStore<Double> preallocate(final int nbEquations, final int nbVariables, final int nbSolutions) {
+        return this.makeZero(nbEquations, nbSolutions);
+    }
+
+    @Override
     public void reset() {
 
         super.reset();
@@ -416,11 +435,6 @@ final class RawQR extends RawDecomposition implements QR<Double> {
     @Override
     protected boolean checkSolvability() {
         return this.isAspectRatioNormal() && this.isFullRank();
-    }
-
-    @Override
-    public PhysicalStore<Double> preallocate(final int nbEquations, final int nbVariables, final int nbSolutions) {
-        return this.makeZero(nbEquations, nbSolutions);
     }
 
 }
