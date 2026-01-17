@@ -29,4 +29,8 @@ public class INV implements ArrayOperation {
         CorePrimitiveOperation.divide(data, 0, Math.min(data.length, right.length), 1, PrimitiveMath.ONE, right);
     }
 
+    public static void invoke(final float[] data, final float[] right) {
+        CorePrimitiveOperation.divide(data, 0, Math.min(data.length, right.length), 1, 1F, right);
+    }
+
 }

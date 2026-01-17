@@ -242,12 +242,17 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
 
     /**
      * The larger of the two errors (relative and absolute).
+     * <p>
+     * This is equivalent to calling {@link #error(double)} with magnitude = 1.
      *
      * @see #getRelativeError()
      * @see #getAbsoluteError()
+     * @see #error(double)
+     * @deprecated v56 Use {@link #error(double)} instead.
      */
+    @Deprecated
     public double epsilon() {
-        return Math.max(this.getRelativeError(), this.getAbsoluteError());
+        return Math.max(myRelativeError, myAbsoluteError);
     }
 
     /**
@@ -273,6 +278,19 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Returns the tolerance for a value with the given magnitude.
+     * <p>
+     * tolerance/error = max(absoluteError, abs(magnitude) * relativeError)
+     *
+     * @see #getRelativeError()
+     * @see #getAbsoluteError()
+     * @see #epsilon()
+     */
+    public double error(final double value) {
+        return Math.max(Math.abs(value) * myRelativeError, myAbsoluteError);
     }
 
     public String format(final double number) {
@@ -399,10 +417,6 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
 
     public boolean isZero(final double value) {
         return NumberContext.isZero(value, myAbsoluteError);
-    }
-
-    public double error(final double value) {
-        return Math.max(Math.abs(value) * myRelativeError, myAbsoluteError);
     }
 
     /**

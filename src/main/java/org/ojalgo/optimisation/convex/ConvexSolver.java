@@ -490,7 +490,7 @@ public abstract class ConvexSolver extends GenericSolver {
         /**
          * Null-Space projection. (Eliminating equality constraints and reducing the number of variables.)
          * <p>
-         * TRUE means yes, FALSE NO, and NULL auto. Even if configured to TRUE there must also be both
+         * TRUE means yes, FALSE no, and NULL auto. Even if configured to TRUE there must also be both
          * equality and inequality constraints for this to actually be used.
          */
         public Configuration projection(final Boolean projection) {

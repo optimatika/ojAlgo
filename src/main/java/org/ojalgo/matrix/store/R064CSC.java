@@ -244,10 +244,11 @@ public final class R064CSC extends CompressedSparseR064 {
 
     /**
      * Algorithm assumes that the matrix is symmetric, and only a triangular part is stored.
+     * <p>
+     * This implementation does NOT reset the norms array! If that array contains non-zero values those will
+     * be taken into account when calculating the norms.
      */
     public static void calculateInfinitySymmetricNorms(final R064CSC matrix, final double[] norms) {
-
-        Arrays.fill(norms, ZERO);
 
         for (int j = 0, n = matrix.getColDim(); j < n; j++) {
             int p0 = matrix.pointers[j];
@@ -272,6 +273,82 @@ public final class R064CSC extends CompressedSparseR064 {
             for (int k = mtrxL.pointers[ij], limit = mtrxL.pointers[ij + 1]; k < limit; k++) {
                 arg.add(mtrxL.indices[k], mtrxL.values[k] * argJ);
             }
+        }
+    }
+
+    /**
+     * Transposed matrix-vector multiplication: data' = left' * right (A'x = y <-> x'A = y')
+     */
+    public static void multiply(final double[] data, final double[] left, final R064CSC right) {
+
+        int[] rightPointers = right.pointers;
+        int[] rightIndices = right.indices;
+        double[] rightValues = right.values;
+        int i;
+        double dataJ;
+        for (int j = 0, n = right.getColDim(); j < n; j++) {
+            dataJ = ZERO;
+            for (int p = rightPointers[j], lim = rightPointers[j + 1]; p < lim; p++) {
+                i = rightIndices[p];
+                dataJ += left[i] * rightValues[p];
+            }
+            data[j] = dataJ;
+        }
+    }
+
+    /**
+     * General matrix-vector multiplication: data = left * right
+     * <p>
+     * The data array will be completely overwritten. No need to pre-fill it with zeros.
+     *
+     * @param data  The array to store the result
+     * @param left  The left matrix in CSC format
+     * @param right The right vector
+     */
+    public static void multiply(final double[] data, final R064CSC left, final double[] right) {
+
+        Arrays.fill(data, ZERO);
+
+        if (left.isEmpty()) {
+            return;
+        }
+
+        // data += left*right
+        int[] leftPointers = left.pointers;
+        int[] leftIndices = left.indices;
+        double[] leftValues = left.values;
+        int i;
+        double rightJ;
+        for (int j = 0, n = left.getColDim(); j < n; j++) {
+            rightJ = right[j];
+            for (int p = leftPointers[j], lim = leftPointers[j + 1]; p < lim; p++) {
+                i = leftIndices[p];
+                data[i] += leftValues[p] * rightJ;
+            }
+        }
+    }
+
+    /**
+     * For a symmetric matrix A, the matrix-vector products A * x and x * A are equal. This method implements
+     * that assuming the matrix is symmetric but only stores the upper/right triangle.
+     */
+    public static void multiplySymmetric(final double[] data, final R064CSC matrix, final double[] vector) {
+
+        R064CSC.multiply(data, matrix, vector);
+
+        int[] matrixPointers = matrix.pointers;
+        int[] matrixIndices = matrix.indices;
+        double[] matrixValues = matrix.values;
+        double dataJ;
+        for (int j = 0, n = matrix.getColDim(); j < n; j++) {
+            dataJ = ZERO;
+            for (int p = matrixPointers[j], lim = matrixPointers[j + 1]; p < lim; p++) {
+                int i = matrixIndices[p];
+                if (i < j) {
+                    dataJ += matrixValues[p] * vector[i];
+                }
+            }
+            data[j] += dataJ;
         }
     }
 

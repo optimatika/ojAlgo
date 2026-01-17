@@ -151,7 +151,7 @@ public abstract class OptimisationConvexTests {
         ConvexData<Double> data = builder.getConvexData(R064Store.FACTORY);
         ConvexObjectiveFunction<Double> objective = data.getObjective();
 
-        Access2D<?>[] matrices = new Access2D<?>[] { data.getAE(), data.getBE(), objective.quadratic(), objective.linear(), data.getAI(), data.getBI() };
+        Access2D<?>[] matrices = { data.getAE(), data.getBE(), objective.quadratic(), objective.linear(), data.getAI(), data.getBI() };
 
         return OptimisationConvexTests.buildModel(matrices, null);
     }

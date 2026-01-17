@@ -648,6 +648,12 @@ public abstract class GenericSolver implements Optimisation.Solver {
         this.log("Done {} {} iterations in {}.", iterationsDone, classSimpleName, duration);
     }
 
+    protected final void printf(final String format, final Object... args) {
+        if (options.logger_appender != null) {
+            options.logger_appender.printf(format, args);
+        }
+    }
+
     protected final void resetIterationsCount() {
         myIterationsCount.set(0);
         myStopwatch.reset();
