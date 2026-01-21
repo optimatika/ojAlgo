@@ -35,6 +35,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.ojalgo.ProgrammingError;
@@ -934,6 +935,13 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
         Set<IntIndex> fixedVariables = modelToCopy.getFixedVariables();
 
+        myReferences = modelToCopy.getReferences();
+
+        myShallowCopy = shallow || modelToCopy.isShallowCopy();
+        myRelaxed = modelToCopy.isRelaxed();
+        myKnownSolution = modelToCopy.getKnownSolution(); // TODO Should this be copied?
+        myValidationFailureHandler = modelToCopy.getValidationFailureHandler();
+
         for (Expression tmpExpr : modelToCopy.getExpressions()) {
             if (shallow) {
                 if (prune) {
@@ -943,21 +951,16 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
                 } else {
                     myExpressions.put(tmpExpr.getName(), tmpExpr.copy(this, false));
                 }
-            } else if (prune) {
-                if (tmpExpr.isObjective() || tmpExpr.isConstraint() && (!tmpExpr.isRedundant() || tmpExpr.isInfeasible())) {
-                    myExpressions.put(tmpExpr.getName(), tmpExpr.copy(this, true).compensate(fixedVariables));
-                }
             } else {
-                myExpressions.put(tmpExpr.getName(), tmpExpr.copy(this, true));
+                if (prune) {
+                    if (tmpExpr.isObjective() || tmpExpr.isConstraint() && (!tmpExpr.isRedundant() || tmpExpr.isInfeasible())) {
+                        myExpressions.put(tmpExpr.getName(), tmpExpr.copy(this, true).compensate(fixedVariables));
+                    }
+                } else {
+                    myExpressions.put(tmpExpr.getName(), tmpExpr.copy(this, true));
+                }
             }
         }
-
-        myReferences = modelToCopy.getReferences();
-
-        myShallowCopy = shallow || modelToCopy.isShallowCopy();
-        myRelaxed = modelToCopy.isRelaxed();
-        myKnownSolution = modelToCopy.getKnownSolution(); // TODO Should this be copied?
-        myValidationFailureHandler = modelToCopy.getValidationFailureHandler();
     }
 
     public Expression addExpression() {
@@ -1542,14 +1545,27 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
-     * Will try to indentify constraints with equal variables set, and check if those can be combined or not.
-     * This is a relatively slow process with small chance to actually achieve somthing. Therefore it is not
-     * part of the default presolve och {@link #simplify()} functionality.
+     * Will try to identify constraints with equal variable sets, and check if those can be combined or not.
+     * This is a relatively slow process with small chance to actually achieve anything. Therefore it is not
+     * part of the default pre-solve and {@link #simplify()} functionality.
+     * <p>
+     * This is an in-place operation. The returned model is the same as this – just to allow chained
+     * invocation.
      *
      * @see Presolvers#reduce(Collection)
      */
     public ExpressionsBasedModel reduce() {
-        Presolvers.reduce(myExpressions.values());
+
+        List<Expression> compensated = this.constraints().map(expr -> expr.compensate(this.getFixedVariables())).collect(Collectors.toList());
+
+        if (Presolvers.reduce(compensated)) {
+            for (Expression compensatedExpression : compensated) {
+                if (compensatedExpression.isRedundant()) {
+                    myExpressions.get(compensatedExpression.getName()).setRedundant();
+                }
+            }
+        }
+
         return this;
     }
 
@@ -1605,8 +1621,11 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
-     * Will perform presolve and then create a copy removing redundant constraint expressions, and pruning the
-     * remaining ones to no longer include fixed variables.
+     * Will perform pre-solve and then create a copy removing redundant constraint expressions, and pruning
+     * the remaining ones to no longer include fixed variables.
+     * <p>
+     * Note that the fixed variables themselves are not removed. They are still present, but fixed, and not
+     * used in any expression.
      */
     public ExpressionsBasedModel simplify() {
 

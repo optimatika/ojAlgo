@@ -11,6 +11,20 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [56.2.1] – 2026-01-21
+
+### Added
+
+#### org.ojalgo.matrix
+
+- More `R064CSC` utilities
+
+### Fixed
+
+#### org.ojalgo.optimisation
+
+- Fixed problems related to simplifying/reducing `ExpressionsBasedModel`
+
 ## [56.2.0] – 2025-12-29
 
 ### Added
