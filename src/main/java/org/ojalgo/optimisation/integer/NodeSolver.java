@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.equation.Equation;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.special.MissingMath;
@@ -76,7 +77,7 @@ public final class NodeSolver extends IntermediateSolver {
         if (solver instanceof UpdatableSolver) {
             UpdatableSolver updatable = (UpdatableSolver) solver;
 
-            ExpressionsBasedModel.EntityMap entityMap = updatable.getEntityMap();
+            ExpressionsBasedModel.EntityMap entityMap = updatable.getEntityMap().orElseThrow(ProgrammingError::new);
 
             if (entityMap != null) {
 
@@ -84,7 +85,7 @@ public final class NodeSolver extends IntermediateSolver {
 
                 int nbSlackVars = entityMap.countSlackVariables();
 
-                boolean[] integers = updatable.integers(model);
+                boolean[] integers = entityMap.integers(model);
 
                 Collection<Equation> potentialCuts = updatable.generateCutCandidates(strategy.getGMICutConfiguration().fractionality, integers);
 
@@ -228,13 +229,8 @@ public final class NodeSolver extends IntermediateSolver {
                             target.options.logger_appender.println("{}: {} < {}", name, cut.getLowerLimit(), cut.getLinearEntrySet());
                         }
 
-                        if (target.options.validate) {
-                            if ((nodeKey == null || nodeKey.sequence == 0) && !this.validate(target)) {
-                                BasicLogger.error("Modified target model cuts off the optimal solution!");
-                            }
-                            if (target.validate(result)) {
-                                BasicLogger.error("Result still valid, was NOT cut off!");
-                            }
+                        if (target.options.validate && target.validate(result)) {
+                            BasicLogger.error("Result still valid, was NOT cut off!");
                         }
                     }
                 }

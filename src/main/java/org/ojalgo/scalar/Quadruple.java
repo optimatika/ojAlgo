@@ -25,7 +25,6 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -120,6 +119,10 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
 
     public static Quadruple valueOf(final BigDecimal number) {
 
+        if (number == null) {
+            return ZERO;
+        }
+
         double base = number.doubleValue();
 
         BigDecimal mag = new BigDecimal(base);
@@ -154,6 +157,10 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
             return new Quadruple(value);
         }
 
+        if (value == Math.rint(value) && Math.abs(value) <= (1L << 53)) {
+            return new Quadruple(value, PrimitiveMath.ZERO);
+        }
+
         double scaled = value * SPLIT;
         double base = scaled - (scaled - value);
         double remainder = value - base;
@@ -179,55 +186,38 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
     }
 
     /**
-     * High-precision division.
+     * High-precision division x/y
      */
-    private static Quadruple divide(final double base1, final double remainder1, final double base2, final double remainder2) {
+    private static Quadruple divide(final double xh, final double xl, final double yh, final double yl) {
 
-        double q1, r1, r2, s1, s2, t1, t2;
-        double c1, c2, cona, conb, a1, a2, b1, b2;
+        double q1 = (xh + xl) / (yh + yl);
 
-        q1 = base1 / base2;
+        double c11 = q1 * yh;
+        double cona = q1 * SPLIT;
+        double conb = yh * SPLIT;
+        double a1 = cona - (cona - q1);
+        double b1 = conb - (conb - yh);
+        double a2 = q1 - a1;
+        double b2 = yh - b1;
+        double c21 = a2 * b2 + (a2 * b1 + (a1 * b2 + (a1 * b1 - c11)));
+        double c2 = q1 * yl;
 
-        cona = q1 * SPLIT;
-        a1 = cona - (cona - q1);
-        a2 = q1 - a1;
+        double p1 = c11 + c2;
+        double e = p1 - c11;
+        double p2 = c21 + (c2 - e + (c11 - (p1 - e)));
 
-        conb = base2 * SPLIT;
-        b1 = conb - (conb - base2);
-        b2 = base2 - b1;
+        double r1 = xh - p1;
+        double r2 = xl - p2;
+        double rhi = r1 + r2;
+        double rlo = r2 - (rhi - r1);
 
-        // high part of q1 * base2
-        c1 = q1 * base2;
-        // rounding errors and cross terms
-        c2 = a1 * b1 - c1 + a1 * b2 + a2 * b1 + a2 * b2;
+        double q2 = (rhi + rlo) / (yh + yl);
 
-        // first remainder
-        r1 = base1 - c1;
-        r2 = remainder1 - c2;
+        double s = q1 + q2;
+        double es = s - q1;
+        double t = (q2 - es) + (q1 - (s - es));
 
-        // next approximation for remainder1 / base2
-        s1 = r1 / base2;
-        t1 = s1 * base2;
-        t2 = a1 * b1 - t1 + a1 * b2 + a2 * b1 + a2 * b2;
-
-        s2 = r2 / base2;
-
-        double base = q1 + s1;
-        double remainder = s2 - (base - (q1 + s1));
-
-        return new Quadruple(base, remainder);
-    }
-
-    private static Quadruple divide(final Quadruple arg1, final Quadruple arg2) {
-
-        // TODO How to do this with only primitive double – same as multiply
-
-        BigDecimal decimal1 = arg1.toBigDecimal();
-        BigDecimal decimal2 = arg2.toBigDecimal();
-
-        BigDecimal quotient = MissingMath.divide(decimal1, decimal2);
-
-        return Quadruple.valueOf(quotient);
+        return new Quadruple(s, t);
     }
 
     /**
@@ -265,11 +255,11 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
     private final double myRemainder;
 
     public Quadruple() {
-        this(0.0, 0.0);
+        this(PrimitiveMath.ZERO, PrimitiveMath.ZERO);
     }
 
     private Quadruple(final double base) {
-        this(base, 0.0);
+        this(base, PrimitiveMath.ZERO);
     }
 
     private Quadruple(final double base, final double remainder) {
@@ -392,8 +382,7 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
     public int hashCode() {
         int prime = 31;
         int result = 1;
-        long temp;
-        temp = Double.doubleToLongBits(myBase);
+        long temp = Double.doubleToLongBits(myBase);
         result = prime * result + (int) (temp ^ temp >>> 32);
         temp = Double.doubleToLongBits(myRemainder);
         return prime * result + (int) (temp ^ temp >>> 32);

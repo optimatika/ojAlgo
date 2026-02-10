@@ -51,7 +51,7 @@ public class Uniform extends AbstractContinuous {
     }
 
     /**
-     * @return An integer: 0 &lt;= ? &lt; limit
+     * @return An integer: 0 <= ? < limit
      */
     public static long randomInteger(final long limit) {
         return (long) PrimitiveMath.FLOOR.invoke(limit * Math.random());

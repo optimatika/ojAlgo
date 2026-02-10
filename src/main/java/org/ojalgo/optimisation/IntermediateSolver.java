@@ -164,43 +164,11 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
     }
 
     /**
-     * Using the solver's {@link ExpressionsBasedModel.Validator} instance, if set. Otherwise no validation
-     * performed.
-     */
-    public boolean validate(final Access1D<?> solution) {
-        if (mySolver != null && mySolver instanceof GenericSolver) {
-            boolean valid = ((GenericSolver) mySolver).validate(solution);
-            if (!valid) {
-                ((GenericSolver) mySolver).setState(State.FAILED); // TODO Should it be INVALID instead?
-            }
-            return valid;
-        } else {
-            return true;
-        }
-    }
-
-    /**
      * Always performs validation directly using
      * {@link ExpressionsBasedModel#validate(Access1D, BasicLogger)}.
      */
     public boolean validate(final Access1D<BigDecimal> solution, final BasicLogger appender) {
         return myModel.validate(solution, appender);
-    }
-
-    /**
-     * Using the solver's {@link ExpressionsBasedModel.Validator} instance, if set. Otherwise no validation
-     * performed.
-     */
-    public boolean validate(final ExpressionsBasedModel model) {
-        if (mySolver != null && mySolver instanceof GenericSolver) {
-            boolean valid = ((GenericSolver) mySolver).validate(model);
-            if (!valid) {
-                ((GenericSolver) mySolver).setState(State.FAILED); // TODO Should it be INVALID instead?
-            }
-            return valid;
-        } else {
-            return true;
-        }
     }
 
     protected int getIndexInSolver(final int globalModelIndex) {

@@ -170,6 +170,34 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     @Override
+    public final ConstraintType getConstraintType() {
+
+        if (myLowerLimit != null) {
+
+            if (myUpperLimit != null) {
+
+                if (myLowerLimit.compareTo(myUpperLimit) == 0) {
+                    return ConstraintType.EQUALITY;
+                } else {
+                    return ConstraintType.RANGE;
+                }
+
+            } else {
+
+                return ConstraintType.LOWER;
+            }
+
+        } else {
+
+            if (myUpperLimit != null) {
+                return ConstraintType.UPPER;
+            } else {
+                return ConstraintType.NONE;
+            }
+        }
+    }
+
+    @Override
     public final BigDecimal getContributionWeight() {
         return myContributionWeight;
     }

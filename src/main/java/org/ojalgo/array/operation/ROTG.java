@@ -24,7 +24,7 @@ package org.ojalgo.array.operation;
 /**
  * Given the Cartesian coordinates (a, b) of a point, these routines return the parameters c, s, r, and z
  * associated with the Givens rotation. The parameters c and s define a unitary matrix such that: Equation The
- * parameter z is defined such that if |a| &gt; |b|, z is s; otherwise if c is not 0 z is 1/c; otherwise z is
+ * parameter z is defined such that if |a| > |b|, z is s; otherwise if c is not 0 z is 1/c; otherwise z is
  * 1.
  *
  * @author apete

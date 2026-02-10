@@ -198,14 +198,14 @@ public class UsageMIP extends OptimisationLinearTests {
             Function<LinearStructure, SimplexTableau> referenceFactory = DenseTableau::new;
             SimplexTableau referenceTableau = SimplexTableauSolver.build(model, referenceFactory);
             SimplexTableauSolver referenceSolver = referenceTableau.newSimplexTableauSolver(options);
-            LinearStructure referenceMap = referenceSolver.getEntityMap();
+            EntityMap referenceMap = referenceSolver.getEntityMap().get();
             Optimisation.Result referenceResult = referenceSolver.solve();
 
             if (!referenceResult.getState().isFeasible()) {
                 continue;
             }
 
-            boolean[] refIntegers = referenceSolver.integers(model);
+            boolean[] refIntegers = referenceMap.integers(model);
             Collection<Equation> referenceCutCandidates = referenceSolver.generateCutCandidates(PrimitiveMath.ELEVENTH, refIntegers);
 
             if (DEBUG) {
@@ -224,11 +224,11 @@ public class UsageMIP extends OptimisationLinearTests {
 
                 SimplexTableauSolver solver = tableau.newSimplexTableauSolver(options);
 
-                LinearStructure map = solver.getEntityMap();
+                EntityMap map = solver.getEntityMap().get();
 
                 Optimisation.Result result = solver.solve();
 
-                boolean[] integers = solver.integers(model);
+                boolean[] integers = map.integers(model);
                 Collection<Equation> cutCandidates = solver.generateCutCandidates(PrimitiveMath.ELEVENTH, integers);
 
                 if (DEBUG) {
@@ -246,11 +246,11 @@ public class UsageMIP extends OptimisationLinearTests {
 
                 PhasedSimplexSolver solver = store.newPhasedSimplexSolver(options);
 
-                LinearStructure map = solver.getEntityMap();
+                EntityMap map = solver.getEntityMap().get();
 
                 Optimisation.Result result = solver.solve();
 
-                boolean[] integers = solver.integers(model);
+                boolean[] integers = map.integers(model);
                 Collection<Equation> cutCandidates = solver.generateCutCandidates(PrimitiveMath.ELEVENTH, integers);
 
                 if (DEBUG) {
@@ -264,8 +264,8 @@ public class UsageMIP extends OptimisationLinearTests {
         }
     }
 
-    void doTest(final Collection<Equation> expectedCandidates, final LinearStructure expectedMap, final Collection<Equation> actualCandidates,
-            final LinearStructure actualMap) {
+    void doTest(final Collection<Equation> expectedCandidates, final EntityMap expectedMap, final Collection<Equation> actualCandidates,
+            final EntityMap actualMap) {
 
         TestUtils.assertEquals(expectedCandidates.size(), actualCandidates.size());
         TestUtils.assertEquals(UsageMIP.getAllModelIndices(expectedMap), UsageMIP.getAllModelIndices(actualMap));

@@ -126,6 +126,10 @@ public final class Variable extends ModelEntity<Variable> {
         return Objects.equals(myIndex, other.myIndex) && myInteger == other.myInteger && Objects.equals(myValue, other.myValue);
     }
 
+    public IntIndex getIndex() {
+        return myIndex;
+    }
+
     public BigDecimal getLowerSlack() {
 
         BigDecimal retVal = null;
@@ -183,8 +187,7 @@ public final class Variable extends ModelEntity<Variable> {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + Objects.hash(myIndex, myInteger, myValue);
-        return result;
+        return prime * result + Objects.hash(myIndex, myInteger, myValue);
     }
 
     public Variable integer() {
@@ -376,10 +379,6 @@ public final class Variable extends ModelEntity<Variable> {
                 this.lower(limit.setScale(0, RoundingMode.CEILING));
             }
         }
-    }
-
-    IntIndex getIndex() {
-        return myIndex;
     }
 
     boolean isFixed() {

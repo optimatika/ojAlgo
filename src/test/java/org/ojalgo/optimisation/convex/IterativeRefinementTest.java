@@ -431,6 +431,15 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
         TestUtils.assertTrue(model.validate(initial));
 
         if (DEBUG) {
+
+            model.constraints().forEach(c -> {
+                try {
+                    BasicLogger.debug("Constraint {}: {} <= {} <= {}", c.getName(), c.getLowerLimit(), c.getLinearEntrySet(), c.getUpperLimit());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+
             model.options.debug(ConvexSolver.class);
         }
 

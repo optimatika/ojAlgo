@@ -184,7 +184,7 @@ public abstract class PowerOf2 {
     }
 
     /**
-     * @return The smallest integer exponent so that 2^exp &gt;= value.
+     * @return The smallest integer exponent so that 2^exp >= value.
      */
     public static int powerOf2Larger(final int value) {
         final int index = Arrays.binarySearch(INT_POWERS, value);
@@ -192,7 +192,7 @@ public abstract class PowerOf2 {
     }
 
     /**
-     * @return The smallest integer exponent so that 2^exp &gt;= value.
+     * @return The smallest integer exponent so that 2^exp >= value.
      */
     public static int powerOf2Larger(final long value) {
         final int index = Arrays.binarySearch(LONG_POWERS, value);
@@ -200,7 +200,7 @@ public abstract class PowerOf2 {
     }
 
     /**
-     * @return The largest integer exponent so that 2^exp &lt;= value.
+     * @return The largest integer exponent so that 2^exp <= value.
      */
     public static int powerOf2Smaller(final int value) {
         final int index = Arrays.binarySearch(INT_POWERS, value);
@@ -208,7 +208,7 @@ public abstract class PowerOf2 {
     }
 
     /**
-     * @return The largest integer exponent so that 2^exp &lt;= value.
+     * @return The largest integer exponent so that 2^exp <= value.
      */
     public static int powerOf2Smaller(final long value) {
         final int index = Arrays.binarySearch(LONG_POWERS, value);

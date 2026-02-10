@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -744,7 +745,7 @@ final class SimplexTableauSolver extends LinearSolver {
     }
 
     @Override
-    public final Collection<Equation> generateCutCandidates(final double fractionality, final boolean... integer) {
+    public Collection<Equation> generateCutCandidates(final double fractionality, final boolean[] integer) {
 
         NumberContext integralityTolerance = options.integer().getIntegralityTolerance();
 
@@ -752,8 +753,8 @@ final class SimplexTableauSolver extends LinearSolver {
     }
 
     @Override
-    public LinearStructure getEntityMap() {
-        return myTableau.structure;
+    public Optional<ExpressionsBasedModel.EntityMap> getEntityMap() {
+        return myTableau.structure.isEntityMap() ? Optional.of(myTableau.structure) : Optional.empty();
     }
 
     @Override
@@ -868,10 +869,8 @@ final class SimplexTableauSolver extends LinearSolver {
 
         Result result = new Optimisation.Result(state, value, solution);
 
-        ConstraintsMetaData constraints = this.getEntityMap().constraints;
-
-        if (constraints.isEntityMap()) {
-            return result.multipliers(constraints, this.extractMultipliers());
+        if (myTableau.structure.isEntityMap()) {
+            return result.multipliers(myTableau.structure.constraints, this.extractMultipliers());
         } else {
             return result.multipliers(this.extractMultipliers());
         }

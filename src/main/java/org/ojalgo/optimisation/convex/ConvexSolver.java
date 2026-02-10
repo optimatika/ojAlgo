@@ -33,7 +33,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.ojalgo.array.ArrayR064;
-import org.ojalgo.array.ArrayR256;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.matrix.decomposition.Cholesky;
@@ -367,11 +366,11 @@ public abstract class ConvexSolver extends GenericSolver {
     public static final class Configuration {
 
         private boolean myCombinedScaleFactor = true;
-        private Boolean myProjection = null;
         private boolean myExtendedPrecision = false;
         private NumberContext myIterativeAccuracy = NumberContext.of(10, 16).withMode(RoundingMode.HALF_DOWN);
         private Supplier<Preconditioner> myIterativePreconditioner = SSORPreconditioner::new;
         private Supplier<IterativeSolverTask> myIterativeSolver = ConjugateGradientSolver::new;
+        private Boolean myProjection = null;
         private double mySmallDiagonal = RELATIVELY_SMALL + MACHINE_EPSILON;
         private Function<Structure2D, MatrixDecomposition.Solver<Double>> mySolverGeneral = LU.R064::make;
         private Function<Structure2D, MatrixDecomposition.Solver<Double>> mySolverSPD = Cholesky.R064::make;
@@ -547,76 +546,43 @@ public abstract class ConvexSolver extends GenericSolver {
         @Override
         public ConvexSolver build(final ExpressionsBasedModel model) {
 
-            Options options = model.options;
+            boolean experimental = model.options.experimental;
 
-            if (options.convex().isExtendedPrecision()) {
+            this.setSwitch(model, ExpressionsBasedModel.IntegrationProperty.TEMPORARY, experimental);
 
-                ConvexData<Quadruple> data = ConvexSolver.copy(model, GenericStore.R128);
-                IterativeRefinementSolver solver = new IterativeRefinementSolver(options, data);
-
-                if (model.options.validate) {
-                    solver.setValidator(this.newValidator(model));
-                }
-
-                return solver;
-
+            if (experimental) {
+                return AlternatingDirectionSolver.INTEGRATION.build(model);
             } else {
-
-                ConvexData<Double> data = ConvexSolver.copy(model, R064Store.FACTORY);
-
-                int nbVars = data.countVariables();
-                int nbEqus = data.countEqualityConstraints();
-                int nbInes = data.countInequalityConstraints();
-
-                Boolean projection = options.convex().getProjection();
-
-                if (nbEqus > 0 && nbInes > 0 && nbEqus <= nbVars
-                        && (Boolean.TRUE.equals(projection) || (projection == null && (nbVars >= 80) && (nbVars / nbEqus <= 2)))) {
-
-                    ConvexSolver solver = new NullSpaceASS(options, data);
-
-                    if (model.options.validate) {
-                        solver.setValidator(this.newValidator(model));
-                    }
-
-                    return solver;
-
-                } else {
-
-                    BasePrimitiveSolver solver = BasePrimitiveSolver.newSolver(data, options);
-
-                    if (model.options.validate) {
-                        solver.setValidator(this.newValidator(model));
-                    }
-
-                    return solver;
-                }
+                return BasePrimitiveSolver.INTEGRATION.build(model);
             }
         }
 
         @Override
         public boolean isCapable(final ExpressionsBasedModel model) {
-            return !model.isAnyVariableInteger() && model.isAnyObjectiveQuadratic() && !model.isAnyConstraintQuadratic();
+            return BasePrimitiveSolver.INTEGRATION.isCapable(model) || AlternatingDirectionSolver.INTEGRATION.isCapable(model);
         }
 
         @Override
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
-
-            if (model.options.convex().isExtendedPrecision()) {
-                return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR256.FACTORY);
+            if (this.isSwitch(model, ExpressionsBasedModel.IntegrationProperty.TEMPORARY)) {
+                return AlternatingDirectionSolver.INTEGRATION.toModelState(solverState, model);
             } else {
-                return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR064.FACTORY);
+                return BasePrimitiveSolver.INTEGRATION.toModelState(solverState, model);
             }
         }
 
         @Override
         public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
-            return ExpressionsBasedModel.Integration.reduceFullToFree(modelState, model, ArrayR064.FACTORY);
+            if (this.isSwitch(model, ExpressionsBasedModel.IntegrationProperty.TEMPORARY)) {
+                return AlternatingDirectionSolver.INTEGRATION.toSolverState(modelState, model);
+            } else {
+                return BasePrimitiveSolver.INTEGRATION.toSolverState(modelState, model);
+            }
         }
 
     }
 
-    public static final ModelIntegration INTEGRATION = new ModelIntegration();
+    public static final ExpressionsBasedModel.Integration<ConvexSolver> INTEGRATION = new ModelIntegration();
 
     public static <N extends Comparable<N>> ConvexData<N> copy(final ExpressionsBasedModel model, final PhysicalStore.Factory<N, ?> factory) {
 

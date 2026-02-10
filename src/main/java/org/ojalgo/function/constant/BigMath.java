@@ -122,9 +122,16 @@ public abstract class BigMath {
     public static final BigDecimal VERY_POSITIVE = new BigDecimal(Long.MAX_VALUE);
 
     /**
-     * The smallest possible number that will be translated to positive infinity when converted to a primitive
-     * double (something close to that at least). The key feature is that it is translated to
-     * {@link Double#POSITIVE_INFINITY}.
+     * A {@link BigDecimal} slightly larger than {@link Double#MAX_VALUE}, constructed by adding a relative
+     * perturbation on the order of double-precision machine epsilon.
+     * <p>
+     * The added term is approximately {@code Double.MAX_VALUE * 1e-16}, which is comparable in magnitude to
+     * {@code Double.MAX_VALUE * ε} for IEEE-754 doubles. As a result, this value is strictly greater than the
+     * largest finite {@code double} and therefore converts to {@link Double#POSITIVE_INFINITY} when
+     * {@link BigDecimal#doubleValue()} is called.
+     * <p>
+     * This constant is not the smallest {@code BigDecimal} that overflows to infinity; it merely provides a
+     * convenient and robust way to exceed the finite {@code double} range.
      */
     public static final BigDecimal SMALLEST_POSITIVE_INFINITY = new BigDecimal(Double.MAX_VALUE).add(new BigDecimal(Double.MAX_VALUE).movePointLeft(16));
     /**

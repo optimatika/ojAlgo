@@ -54,14 +54,7 @@ public final class IntegerSolver extends GenericSolver {
 
         @Override
         public IntegerSolver build(final ExpressionsBasedModel model) {
-
-            IntegerSolver solver = IntegerSolver.make(model);
-
-            if (model.options.validate) {
-                solver.setValidator(this.newValidator(model));
-            }
-
-            return solver;
+            return IntegerSolver.make(model);
         }
 
         @Override
@@ -422,7 +415,6 @@ public final class IntegerSolver extends GenericSolver {
     }
 
     boolean compute(final NodeKey nodeKey, final NodeSolver nodeSolver, final RingLogger nodePrinter, final ModelStrategy strategy) {
-
         if (this.isLogDebug()) {
             nodePrinter.println();
             nodePrinter.println("Branch&Bound Node");
@@ -467,10 +459,12 @@ public final class IntegerSolver extends GenericSolver {
 
         if (options.validate && !nodeSolver.validate(nodeResult, nodePrinter)) {
             // This should not be possible. There is a bug somewhere.
-            nodePrinter.println("Node solution marked as OPTIMAL, but is actually INVALID/INFEASIBLE/FAILED. Stop this branch!");
-            nodePrinter.println("Integer indices: {}", strategy);
-            nodePrinter.println("Lower bounds: {}", Arrays.toString(nodeKey.copyLowerBounds()));
-            nodePrinter.println("Upper bounds: {}", Arrays.toString(nodeKey.copyUpperBounds()));
+            if (nodePrinter != null) {
+                nodePrinter.println("Node solution marked as OPTIMAL, but is actually INVALID/INFEASIBLE/FAILED. Stop this branch!");
+                nodePrinter.println("Integer indices: {}", strategy);
+                nodePrinter.println("Lower bounds: {}", Arrays.toString(nodeKey.copyLowerBounds()));
+                nodePrinter.println("Upper bounds: {}", Arrays.toString(nodeKey.copyUpperBounds()));
+            }
 
             IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
 

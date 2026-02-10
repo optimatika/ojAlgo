@@ -130,6 +130,10 @@ public abstract class TestUtils {
         }
     }
 
+    public static void assertEquals(final BigDecimal expected, final BigDecimal actual, final NumberContext context) {
+        Assertions.assertEquals(context.enforce(expected), context.enforce(actual));
+    }
+
     public static void assertEquals(final boolean expected, final boolean actual) {
         Assertions.assertEquals(expected, actual);
     }

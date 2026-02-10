@@ -31,7 +31,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -186,9 +185,9 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      * Connects solver constraints and variables back to model entities. Used for 2 things:
      * <ol>
      * <li>Solvers that manipulate models (like the {@link IntegerSolver}) need this to map between model
-     * entities and solver indices.
+     * entities and solver indices.</li>
      * <li>Simplifies implementation of
-     * {@link ExpressionsBasedModel.Integration#toModelState(org.ojalgo.optimisation.Optimisation.Result, ExpressionsBasedModel)}.
+     * {@link ExpressionsBasedModel.Integration#toModelState(org.ojalgo.optimisation.Optimisation.Result, ExpressionsBasedModel)}.</li>
      * </ol>
      */
     public interface EntityMap extends ProblemStructure {
@@ -226,18 +225,59 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
          * variable may result in multiple solver variables. Further, slack variables, artificial variables
          * and such are typically not represented in the model.
          *
-         * @param idm Index of solver variable
+         * @param solverIndex Index of solver variable
          * @return Index of model variable (negative if no map)
          */
-        int indexOf(int idm);
+        int indexOf(int solverIndex);
+
+        /**
+         * Build an internal integer-variable mask matching the solver's variable ordering.
+         * <p>
+         * Given an {@link ExpressionsBasedModel} and this {@link EntityMap}, this method inspects the model's
+         * variables and the slack entities to determine which internal variables are subject to integrality
+         * restrictions. The result is typically passed to
+         * {@link UpdatableSolver#generateCutCandidates(double, boolean[])} and used by integer algorithms
+         * (for example {@link IntegerSolver} and {@link org.ojalgo.optimisation.integer.NodeSolver}) to
+         * interpret the solver state.
+         *
+         * @param model the model that this solver instance is (or will be) solving
+         * @return a boolean array where {@code true} marks an internal variable that must take integer
+         *         values; the array length equals the sum of model and slack variables in this
+         *         {@link EntityMap}
+         */
+        default boolean[] integers(final ExpressionsBasedModel model) {
+
+            int nbProblVars = this.countModelVariables();
+            int nbSlackVars = this.countSlackVariables();
+
+            boolean[] integers = new boolean[nbProblVars + nbSlackVars];
+
+            for (int i = 0; i < nbProblVars; i++) {
+                int indexInModel = this.indexOf(i);
+                Variable variable = model.getVariable(indexInModel);
+                if (variable.isInteger()) {
+                    integers[i] = true;
+                }
+            }
+
+            for (int i = 0; i < nbSlackVars; i++) {
+                EntryPair<ModelEntity<?>, ConstraintType> slack = this.getSlack(i);
+                ModelEntity<?> entity = slack.getKey();
+                if (entity.isInteger()) {
+                    integers[nbProblVars + i] = true;
+                }
+            }
+
+            return integers;
+        }
 
         /**
          * Is this solver variable negated relative to the corresponding model variable?
          *
-         * @param idm Index of solver variable
+         * @param solverIndex Index of solver variable
          * @return true if this solver variable represents a negated model variable
          */
-        boolean isNegated(int idm);
+        boolean isNegated(int solverIndex);
 
     }
 
@@ -387,10 +427,6 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             return model.isIntegrationSwitch(property);
         }
 
-        protected final ExpressionsBasedModel.Validator newValidator(final ExpressionsBasedModel model) {
-            return new ExpressionsBasedModel.Validator(model, this, model.getKnownSolution(), model.getValidationFailureHandler());
-        }
-
         protected final void setSwitch(final ExpressionsBasedModel model, final IntegrationProperty property, final boolean value) {
             model.setIntegrationSwitch(property, value);
         }
@@ -402,7 +438,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      * when a single integration is a facade delegating to a set of (switching between a pair of) other
      * integrations.
      * <p>
-     * The various properties are here are for very specific use cases, but have been given generic names to
+     * The various properties are here for very specific use cases, but have been given generic names to
      * encourage reuse.
      * <p>
      * Solver integrations are (absolutely have to be) stateless. If they contain logic that cause them to
@@ -454,88 +490,6 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         @Override
         boolean isApplicable(final Expression target) {
             return target.isConstraint() && !target.isInfeasible() && !target.isRedundant() && target.countQuadraticFactors() == 0;
-        }
-
-    }
-
-    public static final class Validator {
-
-        private static final NumberContext ACCURACY = NumberContext.of(8);
-
-        static final BiConsumer<ExpressionsBasedModel, Access1D<BigDecimal>> NULL = (m, s) -> {};
-
-        public static Validator of(final ExpressionsBasedModel originalModel, final Optimisation.Integration<ExpressionsBasedModel, ?> integration) {
-            return Validator.of(originalModel, integration, NULL);
-        }
-
-        public static Validator of(final ExpressionsBasedModel originalModel, final Optimisation.Integration<ExpressionsBasedModel, ?> integration,
-                final BiConsumer<ExpressionsBasedModel, Access1D<BigDecimal>> handler) {
-            Objects.requireNonNull(originalModel);
-            Objects.requireNonNull(integration);
-            return new Validator(originalModel, integration, null, handler);
-        }
-
-        public static Validator of(final Result knownSolution) {
-            Validator.of(knownSolution, NULL);
-            Objects.requireNonNull(knownSolution);
-            return new Validator(null, null, knownSolution, NULL);
-        }
-
-        public static Validator of(final Result knownSolution, final BiConsumer<ExpressionsBasedModel, Access1D<BigDecimal>> handler) {
-            Objects.requireNonNull(knownSolution);
-            return new Validator(null, null, knownSolution, handler);
-        }
-
-        private static boolean doValidate(final ExpressionsBasedModel model, final Access1D<BigDecimal> solution, final NumberContext accuracy,
-                final BasicLogger logger, final BiConsumer<ExpressionsBasedModel, Access1D<BigDecimal>> handler) {
-
-            if (model != null && solution != null) {
-                boolean valid = model.validate(solution, accuracy != null ? accuracy : ACCURACY, logger != null ? logger : BasicLogger.NULL);
-                if (!valid) {
-                    handler.accept(model, solution);
-                }
-                return valid;
-            } else {
-                return true;
-            }
-        }
-
-        private final BiConsumer<ExpressionsBasedModel, Access1D<BigDecimal>> myHandler;
-        private final Optimisation.Integration<ExpressionsBasedModel, ?> myIntegration;
-        private final Optimisation.Result myKnownSolution;
-        private final ExpressionsBasedModel myOriginalModel;
-
-        /**
-         * @param originalModel Baseline model.
-         * @param integration   The integration used to translate between model and solver state.
-         * @param knownSolution Not just any feasible solution. It needs to be the optimal solution.
-         */
-        Validator(final ExpressionsBasedModel originalModel, final Optimisation.Integration<ExpressionsBasedModel, ?> integration, final Result knownSolution,
-                final BiConsumer<ExpressionsBasedModel, Access1D<BigDecimal>> handler) {
-            super();
-            myOriginalModel = originalModel;
-            myIntegration = integration;
-            myKnownSolution = knownSolution;
-            myHandler = handler;
-        }
-
-        /**
-         * Validate an (intermediate) solver solution against the original model. (Validation only performed
-         * if an original model was provided to the constructor.)
-         */
-        public boolean validate(final Access1D<?> solverSolution, final NumberContext accuracy, final BasicLogger logger) {
-            Result solverState = Optimisation.Result.wrap(solverSolution);
-            Result modelState = myIntegration.toModelState(solverState, myOriginalModel);
-            return Validator.doValidate(myOriginalModel, modelState, accuracy, logger, myHandler);
-        }
-
-        /**
-         * Validate the known solution against a (modified) model - perhaps modified during pre-solve or with
-         * cuts generation in the {@link IntegerSolver}. (Validation only performed if a known solution was
-         * provided to the constructor.)
-         */
-        public boolean validate(final ExpressionsBasedModel modifiedModel, final NumberContext accuracy, final BasicLogger logger) {
-            return Validator.doValidate(modifiedModel, myKnownSolution, accuracy, logger, myHandler);
         }
 
     }
@@ -900,7 +854,6 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      * Temporary storage for some expression specific subset of variables
      */
     private final Set<IntIndex> myTemporary = new HashSet<>();
-    private BiConsumer<ExpressionsBasedModel, Access1D<BigDecimal>> myValidationFailureHandler = Validator.NULL;
     private final ArrayList<Variable> myVariables = new ArrayList<>();
     private final VariablesCategorisation myVariablesCategorisation = new VariablesCategorisation();
 
@@ -940,7 +893,6 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         myShallowCopy = shallow || modelToCopy.isShallowCopy();
         myRelaxed = modelToCopy.isRelaxed();
         myKnownSolution = modelToCopy.getKnownSolution(); // TODO Should this be copied?
-        myValidationFailureHandler = modelToCopy.getValidationFailureHandler();
 
         for (Expression tmpExpr : modelToCopy.getExpressions()) {
             if (shallow) {
@@ -1594,33 +1546,6 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
-     * Same as {@link #setKnownSolution(org.ojalgo.optimisation.Optimisation.Result, BiConsumer)} but with a
-     * no-op handler.
-     */
-    public void setKnownSolution(final Optimisation.Result knownSolution) {
-        this.setKnownSolution(knownSolution, Validator.NULL);
-    }
-
-    /**
-     * For test/validation during solver development.
-     *
-     * @param knownSolution The optimal solution
-     * @param handler       What to do if validation fails
-     */
-    public void setKnownSolution(final Optimisation.Result knownSolution, final BiConsumer<ExpressionsBasedModel, Access1D<BigDecimal>> handler) {
-        Objects.requireNonNull(knownSolution);
-        Objects.requireNonNull(handler);
-        if (!knownSolution.getState().isOptimal()) {
-            throw new ProgrammingError("Must be an optimal solution!");
-        }
-        if (!this.validate(knownSolution)) {
-            throw new ProgrammingError("Solution not valid!");
-        }
-        myKnownSolution = knownSolution;
-        myValidationFailureHandler = handler;
-    }
-
-    /**
      * Will perform pre-solve and then create a copy removing redundant constraint expressions, and pruning
      * the remaining ones to no longer include fixed variables.
      * <p>
@@ -1706,7 +1631,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     public boolean validate(final Access1D<BigDecimal> solution, final NumberContext context, final BasicLogger appender) {
 
-        ProgrammingError.throwIfNull(solution, context, appender);
+        ProgrammingError.throwIfNull(solution, context);
 
         int size = myVariables.size();
 
@@ -1916,10 +1841,6 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     Set<IntIndex> getReferences() {
         return myReferences;
-    }
-
-    BiConsumer<ExpressionsBasedModel, Access1D<BigDecimal>> getValidationFailureHandler() {
-        return myValidationFailureHandler != null ? myValidationFailureHandler : Validator.NULL;
     }
 
     boolean isFixed() {

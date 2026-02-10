@@ -120,9 +120,9 @@ import java.util.function.IntPredicate;
  * <td>9</td>
  * <td>:</td>
  * <td>;</td>
- * <td>&lt;</td>
+ * <td><</td>
  * <td>=</td>
- * <td>&gt;</td>
+ * <td>></td>
  * <td>?</td>
  * </tr>
  * <tr>
@@ -241,7 +241,7 @@ public abstract class ASCII {
     public static final char UPPERCASE_Z = 'Z';
 
     /**
-     * @param length The length of the random string
+     * @param length    The length of the random string
      * @param predicate Need to pass this test
      * @return A String of the specified length containing ASCII characters that pass the predicate test.
      */

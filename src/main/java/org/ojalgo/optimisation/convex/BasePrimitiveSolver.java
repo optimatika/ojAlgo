@@ -23,31 +23,97 @@ package org.ojalgo.optimisation.convex;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.Optional;
+
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.array.ArrayR064;
+import org.ojalgo.array.ArrayR256;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.matrix.store.TransformableRegion;
+import org.ojalgo.optimisation.ConstraintsMetaData;
+import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D.Collectable;
 
 abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolver {
 
+    public static final class Integration extends ExpressionsBasedModel.Integration<ConvexSolver> {
+
+        @Override
+        public ConvexSolver build(final ExpressionsBasedModel model) {
+
+            Options options = model.options;
+
+            if (options.convex().isExtendedPrecision()) {
+
+                ConvexData<Quadruple> data = ConvexSolver.copy(model, GenericStore.R128);
+                return new IterativeRefinementSolver(options, data);
+
+            } else {
+
+                ConvexData<Double> data = ConvexSolver.copy(model, R064Store.FACTORY);
+
+                int nbVars = data.countVariables();
+                int nbEqus = data.countEqualityConstraints();
+                int nbInes = data.countInequalityConstraints();
+
+                Boolean projection = options.convex().getProjection();
+
+                if (nbEqus > 0 && nbInes > 0 && nbEqus <= nbVars
+                        && (Boolean.TRUE.equals(projection) || (projection == null && (nbVars >= 80) && (nbVars / nbEqus <= 2)))) {
+
+                    return new NullSpaceASS(options, data);
+
+                } else {
+
+                    return BasePrimitiveSolver.newSolver(data, options);
+                }
+            }
+        }
+
+        @Override
+        public boolean isCapable(final ExpressionsBasedModel model) {
+            return !model.isAnyVariableInteger() && model.isAnyObjectiveQuadratic() && !model.isAnyConstraintQuadratic();
+        }
+
+        @Override
+        public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
+
+            if (model.options.convex().isExtendedPrecision()) {
+                return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR256.FACTORY);
+            } else {
+                return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR064.FACTORY);
+            }
+        }
+
+        @Override
+        public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
+            return ExpressionsBasedModel.Integration.reduceFullToFree(modelState, model, ArrayR064.FACTORY);
+        }
+
+    }
+
     private static final String Q_NOT_POSITIVE_SEMIDEFINITE = "Q not positive semidefinite!";
     private static final String Q_NOT_SYMMETRIC = "Q not symmetric!";
 
     static final Factory<Double, R064Store> MATRIX_FACTORY = R064Store.FACTORY;
+
+    static final Integration INTEGRATION = new Integration();
 
     static BasePrimitiveSolver.Builder builder(final MatrixStore<Double>[] matrices) {
         return new BasePrimitiveSolver.Builder(matrices);
@@ -149,8 +215,8 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
     }
 
     @Override
-    public ConvexData<Double> getEntityMap() {
-        return myMatrices;
+    public Optional<ExpressionsBasedModel.EntityMap> getEntityMap() {
+        return myMatrices.isEntityMap() ? Optional.of(myMatrices) : Optional.empty();
     }
 
     @Override
@@ -422,6 +488,10 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
         }
 
         return resultLP;
+    }
+
+    ConstraintsMetaData getConstraintsMetaData() {
+        return myMatrices.getConstraintsMetaData();
     }
 
     boolean isPatchedQ() {

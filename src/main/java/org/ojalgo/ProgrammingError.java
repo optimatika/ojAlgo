@@ -115,6 +115,10 @@ public class ProgrammingError extends RuntimeException implements EffectiveThrow
         throw new ProgrammingError(TypeUtils.format(messagePattern, args));
     }
 
+    public ProgrammingError() {
+        super();
+    }
+
     public ProgrammingError(final String message) {
         super(message);
     }
@@ -125,10 +129,6 @@ public class ProgrammingError extends RuntimeException implements EffectiveThrow
 
     protected ProgrammingError(final String message, final Throwable cause) {
         super(message, cause);
-    }
-
-    ProgrammingError() {
-        super();
     }
 
     ProgrammingError(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {

@@ -31,7 +31,7 @@ import org.ojalgo.type.context.NumberContext;
 
 public class QuadrupleTest extends ScalarTests {
 
-    private static final NumberContext NC_EVAL = NumberContext.of(31).withoutScale();
+    private static final NumberContext NC_EVAL = NumberContext.of(31);
 
     static void doTestValueOfToBigDecimal(final BigDecimal value) {
 
@@ -182,6 +182,42 @@ public class QuadrupleTest extends ScalarTests {
             TestUtils.assertTrue(actual.compareTo(expected) == 0);
         }
 
+    }
+
+    /**
+     * Test division/inversion with small divisor using BigDecimal to avoid precision loss.
+     *
+     * @see #testInvertPoorlyRepresented()
+     */
+    @Test
+    public void testInvertNicely() {
+
+        BigDecimal scale = new BigDecimal("0.0001");
+
+        Quadruple initial = Quadruple.valueOf(BigDecimal.ONE);
+        Quadruple divisor = Quadruple.valueOf(scale);
+
+        Quadruple expected = Quadruple.valueOf(BigDecimal.ONE.divide(scale));
+
+        Quadruple actual = initial.divide(divisor);
+
+        TestUtils.assertEquals(expected.toBigDecimal(), actual.toBigDecimal(), NumberContext.of(32));
+    }
+
+    /**
+     * Test division/inversion with small and poorly represented divisor. Expected result is 10000 (1/0.0001)
+     * but 0.0001 cannot be represented exactly as a double.
+     */
+    @Test
+    public void testInvertPoorlyRepresented() {
+
+        Quadruple initial = Quadruple.ONE;
+
+        Quadruple expected = Quadruple.valueOf(BigDecimal.valueOf(10000L));
+
+        Quadruple actual = initial.divide(0.0001);
+
+        TestUtils.assertEquals(expected.toBigDecimal(), actual.toBigDecimal(), NumberContext.of(16));
     }
 
     @Test

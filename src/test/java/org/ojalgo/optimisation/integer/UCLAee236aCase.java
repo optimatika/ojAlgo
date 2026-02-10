@@ -55,7 +55,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         ExpressionsBasedModel retVal = new ExpressionsBasedModel();
 
-        Variable[] variables = new Variable[] { retVal.newVariable("X1").lower(ZERO).weight(TWO.negate()).integer(),
+        Variable[] variables = { retVal.newVariable("X1").lower(ZERO).weight(TWO.negate()).integer(),
                 retVal.newVariable("X2").lower(ZERO).weight(THREE.negate()).integer() };
 
         Expression exprC1 = retVal.newExpression("C1");
@@ -84,7 +84,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
         ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel();
 
         if (DEBUG) {
-            model.options.progress(IntegerSolver.class);
+            model.options.debug(IntegerSolver.class);
         }
 
         Optimisation.Result result = model.minimise();

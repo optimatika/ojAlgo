@@ -592,13 +592,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             Function<LinearStructure, SimplexStore> storeFactory = SimplexStore.newStoreFactory(options);
 
-            PhasedSimplexSolver solver = SimplexSolver.build(model, storeFactory).newPhasedSimplexSolver(options);
-
-            if (options.validate) {
-                solver.setValidator(this.newValidator(model));
-            }
-
-            return solver;
+            return SimplexSolver.build(model, storeFactory).newPhasedSimplexSolver(options);
         }
 
         @Override
@@ -654,13 +648,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             SimplexTableau tableau = SimplexTableauSolver.build(model, tableauFactory);
 
-            SimplexTableauSolver solver = new SimplexTableauSolver(tableau, options);
-
-            if (options.validate) {
-                solver.setValidator(this.newValidator(model));
-            }
-
-            return solver;
+            return new SimplexTableauSolver(tableau, options);
         }
 
         @Override

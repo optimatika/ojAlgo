@@ -11,6 +11,24 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Changed
+
+#### org.ojalgo.optimisation
+
+- Cleaned up the `UpdatableSolver` interface – everything is now optional with default implementations that do nothing. All the quirky stuff is moved to `ExpressionsBasedModel.EntityMap`. This also required `ConstraintsMetaData` to be somewhat refactored, and the `Optimisation.ConstraintType` enum gained another instance `RANGE`.
+
+### Fixed
+
+#### org.ojalgo.scalar
+
+- Improved `Quadruple` division accuracy
+
+### Removed
+
+#### org.ojalgo.optimisation
+
+- The `ExpressionsBasedModel.Validator` class and all functionality related to it. The related `ExpressionsBasedModel.setKnownSolution(...)` methods are also removed.
+
 ## [56.2.1] – 2026-01-21
 
 ### Added

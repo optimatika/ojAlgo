@@ -43,14 +43,7 @@ public final class GomorySolver extends GenericSolver {
 
         @Override
         public GomorySolver build(final ExpressionsBasedModel model) {
-
-            GomorySolver solver = new GomorySolver(model);
-
-            if (model.options.validate) {
-                solver.setValidator(this.newValidator(model));
-            }
-
-            return solver;
+            return new GomorySolver(model);
         }
 
         @Override

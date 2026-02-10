@@ -53,6 +53,8 @@ public interface Optimisation {
      */
     public interface Constraint extends Optimisation {
 
+        ConstraintType getConstraintType();
+
         /**
          * The lower limit/bound - may return null.
          */
@@ -76,12 +78,18 @@ public interface Optimisation {
 
         /**
          * The Constraint has a lower limit, and the upper limit (if it exists) is different.
+         *
+         * @deprecated Use {@link #getConstraintType()} instead.
          */
+        @Deprecated
         boolean isLowerConstraint();
 
         /**
          * The Constraint has an upper limit, and the lower limit (if it exists) is different.
+         *
+         * @deprecated Use {@link #getConstraintType()} instead.
          */
+        @Deprecated
         boolean isUpperConstraint();
 
     }
@@ -103,10 +111,30 @@ public interface Optimisation {
          */
         NONE,
         /**
+         * Corresponds to setting both {@link ModelEntity#lower(Comparable)} and
+         * {@link ModelEntity#upper(Comparable)}, but to different values, and/or checking
+         * {@link Constraint#isRangeConstraint()}.
+         */
+        RANGE,
+        /**
          * Corresponds to setting {@link ModelEntity#upper(Comparable)} and/or checking
          * {@link Constraint#isUpperConstraint()}.
          */
         UPPER;
+
+        /**
+         * Is there a lower bound? (regardless of upper bound)
+         */
+        public boolean isLower() {
+            return this == LOWER || this == RANGE || this == EQUALITY;
+        }
+
+        /**
+         * Is there an upper bound? (regardless of lower bound)
+         */
+        public boolean isUpper() {
+            return this == UPPER || this == RANGE || this == EQUALITY;
+        }
 
     }
 
@@ -413,8 +441,6 @@ public interface Optimisation {
      */
     public interface ProblemStructure extends Optimisation {
 
-        static final boolean DEBUG = false;
-
         /**
          * Not included in {@link #countConstraints()} (because they are not simple linear equality or
          * inequality constraints),
@@ -581,8 +607,7 @@ public interface Optimisation {
             final int prime = 31;
             int result = 1;
             result = prime * result + (myState == null ? 0 : myState.hashCode());
-            long temp;
-            temp = Double.doubleToLongBits(myValue);
+            long temp = Double.doubleToLongBits(myValue);
             return prime * result + (int) (temp ^ temp >>> 32);
         }
 

@@ -165,12 +165,16 @@ public final class ConvexData<N extends Comparable<N>> implements ExpressionsBas
     }
 
     @Override
-    public int indexOf(final int idm) {
-        return myVariableIndices[idm];
+    public int indexOf(final int solverIndex) {
+        return myVariableIndices[solverIndex];
+    }
+
+    public boolean isEntityMap() {
+        return myConstraintsMetaData.isEntityMap();
     }
 
     @Override
-    public boolean isNegated(final int idm) {
+    public boolean isNegated(final int solverIndex) {
         return false;
     }
 

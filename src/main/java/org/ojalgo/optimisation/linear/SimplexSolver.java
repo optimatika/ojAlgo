@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -662,7 +663,7 @@ abstract class SimplexSolver extends LinearSolver {
     }
 
     @Override
-    public final Collection<Equation> generateCutCandidates(final double fractionality, final boolean... integer) {
+    public final Collection<Equation> generateCutCandidates(final double fractionality, final boolean[] integer) {
 
         NumberContext integralityTolerance = options.integer().getIntegralityTolerance();
 
@@ -670,8 +671,8 @@ abstract class SimplexSolver extends LinearSolver {
     }
 
     @Override
-    public LinearStructure getEntityMap() {
-        return mySimplex.structure;
+    public Optional<ExpressionsBasedModel.EntityMap> getEntityMap() {
+        return mySimplex.structure.isEntityMap() ? Optional.of(mySimplex.structure) : Optional.empty();
     }
 
     @Override
@@ -1272,26 +1273,26 @@ abstract class SimplexSolver extends LinearSolver {
             double ub = mySimplex.getUpperBound(j);
 
             switch (state) {
-            case LOWER:
-                if (rc < -epsilon) {
-                    this.log("!DF {}({}) {}, but {} and [{},{}]", j, je, state, rc, lb, ub);
-                    retVal = false;
-                }
-                break;
+                case LOWER:
+                    if (rc < -epsilon) {
+                        this.log("!DF {}({}) {}, but {} and [{},{}]", j, je, state, rc, lb, ub);
+                        retVal = false;
+                    }
+                    break;
 
-            case UPPER:
-                if (rc > epsilon) {
-                    this.log("!DF {}({}) {}, but {} and [{},{}]", j, je, state, rc, lb, ub);
-                    retVal = false;
-                }
-                break;
+                case UPPER:
+                    if (rc > epsilon) {
+                        this.log("!DF {}({}) {}, but {} and [{},{}]", j, je, state, rc, lb, ub);
+                        retVal = false;
+                    }
+                    break;
 
-            case UNBOUNDED:
-                // No reduced cost constraints for unbounded variables
-                break;
+                case UNBOUNDED:
+                    // No reduced cost constraints for unbounded variables
+                    break;
 
-            default:
-                throw new IllegalStateException("Unexpected ColumnState for variable " + j + ": " + state);
+                default:
+                    throw new IllegalStateException("Unexpected ColumnState for variable " + j + ": " + state);
             }
         }
 
@@ -1443,9 +1444,8 @@ abstract class SimplexSolver extends LinearSolver {
             this.log("UB: {}", this.getUpperBounds());
         }
 
-        ConstraintsMetaData constraints = this.getEntityMap().constraints;
-        if (constraints.isEntityMap()) {
-            return result.multipliers(constraints, this.extractMultipliers());
+        if (mySimplex.structure.isEntityMap()) {
+            return result.multipliers(mySimplex.structure.constraints, this.extractMultipliers());
         } else {
             return result.multipliers(this.extractMultipliers());
         }

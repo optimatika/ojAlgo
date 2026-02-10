@@ -166,17 +166,17 @@ final class LinearStructure implements ExpressionsBasedModel.EntityMap {
     }
 
     @Override
-    public int indexOf(final int j) {
+    public int indexOf(final int solverIndex) {
 
-        if (j < 0) {
+        if (solverIndex < 0) {
             throw new IllegalArgumentException();
         }
 
-        if (j < positivePartVariables.length) {
-            return positivePartVariables[j];
+        if (solverIndex < positivePartVariables.length) {
+            return positivePartVariables[solverIndex];
         }
 
-        int jn = j - positivePartVariables.length;
+        int jn = solverIndex - positivePartVariables.length;
 
         if (jn < negativePartVariables.length) {
             return negativePartVariables[jn];
@@ -186,21 +186,25 @@ final class LinearStructure implements ExpressionsBasedModel.EntityMap {
     }
 
     public boolean isConstraintNegated(final int i) {
-        return constraints.negated[i];
+        return constraints.isNegated(i);
+    }
+
+    public boolean isEntityMap() {
+        return constraints.isEntityMap();
     }
 
     @Override
-    public boolean isNegated(final int j) {
+    public boolean isNegated(final int solverIndex) {
 
-        if (j < 0) {
+        if (solverIndex < 0) {
             throw new IllegalArgumentException();
         }
 
-        if (j < positivePartVariables.length) {
+        if (solverIndex < positivePartVariables.length) {
             return false;
         }
 
-        if (j - positivePartVariables.length < negativePartVariables.length) {
+        if (solverIndex - positivePartVariables.length < negativePartVariables.length) {
             return true;
         }
 
@@ -210,7 +214,7 @@ final class LinearStructure implements ExpressionsBasedModel.EntityMap {
     }
 
     public boolean negated(final int i, final boolean negated) {
-        return constraints.negated[i] = negated;
+        return constraints.negated(i, negated);
     }
 
     public void setConstraintMap(final int i, final ModelEntity<?> entity, final ConstraintType type) {
@@ -219,11 +223,11 @@ final class LinearStructure implements ExpressionsBasedModel.EntityMap {
 
     public void setConstraintMap(final int i, final ModelEntity<?> entity, final ConstraintType type, final boolean negated) {
         constraints.setEntry(i, entity, type);
-        constraints.negated[i] = negated;
+        constraints.setNegated(i, negated);
     }
 
     public void setConstraintNegated(final int i, final boolean negated) {
-        constraints.negated[i] = negated;
+        constraints.setNegated(i, negated);
     }
 
     @Override

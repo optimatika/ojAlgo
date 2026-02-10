@@ -22,6 +22,7 @@
 package org.ojalgo.optimisation;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 
 import org.ojalgo.optimisation.Optimisation.ConstraintType;
@@ -33,50 +34,52 @@ import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 public final class ConstraintsMetaData implements Structure1D {
 
     public static ConstraintsMetaData newEntityMap(final int nbConstraints) {
-        return new ConstraintsMetaData((EntryPair<ModelEntity<?>, ConstraintType>[]) new EntryPair<?, ?>[nbConstraints], new boolean[nbConstraints]);
+        return ConstraintsMetaData.newInstance(nbConstraints, true);
     }
 
-    public static ConstraintsMetaData newInstance(final int nbConstraints, final boolean inclDefs) {
-        EntryPair<ModelEntity<?>, ConstraintType>[] definitions = inclDefs ? (EntryPair<ModelEntity<?>, ConstraintType>[]) new EntryPair<?, ?>[nbConstraints]
+    public static ConstraintsMetaData newInstance(final int nbConstraints, final boolean mapped) {
+
+        EntryPair<ModelEntity<?>, ConstraintType>[] definitions = mapped ? (EntryPair<ModelEntity<?>, ConstraintType>[]) new EntryPair<?, ?>[nbConstraints]
                 : null;
-        boolean[] negated = new boolean[nbConstraints];
-        return new ConstraintsMetaData(definitions, negated);
+
+        BitSet negated = new BitSet(nbConstraints);
+
+        return new ConstraintsMetaData(nbConstraints, definitions, negated);
     }
 
     public static ConstraintsMetaData newSimple(final int nbConstraints) {
-        return new ConstraintsMetaData(null, new boolean[nbConstraints]);
+        return ConstraintsMetaData.newInstance(nbConstraints, false);
     }
 
-    public final boolean[] negated;
+    private final int mySize;
+    private final BitSet myNegated;
     private final EntryPair<ModelEntity<?>, ConstraintType>[] myDefinitions;
     private double myMultiplierScale = 1D;
 
-    private ConstraintsMetaData(final EntryPair<ModelEntity<?>, ConstraintType>[] defs, final boolean[] negs) {
+    private ConstraintsMetaData(final int nbConstraints, final EntryPair<ModelEntity<?>, ConstraintType>[] defs, final BitSet negs) {
         super();
+        mySize = nbConstraints;
         myDefinitions = defs;
-        negated = negs;
-    }
-
-    @Override
-    public long count() {
-        return negated.length;
+        myNegated = negs;
     }
 
     public EntryPair<ModelEntity<?>, ConstraintType> getEntry(final int i) {
-        return myDefinitions[i];
+        return myDefinitions != null ? myDefinitions[i] : null;
     }
 
     public boolean isEntityMap() {
         return myDefinitions != null;
     }
 
+    public boolean isNegated(final int i) {
+        return myNegated.get(i);
+    }
+
     public List<KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>>> match(final Access1D<?> multipliers) {
 
-        int length = myDefinitions.length;
+        List<KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>>> retVal = new ArrayList<>(mySize);
 
-        List<KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>>> retVal = new ArrayList<>(length);
-
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < mySize; i++) {
             EntryPair<ModelEntity<?>, ConstraintType> constraintKey = myDefinitions[i];
             double adjustmentFactor = constraintKey.left().getAdjustmentFactor();
             double multiplierValue = multipliers.doubleValue(i);
@@ -86,22 +89,31 @@ public final class ConstraintsMetaData implements Structure1D {
         return retVal;
     }
 
+    public boolean negated(final int i, final boolean neg) {
+        myNegated.set(i, neg);
+        return neg;
+    }
+
     public void setEntry(final int i, final ModelEntity<?> entity, final ConstraintType type) {
         myDefinitions[i] = EntryPair.of(entity, type);
     }
 
     public void setEntry(final int i, final ModelEntity<?> entity, final ConstraintType type, final boolean neg) {
         myDefinitions[i] = EntryPair.of(entity, type);
-        negated[i] = neg;
+        myNegated.set(i, neg);
     }
 
     public void setMultiplierScale(final double multiplierScale) {
         myMultiplierScale = multiplierScale;
     }
 
+    public void setNegated(final int i, final boolean neg) {
+        myNegated.set(i, neg);
+    }
+
     @Override
     public int size() {
-        return negated.length;
+        return mySize;
     }
 
     double getMultiplierScale() {

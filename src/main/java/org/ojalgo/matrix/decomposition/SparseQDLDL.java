@@ -1,3 +1,24 @@
+/*
+ * Copyright 1997-2025 Optimatika
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
@@ -6,6 +27,7 @@ import java.util.Arrays;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.operation.COPY;
+import org.ojalgo.array.operation.NRMINF;
 import org.ojalgo.matrix.store.DiagonalStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -18,6 +40,8 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Access2D.ColumnView;
 import org.ojalgo.structure.ElementView2D;
+import org.ojalgo.structure.Structure1D;
+import org.ojalgo.type.ReciprocalPair;
 
 /**
  * Quasi-Definite LDL (QDLDL) sparse decomposition.
@@ -53,22 +77,45 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
         }
     }
 
-    private static final class WorkerCache {
+    private static final class Work {
 
-        int[] elimBuffer = null;
-        int[] LNextSpaceInCol = null;
-        int[] yIdx = null;
-        boolean[] yMarkers = null;
-        double[] yVals = null;
+        /**
+         * Holds the set of column indices that currently have nonzero entries in the working vector y for the
+         * active column k. The entries are stored compactly from 0 to {@code nnzY - 1} and iterated in
+         * reverse when finalising column k of L and D.
+         */
+        int[] activePattern = null;
+        /**
+         * Temporary stack used during symbolic traversal of the elimination tree when expanding each nonzero
+         * in column k into its ancestors. Holds column indices that still need to be processed.
+         */
+        int[] eliminationStack = null;
+        /**
+         * For each column c in L, tracks the next free position inside the compressed-column storage of
+         * {@code myL}. During numeric factorisation this is advanced as new entries L(k, c) are written.
+         */
+        int[] nextFreeInColumn = null;
+        /**
+         * Marker flags indicating whether a given column index is already present in {@link #activePattern}.
+         * This avoids inserting duplicates while walking the elimination tree and building the sparsity
+         * pattern of the working vector y.
+         */
+        boolean[] patternMarked = null;
+        /**
+         * Working vector y used to accumulate the contribution of A(:, k) and previously computed columns of
+         * L into the Schur complement that defines D(k) and the off-diagonal entries L(k, :). Entries are
+         * reset to zero once their contribution has been propagated.
+         */
+        double[] workY = null;
 
         void reset(final int n) {
 
-            if (yIdx == null || yIdx.length != n) {
-                yIdx = new int[n];
-                elimBuffer = new int[n];
-                LNextSpaceInCol = new int[n];
-                yVals = new double[n];
-                yMarkers = new boolean[n];
+            if (activePattern == null || activePattern.length != n) {
+                activePattern = new int[n];
+                eliminationStack = new int[n];
+                nextFreeInColumn = new int[n];
+                workY = new double[n];
+                patternMarked = new boolean[n];
             }
         }
 
@@ -138,11 +185,10 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
         }
     }
 
-    private double[] myD;
-    private double[] myDinv;
+    private ReciprocalPair myD;
     private R064CSC myL;
     private int myPositiveValuesInD;
-    private final WorkerCache myWorkerCache = new WorkerCache();
+    private final Work myWorkerCache = new Work();
 
     public SparseQDLDL() {
         super(R064Store.FACTORY);
@@ -174,9 +220,8 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
             myL = new R064CSC(n, n, eTree.totNz);
         }
 
-        if (myD == null || myD.length != n) {
-            myD = new double[n];
-            myDinv = new double[n];
+        if (myD == null || myD.size() != n) {
+            myD = new ReciprocalPair(n);
         }
 
         myWorkerCache.reset(n);
@@ -188,8 +233,9 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
     public int countSignificant(final double threshold) {
         int significant = 0;
         if (myD != null) {
-            for (int i = 0; i < myD.length; i++) {
-                if (Math.abs(myD[i]) > threshold) {
+            double[] values = myD.values;
+            for (int i = 0, length = values.length; i < length; i++) {
+                if (Math.abs(values[i]) > threshold) {
                     significant++;
                 }
             }
@@ -240,7 +286,7 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
     public boolean factor(final R064CSC matrix) {
         this.reset();
         EliminationTree eTree = this.computeEliminationTree(matrix);
-        return this.decompose(matrix, eTree, myL, myD, myDinv, myWorkerCache);
+        return this.decompose(matrix, eTree, myL, myD, myWorkerCache);
     }
 
     /**
@@ -250,7 +296,7 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
      */
     public boolean factor(final R064CSC matrix, final EliminationTree eTree) {
         this.reset();
-        return this.decompose(matrix, eTree, myL, myD, myDinv, myWorkerCache);
+        return this.decompose(matrix, eTree, myL, myD, myWorkerCache);
     }
 
     /**
@@ -265,7 +311,7 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
 
         SparseQDLDL.ftranL(pointers, indices, values, x);
 
-        SparseQDLDL.ftranD(myDinv, x);
+        SparseQDLDL.ftranD(myD.inverse, x);
 
         SparseQDLDL.ftranU(pointers, indices, values, x);
     }
@@ -288,7 +334,7 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
 
     @Override
     public MatrixStore<Double> getD() {
-        return myD != null ? DiagonalStore.wrap(myD) : null;
+        return myD != null ? DiagonalStore.wrap(myD.values) : null;
     }
 
     /**
@@ -303,14 +349,18 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
      */
     @Override
     public Double getDeterminant() {
+
         if (myD == null) {
             return NaN;
         }
+
         double det = ONE;
-        for (int i = 0; i < myD.length; i++) {
-            det *= myD[i];
+        double[] values = myD.values;
+        for (int i = 0, length = values.length; i < length; i++) {
+            det *= values[i];
         }
-        return det;
+
+        return Double.valueOf(det);
     }
 
     @Override
@@ -330,24 +380,17 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
 
     @Override
     public int[] getPivotOrder() {
-        int dim = this.getColDim();
-        int[] order = new int[dim];
-        for (int i = 0; i < dim; i++) {
-            order[i] = i;
-        }
-        return order;
+        return Structure1D.newIncreasingRange(0, myD != null ? myD.size() : 0);
     }
 
     @Override
     public double getRankThreshold() {
-        if (myD == null || myD.length == 0) {
+
+        if (myD == null || myD.size() == 0) {
             return ZERO;
         }
-        double largest = ZERO;
-        for (int i = 0; i < myD.length; i++) {
-            largest = Math.max(largest, Math.abs(myD[i]));
-        }
-        return largest * this.getDimensionalEpsilon();
+
+        return NRMINF.invoke(myD.values) * this.getDimensionalEpsilon();
     }
 
     @Override
@@ -437,132 +480,130 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
         return x;
     }
 
-    /**
-     * In this method, variable names are deliberately kept close to what they are in the original c-code.
-     */
-    private boolean decompose(final R064CSC matrix, final EliminationTree eTree, final R064CSC decomp, final double[] D, final double[] Dinv,
-            final WorkerCache workers) {
+    private boolean decompose(final R064CSC matrix, final EliminationTree eTree, final R064CSC decomp, final ReciprocalPair diag, final Work work) {
 
         int n = matrix.getColDim();
 
-        int[] Lnz = eTree.colNz;
-        int[] etree = eTree.tree;
+        int[] mtrxAp = matrix.pointers;
+        int[] mtrxAi = matrix.indices;
+        double[] mtrxAx = matrix.values;
 
-        int[] Ap = matrix.pointers;
-        int[] Ai = matrix.indices;
-        double[] Ax = matrix.values;
+        int[] mtrxLp = decomp.pointers;
+        int[] mtrxLi = decomp.indices;
+        double[] mtrxLx = decomp.values;
 
-        int[] Lp = decomp.pointers;
-        int[] Li = decomp.indices;
-        double[] Lx = decomp.values;
+        int[] treeColumnNonZeros = eTree.colNz;
+        int[] eliminationTree = eTree.tree;
 
-        int i, j, k, nnzY, bidx, cidx, nextIdx, nnzE, tmpIdx;
+        double[] diagVal = diag.values;
+        double[] diagInv = diag.inverse;
 
-        int[] yIdx = workers.yIdx;
-        int[] elimBuffer = workers.elimBuffer;
-        int[] LNextSpaceInCol = workers.LNextSpaceInCol;
-        double[] yVals = workers.yVals;
-        boolean[] yMarkers = workers.yMarkers;
+        int[] activePattern = work.activePattern;
+        int[] eliminationStack = work.eliminationStack;
+        int[] nextFreeInColumn = work.nextFreeInColumn;
+        double[] workY = work.workY;
+        boolean[] patternMarked = work.patternMarked;
 
-        double yVals_cidx;
+        int yNonZeros, baseIndex, patternIndex, nextColumn, eliminationCount, insertionIndex;
+        double yAtPatternIndex;
 
         int positiveValuesInD = 0;
 
-        Lp[0] = 0;
-        for (i = 0; i < n; i++) {
-            Lp[i + 1] = Lp[i] + Lnz[i];
-            yMarkers[i] = false;
-            yVals[i] = ZERO;
-            D[i] = ZERO;
-            LNextSpaceInCol[i] = Lp[i];
+        mtrxLp[0] = 0;
+        for (int i = 0; i < n; i++) {
+            mtrxLp[i + 1] = mtrxLp[i] + treeColumnNonZeros[i];
+            patternMarked[i] = false;
+            workY[i] = ZERO;
+            diagVal[i] = ZERO;
+            nextFreeInColumn[i] = mtrxLp[i];
         }
 
-        D[0] = Ax[0];
-        double maxAbsD = Math.abs(D[0]);
-        if (D[0] == ZERO) {
+        diagVal[0] = mtrxAx[0];
+        double maxAbsD = Math.abs(diagVal[0]);
+        if (diagVal[0] == ZERO) {
             return false;
         }
-        if (D[0] > ZERO) {
+        if (diagVal[0] > ZERO) {
             positiveValuesInD++;
         }
-        Dinv[0] = ONE / D[0];
+        diagInv[0] = ONE / diagVal[0];
 
-        for (k = 1; k < n; k++) {
+        for (int k = 1; k < n; k++) {
 
-            nnzY = 0;
-            tmpIdx = Ap[k + 1];
+            yNonZeros = 0;
+            insertionIndex = mtrxAp[k + 1];
 
-            for (i = Ap[k]; i < tmpIdx; i++) {
+            for (int i = mtrxAp[k]; i < insertionIndex; i++) {
 
-                bidx = Ai[i];
+                baseIndex = mtrxAi[i];
 
-                if (bidx == k) {
-                    D[k] = Ax[i];
+                if (baseIndex == k) {
+                    diagVal[k] = mtrxAx[i];
                     continue;
                 }
 
-                yVals[bidx] = Ax[i];
+                workY[baseIndex] = mtrxAx[i];
 
-                nextIdx = bidx;
+                nextColumn = baseIndex;
 
-                if (!yMarkers[nextIdx]) {
+                if (!patternMarked[nextColumn]) {
 
-                    yMarkers[nextIdx] = true;
-                    elimBuffer[0] = nextIdx;
-                    nnzE = 1;
+                    patternMarked[nextColumn] = true;
+                    eliminationStack[0] = nextColumn;
+                    eliminationCount = 1;
 
-                    nextIdx = etree[bidx];
+                    nextColumn = eliminationTree[baseIndex];
 
-                    while (nextIdx >= 0 && nextIdx < k) {
-                        if (yMarkers[nextIdx]) {
+                    while (nextColumn >= 0 && nextColumn < k) {
+                        if (patternMarked[nextColumn]) {
                             break;
                         }
 
-                        yMarkers[nextIdx] = true;
-                        elimBuffer[nnzE] = nextIdx;
-                        nnzE++;
-                        nextIdx = etree[nextIdx];
+                        patternMarked[nextColumn] = true;
+                        eliminationStack[eliminationCount] = nextColumn;
+                        eliminationCount++;
+                        nextColumn = eliminationTree[nextColumn];
 
                     }
 
-                    while (nnzE > 0) {
-                        yIdx[nnzY++] = elimBuffer[--nnzE];
+                    while (eliminationCount > 0) {
+                        activePattern[yNonZeros++] = eliminationStack[--eliminationCount];
                     }
                 }
             }
 
-            for (i = nnzY - 1; i >= 0; i--) {
+            for (int i = yNonZeros - 1; i >= 0; i--) {
 
-                cidx = yIdx[i];
+                patternIndex = activePattern[i];
 
-                tmpIdx = LNextSpaceInCol[cidx];
-                yVals_cidx = yVals[cidx];
-                for (j = Lp[cidx]; j < tmpIdx; j++) {
-                    yVals[Li[j]] -= Lx[j] * yVals_cidx;
+                insertionIndex = nextFreeInColumn[patternIndex];
+                yAtPatternIndex = workY[patternIndex];
+                for (int j = mtrxLp[patternIndex]; j < insertionIndex; j++) {
+                    workY[mtrxLi[j]] -= mtrxLx[j] * yAtPatternIndex;
                 }
 
-                Li[tmpIdx] = k;
-                Lx[tmpIdx] = yVals_cidx * Dinv[cidx];
+                mtrxLi[insertionIndex] = k;
+                mtrxLx[insertionIndex] = yAtPatternIndex * diagInv[patternIndex];
 
-                D[k] -= yVals_cidx * Lx[tmpIdx];
-                LNextSpaceInCol[cidx]++;
+                diagVal[k] -= yAtPatternIndex * mtrxLx[insertionIndex];
+                nextFreeInColumn[patternIndex]++;
 
-                yVals[cidx] = ZERO;
-                yMarkers[cidx] = false;
+                workY[patternIndex] = ZERO;
+                patternMarked[patternIndex] = false;
             }
 
-            maxAbsD = Math.max(maxAbsD, Math.abs(D[k]));
+            maxAbsD = Math.max(maxAbsD, Math.abs(diagVal[k]));
 
             double tol = maxAbsD * this.getDimensionalEpsilon();
 
-            if (Math.abs(D[k]) <= tol) {
+            if (Math.abs(diagVal[k]) <= tol) {
                 return false;
             }
-            if (D[k] > tol) {
+            if (diagVal[k] > tol) {
                 positiveValuesInD++;
             }
 
-            Dinv[k] = ONE / D[k];
+            diagInv[k] = ONE / diagVal[k];
         }
 
         myPositiveValuesInD = positiveValuesInD;
@@ -572,7 +613,7 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
 
     @Override
     protected boolean checkSolvability() {
-        return myD != null && myPositiveValuesInD == myD.length;
+        return myD != null && myPositiveValuesInD == myD.size();
     }
 
 }

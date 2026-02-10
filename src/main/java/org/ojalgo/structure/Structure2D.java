@@ -183,7 +183,7 @@ public interface Structure2D extends Structure1D {
         B left(S left);
 
         /**
-         * Setting either limit to &lt; 0 is interpreted as "no limit" (useful when you only want to limit
+         * Setting either limit to < 0 is interpreted as "no limit" (useful when you only want to limit
          * either the rows or columns, and don't know the size of the other)
          */
         B limits(long rowLimit, long columnLimit);
@@ -619,7 +619,7 @@ public interface Structure2D extends Structure1D {
     /**
      * 2D data structures are either square, tall, fat or empty.
      * <p>
-     * m &lt;= 0 or n &lt;= 0
+     * m <= 0 or n <= 0
      * </p>
      * Historically some ojAlgo data structures did allow to create "empty" instances. Currently this is not
      * encouraged, but still possible in some instances.
@@ -633,7 +633,7 @@ public interface Structure2D extends Structure1D {
     /**
      * 2D data structures are either square, tall, fat or empty.
      * <p>
-     * 1 &lt;= m &lt; n
+     * 1 <= m < n
      * </p>
      *
      * @return true if matrix is fat
@@ -653,7 +653,7 @@ public interface Structure2D extends Structure1D {
     /**
      * 2D data structures are either square, tall, fat or empty.
      * <p>
-     * m = n &lt;&gt; 0
+     * m = n <> 0
      * </p>
      *
      * @return true if matrix is square
@@ -666,7 +666,7 @@ public interface Structure2D extends Structure1D {
     /**
      * 2D data structures are either square, tall, fat or empty.
      * <p>
-     * m &lt; n &gt;= 1
+     * m < n >= 1
      * </p>
      *
      * @return true if matrix is tall

@@ -319,7 +319,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * @return
          *         <ul>
          *         <li>0 if {@link #equals(double, double, double) equals(x, y, eps)}</li>
-         *         <li>&lt; 0 if !{@link #equals(double, double, double) equals(x, y, eps)} &amp;&amp; x &lt;
+         *         <li>< 0 if !{@link #equals(double, double, double) equals(x, y, eps)} &amp;&amp; x <
          *         y</li>
          *         <li>>0 if !{@link #equals(double, double, double) equals(x, y, eps)} &amp;&amp; x > y</li>
          *         </ul>
@@ -347,7 +347,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * @return
          *         <ul>
          *         <li>0 if {@link #equals(double, double, int) equals(x, y, maxUlps)}</li>
-         *         <li>&lt; 0 if !{@link #equals(double, double, int) equals(x, y, maxUlps)} &amp;&amp; x &lt;
+         *         <li>< 0 if !{@link #equals(double, double, int) equals(x, y, maxUlps)} &amp;&amp; x <
          *         y</li>
          *         <li>>0 if !{@link #equals(double, double, int) equals(x, y, maxUlps)} &amp;&amp; x > y</li>
          *         </ul>

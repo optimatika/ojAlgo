@@ -3,11 +3,12 @@ package org.ojalgo.type;
 import java.util.Arrays;
 
 import org.ojalgo.array.operation.INV;
+import org.ojalgo.structure.Structure1D;
 
 /**
  * A simple container for a pair of double (R064) arrays, one holding values and the other their reciprocal.
  */
-public final class ReciprocalPair {
+public final class ReciprocalPair implements Structure1D {
 
     public final double[] inverse;
     public final double[] values;
@@ -24,6 +25,11 @@ public final class ReciprocalPair {
 
     public void invert() {
         INV.invoke(inverse, values);
+    }
+
+    @Override
+    public int size() {
+        return values.length;
     }
 
 }

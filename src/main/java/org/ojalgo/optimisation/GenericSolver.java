@@ -45,7 +45,6 @@ import org.ojalgo.structure.Access2D.RowView;
 import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.Stopwatch;
-import org.ojalgo.type.context.NumberContext;
 
 public abstract class GenericSolver implements Optimisation.Solver {
 
@@ -521,7 +520,6 @@ public abstract class GenericSolver implements Optimisation.Solver {
     private final AtomicInteger myIterationsCount = new AtomicInteger(0);
     private State myState = State.UNEXPLORED;
     private final Stopwatch myStopwatch = new Stopwatch();
-    private ExpressionsBasedModel.Validator myValidator = null;
 
     protected GenericSolver(final Optimisation.Options optimisationOptions) {
 
@@ -558,7 +556,11 @@ public abstract class GenericSolver implements Optimisation.Solver {
      * The number of s since solver instantiated or iterations count reset.
      */
     protected final CalendarDateDuration getDuration() {
-        return myStopwatch.stop(CalendarDateUnit.SECOND);
+        return this.getDuration(CalendarDateUnit.SECOND);
+    }
+
+    protected final CalendarDateDuration getDuration(final CalendarDateUnit unit) {
+        return myStopwatch.stop(unit);
     }
 
     protected State getState() {
@@ -666,41 +668,6 @@ public abstract class GenericSolver implements Optimisation.Solver {
     protected final void setState(final State state) {
         Objects.requireNonNull(state);
         myState = state;
-    }
-
-    /**
-     * Optionally set a validator. If set, solvers may call {@link #validate(Access1D)} or
-     * {@link #validate(ExpressionsBasedModel)} at suitable points in the code to validate its actions. This
-     * is a solver debugging tool - not to be used in production code.
-     */
-    protected final void setValidator(final ExpressionsBasedModel.Validator validator) {
-        myValidator = validator;
-    }
-
-    /**
-     * @see #setValidator(org.ojalgo.optimisation.ExpressionsBasedModel.Validator)
-     * @see org.ojalgo.optimisation.ExpressionsBasedModel.Validator#validate(Access1D, NumberContext,
-     *      BasicLogger)
-     */
-    protected final boolean validate(final Access1D<?> solverSolution) {
-        if (myValidator != null && solverSolution != null) {
-            return myValidator.validate(solverSolution, options.feasibility, options.logger_appender);
-        } else {
-            return true;
-        }
-    }
-
-    /**
-     * @see #setValidator(org.ojalgo.optimisation.ExpressionsBasedModel.Validator)
-     * @see org.ojalgo.optimisation.ExpressionsBasedModel.Validator#validate(ExpressionsBasedModel,
-     *      NumberContext, BasicLogger)
-     */
-    protected final boolean validate(final ExpressionsBasedModel modifiedModel) {
-        if (myValidator != null && modifiedModel != null) {
-            return myValidator.validate(modifiedModel, options.feasibility, options.logger_appender);
-        } else {
-            return true;
-        }
     }
 
 }
