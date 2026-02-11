@@ -84,18 +84,7 @@ import org.ojalgo.type.keyvalue.EntryPair;
  */
 final class AlternatingDirectionSolver extends ConvexSolver implements UpdatableSolver {
 
-    /**
-     * Not yet fully implemented.
-     */
-    static final class Builder extends Composer<Double> {
-
-        Builder(final int m, final int n) {
-            super(R064Store.FACTORY, m, n, false);
-        }
-
-    }
-
-    static class Composer<N extends Comparable<N>> {
+    static final class Composer<N extends Comparable<N>> {
 
         private final ColumnsSupplier<N> myA;
         private transient PhysicalStore<N> myFullP = null;
@@ -791,10 +780,6 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
         return retVal;
     }
 
-    static Builder newBuilder(final int nbConstraints, final int nbVariables) {
-        return new Builder(nbConstraints, nbVariables);
-    }
-
     /** Problem data */
     private final Problem myData;
 
@@ -1216,28 +1201,31 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
         int m = myData.getRowDim();
         int n = myData.getColDim();
 
+        // 1. Solve KKT-like system
         for (int j = 0; j < n; j++) {
             myWork.xz[j] = Configuration.SIGMA * myWork.x0[j] - myData.q[j];
         }
         for (int i = 0; i < m; i++) {
             myWork.xz[n + i] = myWork.z0[i] - myWork.rho.inverse[i] * myWork.y[i];
         }
-
         myKKT.ftran(myWork.xz);
 
         double tmp;
 
+        // Apply relaxation and compute the step difference
         for (int j = 0; j < n; j++) {
-            tmp = Configuration.ALPHA * myWork.xz[j] + (PrimitiveMath.ONE - Configuration.ALPHA) * myWork.x0[j];
-            myWork.x[j] = tmp;
-            myWork.xd[j] = tmp - myWork.x0[j];
+            tmp = myWork.xz[j] - myWork.x0[j];
+            myWork.xd[j] = Configuration.ALPHA * tmp;
+            myWork.x[j] = myWork.x0[j] + myWork.xd[j];
         }
 
+        // 2. Project onto box
         for (int i = 0; i < m; i++) {
             tmp = Configuration.ALPHA * myWork.xz[i + n] + (PrimitiveMath.ONE - Configuration.ALPHA) * myWork.z0[i] + myWork.rho.inverse[i] * myWork.y[i];
             myWork.z[i] = Math.min(Math.max(myData.l[i], tmp), myData.u[i]);
         }
 
+        // 3. Dual update
         for (int i = 0; i < m; i++) {
             myWork.yd[i] = myWork.rho.values[i]
                     * (Configuration.ALPHA * myWork.xz[i + n] + (PrimitiveMath.ONE - Configuration.ALPHA) * myWork.z0[i] - myWork.z[i]);

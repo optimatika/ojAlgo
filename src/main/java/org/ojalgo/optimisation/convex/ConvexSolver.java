@@ -41,6 +41,7 @@ import org.ojalgo.matrix.decomposition.MatrixDecomposition;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.R064CSC;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.task.iterative.ConjugateGradientSolver;
 import org.ojalgo.matrix.task.iterative.IterativeSolverTask;
@@ -313,8 +314,13 @@ public abstract class ConvexSolver extends GenericSolver {
 
             } else {
 
-                ConvexData<Double> data = this.getConvexData(R064Store.FACTORY);
-                return BasePrimitiveSolver.newSolver(data, options);
+                if (options.experimental) {
+                    AlternatingDirectionSolver.Problem problem = this.getADProblem();
+                    return new AlternatingDirectionSolver(problem, options);
+                } else {
+                    ConvexData<Double> data = this.getConvexData(R064Store.FACTORY);
+                    return BasePrimitiveSolver.newSolver(data, options);
+                }
             }
         }
 
@@ -359,6 +365,52 @@ public abstract class ConvexSolver extends GenericSolver {
          */
         protected PhysicalStore<Double> getQ() {
             return this.getObjective().quadratic();
+        }
+
+        <N extends Comparable<N>> AlternatingDirectionSolver.Problem getADProblem() {
+
+            int nbVars = this.countVariables();
+            int nbEqus = this.countEqualityConstraints();
+            int nbIneq = this.countInequalityConstraints();
+
+            int m = nbEqus + nbIneq;
+            int n = nbVars;
+
+            R064CSC.Builder P = R064CSC.newBuilder(n, n);
+            double[] q = new double[n];
+            R064CSC.Builder A = R064CSC.newBuilder(m, n);
+            double[] l = new double[m];
+            double[] u = new double[m];
+
+            PhysicalStore<Double> quadratic = this.getObjective().quadratic();
+            PhysicalStore<Double> linear = this.getObjective().linear();
+
+            for (int j = 0; j < n; j++) {
+                q[j] = -linear.doubleValue(j);
+                for (int i = 0; i <= j; i++) {
+                    P.set(i, j, quadratic.doubleValue(i, j));
+                }
+            }
+
+            for (int i = 0; i < nbEqus; i++) {
+                for (NonzeroView<Double> nz : this.getAE(i).nonzeros()) {
+                    A.set(i, (int) nz.index(), nz.doubleValue());
+                }
+                double be = this.getBE(i);
+                l[i] = be;
+                u[i] = be;
+            }
+
+            for (int i = 0; i < nbIneq; i++) {
+                int row = nbEqus + i;
+                for (NonzeroView<Double> nz : this.getAI(i).nonzeros()) {
+                    A.set(row, (int) nz.index(), nz.doubleValue());
+                }
+                l[row] = Double.NEGATIVE_INFINITY;
+                u[row] = this.getBI(i);
+            }
+
+            return new AlternatingDirectionSolver.Problem(P, q, A, l, u);
         }
 
     }

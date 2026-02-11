@@ -241,7 +241,7 @@ public interface Optimisation {
          * constraints violated or not? are the variable values integer or not?
          * <p>
          * Primarily used in {@link ExpressionsBasedModel}. Not used (should not be) as part of solver logic,
-         * but ouside the solvers to validate their results.
+         * but outside the solvers to validate their results.
          */
         public NumberContext feasibility = NumberContext.of(12, 8);
 
