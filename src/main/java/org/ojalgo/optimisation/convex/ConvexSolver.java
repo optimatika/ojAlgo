@@ -95,7 +95,14 @@ public abstract class ConvexSolver extends GenericSolver {
 
     public enum Algorithm {
 
-        ACTIVE_SET, ADMM;
+        /**
+         * The original ojAlgo QP-solver. Mature and stable, but sometimes struggles with larger models.
+         */
+        ACTIVE_SET,
+        /**
+         * Typically faster, except for very small models, but not as stable/mature.
+         */
+        ADMM;
 
     }
 

@@ -11,6 +11,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.optimisation
+
+- New ADMM (OSQP) QP-solver named `AlternatingDirectionSolver`. The `ConvexSolver.Configuration` now lets you specify either the `ACTIVE_SET` or `ADMM` algorithm. If you don't specify which, simple logic will select for you.
+
 ### Changed
 
 #### org.ojalgo.optimisation
