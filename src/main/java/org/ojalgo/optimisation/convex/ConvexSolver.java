@@ -630,7 +630,7 @@ public abstract class ConvexSolver extends GenericSolver {
                     algorithm = Algorithm.ACTIVE_SET;
                 } else if (n > 100 * m) {
                     algorithm = Algorithm.ADMM;
-                } else if (m + n < 800) {
+                } else if (m + n < 750) {
                     algorithm = Algorithm.ACTIVE_SET;
                 } else {
                     algorithm = Algorithm.ADMM;

@@ -710,6 +710,10 @@ public interface Optimisation {
             return this == MIN ? model.minimise() : model.maximise();
         }
 
+        public Optimisation.Result solve(final ExpressionsBasedModel model, final ExpressionsBasedModel.Integration<?> integration) {
+            return this == MIN ? model.minimise(integration) : model.maximise(integration);
+        }
+
     }
 
     /**

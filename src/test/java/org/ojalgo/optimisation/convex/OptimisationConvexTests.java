@@ -31,6 +31,7 @@ import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.optimisation.convex.ConvexSolver.Algorithm;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.context.NumberContext;
@@ -39,6 +40,37 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  */
 public abstract class OptimisationConvexTests {
+
+    public static abstract class ConfiguredIntegration {
+
+        public static final ExpressionsBasedModel.Integration<ConvexSolver> ADMM = ConvexSolver.INTEGRATION.withOptionsModifier(opt -> {
+            opt.convex().algorithm(Algorithm.ADMM);
+        });
+        public static final ExpressionsBasedModel.Integration<ConvexSolver> ASET_PLAIN_D = ConvexSolver.INTEGRATION.withOptionsModifier(opt -> {
+            opt.convex().algorithm(Algorithm.ACTIVE_SET);
+            opt.convex().projection(Boolean.FALSE);
+            opt.sparse = Boolean.FALSE;
+        });
+        public static final ExpressionsBasedModel.Integration<ConvexSolver> ASET_PLAIN_S = ConvexSolver.INTEGRATION.withOptionsModifier(opt -> {
+            opt.convex().algorithm(Algorithm.ACTIVE_SET);
+            opt.convex().projection(Boolean.FALSE);
+            opt.sparse = Boolean.TRUE;
+        });
+        public static final ExpressionsBasedModel.Integration<ConvexSolver> ASET_PROJ_D = ConvexSolver.INTEGRATION.withOptionsModifier(opt -> {
+            opt.convex().algorithm(Algorithm.ACTIVE_SET);
+            opt.convex().projection(Boolean.TRUE);
+            opt.sparse = Boolean.FALSE;
+        });
+        public static final ExpressionsBasedModel.Integration<ConvexSolver> ASET_PROJ_S = ConvexSolver.INTEGRATION.withOptionsModifier(opt -> {
+            opt.convex().algorithm(Algorithm.ACTIVE_SET);
+            opt.convex().projection(Boolean.TRUE);
+            opt.sparse = Boolean.TRUE;
+        });
+
+    }
+
+    public static final ExpressionsBasedModel.Integration<?>[] VARIANTS = { ConfiguredIntegration.ADMM, ConfiguredIntegration.ASET_PLAIN_D,
+            ConfiguredIntegration.ASET_PLAIN_S, ConfiguredIntegration.ASET_PROJ_D, ConfiguredIntegration.ASET_PROJ_S };
 
     static boolean DEBUG = false;
 
