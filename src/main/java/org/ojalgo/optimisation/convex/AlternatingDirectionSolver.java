@@ -76,7 +76,7 @@ import org.ojalgo.type.keyvalue.EntryPair;
  *
  * using alternating-direction updates on a regularised KKT system. A sparse factorisation is reused across
  * iterations while primal/dual residuals and penalty parameters are updated in an ADMM-like fashion. Compared
- * to the C reference implementation, some things are done differently and not all features and configuration
+ * to the C reference implementation, some things are done differently and not all features and configurations
  * are present/supported. It does however follow the core concepts described in the original paper.
  *
  * @see https://web.stanford.edu/~boyd/papers/pdf/osqp.pdf

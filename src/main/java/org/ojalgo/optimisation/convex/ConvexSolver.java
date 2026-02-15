@@ -93,6 +93,12 @@ import org.ojalgo.type.context.NumberContext;
  */
 public abstract class ConvexSolver extends GenericSolver {
 
+    public enum Algorithm {
+
+        ACTIVE_SET, ADMM;
+
+    }
+
     public static final class Builder extends GenericSolver.Builder<ConvexSolver.Builder, ConvexSolver> {
 
         Builder() {
@@ -417,6 +423,7 @@ public abstract class ConvexSolver extends GenericSolver {
 
     public static final class Configuration {
 
+        private Algorithm myAlgorithm = null;
         private boolean myCombinedScaleFactor = true;
         private boolean myExtendedPrecision = false;
         private NumberContext myIterativeAccuracy = NumberContext.of(10, 16).withMode(RoundingMode.HALF_DOWN);
@@ -426,6 +433,11 @@ public abstract class ConvexSolver extends GenericSolver {
         private double mySmallDiagonal = RELATIVELY_SMALL + MACHINE_EPSILON;
         private Function<Structure2D, MatrixDecomposition.Solver<Double>> mySolverGeneral = LU.R064::make;
         private Function<Structure2D, MatrixDecomposition.Solver<Double>> mySolverSPD = Cholesky.R064::make;
+
+        public Configuration algorithm(final Algorithm algorithm) {
+            myAlgorithm = algorithm;
+            return this;
+        }
 
         /**
          * Only relevant with extended precision. With the extended precision solver the primal and dual
@@ -587,6 +599,10 @@ public abstract class ConvexSolver extends GenericSolver {
             return this;
         }
 
+        Algorithm getAlgorithm() {
+            return myAlgorithm;
+        }
+
         Boolean getProjection() {
             return myProjection;
         }
@@ -598,14 +614,30 @@ public abstract class ConvexSolver extends GenericSolver {
         @Override
         public ConvexSolver build(final ExpressionsBasedModel model) {
 
-            boolean experimental = model.options.experimental;
+            Algorithm algorithm = model.options.convex().getAlgorithm();
 
-            this.setSwitch(model, ExpressionsBasedModel.IntegrationProperty.TEMPORARY, experimental);
+            if (algorithm == null) {
+                int n = model.countVariables();
+                int m = model.countExpressions();
+                if (m > 50 * n) {
+                    algorithm = Algorithm.ACTIVE_SET;
+                } else if (n > 100 * m) {
+                    algorithm = Algorithm.ADMM;
+                } else if (m + n < 800) {
+                    algorithm = Algorithm.ACTIVE_SET;
+                } else {
+                    algorithm = Algorithm.ADMM;
+                }
+            }
 
-            if (experimental) {
+            if (algorithm == Algorithm.ACTIVE_SET) {
+                this.setSwitch(model, ExpressionsBasedModel.IntegrationProperty.ACTIVE_SET_OR_ADMM, false);
+                return BasePrimitiveSolver.INTEGRATION.build(model);
+            } else if (algorithm == Algorithm.ADMM) {
+                this.setSwitch(model, ExpressionsBasedModel.IntegrationProperty.ACTIVE_SET_OR_ADMM, true);
                 return AlternatingDirectionSolver.INTEGRATION.build(model);
             } else {
-                return BasePrimitiveSolver.INTEGRATION.build(model);
+                throw new IllegalStateException("Unknown algorithm: " + algorithm);
             }
         }
 
@@ -616,7 +648,7 @@ public abstract class ConvexSolver extends GenericSolver {
 
         @Override
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
-            if (this.isSwitch(model, ExpressionsBasedModel.IntegrationProperty.TEMPORARY)) {
+            if (this.isSwitch(model, ExpressionsBasedModel.IntegrationProperty.ACTIVE_SET_OR_ADMM)) {
                 return AlternatingDirectionSolver.INTEGRATION.toModelState(solverState, model);
             } else {
                 return BasePrimitiveSolver.INTEGRATION.toModelState(solverState, model);
@@ -625,7 +657,7 @@ public abstract class ConvexSolver extends GenericSolver {
 
         @Override
         public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
-            if (this.isSwitch(model, ExpressionsBasedModel.IntegrationProperty.TEMPORARY)) {
+            if (this.isSwitch(model, ExpressionsBasedModel.IntegrationProperty.ACTIVE_SET_OR_ADMM)) {
                 return AlternatingDirectionSolver.INTEGRATION.toSolverState(modelState, model);
             } else {
                 return BasePrimitiveSolver.INTEGRATION.toSolverState(modelState, model);

@@ -451,6 +451,12 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     public enum IntegrationProperty {
 
         /**
+         * Any integration that can switch between an active-set method and an ADMM method.
+         * <p>
+         * ACTIVE_SET==false, ADMM==true
+         */
+        ACTIVE_SET_OR_ADMM,
+        /**
          * Any integration that can switch between Java and native code solvers.
          * <p>
          * JAVA==false, NATIVE==true

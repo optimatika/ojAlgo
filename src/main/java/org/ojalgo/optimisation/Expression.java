@@ -397,6 +397,43 @@ public final class Expression extends ModelEntity<Expression> {
 
     }
 
+    public double density() {
+
+        int nbVars = myModel.countVariables();
+
+        if (nbVars == 0) {
+
+            return ZERO;
+
+        } else {
+
+            if (this.isAnyQuadraticFactorNonZero()) {
+
+                int nbQuads = this.countQuadraticFactors();
+
+                double denom = nbVars * nbVars;
+
+                double numer = nbQuads;
+
+                return numer / denom;
+
+            } else if (this.isAnyLinearFactorNonZero()) {
+
+                int nbLins = this.countLinearFactors();
+
+                double denom = nbVars;
+
+                double numer = nbLins;
+
+                return numer / denom;
+
+            } else {
+
+                return ZERO;
+            }
+        }
+    }
+
     public double doubleValue(final IntIndex key, final boolean adjusted) {
         return this.get(key, adjusted).doubleValue();
     }
@@ -1019,43 +1056,6 @@ public final class Expression extends ModelEntity<Expression> {
 
     int countQuadraticFactors() {
         return myQuadratic.size();
-    }
-
-    double density() {
-
-        int nbVars = myModel.countVariables();
-
-        if (nbVars == 0) {
-
-            return ZERO;
-
-        } else {
-
-            if (this.isAnyQuadraticFactorNonZero()) {
-
-                int nbQuads = this.countQuadraticFactors();
-
-                double denom = nbVars * nbVars;
-
-                double numer = nbQuads;
-
-                return numer / denom;
-
-            } else if (this.isAnyLinearFactorNonZero()) {
-
-                int nbLins = this.countLinearFactors();
-
-                double denom = nbVars;
-
-                double numer = nbLins;
-
-                return numer / denom;
-
-            } else {
-
-                return ZERO;
-            }
-        }
     }
 
     @Override
