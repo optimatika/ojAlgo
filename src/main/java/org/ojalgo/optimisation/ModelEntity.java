@@ -36,28 +36,10 @@ import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * ModelEntity is the abstract base class for optimization model components such as variables and expressions
- * in ojAlgo's optimization framework.
- * <p>
- * A ModelEntity can serve as both a constraint and an objective function component:
- * <ul>
- * <li>As a constraint: Define feasible values using lower/upper bounds</li>
- * <li>As an objective: Contribute to the objective function with a weight</li>
- * </ul>
- * <p>
- * The class provides methods to:
- * <ul>
- * <li>Set and get lower/upper limits for constraints</li>
- * <li>Set and get contribution weights for objective functions</li>
- * <li>Handle integer restrictions</li>
- * <li>Validate constraint satisfaction</li>
- * <li>Apply scaling adjustments for numerical stability</li>
- * </ul>
- * <p>
- * Implementations include {@link Variable} for decision variables and {@link Expression} for linear and
- * quadratic expressions.
+ * Abstract base for {@link Variable} and {@link Expression}. A ModelEntity can act as a constraint (via
+ * lower/upper limits) and/or contribute to the objective function (via a contribution weight).
  *
- * @param <ME> The concrete implementation type (for fluent interface returns)
+ * @param <ME> The concrete subclass type, enabling a fluent API
  * @author apete
  */
 public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.Constraint, Optimisation.Objective, Comparable<ME> {
@@ -163,7 +145,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     /**
-     * @return Adjusted "1"
+     * @return The scaling factor (10^exponent) used to adjust model parameters for numerical stability
      */
     public final double getAdjustmentFactor() {
         return BigDecimal.ONE.movePointRight(this.getAdjustmentExponent()).doubleValue(); // 10^exponent
@@ -308,8 +290,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     /**
-     * @see #getLowerLimit()
-     * @see #getUpperLimit()
+     * Set both the lower and upper limits to the same value, creating an equality constraint.
      */
     public final ME level(final Comparable<?> level) {
         BigDecimal value = ModelEntity.toBigDecimal(level);
@@ -344,7 +325,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     /**
-     * Purely the reverse scaling part of {@link #toUnadjusted(double, NumberContext)}
+     * Reverses the scaling applied by {@link #toAdjusted(BigDecimal)}, without enforcing limits or context.
      */
     public final BigDecimal reverseAdjustment(final BigDecimal adjusted) {
 
@@ -356,7 +337,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     /**
-     * Add this shift to the lower/upper limits, if they exist.
+     * Adds the given shift to the lower and/or upper limits, if they are set.
      */
     public void shift(final BigDecimal shift) {
 
@@ -370,9 +351,9 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     /**
-     * Will convert a {@link BigDecimal} model parameter to a corresponing {@link double} solver parameter, in
-     * the process scaling it. This operation is reversed by {@link #toUnadjusted(double, NumberContext)}
-     * and/or {@link #reverseAdjustment(BigDecimal)}.
+     * Converts a {@link BigDecimal} model parameter to a corresponding double solver parameter, scaling it in
+     * the process. This operation is reversed by {@link #toUnadjusted(double, NumberContext)} and/or
+     * {@link #reverseAdjustment(BigDecimal)}.
      */
     public final double toAdjusted(final BigDecimal unadjusted) {
 
@@ -402,9 +383,8 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     /**
-     * The inverse of {@link #toAdjusted(BigDecimal)}. This will also enforce the lower and upper limits as
-     * well as the {@link NumberContext}. To "only" do the reverse adjustment call
-     * {@link #reverseAdjustment(BigDecimal)}.
+     * The inverse of {@link #toAdjusted(BigDecimal)}. Also enforces the lower/upper limits and the
+     * {@link NumberContext}. To reverse only the scaling, call {@link #reverseAdjustment(BigDecimal)}.
      */
     public final BigDecimal toUnadjusted(final double adjusted, final NumberContext context) {
 
@@ -445,7 +425,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     /**
-     * @see #getContributionWeight()
+     * Set the contribution weight for the objective function. A zero weight is treated as "no weight" (null).
      */
     @SuppressWarnings("unchecked")
     public final ME weight(final Comparable<?> weight) {
@@ -618,8 +598,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     /**
-     * @return true if both the lower and upper limits are defined, and the range is defined by lower and
-     *         upper.
+     * @return true if the lower limit equals {@code lower} and the upper limit equals {@code upper}
      */
     boolean isClosedRange(final BigDecimal lower, final BigDecimal upper) {
         return myLowerLimit != null && myUpperLimit != null && myLowerLimit.compareTo(lower) == 0 && myUpperLimit.compareTo(upper) == 0;

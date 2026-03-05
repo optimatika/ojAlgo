@@ -60,47 +60,30 @@ import org.ojalgo.structure.Structure2D.IntRowColumn;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * Expression represents a mathematical expression in the optimization model that can serve as either a
- * constraint or a component of the objective function.
+ * A mathematical expression (linear, quadratic, or both) in an {@link ExpressionsBasedModel}. An Expression
+ * combines variable coefficients set via {@link #set(Variable, Comparable)} or
+ * {@link #add(Variable, Comparable)}, and optionally quadratic terms via
+ * {@link #set(Variable, Variable, Comparable)}.
  * <p>
- * An Expression can be:
- * <ul>
- * <li>Linear: Contains only linear terms (variable coefficients)</li>
- * <li>Quadratic: Contains quadratic terms (products of variables)</li>
- * <li>Compound: Contains both linear and quadratic terms</li>
- * </ul>
- * <p>
- * Basic usage:
- * <ul>
- * <li>Set coefficients for variables with {@link #set(Variable, Comparable)} or
- * {@link #add(Variable, Comparable)} methods</li>
- * <li>Create quadratic terms with {@link #set(Variable, Variable, Comparable)} methods</li>
- * <li>Create constraints by setting lower/upper bounds using {@link #lower(Comparable)},
- * {@link #upper(Comparable)}, or {@link #level(Comparable)} for equality constraints</li>
- * <li>Contribute to the objective function by setting a weight using {@link #weight(Comparable)}</li>
- * </ul>
- * <p>
- * Advanced features include:
- * <ul>
- * <li>Integer expression handling with automatic detection and constraint tightening</li>
- * <li>Support for binary variables with specialized methods for detecting binary constraints</li>
- * <li>Expression evaluation at specific variable values using {@link #evaluate(Access1D)}</li>
- * <li>Compensation for fixed variables to simplify expressions during solving</li>
- * <li>Numerical scaling for improved solver stability</li>
- * <li>Convenient methods for creating common expression types (sums, distances, etc.)</li>
- * <li>Conversion to various function types for integration with different solvers</li>
- * </ul>
- * <p>
- * The Expression class provides a fluent interface for building expressions with method chaining. It also
- * supports automatic handling of numerical stability issues through scaling adjustments.
- * <p>
- * Note that while the Expression class supports quadratic terms in constraints, some solvers may only support
- * linear constraints. Quadratic, linear, or compound expressions can typically be used in the objective
- * function depending on the solver capabilities.
+ * As a {@link ModelEntity}, it becomes a constraint when lower/upper limits are set, and contributes to the
+ * objective function when a weight is set.
  *
  * @author apete
  */
-public final class Expression extends ModelEntity<Expression> {
+public class Expression extends ModelEntity<Expression> {
+
+    /**
+     * Creates {@link Expression} instances. A custom factory can be set on an
+     * {@link Optimisation.Environment} to control expression creation for all models produced by that
+     * environment.
+     *
+     * @see Optimisation.Environment#setExpressionFactory(Factory)
+     */
+    public interface Factory<E extends Expression> {
+
+        E make(String name, ExpressionsBasedModel model);
+
+    }
 
     private BigDecimal myConstant = null;
     private transient boolean myInfeasible = false;
@@ -110,13 +93,27 @@ public final class Expression extends ModelEntity<Expression> {
     private final Map<IntRowColumn, BigDecimal> myQuadratic;
     private transient boolean myRedundant = false;
     /**
-     * A shallow copy (typically created by presolver or integer solver) shares the Map:s holding the
-     * paramaters with other Expressions. They will only differ on the lower/upper limits and on meta data
-     * like flags indicating redundancy or infeasibility.
+     * A shallow copy (typically created by presolver or integer solver) shares the Maps holding the
+     * parameters with other Expressions. They only differ on limits and meta data like redundancy or
+     * infeasibility flags.
      */
     private final boolean myShallowCopy;
 
-    protected Expression(final Expression expressionToCopy, final ExpressionsBasedModel destinationModel, final boolean deep) {
+    protected Expression(final String name, final ExpressionsBasedModel model) {
+
+        super(name);
+
+        ProgrammingError.throwIfNull(name, model);
+
+        myModel = model;
+
+        myShallowCopy = false;
+
+        myLinear = new HashMap<>();
+        myQuadratic = new HashMap<>();
+    }
+
+    Expression(final Expression expressionToCopy, final ExpressionsBasedModel destinationModel, final boolean deep) {
 
         super(expressionToCopy);
 
@@ -149,20 +146,6 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
-    Expression(final String name, final ExpressionsBasedModel model) {
-
-        super(name);
-
-        ProgrammingError.throwIfNull(name, model);
-
-        myModel = model;
-
-        myShallowCopy = false;
-
-        myLinear = new HashMap<>();
-        myQuadratic = new HashMap<>();
-    }
-
     /**
      * Adds the scaled values from another Expression to this Expression. The lower and upper limits/bounds,
      * of either involved Expression, are not affected. Nor is the objective weight. Only the factors (linear
@@ -177,110 +160,110 @@ public final class Expression extends ModelEntity<Expression> {
      * model.newExpression("Expr3").add(2.0, expr1).add(-3.0, expr2).lower(0.0);
      * </pre>
      */
-    public Expression add(final Comparable<?> scale, final Expression values) {
+    public final Expression add(final Comparable<?> scale, final Expression values) {
         return this.doAdd(ModelEntity.toBigDecimal(scale), values);
     }
 
     /**
      * @see #add(Comparable, Expression)
      */
-    public Expression add(final double scale, final Expression values) {
+    public final Expression add(final double scale, final Expression values) {
         return this.doAdd(BigDecimal.valueOf(scale), values);
     }
 
     /**
      * @see #add(Variable, Comparable)
      */
-    public Expression add(final int index, final Comparable<?> value) {
+    public final Expression add(final int index, final Comparable<?> value) {
         return this.doAdd(this.toIntIndex(index), ModelEntity.toBigDecimal(value));
     }
 
     /**
      * @see #add(Variable, Comparable)
      */
-    public Expression add(final int index, final double value) {
+    public final Expression add(final int index, final double value) {
         return this.doAdd(this.toIntIndex(index), BigDecimal.valueOf(value));
     }
 
     /**
      * @see #add(Variable, Comparable)
      */
-    public Expression add(final int row, final int column, final Comparable<?> value) {
+    public final Expression add(final int row, final int column, final Comparable<?> value) {
         return this.doAdd(this.toIntRowColumn(row, column), ModelEntity.toBigDecimal(value));
     }
 
     /**
      * @see #add(Variable, Comparable)
      */
-    public Expression add(final int row, final int column, final double value) {
+    public final Expression add(final int row, final int column, final double value) {
         return this.doAdd(this.toIntRowColumn(row, column), BigDecimal.valueOf(value));
     }
 
     /**
      * @see #add(Variable, Comparable)
      */
-    public Expression add(final int row, final int column, final long value) {
+    public final Expression add(final int row, final int column, final long value) {
         return this.doAdd(this.toIntRowColumn(row, column), BigDecimal.valueOf(value));
     }
 
     /**
      * @see #add(Variable, Comparable)
      */
-    public Expression add(final int index, final long value) {
+    public final Expression add(final int index, final long value) {
         return this.doAdd(this.toIntIndex(index), BigDecimal.valueOf(value));
     }
 
     /**
      * @see #add(Comparable, Expression)
      */
-    public Expression add(final long scale, final Expression values) {
+    public final Expression add(final long scale, final Expression values) {
         return this.doAdd(BigDecimal.valueOf(scale), values);
     }
 
     /**
      * Will add the value to this variable's factor.
      */
-    public Expression add(final Variable variable, final Comparable<?> value) {
+    public final Expression add(final Variable variable, final Comparable<?> value) {
         return this.doAdd(this.toIntIndex(variable), ModelEntity.toBigDecimal(value));
     }
 
     /**
      * @see #add(Variable, Comparable)
      */
-    public Expression add(final Variable variable, final double value) {
+    public final Expression add(final Variable variable, final double value) {
         return this.doAdd(this.toIntIndex(variable), BigDecimal.valueOf(value));
     }
 
     /**
      * @see #add(Variable, Comparable)
      */
-    public Expression add(final Variable variable, final long value) {
+    public final Expression add(final Variable variable, final long value) {
         return this.doAdd(this.toIntIndex(variable), BigDecimal.valueOf(value));
     }
 
     /**
      * @see #add(Variable, Comparable)
      */
-    public Expression add(final Variable variable1, final Variable variable2, final Comparable<?> value) {
+    public final Expression add(final Variable variable1, final Variable variable2, final Comparable<?> value) {
         return this.doAdd(this.toIntRowColumn(variable1, variable2), ModelEntity.toBigDecimal(value));
     }
 
     /**
      * @see #add(Variable, Comparable)
      */
-    public Expression add(final Variable variable1, final Variable variable2, final double value) {
+    public final Expression add(final Variable variable1, final Variable variable2, final double value) {
         return this.doAdd(this.toIntRowColumn(variable1, variable2), BigDecimal.valueOf(value));
     }
 
     /**
      * @see #add(Variable, Comparable)
      */
-    public Expression add(final Variable variable1, final Variable variable2, final long value) {
+    public final Expression add(final Variable variable1, final Variable variable2, final long value) {
         return this.doAdd(this.toIntRowColumn(variable1, variable2), BigDecimal.valueOf(value));
     }
 
     @Override
-    public void addTo(final Expression target, final BigDecimal scale) {
+    public final void addTo(final Expression target, final BigDecimal scale) {
 
         for (Entry<IntIndex, BigDecimal> entry : myLinear.entrySet()) {
             BigDecimal value = entry.getValue().multiply(scale);
@@ -306,7 +289,7 @@ public final class Expression extends ModelEntity<Expression> {
      * @param fixedVariables A set of (by the presolver) fixed variable indices
      * @return The reduced/modified expression
      */
-    public Expression compensate(final Set<IntIndex> fixedVariables) {
+    public final Expression compensate(final Set<IntIndex> fixedVariables) {
 
         if (fixedVariables.size() == 0 || !this.isAnyQuadraticFactorNonZero() && Collections.disjoint(fixedVariables, this.getLinearKeySet())) {
 
@@ -397,7 +380,7 @@ public final class Expression extends ModelEntity<Expression> {
 
     }
 
-    public double density() {
+    public final double density() {
 
         int nbVars = myModel.countVariables();
 
@@ -434,15 +417,15 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
-    public double doubleValue(final IntIndex key, final boolean adjusted) {
+    public final double doubleValue(final IntIndex key, final boolean adjusted) {
         return this.get(key, adjusted).doubleValue();
     }
 
-    public double doubleValue(final IntRowColumn key, final boolean adjusted) {
+    public final double doubleValue(final IntRowColumn key, final boolean adjusted) {
         return this.get(key, adjusted).doubleValue();
     }
 
-    public void enforce(final NumberContext enforcer) {
+    public final void enforce(final NumberContext enforcer) {
 
         myLinear.replaceAll((key, value) -> enforcer.enforce(value));
 
@@ -473,7 +456,7 @@ public final class Expression extends ModelEntity<Expression> {
                 && myShallowCopy == other.myShallowCopy;
     }
 
-    public BigDecimal evaluate(final Access1D<BigDecimal> point) {
+    public final BigDecimal evaluate(final Access1D<BigDecimal> point) {
 
         BigDecimal retVal = this.getConstant();
 
@@ -492,23 +475,23 @@ public final class Expression extends ModelEntity<Expression> {
         return retVal;
     }
 
-    public BigDecimal get(final IntIndex key) {
+    public final BigDecimal get(final IntIndex key) {
         return this.get(key, false);
     }
 
-    public BigDecimal get(final IntIndex key, final boolean adjusted) {
+    public final BigDecimal get(final IntIndex key, final boolean adjusted) {
         return this.convert(myLinear.get(key), adjusted);
     }
 
-    public BigDecimal get(final IntRowColumn key) {
+    public final BigDecimal get(final IntRowColumn key) {
         return this.get(key, false);
     }
 
-    public BigDecimal get(final IntRowColumn key, final boolean adjusted) {
+    public final BigDecimal get(final IntRowColumn key, final boolean adjusted) {
         return this.convert(myQuadratic.get(key), adjusted);
     }
 
-    public BigDecimal get(final Variable variable) {
+    public final BigDecimal get(final Variable variable) {
         IntIndex index = this.toIntIndex(variable);
         if (index != null) {
             return this.get(index);
@@ -517,7 +500,7 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
-    public MatrixStore<Double> getAdjustedGradient(final Access1D<?> point) {
+    public final MatrixStore<Double> getAdjustedGradient(final Access1D<?> point) {
 
         R064Store retVal = R064Store.FACTORY.make(myModel.countVariables(), 1);
 
@@ -541,7 +524,7 @@ public final class Expression extends ModelEntity<Expression> {
         return retVal;
     }
 
-    public MatrixStore<Double> getAdjustedHessian() {
+    public final MatrixStore<Double> getAdjustedHessian() {
 
         int tmpCountVariables = myModel.countVariables();
         R064Store retVal = R064Store.FACTORY.make(tmpCountVariables, tmpCountVariables);
@@ -557,19 +540,19 @@ public final class Expression extends ModelEntity<Expression> {
         return retVal;
     }
 
-    public Set<Entry<IntIndex, BigDecimal>> getLinearEntrySet() {
+    public final Set<Entry<IntIndex, BigDecimal>> getLinearEntrySet() {
         return myLinear.entrySet();
     }
 
-    public Set<IntIndex> getLinearKeySet() {
+    public final Set<IntIndex> getLinearKeySet() {
         return myLinear.keySet();
     }
 
-    public Set<Entry<IntRowColumn, BigDecimal>> getQuadraticEntrySet() {
+    public final Set<Entry<IntRowColumn, BigDecimal>> getQuadraticEntrySet() {
         return myQuadratic.entrySet();
     }
 
-    public Set<IntRowColumn> getQuadraticKeySet() {
+    public final Set<IntRowColumn> getQuadraticKeySet() {
         return myQuadratic.keySet();
     }
 
@@ -580,32 +563,32 @@ public final class Expression extends ModelEntity<Expression> {
         return prime * result + Objects.hash(myConstant, myLinear, myQuadratic, myShallowCopy);
     }
 
-    public boolean isAnyLinearFactorNonZero() {
+    public final boolean isAnyLinearFactorNonZero() {
         return myLinear.size() > 0;
     }
 
-    public boolean isAnyQuadraticFactorNonZero() {
+    public final boolean isAnyQuadraticFactorNonZero() {
         return myQuadratic.size() > 0;
     }
 
-    public boolean isFunctionConstant() {
+    public final boolean isFunctionConstant() {
         return !this.isAnyQuadraticFactorNonZero() && !this.isAnyLinearFactorNonZero();
     }
 
-    public boolean isFunctionLinear() {
+    public final boolean isFunctionLinear() {
         return !this.isAnyQuadraticFactorNonZero() && this.isAnyLinearFactorNonZero();
     }
 
-    public boolean isFunctionPureQuadratic() {
+    public final boolean isFunctionPureQuadratic() {
         return this.isAnyQuadraticFactorNonZero() && !this.isAnyLinearFactorNonZero();
     }
 
-    public boolean isFunctionQuadratic() {
+    public final boolean isFunctionQuadratic() {
         return this.isAnyQuadraticFactorNonZero() && this.isAnyLinearFactorNonZero();
     }
 
     @Override
-    public boolean isInteger() {
+    public final boolean isInteger() {
         if (myInteger == null) {
             this.doIntegerRounding();
         }
@@ -613,114 +596,114 @@ public final class Expression extends ModelEntity<Expression> {
     }
 
     /**
-     * @return Are all the (linear) variables binary
+     * @return true if this is a purely linear expression and all referenced variables are binary
      */
-    public boolean isLinearAndAllBinary() {
+    public final boolean isLinearAndAllBinary() {
         return myQuadratic.size() == 0 && myLinear.size() > 0 && myLinear.keySet().stream().allMatch(i -> myModel.getVariable(i).isBinary());
     }
 
     /**
-     * @return Are all the (linear) variables integer
+     * @return true if this is a purely linear expression and all referenced variables are integer
      */
-    public boolean isLinearAndAllInteger() {
+    public final boolean isLinearAndAllInteger() {
         return myQuadratic.size() == 0 && myLinear.size() > 0 && myLinear.keySet().stream().allMatch(i -> myModel.getVariable(i).isInteger());
     }
 
     /**
-     * @return Are any of the (linear) variables binary
+     * @return true if this is a purely linear expression and at least one referenced variable is binary
      */
-    public boolean isLinearAndAnyBinary() {
+    public final boolean isLinearAndAnyBinary() {
         return myQuadratic.size() == 0 && myLinear.size() > 0 && myLinear.keySet().stream().anyMatch(i -> myModel.getVariable(i).isBinary());
     }
 
     /**
-     * @return Are any of the (linear) variables integer
+     * @return true if this is a purely linear expression and at least one referenced variable is integer
      */
-    public boolean isLinearAndAnyInteger() {
+    public final boolean isLinearAndAnyInteger() {
         return myQuadratic.size() == 0 && myLinear.size() > 0 && myLinear.keySet().stream().anyMatch(i -> myModel.getVariable(i).isInteger());
     }
 
     /**
      * @see #set(Variable, Comparable)
      */
-    public Expression set(final int index, final Comparable<?> value) {
+    public final Expression set(final int index, final Comparable<?> value) {
         return this.doSet(this.toIntIndex(index), ModelEntity.toBigDecimal(value));
     }
 
     /**
      * @see #set(Variable, Comparable)
      */
-    public Expression set(final int index, final double value) {
+    public final Expression set(final int index, final double value) {
         return this.doSet(this.toIntIndex(index), BigDecimal.valueOf(value));
     }
 
     /**
      * @see #set(Variable, Comparable)
      */
-    public Expression set(final int row, final int column, final Comparable<?> value) {
+    public final Expression set(final int row, final int column, final Comparable<?> value) {
         return this.doSet(this.toIntRowColumn(row, column), ModelEntity.toBigDecimal(value));
     }
 
     /**
      * @see #set(Variable, Comparable)
      */
-    public Expression set(final int row, final int column, final double value) {
+    public final Expression set(final int row, final int column, final double value) {
         return this.doSet(this.toIntRowColumn(row, column), BigDecimal.valueOf(value));
     }
 
     /**
      * @see #set(Variable, Comparable)
      */
-    public Expression set(final int row, final int column, final long value) {
+    public final Expression set(final int row, final int column, final long value) {
         return this.doSet(this.toIntRowColumn(row, column), BigDecimal.valueOf(value));
     }
 
     /**
      * @see #set(Variable, Comparable)
      */
-    public Expression set(final int index, final long value) {
+    public final Expression set(final int index, final long value) {
         return this.doSet(this.toIntIndex(index), BigDecimal.valueOf(value));
     }
 
     /**
      * Will set (replace) the variable's factor to this value
      */
-    public Expression set(final Variable variable, final Comparable<?> value) {
+    public final Expression set(final Variable variable, final Comparable<?> value) {
         return this.doSet(this.toIntIndex(variable), ModelEntity.toBigDecimal(value));
     }
 
     /**
      * @see #set(Variable, Comparable)
      */
-    public Expression set(final Variable variable, final double value) {
+    public final Expression set(final Variable variable, final double value) {
         return this.doSet(this.toIntIndex(variable), BigDecimal.valueOf(value));
     }
 
     /**
      * @see #set(Variable, Comparable)
      */
-    public Expression set(final Variable variable, final long value) {
+    public final Expression set(final Variable variable, final long value) {
         return this.doSet(this.toIntIndex(variable), BigDecimal.valueOf(value));
     }
 
     /**
      * @see #set(Variable, Comparable)
      */
-    public Expression set(final Variable variable1, final Variable variable2, final Comparable<?> value) {
+    public final Expression set(final Variable variable1, final Variable variable2, final Comparable<?> value) {
         return this.doSet(this.toIntRowColumn(variable1, variable2), ModelEntity.toBigDecimal(value));
     }
 
     /**
      * @see #set(Variable, Comparable)
      */
-    public Expression set(final Variable variable1, final Variable variable2, final double value) {
+    public final Expression set(final Variable variable1, final Variable variable2, final double value) {
         return this.doSet(this.toIntRowColumn(variable1, variable2), BigDecimal.valueOf(value));
     }
 
     /**
      * @see #set(Variable, Comparable)
      */
-    public Expression set(final Variable variable1, final Variable variable2, final long value) {
+    public final Expression set(final Variable variable1, final Variable variable2, final long value) {
         return this.doSet(this.toIntRowColumn(variable1, variable2), BigDecimal.valueOf(value));
     }
 
@@ -731,7 +714,7 @@ public final class Expression extends ModelEntity<Expression> {
      * @param variables The relevant variables
      * @param point     The point to measure from
      */
-    public void setCompoundFactorsOffset(final List<Variable> variables, final Access1D<?> point) {
+    public final void setCompoundFactorsOffset(final List<Variable> variables, final Access1D<?> point) {
 
         int tmpLength = variables.size();
 
@@ -754,7 +737,7 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
-    public void setLinearFactors(final List<Variable> variables, final Access1D<?> factors) {
+    public final void setLinearFactors(final List<Variable> variables, final Access1D<?> factors) {
 
         int tmpLimit = variables.size();
 
@@ -772,13 +755,13 @@ public final class Expression extends ModelEntity<Expression> {
      *
      * @param variables The relevant variables
      */
-    public void setLinearFactorsSimple(final List<Variable> variables) {
+    public final void setLinearFactorsSimple(final List<Variable> variables) {
         for (Variable tmpVariable : variables) {
             this.set(tmpVariable, BigMath.ONE);
         }
     }
 
-    public void setQuadraticFactors(final List<Variable> variables, final Access2D<?> factors) {
+    public final void setQuadraticFactors(final List<Variable> variables, final Access2D<?> factors) {
 
         int tmpLimit = variables.size();
 
@@ -797,13 +780,13 @@ public final class Expression extends ModelEntity<Expression> {
     /**
      * Will attempt to exploit integer property to tighten the lower and/or upper limits (integer rounding).
      */
-    public void tighten() {
+    public final void tighten() {
         if (this.isConstraint()) {
             this.isInteger();
         }
     }
 
-    public MultiaryFunction.TwiceDifferentiable<Double> toFunction() {
+    public final MultiaryFunction.TwiceDifferentiable<Double> toFunction() {
 
         if (this.isFunctionQuadratic()) {
             return this.makeQuadraticFunction();
@@ -954,7 +937,7 @@ public final class Expression extends ModelEntity<Expression> {
         return noninteger.subtract(intPart);
     }
 
-    protected void appendMiddlePart(final StringBuilder builder, final Access1D<BigDecimal> solution, final NumberContext display) {
+    protected final void appendMiddlePart(final StringBuilder builder, final Access1D<BigDecimal> solution, final NumberContext display) {
 
         builder.append(this.getName());
         builder.append(": ");
@@ -981,7 +964,7 @@ public final class Expression extends ModelEntity<Expression> {
     /**
      * Add all indices of referenced variables to the supplied {@link Set}.
      */
-    void addAll(final Set<IntIndex> referenced) {
+    final void addAll(final Set<IntIndex> referenced) {
         referenced.addAll(this.getLinearKeySet());
         for (IntRowColumn quad : this.getQuadraticKeySet()) {
             referenced.add(quad.row());
@@ -989,7 +972,7 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
-    void addObjectiveConstant(final BigDecimal value) {
+    final void addObjectiveConstant(final BigDecimal value) {
 
         BigDecimal weight = this.getContributionWeight();
 
@@ -1000,7 +983,7 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
-    void appendToString(final StringBuilder builder, final Access1D<BigDecimal> solution, final NumberContext display) {
+    final void appendToString(final StringBuilder builder, final Access1D<BigDecimal> solution, final NumberContext display) {
 
         this.appendLeftPart(builder, display);
         if (solution != null) {
@@ -1015,7 +998,7 @@ public final class Expression extends ModelEntity<Expression> {
      * Calculates this expression's value - the subset variables' part of this expression. Will never return
      * null.
      */
-    BigDecimal calculateSetValue(final Collection<IntIndex> subset) {
+    final BigDecimal calculateSetValue(final Collection<IntIndex> subset) {
 
         BigDecimal retVal = BigMath.ZERO;
 
@@ -1042,24 +1025,24 @@ public final class Expression extends ModelEntity<Expression> {
         return retVal;
     }
 
-    Expression copy(final ExpressionsBasedModel destinationModel, final boolean deep) {
+    final Expression copy(final ExpressionsBasedModel destinationModel, final boolean deep) {
         return new Expression(this, destinationModel, deep);
     }
 
-    long countIntegerFactors() {
+    final long countIntegerFactors() {
         return myLinear.keySet().stream().map(this::resolve).filter(Variable::isInteger).count();
     }
 
-    int countLinearFactors() {
+    final int countLinearFactors() {
         return myLinear.size();
     }
 
-    int countQuadraticFactors() {
+    final int countQuadraticFactors() {
         return myQuadratic.size();
     }
 
     @Override
-    int deriveAdjustmentExponent() {
+    final int deriveAdjustmentExponent() {
 
         if (this.isInteger()) {
             return 0;
@@ -1112,16 +1095,14 @@ public final class Expression extends ModelEntity<Expression> {
     }
 
     /**
-     * Assumes at least 1 variable, and all variables integer!
-     *
-     * @see org.ojalgo.optimisation.ModelEntity#doIntegerRounding()
+     * Detects whether all referenced variables are integer and, if so, tightens the lower/upper limits.
      */
     @Override
-    void doIntegerRounding() {
+    final void doIntegerRounding() {
         this.doIntegerRounding(this.getLinearKeySet(), this.getLowerLimit(), this.getUpperLimit());
     }
 
-    void doIntegerRounding(final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper) {
+    final void doIntegerRounding(final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper) {
 
         if (myInteger != null) {
             return;
@@ -1178,7 +1159,7 @@ public final class Expression extends ModelEntity<Expression> {
         myInteger = Boolean.TRUE;
     }
 
-    Expression doMixedIntegerRounding() {
+    final Expression doMixedIntegerRounding() {
 
         if (!this.isEqualityConstraint()) {
             return null;
@@ -1223,7 +1204,7 @@ public final class Expression extends ModelEntity<Expression> {
         return retVal.lower(BigMath.ONE);
     }
 
-    Expression doSet(final IntIndex key, final BigDecimal value) {
+    final Expression doSet(final IntIndex key, final BigDecimal value) {
 
         if (value.signum() != 0) {
             myLinear.put(key, value);
@@ -1235,7 +1216,7 @@ public final class Expression extends ModelEntity<Expression> {
         return this;
     }
 
-    Expression doSet(final IntRowColumn key, final BigDecimal value) {
+    final Expression doSet(final IntRowColumn key, final BigDecimal value) {
 
         if (value.signum() != 0) {
             myQuadratic.put(key, value);
@@ -1248,7 +1229,7 @@ public final class Expression extends ModelEntity<Expression> {
         return this;
     }
 
-    Set<Variable> getBinaryVariables(final Set<IntIndex> subset) {
+    final Set<Variable> getBinaryVariables(final Set<IntIndex> subset) {
 
         HashSet<Variable> retVal = new HashSet<>();
 
@@ -1264,39 +1245,39 @@ public final class Expression extends ModelEntity<Expression> {
         return retVal;
     }
 
-    Map<IntIndex, BigDecimal> getLinear() {
+    final Map<IntIndex, BigDecimal> getLinear() {
         return myLinear;
     }
 
-    ExpressionsBasedModel getModel() {
+    final ExpressionsBasedModel getModel() {
         return myModel;
     }
 
-    Map<IntRowColumn, BigDecimal> getQuadratic() {
+    final Map<IntRowColumn, BigDecimal> getQuadratic() {
         return myQuadratic;
     }
 
-    boolean includes(final Variable variable) {
+    final boolean includes(final Variable variable) {
         IntIndex tmpVarInd = this.toIntIndex(variable);
         return myLinear.containsKey(tmpVarInd)
                 || myQuadratic.size() > 0 && myQuadratic.keySet().stream().anyMatch(k -> (k.row == tmpVarInd.index || k.column == tmpVarInd.index));
     }
 
-    boolean isConstantSet() {
+    final boolean isConstantSet() {
         return myConstant != null && myConstant.signum() != 0;
     }
 
     @Override
-    boolean isInfeasible() {
+    final boolean isInfeasible() {
         return myInfeasible || super.isInfeasible();
     }
 
     /**
      * @param subset The indices of a variable subset
-     * @return true if none of the variables in the subset can make a positve contribution to the expression
+     * @return true if none of the variables in the subset can make a positive contribution to the expression
      *         value
      */
-    boolean isNegativeOn(final Set<IntIndex> subset) {
+    final boolean isNegativeOn(final Set<IntIndex> subset) {
 
         if (this.isAnyQuadraticFactorNonZero()) {
 
@@ -1325,7 +1306,7 @@ public final class Expression extends ModelEntity<Expression> {
      * @return true if none of the variables in the subset can make a negative contribution to the expression
      *         value
      */
-    boolean isPositiveOn(final Set<IntIndex> subset) {
+    final boolean isPositiveOn(final Set<IntIndex> subset) {
 
         if (this.isAnyQuadraticFactorNonZero()) {
 
@@ -1349,36 +1330,36 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
-    boolean isRedundant() {
+    final boolean isRedundant() {
         return myRedundant;
     }
 
-    Variable resolve(final Structure1D.IntIndex index) {
+    final Variable resolve(final Structure1D.IntIndex index) {
         return myModel.getVariable(index);
     }
 
-    void setConstant(final Comparable<?> value) {
+    final void setConstant(final Comparable<?> value) {
         myConstant = ModelEntity.toBigDecimal(value);
     }
 
-    void setConstant(final double value) {
+    final void setConstant(final double value) {
         myConstant = BigDecimal.valueOf(value);
     }
 
-    void setConstant(final long value) {
+    final void setConstant(final long value) {
         myConstant = BigDecimal.valueOf(value);
     }
 
-    void setInfeasible() {
+    final void setInfeasible() {
         myInfeasible = true;
         myModel.setInfeasible();
     }
 
-    void setInteger() {
+    final void setInteger() {
         myInteger = Boolean.TRUE;
     }
 
-    void setRedundant() {
+    final void setRedundant() {
         myRedundant = true;
     }
 
