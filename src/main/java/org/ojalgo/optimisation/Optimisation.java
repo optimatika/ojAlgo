@@ -23,9 +23,13 @@ package org.ojalgo.optimisation;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.ArrayR064;
@@ -134,6 +138,133 @@ public interface Optimisation {
          */
         public boolean isUpper() {
             return this == UPPER || this == RANGE || this == EQUALITY;
+        }
+
+    }
+
+    /**
+     * Holds configuration for {@link ExpressionsBasedModel} instances: solver integrations, presolvers,
+     * variable/expression factories, and 3rd party configurators.
+     * <p>
+     * The default instance {@link Optimisation#ENVIRONMENT} is used when constructing models directly. To
+     * isolate configuration for different sets of models, create separate environments via
+     * {@link Optimisation#newEnvironment()} and use {@link #newModel()} as the model factory.
+     *
+     * @see #newModel()
+     * @see #newModel(Optimisation.Options)
+     */
+    public final class Environment {
+
+        private final Map<Class<?>, Object> myConfigurators = new ConcurrentHashMap<>();
+        private Expression.Factory<?> myExpressionFactory = Expression::new;
+        private final List<ExpressionsBasedModel.Integration<?>> myIntegrations = new ArrayList<>();
+        private final TreeSet<ExpressionsBasedModel.Presolver> myPresolvers = new TreeSet<>();
+        private Variable.Factory<?> myVariableFactory = Variable::new;
+
+        Environment() {
+            super();
+        }
+
+        public boolean addIntegration(final ExpressionsBasedModel.Integration<?> integration) {
+            return myIntegrations.add(integration);
+        }
+
+        public boolean addPresolver(final ExpressionsBasedModel.Presolver presolver) {
+            return myPresolvers.add(presolver);
+        }
+
+        public void clearIntegrations() {
+            myIntegrations.clear();
+        }
+
+        public void clearPresolvers() {
+            myPresolvers.clear();
+        }
+
+        public <T> Optional<T> getConfigurator(final Class<T> type) {
+            ProgrammingError.throwIfNull(type);
+            if (myConfigurators.isEmpty()) {
+                return Optional.empty();
+            }
+            Object exact = myConfigurators.get(type);
+            if (exact != null && type.isInstance(exact)) {
+                return Optional.of(type.cast(exact));
+            }
+            for (Object configurator : myConfigurators.values()) {
+                if (type.isInstance(configurator)) {
+                    return Optional.of(type.cast(configurator));
+                }
+            }
+            return Optional.empty();
+        }
+
+        /**
+         * Creates a new model with configurations and options from this environment.
+         */
+        public ExpressionsBasedModel newModel() {
+            return new ExpressionsBasedModel(this, new Optimisation.Options());
+        }
+
+        /**
+         * Same as {@link #newModel()} but with the given options instead of the options from this
+         * environment.
+         */
+        public ExpressionsBasedModel newModel(final Optimisation.Options optimisationOptions) {
+            return new ExpressionsBasedModel(this, optimisationOptions);
+        }
+
+        public boolean removeIntegration(final ExpressionsBasedModel.Integration<?> integration) {
+            return myIntegrations.remove(integration);
+        }
+
+        public boolean removePresolver(final ExpressionsBasedModel.Presolver presolver) {
+            return myPresolvers.remove(presolver);
+        }
+
+        /**
+         * A configurator for 3rd party solvers. Each such solver may define its own configurator type.
+         */
+        public void setConfigurator(final Object configurator) {
+            ProgrammingError.throwIfNull(configurator);
+            myConfigurators.put(configurator.getClass(), configurator);
+        }
+
+        public void setExpressionFactory(final Expression.Factory<?> expressionFactory) {
+            myExpressionFactory = expressionFactory;
+        }
+
+        public void setVariableFactory(final Variable.Factory<?> variableFactory) {
+            myVariableFactory = variableFactory;
+        }
+
+        int countIntegrations() {
+            return myIntegrations.size();
+        }
+
+        int countPresolvers() {
+            return myPresolvers.size();
+        }
+
+        <T> T getConfigurator(final T defaultValue) {
+            ProgrammingError.throwIfNull(defaultValue);
+            Class<T> type = (Class<T>) defaultValue.getClass();
+            return this.getConfigurator(type).orElse(defaultValue);
+        }
+
+        Expression.Factory<?> getExpressionFactory() {
+            return myExpressionFactory;
+        }
+
+        Iterable<ExpressionsBasedModel.Integration<?>> getIntegrations() {
+            return myIntegrations;
+        }
+
+        Iterable<ExpressionsBasedModel.Presolver> getPresolvers() {
+            return myPresolvers;
+        }
+
+        Variable.Factory<?> getVariableFactory() {
+            return myVariableFactory;
         }
 
     }
@@ -326,7 +457,6 @@ public interface Optimisation {
          */
         public boolean validate = false;
 
-        private Object myConfigurator = null;
         private ConvexSolver.Configuration myConvexConfiguration = new ConvexSolver.Configuration();
         private IntegerStrategy myIntegerStrategy = IntegerStrategy.DEFAULT;
         private LinearSolver.Configuration myLinearConfiguration = new LinearSolver.Configuration();
@@ -369,13 +499,13 @@ public interface Optimisation {
             return this;
         }
 
+        /**
+         * @deprecated Use {@link ExpressionsBasedModel#getConfigurator(Object)} or
+         *             {@link Environment#getConfigurator(Class)} instead.
+         */
+        @Deprecated
         public <T> Optional<T> getConfigurator(final Class<T> type) {
-            ProgrammingError.throwIfNull(type);
-            if (myConfigurator != null && type.isInstance(myConfigurator)) {
-                return Optional.of((T) myConfigurator);
-            } else {
-                return Optional.empty();
-            }
+            return Optimisation.ENVIRONMENT.getConfigurator(type);
         }
 
         public IntegerStrategy integer() {
@@ -417,11 +547,14 @@ public interface Optimisation {
         }
 
         /**
-         * A configurator for 3:d party solvers. Each such solver may define its own configurator type.
+         * A configurator for 3rd party solvers. Each such solver may define its own configurator type.
+         *
+         * @deprecated Use {@link ExpressionsBasedModel#setConfigurator(Object)} or
+         *             {@link Environment#setConfigurator(Object)} instead.
          */
+        @Deprecated
         public void setConfigurator(final Object configurator) {
-            ProgrammingError.throwIfNull(configurator);
-            myConfigurator = configurator;
+            Optimisation.ENVIRONMENT.setConfigurator(configurator);
         }
 
         /**
@@ -863,6 +996,20 @@ public interface Optimisation {
             return Math.abs(myValue);
         }
 
+    }
+
+    /**
+     * The default optimisation environment.
+     */
+    Environment ENVIRONMENT = new Environment();
+
+    /**
+     * Create a new optimisation environment. You can use the default environment {@link #ENVIRONMENT} or
+     * create separate environments if you need different configurations for different (sets of) models and
+     * solvers.
+     */
+    static Environment newEnvironment() {
+        return new Environment();
     }
 
 }

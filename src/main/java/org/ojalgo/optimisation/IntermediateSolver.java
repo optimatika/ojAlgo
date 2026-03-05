@@ -80,7 +80,7 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
     @Override
     public Optimisation.Result solve(final Optimisation.Result candidate) {
 
-        if (mySolver == null && ExpressionsBasedModel.PRESOLVERS.size() > 0) {
+        if (mySolver == null && myModel.getEnvironment().countPresolvers() > 0) {
             myModel.presolve();
         }
 

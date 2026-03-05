@@ -36,45 +36,33 @@ import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * Variable represents a decision variable in an optimization model.
- * <p>
- * Each variable has a unique index in the model and can have:
- * </p>
- * <ul>
- * <li>Lower and upper bounds (constraints)</li>
- * <li>A contribution weight in the objective function</li>
- * <li>An integer or continuous domain</li>
- * <li>A current value</li>
- * </ul>
- * <p>
- * Variables can be configured as:
- * </p>
- * <ul>
- * <li>Binary (0-1 integer variables)</li>
- * <li>Integer (whole number values only)</li>
- * <li>Continuous (any value within bounds)</li>
- * <li>Fixed (equal lower and upper bounds)</li>
- * <li>Unbounded (no effective limits)</li>
- * </ul>
- * <p>
- * As a subclass of ModelEntity, a Variable can function both as a constraint (through lower/upper bounds) and
- * as an objective function component (through its contribution weight).
- * </p>
- * <p>
- * Variables are typically created and managed through {@link ExpressionsBasedModel}, which assigns their
- * indices and incorporates them into the optimization problem.
- * </p>
+ * A decision variable in an {@link ExpressionsBasedModel}. Each variable has a unique index and can be
+ * continuous, integer, or binary. As a {@link ModelEntity}, it can define constraints (via lower/upper
+ * bounds) and contribute to the objective function (via a contribution weight).
  *
  * @author apete
  */
-public final class Variable extends ModelEntity<Variable> {
+public class Variable extends ModelEntity<Variable> {
+
+    /**
+     * Creates {@link Variable} instances. A custom factory can be set on an
+     * {@link Optimisation.Environment} to control variable creation for all models produced by that
+     * environment.
+     *
+     * @see Optimisation.Environment#setVariableFactory(Factory)
+     */
+    public interface Factory<V extends Variable> {
+
+        V make(String name, int index);
+
+    }
 
     private final IntIndex myIndex;
     private boolean myInteger = false;
     private transient boolean myUnbounded = false;
     private BigDecimal myValue = null;
 
-    Variable(final String name, final int index) {
+    protected Variable(final String name, final int index) {
 
         super(name);
 
@@ -91,18 +79,14 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     @Override
-    public void addTo(final Expression target, final BigDecimal scale) {
+    public final void addTo(final Expression target, final BigDecimal scale) {
         target.add(this, scale);
     }
 
     /**
-     * See {@link #isBinary()}.
-     *
-     * @see #getUpperLimit()
-     * @see #isInteger()
-     * @see #isBinary()
+     * Constrain this variable to be binary: integer with lower bound 0 and upper bound 1.
      */
-    public Variable binary() {
+    public final Variable binary() {
         return this.lower(ZERO).upper(ONE).integer(true);
     }
 
@@ -126,11 +110,11 @@ public final class Variable extends ModelEntity<Variable> {
         return Objects.equals(myIndex, other.myIndex) && myInteger == other.myInteger && Objects.equals(myValue, other.myValue);
     }
 
-    public IntIndex getIndex() {
+    public final IntIndex getIndex() {
         return myIndex;
     }
 
-    public BigDecimal getLowerSlack() {
+    public final BigDecimal getLowerSlack() {
 
         BigDecimal retVal = null;
 
@@ -147,13 +131,13 @@ public final class Variable extends ModelEntity<Variable> {
         }
 
         if (retVal != null && this.isInteger()) {
-            retVal = retVal.setScale(0, BigDecimal.ROUND_CEILING);
+            retVal = retVal.setScale(0, RoundingMode.CEILING);
         }
 
         return retVal;
     }
 
-    public BigDecimal getUpperSlack() {
+    public final BigDecimal getUpperSlack() {
 
         BigDecimal retVal = null;
 
@@ -170,13 +154,13 @@ public final class Variable extends ModelEntity<Variable> {
         }
 
         if (retVal != null && this.isInteger()) {
-            retVal = retVal.setScale(0, BigDecimal.ROUND_FLOOR);
+            retVal = retVal.setScale(0, RoundingMode.FLOOR);
         }
 
         return retVal;
     }
 
-    public BigDecimal getValue() {
+    public final BigDecimal getValue() {
         if (myValue == null && this.isEqualityConstraint()) {
             myValue = this.getLowerLimit();
         }
@@ -185,19 +169,19 @@ public final class Variable extends ModelEntity<Variable> {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
+        int prime = 31;
         int result = super.hashCode();
         return prime * result + Objects.hash(myIndex, myInteger, myValue);
     }
 
-    public Variable integer() {
+    public final Variable integer() {
         return this.integer(true);
     }
 
     /**
      * See {@link #isInteger()}.
      */
-    public Variable integer(final boolean integer) {
+    public final Variable integer(final boolean integer) {
         this.setInteger(integer);
         return this;
     }
@@ -205,7 +189,7 @@ public final class Variable extends ModelEntity<Variable> {
     /**
      * Variable can only be 0 or 1.
      */
-    public boolean isBinary() {
+    public final boolean isBinary() {
         return myInteger && this.isClosedRange(ZERO, ONE);
     }
 
@@ -213,36 +197,36 @@ public final class Variable extends ModelEntity<Variable> {
      * @return true if this is an integer variable, otherwise false
      */
     @Override
-    public boolean isInteger() {
+    public final boolean isInteger() {
         return myInteger;
     }
 
     /**
-     * The range includes something < 0.0
+     * @return true if the feasible range includes negative values
      */
-    public boolean isNegative() {
+    public final boolean isNegative() {
         return !this.isLowerLimitSet() || this.getLowerLimit().signum() < 0;
     }
 
     /**
-     * The range includes something > 0.0
+     * @return true if the feasible range includes positive values
      */
-    public boolean isPositive() {
+    public final boolean isPositive() {
         return !this.isUpperLimitSet() || this.getUpperLimit().signum() > 0;
     }
 
-    public boolean isValueSet() {
+    public final boolean isValueSet() {
         return myValue != null;
     }
 
     @Override
-    public Variable lower(final Comparable<?> lower) {
+    public final Variable lower(final Comparable<?> lower) {
         Variable retVal = super.lower(lower);
         this.assertFixedValue();
         return retVal;
     }
 
-    public BigDecimal quantifyContribution() {
+    public final BigDecimal quantifyContribution() {
 
         BigDecimal retVal = ZERO;
 
@@ -254,15 +238,15 @@ public final class Variable extends ModelEntity<Variable> {
         return retVal;
     }
 
-    public Variable relax() {
+    public final Variable relax() {
         return this.integer(false);
     }
 
-    public void setInteger(final boolean integer) {
+    public final void setInteger(final boolean integer) {
         myInteger = integer;
     }
 
-    public void setValue(final Comparable<?> value) {
+    public final void setValue(final Comparable<?> value) {
         BigDecimal tmpValue = null;
         if (value != null) {
             tmpValue = TypeUtils.toBigDecimal(value);
@@ -277,13 +261,13 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     @Override
-    public Variable upper(final Comparable<?> upper) {
+    public final Variable upper(final Comparable<?> upper) {
         Variable retVal = super.upper(upper);
         this.assertFixedValue();
         return retVal;
     }
 
-    public Variable value(final BigDecimal value) {
+    public final Variable value(final BigDecimal value) {
         this.setValue(value);
         return this;
     }
@@ -295,7 +279,7 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     @Override
-    protected void appendMiddlePart(final StringBuilder builder, final NumberContext display) {
+    protected final void appendMiddlePart(final StringBuilder builder, final NumberContext display) {
 
         builder.append(this.getName());
 
@@ -320,19 +304,19 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     @Override
-    protected boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger appender) {
+    protected final boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger appender) {
         return this.validate(value, context, appender, false);
     }
 
     /**
      * Internal copy that includes the index
      */
-    Variable copy() {
+    final Variable copy() {
         return new Variable(this);
     }
 
     @Override
-    int deriveAdjustmentExponent() {
+    final int deriveAdjustmentExponent() {
 
         if (!this.isConstraint() || this.isInteger()) {
             return 0;
@@ -369,7 +353,7 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     @Override
-    void doIntegerRounding() {
+    final void doIntegerRounding() {
         if (myInteger) {
             BigDecimal limit;
             if ((limit = this.getUpperLimit()) != null && limit.scale() > 0) {
@@ -381,23 +365,23 @@ public final class Variable extends ModelEntity<Variable> {
         }
     }
 
-    boolean isFixed() {
+    final boolean isFixed() {
         return this.isEqualityConstraint();
     }
 
-    boolean isUnbounded() {
+    final boolean isUnbounded() {
         return myUnbounded;
     }
 
-    void setFixed(final BigDecimal value) {
+    final void setFixed(final BigDecimal value) {
         this.level(value).setValue(value);
     }
 
-    void setUnbounded(final boolean uncorrelated) {
+    final void setUnbounded(final boolean uncorrelated) {
         myUnbounded = uncorrelated;
     }
 
-    boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger appender, final boolean relaxed) {
+    final boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger appender, final boolean relaxed) {
 
         boolean retVal = super.validate(value, context, appender);
 

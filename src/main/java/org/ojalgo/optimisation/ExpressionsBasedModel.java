@@ -57,54 +57,28 @@ import org.ojalgo.type.keyvalue.EntryPair;
 import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 
 /**
+ * Construct optimisation problems by combining {@link Variable}s and {@link Expression}s. Each model entity
+ * becomes a constraint when lower/upper limits are set, and contributes to the objective function when a
+ * weight is set.
  * <p>
- * Lets you construct optimisation problems by combining (mathematical) expressions in terms of variables.
- * Each expression or variable can be a constraint and/or contribute to the objective function. An expression
- * or variable is turned into a constraint by setting a lower and/or upper limit. Use
- * {@linkplain Expression#lower(Comparable)}, {@linkplain Expression#upper(Comparable)} or
- * {@linkplain Expression#level(Comparable)}. An expression or variable is made part of (contributing to) the
- * objective function by setting a contribution weight. Use {@linkplain Expression#weight(Comparable)}.
- * <p>
- * You may think of variables as simple (the simplest possible) expressions, and of expressions as weighted
- * combinations of variables. They are both model entities and it is as such they can be turned into
- * constraints and set to contribute to the objective function. Alternatively you may choose to disregard the
- * fact that variables are model entities and simply treat them as index values. In this case everything
- * (constraints and objective) needs to be defined using expressions.
- * <p>
- * Basic instructions:
+ * Typical workflow:
  * <ol>
- * <li>Create a model (new ExpressionsBasedModel()).
- * <li>Define variables using model.addVariable() and set contribution weights and lower/upper limits as
- * needed.
- * <li>Add expressions to the model using model.addExpression() and set contribution weights and lower/upper
- * limits as needed.
- * <li>Solve your problem using model.minimise() or model.maximise()
+ * <li>Create a model
+ * <li>Add variables via {@link #addVariable(String)} with bounds and/or weights
+ * <li>Add expressions via {@link #addExpression(String)} with coefficients, bounds, and/or weights
+ * <li>Solve with {@link #minimise()} or {@link #maximise()}
  * </ol>
  * <p>
- * When using this class you do not need to worry about which solver will actually be used. The docs of the
- * various solvers describe requirements on input formats and similar. This is handled for you and should
- * absolutely NOT be considered here! Compared to using the various solvers directly this class actually does
- * something for you:
- * <ol>
- * <li>You can model your problems without worrying about specific solver requirements.</li>
- * <li>It knows which solver to use.</li>
- * <li>It knows how to use that solver.</li>
- * <li>It has a presolver that tries to simplify the problem before invoking a solver (sometimes it turns out
- * there is no need to invoke a solver at all).</li>
- * <li>When/if needed it scales problem parameters, before creating solver specific data structures, to
- * minimise numerical problems in the solvers.</li>
- * <li>It's the only way to access the integer solver.</li>
- * </ol>
+ * The model automatically selects and configures a suitable solver, applies presolve simplifications, and
+ * scales parameters for numerical stability.
  * <p>
- * Different solvers can be used, and ojAlgo comes with a collection built in. The default built-in solvers
- * can handle anything you can model with a couple of restrictions:
- * </p>
- * <ul>
- * <li>No quadratic constraints (The plan is that future versions should not have this limitation.)</li>
- * <li>If you use quadratic expressions make sure they're convex. This is most likely a requirement even with
- * 3:d party solvers.</li>
- * </ul>
+ * Each model is associated with an {@link Optimisation.Environment} that holds solver integrations,
+ * presolvers, and variable/expression factories. The no-arg constructor uses the default
+ * {@link Optimisation#ENVIRONMENT}. To isolate configuration (e.g. different solver integrations for
+ * different model types) create a separate environment and use {@link Optimisation.Environment#newModel()} as
+ * the factory.
  *
+ * @see Optimisation.Environment
  * @author apete
  */
 public final class ExpressionsBasedModel implements Optimisation.Model {
@@ -311,8 +285,10 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
-     * {@link Optimisation.Solver}:s that should be usabale from {@link ExpressionsBasedModel} needs to
-     * implement a subclass of this.
+     * {@link Optimisation.Solver}s usable from {@link ExpressionsBasedModel} need to implement a subclass of
+     * this. Integrations are registered on an {@link Optimisation.Environment} (or the default
+     * {@link Optimisation#ENVIRONMENT} via
+     * {@link ExpressionsBasedModel#addIntegration(Optimisation.Integration)}).
      *
      * @author apete
      */
@@ -741,43 +717,60 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         }
     }
 
-    private static final List<ExpressionsBasedModel.Integration<?>> INTEGRATIONS = new ArrayList<>();
-
     private static final String NEW_LINE = "\n";
     private static final String OBJ_FUNC_AS_CONSTR_KEY = UUID.randomUUID().toString();
     private static final String OBJECTIVE = "Generated/Aggregated Objective";
     private static final String START_END = "############################################\n";
-    static final TreeSet<Presolver> PRESOLVERS = new TreeSet<>();
 
     static {
         ExpressionsBasedModel.resetPresolvers();
     }
 
     /**
-     * Add an integration for a solver that will be used rather than the built-in solvers
+     * Register a solver integration with the default {@link Optimisation#ENVIRONMENT}. Models created with
+     * the no-arg constructor will use this integration. For isolated configuration, register integrations on
+     * a separate {@link Optimisation.Environment} instead.
+     *
+     * @see Optimisation.Environment#addIntegration(Integration)
      */
     public static boolean addIntegration(final Optimisation.Integration<ExpressionsBasedModel, ?> integration) {
         if (integration instanceof ExpressionsBasedModel.Integration<?>) {
-            return INTEGRATIONS.add((ExpressionsBasedModel.Integration<?>) integration);
+            return Optimisation.ENVIRONMENT.addIntegration((ExpressionsBasedModel.Integration<?>) integration);
         } else {
-            return INTEGRATIONS.add(new IntegrationWrapper(integration));
+            return Optimisation.ENVIRONMENT.addIntegration(new IntegrationWrapper(integration));
         }
     }
 
+    /**
+     * Delegates to {@link Optimisation#ENVIRONMENT}. For isolated configuration use a separate
+     * {@link Optimisation.Environment}.
+     *
+     * @see Optimisation.Environment#addPresolver(Presolver)
+     */
     public static boolean addPresolver(final Presolver presolver) {
-        return PRESOLVERS.add(presolver);
-    }
-
-    public static void clearIntegrations() {
-        INTEGRATIONS.clear();
-    }
-
-    public static void clearPresolvers() {
-        PRESOLVERS.clear();
+        return Optimisation.ENVIRONMENT.addPresolver(presolver);
     }
 
     /**
-     * Don't you worry about this! It's for internal use.
+     * Delegates to {@link Optimisation#ENVIRONMENT}.
+     *
+     * @see Optimisation.Environment#clearIntegrations()
+     */
+    public static void clearIntegrations() {
+        Optimisation.ENVIRONMENT.clearIntegrations();
+    }
+
+    /**
+     * Delegates to {@link Optimisation#ENVIRONMENT}.
+     *
+     * @see Optimisation.Environment#clearPresolvers()
+     */
+    public static void clearPresolvers() {
+        Optimisation.ENVIRONMENT.clearPresolvers();
+    }
+
+    /**
+     * Internal heuristic for solver selection. Not intended for external use.
      */
     public static boolean isNative(final ExpressionsBasedModel model) {
 
@@ -825,22 +818,45 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         }
     }
 
+    /**
+     * Delegates to {@link Optimisation#ENVIRONMENT}.
+     *
+     * @see Optimisation.Environment#removeIntegration(Integration)
+     */
     public static boolean removeIntegration(final Integration<?> integration) {
-        return INTEGRATIONS.remove(integration);
+        return Optimisation.ENVIRONMENT.removeIntegration(integration);
     }
 
+    /**
+     * Delegates to {@link Optimisation#ENVIRONMENT}.
+     *
+     * @see Optimisation.Environment#removePresolver(Presolver)
+     */
     public static boolean removePresolver(final Presolver presolver) {
-        return PRESOLVERS.remove(presolver);
+        return Optimisation.ENVIRONMENT.removePresolver(presolver);
     }
 
+    /**
+     * Resets the default environment's presolvers to the built-in set.
+     */
     public static void resetPresolvers() {
         ExpressionsBasedModel.addPresolver(Presolvers.ZERO_ONE_TWO);
         ExpressionsBasedModel.addPresolver(Presolvers.INTEGER);
         ExpressionsBasedModel.addPresolver(Presolvers.REDUNDANT_CONSTRAINT);
     }
 
+    /**
+     * Delegates to {@link Optimisation#ENVIRONMENT}.
+     *
+     * @see Optimisation.Environment#setConfigurator(Object)
+     */
+    public static void setConfigurator(final Object configurator) {
+        Optimisation.ENVIRONMENT.setConfigurator(configurator);
+    }
+
     public final Optimisation.Options options;
 
+    private final Optimisation.Environment myEnvironment;
     private final Map<String, Expression> myExpressions = new HashMap<>();
     private final Set<IntIndex> myFixedVariables = new HashSet<>();
     private transient ExpressionsBasedModel.Integration<?> myForcedIntegration = null;
@@ -852,7 +868,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     private final Set<IntIndex> myReferences;
     private boolean myRelaxed;
     /**
-     * A shallow copy may share complex/large data structures with other models - typically the Map:s holding
+     * A shallow copy may share complex/large data structures with other models - typically the Maps holding
      * Expression parameters.
      */
     private final boolean myShallowCopy;
@@ -863,26 +879,28 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     private final ArrayList<Variable> myVariables = new ArrayList<>();
     private final VariablesCategorisation myVariablesCategorisation = new VariablesCategorisation();
 
+    /**
+     * Creates a model using the default {@link Optimisation#ENVIRONMENT} and default
+     * {@link Optimisation.Options}. For isolated configuration use
+     * {@link Optimisation.Environment#newModel()}.
+     */
     public ExpressionsBasedModel() {
-        this(new Optimisation.Options());
+        this(Optimisation.ENVIRONMENT, new Optimisation.Options());
     }
 
+    /**
+     * Creates a model using the default {@link Optimisation#ENVIRONMENT} with the supplied options. For
+     * isolated configuration use {@link Optimisation.Environment#newModel(Optimisation.Options)}.
+     */
     public ExpressionsBasedModel(final Optimisation.Options optimisationOptions) {
-
-        super();
-
-        options = optimisationOptions;
-
-        myReferences = new HashSet<>();
-
-        myShallowCopy = false;
-        myRelaxed = false;
+        this(Optimisation.ENVIRONMENT, optimisationOptions);
     }
 
     ExpressionsBasedModel(final ExpressionsBasedModel modelToCopy, final boolean shallow, final boolean prune) {
 
         super();
 
+        myEnvironment = modelToCopy.getEnvironment();
         options = modelToCopy.options;
 
         this.setOptimisationSense(modelToCopy.getOptimisationSense());
@@ -921,6 +939,20 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         }
     }
 
+    ExpressionsBasedModel(final Optimisation.Environment optimisationEnvironment, final Optimisation.Options optimisationOptions) {
+
+        super();
+
+        myEnvironment = optimisationEnvironment;
+
+        options = optimisationOptions;
+
+        myReferences = new HashSet<>();
+
+        myShallowCopy = false;
+        myRelaxed = false;
+    }
+
     public Expression addExpression() {
         return this.newExpression("EXPR" + myExpressions.size());
     }
@@ -944,7 +976,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             throw new ProgrammingError("The linked to expression needs to be a constraint!");
         }
 
-        final IntIndex[] sequence = new IntIndex[orderedSet.size()];
+        IntIndex[] sequence = new IntIndex[orderedSet.size()];
         int index = 0;
         for (final Variable variable : orderedSet) {
             if (variable == null || variable.getIndex() == null) {
@@ -959,18 +991,18 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     /**
      * Calling this method will create 2 things:
      * <ol>
-     * <li>A simple expression meassuring the sum of the (binary) variable values (the number of binary
+     * <li>A simple expression measuring the sum of the (binary) variable values (the number of binary
      * variables that are "ON"). The upper, and optionally lower, limits are set as defined by the
-     * <code>max</code> and <code>min</code> parameter values.</li>
-     * <li>A custom presolver (specific to this SOS) to be used by the MIP solver. This presolver help to keep
-     * track of which combinations of variable values or feasible, and is the only thing that enforces the
-     * order.</li>
+     * <code>max</code> and <code>min</code> parameter values.
+     * <li>A custom presolver (specific to this SOS) to be used by the MIP solver. This presolver helps to
+     * keep track of which combinations of variable values are feasible, and is the only thing that enforces
+     * the order.
      * </ol>
      *
      * @param orderedSet The set members in correct order. Each of these variables must be binary.
-     * @param min        The minimum number of binary varibales in the set that must be "ON" (Set this to 0 if
+     * @param min        The minimum number of binary variables in the set that must be "ON" (Set this to 0 if
      *                   there is no minimum.)
-     * @param max        The SOS type or maximum number of binary varibales in the set that may be "ON"
+     * @param max        The SOS type or maximum number of binary variables in the set that may be "ON"
      */
     public void addSpecialOrderedSet(final Collection<Variable> orderedSet, final int min, final int max) {
 
@@ -1020,7 +1052,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
-     * Returns a prefiltered stream of expressions that are constraints and have not been markes as redundant.
+     * Returns a prefiltered stream of expressions that are constraints and have not been marked as redundant.
      */
     public Stream<Expression> constraints() {
         return myExpressions.values().stream().filter(c -> c.isConstraint() && !c.isRedundant());
@@ -1113,6 +1145,14 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         myVariablesCategorisation.reset();
     }
 
+    /**
+     * Returns a configurator that is of the same type as {@code defaultValue} or a subclass thereof. If no
+     * such configurator exists, returns {@code defaultValue}.
+     */
+    public <T> T getConfigurator(final T defaultValue) {
+        return myEnvironment.getConfigurator(defaultValue);
+    }
+
     public Expression getExpression(final String name) {
         return myExpressions.get(name);
     }
@@ -1147,8 +1187,8 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
-     * @return A list of the variables that are not fixed at a specific value and whos range include negative
-     *         values
+     * @return A list of the variables that are not fixed at a specific value and whose range includes
+     *         negative values
      */
     public List<Variable> getNegativeVariables() {
         return Collections.unmodifiableList(myVariablesCategorisation.getNegativeVariables(myVariables));
@@ -1167,8 +1207,8 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
-     * Returns a list of the variables that are not fixed at a specific value and whos range include positive
-     * values and/or zero
+     * @return A list of the variables that are not fixed at a specific value and whose range includes
+     *         positive values and/or zero
      */
     public List<Variable> getPositiveVariables() {
         return Collections.unmodifiableList(myVariablesCategorisation.getPositiveVariables(myVariables));
@@ -1403,8 +1443,12 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     public Expression newExpression(final String name) {
+        return this.newExpression(name, myEnvironment.getExpressionFactory());
+    }
 
-        final Expression retVal = new Expression(name, this);
+    public <E extends Expression> E newExpression(final String name, final Expression.Factory<E> factory) {
+
+        E retVal = factory.make(name, this);
 
         myExpressions.put(name, retVal);
 
@@ -1412,12 +1456,16 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     public Variable newVariable(final String name) {
+        return this.newVariable(name, myEnvironment.getVariableFactory());
+    }
+
+    public <V extends Variable> V newVariable(final String name, final Variable.Factory<V> factory) {
 
         if (myShallowCopy) {
             throw new IllegalStateException("This model is a work copy - its set of variables cannot be modified!");
         }
 
-        Variable retVal = new Variable(name, myVariables.size());
+        V retVal = factory.make(name, myVariables.size());
         myVariables.add(retVal);
         return retVal;
     }
@@ -1484,18 +1532,15 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      * <p>
      * The general recommendation is to NOT call this method directly. Instead you should use/call
      * {@link #maximise()} or {@link #minimise()}.
-     * </P>
      * <p>
      * The primary use case for this method is as a callback method for solvers that iteratively modifies the
      * model and solves at each iteration point.
-     * </P>
      * <p>
      * With direct usage of this method:
-     * </P>
      * <ul>
-     * <li>Maximisation/Minimisation is undefined (you don't know which it is)</li>
-     * <li>The solution is not written back to the model</li>
-     * <li>The solution is not validated by the model</li>
+     * <li>Maximisation/Minimisation is undefined (you don't know which it is)
+     * <li>The solution is not written back to the model
+     * <li>The solution is not validated by the model
      * </ul>
      */
     public <T extends IntermediateSolver> T prepare(final Function<ExpressionsBasedModel, T> factory) {
@@ -1596,8 +1641,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
-     * This methods validtes model construction only. All the other validate(...) method validates the
-     * solution (one way or another).
+     * Validates model construction only. The other validate(...) methods validate the solution.
      *
      * @see Optimisation.Model#validate()
      */
@@ -1711,7 +1755,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         this.setOptimisationSense(sense);
         myForcedIntegration = forcedIntegration;
 
-        if (!myShallowCopy && PRESOLVERS.size() > 0) {
+        if (!myShallowCopy && myEnvironment.countPresolvers() > 0) {
             this.scanEntities();
         }
 
@@ -1805,12 +1849,16 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         return myExpressions.values().stream();
     }
 
+    Optimisation.Environment getEnvironment() {
+        return myEnvironment;
+    }
+
     ExpressionsBasedModel.Integration<?> getIntegration() {
 
         ExpressionsBasedModel.Integration<?> retVal = myForcedIntegration;
 
         if (retVal == null) {
-            for (ExpressionsBasedModel.Integration<?> preferred : INTEGRATIONS) {
+            for (ExpressionsBasedModel.Integration<?> preferred : myEnvironment.getIntegrations()) {
                 if (preferred.isCapable(this)) {
                     retVal = preferred;
                     break;
@@ -1931,7 +1979,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
                     myTemporary.addAll(expr.getLinearKeySet());
                     myTemporary.removeAll(fixedVariables);
 
-                    for (Presolver presolver : PRESOLVERS) {
+                    for (Presolver presolver : myEnvironment.getPresolvers()) {
                         if (!needToRepeat) {
                             needToRepeat |= presolver.simplify(expr, myTemporary, compensatedLowerLimit, compensatedUpperLimit, options.feasibility);
                         }
