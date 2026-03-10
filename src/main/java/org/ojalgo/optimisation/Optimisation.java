@@ -230,10 +230,12 @@ public interface Optimisation {
         }
 
         public void setExpressionFactory(final Expression.Factory<?> expressionFactory) {
+            ProgrammingError.throwIfNull(expressionFactory);
             myExpressionFactory = expressionFactory;
         }
 
         public void setVariableFactory(final Variable.Factory<?> variableFactory) {
+            ProgrammingError.throwIfNull(variableFactory);
             myVariableFactory = variableFactory;
         }
 
