@@ -837,9 +837,11 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
-     * Resets the default environment's presolvers to the built-in set.
+     * Resets the default environment's presolvers to the built-in set, removing any previously registered
+     * presolvers.
      */
     public static void resetPresolvers() {
+        ExpressionsBasedModel.clearPresolvers();
         ExpressionsBasedModel.addPresolver(Presolvers.ZERO_ONE_TWO);
         ExpressionsBasedModel.addPresolver(Presolvers.INTEGER);
         ExpressionsBasedModel.addPresolver(Presolvers.REDUNDANT_CONSTRAINT);
