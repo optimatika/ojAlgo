@@ -721,11 +721,11 @@ public final class RationalNumber implements SelfDeclaringScalar<RationalNumber>
         }
     }
 
-    long getDenominator() {
+    public long getDenominator() {
         return myDenominator;
     }
 
-    long getNumerator() {
+    public long getNumerator() {
         return myNumerator;
     }
 
