@@ -36,6 +36,16 @@ import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Primitive1D;
 
+/**
+ * Revised simplex data structure. Instead of materialising the full tableau, this class stores the original
+ * constraint matrix and maintains the basis inverse in factored form through a {@link BasisRepresentation}.
+ * Tableau elements (pivot rows/columns, reduced costs, dual variables) are computed on demand by
+ * multiplying through the factored inverse.
+ * <p>
+ * This approach is more memory-efficient and often faster for larger or sparser problems than
+ * {@link DenseTableau}. It is the backing data structure for the {@link SimplexSolver} family
+ * ({@link PhasedSimplexSolver}, {@link DualSimplexSolver}, {@link PrimalSimplexSolver}).
+ */
 final class RevisedStore extends SimplexStore {
 
     private static BasisRepresentation newBasisRepresentation(final int nbConstraints) {

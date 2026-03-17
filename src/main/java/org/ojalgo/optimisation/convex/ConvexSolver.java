@@ -821,6 +821,14 @@ public abstract class ConvexSolver extends GenericSolver {
         return new Builder(nbVariables);
     }
 
+    /**
+     * Use {@link ModelIntegration#build(ExpressionsBasedModel)} directly instead, and then remember to also
+     * use {@link ModelIntegration#toModelState(Optimisation.Result, ExpressionsBasedModel)} and
+     * {@link ModelIntegration#toSolverState(Optimisation.Result, ExpressionsBasedModel)}.
+     *
+     * @deprecated v57 Use {@link #INTEGRATION} instead.
+     */
+    @Deprecated
     public static ConvexSolver newSolver(final ExpressionsBasedModel model) {
         return INTEGRATION.build(model);
     }

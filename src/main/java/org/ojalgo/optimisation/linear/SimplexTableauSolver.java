@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.ojalgo.array.Array1D;
@@ -54,15 +55,22 @@ import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * Classic simplex tableau solver:
+ * Classic 2-phase primal simplex operating on an explicit tableau ({@link SimplexTableau}).
+ * <p>
+ * Problem form requirements:
  * <ul>
- * <li>Primal algorithm
- * <li>2-phase
- * <li>All variables assumed >=0, and RHS required to be >=0
- * <li>Variable bounds other than >=0 handled like constraints
+ * <li>All variables are assumed non-negative (>= 0).
+ * <li>The RHS of every constraint must be non-negative after internal sign normalisation.
+ * <li>Variable bounds other than the default >= 0 are handled as additional constraints rather than natively;
+ * use the store-based {@link SimplexSolver} hierarchy when explicit finite lower/upper bounds are needed.
  * </ul>
- *
- * @author apete
+ * Phase 1 drives artificial variables to zero to obtain a basic feasible solution; phase 2 then optimises the
+ * original objective. The tableau may be dense ({@link DenseTableau}) or sparse ({@link SparseTableau}),
+ * selected automatically based on problem characteristics.
+ * <p>
+ * This is the older of the two simplex families in ojAlgo. It is selected by default when the
+ * {@link LinearSolver.Builder} has no modified variable bounds, or when
+ * {@link LinearSolver.Configuration#primal()} is explicitly requested.
  */
 final class SimplexTableauSolver extends LinearSolver {
 
@@ -738,6 +746,7 @@ final class SimplexTableauSolver extends LinearSolver {
             }
             myFixedVariables.put(index, value);
             myPoint.returnToPhase1();
+            this.invalidateCache();
         }
 
         return retVal;
@@ -758,6 +767,8 @@ final class SimplexTableauSolver extends LinearSolver {
 
     @Override
     public Result solve(final Result kickStarter) {
+
+        this.invalidateCache();
 
         if (this.isLogDebug() && this.isTableauPrintable()) {
             this.logDebugTableau("Initial Tableau");
@@ -791,6 +802,7 @@ final class SimplexTableauSolver extends LinearSolver {
         if (lower == upper) {
             return this.fixVariable(index, lower);
         } else {
+            this.invalidateCache();
             return false;
         }
     }
@@ -866,7 +878,9 @@ final class SimplexTableauSolver extends LinearSolver {
         double value = this.evaluateFunction(solution);
         Optimisation.State state = this.getState();
 
-        Result result = new Optimisation.Result(state, value, solution);
+        Supplier<Access1D<?>> reducedGradient = () -> ArrayR064.wrap(this.extractReducedGradients());
+
+        Result result = new Optimisation.Result(state, value, solution).withReducedGradient(reducedGradient);
 
         if (myTableau.structure.isEntityMap()) {
             return result.multipliers(myTableau.structure.constraints, this.extractMultipliers());
@@ -881,16 +895,13 @@ final class SimplexTableauSolver extends LinearSolver {
 
     protected Access1D<?> extractMultipliers() {
 
-        Access1D<Double> duals = myTableau.sliceDualVariables();
-
-        LinearStructure structure = myTableau.structure;
+        int nbConstraints = myTableau.structure.countConstraints();
 
         return new Access1D<Double>() {
 
             @Override
             public double doubleValue(final int index) {
-                double dualValue = duals.doubleValue(index);
-                return structure.isConstraintNegated(index) ? -dualValue : dualValue;
+                return SimplexTableauSolver.this.getDualMultiplier(index);
             }
 
             @Override
@@ -900,7 +911,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
             @Override
             public int size() {
-                return structure.countConstraints();
+                return nbConstraints;
             }
 
             @Override
@@ -966,6 +977,7 @@ final class SimplexTableauSolver extends LinearSolver {
             // BasicLogger.debug("Phase1 iters: {}", this.countIterations());
 
             myPoint.switchToPhase2();
+            myTableau.removePhase1();
             this.setState(Optimisation.State.FEASIBLE);
         }
 
@@ -1018,6 +1030,25 @@ final class SimplexTableauSolver extends LinearSolver {
         this.setState(State.VALID);
 
         return retVal;
+    }
+
+    @Override
+    double[] extractDualMultipliers() {
+        double[] duals = new double[myTableau.m];
+        myTableau.extractDualVariables(duals);
+        for (int i = 0; i < duals.length; i++) {
+            if (myTableau.structure.isConstraintNegated(i)) {
+                duals[i] = -duals[i];
+            }
+        }
+        return duals;
+    }
+
+    @Override
+    double[] extractReducedGradients() {
+        double[] gradients = new double[myTableau.n];
+        myTableau.extractReducedCosts(gradients);
+        return gradients;
     }
 
     int findNextPivotCol() {

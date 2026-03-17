@@ -34,6 +34,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -44,10 +45,7 @@ import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.InMemoryFile;
 import org.ojalgo.netio.ToFileWriter;
-import org.ojalgo.optimisation.ExpressionsBasedModel.Presolver;
-import org.ojalgo.optimisation.Optimisation.ConstraintType;
 import org.ojalgo.optimisation.Optimisation.Integration;
-import org.ojalgo.optimisation.Optimisation.ProblemStructure;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.optimisation.linear.LinearSolver;
@@ -57,7 +55,6 @@ import org.ojalgo.structure.Structure2D.IntRowColumn;
 import org.ojalgo.type.EnumBitSet;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.keyvalue.EntryPair;
-import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 
 /**
  * Construct optimisation problems by combining {@link Variable}s and {@link Expression}s. Each model entity
@@ -298,6 +295,11 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     public static abstract class Integration<S extends Optimisation.Solver> implements Optimisation.Integration<ExpressionsBasedModel, S> {
 
         protected static Result expandFreeToFull(final Result solverState, final ExpressionsBasedModel model, final DenseArray.Factory<?, ?> factory) {
+            return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, factory, Optional.empty());
+        }
+
+        protected static Result expandFreeToFull(final Result solverState, final ExpressionsBasedModel model, final DenseArray.Factory<?, ?> factory,
+                final Optional<Supplier<Access1D<?>>> reducedGradient) {
 
             List<Variable> freeVariables = model.getFreeVariables();
             Set<IntIndex> fixedVariables = model.getFixedVariables();
@@ -320,7 +322,23 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
                 modelSolution.set(fixed.index, model.getVariable(fixed.index).getValue());
             }
 
-            return solverState.withSolution(modelSolution);
+            Result retVal = solverState.withSolution(modelSolution);
+
+            if (reducedGradient.isPresent()) {
+
+                Supplier<Access1D<?>> gradientSupplier = () -> {
+                    DenseArray<?> fullGradient = factory.make(nbModelVars);
+                    Access1D<?> freeGradient = reducedGradient.get().get();
+                    for (int i = 0; i < nbFreeVars; i++) {
+                        fullGradient.set(model.indexOf(freeVariables.get(i)), freeGradient.doubleValue(i));
+                    }
+                    return fullGradient;
+                };
+
+                retVal = retVal.withReducedGradient(gradientSupplier);
+            }
+
+            return retVal;
         }
 
         protected static Result reduceFullToFree(final Result modelState, final ExpressionsBasedModel model, final DenseArray.Factory<?, ?> factory) {
@@ -351,7 +369,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
          * The reverse of {@link #toSolverState(Optimisation.Result, ExpressionsBasedModel)}.
          *
          * @see #reduceFullToFree(Optimisation.Result, ExpressionsBasedModel, DenseArray.Factory)
-         * @see #expandFreeToFull(Optimisation.Result, ExpressionsBasedModel, DenseArray.Factory)
+         * @see #expandFreeToFull(Optimisation.Result, ExpressionsBasedModel, DenseArray.Factory, Optional)
          */
         @Override
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
@@ -371,7 +389,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
          * variables. There are helper methods to do just that.
          *
          * @see #reduceFullToFree(Optimisation.Result, ExpressionsBasedModel, DenseArray.Factory)
-         * @see #expandFreeToFull(Optimisation.Result, ExpressionsBasedModel, DenseArray.Factory)
+         * @see #expandFreeToFull(Optimisation.Result, ExpressionsBasedModel, DenseArray.Factory, Optional)
          */
         @Override
         public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
@@ -1768,9 +1786,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
         Optimisation.Result result = prepared.solve(null);
 
-        Optimisation.State retState = result.getState();
-
-        if (retState.isApproximate()) {
+        if (result.getState().isApproximate()) {
             for (int i = 0, limit = myVariables.size(); i < limit; i++) {
                 Variable tmpVariable = myVariables.get(i);
                 if (!tmpVariable.isFixed()) {
@@ -1778,15 +1794,14 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
                 }
             }
         }
-        Result retSolution = this.getVariableValues();
+
+        Optimisation.Result retSolution = this.getVariableValues();
 
         double retValue = this.objective().evaluate(retSolution).doubleValue();
 
-        List<KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>>> matchedMultipliers = result.getMatchedMultipliers();
-
         prepared.dispose();
 
-        return new Optimisation.Result(retState, retValue, retSolution).multipliers(matchedMultipliers);
+        return result.withSolution(retSolution).withValue(retValue);
     }
 
     private void scanEntities() {

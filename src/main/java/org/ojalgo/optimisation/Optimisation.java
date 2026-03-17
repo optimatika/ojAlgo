@@ -30,6 +30,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.ArrayR064;
@@ -633,6 +634,7 @@ public interface Optimisation {
         private ConstraintsMetaData myConstraintsMap = null;
         private List<KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>>> myMatchedMultipliers = null;
         private Access1D<?> myMultipliers = null;
+        private Supplier<Access1D<?>> myReducedGradient = null;
         private final Access1D<?> mySolution;
         private final Optimisation.State myState;
         private final double myValue; // Objective Function Value
@@ -714,6 +716,20 @@ public interface Optimisation {
         }
 
         /**
+         * The reduced gradient of the solution. This is the rate of change of the objective if a variable
+         * were to move from its current bound, accounting for the dual variables.
+         * <p>
+         * If the {@link Optional} is empty the underlying {@link Solver} or {@link Integration} does not
+         * provide the reduced gradient.
+         * <p>
+         * If the {@link Optional} is not empty the {@link Supplier} always return a non-null {@link Access1D}
+         * instance. The {@link Supplier} construct is to allow for lazy construction.
+         */
+        public Optional<Supplier<Access1D<?>>> getReducedGradient() {
+            return Optional.ofNullable(myReducedGradient);
+        }
+
+        /**
          * Will round the solution to the given precision
          */
         public Optimisation.Result getSolution(final NumberContext precision) {
@@ -779,11 +795,20 @@ public interface Optimisation {
             return this.withValue(-myValue);
         }
 
+        public Result withReducedGradient(final Supplier<Access1D<?>> reducedGradient) {
+            myReducedGradient = reducedGradient;
+            return this;
+        }
+
         public Result withSolution(final Access1D<?> solution) {
 
             Result retVal = new Result(myState, myValue, solution);
 
             this.multipliers(retVal);
+
+            if (solution.size() == mySolution.size()) {
+                retVal = retVal.withReducedGradient(myReducedGradient);
+            }
 
             return retVal;
         }
@@ -805,7 +830,7 @@ public interface Optimisation {
 
             this.multipliers(retVal);
 
-            return retVal;
+            return retVal.withReducedGradient(myReducedGradient);
         }
 
         public Result withValue(final double value) {
@@ -814,7 +839,7 @@ public interface Optimisation {
 
             this.multipliers(retVal);
 
-            return retVal;
+            return retVal.withReducedGradient(myReducedGradient);
         }
 
         private void multipliers(final Result target) {

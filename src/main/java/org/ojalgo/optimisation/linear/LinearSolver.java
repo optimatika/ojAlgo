@@ -41,7 +41,6 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexData;
-import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Mutate1D;
@@ -51,22 +50,66 @@ import org.ojalgo.structure.Primitive2D;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.IndexSelector;
 
+/**
+ * Base class for ojAlgo's linear programming (LP) solvers. Several simplex-based subclasses exist, and the
+ * exact problem form accepted may vary between them.
+ * <p>
+ * The recommended way to model and solve any LP (or optimisation problem in general) is to use
+ * {@link ExpressionsBasedModel}. The model automatically selects a suitable solver and translates between the
+ * user-friendly model representation and the solver's internal form. The {@link #INTEGRATION} field is the
+ * bridge that makes this possible — it is an {@link ExpressionsBasedModel.Integration
+ * ExpressionsBasedModel.Integration} registered by default so that {@link ExpressionsBasedModel} can delegate
+ * to {@link LinearSolver} without any additional setup.
+ * <p>
+ * For more direct control, use {@link #newBuilder()} to create a {@link Builder}. The Builder accepts an LP
+ * in standard form and produces a solver via {@link Builder#build()}.
+ * <p>
+ * Implements {@link UpdatableSolver} — after solving the solver can be updated in-place and re-solved without
+ * rebuilding the entire problem.
+ */
 public abstract class LinearSolver extends GenericSolver implements UpdatableSolver {
 
     /**
-     * <p>
-     * Compared to {@link LinearSolver.StandardBuilder} this builder: <br>
-     * 1) Accepts inequality constraints <br>
-     * 2) Has relaxed the requiremnt on the RHS to be non-negative (both equalities and inequalities) <br>
-     * <p>
-     * Compared to {@link ConvexSolver.Builder} this builder: <br>
-     * 1) Requires the objective function to be linear (or only the linear factors will be concidered) <br>
-     * 2) Assumes (requires) variables to be non-negative <br>
-     * <p>
+     * Assembles a linear program and builds a {@link LinearSolver}. The problem is expressed as:
      *
-     * @author apete
+     * <pre>
+     * min [c]'[x]
+     * s.t. [AE][x] = [bE]
+     *      [AI][x] <= [bI]
+     *      [lb] <= [x] <= [ub]
+     * </pre>
+     *
+     * Objective: set via {@link #objective(double...)} or the convenience factory
+     * {@link LinearSolver#newBuilder(double...)}.
+     * <p>
+     * Constraints:
+     * <ul>
+     * <li>{@link #inequality(double, double...)} / {@link #inequalities(Access2D, Access1D)} for [AI][x] <=
+     * [bI]
+     * <li>{@link #equality(double, double...)} / {@link #equalities(Access2D, Access1D)} for [AE][x] = [bE]
+     * </ul>
+     * The RHS may be negative; the implementation handles sign normalisation internally.
+     * <p>
+     * Variable bounds: every variable defaults to lower=0, upper=+Infinity (standard LP convention). Use
+     * {@link #lower(double...)} and {@link #upper(double...)} to override per-variable or uniformly.
+     * <p>
+     * Building a solver: calling {@link #build(Optimisation.Options)} delegates to one of two simplex
+     * implementations. When no explicit {@link Configuration} is set, the choice is automatic: if any
+     * variable bounds have been modified (via {@link #lower(double...)} or {@link #upper(double...)}), the
+     * revised simplex solver is used; otherwise the tableau solver is used. An explicit
+     * {@link Configuration#primal()} or {@link Configuration#dual()} always overrides this default.
+     * <ul>
+     * <li>Tableau solver (default when bounds are unchanged / {@link Configuration#primal()}) — classic
+     * 2-phase primal simplex operating on a full or sparse tableau. Requires all variables >= 0 (the
+     * default).
+     * <li>Revised simplex solver (default when bounds are modified / {@link Configuration#dual()}) — phased
+     * dual/primal simplex using a factored basis inverse. Supports explicit finite lower and upper bounds on
+     * variables.
+     * </ul>
      */
     public static final class Builder extends GenericSolver.Builder<LinearSolver.Builder, LinearSolver> {
+
+        private boolean myBoundsModified = false;
 
         Builder() {
             super();
@@ -102,8 +145,9 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return super.inequality(rhs, factors);
         }
 
-        public final LinearSolver.Builder lower(final double... bounds) {
-            double[] lowerBounds = this.getLowerBounds(ZERO).data;
+        public LinearSolver.Builder lower(final double... bounds) {
+            myBoundsModified = true;
+            double[] lowerBounds = this.getLowerBounds();
             for (int i = 0, limit = Math.min(lowerBounds.length, bounds.length); i < limit; i++) {
                 lowerBounds[i] = bounds[i];
             }
@@ -111,12 +155,13 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         }
 
         public LinearSolver.Builder lower(final double bound) {
-            double[] lowerBounds = this.getLowerBounds(ZERO).data;
+            myBoundsModified = true;
+            double[] lowerBounds = this.getLowerBounds();
             Arrays.fill(lowerBounds, bound);
             return this;
         }
 
-        public final LinearSolver.Builder objective(final double... factors) {
+        public LinearSolver.Builder objective(final double... factors) {
             this.setNumberOfVariables(factors.length);
             this.getObjective().linear().fillMatching(this.getFactory().column(factors));
             return this;
@@ -220,8 +265,9 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return retVal;
         }
 
-        public final LinearSolver.Builder upper(final double... bounds) {
-            double[] upperBounds = this.getUpperBounds(POSITIVE_INFINITY).data;
+        public LinearSolver.Builder upper(final double... bounds) {
+            myBoundsModified = true;
+            double[] upperBounds = this.getUpperBounds();
             for (int i = 0, limit = Math.min(upperBounds.length, bounds.length); i < limit; i++) {
                 upperBounds[i] = bounds[i];
             }
@@ -229,7 +275,8 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         }
 
         public LinearSolver.Builder upper(final double bound) {
-            double[] upperBounds = this.getUpperBounds(POSITIVE_INFINITY).data;
+            myBoundsModified = true;
+            double[] upperBounds = this.getUpperBounds();
             Arrays.fill(upperBounds, bound);
             return this;
         }
@@ -237,94 +284,22 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         @Override
         protected LinearSolver doBuild(final Options options) {
 
-            int nbInequalites = this.countInequalityConstraints();
-            int nbEqualites = this.countEqualityConstraints();
-            int nbVariables = this.countVariables();
+            Boolean dualOrPrimal = options.linear().getDualOrPrimal();
 
-            IndexSelector ineqSign = new IndexSelector(nbInequalites);
+            boolean dual = dualOrPrimal != null ? dualOrPrimal.booleanValue() : myBoundsModified;
 
-            if (nbInequalites > 0) {
+            if (dual) {
 
-                MatrixStore<Double> mtrxBI = this.getBI();
+                Function<LinearStructure, SimplexStore> storeFactory = SimplexStore.newStoreFactory(options);
+                SimplexStore store = this.newSimplexStore(storeFactory);
+                return store.newPhasedSimplexSolver(options);
 
-                for (int i = 0; i < nbInequalites; i++) {
-                    double valRHS = mtrxBI.doubleValue(i);
-                    if (valRHS < ZERO) {
-                        ineqSign.exclude(i);
-                    } else {
-                        ineqSign.include(i);
-                    }
-                }
+            } else {
+
+                Function<LinearStructure, SimplexTableau> tableauFactory = SimplexTableau.newTableauFactory(options);
+                SimplexTableau tableau = this.newSimplexTableau(tableauFactory);
+                return new SimplexTableauSolver(tableau, options);
             }
-
-            int nbIdentitySlackVariables = ineqSign.countIncluded();
-            int nbSlackVariables = ineqSign.countExcluded();
-
-            LinearStructure structure = new LinearStructure(false, nbInequalites, nbEqualites, nbVariables, 0, nbSlackVariables, nbIdentitySlackVariables);
-
-            SimplexTableau tableau = SimplexTableau.newTableauFactory(options).apply(structure);
-            Primitive2D constraintsBody = tableau.constraintsBody();
-            Primitive1D constraintsRHS = tableau.constraintsRHS();
-            Primitive1D objective = tableau.objective();
-
-            if (nbInequalites > 0) {
-
-                int insIdSlack = 0;
-                int insGnSlack = 0;
-
-                for (int i = 0; i < nbInequalites; i++) {
-
-                    SparseArray<Double> body = this.getAI(i);
-                    double valRHS = this.getBI(i);
-                    boolean positive = ineqSign.isIncluded(i);
-
-                    int row = positive ? insIdSlack : nbIdentitySlackVariables + insGnSlack;
-                    int col = positive ? nbVariables + nbSlackVariables + insIdSlack++ : nbVariables + insGnSlack++;
-
-                    for (NonzeroView<Double> nz : body.nonzeros()) {
-                        constraintsBody.set(row, nz.index(), positive ? nz.doubleValue() : -nz.doubleValue());
-                    }
-
-                    constraintsBody.set(row, col, positive ? ONE : NEG);
-
-                    constraintsRHS.set(row, positive ? valRHS : -valRHS);
-
-                    structure.negated(row, !positive);
-                }
-            }
-
-            if (nbEqualites > 0) {
-
-                MatrixStore<Double> mtrxAE = this.getAE();
-                MatrixStore<Double> mtrxBE = this.getBE();
-
-                for (int i = 0; i < nbEqualites; i++) {
-
-                    double valRHS = mtrxBE.doubleValue(i);
-                    boolean positive = valRHS >= ZERO;
-
-                    int row = nbInequalites + i;
-
-                    for (int j = 0; j < nbVariables; j++) {
-                        double value = mtrxAE.doubleValue(i, j);
-                        if (Math.abs(value) > MACHINE_EPSILON) {
-                            constraintsBody.set(row, j, positive ? value : -value);
-                        }
-                    }
-
-                    constraintsRHS.set(row, positive ? valRHS : -valRHS);
-
-                    structure.negated(row, !positive);
-                }
-            }
-
-            MatrixStore<Double> mtrxC = this.getC();
-
-            for (int i = 0; i < nbVariables; i++) {
-                objective.set(i, mtrxC.doubleValue(i));
-            }
-
-            return new SimplexTableauSolver(tableau, options);
         }
 
         protected double[] getLowerBounds() {
@@ -453,6 +428,8 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
                     constraintsBody.set(row, col, positive ? ONE : NEG);
 
                     constraintsRHS.set(row, positive ? valRHS : -valRHS);
+
+                    structure.negated(row, !positive);
                 }
             }
 
@@ -476,6 +453,8 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
                     }
 
                     constraintsRHS.set(row, positive ? valRHS : -valRHS);
+
+                    structure.negated(row, !positive);
                 }
             }
 
@@ -522,22 +501,28 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     }
 
+    /**
+     * Bridges {@link ExpressionsBasedModel} and the LP simplex solvers. This integration translates a
+     * high-level model into the internal simplex representation and maps solver results back to model
+     * variables. It is registered by default (via {@link #INTEGRATION}) so that {@link ExpressionsBasedModel}
+     * can automatically delegate LP problems to {@link LinearSolver}.
+     * <p>
+     * Internally delegates to either the older tableau-based primal simplex or the newer revised dual
+     * simplex, depending on the {@link Configuration} and problem characteristics.
+     */
     public static final class ModelIntegration extends ExpressionsBasedModel.Integration<LinearSolver> {
 
         @Override
         public LinearSolver build(final ExpressionsBasedModel model) {
 
-            Boolean dualOrPrimal = model.options.linear().getDualOrPrimal();
-
-            boolean newerDualImpl = true;
-
-            if (Boolean.FALSE.equals(dualOrPrimal)) {
-                newerDualImpl = false;
+            boolean newerDualSolver = true;
+            if (Boolean.FALSE.equals(model.options.linear().getDualOrPrimal())) {
+                newerDualSolver = false;
             }
 
-            this.setSwitch(model, ExpressionsBasedModel.IntegrationProperty.PRIMAL_OR_DUAL_LP, newerDualImpl);
+            this.setSwitch(model, ExpressionsBasedModel.IntegrationProperty.PRIMAL_OR_DUAL_LP, newerDualSolver);
 
-            if (newerDualImpl) {
+            if (newerDualSolver) {
                 return NEWER_DUAL_SOLVER.build(model);
             } else {
                 return OLDER_PRIMAL_SOLVER.build(model);
@@ -602,7 +587,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
         @Override
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
-            return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR064.FACTORY);
+            return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR064.FACTORY, solverState.getReducedGradient());
         }
 
         @Override
@@ -717,6 +702,11 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     }
 
+    /**
+     * The default {@link ExpressionsBasedModel.Integration} that allows {@link ExpressionsBasedModel} to
+     * solve LP problems using {@link LinearSolver}. Registered automatically — users do not normally need to
+     * reference this directly.
+     */
     public static final ExpressionsBasedModel.Integration<LinearSolver> INTEGRATION = new ModelIntegration();
 
     static final NewIntegration NEWER_DUAL_SOLVER = new NewIntegration();
@@ -750,6 +740,14 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         return LinearSolver.newBuilder(objective);
     }
 
+    /**
+     * Use {@link ModelIntegration#build(ExpressionsBasedModel)} directly instead, and then remember to also
+     * use {@link ModelIntegration#toModelState(Optimisation.Result, ExpressionsBasedModel)} and
+     * {@link ModelIntegration#toSolverState(Optimisation.Result, ExpressionsBasedModel)}.
+     *
+     * @deprecated v57 Use {@link #INTEGRATION} instead.
+     */
+    @Deprecated
     public static LinearSolver newSolver(final ExpressionsBasedModel model) {
         return INTEGRATION.build(model);
     }
@@ -807,8 +805,43 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         return LinearFunction.wrap(tmpC);
     }
 
+    private transient double[] myCachedDualMultiplier = null;
+    private transient double[] myCachedReducedGradient = null;
+
     protected LinearSolver(final Options solverOptions) {
         super(solverOptions);
+    }
+
+    @Override
+    public final double getDualMultiplier(final int index) {
+        if (myCachedDualMultiplier == null) {
+            myCachedDualMultiplier = this.extractDualMultipliers();
+        }
+        return myCachedDualMultiplier[index];
+    }
+
+    @Override
+    public final double getReducedGradient(final int index) {
+        if (myCachedReducedGradient == null) {
+            myCachedReducedGradient = this.extractReducedGradients();
+        }
+        return myCachedReducedGradient[index];
+    }
+
+    /**
+     * Extract the full array of dual multipliers (Lagrange multipliers) for all constraints, in original
+     * (un-negated) sign convention.
+     */
+    abstract double[] extractDualMultipliers();
+
+    /**
+     * Extract the full array of reduced gradients for all variables.
+     */
+    abstract double[] extractReducedGradients();
+
+    void invalidateCache() {
+        myCachedDualMultiplier = null;
+        myCachedReducedGradient = null;
     }
 
 }

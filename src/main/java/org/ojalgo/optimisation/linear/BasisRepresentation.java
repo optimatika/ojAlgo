@@ -4,6 +4,18 @@ import org.ojalgo.array.SparseArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.transformation.InvertibleFactor;
 
+/**
+ * Maintains a factored representation of the basis inverse (B^-1) for the revised simplex method. On each
+ * pivot the representation is updated to reflect the column exchange, avoiding a full re-inversion.
+ * <p>
+ * Implementations:
+ * <ul>
+ * <li>{@link DecomposedInverse} — uses a matrix decomposition (LU) that is periodically re-factored.
+ * <li>{@link ProductFormInverse} — accumulates elementary column operations (eta vectors).
+ * </ul>
+ *
+ * @see RevisedStore
+ */
 interface BasisRepresentation extends InvertibleFactor<Double> {
 
     /**

@@ -31,7 +31,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
+import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.operation.IndexOf;
 import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -51,10 +53,21 @@ import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * Meant to replace {@link SimplexTableauSolver}. It is already better in many aspects, but still can't do
- * everything required to fully replace the old solver.
- *
- * @author apete
+ * Revised simplex solver family, intended as the successor to {@link SimplexTableauSolver}.
+ * <p>
+ * Unlike the tableau solver, this family natively supports explicit finite lower and upper bounds on
+ * variables. Non-basic variables are tracked at their lower bound, upper bound, or as unbounded via
+ * {@link SimplexStore.ColumnState}. The basis inverse is maintained in factored form through a
+ * {@link BasisRepresentation} rather than stored in an explicit tableau.
+ * <p>
+ * Concrete subclasses implement different simplex strategies:
+ * <ul>
+ * <li>{@link PhasedSimplexSolver} — dual phase-1 then primal phase-2 (the default and most general).
+ * <li>{@link DualSimplexSolver} — pure dual simplex; requires dual feasibility (all variables bounded).
+ * <li>{@link PrimalSimplexSolver} — pure primal simplex; requires an already feasible starting basis.
+ * </ul>
+ * This solver is selected by default when the {@link LinearSolver.Builder} has modified variable bounds, or
+ * when {@link LinearSolver.Configuration#dual()} is explicitly requested.
  */
 abstract class SimplexSolver extends LinearSolver {
 
@@ -678,21 +691,19 @@ abstract class SimplexSolver extends LinearSolver {
     public boolean updateRange(final int index, final double lower, final double upper) {
         double shift = mySolutionShift[index];
         this.setState(State.UNEXPLORED);
+        this.invalidateCache();
         return mySimplex.updateRange(index, lower - shift, upper - shift);
     }
 
     private Access1D<?> extractMultipliers() {
 
-        Access1D<Double> duals = mySimplex.sliceDualVariables();
-
-        LinearStructure structure = mySimplex.structure;
+        int nbConstraints = mySimplex.structure.countConstraints();
 
         return new Access1D<Double>() {
 
             @Override
             public double doubleValue(final int index) {
-                int i = Math.toIntExact(index);
-                return structure.isConstraintNegated(i) ? -duals.doubleValue(index) : duals.doubleValue(index);
+                return SimplexSolver.this.getDualMultiplier(index);
             }
 
             @Override
@@ -702,7 +713,7 @@ abstract class SimplexSolver extends LinearSolver {
 
             @Override
             public int size() {
-                return structure.countConstraints();
+                return nbConstraints;
             }
 
             @Override
@@ -1425,21 +1436,42 @@ abstract class SimplexSolver extends LinearSolver {
         }
     }
 
+    @Override
+    double[] extractDualMultipliers() {
+        double[] duals = new double[mySimplex.m];
+        mySimplex.extractDualVariables(duals);
+        for (int i = 0; i < duals.length; i++) {
+            if (mySimplex.structure.isConstraintNegated(i)) {
+                duals[i] = -duals[i];
+            }
+        }
+        return duals;
+    }
+
+    @Override
+    double[] extractReducedGradients() {
+        double[] gradients = new double[mySimplex.n];
+        mySimplex.extractReducedCosts(gradients);
+        return gradients;
+    }
+
     final Result extractResult() {
 
-        double retValue = this.extractValue();
+        double value = this.extractValue();
 
-        State retState = this.getState();
+        State state = this.getState();
 
-        double[] retSolution = this.extractSolution();
+        double[] solution = this.extractSolution();
 
-        Result result = Optimisation.Result.of(retValue, retState, retSolution);
+        Supplier<Access1D<?>> reducedGradient = () -> ArrayR064.wrap(this.extractReducedGradients());
+
+        Result result = Optimisation.Result.of(value, state, solution).withReducedGradient(reducedGradient);
 
         if (this.isLogDebug()) {
             this.log();
-            this.log("{} {} {}", retValue, retState, mySimplex.toString());
+            this.log("{} {} {}", value, state, mySimplex.toString());
             this.log("LB: {}", this.getLowerBounds());
-            this.log(" X: {}", retSolution);
+            this.log(" X: {}", solution);
             this.log("UB: {}", this.getUpperBounds());
         }
 
@@ -1459,6 +1491,8 @@ abstract class SimplexSolver extends LinearSolver {
     }
 
     final IterDescr prepareToIterate() {
+
+        this.invalidateCache();
 
         this.setup(mySimplex);
 

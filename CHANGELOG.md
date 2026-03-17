@@ -19,6 +19,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - New `Optimisation.Environment` class that holds solver integrations, presolvers, variable/expression factories, and 3rd-party configurators. Use `Optimisation.newEnvironment()` to create isolated configurations and `Environment.newModel()` as the model factory.
 - New `FactorKKT` – a dedicated KKT factorisation helper used by the convex solvers.
 - New `RuizScaling` – Ruiz equilibration for KKT/constraint systems in the convex solver pipeline.
+- `UpdatableSolver` gained `getDualMultiplier(int)` and `getReducedGradient(int)` for querying dual variables and reduced gradients after a solve.
+- `Optimisation.Result` now carries an optional reduced gradient via `getReducedGradient()` / `withReducedGradient(Supplier)`.
 
 #### org.ojalgo.matrix
 
@@ -37,6 +39,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Cleaned up the `UpdatableSolver` interface – everything is now optional with default implementations that do nothing. All the quirky stuff is moved to `ExpressionsBasedModel.EntityMap`. This also required `ConstraintsMetaData` to be somewhat refactored, and the `Optimisation.ConstraintType` enum gained another instance `RANGE`.
 - Deprecated `Constraint.isLowerConstraint()` and `Constraint.isUpperConstraint()` in favour of `Constraint.getConstraintType()`.
+- `LinearSolver.Builder` now auto-selects the revised simplex (dual) solver when variable bounds have been modified; tableau (primal) remains the default for unchanged bounds. An explicit `Configuration` override still takes precedence.
 
 #### org.ojalgo.matrix
 

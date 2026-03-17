@@ -35,6 +35,13 @@ import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Primitive1D;
 import org.ojalgo.structure.Primitive2D;
 
+/**
+ * {@link SimplexTableau} backed by sparse row vectors ({@link SparseArray}). Each constraint row, the
+ * objective row, and the phase-1 row are stored as sparse arrays, keeping memory and pivot cost proportional
+ * to the number of non-zeros rather than the full tableau dimensions.
+ * <p>
+ * Preferred over {@link DenseTableau} for large or highly sparse LP problems.
+ */
 final class SparseTableau extends SimplexTableau {
 
     private static final Array1D.Factory<Double> ARRAY1D_FACTORY = Array1D.factory(ArrayR064.FACTORY);

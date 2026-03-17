@@ -24,6 +24,7 @@ package org.ojalgo.optimisation.convex;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
@@ -95,9 +96,9 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
 
             if (model.options.convex().isExtendedPrecision()) {
-                return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR256.FACTORY);
+                return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR256.FACTORY, solverState.getReducedGradient());
             } else {
-                return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR064.FACTORY);
+                return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR064.FACTORY, solverState.getReducedGradient());
             }
         }
 
@@ -111,9 +112,9 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
     private static final String Q_NOT_POSITIVE_SEMIDEFINITE = "Q not positive semidefinite!";
     private static final String Q_NOT_SYMMETRIC = "Q not symmetric!";
 
-    static final Factory<Double, R064Store> MATRIX_FACTORY = R064Store.FACTORY;
-
     static final Integration INTEGRATION = new Integration();
+
+    static final Factory<Double, R064Store> MATRIX_FACTORY = R064Store.FACTORY;
 
     static BasePrimitiveSolver.Builder builder(final MatrixStore<Double>[] matrices) {
         return new BasePrimitiveSolver.Builder(matrices);
@@ -185,6 +186,7 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
         return new ConvexObjectiveFunction<>(tmpQ, tmpC);
     }
 
+    private transient double[] myCachedReducedGradient = null;
     private final ConvexData<Double> myMatrices;
     private boolean myPatchedQ = false;
     private final R064Store mySolutionX;
@@ -220,7 +222,17 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
     }
 
     @Override
+    public double getReducedGradient(final int index) {
+        if (myCachedReducedGradient == null) {
+            myCachedReducedGradient = this.computeReducedGradient();
+        }
+        return myCachedReducedGradient[index];
+    }
+
+    @Override
     public Optimisation.Result solve(final Optimisation.Result kickStarter) {
+
+        myCachedReducedGradient = null;
 
         if (this.initialise(kickStarter)) {
 
@@ -250,7 +262,9 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
         double value = this.evaluateFunction(solution);
         Optimisation.State state = this.getState();
 
-        return new Optimisation.Result(state, value, solution);
+        Supplier<Access1D<?>> reducedGradient = () -> ArrayR064.wrap(this.computeReducedGradient());
+
+        return new Optimisation.Result(state, value, solution).withReducedGradient(reducedGradient);
     }
 
     protected boolean computeGeneral(final Collectable<Double, ? super TransformableRegion<Double>> matrix) {
@@ -488,6 +502,22 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
         }
 
         return resultLP;
+    }
+
+    /**
+     * Compute the reduced gradient vector (gradient of the Lagrangian w.r.t. x). The base implementation
+     * returns Qx - c; {@link ConstrainedSolver} overrides to add A'λ.
+     */
+    double[] computeReducedGradient() {
+        int n = this.countVariables();
+        double[] gradient = new double[n];
+        PhysicalStore<Double> x = this.getSolutionX();
+        MatrixStore<Double> Qx = this.getMatrixQ().multiply(x);
+        MatrixStore<Double> c = this.getMatrixC();
+        for (int j = 0; j < n; j++) {
+            gradient[j] = Qx.doubleValue(j) - c.doubleValue(j);
+        }
+        return gradient;
     }
 
     ConstraintsMetaData getConstraintsMetaData() {

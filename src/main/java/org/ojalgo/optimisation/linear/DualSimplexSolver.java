@@ -26,9 +26,14 @@ import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 import org.ojalgo.optimisation.Optimisation;
 
 /**
- * Requires all variables to have both lower and upper bounds.
- *
- * @author apete
+ * Pure dual simplex — runs only dual iterations (no phase-1/phase-2 switching).
+ * <p>
+ * Requires all variables to have both finite lower and upper bounds so that the initial basis is dual
+ * feasible. If the dual iterations reach primal feasibility the solution is optimal; otherwise the problem
+ * is infeasible.
+ * <p>
+ * Exists primarily for testing and specialised scenarios. For general use prefer
+ * {@link PhasedSimplexSolver}.
  */
 final class DualSimplexSolver extends SimplexSolver {
 

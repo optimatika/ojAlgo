@@ -41,6 +41,11 @@ final class UnconstrainedSolver extends BasePrimitiveSolver {
     }
 
     @Override
+    public double getDualMultiplier(final int index) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     protected MatrixStore<Double> getIterationKKT() {
         return this.getMatrixQ();
     }

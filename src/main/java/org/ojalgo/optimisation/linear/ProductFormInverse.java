@@ -38,6 +38,13 @@ import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.transformation.InvertibleFactor;
 import org.ojalgo.type.ObjectPool;
 
+/**
+ * Product-form-of-the-inverse (PFI) {@link BasisRepresentation}. Each basis update is recorded as an eta
+ * vector (elementary column operation). Solving a system with B applies the sequence of eta factors in
+ * order. Periodically re-inverts via LU to bound numerical drift and factor count.
+ *
+ * @see DecomposedInverse
+ */
 final class ProductFormInverse implements BasisRepresentation {
 
     static final class ArrayPool extends ObjectPool<SparseArray<Double>> {

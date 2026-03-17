@@ -27,107 +27,84 @@ import java.util.Optional;
 
 import org.ojalgo.equation.Equation;
 import org.ojalgo.optimisation.ExpressionsBasedModel.EntityMap;
+import org.ojalgo.optimisation.convex.ConvexSolver;
+import org.ojalgo.optimisation.linear.LinearSolver;
 
 /**
- * A solver that can be updated in-place between solves.
+ * A solver that can be updated in-place between solves — primarily used by branch-and-bound to avoid
+ * rebuilding the continuous relaxation at every node.
  * <p>
- * An {@link UpdatableSolver} exposes a stable mapping between the solver's internal variables and the
- * {@link ExpressionsBasedModel} entities and, optionally, supports incremental modification of variable
- * bounds and generation of cutting planes. This is primarily used by
- * {@link org.ojalgo.optimisation.integer.IntegerSolver} (branch-and-bound) implementations to avoid
- * rebuilding the underlying continuous relaxation from scratch for every node in the search tree.
- * <p>
- * The contract is intentionally minimal:
- * <ul>
- * <li>The mapping from model entities to internal variables is exposed via {@link #getEntityMap()}.</li>
- * <li>Bounds for an internal variable may be tightened via {@link #fixVariable(int, double)} or
- * {@link #updateRange(int, double, double)}.</li>
- * <li>Optionally, additional valid inequalities may be proposed via
- * {@link #generateCutCandidates(double, boolean[])}.</li>
- * </ul>
- * An implementation is free to ignore any of these update operations by returning {@code false} or an empty
- * collection, in which case the caller should fall back to rebuilding the solver instance.
+ * All update operations are optional; returning {@code false} or an empty collection signals that the caller
+ * should fall back to rebuilding the solver.
  */
 public interface UpdatableSolver extends Optimisation.Solver {
 
     /**
-     * Try to fix a solver variable to a single value.
-     * <p>
-     * The {@code index} is the solver's own variable index as defined by the {@link EntityMap} returned from
-     * {@link #getEntityMap()}. Implementations that support this operation should tighten both the lower and
-     * upper bound of the referenced variable to {@code value}. If the index is out of range, or if fixing the
-     * variable would make the current solver state inconsistent, the method should return {@code false}
-     * without throwing.
+     * Fix a solver variable to a single value (sets both lower and upper bound).
      *
-     * @param index the solver specific variable index, not the model index
-     * @param value the single value the variable is required to take
-     * @return {@code true} if the variable was successfully fixed, {@code false} if the operation is not
-     *         supported or could not be applied
+     * @param index solver-internal variable index (as defined by {@link EntityMap})
+     * @param value the value to fix the variable to
+     * @return {@code true} if successfully applied
      */
     default boolean fixVariable(final int index, final double value) {
         return false;
     }
 
     /**
-     * Optionally generate candidate cutting planes for a given fractional solution.
-     * <p>
-     * This hook is used by integer optimisation algorithms to request model-equivalent inequalities that cut
-     * off the current fractional solution but keep all integer-feasible points. The {@code fractionality}
-     * parameter communicates how far from integrality the current solution is (typically the maximum distance
-     * to the nearest integer among all integer variables). The variable selection mask ({@code integer}) is a
-     * boolean array aligned with the solver's internal variable ordering – the same indexing convention as
-     * for {@link #fixVariable(int, double)} and {@link #updateRange(int, double, double)}.
-     * <p>
-     * The default implementation returns an empty set, meaning that the solver does not contribute any cuts
-     * and the caller should proceed without cut generation.
+     * Generate candidate cutting planes that separate the current fractional solution from the
+     * integer-feasible region.
      *
-     * @param fractionality a measure of how fractional the current solution is; values close to zero mean
-     *                      nearly integral, values near {@code 0.5} indicate highly fractional components
-     * @param integer       a boolean mask indicating which internal variables correspond to
-     *                      integer-constrained model entities; {@code true} means the variable must take an
-     *                      integer value
-     * @return a collection of {@link Equation} instances representing additional valid inequalities to be
-     *         added to the model; may be empty but should never be {@code null}
+     * @param fractionality measure of how fractional the current solution is (0 = nearly integral, 0.5 =
+     *                      highly fractional)
+     * @param integer       mask aligned with solver-internal indices; {@code true} for integer-constrained
+     *                      variables
+     * @return valid inequalities to add, or an empty collection if none are generated
      */
     default Collection<Equation> generateCutCandidates(final double fractionality, final boolean[] integer) {
         return Collections.emptySet();
     }
 
     /**
-     * The mapping between this solver's internal variable indices and the owning
-     * {@link ExpressionsBasedModel}.
-     * <p>
-     * The {@link EntityMap} describes how model variables and slack variables are laid out in the solver.
-     * This allows callers (for example branch-and-bound controllers) to translate between model-level
-     * entities and the indices used in {@link #fixVariable(int, double)} and
-     * {@link #updateRange(int, double, double)}, and to construct the integer mask passed to
-     * {@link #generateCutCandidates(double, boolean[])}.
+     * The dual variable (Lagrange multiplier) associated with constraint {@code index}. This is the rate of
+     * change of the optimal objective value per unit relaxation of that constraint.
      *
-     * @return an {@link Optional} containing the {@link EntityMap} for this solver when such a mapping is
-     *         available; {@link Optional#empty()} otherwise
+     * @param index solver-internal constraint index
+     * @return the dual variable value at the current solution
+     */
+    double getDualMultiplier(int index);
+
+    /**
+     * The mapping between this solver's internal variable indices and the owning
+     * {@link ExpressionsBasedModel}. This is needed when the solver was built from a model and there is no
+     * 1-to-1 correspondence between model and solver variables.
+     * <p>
+     * When the solver was built from a {@link LinearSolver.Builder} or {@link ConvexSolver.Builder} the
+     * mapping is typically 1-to-1 and no {@link EntityMap} is available.
+     *
+     * @return the {@link EntityMap} if available; {@link Optional#empty()} otherwise
      */
     default Optional<ExpressionsBasedModel.EntityMap> getEntityMap() {
         return Optional.empty();
     }
 
     /**
-     * Incrementally tighten the bounds of a solver variable.
-     * <p>
-     * The {@code index} is the solver's internal variable index as described by the {@link EntityMap}
-     * returned from {@link #getEntityMap()}. Implementations are expected to intersect the current variable
-     * bounds with the supplied {@code [lower, upper]} range. This method generalises
-     * {@link #fixVariable(int, double)} in the sense that fixing a variable corresponds to calling
-     * {@code updateRange(index, value, value)}.
-     * <p>
-     * Callers should only supply ranges that are consistent with the owning {@link ExpressionsBasedModel}. If
-     * the update is not supported or would result in an inconsistent internal state, the implementation
-     * should return {@code false} rather than throwing.
+     * The reduced gradient of variable {@code index} — the rate of change of the objective if this variable
+     * were to move from its current bound, accounting for the dual variables. For LP this is a constant per
+     * variable at a given basis; for convex problems it is point-dependent.
      *
-     * @param index the solver specific variable index, not the model index
-     * @param lower the new (possibly tighter) lower bound for the variable
-     * @param upper the new (possibly tighter) upper bound for the variable
-     * @return {@code true} if the range was successfully updated, {@code false} if the operation is not
-     *         supported or could not be applied
+     * @param index solver-internal variable index (as defined by {@link EntityMap})
+     * @return the reduced gradient at the current solution
+     */
+    double getReducedGradient(int index);
+
+    /**
+     * Tighten the bounds of a solver variable by intersecting with the given range. Generalises
+     * {@link #fixVariable(int, double)} (fixing ≡ {@code updateRange(index, value, value)}).
+     *
+     * @param index solver-internal variable index (as defined by {@link EntityMap})
+     * @param lower new lower bound
+     * @param upper new upper bound
+     * @return {@code true} if successfully applied
      */
     default boolean updateRange(final int index, final double lower, final double upper) {
         return false;

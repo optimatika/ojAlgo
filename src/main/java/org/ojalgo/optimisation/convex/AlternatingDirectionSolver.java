@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.ArrayR256;
@@ -314,9 +315,9 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
         @Override
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
             if (model.options.convex().isExtendedPrecision()) {
-                return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR256.FACTORY);
+                return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR256.FACTORY, solverState.getReducedGradient());
             } else {
-                return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR064.FACTORY);
+                return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR064.FACTORY, solverState.getReducedGradient());
             }
         }
 
@@ -692,9 +693,9 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
         }
     }
 
-    static final Integration INTEGRATION = new Integration();
-
     private static final double SCALED_INFINITY = Configuration.INFINITY * RuizScaling.MIN;
+
+    static final Integration INTEGRATION = new Integration();
 
     static <N extends Comparable<N>> Composer<N> build(final ExpressionsBasedModel model, final PhysicalStore.Factory<N, ?> factory) {
 
@@ -780,6 +781,8 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
         return retVal;
     }
 
+    private transient double[] myCachedReducedGradient = null;
+
     /** Problem data */
     private final Problem myData;
 
@@ -833,12 +836,27 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
     }
 
     @Override
+    public double getDualMultiplier(final int index) {
+        return mySolution.y[index];
+    }
+
+    @Override
     public Optional<ExpressionsBasedModel.EntityMap> getEntityMap() {
         return myStructure != null ? Optional.of(myStructure) : Optional.empty();
     }
 
     @Override
+    public double getReducedGradient(final int index) {
+        if (myCachedReducedGradient == null) {
+            myCachedReducedGradient = this.computeReducedGradient();
+        }
+        return myCachedReducedGradient[index];
+    }
+
+    @Override
     public Result solve(final Result kickStarter) {
+
+        myCachedReducedGradient = null;
 
         if (kickStarter != null && kickStarter.getState().isFeasible()) {
             this.initialisePrimal(kickStarter);
@@ -911,11 +929,15 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
             state = Optimisation.State.FAILED;
         }
 
-        return mySolution.compose(value, state);
+        Supplier<Access1D<?>> reducedGradient = () -> ArrayR064.wrap(this.computeReducedGradient());
+
+        return mySolution.compose(value, state).withReducedGradient(reducedGradient);
     }
 
     @Override
     public boolean updateRange(final int index, final double lower, final double upper) {
+
+        myCachedReducedGradient = null;
 
         double scalar = myScaling.dual.values[index];
 
@@ -1059,6 +1081,26 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
         }
 
         return exitflag;
+    }
+
+    /**
+     * Computes the reduced gradient (gradient of the Lagrangian) in original (unscaled) coordinates.
+     * <p>
+     * Evaluates {@code P_s x_s + q_s + A_s' y_s} using scaled data and work arrays, then unscales each
+     * component by {@code primal.inverse[j] / cost}.
+     */
+    private double[] computeReducedGradient() {
+        int n = myData.getColDim();
+        double[] gradient = new double[n];
+        double[] Px = new double[n];
+        double[] yA = new double[n];
+        R064CSC.multiplySymmetric(Px, myData.P, myWork.x);
+        R064CSC.multiply(yA, myWork.y, myData.A);
+        double invCost = PrimitiveMath.ONE / myScaling.cost;
+        for (int j = 0; j < n; j++) {
+            gradient[j] = (Px[j] + myData.q[j] + yA[j]) * myScaling.primal.inverse[j] * invCost;
+        }
+        return gradient;
     }
 
     /**

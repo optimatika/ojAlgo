@@ -37,11 +37,12 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RowsSupplier;
-import org.ojalgo.matrix.store.SparseStore;
+import org.ojalgo.matrix.store.SparseStructure2D;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.RowView;
+import org.ojalgo.structure.ElementView2D;
 import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.Stopwatch;
@@ -64,9 +65,14 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
             baseA.addRows(addRowDim);
 
-            if (addA instanceof SparseStore) {
+            if (addA instanceof SparseStructure2D) {
 
-                ((SparseStore<?>) addA).nonzeros().forEach(nz -> baseA.getRow(baseRowDim + Math.toIntExact(nz.row())).set(nz.column(), nz.doubleValue()));
+                for (ElementView2D<?, ?> nz : addA.nonzeros()) {
+                    int row = baseRowDim + Math.toIntExact(nz.row());
+                    long col = nz.column();
+                    double val = nz.doubleValue();
+                    baseA.getRow(row).set(col, val);
+                }
 
             } else {
 
@@ -457,7 +463,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
             ProgrammingError.throwIfNotEqualRowDimensions(mtrxAE, mtrxBE);
 
             myAE = FACTORY.makeRowsSupplier(mtrxAE.getColDim());
-            myBE = FACTORY.makeZero(0, 0);
+            myBE = FACTORY.makeZero(0, 1);
 
             myBE = Builder.add(myAE, myBE, mtrxAE, mtrxBE);
         }
@@ -468,7 +474,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
             ProgrammingError.throwIfNotEqualRowDimensions(mtrxAI, mtrxBI);
 
             myAI = FACTORY.makeRowsSupplier(mtrxAI.getColDim());
-            myBI = FACTORY.makeZero(0, 0);
+            myBI = FACTORY.makeZero(0, 1);
 
             myBI = Builder.add(myAI, myBI, mtrxAI, mtrxBI);
         }

@@ -48,6 +48,23 @@ import org.ojalgo.structure.Structure1D;
 import org.ojalgo.type.EnumPartition;
 import org.ojalgo.type.context.NumberContext;
 
+/**
+ * Abstract internal data structure shared by the simplex solver implementations. Holds the constraint matrix,
+ * objective, variable bounds, basis partition, and current solution state needed to execute simplex
+ * iterations.
+ * <p>
+ * Two concrete families extend this class:
+ * <ul>
+ * <li>{@link SimplexTableau} — stores the full (or sparse) simplex tableau explicitly. Used by
+ * {@link SimplexTableauSolver}.
+ * <li>{@link RevisedStore} — maintains the basis inverse in factored form via a
+ * {@link BasisRepresentation}, computing tableau elements on demand. Used by {@link SimplexSolver} and its
+ * subclasses.
+ * </ul>
+ * Non-basic variables are partitioned into {@link ColumnState#LOWER}, {@link ColumnState#UPPER}, or
+ * {@link ColumnState#UNBOUNDED}; basic variables are {@link ColumnState#BASIS}. The partition is updated on
+ * each pivot.
+ */
 abstract class SimplexStore {
 
     enum ColumnState {
@@ -219,6 +236,30 @@ abstract class SimplexStore {
      */
     final int countRemainingArtificials() {
         return myRemainingArtificials;
+    }
+
+    /**
+     * Extract the dual variables (Lagrange multipliers) for all constraints into the given array. The array
+     * must have length {@link #m}.
+     */
+    final void extractDualVariables(final double[] target) {
+        Primitive1D duals = this.sliceDualVariables();
+        for (int i = 0; i < m; i++) {
+            target[i] = duals.doubleValue(i);
+        }
+    }
+
+    /**
+     * Extract the reduced costs for all variables into the given array. The array must have length
+     * {@link #n}. Basic variables get 0; non-basic variables get their reduced cost from the excluded array.
+     */
+    final void extractReducedCosts(final double[] target) {
+        for (int ji = 0; ji < included.length; ji++) {
+            target[included[ji]] = ZERO;
+        }
+        for (int je = 0; je < excluded.length; je++) {
+            target[excluded[je]] = this.getReducedCost(je);
+        }
     }
 
     final double[] extractSolution() {

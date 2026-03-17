@@ -26,13 +26,17 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import org.ojalgo.structure.Mutate1D;
 
 /**
- * First runs the dual algorithm (with a possibly modified objective function) to establish feasibility, and
- * then the primal to reach optimality.
+ * Two-phase revised simplex. Phase 1 constructs a modified objective that makes the starting point dual
+ * feasible and then runs dual simplex iterations to achieve primal feasibility. Phase 2 restores the
+ * original objective and runs primal simplex iterations (maintaining primal feasibility) to reach
+ * optimality.
  * <p>
- * This is the primary sub-class of {@link SimplexSolver} and the one you would typically use. All the other
- * sub-classes are primarily there to help with testing.
- *
- * @author apete
+ * This is the most general {@link SimplexSolver} subclass and the one normally instantiated by
+ * {@link LinearSolver.Builder} and the {@link LinearSolver.ModelIntegration}. It handles explicit finite
+ * lower and upper bounds on variables natively and does not require the initial basis to be feasible.
+ * <p>
+ * The other subclasses ({@link DualSimplexSolver}, {@link PrimalSimplexSolver}) run only one of the two
+ * phases and impose stronger preconditions; they exist primarily for testing and specialised use cases.
  */
 final class PhasedSimplexSolver extends SimplexSolver {
 

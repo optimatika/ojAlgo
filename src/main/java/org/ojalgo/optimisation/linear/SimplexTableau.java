@@ -44,6 +44,18 @@ import org.ojalgo.structure.Primitive2D;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
+/**
+ * {@link SimplexStore} subclass that stores the simplex tableau explicitly — constraint body, RHS, and
+ * objective row are all materialised and updated in-place on each pivot. This is the traditional full-tableau
+ * approach.
+ * <p>
+ * Concrete implementations choose the storage layout:
+ * <ul>
+ * <li>{@link DenseTableau} — dense two-dimensional array; efficient for smaller or denser problems.
+ * <li>{@link SparseTableau} — sparse row vectors; better for large or highly sparse problems.
+ * </ul>
+ * Used by {@link SimplexTableauSolver} (the classic 2-phase primal simplex).
+ */
 abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, Mutate2D {
 
     /**

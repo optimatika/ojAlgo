@@ -32,6 +32,15 @@ import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Primitive1D;
 import org.ojalgo.structure.Primitive2D;
 
+/**
+ * {@link SimplexTableau} backed by a dense two-dimensional {@code double} array. All tableau elements
+ * (constraint body, RHS, objective, and phase-1 row) are stored explicitly and updated in-place on each
+ * pivot.
+ * <p>
+ * Best suited for smaller or denser LP problems. For large sparse problems {@link SparseTableau} may be
+ * more efficient. Also used as a dense backing option by the {@link SimplexSolver} family (via
+ * {@link SimplexStore#newStoreFactory(org.ojalgo.optimisation.Optimisation.Options)}).
+ */
 final class DenseTableau extends SimplexTableau {
 
     private final int myColDim;

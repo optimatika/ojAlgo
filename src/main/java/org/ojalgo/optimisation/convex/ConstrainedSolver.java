@@ -45,6 +45,11 @@ abstract class ConstrainedSolver extends BasePrimitiveSolver {
     }
 
     @Override
+    public double getDualMultiplier(final int index) {
+        return mySolutionL.doubleValue(index);
+    }
+
+    @Override
     protected Result buildResult() {
 
         Result result = super.buildResult();
@@ -94,6 +99,21 @@ abstract class ConstrainedSolver extends BasePrimitiveSolver {
         }
 
         return spdQ;
+    }
+
+    @Override
+    double[] computeReducedGradient() {
+        double[] gradient = super.computeReducedGradient();
+        MatrixStore<Double> iterA = this.getIterationA();
+        int nbRows = iterA.getRowDim();
+        int nbCols = gradient.length;
+        for (int i = 0; i < nbRows; i++) {
+            double lambda = mySolutionL.doubleValue(i);
+            for (int j = 0; j < nbCols; j++) {
+                gradient[j] += iterA.doubleValue(i, j) * lambda;
+            }
+        }
+        return gradient;
     }
 
     /**

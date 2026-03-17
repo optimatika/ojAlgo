@@ -22,6 +22,8 @@ General style
 Javadoc and code comments
 - Use HTML for layout but keep it tidy and readable in source.
 - Avoid unnecessary end tags like </p> and </li>.
+- Avoid unnecessary formatting tags like <b> and <i>.
+- Avoid html entities and symbols like &lt; &gt; &nbsp; or &copy;.
 - Comment classes, methods, fields, and constants as proper Javadoc; avoid unattached line or block comments.
 - Treat inline line/block comments as a last resort—when the code needs explanation, attach concise Javadoc to the relevant declaration instead.
 - Prefer concise lists and paragraphs; link APIs with {@link ...} where it adds clarity.

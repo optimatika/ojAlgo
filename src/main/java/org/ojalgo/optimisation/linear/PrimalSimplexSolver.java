@@ -24,9 +24,13 @@ package org.ojalgo.optimisation.linear;
 import org.ojalgo.optimisation.Optimisation;
 
 /**
- * Requires the initial basis to be feasible (doesn't do a phase-1).
- *
- * @author apete
+ * Pure primal simplex — runs only primal iterations (no phase-1).
+ * <p>
+ * Requires the initial basis to already be primal feasible. If it is not, the solve will fail. The solver
+ * supports explicit finite lower and upper bounds on variables (inherited from {@link SimplexSolver}).
+ * <p>
+ * Exists primarily for testing and specialised scenarios where a feasible starting point is known. For
+ * general use prefer {@link PhasedSimplexSolver}.
  */
 final class PrimalSimplexSolver extends SimplexSolver {
 
