@@ -21,7 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.ONE;
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;

@@ -73,7 +73,7 @@ class NullSpaceProjection {
 
         MatrixStore<Double> Z = decomposition.getQ().offsets(0, rank);
 
-        PhysicalStore<Double> x0 = R064Store.FACTORY.make(nbVars, 1);
+        R064Store x0 = R064Store.FACTORY.make(nbVars, 1);
         x0.fillMatching(fullModel.getBE());
         decomposition.btran(x0);
 
@@ -199,8 +199,7 @@ class NullSpaceProjection {
         }
 
         Optimisation.Result retVal = new Optimisation.Result(reducedlState.getState(), NaN, x);
-        retVal = retVal.multipliers(myOriginal.getConstraintsMetaData(), multipliers);
-        return retVal;
+        return retVal.multipliers(myOriginal.getConstraintsMetaData(), multipliers);
     }
 
     /**

@@ -27,8 +27,6 @@ import org.ojalgo.structure.Access1D;
 
 public abstract class OperationParameter implements ArrayOperation {
 
-    public static int THRESHOLD = 256;
-
     public static <N extends Comparable<N>> void invoke(final BasicArray<N> data, final int first, final int limit, final int step, final Access1D<N> value,
             final ParameterFunction<N> function, final int param) {
         for (int i = first; i < limit; i += step) {

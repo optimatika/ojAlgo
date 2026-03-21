@@ -25,8 +25,6 @@ import org.ojalgo.array.BasicArray;
 
 public abstract class Exchange implements ArrayOperation {
 
-    public static int THRESHOLD = 256;
-
     public static <N extends Comparable<N>> void exchange(final BasicArray<N> data, final long firstA, final long firstB, final long step, final long count) {
 
         long indexA = firstA;

@@ -21,6 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition.function;
 
+@FunctionalInterface
 public interface RotateRight {
 
     RotateRight NULL = (low, high, cos, sin) -> {};

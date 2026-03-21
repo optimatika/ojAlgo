@@ -41,9 +41,9 @@ public interface BasicParser<T> extends TextLineReader.Parser<T> {
     /**
      * Will parse this file, line by line, passing the reulting objects (1 per line) to the supplied consumer.
      *
-     * @param file The CSV file to parse
+     * @param file       The CSV file to parse
      * @param skipHeader Should skip (1) header row/line
-     * @param consumer The results consumer
+     * @param consumer   The results consumer
      */
     default void parse(final File file, final boolean skipHeader, final Consumer<T> consumer) {
 
@@ -58,7 +58,7 @@ public interface BasicParser<T> extends TextLineReader.Parser<T> {
      * Will parse this file, line by line, passing the resulting objects (1 per line) to the supplied
      * consumer.
      *
-     * @param file The CSV file to parse
+     * @param file     The CSV file to parse
      * @param consumer The results consumer
      */
     default void parse(final File file, final Consumer<T> consumer) {
@@ -66,9 +66,9 @@ public interface BasicParser<T> extends TextLineReader.Parser<T> {
     }
 
     /**
-     * @param reader The CSV data reader
+     * @param reader     The CSV data reader
      * @param skipHeader Should skip (1) header row/line
-     * @param consumer The results consumer
+     * @param consumer   The results consumer
      */
     default void parse(final Reader reader, final boolean skipHeader, final Consumer<T> consumer) {
 
@@ -80,7 +80,7 @@ public interface BasicParser<T> extends TextLineReader.Parser<T> {
     }
 
     /**
-     * @param reader The CSV data reader
+     * @param reader   The CSV data reader
      * @param consumer The results consumer
      */
     default void parse(final Reader reader, final Consumer<T> consumer) {

@@ -347,6 +347,15 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
         }
     }
 
+    /**
+     * AXPY using a raw {@code double[]} vector — avoids {@link NonzeroView} allocation.
+     */
+    public void axpy(final double a, final double[] y) {
+        for (int n = 0; n < myActualLength; n++) {
+            y[myIndices[n]] += a * myValues.doubleValue(n);
+        }
+    }
+
     @Override
     public long count() {
         return mySize;
@@ -367,6 +376,20 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
         for (int n = 0; n < myActualLength; n++) {
             retVal += myValues.doubleValue(n) * vector.doubleValue(myIndices[n]);
+        }
+
+        return retVal;
+    }
+
+    /**
+     * Dot product using a raw {@code double[]} vector — avoids {@link NonzeroView} allocation.
+     */
+    public double dot(final double[] vector) {
+
+        double retVal = PrimitiveMath.ZERO;
+
+        for (int n = 0; n < myActualLength; n++) {
+            retVal += myValues.doubleValue(n) * vector[myIndices[n]];
         }
 
         return retVal;

@@ -23,6 +23,8 @@ package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.function.constant.PrimitiveMath.MACHINE_SMALLEST;
 
+import java.util.List;
+
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
@@ -33,6 +35,7 @@ import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
+import org.ojalgo.matrix.transformation.InvertibleFactor;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
@@ -103,6 +106,168 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
     }
 
+    /**
+     * [A]=[Q][R] — Householder reflections stored in the lower part of the in-place body.
+     * <p>
+     * ftran applies Q^T (Householder reflections in forward order). btran applies Q (Householder reflections
+     * in reverse order).
+     */
+    static final class FactorQ<N extends Comparable<N>> implements MatrixDecomposition.Factor<N> {
+
+        private final DecompositionStore<N> myBody;
+        private final PhysicalStore.Factory<N, ?> myFactory;
+        private final boolean myFullSize;
+        private final int myMinDim;
+
+        FactorQ(final DecompositionStore<N> body, final PhysicalStore.Factory<N, ?> factory, final int minDim, final boolean fullSize) {
+            super();
+            myBody = body;
+            myFactory = factory;
+            myMinDim = minDim;
+            myFullSize = fullSize;
+        }
+
+        @Override
+        public void btran(final double[] arg) {
+            PhysicalStore<N> x = myFactory.column(arg);
+            this.btran(x);
+            x.supplyTo(arg);
+        }
+
+        @Override
+        public void btran(final PhysicalStore<N> arg) {
+
+            HouseholderReference<N> reference = HouseholderReference.makeColumn(myBody);
+
+            for (int j = myMinDim - 1; j >= 0; j--) {
+
+                reference.point(j, j);
+
+                if (!reference.isZero()) {
+                    arg.transformLeft(reference, 0);
+                }
+            }
+        }
+
+        @Override
+        public void ftran(final double[] arg) {
+            PhysicalStore<N> x = myFactory.column(arg);
+            this.ftran(x);
+            x.supplyTo(arg);
+        }
+
+        @Override
+        public void ftran(final PhysicalStore<N> arg) {
+
+            HouseholderReference<N> reference = HouseholderReference.makeColumn(myBody);
+
+            for (int j = 0; j < myMinDim; j++) {
+
+                reference.point(j, j);
+
+                if (!reference.isZero()) {
+                    arg.transformLeft(reference, 0);
+                }
+            }
+        }
+
+        @Override
+        public MatrixStore<N> get() {
+
+            int m = myBody.getRowDim();
+            int cols = myFullSize ? m : myMinDim;
+
+            PhysicalStore<N> retVal = myFactory.makeEye(m, cols);
+
+            HouseholderReference<N> reference = HouseholderReference.makeColumn(myBody);
+
+            for (int j = myMinDim - 1; j >= 0; j--) {
+
+                reference.point(j, j);
+
+                if (!reference.isZero()) {
+                    retVal.transformLeft(reference, j);
+                }
+            }
+
+            return retVal;
+        }
+
+        @Override
+        public int getColDim() {
+            return myBody.getRowDim();
+        }
+
+        @Override
+        public int getRowDim() {
+            return myBody.getRowDim();
+        }
+
+    }
+
+    /**
+     * [A]=[Q][R] — Upper triangular factor R stored in the upper part of the in-place body.
+     * <p>
+     * ftran solves [R][x]=[b] via back-substitution. btran solves [R]^T[x]=[b] via forward-substitution.
+     */
+    static final class FactorR<N extends Comparable<N>> implements MatrixDecomposition.Factor<N> {
+
+        private final DecompositionStore<N> myBody;
+        private final boolean myFullSize;
+
+        FactorR(final DecompositionStore<N> body, final boolean fullSize) {
+            super();
+            myBody = body;
+            myFullSize = fullSize;
+        }
+
+        @Override
+        public void btran(final double[] arg) {
+            myBody.substituteForwards(true, false, arg);
+        }
+
+        @Override
+        public void btran(final PhysicalStore<N> arg) {
+            myBody.substituteForwards(true, false, arg);
+        }
+
+        @Override
+        public void ftran(final double[] arg) {
+            myBody.substituteBackwards(false, false, arg);
+        }
+
+        @Override
+        public void ftran(final PhysicalStore<N> arg) {
+            myBody.substituteBackwards(false, false, arg);
+        }
+
+        @Override
+        public MatrixStore<N> get() {
+
+            MatrixStore<N> logical = myBody.triangular(true, false);
+
+            int nbRows = myBody.getRowDim();
+            int nbCols = myBody.getColDim();
+
+            if (!myFullSize && nbRows > nbCols) {
+                return logical.limits(nbCols, -1);
+            }
+
+            return logical;
+        }
+
+        @Override
+        public int getColDim() {
+            return myBody.getColDim();
+        }
+
+        @Override
+        public int getRowDim() {
+            return myBody.getMinDim();
+        }
+
+    }
+
     private final boolean myFullSize;
     private int myNumberOfHouseholderTransformations = 0;
 
@@ -113,7 +278,7 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
     @Override
     public void btran(final double[] arg) {
-        DecompositionStore<N> x = this.copyRow(arg);
+        DecompositionStore<N> x = this.copyColumn(arg);
         this.btran(x);
         x.supplyTo(arg);
     }
@@ -188,6 +353,25 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
     }
 
     @Override
+    public void ftran(final PhysicalStore<N> arg) {
+
+        DecompositionStore<N> body = this.getInPlace();
+
+        HouseholderReference<N> reference = HouseholderReference.makeColumn(body);
+
+        for (int j = 0, limit = this.getMinDim(); j < limit; j++) {
+
+            reference.point(j, j);
+
+            if (!reference.isZero()) {
+                arg.transformLeft(reference, 0);
+            }
+        }
+
+        arg.substituteBackwards(body, false, false, false);
+    }
+
+    @Override
     public N getDeterminant() {
 
         AggregatorFunction<N> aggregator = this.aggregator().product();
@@ -206,38 +390,22 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
         return this.getSolution(this.makeIdentity(this.getRowDim()), preallocated);
     }
 
+    /**
+     * [A]=[Q][R]
+     */
+    @Override
+    public List<InvertibleFactor<N>> getFactors() {
+        return List.of(this.getFactorQ(), this.getFactorR());
+    }
+
     @Override
     public MatrixStore<N> getQ() {
-
-        DecompositionStore<N> retVal = this.makeEye(this.getRowDim(), myFullSize ? this.getRowDim() : this.getMinDim());
-
-        HouseholderReference<N> tmpReference = HouseholderReference.makeColumn(this.getInPlace());
-
-        for (int j = this.getMinDim() - 1; j >= 0; j--) {
-
-            tmpReference.point(j, j);
-
-            if (!tmpReference.isZero()) {
-                retVal.transformLeft(tmpReference, j);
-            }
-        }
-
-        return retVal;
+        return this.getFactorQ().get();
     }
 
     @Override
     public MatrixStore<N> getR() {
-
-        MatrixStore<N> logical = this.getInPlace().triangular(true, false);
-
-        int nbRows = this.getRowDim();
-        int nbCols = this.getColDim();
-
-        if (!myFullSize && nbRows > nbCols) {
-            return logical.limits(nbCols, -1);
-        }
-
-        return logical;
+        return this.getFactorR().get();
     }
 
     @Override
@@ -348,6 +516,21 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
     @Override
     protected boolean checkSolvability() {
         return this.isAspectRatioNormal() && this.isFullRank();
+    }
+
+    /**
+     * [A]=[Q][R]
+     */
+    MatrixDecomposition.Factor<N> getFactorQ() {
+        DecompositionStore<N> body = this.getInPlace();
+        return new FactorQ<>(body, body.physical(), this.getMinDim(), myFullSize);
+    }
+
+    /**
+     * [A]=[Q][R]
+     */
+    MatrixDecomposition.Factor<N> getFactorR() {
+        return new FactorR<>(this.getInPlace(), myFullSize);
     }
 
     /**

@@ -160,22 +160,22 @@ public interface Scalar<N extends Comparable<N>> extends AccessScalar<N>, Field<
     /**
      * Tests if this scalar value is exactly zero.
      * <p>
-     * Each implementation should test for zero as exactly as possible based on what's achievable
-     * with that specific scalar type. The purpose is NOT to have similar behavior between different
-     * implementations, but rather to leverage the full precision and capabilities of each type.
+     * Each implementation should test for zero as exactly as possible based on what's achievable with that
+     * specific scalar type. The purpose is NOT to have similar behavior between different implementations,
+     * but rather to leverage the full precision and capabilities of each type.
      * </p>
      * <p>
      * For example:
      * <ul>
-     *   <li>Primitive types (like {@code double}) should use exact equality comparison</li>
-     *   <li>High-precision types (like {@link Quadruple}) should check both base and remainder components</li>
-     *   <li>Arbitrary-precision types (like {@link BigDecimal}) should use their built-in zero detection</li>
-     *   <li>Complex types should check both real and imaginary parts</li>
+     * <li>Primitive types (like {@code double}) should use exact equality comparison</li>
+     * <li>High-precision types (like {@link Quadruple}) should check both base and remainder components</li>
+     * <li>Arbitrary-precision types (like {@link BigDecimal}) should use their built-in zero detection</li>
+     * <li>Complex types should check both real and imaginary parts</li>
      * </ul>
      * </p>
      * <p>
-     * This method should NOT use tolerance-based comparisons or approximate zero detection,
-     * as those are better handled by context-aware methods like {@link #isSmall(double)}.
+     * This method should NOT use tolerance-based comparisons or approximate zero detection, as those are
+     * better handled by context-aware methods like {@link #isSmall(double)}.
      * </p>
      * 
      * @return true if this scalar represents exactly zero, false otherwise

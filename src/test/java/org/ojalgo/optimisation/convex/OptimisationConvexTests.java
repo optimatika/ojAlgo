@@ -21,7 +21,8 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.function.constant.BigMath.*;
+import static org.ojalgo.function.constant.BigMath.HALF;
+import static org.ojalgo.function.constant.BigMath.NEG;
 
 import java.math.BigDecimal;
 

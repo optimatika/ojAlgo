@@ -32,8 +32,6 @@ import org.ojalgo.function.constant.PrimitiveMath;
  */
 public abstract class ASUM implements ArrayOperation {
 
-    public static int THRESHOLD = 128;
-
     public static double invoke(final double[] data, final int first, final int limit, final int step) {
         double retVal = 0D;
         for (int i = first; i < limit; i += step) {

@@ -22,8 +22,8 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.BenchmarkUtils;
-import org.ojalgo.array.operation.HermitianRank2Update;
-import org.ojalgo.array.operation.MultiplyHermitianAndVector;
+import org.ojalgo.matrix.operation.HermitianRank2Update;
+import org.ojalgo.matrix.operation.MultiplyHermitianAndVector;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.openjdk.jmh.annotations.Benchmark;

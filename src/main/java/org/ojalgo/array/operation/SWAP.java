@@ -28,8 +28,6 @@ package org.ojalgo.array.operation;
  */
 public abstract class SWAP implements ArrayOperation {
 
-    public static int THRESHOLD = 128;
-
     public static void exchangeColumns(final double[][] target, final int colA, final int colB) {
         double tmpElem;
         int limit = target.length;

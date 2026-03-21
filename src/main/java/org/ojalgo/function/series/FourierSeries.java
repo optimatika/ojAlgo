@@ -88,10 +88,10 @@ public class FourierSeries implements PrimitiveFunction.Unary {
     private final double[] mySinCoefficients;
 
     /**
-     * @param period The period of the function
+     * @param period       The period of the function
      * @param coefficients The Fourier coefficients. The first coefficient is the constant term (the real part
-     *        of that complex number), then the following coefficients are the coefficients of the cos and sin
-     *        terms with increasing frequency.
+     *                     of that complex number), then the following coefficients are the coefficients of
+     *                     the cos and sin terms with increasing frequency.
      */
     public FourierSeries(final double period, final ComplexNumber... coefficients) {
 

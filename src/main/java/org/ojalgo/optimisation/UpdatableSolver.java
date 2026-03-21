@@ -82,9 +82,10 @@ public interface UpdatableSolver extends Optimisation.Solver {
      * and the caller should proceed without cut generation.
      *
      * @param fractionality a measure of how fractional the current solution is; values close to zero mean
-     *        nearly integral, values near {@code 0.5} indicate highly fractional components
-     * @param integer a boolean mask indicating which internal variables correspond to integer-constrained
-     *        model entities; {@code true} means the variable must take an integer value
+     *                      nearly integral, values near {@code 0.5} indicate highly fractional components
+     * @param integer       a boolean mask indicating which internal variables correspond to
+     *                      integer-constrained model entities; {@code true} means the variable must take an
+     *                      integer value
      * @return a collection of {@link Equation} instances representing additional valid inequalities to be
      *         added to the model; may be empty but should never be {@code null}
      */

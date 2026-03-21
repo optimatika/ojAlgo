@@ -62,16 +62,22 @@ public final class NodeKey implements Comparable<NodeKey> {
     static final double MINIMUM_DISPLACEMENT = 1E-9;
 
     public static final Comparator<NodeKey> BREADTH_FIRST_SEARCH = Comparator.comparingInt((final NodeKey nk) -> nk.depth).thenComparingLong(nk -> nk.sequence);
-    public static final Comparator<NodeKey> DEPTH_FIRST_SEARCH = Comparator.comparingInt((final NodeKey nk) -> nk.depth).reversed()
-            .thenComparing(Comparator.comparingLong((final NodeKey nk) -> nk.sequence).reversed());
+
+    public static final Comparator<NodeKey> DEPTH_FIRST_SEARCH = Comparator.comparingInt((final NodeKey nk) -> -nk.depth).thenComparingLong(nk -> -nk.sequence);
+
     public static final Comparator<NodeKey> FIFO_SEQUENCE = Comparator.comparingLong((final NodeKey nk) -> nk.sequence);
-    public static final Comparator<NodeKey> LARGE_DISPLACEMENT = Comparator.comparingDouble((final NodeKey nk) -> nk.displacement).reversed();
-    public static final Comparator<NodeKey> LIFO_SEQUENCE = Comparator.comparingLong((final NodeKey nk) -> nk.sequence).reversed();
-    public static final Comparator<NodeKey> MAX_OBJECTIVE = Comparator.comparingDouble((final NodeKey nk) -> nk.objective).reversed()
-            .thenComparingInt(nk -> nk.depth).thenComparingDouble(nk -> nk.displacement);
-    public static final Comparator<NodeKey> MIN_OBJECTIVE = Comparator.comparingDouble((final NodeKey nk) -> nk.objective).thenComparingInt(nk -> nk.depth)
-            .thenComparingDouble(nk -> nk.displacement);
+
+    public static final Comparator<NodeKey> LIFO_SEQUENCE = Comparator.comparingLong((final NodeKey nk) -> -nk.sequence);
+
     public static final Comparator<NodeKey> SMALL_DISPLACEMENT = Comparator.comparingDouble((final NodeKey nk) -> nk.displacement);
+
+    public static final Comparator<NodeKey> LARGE_DISPLACEMENT = Comparator.comparingDouble((final NodeKey nk) -> -nk.displacement);
+
+    public static final Comparator<NodeKey> MIN_OBJECTIVE = Comparator.comparingDouble((final NodeKey nk) -> nk.objective)
+            .thenComparingDouble(nk -> -nk.displacement);
+
+    public static final Comparator<NodeKey> MAX_OBJECTIVE = Comparator.comparingDouble((final NodeKey nk) -> -nk.objective)
+            .thenComparingDouble(nk -> -nk.displacement);
 
     /**
      * Used for one thing only - to validate (log problems with) node solver results. Does not effect the

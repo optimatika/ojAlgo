@@ -59,7 +59,7 @@ public final class BinaryContext extends FormatContext<byte[]> {
 
     @Override
     protected byte[] handleParseException(final Format format, final String string) {
-        return new byte[] { };
+        return new byte[] {};
     }
 
 }

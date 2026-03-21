@@ -446,7 +446,7 @@ public abstract class EvD1D {
     }
 
     /**
-     * @param mtrxH Array for internal storage of nonsymmetric Hessenberg form.
+     * @param mtrxH    Array for internal storage of nonsymmetric Hessenberg form.
      * @param vctrWork Temporary work storage
      */
     public static void orthes(final double[] mtrxH, final double[] trnspV, final double[] vctrWork) {

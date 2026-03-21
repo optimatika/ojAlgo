@@ -64,39 +64,39 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
             }
 
             switch (arch.toLowerCase()) {
-            case "x86":
-            case "i386":
-                return X86;
-            case "x86_64":
-            case "amd64":
-                return X86_64;
-            case "aarch64":
-                return AARCH64;
-            case "arm":
-                return ARM;
-            case "ppc":
-            case "ppc64":
-                return PPC;
-            default:
-                return OTHER;
+                case "x86":
+                case "i386":
+                    return X86;
+                case "x86_64":
+                case "amd64":
+                    return X86_64;
+                case "aarch64":
+                    return AARCH64;
+                case "arm":
+                    return ARM;
+                case "ppc":
+                case "ppc64":
+                    return PPC;
+                default:
+                    return OTHER;
             }
         }
 
         @Override
         public String toString() {
             switch (this) {
-            case X86:
-                return "x86";
-            case X86_64:
-                return "x86_64";
-            case AARCH64:
-                return "aarch64";
-            case ARM:
-                return "arm";
-            case PPC:
-                return "ppc";
-            default:
-                return "other";
+                case X86:
+                    return "x86";
+                case X86_64:
+                    return "x86_64";
+                case AARCH64:
+                    return "aarch64";
+                case ARM:
+                    return "arm";
+                case PPC:
+                    return "ppc";
+                default:
+                    return "other";
             }
         }
     }
@@ -298,61 +298,61 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
         long l1Size;
 
         switch (architecture) {
-        case PPC:
-            if (threads >= 16) {
-                threadsPerCore = 8; // SMT8
-            } else if (threads >= 8) {
-                threadsPerCore = 4; // SMT4
-            } else if (threads >= 4) {
-                threadsPerCore = 2; // SMT2
-            } else {
-                threadsPerCore = 1;
-            }
-            l1Size = 64L * K;
-            break;
-
-        case X86:
-        case X86_64:
-            // For 4-thread systems, infer SMT2 vs 1 based on memory bands; otherwise typical SMT2 for larger even counts
-            if (threads == 4) {
-                long gb = Math.max(1L, memory / (K * K * K));
-                if (gb < 4L) {
-                    threadsPerCore = 1; // very low-RAM quads (no HT)
-                } else if (gb <= 11L) {
-                    threadsPerCore = 2; // likely 2C4T with HT
+            case PPC:
+                if (threads >= 16) {
+                    threadsPerCore = 8; // SMT8
+                } else if (threads >= 8) {
+                    threadsPerCore = 4; // SMT4
+                } else if (threads >= 4) {
+                    threadsPerCore = 2; // SMT2
                 } else {
-                    threadsPerCore = 1; // likely 4C4T without HT
+                    threadsPerCore = 1;
                 }
-            } else if (threads == 2) {
+                l1Size = 64L * K;
+                break;
+
+            case X86:
+            case X86_64:
+                // For 4-thread systems, infer SMT2 vs 1 based on memory bands; otherwise typical SMT2 for larger even counts
+                if (threads == 4) {
+                    long gb = Math.max(1L, memory / (K * K * K));
+                    if (gb < 4L) {
+                        threadsPerCore = 1; // very low-RAM quads (no HT)
+                    } else if (gb <= 11L) {
+                        threadsPerCore = 2; // likely 2C4T with HT
+                    } else {
+                        threadsPerCore = 1; // likely 4C4T without HT
+                    }
+                } else if (threads == 2) {
+                    threadsPerCore = 1;
+                } else {
+                    threadsPerCore = (threads >= 4 && (threads % 2 == 0)) ? 2 : 1;
+                }
+                l1Size = 32L * K;
+                break;
+
+            case AARCH64:
                 threadsPerCore = 1;
-            } else {
-                threadsPerCore = (threads >= 4 && (threads % 2 == 0)) ? 2 : 1;
-            }
-            l1Size = 32L * K;
-            break;
+                l1Size = 64L * K;
+                break;
 
-        case AARCH64:
-            threadsPerCore = 1;
-            l1Size = 64L * K;
-            break;
+            case ARM:
+                threadsPerCore = (threads >= 8) ? 2 : 1;
+                l1Size = 32L * K;
+                break;
 
-        case ARM:
-            threadsPerCore = (threads >= 8) ? 2 : 1;
-            l1Size = 32L * K;
-            break;
-
-        default:
-            // Generic/OTHER: scale SMT with high thread counts typical for many-thread architectures (e.g., SPARC T-series)
-            if (threads >= 64) {
-                threadsPerCore = 8;
-            } else if (threads >= 32) {
-                threadsPerCore = 4;
-            } else if (threads >= 4 && (threads % 2 == 0)) {
-                threadsPerCore = 2;
-            } else {
-                threadsPerCore = 1;
-            }
-            l1Size = 32L * K;
+            default:
+                // Generic/OTHER: scale SMT with high thread counts typical for many-thread architectures (e.g., SPARC T-series)
+                if (threads >= 64) {
+                    threadsPerCore = 8;
+                } else if (threads >= 32) {
+                    threadsPerCore = 4;
+                } else if (threads >= 4 && (threads % 2 == 0)) {
+                    threadsPerCore = 2;
+                } else {
+                    threadsPerCore = 1;
+                }
+                l1Size = 32L * K;
         }
 
         return new BasicMachine(l1Size, threadsPerCore);
@@ -365,146 +365,146 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
         final int cores = Math.max(1, threads / tpc);
 
         switch (architecture) {
-        case X86:
-        case X86_64: {
-            if (level == 2) {
-                // Modern x86(x64) commonly scales L2 per core; legacy 4-thread low-RAM used larger shared L2
-                if (threads == 4) {
-                    long gb = Math.max(1L, memory / (K * K * K));
-                    if (gb <= 3L) {
-                        return new BasicMachine(3L * K * K, 2);
+            case X86:
+            case X86_64: {
+                if (level == 2) {
+                    // Modern x86(x64) commonly scales L2 per core; legacy 4-thread low-RAM used larger shared L2
+                    if (threads == 4) {
+                        long gb = Math.max(1L, memory / (K * K * K));
+                        if (gb <= 3L) {
+                            return new BasicMachine(3L * K * K, 2);
+                        }
                     }
-                }
-                // Legacy 32-bit x86 single/dual-core often had larger shared L2
-                if (architecture == Architecture.X86 && threads <= 2) {
-                    long gb = Math.max(1L, memory / (K * K * K));
-                    if (gb <= 2L) {
-                        return new BasicMachine(1L * K * K, 1);
-                    } else if (gb <= 4L) {
-                        return new BasicMachine(6L * K * K, 2);
+                    // Legacy 32-bit x86 single/dual-core often had larger shared L2
+                    if (architecture == Architecture.X86 && threads <= 2) {
+                        long gb = Math.max(1L, memory / (K * K * K));
+                        if (gb <= 2L) {
+                            return new BasicMachine(1L * K * K, 1);
+                        } else if (gb <= 4L) {
+                            return new BasicMachine(6L * K * K, 2);
+                        }
                     }
-                }
-                // Early x86_64 dual-core without HT often had shared L2 of a few MB
-                if (architecture == Architecture.X86_64 && threads == 2) {
-                    long gb = Math.max(1L, memory / (K * K * K));
-                    if (gb <= 4L) {
-                        return new BasicMachine(4L * K * K, 2);
+                    // Early x86_64 dual-core without HT often had shared L2 of a few MB
+                    if (architecture == Architecture.X86_64 && threads == 2) {
+                        long gb = Math.max(1L, memory / (K * K * K));
+                        if (gb <= 4L) {
+                            return new BasicMachine(4L * K * K, 2);
+                        }
                     }
-                }
-                // Default per-core L2 size with a memory-banded bump for mid/high-memory 8-16 thread systems
-                long gb = Math.max(1L, memory / (K * K * K));
-                if (threads >= 8 && threads <= 16 && gb >= 24L) {
-                    return new BasicMachine(1L * K * K, tpc);
-                }
-                return new BasicMachine(256L * K, tpc);
-            } else if (level == 3) {
-                // Heuristics for L3 size and sharing
-                long l3Size;
-                int l3Threads = threads; // default: shared by all threads
-                if (threads >= 96) {
-                    l3Size = 30L * K * K; // large multi-socket server
-                    l3Threads = Math.max(1, threads / 4); // approximate per-socket sharing (assume 4 sockets)
-                } else if (threads >= 64) {
-                    l3Size = 20L * K * K;
-                    l3Threads = Math.max(1, threads / 2); // typical dual-socket sharing
-                } else if (cores == 6) {
-                    l3Size = 12L * K * K; // Common 6-core desktop/workstation parts
-                } else if (cores >= 8) {
-                    // Use memory ranges to separate older vs newer 8+ core platforms
+                    // Default per-core L2 size with a memory-banded bump for mid/high-memory 8-16 thread systems
                     long gb = Math.max(1L, memory / (K * K * K));
-                    if (gb >= 32L) {
-                        // Newer: ~2MB per core, shared by all threads
-                        l3Size = Math.min(32L * K * K, cores * 2L * K * K);
-                        l3Threads = threads;
-                    } else if (gb <= 16L) {
-                        // Older/leaner memory configs: smaller LLC, shared by physical cores only
-                        l3Size = 8L * K * K;
-                        l3Threads = cores;
+                    if (threads >= 8 && threads <= 16 && gb >= 24L) {
+                        return new BasicMachine(1L * K * K, tpc);
+                    }
+                    return new BasicMachine(256L * K, tpc);
+                } else if (level == 3) {
+                    // Heuristics for L3 size and sharing
+                    long l3Size;
+                    int l3Threads = threads; // default: shared by all threads
+                    if (threads >= 96) {
+                        l3Size = 30L * K * K; // large multi-socket server
+                        l3Threads = Math.max(1, threads / 4); // approximate per-socket sharing (assume 4 sockets)
+                    } else if (threads >= 64) {
+                        l3Size = 20L * K * K;
+                        l3Threads = Math.max(1, threads / 2); // typical dual-socket sharing
+                    } else if (cores == 6) {
+                        l3Size = 12L * K * K; // Common 6-core desktop/workstation parts
+                    } else if (cores >= 8) {
+                        // Use memory ranges to separate older vs newer 8+ core platforms
+                        long gb = Math.max(1L, memory / (K * K * K));
+                        if (gb >= 32L) {
+                            // Newer: ~2MB per core, shared by all threads
+                            l3Size = Math.min(32L * K * K, cores * 2L * K * K);
+                            l3Threads = threads;
+                        } else if (gb <= 16L) {
+                            // Older/leaner memory configs: smaller LLC, shared by physical cores only
+                            l3Size = 8L * K * K;
+                            l3Threads = cores;
+                        } else {
+                            // In-between: scale with cores, shared by all threads
+                            l3Size = Math.max(8L * K * K, Math.min(32L * K * K, cores * 2L * K * K));
+                            l3Threads = threads;
+                        }
+                    } else if (threads == 8) {
+                        long gb = Math.max(1L, memory / (K * K * K));
+                        if (gb >= 28L && gb <= 31L) {
+                            // Mid-memory 30GB configs (e.g., some cloud/desktop platforms)
+                            l3Size = 8250L * K; // 8,250 KiB (~8.06 MiB)
+                        } else {
+                            l3Size = 8L * K * K; // 8 MiB
+                        }
+                    } else if (threads == 4) {
+                        long gb = Math.max(1L, memory / (K * K * K));
+                        // Memory-banded L3 for 4-thread systems: <=4GB -> 3MB, <=8GB -> 4MB, >8GB -> 6MB
+                        if (gb <= 4L) {
+                            l3Size = 3L * K * K;
+                        } else if (gb <= 8L) {
+                            l3Size = 4L * K * K;
+                        } else {
+                            l3Size = 6L * K * K;
+                        }
                     } else {
-                        // In-between: scale with cores, shared by all threads
-                        l3Size = Math.max(8L * K * K, Math.min(32L * K * K, cores * 2L * K * K));
-                        l3Threads = threads;
+                        // Generic: ~2MB per core, min 3MB, cap 32MB
+                        l3Size = Math.max(3L * K * K, Math.min(32L * K * K, cores * 2L * K * K));
                     }
-                } else if (threads == 8) {
-                    long gb = Math.max(1L, memory / (K * K * K));
-                    if (gb >= 28L && gb <= 31L) {
-                        // Mid-memory 30GB configs (e.g., some cloud/desktop platforms)
-                        l3Size = 8250L * K; // 8,250 KiB (~8.06 MiB)
-                    } else {
-                        l3Size = 8L * K * K; // 8 MiB
-                    }
-                } else if (threads == 4) {
-                    long gb = Math.max(1L, memory / (K * K * K));
-                    // Memory-banded L3 for 4-thread systems: <=4GB -> 3MB, <=8GB -> 4MB, >8GB -> 6MB
-                    if (gb <= 4L) {
-                        l3Size = 3L * K * K;
-                    } else if (gb <= 8L) {
-                        l3Size = 4L * K * K;
-                    } else {
-                        l3Size = 6L * K * K;
-                    }
-                } else {
-                    // Generic: ~2MB per core, min 3MB, cap 32MB
-                    l3Size = Math.max(3L * K * K, Math.min(32L * K * K, cores * 2L * K * K));
+                    return new BasicMachine(l3Size, l3Threads);
                 }
-                return new BasicMachine(l3Size, l3Threads);
+                break;
             }
-            break;
-        }
-        case AARCH64: {
-            if (level == 2) {
-                // Non-Apple default ~256KB per core; Apple can have bigger shared L2
-                // Use simple heuristic on threads & memory to mimic common M1/M2 examples
-                if (threads == 8) {
-                    long gb = Math.max(1L, memory / (K * K * K));
-                    if (gb <= 18L) {
-                        // M1 Pro example: large shared L2 across performance clusters
-                        return new BasicMachine(28L * K * K, 8);
-                    } else {
-                        // M2 Air example: 4MB (perf), simplified as a single unit with 4 threads
-                        return new BasicMachine(4L * K * K, 4);
+            case AARCH64: {
+                if (level == 2) {
+                    // Non-Apple default ~256KB per core; Apple can have bigger shared L2
+                    // Use simple heuristic on threads & memory to mimic common M1/M2 examples
+                    if (threads == 8) {
+                        long gb = Math.max(1L, memory / (K * K * K));
+                        if (gb <= 18L) {
+                            // M1 Pro example: large shared L2 across performance clusters
+                            return new BasicMachine(28L * K * K, 8);
+                        } else {
+                            // M2 Air example: 4MB (perf), simplified as a single unit with 4 threads
+                            return new BasicMachine(4L * K * K, 4);
+                        }
                     }
-                }
-                return new BasicMachine(256L * K, tpc);
-            } else if (level == 3) {
-                if (threads == 8) {
-                    long gb = Math.max(1L, memory / (K * K * K));
-                    if (gb <= 18L) {
-                        return new BasicMachine(24L * K * K, 8); // M1 Pro SLC/L3
-                    } else {
-                        return new BasicMachine(8L * K * K, 8); // M2 example
+                    return new BasicMachine(256L * K, tpc);
+                } else if (level == 3) {
+                    if (threads == 8) {
+                        long gb = Math.max(1L, memory / (K * K * K));
+                        if (gb <= 18L) {
+                            return new BasicMachine(24L * K * K, 8); // M1 Pro SLC/L3
+                        } else {
+                            return new BasicMachine(8L * K * K, 8); // M2 example
+                        }
                     }
+                    // Generic ARM64: modest LLC
+                    return new BasicMachine(2L * K * K, threads);
                 }
-                // Generic ARM64: modest LLC
-                return new BasicMachine(2L * K * K, threads);
+                break;
             }
-            break;
-        }
-        case ARM: {
-            if (level == 2) {
-                return new BasicMachine(256L * K, tpc);
-            } else if (level == 3) {
-                return new BasicMachine(2L * K * K, threads);
+            case ARM: {
+                if (level == 2) {
+                    return new BasicMachine(256L * K, tpc);
+                } else if (level == 3) {
+                    return new BasicMachine(2L * K * K, threads);
+                }
+                break;
             }
-            break;
-        }
-        case PPC: {
-            if (level == 2) {
-                // Many PPC parts have ~512KB L2 per core (simplified)
-                return new BasicMachine(512L * K, Math.min(8, tpc));
-            } else if (level == 3) {
-                // Typical small PPC L3
-                return new BasicMachine(8L * K * K, threads);
+            case PPC: {
+                if (level == 2) {
+                    // Many PPC parts have ~512KB L2 per core (simplified)
+                    return new BasicMachine(512L * K, Math.min(8, tpc));
+                } else if (level == 3) {
+                    // Typical small PPC L3
+                    return new BasicMachine(8L * K * K, threads);
+                }
+                break;
             }
-            break;
-        }
-        default: {
-            if (level == 2) {
-                return new BasicMachine(256L * K, tpc);
-            } else if (level == 3) {
-                return new BasicMachine(3L * K * K, threads);
+            default: {
+                if (level == 2) {
+                    return new BasicMachine(256L * K, tpc);
+                } else if (level == 3) {
+                    return new BasicMachine(3L * K * K, threads);
+                }
             }
-        }
         }
 
         // Fallback (should not reach)
@@ -517,25 +517,25 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
     private static int estimateNumberOfLevels(final Architecture architecture, final long memory, final int threads, final BasicMachine l1) {
         // Heuristic: return number of cache levels including L1 (i.e., L1=1, L2+L1=2, L3+L2+L1=3)
         switch (architecture) {
-        case X86:
-        case X86_64: {
-            if (threads <= 2) {
+            case X86:
+            case X86_64: {
+                if (threads <= 2) {
+                    return 2;
+                }
+                if (threads == 4) {
+                    long gb = Math.max(1L, memory / (K * K * K));
+                    return (gb <= 3L) ? 2 : 3;
+                }
+                return 3;
+            }
+            case AARCH64:
+                return 3;
+            case ARM:
                 return 2;
-            }
-            if (threads == 4) {
-                long gb = Math.max(1L, memory / (K * K * K));
-                return (gb <= 3L) ? 2 : 3;
-            }
-            return 3;
-        }
-        case AARCH64:
-            return 3;
-        case ARM:
-            return 2;
-        case PPC:
-            return (threads >= 16) ? 3 : 2;
-        default:
-            return 2;
+            case PPC:
+                return (threads >= 16) ? 3 : 2;
+            default:
+                return 2;
         }
     }
 

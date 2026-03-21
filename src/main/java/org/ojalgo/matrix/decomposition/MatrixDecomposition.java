@@ -21,6 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -101,6 +102,12 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          * @return True if it will generate a full sized decomposition.
          */
         boolean isFullSize();
+
+    }
+
+    interface Factor<N extends Comparable<N>> extends InvertibleFactor<N> {
+
+        MatrixStore<N> get();
 
     }
 
@@ -316,6 +323,10 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
             return this.decompose(matrix) && this.isSolvable();
         }
 
+        default List<InvertibleFactor<N>> getFactors() {
+            return List.of(this);
+        }
+
         /**
          * The output must be a "right inverse" and a "generalised inverse".
          */
@@ -440,6 +451,12 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          * <p>
          * If the updatable decomposition is a {@link MatrixDecomposition.Solver} then this method should only
          * return true if {@link MatrixDecomposition.Solver#isSolvable()} is true after the update.
+         * <p>
+         * When/if you update a decomposition using this method, some things like perhaps
+         * {@link #reconstruct()} may no longer give the correct result. What absolutely must work are things
+         * like solving equation systems and getting the inverse, but extracting individual decomposition
+         * factors or reconstructing the original (now modified) matrix may be complicated and not strictly
+         * required to work.
          *
          * @param columnIndex The index of the column, in the original matrix, to replace
          * @param newColumn   The new column values

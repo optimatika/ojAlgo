@@ -27,8 +27,6 @@ import org.ojalgo.structure.Structure2D;
 
 public abstract class VisitAll implements ArrayOperation {
 
-    public static int THRESHOLD = 128;
-
     public static void visit(final double[] target, final DoubleConsumer visitor) {
         VisitAll.visit(target, 0, target.length, visitor);
     }

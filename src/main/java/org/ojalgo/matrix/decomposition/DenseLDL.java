@@ -21,7 +21,10 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.MACHINE_SMALLEST;
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+
+import java.util.List;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.BasicArray;
@@ -34,6 +37,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.TransformableRegion;
+import org.ojalgo.matrix.transformation.InvertibleFactor;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
@@ -49,6 +53,61 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
 
         C128() {
             super(GenericStore.C128);
+        }
+
+    }
+
+    /**
+     * [A]=[P][L][D][L]<sup>H</sup>[P]<sup>T</sup> — diagonal factor.
+     */
+    static final class FactorD<N extends Comparable<N>> implements MatrixDecomposition.Factor<N> {
+
+        private final DecompositionStore<N> myDiagonal;
+        private final BinaryFunction<N> myDivide;
+
+        FactorD(final DecompositionStore<N> diagonal, final BinaryFunction<N> divide) {
+            super();
+            myDiagonal = diagonal;
+            myDivide = divide;
+        }
+
+        @Override
+        public void btran(final double[] arg) {
+            this.ftran(arg);
+        }
+
+        @Override
+        public void btran(final PhysicalStore<N> arg) {
+            this.ftran(arg);
+        }
+
+        @Override
+        public void ftran(final double[] arg) {
+            for (int i = 0, limit = myDiagonal.getMinDim(); i < limit; i++) {
+                arg[i] /= myDiagonal.doubleValue(i, i);
+            }
+        }
+
+        @Override
+        public void ftran(final PhysicalStore<N> arg) {
+            for (int i = 0, limit = myDiagonal.getMinDim(); i < limit; i++) {
+                arg.modifyRow(i, myDivide.by(myDiagonal.get(i, i)));
+            }
+        }
+
+        @Override
+        public MatrixStore<N> get() {
+            return myDiagonal.diagonal();
+        }
+
+        @Override
+        public int getColDim() {
+            return myDiagonal.getMinDim();
+        }
+
+        @Override
+        public int getRowDim() {
+            return myDiagonal.getMinDim();
         }
 
     }
@@ -94,28 +153,12 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
 
     @Override
     public void btran(final double[] arg) {
-        DecompositionStore<N> x = this.copyRow(arg);
-        this.btran(x);
-        x.supplyTo(arg);
+        this.ftran(arg);
     }
 
     @Override
     public void btran(final PhysicalStore<N> arg) {
-
-        this.applyPivotOrder(myPivot, arg);
-
-        DecompositionStore<N> body = this.getInPlace();
-
-        arg.substituteForwards(body, true, false, false);
-
-        BinaryFunction<N> divide = this.function().divide();
-        for (int i = 0, limit = this.getMinDim(); i < limit; i++) {
-            arg.modifyRow(i, divide.by(body.get(i, i)));
-        }
-
-        arg.substituteBackwards(body, true, true, false);
-
-        this.applyReverseOrder(myPivot, arg);
+        this.ftran(arg);
     }
 
     @Override
@@ -151,14 +194,39 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
 
     @Override
     public void ftran(final double[] arg) {
-        DecompositionStore<N> x = this.copyColumn(arg);
-        this.ftran(x);
-        x.supplyTo(arg);
+
+        myPivot.applyPivotOrder(arg);
+
+        DecompositionStore<N> body = this.getInPlace();
+
+        body.substituteForwards(false, true, arg);
+
+        for (int i = 0, limit = this.getMinDim(); i < limit; i++) {
+            arg[i] /= body.doubleValue(i, i);
+        }
+
+        body.substituteBackwards(true, true, arg);
+
+        myPivot.applyReverseOrder(arg);
     }
 
     @Override
     public void ftran(final PhysicalStore<N> arg) {
-        this.getSolution(arg.copy(), arg);
+
+        this.applyPivotOrder(myPivot, arg);
+
+        DecompositionStore<N> body = this.getInPlace();
+
+        body.substituteForwards(false, true, arg);
+
+        BinaryFunction<N> divide = this.function().divide();
+        for (int i = 0, limit = this.getMinDim(); i < limit; i++) {
+            arg.modifyOne(i, divide.by(body.get(i, i)));
+        }
+
+        body.substituteBackwards(true, true, arg);
+
+        this.applyReverseOrder(myPivot, arg);
     }
 
     @Override
@@ -178,6 +246,16 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
         } else {
             return aggregator.get();
         }
+    }
+
+    @Override
+    public List<InvertibleFactor<N>> getFactors() {
+
+        DecompositionStore<N> inPlace = this.getInPlace();
+        MatrixStore<N> identity = this.makeIdentity(this.getRowDim());
+
+        return List.of(new FactorPivot<>(identity, myPivot, true), new FactorLower<>(inPlace, true), new FactorD<>(inPlace, this.function().divide()),
+                new FactorUpperConjugate<>(inPlace, true), new FactorPivot<>(identity, myPivot, false));
     }
 
     @Override
@@ -209,9 +287,7 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
 
     @Override
     public MatrixStore<N> getL() {
-        DecompositionStore<N> tmpInPlace = this.getInPlace();
-        MatrixStore<N> tmpBuilder = tmpInPlace;
-        return tmpBuilder.triangular(false, true);
+        return this.getInPlace().triangular(false, true);
     }
 
     @Override

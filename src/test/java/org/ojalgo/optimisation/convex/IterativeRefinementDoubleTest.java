@@ -300,9 +300,9 @@ public class IterativeRefinementDoubleTest extends OptimisationConvexTests {
      * formula in the paper seems wrong.
      * <p>
      * In this re-implementation the problem is stated with "-C", as it is how ojAlgo usually works. The
-     * (initial) dual variable is negative (since it has to be), and the C update formula is modified according
-     * to my own derivation. Then it works... except that ojAlgo finds the exact optimal solution in the first
-     * iteration. To test step 2 of the example, we have to pretend that it doesn't.
+     * (initial) dual variable is negative (since it has to be), and the C update formula is modified
+     * according to my own derivation. Then it works... except that ojAlgo finds the exact optimal solution in
+     * the first iteration. To test step 2 of the example, we have to pretend that it doesn't.
      */
     @Test
     public void testReimplementExample4() {
@@ -327,8 +327,8 @@ public class IterativeRefinementDoubleTest extends OptimisationConvexTests {
 
         R064Store AI = R064Store.FACTORY.copy(RawStore.wrap(new double[][] { { -1.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0, 0.0, 0.0 },
                 { 0.0, 0.0, -1.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, -1.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, -1.0 } }));
-        R064Store BI = R064Store.FACTORY.copy(RawStore.wrap(new double[][] { { 0.7907669085467611 }, { 0.0019999999999900154 },
-                { 0.20323309144826854 }, { 0.0019999999999900154 }, { 0.0019999999999903207 } }));
+        R064Store BI = R064Store.FACTORY.copy(RawStore.wrap(new double[][] { { 0.7907669085467611 }, { 0.0019999999999900154 }, { 0.20323309144826854 },
+                { 0.0019999999999900154 }, { 0.0019999999999903207 } }));
 
         R064Store C = R064Store.FACTORY.copy(RawStore.wrap(
                 new double[][] { { -550875.2032141489 }, { -562399.9568628508 }, { -564250.6957511578 }, { -691369.2681449897 }, { -1400521.5234620553 } }));
@@ -417,11 +417,11 @@ public class IterativeRefinementDoubleTest extends OptimisationConvexTests {
                         { -0.0, -0.0, -1.0, -0.0, -0.0, -0.0, -0.0, -0.0 }, { -0.0, -0.0, -0.0, -1.0, -0.0, -0.0, -0.0, -0.0 },
                         { -0.0, -0.0, -0.0, -0.0, -1.0, -0.0, -0.0, -0.0 }, { -0.0, -0.0, -0.0, -0.0, -0.0, -1.0, -0.0, -0.0 },
                         { -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -1.0, -0.0 }, { -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -1.0 } }));
-        R064Store BI = R064Store.FACTORY.copy(RawStore.wrap(new double[][] { { 99999.999 }, { 999.999 }, { 1.4176006647997381 },
-                { 0.582399335200262 }, { 8.342297391034407E-10 }, { 0.9999999991637702 }, { 0.8576273045249193 }, { 0.1423726954730807 } }));
+        R064Store BI = R064Store.FACTORY.copy(RawStore.wrap(new double[][] { { 99999.999 }, { 999.999 }, { 1.4176006647997381 }, { 0.582399335200262 },
+                { 8.342297391034407E-10 }, { 0.9999999991637702 }, { 0.8576273045249193 }, { 0.1423726954730807 } }));
 
-        R064Store C = R064Store.FACTORY.copy(RawStore.wrap(new double[][] { { -1.0507334266932648E-5 }, { 111.76733530105174 },
-                { 35972.35323772494 }, { 3402.691149823142 }, { 241369.47835246887 }, { 39207.7768435451 }, { -4098.6473014047 }, { 4596.891294076649 } }));
+        R064Store C = R064Store.FACTORY.copy(RawStore.wrap(new double[][] { { -1.0507334266932648E-5 }, { 111.76733530105174 }, { 35972.35323772494 },
+                { 3402.691149823142 }, { 241369.47835246887 }, { 39207.7768435451 }, { -4098.6473014047 }, { 4596.891294076649 } }));
 
         R064Store Q = R064Store.FACTORY.copy(RawStore.wrap(new double[][] {
                 { 0.001000000000015139, -1.3922723188263615E-7, -1.260916429481889E-5, 1.1365393461671568E-10, 3.833998314967881E-6, -4.89115589330624E-6,

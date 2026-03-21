@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.array.operation;
+package org.ojalgo.matrix.operation;
 
 import org.ojalgo.scalar.Scalar;
 
@@ -30,7 +30,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public abstract class HermitianRank2Update implements ArrayOperation {
+public abstract class HermitianRank2Update implements MatrixOperation {
 
     public static int THRESHOLD = 256;
 

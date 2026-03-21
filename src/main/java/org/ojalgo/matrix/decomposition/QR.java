@@ -23,7 +23,6 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.array.PlainArray;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
@@ -97,11 +96,6 @@ public interface QR<N extends Comparable<N>> extends MatrixDecomposition.Updatab
         final MatrixStore<N> tmpStore = tmpQ.multiply(tmpR);
 
         return Access2D.equals(tmpStore, matrix, context);
-    }
-
-    @Override
-    default void ftran(final PhysicalStore<N> arg) {
-        this.getSolution(arg.copy(), arg);
     }
 
     MatrixStore<N> getQ();

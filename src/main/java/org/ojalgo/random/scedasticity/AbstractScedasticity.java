@@ -38,7 +38,7 @@ abstract class AbstractScedasticity implements ScedasticityModel {
      * Will set the array of weights to equal weights (average values)
      *
      * @param weights Array of weights (to be set)
-     * @param total The total the weights should sum up to
+     * @param total   The total the weights should sum up to
      */
     static void average(final double[] weights, final double total) {
         Arrays.fill(weights, total / weights.length);
@@ -48,7 +48,7 @@ abstract class AbstractScedasticity implements ScedasticityModel {
      * Will set the array of weights to decreasing weights (halved next values)
      *
      * @param weights Array of weights (to be set)
-     * @param total The total the weights should sum up to
+     * @param total   The total the weights should sum up to
      */
     static void decreasing(final double[] weights, final double total) {
 

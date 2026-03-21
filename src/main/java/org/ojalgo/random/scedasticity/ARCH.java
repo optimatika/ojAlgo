@@ -35,7 +35,7 @@ public final class ARCH extends AbstractScedasticity {
      * Parameter estimation using heuristics (not max likelihood).
      *
      * @param series Series to adapt to
-     * @param q Number of lagged squared error terms
+     * @param q      Number of lagged squared error terms
      * @return Ready to use ARCH model
      */
     public static ARCH estimate(final Access1D<?> series, final int q) {

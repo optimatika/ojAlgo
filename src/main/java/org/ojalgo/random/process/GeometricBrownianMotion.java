@@ -47,8 +47,8 @@ public final class GeometricBrownianMotion extends SingleValueBasedProcess<LogNo
 
     /**
      * @param seriesOfSamples A series of samples, evenly spaced in time.
-     * @param samplePeriod The amount of time (in which ever unit you prefer) between each sample in the
-     *        series.
+     * @param samplePeriod    The amount of time (in which ever unit you prefer) between each sample in the
+     *                        series.
      */
     public static GeometricBrownianMotion estimate(final Access1D<?> seriesOfSamples, final double samplePeriod) {
 
@@ -85,10 +85,10 @@ public final class GeometricBrownianMotion extends SingleValueBasedProcess<LogNo
     }
 
     /**
-     * @param initialValue The process initial value.
+     * @param initialValue        The process initial value.
      * @param expectedFutureValue An expected value (sometime in the future).
-     * @param aVariance The variance of that future value.
-     * @param aHorizon When do you expect that value?
+     * @param aVariance           The variance of that future value.
+     * @param aHorizon            When do you expect that value?
      */
     public static GeometricBrownianMotion make(final double initialValue, final double expectedFutureValue, final double aVariance, final double aHorizon) {
 

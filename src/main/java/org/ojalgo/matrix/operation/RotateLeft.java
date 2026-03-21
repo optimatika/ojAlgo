@@ -19,74 +19,74 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.array.operation;
+package org.ojalgo.matrix.operation;
 
 import org.ojalgo.scalar.Scalar;
 
-public abstract class RotateRight implements ArrayOperation {
+public abstract class RotateLeft implements MatrixOperation {
 
     public static int THRESHOLD = 128;
 
-    public static void invoke(final double[] data, final int structure, final int colA, final int colB, final double cos, final double sin) {
+    public static void invoke(final double[] data, final int structure, final int rowA, final int rowB, final double cos, final double sin) {
 
         double oldA;
         double oldB;
 
-        int indexA = colA * structure;
-        int indexB = colB * structure;
+        int indexA = rowA;
+        int indexB = rowB;
 
-        for (int i = 0; i < structure; i++) {
+        for (int j = 0, lim = data.length / structure; j < lim; j++) {
 
             oldA = data[indexA];
             oldB = data[indexB];
 
-            data[indexA] = cos * oldA - sin * oldB;
-            data[indexB] = cos * oldB + sin * oldA;
+            data[indexA] = cos * oldA + sin * oldB;
+            data[indexB] = cos * oldB - sin * oldA;
 
-            indexA++;
-            indexB++;
+            indexA += structure;
+            indexB += structure;
         }
     }
 
-    public static void invoke(final float[] data, final int structure, final int colA, final int colB, final float cos, final float sin) {
+    public static void invoke(final float[] data, final int structure, final int rowA, final int rowB, final float cos, final float sin) {
 
         float oldA;
         float oldB;
 
-        int indexA = colA * structure;
-        int indexB = colB * structure;
+        int indexA = rowA;
+        int indexB = rowB;
 
-        for (int i = 0; i < structure; i++) {
+        for (int j = 0, lim = data.length / structure; j < lim; j++) {
 
             oldA = data[indexA];
             oldB = data[indexB];
 
-            data[indexA] = cos * oldA - sin * oldB;
-            data[indexB] = cos * oldB + sin * oldA;
+            data[indexA] = cos * oldA + sin * oldB;
+            data[indexB] = cos * oldB - sin * oldA;
 
-            indexA++;
-            indexB++;
+            indexA += structure;
+            indexB += structure;
         }
     }
 
-    public static <N extends Scalar<N>> void invoke(final N[] data, final int structure, final int colA, final int colB, final N cos, final N sin) {
+    public static <N extends Scalar<N>> void invoke(final N[] data, final int structure, final int rowA, final int rowB, final N cos, final N sin) {
 
         N oldA;
         N oldB;
 
-        int indexA = colA * structure;
-        int indexB = colB * structure;
+        int indexA = rowA;
+        int indexB = rowB;
 
-        for (int i = 0; i < structure; i++) {
+        for (int j = 0, lim = data.length / structure; j < lim; j++) {
 
             oldA = data[indexA];
             oldB = data[indexB];
 
-            data[indexA] = cos.multiply(oldA).subtract(sin.multiply(oldB)).get();
-            data[indexB] = cos.multiply(oldB).add(sin.multiply(oldA)).get();
+            data[indexA] = cos.multiply(oldA).add(sin.multiply(oldB)).get();
+            data[indexB] = cos.multiply(oldB).subtract(sin.multiply(oldA)).get();
 
-            indexA++;
-            indexB++;
+            indexA += structure;
+            indexB += structure;
         }
     }
 

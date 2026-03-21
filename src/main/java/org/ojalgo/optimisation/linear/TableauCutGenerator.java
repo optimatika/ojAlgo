@@ -51,11 +51,11 @@ abstract class TableauCutGenerator {
     /**
      * Calculates a Gomory cut – all variables must be integer.
      * 
-     * @param body Simplex tableau row (excluding the RHS column)
-     * @param index The pivot index of the returned equation. Otherwise not used in the generation.
-     * @param rhs The right hand side value of the row – the value that should be an integer.
+     * @param body          Simplex tableau row (excluding the RHS column)
+     * @param index         The pivot index of the returned equation. Otherwise not used in the generation.
+     * @param rhs           The right hand side value of the row – the value that should be an integer.
      * @param fractionality The fractionality threshold. If the fractional part of the right hand side is less
-     *        than this value, no cut is generated.
+     *                      than this value, no cut is generated.
      * @return A Gomory cut equation, or null if no cut was generated.
      */
     static Equation doGomory(final Primitive1D body, final int index, final double rhs, final double fractionality) {
@@ -94,9 +94,10 @@ abstract class TableauCutGenerator {
      * <li>rhs > 0.0
      * </ul>
      * 
-     * @param body The equation body.
-     * @param index The index of the variable that should integer valued, but is not.
-     * @param rhs The equation right hand side – the value of the variable that should be integer, but is not.
+     * @param body    The equation body.
+     * @param index   The index of the variable that should integer valued, but is not.
+     * @param rhs     The equation right hand side – the value of the variable that should be integer, but is
+     *                not.
      * @param integer Which of the variables are integer?
      * @return A GMI cut
      */
@@ -208,19 +209,19 @@ abstract class TableauCutGenerator {
     /**
      * Calculates a Gomory Mixed Integer (GMI) cut.
      * 
-     * @param body The equation body (simplex tableau row). The tableau is assumed to be in an optimal (phase
-     *        2) state. Any reference to artificial variables will be ignored.
-     * @param index Index (tableau column) of the variable to be cut. A basic variable that should be integer,
-     *        but is not. The body value at this index must be integer (not 0) and if this actually is from a
-     *        tableau row it should be (will be) 1.
-     * @param rhs The equation right hand side value – the value that should be an integer.
+     * @param body          The equation body (simplex tableau row). The tableau is assumed to be in an
+     *                      optimal (phase 2) state. Any reference to artificial variables will be ignored.
+     * @param index         Index (tableau column) of the variable to be cut. A basic variable that should be
+     *                      integer, but is not. The body value at this index must be integer (not 0) and if
+     *                      this actually is from a tableau row it should be (will be) 1.
+     * @param rhs           The equation right hand side value – the value that should be an integer.
      * @param fractionality The fractionality threshold.
-     * @param excluded Indices of the non-basic variables (excluded from the basis).
-     * @param integers Which variables are integer? There must be one element for each variable - the length
-     *        of this array defines the number of variables.
-     * @param lowers Variables' lower bounds.
-     * @param uppers Variables' upper bounds.
-     * @param shifts The variable bounds may be shifted from their original values.
+     * @param excluded      Indices of the non-basic variables (excluded from the basis).
+     * @param integers      Which variables are integer? There must be one element for each variable - the
+     *                      length of this array defines the number of variables.
+     * @param lowers        Variables' lower bounds.
+     * @param uppers        Variables' upper bounds.
+     * @param shifts        The variable bounds may be shifted from their original values.
      * @return A GMI cut equation, or null if no cut was generated.
      */
     static Equation doGomoryMixedInteger(final Primitive1D body, final int index, final double rhs, final double fractionality, final int[] excluded,

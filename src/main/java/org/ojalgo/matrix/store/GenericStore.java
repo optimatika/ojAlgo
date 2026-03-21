@@ -32,7 +32,11 @@ import org.ojalgo.array.ArrayQ128;
 import org.ojalgo.array.ArrayR128;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.ScalarArray;
-import org.ojalgo.array.operation.*;
+import org.ojalgo.array.operation.FillMatchingDual;
+import org.ojalgo.array.operation.FillMatchingSingle;
+import org.ojalgo.array.operation.ModifyAll;
+import org.ojalgo.array.operation.OperationBinary;
+import org.ojalgo.array.operation.OperationUnary;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
@@ -42,12 +46,7 @@ import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
-import org.ojalgo.matrix.operation.HouseholderLeft;
-import org.ojalgo.matrix.operation.HouseholderRight;
-import org.ojalgo.matrix.operation.MultiplyBoth;
-import org.ojalgo.matrix.operation.MultiplyLeft;
-import org.ojalgo.matrix.operation.MultiplyNeither;
-import org.ojalgo.matrix.operation.MultiplyRight;
+import org.ojalgo.matrix.operation.*;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
@@ -862,6 +861,31 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
     }
 
     @Override
+    public void substituteBackwards(final boolean conjugated, final boolean unitDiagonal, final double[] arg) {
+        GenericStore<N> tmp = myFactory.make(arg.length, 1);
+        for (int i = 0; i < arg.length; i++) {
+            tmp.set(i, myFactory.scalar().cast(arg[i]));
+        }
+        this.substituteBackwards(conjugated, unitDiagonal, tmp);
+        for (int i = 0; i < arg.length; i++) {
+            arg[i] = tmp.doubleValue(i);
+        }
+    }
+
+    @Override
+    public void substituteBackwards(final boolean conjugated, final boolean unitDiagonal, final PhysicalStore<N> arg) {
+        if (arg instanceof GenericStore<?>) {
+            @SuppressWarnings("unchecked")
+            GenericStore<N> generic = (GenericStore<N>) arg;
+            SubstituteBackwards.invoke(generic.data, this, unitDiagonal, conjugated, myFactory.scalar());
+        } else {
+            double[] argCopy = arg.toRawCopy1D();
+            this.substituteBackwards(conjugated, unitDiagonal, argCopy);
+            arg.fillMatching(argCopy);
+        }
+    }
+
+    @Override
     public void substituteForwards(final Access2D<N> body, final boolean unitDiagonal, final boolean conjugated, final boolean identity) {
 
         final int tmpRowDim = myRowDim;
@@ -883,6 +907,31 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
         } else {
 
             SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, identity, myFactory.scalar());
+        }
+    }
+
+    @Override
+    public void substituteForwards(final boolean conjugated, final boolean unitDiagonal, final double[] arg) {
+        GenericStore<N> tmp = myFactory.make(arg.length, 1);
+        for (int i = 0; i < arg.length; i++) {
+            tmp.set(i, myFactory.scalar().cast(arg[i]));
+        }
+        this.substituteForwards(conjugated, unitDiagonal, tmp);
+        for (int i = 0; i < arg.length; i++) {
+            arg[i] = tmp.doubleValue(i);
+        }
+    }
+
+    @Override
+    public void substituteForwards(final boolean conjugated, final boolean unitDiagonal, final PhysicalStore<N> arg) {
+        if (arg instanceof GenericStore<?>) {
+            @SuppressWarnings("unchecked")
+            GenericStore<N> generic = (GenericStore<N>) arg;
+            SubstituteForwards.invoke(generic.data, this, unitDiagonal, conjugated, myFactory.scalar());
+        } else {
+            double[] argCopy = arg.toRawCopy1D();
+            this.substituteForwards(conjugated, unitDiagonal, argCopy);
+            arg.fillMatching(argCopy);
         }
     }
 

@@ -28,7 +28,6 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -44,16 +43,16 @@ public class StrategyMixer {
 
         ExpressionsBasedModel tmpModel = new ExpressionsBasedModel();
 
-        BigDecimal[] tmpTarget = new BigDecimal[] { THIRD, THIRD, THIRD };
+        BigDecimal[] tmpTarget = { THIRD, THIRD, THIRD };
 
-        BigDecimal[] tmpStrat1 = new BigDecimal[] { HALF, HALF, ZERO };
-        BigDecimal[] tmpStrat2 = new BigDecimal[] { HALF, ZERO, HALF };
-        BigDecimal[] tmpStrat3 = new BigDecimal[] { ZERO, HALF, HALF };
+        BigDecimal[] tmpStrat1 = { HALF, HALF, ZERO };
+        BigDecimal[] tmpStrat2 = { HALF, ZERO, HALF };
+        BigDecimal[] tmpStrat3 = { ZERO, HALF, HALF };
 
-        BigDecimal[][] tmpStrats = new BigDecimal[][] { tmpStrat1, tmpStrat2, tmpStrat3 };
+        BigDecimal[][] tmpStrats = { tmpStrat1, tmpStrat2, tmpStrat3 };
 
-        Variable[] tmpVars = new Variable[] { tmpModel.newVariable("S1"), tmpModel.newVariable("S2"), tmpModel.newVariable("S3"),
-                tmpModel.newVariable("B1").binary(), tmpModel.newVariable("B2").binary(), tmpModel.newVariable("B3").binary() };
+        Variable[] tmpVars = { tmpModel.newVariable("S1"), tmpModel.newVariable("S2"), tmpModel.newVariable("S3"), tmpModel.newVariable("B1").binary(),
+                tmpModel.newVariable("B2").binary(), tmpModel.newVariable("B3").binary() };
 
         for (int s = 0; s < 3; s++) {
 
@@ -128,7 +127,7 @@ public class StrategyMixer {
         int tmpUseCount = 0;
         double tmpTotalWeight = 0D;
 
-        Variable[] tmpSolution = new Variable[] { tmpVars[0], tmpVars[1], tmpVars[2] };
+        Variable[] tmpSolution = { tmpVars[0], tmpVars[1], tmpVars[2] };
         for (Variable tmpWeight : tmpSolution) {
             if (tmpWeight.getValue().signum() != 0) {
                 tmpUseCount++;
@@ -137,7 +136,7 @@ public class StrategyMixer {
         }
 
         TestUtils.assertEquals(TWO.intValue(), tmpUseCount);
-        TestUtils.assertEquals(PrimitiveMath.ONE, tmpTotalWeight, 1E-14 / PrimitiveMath.THREE);
+        TestUtils.assertEquals(ONE.doubleValue(), tmpTotalWeight, 1E-14 / THREE.doubleValue());
     }
 
 }

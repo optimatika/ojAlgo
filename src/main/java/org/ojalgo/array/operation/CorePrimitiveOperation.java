@@ -27,8 +27,6 @@ import org.ojalgo.structure.Access1D;
 
 public abstract class CorePrimitiveOperation implements ArrayOperation {
 
-    public static int THRESHOLD = 256;
-
     public static <N extends Comparable<N>> void add(final BasicArray<N> data, final long first, final long limit, final long step, final Access1D<N> left,
             final Access1D<N> right) {
 

@@ -21,7 +21,8 @@
  */
 package org.ojalgo.matrix.store;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.ONE;
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import java.util.Arrays;
 
@@ -31,7 +32,13 @@ import org.ojalgo.array.Array2D;
 import org.ojalgo.array.ArrayC128;
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.BasicArray;
-import org.ojalgo.array.operation.*;
+import org.ojalgo.array.operation.AXPY;
+import org.ojalgo.array.operation.FillCompatible;
+import org.ojalgo.array.operation.FillMatchingDual;
+import org.ojalgo.array.operation.FillMatchingSingle;
+import org.ojalgo.array.operation.ModifyAll;
+import org.ojalgo.array.operation.OperationBinary;
+import org.ojalgo.array.operation.OperationUnary;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
@@ -43,12 +50,7 @@ import org.ojalgo.machine.JavaType;
 import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.decomposition.EvD1D;
-import org.ojalgo.matrix.operation.HouseholderLeft;
-import org.ojalgo.matrix.operation.HouseholderRight;
-import org.ojalgo.matrix.operation.MultiplyBoth;
-import org.ojalgo.matrix.operation.MultiplyLeft;
-import org.ojalgo.matrix.operation.MultiplyNeither;
-import org.ojalgo.matrix.operation.MultiplyRight;
+import org.ojalgo.matrix.operation.*;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
@@ -868,6 +870,11 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
     }
 
     @Override
+    public void substituteBackwards(final boolean conjugated, final boolean unitDiagonal, final double[] arg) {
+        SubstituteBackwards.invoke(arg, data, myRowDim, unitDiagonal, conjugated);
+    }
+
+    @Override
     public void substituteForwards(final Access2D<Double> body, final boolean unitDiagonal, final boolean conjugated, final boolean identity) {
 
         final int tmpRowDim = myRowDim;
@@ -890,6 +897,11 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
 
             SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, identity);
         }
+    }
+
+    @Override
+    public void substituteForwards(final boolean conjugated, final boolean unitDiagonal, final double[] arg) {
+        SubstituteForwards.invoke(arg, data, myRowDim, unitDiagonal, conjugated);
     }
 
     @Override

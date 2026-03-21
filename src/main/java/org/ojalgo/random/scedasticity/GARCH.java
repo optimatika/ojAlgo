@@ -34,8 +34,8 @@ public final class GARCH extends AbstractScedasticity {
      * Parameter estimation using heuristics (not max likelihood).
      *
      * @param series Series to adapt to
-     * @param p Number of lagged variance values
-     * @param q Number of lagged squared error terms
+     * @param p      Number of lagged variance values
+     * @param q      Number of lagged squared error terms
      * @return Ready to use GARCH model
      */
     public static GARCH estimate(final Access1D<?> series, final int p, final int q) {

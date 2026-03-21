@@ -43,7 +43,8 @@ public interface RandomProcess<D extends Distribution> {
 
         /**
          * @param initialValue Initial value
-         * @param results (Random values) scenarios/realisations/series in rows, and sample sets in columns.
+         * @param results      (Random values) scenarios/realisations/series in rows, and sample sets in
+         *                     columns.
          */
         public SimulationResults(final double initialValue, final Array2D<Double> results) {
 

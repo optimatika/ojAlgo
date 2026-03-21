@@ -28,8 +28,6 @@ import org.ojalgo.structure.Access1D;
 
 public abstract class FillAll implements ArrayOperation {
 
-    public static int THRESHOLD = 128;
-
     public static <N extends Comparable<N>> void fill(final BasicArray<N> data, final int first, final int limit, final int step, final double value) {
         for (int i = first; i < limit; i += step) {
             data.set(i, value);

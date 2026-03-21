@@ -21,7 +21,8 @@
  */
 package org.ojalgo.optimisation;
 
-import static org.ojalgo.function.constant.BigMath.*;
+import static org.ojalgo.function.constant.BigMath.ONE;
+import static org.ojalgo.function.constant.BigMath.ZERO;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -45,9 +46,8 @@ import org.ojalgo.type.context.NumberContext;
 public class Variable extends ModelEntity<Variable> {
 
     /**
-     * Creates {@link Variable} instances. A custom factory can be set on an
-     * {@link Optimisation.Environment} to control variable creation for all models produced by that
-     * environment.
+     * Creates {@link Variable} instances. A custom factory can be set on an {@link Optimisation.Environment}
+     * to control variable creation for all models produced by that environment.
      *
      * @see Optimisation.Environment#setVariableFactory(Factory)
      */

@@ -453,7 +453,7 @@ public abstract class P20150720 {
 
     /**
      * @param args the command line arguments Objective: allocate the maximum qty, and try to keep
-     *        proportionality between customer.
+     *             proportionality between customer.
      */
     public static void main(final String[] args) {
 

@@ -411,8 +411,8 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     }
 
     /**
-     * Setting either limit to < 0 is interpreted as "no limit" (useful when you only want to limit either
-     * the rows or columns, and don't know the size of the other)
+     * Setting either limit to < 0 is interpreted as "no limit" (useful when you only want to limit either the
+     * rows or columns, and don't know the size of the other)
      */
     @Override
     default MatrixStore<N> limits(final long rowLimit, final long columnLimit) {

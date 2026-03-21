@@ -23,6 +23,8 @@ package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.List;
+
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.DOT;
@@ -38,6 +40,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.store.TransformableRegion;
+import org.ojalgo.matrix.transformation.InvertibleFactor;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 
@@ -51,6 +54,174 @@ import org.ojalgo.structure.Access2D.Collectable;
  * of simultaneous linear equations. This will fail if isFullRank() returns false.
  */
 final class RawQR extends RawDecomposition implements QR<Double> {
+
+    /**
+     * [A]=[Q][R] — Householder reflections stored in the transposed internal data.
+     * <p>
+     * ftran applies Q^T (Householder reflections in forward order). btran applies Q (Householder reflections
+     * in reverse order).
+     */
+    static final class FactorQ extends AbstractDecomposition.PrimitiveFactor {
+
+        private final double[][] myData;
+        private final int myM;
+        private final int myMinDim;
+
+        FactorQ(final double[][] data, final int m, final int minDim) {
+            super();
+            myData = data;
+            myM = m;
+            myMinDim = minDim;
+        }
+
+        @Override
+        public void btran(final double[] arg) {
+
+            double[] colK;
+            double beta;
+
+            for (int k = myMinDim - 1; k >= 0; k--) {
+
+                colK = myData[k];
+                beta = ONE / colK[k];
+
+                HouseholderLeft.call(arg, myM, 0, colK, k, beta);
+            }
+        }
+
+        @Override
+        public void ftran(final double[] arg) {
+
+            double[] colK;
+            double beta;
+
+            for (int k = 0; k < myMinDim; k++) {
+
+                colK = myData[k];
+                beta = ONE / colK[k];
+
+                HouseholderLeft.call(arg, myM, 0, colK, k, beta);
+            }
+        }
+
+        @Override
+        public MatrixStore<Double> get() {
+
+            RawStore retVal = RawDecomposition.make(myM, myMinDim);
+            double[][] retData = retVal.data;
+
+            for (int k = myMinDim - 1; k >= 0; k--) {
+                for (int i = 0; i < myM; i++) {
+                    retData[i][k] = ZERO;
+                }
+                retData[k][k] = ONE;
+                for (int j = k; j < myMinDim; j++) {
+                    if (myData[k][k] != 0) {
+                        double s = ZERO;
+                        for (int i = k; i < myM; i++) {
+                            s += myData[k][i] * retData[i][j];
+                        }
+                        s = -s / myData[k][k];
+                        for (int i = k; i < myM; i++) {
+                            retData[i][j] += s * myData[k][i];
+                        }
+                    }
+                }
+            }
+            return retVal;
+        }
+
+        @Override
+        public int getColDim() {
+            return myM;
+        }
+
+        @Override
+        public int getRowDim() {
+            return myM;
+        }
+
+    }
+
+    /**
+     * [A]=[Q][R] — Upper triangular factor with diagonal stored separately.
+     * <p>
+     * ftran solves [R][x]=[b] via back-substitution. btran solves [R]^T[x]=[b] via forward-substitution.
+     */
+    static final class FactorR extends AbstractDecomposition.PrimitiveFactor {
+
+        private final double[][] myData;
+        private final double[] myDiagR;
+        private final int myM;
+        private final int myN;
+
+        FactorR(final double[][] data, final double[] diagR, final int m, final int n) {
+            super();
+            myData = data;
+            myDiagR = diagR;
+            myM = m;
+            myN = n;
+        }
+
+        @Override
+        public void btran(final double[] arg) {
+
+            double[] colK;
+
+            for (int k = 0; k < myN; k++) {
+
+                colK = myData[k];
+
+                arg[k] -= DOT.invoke(arg, 0, colK, 0, 0, k);
+                arg[k] /= myDiagR[k];
+            }
+        }
+
+        @Override
+        public void ftran(final double[] arg) {
+
+            double[] colK;
+
+            for (int k = myN - 1; k >= 0; k--) {
+
+                colK = myData[k];
+
+                arg[k] /= myDiagR[k];
+                AXPY.invoke(arg, 0, -arg[k], colK, 0, 0, k);
+            }
+        }
+
+        @Override
+        public MatrixStore<Double> get() {
+
+            int r = Math.min(myM, myN);
+
+            RawStore retVal = RawDecomposition.make(r, myN);
+            double[][] retData = retVal.data;
+
+            double[] tmpRow;
+            for (int i = 0; i < r; i++) {
+                tmpRow = retData[i];
+                tmpRow[i] = myDiagR[i];
+                for (int j = i + 1; j < myN; j++) {
+                    tmpRow[j] = myData[j][i];
+                }
+            }
+
+            return retVal;
+        }
+
+        @Override
+        public int getColDim() {
+            return myN;
+        }
+
+        @Override
+        public int getRowDim() {
+            return Math.min(myM, myN);
+        }
+
+    }
 
     /**
      * Array for internal storage of diagonal of R.
@@ -70,54 +241,36 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
     @Override
     public void btran(final double[] arg) {
-        DecompositionStore<Double> x = this.copyRow(arg);
-        this.btran(x);
-        x.supplyTo(arg);
-    }
-
-    @Override
-    public void btran(final PhysicalStore<Double> arg) {
-
-        R064Store preallocated = (R064Store) arg;
-
-        double[] dataRHS = preallocated.data;
 
         int m = this.getRowDim();
         int n = this.getColDim();
 
-        if (m != n) {
-            throw new IllegalArgumentException("Only square matrices!");
-        }
-        if (preallocated.getRowDim() != m) {
-            throw new IllegalArgumentException("Row dimensions must agree!");
-        }
-        if (!this.isFullRank()) {
-            throw new RuntimeException("Rank deficient!");
-        }
-
         double[][] dataInternal = this.getInternalData();
 
         double[] colK;
-        double beta;
 
-        // Solve Rt*y = b;
         for (int k = 0; k < n; k++) {
 
             colK = dataInternal[k];
-            double tmpDiagK = myDiagonalR[k];
 
-            dataRHS[k] -= DOT.invoke(dataRHS, 0, colK, 0, 0, k);
-            dataRHS[k] /= tmpDiagK;
+            arg[k] -= DOT.invoke(arg, 0, colK, 0, 0, k);
+            arg[k] /= myDiagonalR[k];
         }
 
-        // Compute Y = transpose(Q)*B
+        double beta;
+
         for (int k = n - 1; k >= 0; k--) {
 
             colK = dataInternal[k];
             beta = ONE / colK[k];
 
-            HouseholderLeft.call(dataRHS, m, 0, colK, k, beta);
+            HouseholderLeft.call(arg, m, 0, colK, k, beta);
         }
+    }
+
+    @Override
+    public void btran(final PhysicalStore<Double> arg) {
+        InvertibleFactor.doPrimitive(arg, this);
     }
 
     @Override
@@ -169,9 +322,35 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
     @Override
     public void ftran(final double[] arg) {
-        DecompositionStore<Double> x = this.copyColumn(arg);
-        this.ftran(x);
-        x.supplyTo(arg);
+
+        int m = this.getRowDim();
+        int n = this.getColDim();
+
+        double[][] dataInternal = this.getInternalData();
+
+        double[] colK;
+        double beta;
+
+        for (int k = 0; k < n; k++) {
+
+            colK = dataInternal[k];
+            beta = ONE / colK[k];
+
+            HouseholderLeft.call(arg, m, 0, colK, k, beta);
+        }
+
+        for (int k = n - 1; k >= 0; k--) {
+
+            colK = dataInternal[k];
+
+            arg[k] /= myDiagonalR[k];
+            AXPY.invoke(arg, 0, -arg[k], colK, 0, 0, k);
+        }
+    }
+
+    @Override
+    public void ftran(final PhysicalStore<Double> arg) {
+        InvertibleFactor.doPrimitive(this, arg);
     }
 
     @Override
@@ -194,68 +373,21 @@ final class RawQR extends RawDecomposition implements QR<Double> {
     }
 
     /**
-     * Generate and return the (economy-sized) orthogonal factor
-     *
-     * @return Q
+     * [A]=[Q][R]
      */
     @Override
-    public RawStore getQ() {
-
-        int m = this.getRowDim();
-        int r = this.getMinDim();
-
-        double[][] internalData = this.getInternalData();
-
-        RawStore retVal = RawDecomposition.make(m, r);
-        double[][] retData = retVal.data;
-
-        for (int k = r - 1; k >= 0; k--) {
-            for (int i = 0; i < m; i++) {
-                retData[i][k] = ZERO;
-            }
-            retData[k][k] = ONE;
-            for (int j = k; j < r; j++) {
-                if (internalData[k][k] != 0) {
-                    double s = ZERO;
-                    for (int i = k; i < m; i++) {
-                        s += internalData[k][i] * retData[i][j];
-                    }
-                    s = -s / internalData[k][k];
-                    for (int i = k; i < m; i++) {
-                        retData[i][j] += s * internalData[k][i];
-                    }
-                }
-            }
-        }
-        return retVal;
+    public List<InvertibleFactor<Double>> getFactors() {
+        return List.of(this.getFactorQ(), this.getFactorR());
     }
 
-    /**
-     * Return the upper triangular factor
-     *
-     * @return R
-     */
+    @Override
+    public RawStore getQ() {
+        return (RawStore) this.getFactorQ().get();
+    }
+
     @Override
     public MatrixStore<Double> getR() {
-
-        int n = this.getColDim();
-        int r = this.getMinDim();
-
-        double[][] internalData = this.getInternalData();
-
-        RawStore retVal = RawDecomposition.make(r, n);
-        double[][] retData = retVal.data;
-
-        double[] tmpRow;
-        for (int i = 0; i < r; i++) {
-            tmpRow = retData[i];
-            tmpRow[i] = myDiagonalR[i];
-            for (int j = i + 1; j < n; j++) {
-                tmpRow[j] = internalData[j][i];
-            }
-        }
-
-        return retVal;
+        return this.getFactorR().get();
     }
 
     @Override
@@ -435,6 +567,20 @@ final class RawQR extends RawDecomposition implements QR<Double> {
     @Override
     protected boolean checkSolvability() {
         return this.isAspectRatioNormal() && this.isFullRank();
+    }
+
+    /**
+     * [A]=[Q][R]
+     */
+    MatrixDecomposition.Factor<Double> getFactorQ() {
+        return new FactorQ(this.getInternalData(), this.getRowDim(), this.getMinDim());
+    }
+
+    /**
+     * [A]=[Q][R]
+     */
+    MatrixDecomposition.Factor<Double> getFactorR() {
+        return new FactorR(this.getInternalData(), myDiagonalR, this.getRowDim(), this.getColDim());
     }
 
 }

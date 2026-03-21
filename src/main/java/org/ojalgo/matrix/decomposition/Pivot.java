@@ -67,6 +67,30 @@ final class Pivot {
         return Arrays.toString(myOrder) + "/" + Arrays.toString(this.reverseOrder());
     }
 
+    private void followPermutationCycles(final double[] elements, final int[] order) {
+
+        myDoneBits.clear();
+        int dim = order.length;
+
+        for (int i = 0; i < dim; i++) {
+            if (!myDoneBits.get(i)) {
+                int j = i;
+                double temp = elements[i];
+
+                while (!myDoneBits.get(j)) {
+                    myDoneBits.set(j);
+                    int next = order[j];
+                    if (next != j) {
+                        double val = elements[next];
+                        elements[next] = temp;
+                        temp = val;
+                        j = next;
+                    }
+                }
+            }
+        }
+    }
+
     private <N extends Comparable<N>, M extends Access2D<N> & Mutate2D> void followPermutationCycles(final M elements, final int[] order) {
 
         myDoneBits.clear();
@@ -92,13 +116,25 @@ final class Pivot {
         }
     }
 
+    void applyPivotOrder(final double[] arg) {
+        if (myModified) {
+            this.followPermutationCycles(arg, this.reverseOrder());
+        }
+    }
+
     /**
      * Equivalent to selecting the rows (or columns) in the pivot order,
      * <code>arg.rows(pivot.getOrder())</code>.
      */
     <N extends Comparable<N>, M extends Access2D<N> & Mutate2D> void applyPivotOrder(final M arg) {
-        if (this.isModified()) {
+        if (myModified) {
             this.followPermutationCycles(arg, this.reverseOrder());
+        }
+    }
+
+    void applyReverseOrder(final double[] arg) {
+        if (myModified) {
+            this.followPermutationCycles(arg, myOrder);
         }
     }
 
@@ -107,7 +143,7 @@ final class Pivot {
      * <code>arg.rows(pivot.reverseOrder())</code>.
      */
     <N extends Comparable<N>, M extends Access2D<N> & Mutate2D> void applyReverseOrder(final M arg) {
-        if (this.isModified()) {
+        if (myModified) {
             this.followPermutationCycles(arg, myOrder);
         }
     }

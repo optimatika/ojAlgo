@@ -183,8 +183,8 @@ public interface Structure2D extends Structure1D {
         B left(S left);
 
         /**
-         * Setting either limit to < 0 is interpreted as "no limit" (useful when you only want to limit
-         * either the rows or columns, and don't know the size of the other)
+         * Setting either limit to < 0 is interpreted as "no limit" (useful when you only want to limit either
+         * the rows or columns, and don't know the size of the other)
          */
         B limits(long rowLimit, long columnLimit);
 
@@ -193,7 +193,7 @@ public interface Structure2D extends Structure1D {
         /**
          * Will repeat this structure creating a new structure with a multiple of rows and columns.
          *
-         * @param rowsRepetitions The number of times to repeat the rows
+         * @param rowsRepetitions    The number of times to repeat the rows
          * @param columnsRepetitions The number of times to repeat the columns
          * @return The builder
          */

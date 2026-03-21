@@ -23,6 +23,8 @@ package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.List;
+
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.UnaryFunction;
@@ -32,6 +34,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.TransformableRegion;
+import org.ojalgo.matrix.transformation.InvertibleFactor;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
@@ -91,18 +94,12 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
 
     @Override
     public void btran(final double[] arg) {
-        DecompositionStore<N> x = this.copyRow(arg);
-        this.btran(x);
-        x.supplyTo(arg);
+        this.ftran(arg);
     }
 
     @Override
     public void btran(final PhysicalStore<N> arg) {
-
-        DecompositionStore<N> body = this.getInPlace();
-
-        arg.substituteForwards(body, false, false, false);
-        arg.substituteBackwards(body, false, true, false);
+        this.ftran(arg);
     }
 
     @Override
@@ -140,9 +137,11 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
 
     @Override
     public void ftran(final double[] arg) {
-        DecompositionStore<N> x = this.copyColumn(arg);
-        this.ftran(x);
-        x.supplyTo(arg);
+
+        DecompositionStore<N> body = this.getInPlace();
+
+        body.substituteForwards(false, false, arg);
+        body.substituteBackwards(true, false, arg);
     }
 
     @Override
@@ -150,8 +149,8 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
 
         DecompositionStore<N> body = this.getInPlace();
 
-        arg.substituteForwards(body, false, false, false);
-        arg.substituteBackwards(body, false, true, false);
+        body.substituteForwards(false, false, arg);
+        body.substituteBackwards(true, false, arg);
     }
 
     @Override
@@ -162,6 +161,12 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
         this.getInPlace().visitDiagonal(0, 0, tmpAggrFunc);
 
         return tmpAggrFunc.get();
+    }
+
+    @Override
+    public List<InvertibleFactor<N>> getFactors() {
+        DecompositionStore<N> inPlace = this.getInPlace();
+        return List.of(new FactorLower<>(inPlace, false), new FactorUpperConjugate<>(inPlace, false));
     }
 
     @Override

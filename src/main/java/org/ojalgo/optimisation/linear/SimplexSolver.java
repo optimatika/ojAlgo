@@ -35,7 +35,6 @@ import java.util.function.Function;
 import org.ojalgo.array.operation.IndexOf;
 import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.optimisation.ConstraintsMetaData;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;

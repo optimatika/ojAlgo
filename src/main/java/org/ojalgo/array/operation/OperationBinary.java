@@ -35,8 +35,6 @@ import org.ojalgo.structure.Access1D;
 
 public abstract class OperationBinary implements ArrayOperation {
 
-    public static int THRESHOLD = 256;
-
     public static <N extends Comparable<N>> void invoke(final BasicArray<N> data, final long first, final long limit, final long step, final Access1D<N> left,
             final BinaryFunction<N> function, final Access1D<N> right) {
 

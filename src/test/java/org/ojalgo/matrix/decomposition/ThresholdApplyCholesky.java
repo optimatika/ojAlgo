@@ -22,7 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.BenchmarkUtils;
-import org.ojalgo.array.operation.ApplyCholesky;
+import org.ojalgo.matrix.operation.ApplyCholesky;
 import org.ojalgo.matrix.store.R064Store;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;

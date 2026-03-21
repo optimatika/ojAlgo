@@ -444,7 +444,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
          * the second element of the first column of each of the matrices, then the intial refrence is {1, 0,
          * 0} and the slice dimension is 2.
          *
-         * @param initial Indices pointing to what will be the first element of the sliced {@link Access1D}
+         * @param initial   Indices pointing to what will be the first element of the sliced {@link Access1D}
          * @param dimension Which indices that make out an element reference should be incremented
          * @return A sliced 1D view of the underlying AnyD data structure
          */

@@ -36,8 +36,8 @@ final class SequencedReader<S, T> implements FromFileReader<T> {
      * Create an {@link AutoSupplier} that will supply items from the containers, one after the other, until
      * all containers are empty. You can create multiple such suppliers sharing the same queue of containers.
      *
-     * @param <S> The type of some sort of item container (maybe a {@link File})
-     * @param <T> The supplier item type (what do the files contain?)
+     * @param <S>     The type of some sort of item container (maybe a {@link File})
+     * @param <T>     The supplier item type (what do the files contain?)
      * @param sources A set of item containers (could be a set of {@link File}:s)
      * @param factory A factory method that can take one of the "containers" and return an item supplier.
      * @return A sequenced supplier.

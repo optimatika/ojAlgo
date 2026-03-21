@@ -23,8 +23,6 @@ package org.ojalgo.array.operation;
 
 public abstract class SortAll implements ArrayOperation {
 
-    public static int THRESHOLD = 128;
-
     public static void sort(final long[] primary, final double[] secondary) {
 
         boolean tmpSwapped;

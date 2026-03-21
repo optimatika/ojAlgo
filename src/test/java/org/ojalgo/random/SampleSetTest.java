@@ -84,7 +84,7 @@ public class SampleSetTest extends RandomTests {
     @Test
     public void testEmptySet() {
 
-        SampleSet sampleSet = SampleSet.wrap(new double[] { });
+        SampleSet sampleSet = SampleSet.wrap(new double[] {});
 
         try {
 
@@ -176,7 +176,7 @@ public class SampleSetTest extends RandomTests {
     @Test
     public void testQuartileSize0() {
 
-        ArrayR064 tmpSamples = ArrayR064.wrap(new double[] { });
+        ArrayR064 tmpSamples = ArrayR064.wrap(new double[] {});
         SampleSet sampleSet = SampleSet.wrap(tmpSamples);
 
         TestUtils.assertEquals(0.0, sampleSet.getQuartile1());

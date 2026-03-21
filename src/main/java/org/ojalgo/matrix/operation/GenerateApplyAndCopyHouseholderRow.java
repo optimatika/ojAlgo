@@ -19,27 +19,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.array.operation;
+package org.ojalgo.matrix.operation;
 
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 
-public abstract class GenerateApplyAndCopyHouseholderColumn implements ArrayOperation {
+public abstract class GenerateApplyAndCopyHouseholderRow implements MatrixOperation {
 
     public static int THRESHOLD = 128;
 
     public static boolean invoke(final double[] data, final int structure, final int row, final int col, final Householder.Primitive64 destination) {
 
-        int tmpColBase = col * structure;
+        int tmpColDim = data.length / structure;
 
         double[] tmpVector = destination.vector;
-        destination.first = row;
+        destination.first = col;
 
-        double tmpNormInf = PrimitiveMath.ZERO; // Copy column and calculate its infinity-norm.
-        for (int i = row; i < structure; i++) {
-            tmpNormInf = Math.max(tmpNormInf, PrimitiveMath.ABS.invoke(tmpVector[i] = data[i + tmpColBase]));
+        double tmpNormInf = PrimitiveMath.ZERO; // Copy row and calculate its infinity-norm.
+        for (int j = col; j < tmpColDim; j++) {
+            tmpNormInf = PrimitiveMath.MAX.invoke(tmpNormInf, PrimitiveMath.ABS.invoke(tmpVector[j] = data[row + j * structure]));
         }
 
         boolean retVal = tmpNormInf != PrimitiveMath.ZERO;
@@ -47,31 +47,32 @@ public abstract class GenerateApplyAndCopyHouseholderColumn implements ArrayOper
         double tmpNorm2 = PrimitiveMath.ZERO;
 
         if (retVal) {
-            for (int i = row + 1; i < structure; i++) {
-                tmpVal = tmpVector[i] /= tmpNormInf;
+            for (int j = col + 1; j < tmpColDim; j++) {
+                tmpVal = tmpVector[j] /= tmpNormInf;
                 tmpNorm2 += tmpVal * tmpVal;
             }
-            retVal = !PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpNorm2);
+            double value = tmpNorm2;
+            retVal = !PrimitiveScalar.isSmall(PrimitiveMath.ONE, value);
         }
 
         if (retVal) {
 
-            double tmpScale = tmpVector[row] / tmpNormInf;
+            double tmpScale = tmpVector[col] / tmpNormInf;
             tmpNorm2 += tmpScale * tmpScale;
             tmpNorm2 = PrimitiveMath.SQRT.invoke(tmpNorm2); // 2-norm of the vector to transform (scaled by inf-norm)
 
             if (tmpScale <= PrimitiveMath.ZERO) {
-                data[row + tmpColBase] = tmpNorm2 * tmpNormInf;
+                data[row + col * structure] = tmpNorm2 * tmpNormInf;
                 tmpScale -= tmpNorm2;
             } else {
-                data[row + tmpColBase] = -tmpNorm2 * tmpNormInf;
+                data[row + col * structure] = -tmpNorm2 * tmpNormInf;
                 tmpScale += tmpNorm2;
             }
 
-            tmpVector[row] = PrimitiveMath.ONE;
+            tmpVector[col] = PrimitiveMath.ONE;
 
-            for (int i = row + 1; i < structure; i++) {
-                data[i + tmpColBase] = tmpVector[i] /= tmpScale;
+            for (int j = col + 1; j < tmpColDim; j++) {
+                data[row + j * structure] = tmpVector[j] /= tmpScale;
             }
 
             destination.beta = PrimitiveMath.ABS.invoke(tmpScale) / tmpNorm2;
@@ -82,14 +83,14 @@ public abstract class GenerateApplyAndCopyHouseholderColumn implements ArrayOper
 
     public static boolean invoke(final float[] data, final int structure, final int row, final int col, final Householder.Primitive32 destination) {
 
-        int tmpColBase = col * structure;
+        int tmpColDim = data.length / structure;
 
         float[] tmpVector = destination.vector;
-        destination.first = row;
+        destination.first = col;
 
-        double tmpNormInf = PrimitiveMath.ZERO; // Copy column and calculate its infinity-norm.
-        for (int i = row; i < structure; i++) {
-            tmpNormInf = PrimitiveMath.MAX.invoke(tmpNormInf, PrimitiveMath.ABS.invoke(tmpVector[i] = data[i + tmpColBase]));
+        double tmpNormInf = PrimitiveMath.ZERO; // Copy row and calculate its infinity-norm.
+        for (int j = col; j < tmpColDim; j++) {
+            tmpNormInf = PrimitiveMath.MAX.invoke(tmpNormInf, PrimitiveMath.ABS.invoke(tmpVector[j] = data[row + j * structure]));
         }
 
         boolean retVal = tmpNormInf != PrimitiveMath.ZERO;
@@ -97,31 +98,32 @@ public abstract class GenerateApplyAndCopyHouseholderColumn implements ArrayOper
         double tmpNorm2 = PrimitiveMath.ZERO;
 
         if (retVal) {
-            for (int i = row + 1; i < structure; i++) {
-                tmpVal = tmpVector[i] /= tmpNormInf;
+            for (int j = col + 1; j < tmpColDim; j++) {
+                tmpVal = tmpVector[j] /= tmpNormInf;
                 tmpNorm2 += tmpVal * tmpVal;
             }
-            retVal = !PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpNorm2);
+            double value = tmpNorm2;
+            retVal = !PrimitiveScalar.isSmall(PrimitiveMath.ONE, value);
         }
 
         if (retVal) {
 
-            double tmpScale = tmpVector[row] / tmpNormInf;
+            double tmpScale = tmpVector[col] / tmpNormInf;
             tmpNorm2 += tmpScale * tmpScale;
             tmpNorm2 = PrimitiveMath.SQRT.invoke(tmpNorm2); // 2-norm of the vector to transform (scaled by inf-norm)
 
             if (tmpScale <= PrimitiveMath.ZERO) {
-                data[row + tmpColBase] = (float) (tmpNorm2 * tmpNormInf);
+                data[row + col * structure] = (float) (tmpNorm2 * tmpNormInf);
                 tmpScale -= tmpNorm2;
             } else {
-                data[row + tmpColBase] = (float) (-tmpNorm2 * tmpNormInf);
+                data[row + col * structure] = (float) (-tmpNorm2 * tmpNormInf);
                 tmpScale += tmpNorm2;
             }
 
-            tmpVector[row] = (float) PrimitiveMath.ONE;
+            tmpVector[col] = (float) PrimitiveMath.ONE;
 
-            for (int i = row + 1; i < structure; i++) {
-                data[i + tmpColBase] = tmpVector[i] /= tmpScale;
+            for (int j = col + 1; j < tmpColDim; j++) {
+                data[row + j * structure] = tmpVector[j] /= tmpScale;
             }
 
             destination.beta = (float) (PrimitiveMath.ABS.invoke(tmpScale) / tmpNorm2);
@@ -133,46 +135,49 @@ public abstract class GenerateApplyAndCopyHouseholderColumn implements ArrayOper
     public static <N extends Scalar<N>> boolean invoke(final N[] data, final int structure, final int row, final int col,
             final Householder.Generic<N> destination, final Scalar.Factory<N> scalar) {
 
-        int tmpColBase = col * structure;
+        int tmpColDim = data.length / structure;
 
         N[] tmpVector = destination.vector;
-        destination.first = row;
+        destination.first = col;
 
         double tmpNormInf = PrimitiveMath.ZERO;
-        for (int i = row; i < structure; i++) {
-            tmpNormInf = PrimitiveMath.MAX.invoke(tmpNormInf, (tmpVector[i] = data[i + tmpColBase]).norm());
+        for (int j = col; j < tmpColDim; j++) {
+            tmpNormInf = PrimitiveMath.MAX.invoke(tmpNormInf, (tmpVector[j] = data[row + j * structure]).norm());
         }
 
         boolean retVal = tmpNormInf != PrimitiveMath.ZERO;
-        Scalar<N> tmpVal;
+        N tmpVal;
         double tmpNorm2 = PrimitiveMath.ZERO;
 
         if (retVal) {
-            for (int i = row + 1; i < structure; i++) {
-                tmpVal = tmpVector[i].divide(tmpNormInf);
+            for (int j = col + 1; j < tmpColDim; j++) {
+                tmpVal = tmpVector[j].divide(tmpNormInf).get();
                 tmpNorm2 += tmpVal.norm() * tmpVal.norm();
-                tmpVector[i] = tmpVal.get();
+                tmpVector[j] = tmpVal;
             }
-            retVal = !PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpNorm2);
+            double value = tmpNorm2;
+            retVal = !PrimitiveScalar.isSmall(PrimitiveMath.ONE, value);
         }
 
         if (retVal) {
 
-            Scalar<N> tmpScale = tmpVector[row].divide(tmpNormInf);
+            N tmpScale = tmpVector[col].divide(tmpNormInf).get();
             tmpNorm2 += tmpScale.norm() * tmpScale.norm();
             tmpNorm2 = PrimitiveMath.SQRT.invoke(tmpNorm2);
 
-            // data[row + tmpColBase] = ComplexNumber.makePolar(tmpNorm2 * tmpNormInf, tmpScale.phase());
+            // data[(row + (col * structure))] = ComplexNumber.makePolar(tmpNorm2 * tmpNormInf, tmpScale.phase());
             data[row + col * structure] = tmpScale.signum().multiply(tmpNorm2 * tmpNormInf).get();
             // tmpScale = tmpScale.subtract(ComplexNumber.makePolar(tmpNorm2, tmpScale.phase()));
             tmpScale = tmpScale.subtract(tmpScale.signum().multiply(tmpNorm2)).get();
 
-            tmpVector[row] = scalar.one().get();
+            tmpVector[col] = scalar.one().get();
 
-            for (int i = row + 1; i < structure; i++) {
-                data[i + tmpColBase] = tmpVector[i] = tmpVector[i].divide(tmpScale).get();
+            for (int j = col + 1; j < tmpColDim; j++) {
+                // data[row + (j * structure)] = tmpVector[j] = ComplexFunction.DIVIDE.invoke(tmpVector[j], tmpScale).conjugate();
+                data[row + j * structure] = tmpVector[j] = tmpVector[j].divide(tmpScale).conjugate().get();
             }
 
+            // destination.beta = ComplexNumber.valueOf(tmpScale.norm() / tmpNorm2);
             destination.beta = scalar.cast(tmpScale.norm() / tmpNorm2);
         }
 

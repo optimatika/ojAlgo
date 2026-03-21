@@ -651,6 +651,7 @@ public class NextGenSysModTest {
         }
 
     }
+
     public static final class Case050B extends CaseData {
 
         public static final double[][] covarianceMtrx = {

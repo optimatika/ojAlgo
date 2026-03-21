@@ -21,7 +21,8 @@
  */
 package org.ojalgo.data.cluster;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.POSITIVE_INFINITY;
+import static org.ojalgo.function.constant.PrimitiveMath.THIRD;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -56,7 +56,7 @@ public final class NetworkTrainer extends WrappedANN {
     }
 
     /**
-     * @param layer 0-based index among the calculation layers (excluding the input layer)
+     * @param layer     0-based index among the calculation layers (excluding the input layer)
      * @param activator The activator function to use
      * @deprecated Use {@link NetworkBuilder} and {@link NetworkBuilder#layer(int, Activator)} instead.
      */
@@ -188,7 +188,7 @@ public final class NetworkTrainer extends WrappedANN {
      * something 2D where the number of rows should match the batch size and the number of columns the number
      * of inputs and outputs respectively. When the batch size is 1 then the arguments can actually be 1D.
      *
-     * @param givenInput One or more input examples, depending on the batch size
+     * @param givenInput   One or more input examples, depending on the batch size
      * @param targetOutput One or more, matching, output targets
      */
     public void train(final Access1D<Double> givenInput, final Access1D<Double> targetOutput) {

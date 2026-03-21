@@ -205,7 +205,7 @@ public interface IntegerStrategy {
     static ConfigurableStrategy newConfigurable() {
 
         Comparator<NodeKey>[] definitions = (Comparator<NodeKey>[]) new Comparator<?>[] { NodeKey.MIN_OBJECTIVE, NodeKey.DEPTH_FIRST_SEARCH,
-                NodeKey.BREADTH_FIRST_SEARCH, NodeKey.LARGE_DISPLACEMENT, NodeKey.SMALL_DISPLACEMENT };
+                NodeKey.BREADTH_FIRST_SEARCH };
 
         NumberContext integrality = NumberContext.of(12, 8);
         NumberContext gap = NumberContext.of(7, 8);

@@ -26,14 +26,17 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.SparseArray;
-import org.ojalgo.array.SparseArray.NonzeroView;
+import org.ojalgo.matrix.operation.SubstituteBackwards;
+import org.ojalgo.matrix.operation.SubstituteForwards;
 import org.ojalgo.matrix.store.DiagonalStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.R064CSR;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.matrix.store.SparseStore;
@@ -51,6 +54,104 @@ import org.ojalgo.type.NumberDefinition;
  * A sparse, primitive double based, LU decomposition with support for incremental Forrest-Tomlin updates.
  */
 final class SparseLU extends AbstractDecomposition<Double, R064Store> implements LU<Double> {
+
+    /**
+     * [A]=[P][L][U][Q]
+     */
+    static final class FactorL extends AbstractDecomposition.PrimitiveFactor {
+
+        private final R064CSR myBody;
+
+        FactorL(final R064CSR body) {
+            super();
+            myBody = body;
+        }
+
+        @Override
+        public void btran(final double[] arg) {
+            SubstituteBackwards.invoke(arg, myBody);
+        }
+
+        @Override
+        public void ftran(final double[] arg) {
+            SubstituteForwards.invoke(arg, myBody);
+        }
+
+        @Override
+        public MatrixStore<Double> get() {
+            return myBody.triangular(false, true);
+        }
+
+        @Override
+        public int getColDim() {
+            return myBody.getMinDim();
+        }
+
+        @Override
+        public int getRowDim() {
+            return myBody.getRowDim();
+        }
+
+    }
+
+    /**
+     * [A]=[P][L][U][Q]
+     */
+    static final class FactorU extends AbstractDecomposition.PrimitiveFactor {
+
+        private final double[] myBodyDiagonal;
+        private final RowsSupplier<Double> myBodyMain;
+        private final Pivot myColPivot;
+
+        FactorU(final RowsSupplier<Double> u, final double[] diagU, final Pivot colPivot) {
+            super();
+            myBodyMain = u;
+            myBodyDiagonal = diagU;
+            myColPivot = colPivot;
+        }
+
+        @Override
+        public void btran(final double[] arg) {
+            int r = myBodyDiagonal.length;
+            for (int ij = 0; ij < r; ij++) {
+                double varJ = arg[ij] / myBodyDiagonal[ij];
+                arg[ij] = varJ;
+                myBodyMain.getRow(ij).axpy(-varJ, arg);
+            }
+        }
+
+        @Override
+        public void ftran(final double[] arg) {
+            int r = myBodyDiagonal.length;
+            for (int ij = r - 1; ij >= 0; ij--) {
+                arg[ij] = (arg[ij] - myBodyMain.getRow(ij).dot(arg)) / myBodyDiagonal[ij];
+            }
+        }
+
+        @Override
+        public MatrixStore<Double> get() {
+            MatrixStore<Double> retVal = myBodyMain.triangular(true, false).superimpose(DiagonalStore.wrap(myBodyDiagonal));
+            int nbCols = this.getColDim();
+            if (this.getRowDim() > nbCols) {
+                retVal = retVal.limits(nbCols, nbCols);
+            }
+            if (myColPivot != null && myColPivot.isModified()) {
+                retVal = retVal.columns(myColPivot.reverseOrder());
+            }
+            return retVal;
+        }
+
+        @Override
+        public int getColDim() {
+            return myBodyMain.getColDim();
+        }
+
+        @Override
+        public int getRowDim() {
+            return myBodyDiagonal.length;
+        }
+
+    }
 
     static final class PermutationEta implements InvertibleFactor<Double>, Mutate1D {
 
@@ -71,14 +172,10 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
         public void btran(final double[] arg) {
 
             double rowValue = arg[myTo];
-            for (NonzeroView<Double> nz : myElements.nonzeros()) {
-                arg[(int) nz.index()] += nz.doubleValue() * rowValue;
-            }
+            myElements.axpy(rowValue, arg);
 
             double tmp = arg[myTo];
-            for (int i = myTo; i > myFrom; i--) {
-                arg[i] = arg[i - 1];
-            }
+            System.arraycopy(arg, myFrom, arg, myFrom + 1, myTo - myFrom);
             arg[myFrom] = tmp;
         }
 
@@ -86,9 +183,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
         public void btran(final PhysicalStore<Double> arg) {
 
             double rowValue = arg.doubleValue(myTo);
-            for (NonzeroView<Double> nz : myElements.nonzeros()) {
-                arg.add(nz.index(), nz.doubleValue() * rowValue);
-            }
+            myElements.axpy(rowValue, arg);
 
             double tmp = arg.doubleValue(myTo);
             for (int i = myTo; i > myFrom; i--) {
@@ -101,16 +196,10 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
         public void ftran(final double[] arg) {
 
             double tmp = arg[myFrom];
-            for (int i = myFrom; i < myTo; i++) {
-                arg[i] = arg[i + 1];
-            }
+            System.arraycopy(arg, myFrom + 1, arg, myFrom, myTo - myFrom);
             arg[myTo] = tmp;
 
-            double sum = ZERO;
-            for (NonzeroView<Double> nz : myElements.nonzeros()) {
-                sum += nz.doubleValue() * arg[(int) nz.index()];
-            }
-            arg[myTo] += sum;
+            arg[myTo] += myElements.dot(arg);
         }
 
         @Override
@@ -122,11 +211,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
             }
             arg.set(myTo, tmp);
 
-            double sum = ZERO;
-            for (NonzeroView<Double> nz : myElements.nonzeros()) {
-                sum += nz.doubleValue() * arg.doubleValue(nz.index());
-            }
-            arg.add(myTo, sum);
+            arg.add(myTo, myElements.dot(arg));
         }
 
         @Override
@@ -171,6 +256,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
      */
     private double[] myDiagU;
     private final List<InvertibleFactor<Double>> myFactors = new ArrayList<>();
+    private R064CSR myFixedL;
     private RowsSupplier<Double> myL;
     private final Pivot myPivot;
     private RowsSupplier<Double> myU;
@@ -187,29 +273,25 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
 
     @Override
     public void btran(final double[] arg) {
-        DecompositionStore<Double> x = this.copyRow(arg);
-        this.btran(x);
-        x.supplyTo(arg);
-    }
-
-    @Override
-    public void btran(final PhysicalStore<Double> arg) {
 
         int r = this.getMinDim();
 
         if (myColPivot != null) {
-            this.applyPivotOrder(myColPivot, arg);
+            myColPivot.applyPivotOrder(arg);
         }
 
-        this.btranU(r, arg);
+        this.btranU(arg);
 
-        for (int i = myFactors.size() - 1; i >= 0; i--) {
-            myFactors.get(i).btran(arg);
-        }
+        InvertibleFactor.btran(myFactors, arg);
 
-        this.btranL(r, arg);
+        this.btranL(arg);
 
-        this.applyReverseOrder(myPivot, arg);
+        myPivot.applyReverseOrder(arg);
+    }
+
+    @Override
+    public void btran(final PhysicalStore<Double> arg) {
+        InvertibleFactor.doPrimitive(arg, this);
     }
 
     @Override
@@ -252,7 +334,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
 
             myPivot.applyPivotOrder(wCol);
 
-            this.ftranL(r, wCol);
+            this.ftranL(wCol);
 
             int p = j;
             double magnP = Math.abs(wColData[p]);
@@ -293,26 +375,30 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
             }
         }
 
+        myFixedL = myL.toCSR();
+
         return this.computed(true);
     }
 
     @Override
     public void ftran(final double[] arg) {
-        DecompositionStore<Double> x = this.copyColumn(arg);
-        this.ftran(x);
-        x.supplyTo(arg);
+
+        myPivot.applyPivotOrder(arg);
+
+        this.ftranL(arg);
+
+        InvertibleFactor.ftran(myFactors, arg);
+
+        this.ftranU(arg);
+
+        if (myColPivot != null) {
+            myColPivot.applyReverseOrder(arg);
+        }
     }
 
     @Override
     public void ftran(final PhysicalStore<Double> arg) {
-
-        this.applyPivotOrder(myPivot, arg);
-
-        this.ftranInternal(arg);
-
-        if (myColPivot != null) {
-            this.applyReverseOrder(myColPivot, arg);
-        }
+        InvertibleFactor.doPrimitive(this, arg);
     }
 
     @Override
@@ -332,6 +418,25 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
         return Double.valueOf(retVal);
     }
 
+    /**
+     * [A]=[P][L][etas...][U][Q]
+     */
+    @Override
+    public List<InvertibleFactor<Double>> getFactors() {
+
+        List<InvertibleFactor<Double>> retVal = new ArrayList<>();
+        retVal.add(this.getFactorP());
+        retVal.add(this.getFactorL());
+        retVal.addAll(myFactors);
+        retVal.add(this.getFactorU());
+
+        if (myColPivot != null) {
+            retVal.add(this.getFactorQ().get());
+        }
+
+        return retVal;
+    }
+
     @Override
     public MatrixStore<Double> getInverse(final PhysicalStore<Double> preallocated) {
         return this.getSolution(R064Store.FACTORY.makeIdentity(this.getMinDim()), preallocated);
@@ -339,7 +444,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
 
     @Override
     public MatrixStore<Double> getL() {
-        return myL.triangular(false, true);
+        return this.getFactorL().get();
     }
 
     @Override
@@ -384,13 +489,23 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
             for (int col = 0; col < nbSolutions; col++) {
 
                 column.fillMatching(preallocated.sliceColumn(col));
-                this.ftranInternal(column);
+
+                this.ftranL(column);
+
+                InvertibleFactor.ftran(myFactors, column);
+
+                this.ftranU(column);
+
                 preallocated.fillColumn(col, column);
             }
 
         } else {
 
-            this.ftranInternal(preallocated);
+            this.ftranL(preallocated);
+
+            InvertibleFactor.ftran(myFactors, preallocated);
+
+            this.ftranU(preallocated);
         }
 
         if (myColPivot != null) {
@@ -407,15 +522,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
      */
     @Override
     public MatrixStore<Double> getU() {
-        MatrixStore<Double> retVal = myU.triangular(true, false).superimpose(DiagonalStore.wrap(myDiagU));
-        int nbCols = this.getColDim();
-        if (this.getRowDim() > nbCols) {
-            retVal = retVal.limits(nbCols, nbCols);
-        }
-        if (myColPivot != null && myColPivot.isModified()) {
-            retVal = retVal.columns(myColPivot.reverseOrder());
-        }
-        return retVal;
+        return this.getFactorU().get();
     }
 
     @Override
@@ -480,22 +587,20 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
         int columnIndex = myColPivot.locationOf(specifiedColumn);
 
         newColumn.supplyTo(wCol);
-        myPivot.applyPivotOrder(wCol);
+        myPivot.applyPivotOrder(wColData);
 
-        this.ftranL(r, wCol);
+        this.ftranL(wColData);
 
         // Apply any existing transformations to the new column
-        for (int i = 0; i < myFactors.size(); i++) {
-            myFactors.get(i).ftran(wCol);
-        }
+        InvertibleFactor.ftran(myFactors, wColData);
 
         // After forward substitution is complete, find the last non-zero row
         double diag = NaN;
         int lastRowNonZero = -1;
         for (int i = m - 1; i >= 0; i--) {
-            if (!FletcherMatthews.PRECISION.isZero(wCol.doubleValue(i))) {
+            if (!FletcherMatthews.PRECISION.isZero(wColData[i])) {
                 lastRowNonZero = i;
-                diag = wCol.doubleValue(i);
+                diag = wColData[i];
                 break; // Stop as soon as we find a non-zero value
             }
         }
@@ -514,9 +619,9 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
 
             // Lucky!
             for (int i = 0; i < columnIndex; i++) {
-                myU.set(i, columnIndex, wCol.doubleValue(i));
+                myU.set(i, columnIndex, wColData[i]);
             }
-            myDiagU[columnIndex] = wCol.doubleValue(columnIndex);
+            myDiagU[columnIndex] = wColData[columnIndex];
 
         } else {
 
@@ -562,14 +667,29 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
         return true;
     }
 
-    private void btranL(final int r, final PhysicalStore<Double> arg) {
+    private void btranL(final double[] arg) {
+        SubstituteBackwards.invoke(arg, myFixedL);
+    }
+
+    private void btranL(final PhysicalStore<Double> arg) {
+        int r = myL.getMinDim();
         for (int ij = r - 1; ij > 0; ij--) {
             double varJ = arg.doubleValue(ij);
             myL.getRow(ij).axpy(-varJ, arg);
         }
     }
 
-    private void btranU(final int r, final PhysicalStore<Double> arg) {
+    private void btranU(final double[] arg) {
+        int r = myDiagU.length;
+        for (int ij = 0; ij < r; ij++) {
+            double varJ = arg[ij] / myDiagU[ij];
+            arg[ij] = varJ;
+            myU.getRow(ij).axpy(-varJ, arg);
+        }
+    }
+
+    private void btranU(final PhysicalStore<Double> arg) {
+        int r = myDiagU.length;
         for (int ij = 0; ij < r; ij++) {
             double varJ = arg.doubleValue(ij) / myDiagU[ij];
             arg.set(ij, varJ);
@@ -577,27 +697,25 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
         }
     }
 
-    private void ftranInternal(final PhysicalStore<Double> arg) {
-
-        int r = this.getMinDim();
-
-        this.ftranL(r, arg);
-
-        for (int i = 0; i < myFactors.size(); i++) {
-            myFactors.get(i).ftran(arg);
-        }
-
-        this.ftranU(arg, r);
+    private void ftranL(final double[] arg) {
+        SubstituteForwards.invoke(arg, myFixedL);
     }
 
-    private void ftranL(final int r, final PhysicalStore<Double> arg) {
+    private void ftranL(final PhysicalStore<Double> arg) {
+        int r = myL.getMinDim();
         for (int ij = 1; ij < r; ij++) {
             arg.add(ij, 0, -myL.getRow(ij).dot(arg));
         }
     }
 
-    private void ftranU(final PhysicalStore<Double> arg, final int r) {
-        for (int ij = r - 1; ij >= 0; ij--) {
+    private void ftranU(final double[] arg) {
+        for (int ij = myDiagU.length - 1; ij >= 0; ij--) {
+            arg[ij] = (arg[ij] - myU.getRow(ij).dot(arg)) / myDiagU[ij];
+        }
+    }
+
+    private void ftranU(final PhysicalStore<Double> arg) {
+        for (int ij = myDiagU.length - 1; ij >= 0; ij--) {
             double sum = arg.doubleValue(ij);
             sum -= myU.getRow(ij).dot(arg);
             arg.set(ij, 0, sum / myDiagU[ij]);
@@ -607,6 +725,39 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
     @Override
     protected boolean checkSolvability() {
         return this.isSquare() && this.isFullRank();
+    }
+
+    /**
+     * [A]=[P][L][U][Q]
+     */
+    MatrixDecomposition.Factor<Double> getFactorL() {
+        return new FactorL(myFixedL);
+    }
+
+    /**
+     * [A]=[P][L][U][Q]
+     */
+    MatrixDecomposition.Factor<Double> getFactorP() {
+        return new FactorPivot<>(this.makeIdentity(this.getRowDim()), myPivot, true);
+    }
+
+    /**
+     * [A]=[P][L][U][Q]
+     */
+    Optional<MatrixDecomposition.Factor<Double>> getFactorQ() {
+
+        if (myColPivot != null) {
+            return Optional.of(new FactorPivot<>(this.makeIdentity(this.getColDim()), myColPivot, false));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * [A]=[P][L][U][Q]
+     */
+    MatrixDecomposition.Factor<Double> getFactorU() {
+        return new FactorU(myU, myDiagU, myColPivot);
     }
 
     R064Store getWorkerColumn(final int nbRows) {
@@ -655,6 +806,8 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
         }
 
         myFactors.clear();
+
+        myFixedL = null;
     }
 
 }

@@ -34,11 +34,10 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * Minimal Residual (MINRES) solver for symmetric (possibly indefinite) square systems.
  * <p>
- * This class mirrors the public API and internal scratch structure of {@link QMRSolver},
- * but implements the classic MINRES iteration specialised for symmetric matrices.
- * Right-preconditioning is supported using the {@link Preconditioner} API provided by
- * {@link IterativeSolverTask}. A shift parameter is present but fixed to zero in this
- * implementation; it is retained to enable straightforward future extensions.
+ * This class mirrors the public API and internal scratch structure of {@link QMRSolver}, but implements the
+ * classic MINRES iteration specialised for symmetric matrices. Right-preconditioning is supported using the
+ * {@link Preconditioner} API provided by {@link IterativeSolverTask}. A shift parameter is present but fixed
+ * to zero in this implementation; it is retained to enable straightforward future extensions.
  * <p>
  * Characteristics
  * <ul>
@@ -146,7 +145,8 @@ public final class MINRESSolver extends IterativeSolverTask {
         rightPreconditioner.apply(r1, y);
 
         double beta1 = r1.dot(y);
-        if (beta1 < ZERO) throw new IllegalArgumentException("indefinite preconditioner");
+        if (beta1 < ZERO)
+            throw new IllegalArgumentException("indefinite preconditioner");
         if (beta1 == ZERO) {
             return accuracy.isZero(normRHS) ? normErr : normErr / normRHS;
         }
@@ -190,7 +190,8 @@ public final class MINRESSolver extends IterativeSolverTask {
                 final double Avi = row.dot(v);
                 y.set(row.index, Avi);
             }
-            if (shift != ZERO) axpy(-shift, v, y);
+            if (shift != ZERO)
+                axpy(-shift, v, y);
 
             if (itn >= 2) {
                 // y -= (beta/oldb) * r1
@@ -203,7 +204,9 @@ public final class MINRESSolver extends IterativeSolverTask {
             axpy(-(alfa / beta), r2, y);
 
             // r1 <- r2 ; r2 <- y switch references to avoid a vector copy
-            final R064Store tmpRef = r1; r1 = r2; r2 = tmpRef;
+            final R064Store tmpRef = r1;
+            r1 = r2;
+            r2 = tmpRef;
             r2.fillMatching(y);
 
             // y = M^{-1} r2 (precondition for next step)
@@ -211,7 +214,8 @@ public final class MINRESSolver extends IterativeSolverTask {
 
             oldb = beta;
             beta = r2.dot(y);
-            if (beta < 0) throw new IllegalArgumentException("non-symmetric matrix / breakdown");
+            if (beta < 0)
+                throw new IllegalArgumentException("non-symmetric matrix / breakdown");
             beta = Math.sqrt(beta);
             tnorm2 += alfa * alfa + oldb * oldb + beta * beta;
 
@@ -233,8 +237,8 @@ public final class MINRESSolver extends IterativeSolverTask {
 
             // Update w and x: w = (v - oldeps*w1 - delta*w2) / gamma ; x += phi * w
             w1.fillMatching(w2); // shift: w1 <= previous w2
-            w2.fillMatching(w);  // shift: w2 <= previous w
-            w.fillMatching(v);   // w = v
+            w2.fillMatching(w); // shift: w2 <= previous w
+            w.fillMatching(v); // w = v
             axpy(-oldeps, w1, w);
             axpy(-delta, w2, w);
             scaleInPlace(w, ONE / gamma);
@@ -259,16 +263,24 @@ public final class MINRESSolver extends IterativeSolverTask {
             final double Acond = gmax / gmin;
 
             if (istop == 0) {
-                if (1 + rootOverAnorm <= 1) istop = 2;
-                if (1 + test1 <= 1) istop = 1;
-                if (itn >= (iterationsLimit > 0 ? iterationsLimit : 5 * n)) istop = 6;
-                if (Acond >= 0.1 / MACHINE_EPSILON) istop = 4;
-                if (epsx >= beta1) istop = 3;
-                if (rootOverAnorm <= rtol) istop = 2;
-                if (test1 <= rtol) istop = 1;
+                if (1 + rootOverAnorm <= 1)
+                    istop = 2;
+                if (1 + test1 <= 1)
+                    istop = 1;
+                if (itn >= (iterationsLimit > 0 ? iterationsLimit : 5 * n))
+                    istop = 6;
+                if (Acond >= 0.1 / MACHINE_EPSILON)
+                    istop = 4;
+                if (epsx >= beta1)
+                    istop = 3;
+                if (rootOverAnorm <= rtol)
+                    istop = 2;
+                if (test1 <= rtol)
+                    istop = 1;
             }
 
-            if (istop != 0) break;
+            if (istop != 0)
+                break;
         }
 
         // Compute residual ratio ||b - A x|| / ||b|| using equations (no dense A)

@@ -19,17 +19,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.array.operation;
+package org.ojalgo.matrix.operation;
 
-/**
- * Given two vectors x and y, each vector element of these vectors is replaced as follows: for i=1 to n, where
- * H is a modified Givens transformation matrix whose values are stored in the param[1] through param[4]
- * array. See discussion on the param argument.
- *
- * @author apete
- */
-public abstract class ROTM implements ArrayOperation {
+import org.ojalgo.array.operation.AXPY;
+import org.ojalgo.scalar.Scalar;
+
+public abstract class ApplyCholesky implements MatrixOperation {
 
     public static int THRESHOLD = 128;
+
+    public static void invoke(final double[] data, final int structure, final int firstColumn, final int columnLimit, final double[] multipliers) {
+        for (int j = firstColumn; j < columnLimit; j++) {
+            AXPY.invoke(data, j * structure, -multipliers[j], multipliers, 0, j, structure);
+        }
+    }
+
+    public static <N extends Scalar<N>> void invoke(final N[] data, final int structure, final int firstColumn, final int columnLimit, final N[] multipliers) {
+        for (int j = firstColumn; j < columnLimit; j++) {
+            AXPY.invoke(data, j * structure, multipliers[j].conjugate().negate().get(), multipliers, 0, j, structure);
+        }
+    }
 
 }

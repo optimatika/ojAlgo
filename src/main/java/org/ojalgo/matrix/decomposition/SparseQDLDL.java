@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.operation.COPY;
@@ -36,6 +37,7 @@ import org.ojalgo.matrix.store.R064CSC.Builder;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.matrix.store.TransformableRegion;
+import org.ojalgo.matrix.transformation.InvertibleFactor;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Access2D.ColumnView;
@@ -117,6 +119,123 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
                 workY = new double[n];
                 patternMarked = new boolean[n];
             }
+        }
+
+    }
+
+    /**
+     * [A]=[L][D][L]<sup>T</sup> — diagonal factor.
+     */
+    static final class FactorD extends AbstractDecomposition.PrimitiveFactor {
+
+        private final ReciprocalPair myDiagonal;
+
+        FactorD(final ReciprocalPair diagonal) {
+            super();
+            myDiagonal = diagonal;
+        }
+
+        @Override
+        public void btran(final double[] arg) {
+            this.ftran(arg);
+        }
+
+        @Override
+        public void ftran(final double[] arg) {
+            SparseQDLDL.ftranD(myDiagonal.inverse, arg);
+        }
+
+        @Override
+        public MatrixStore<Double> get() {
+            return DiagonalStore.wrap(myDiagonal.values);
+        }
+
+        @Override
+        public int getColDim() {
+            return myDiagonal.size();
+        }
+
+        @Override
+        public int getRowDim() {
+            return myDiagonal.size();
+        }
+
+    }
+
+    /**
+     * [A]=[L][D][L]<sup>T</sup> — unit lower triangular factor (CSC).
+     */
+    static final class FactorL extends AbstractDecomposition.PrimitiveFactor {
+
+        private final R064CSC myBody;
+
+        FactorL(final R064CSC body) {
+            super();
+            myBody = body;
+        }
+
+        @Override
+        public void btran(final double[] arg) {
+            SparseQDLDL.ftranU(myBody.pointers, myBody.indices, myBody.values, arg);
+        }
+
+        @Override
+        public void ftran(final double[] arg) {
+            SparseQDLDL.ftranL(myBody.pointers, myBody.indices, myBody.values, arg);
+        }
+
+        @Override
+        public MatrixStore<Double> get() {
+            return myBody.triangular(false, true);
+        }
+
+        @Override
+        public int getColDim() {
+            return myBody.getColDim();
+        }
+
+        @Override
+        public int getRowDim() {
+            return myBody.getRowDim();
+        }
+
+    }
+
+    /**
+     * [A]=[L][D][L]<sup>T</sup> — transpose of L (unit upper triangular).
+     */
+    static final class FactorLT extends AbstractDecomposition.PrimitiveFactor {
+
+        private final R064CSC myBody;
+
+        FactorLT(final R064CSC body) {
+            super();
+            myBody = body;
+        }
+
+        @Override
+        public void btran(final double[] arg) {
+            SparseQDLDL.ftranL(myBody.pointers, myBody.indices, myBody.values, arg);
+        }
+
+        @Override
+        public void ftran(final double[] arg) {
+            SparseQDLDL.ftranU(myBody.pointers, myBody.indices, myBody.values, arg);
+        }
+
+        @Override
+        public MatrixStore<Double> get() {
+            return myBody.triangular(false, true).transpose();
+        }
+
+        @Override
+        public int getColDim() {
+            return myBody.getColDim();
+        }
+
+        @Override
+        public int getRowDim() {
+            return myBody.getRowDim();
         }
 
     }
@@ -318,13 +437,7 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
 
     @Override
     public void ftran(final PhysicalStore<Double> arg) {
-        if (arg instanceof R064Store) {
-            this.ftran(((R064Store) arg).data);
-        } else {
-            double[] x = arg.toRawCopy1D();
-            this.ftran(x);
-            COPY.invoke(x, arg);
-        }
+        InvertibleFactor.doPrimitive(this, arg);
     }
 
     @Override
@@ -361,6 +474,11 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
         }
 
         return Double.valueOf(det);
+    }
+
+    @Override
+    public List<InvertibleFactor<Double>> getFactors() {
+        return List.of(new FactorL(myL), new FactorD(myD), new FactorLT(myL));
     }
 
     @Override

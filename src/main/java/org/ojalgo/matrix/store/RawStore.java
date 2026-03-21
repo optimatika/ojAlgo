@@ -28,7 +28,14 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.operation.*;
+import org.ojalgo.array.operation.AMAX;
+import org.ojalgo.array.operation.COPY;
+import org.ojalgo.array.operation.FillAll;
+import org.ojalgo.array.operation.FillCompatible;
+import org.ojalgo.array.operation.FillMatchingDual;
+import org.ojalgo.array.operation.ModifyAll;
+import org.ojalgo.array.operation.SWAP;
+import org.ojalgo.array.operation.VisitAll;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -40,6 +47,8 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.operation.MultiplyBoth;
 import org.ojalgo.matrix.operation.MultiplyNeither;
+import org.ojalgo.matrix.operation.SubstituteBackwards;
+import org.ojalgo.matrix.operation.SubstituteForwards;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.PrimitiveScalar;
@@ -686,8 +695,18 @@ public final class RawStore implements PhysicalStore<Double>, Factory2D.Builder<
     }
 
     @Override
+    public void substituteBackwards(final boolean conjugated, final boolean unitDiagonal, final double[] arg) {
+        SubstituteBackwards.invoke(arg, data, unitDiagonal, conjugated);
+    }
+
+    @Override
     public void substituteForwards(final Access2D<Double> body, final boolean unitDiagonal, final boolean conjugated, final boolean identity) {
         SubstituteForwards.invoke(data, body, unitDiagonal, conjugated, identity);
+    }
+
+    @Override
+    public void substituteForwards(final boolean conjugated, final boolean unitDiagonal, final double[] arg) {
+        SubstituteForwards.invoke(arg, data, unitDiagonal, conjugated);
     }
 
     @Override

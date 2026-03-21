@@ -23,12 +23,15 @@ package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.List;
+
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.operation.DOT;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.store.TransformableRegion;
+import org.ojalgo.matrix.transformation.InvertibleFactor;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 
@@ -48,14 +51,12 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
     @Override
     public void btran(final double[] arg) {
-        DecompositionStore<Double> x = this.copyRow(arg);
-        this.btran(x);
-        x.supplyTo(arg);
+        this.ftran(arg);
     }
 
     @Override
     public void btran(final PhysicalStore<Double> arg) {
-        this.doSolve(arg);
+        this.ftran(arg);
     }
 
     @Override
@@ -114,14 +115,20 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
     @Override
     public void ftran(final double[] arg) {
-        DecompositionStore<Double> x = this.copyColumn(arg);
-        this.ftran(x);
-        x.supplyTo(arg);
+
+        RawStore body = this.getInternalStore();
+
+        body.substituteForwards(false, false, arg);
+        body.substituteBackwards(true, false, arg);
     }
 
     @Override
     public void ftran(final PhysicalStore<Double> arg) {
-        this.doSolve(arg);
+
+        RawStore body = this.getInternalStore();
+
+        body.substituteForwards(false, false, arg);
+        body.substituteBackwards(true, false, arg);
     }
 
     @Override
@@ -138,7 +145,13 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
             retVal *= tmpVal * tmpVal;
         }
 
-        return retVal;
+        return Double.valueOf(retVal);
+    }
+
+    @Override
+    public List<InvertibleFactor<Double>> getFactors() {
+        RawStore internalStore = this.getInternalStore();
+        return List.of(new FactorLower<>(internalStore, false), new FactorUpperConjugate<>(internalStore, false));
     }
 
     @Override

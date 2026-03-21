@@ -72,8 +72,9 @@ public class ImageData implements MatrixStore<Double>, Mutate2D.Receiver<Double>
          * Used as a callback from {@link #newTransformation(FrequencyDomainUpdater)}.
          * 
          * @param distance The distance from the centre. The centre is the zero frequency. The distance is
-         *        scaled so that the radius of the largest circle that can fit in the image rectangle is 100.
-         * @param value The current value
+         *                 scaled so that the radius of the largest circle that can fit in the image rectangle
+         *                 is 100.
+         * @param value    The current value
          * @return The new value
          */
         ComplexNumber invoke(double distance, ComplexNumber value);

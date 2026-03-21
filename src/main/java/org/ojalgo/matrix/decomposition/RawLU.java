@@ -23,6 +23,9 @@ package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.SWAP;
@@ -32,12 +35,97 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.store.TransformableRegion;
+import org.ojalgo.matrix.transformation.InvertibleFactor;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.type.context.NumberContext;
 
 final class RawLU extends RawDecomposition implements LU<Double> {
+
+    /**
+     * [A]=[P][L][U][Q]
+     */
+    static final class FactorL extends AbstractDecomposition.PrimitiveFactor {
+
+        private final RawStore myBody;
+
+        FactorL(final RawStore body) {
+            super();
+            myBody = body;
+        }
+
+        @Override
+        public void btran(final double[] arg) {
+            myBody.substituteBackwards(true, true, arg);
+        }
+
+        @Override
+        public void ftran(final double[] arg) {
+            myBody.substituteForwards(false, true, arg);
+        }
+
+        @Override
+        public MatrixStore<Double> get() {
+            return myBody.triangular(false, true).limits(this.getRowDim(), this.getColDim());
+        }
+
+        @Override
+        public int getColDim() {
+            return myBody.getMinDim();
+        }
+
+        @Override
+        public int getRowDim() {
+            return myBody.getRowDim();
+        }
+
+    }
+
+    /**
+     * [A]=[P][L][U][Q]
+     */
+    static final class FactorU extends AbstractDecomposition.PrimitiveFactor {
+
+        private final RawStore myBody;
+        private final Pivot myColPivot;
+
+        FactorU(final RawStore body, final Pivot colPivot) {
+            super();
+            myBody = body;
+            myColPivot = colPivot;
+        }
+
+        @Override
+        public void btran(final double[] arg) {
+            myBody.substituteForwards(true, false, arg);
+        }
+
+        @Override
+        public void ftran(final double[] arg) {
+            myBody.substituteBackwards(false, false, arg);
+        }
+
+        @Override
+        public MatrixStore<Double> get() {
+            MatrixStore<Double> retVal = myBody.triangular(true, false).limits(this.getRowDim(), this.getColDim());
+            if (myColPivot != null && myColPivot.isModified()) {
+                retVal = retVal.columns(myColPivot.reverseOrder());
+            }
+            return retVal;
+        }
+
+        @Override
+        public int getColDim() {
+            return myBody.getColDim();
+        }
+
+        @Override
+        public int getRowDim() {
+            return myBody.getMinDim();
+        }
+
+    }
 
     private Pivot myColPivot = null;
     private final Pivot myPivot = new Pivot();
@@ -54,9 +142,18 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
     @Override
     public void btran(final double[] arg) {
-        DecompositionStore<Double> x = this.copyRow(arg);
-        this.btran(x);
-        x.supplyTo(arg);
+
+        if (myColPivot != null) {
+            myColPivot.applyPivotOrder(arg);
+        }
+
+        RawStore body = this.getInternalStore();
+
+        body.substituteForwards(true, false, arg);
+
+        body.substituteBackwards(true, true, arg);
+
+        myPivot.applyReverseOrder(arg);
     }
 
     @Override
@@ -66,11 +163,11 @@ final class RawLU extends RawDecomposition implements LU<Double> {
             this.applyPivotOrder(myColPivot, arg);
         }
 
-        MatrixStore<Double> body = this.getInternalStore();
+        RawStore body = this.getInternalStore();
 
-        arg.substituteForwards(body, false, true, false);
+        body.substituteForwards(true, false, arg);
 
-        arg.substituteBackwards(body, true, true, false);
+        body.substituteBackwards(true, true, arg);
 
         this.applyReverseOrder(myPivot, arg);
     }
@@ -124,9 +221,18 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
     @Override
     public void ftran(final double[] arg) {
-        DecompositionStore<Double> x = this.copyColumn(arg);
-        this.ftran(x);
-        x.supplyTo(arg);
+
+        myPivot.applyPivotOrder(arg);
+
+        RawStore body = this.getInternalStore();
+
+        body.substituteForwards(false, true, arg);
+
+        body.substituteBackwards(false, false, arg);
+
+        if (myColPivot != null) {
+            myColPivot.applyReverseOrder(arg);
+        }
     }
 
     @Override
@@ -134,11 +240,11 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
         this.applyPivotOrder(myPivot, arg);
 
-        MatrixStore<Double> body = this.getInternalStore();
+        RawStore body = this.getInternalStore();
 
-        arg.substituteForwards(body, true, false, false);
+        body.substituteForwards(false, true, arg);
 
-        arg.substituteBackwards(body, false, false, false);
+        body.substituteBackwards(false, false, arg);
 
         if (myColPivot != null) {
             this.applyReverseOrder(myColPivot, arg);
@@ -165,6 +271,19 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return Double.valueOf(retVal);
     }
 
+    /**
+     * [A]=[P][L][U][Q]
+     */
+    @Override
+    public List<InvertibleFactor<Double>> getFactors() {
+
+        if (myColPivot != null) {
+            return List.of(this.getFactorP(), this.getFactorL(), this.getFactorU(), this.getFactorQ().get());
+        } else {
+            return List.of(this.getFactorP(), this.getFactorL(), this.getFactorU());
+        }
+    }
+
     @Override
     public MatrixStore<Double> getInverse(final PhysicalStore<Double> preallocated) {
         return this.doGetInverse(preallocated);
@@ -172,12 +291,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
     @Override
     public MatrixStore<Double> getL() {
-        MatrixStore<Double> logical = this.getInternalStore().triangular(false, true);
-        int nbRows = this.getRowDim();
-        if (nbRows < this.getColDim()) {
-            return logical.limits(nbRows, nbRows);
-        }
-        return logical;
+        return this.getFactorL().get();
     }
 
     @Override
@@ -211,15 +325,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
     @Override
     public MatrixStore<Double> getU() {
-        MatrixStore<Double> retVal = this.getInternalStore().triangular(true, false);
-        int nbCols = this.getColDim();
-        if (this.getRowDim() > nbCols) {
-            retVal = retVal.limits(nbCols, nbCols);
-        }
-        if (myColPivot != null && myColPivot.isModified()) {
-            retVal = retVal.columns(myColPivot.reverseOrder());
-        }
-        return retVal;
+        return this.getFactorU().get();
     }
 
     @Override
@@ -362,7 +468,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
     private MatrixStore<Double> doSolve(final PhysicalStore<Double> preallocated) {
 
-        MatrixStore<Double> body = this.getInternalStore();
+        RawStore body = this.getInternalStore();
 
         preallocated.substituteForwards(body, true, false, false);
 
@@ -378,6 +484,39 @@ final class RawLU extends RawDecomposition implements LU<Double> {
     @Override
     protected boolean checkSolvability() {
         return this.isSquare() && this.isFullRank();
+    }
+
+    /**
+     * [A]=[P][L][U][Q]
+     */
+    MatrixDecomposition.Factor<Double> getFactorL() {
+        return new FactorL(this.getInternalStore());
+    }
+
+    /**
+     * [A]=[P][L][U][Q]
+     */
+    MatrixDecomposition.Factor<Double> getFactorP() {
+        return new FactorPivot<>(this.makeIdentity(this.getRowDim()), myPivot, true);
+    }
+
+    /**
+     * [A]=[P][L][U][Q]
+     */
+    Optional<MatrixDecomposition.Factor<Double>> getFactorQ() {
+
+        if (myColPivot != null) {
+            return Optional.of(new FactorPivot<>(this.makeIdentity(this.getColDim()), myColPivot, false));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * [A]=[P][L][U][Q]
+     */
+    MatrixDecomposition.Factor<Double> getFactorU() {
+        return new FactorU(this.getInternalStore(), myColPivot);
     }
 
     R064Store getWorkerColumn(final int nbRows) {

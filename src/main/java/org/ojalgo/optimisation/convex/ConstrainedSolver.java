@@ -21,14 +21,10 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import java.util.Optional;
-
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.TransformableRegion;
-import org.ojalgo.optimisation.ConstraintsMetaData;
-import org.ojalgo.optimisation.ExpressionsBasedModel.EntityMap;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.structure.Access2D.Collectable;
 

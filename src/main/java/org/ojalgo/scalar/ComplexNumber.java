@@ -411,16 +411,16 @@ public final class ComplexNumber
     @Override
     public double doubleValue(final int index) {
         switch (index) {
-        case 0:
-            return myRealValue;
-        case 1:
-            return i;
-        case 2:
-            return -i;
-        case 3:
-            return myRealValue;
-        default:
-            throw new ArrayIndexOutOfBoundsException();
+            case 0:
+                return myRealValue;
+            case 1:
+                return i;
+            case 2:
+                return -i;
+            case 3:
+                return myRealValue;
+            default:
+                throw new ArrayIndexOutOfBoundsException();
         }
     }
 

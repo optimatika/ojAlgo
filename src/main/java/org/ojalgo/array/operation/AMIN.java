@@ -34,8 +34,6 @@ import org.ojalgo.function.special.MissingMath;
  */
 public abstract class AMIN implements ArrayOperation {
 
-    public static int THRESHOLD = 128;
-
     public static void invoke(final double[] data, final double[] array1, final double[] array2) {
         for (int i = 0, limit = MissingMath.min(data.length, array1.length, array2.length); i < limit; i++) {
             data[i] = Math.min(array1[i], array2[i]);

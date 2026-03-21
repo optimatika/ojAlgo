@@ -19,12 +19,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.array.operation;
+package org.ojalgo.matrix.operation;
 
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import java.util.Arrays;
 
+import org.ojalgo.array.operation.AXPY;
+import org.ojalgo.array.operation.FillMatchingSingle;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.transformation.Householder;
@@ -37,7 +39,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public abstract class HouseholderHermitian implements ArrayOperation {
+public abstract class HouseholderHermitian implements MatrixOperation {
 
     public static void invoke(final double[] data, final Householder.Primitive64 householder, final double[] worker) {
 

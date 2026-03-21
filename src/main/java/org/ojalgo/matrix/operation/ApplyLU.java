@@ -19,16 +19,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.array.operation;
+package org.ojalgo.matrix.operation;
 
-/**
- * Given two complex vectors x and y, each vector element of these vectors is replaced as follows: xi = c*xi +
- * s*yi yi = c*yi - s*xi
- *
- * @author apete
- */
-public abstract class ROT implements ArrayOperation {
+import org.ojalgo.array.operation.AXPY;
+import org.ojalgo.scalar.Scalar;
 
-    public static int THRESHOLD = 128;
+public abstract class ApplyLU implements MatrixOperation {
+
+    public static int THRESHOLD = 256;
+
+    public static void invoke(final double[] data, final int structure, final int firstColumn, final int columnLimit, final double[] multipliers,
+            final int iterationPoint) {
+        for (int j = firstColumn; j < columnLimit; j++) {
+            AXPY.invoke(data, j * structure, -data[iterationPoint + j * structure], multipliers, 0, iterationPoint + 1, structure);
+        }
+    }
+
+    public static <N extends Scalar<N>> void invoke(final N[] data, final int structure, final int firstColumn, final int columnLimit, final N[] multipliers,
+            final int iterationPoint) {
+        for (int j = firstColumn; j < columnLimit; j++) {
+            AXPY.invoke(data, j * structure, data[iterationPoint + j * structure].negate().get(), multipliers, 0, iterationPoint + 1, structure);
+        }
+    }
 
 }

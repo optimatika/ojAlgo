@@ -24,6 +24,8 @@ package org.ojalgo.array.operation;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
+import org.ojalgo.matrix.operation.SubstituteBackwards;
+import org.ojalgo.matrix.operation.SubstituteForwards;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.R064Store;

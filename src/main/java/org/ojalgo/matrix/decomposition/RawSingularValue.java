@@ -23,6 +23,8 @@ package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.List;
+
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.operation.AXPY;
@@ -32,7 +34,9 @@ import org.ojalgo.matrix.decomposition.function.NegateColumn;
 import org.ojalgo.matrix.decomposition.function.RotateRight;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.store.TransformableRegion;
+import org.ojalgo.matrix.transformation.InvertibleFactor;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
@@ -41,11 +45,10 @@ import org.ojalgo.structure.Access2D.Collectable;
  * <p>
  * Singular Value Decomposition.
  * <P>
- * For an m-by-n matrix A with m >= n, the singular value decomposition is an m-by-n orthogonal matrix U,
- * an n-by-n diagonal matrix S, and an n-by-n orthogonal matrix V so that A = U*S*V'.
+ * For an m-by-n matrix A with m >= n, the singular value decomposition is an m-by-n orthogonal matrix U, an
+ * n-by-n diagonal matrix S, and an n-by-n orthogonal matrix V so that A = U*S*V'.
  * <P>
- * The singular values, sigma[k] = S[k][k], are ordered so that sigma[0] >= sigma[1] >= ... >=
- * sigma[n-1].
+ * The singular values, sigma[k] = S[k][k], are ordered so that sigma[0] >= sigma[1] >= ... >= sigma[n-1].
  * <P>
  * The singular value decompostion always exists, so the constructor will never fail. The matrix condition
  * number and the effective numerical rank can be computed from this decomposition.
@@ -54,6 +57,171 @@ import org.ojalgo.structure.Access2D.Collectable;
  * @author apete
  */
 final class RawSingularValue extends RawDecomposition implements SingularValue<Double> {
+
+    /**
+     * [A]=[U][S][V]<sup>T</sup> — multiply by [U]<sup>T</sup>.
+     * <p>
+     * ftran: y = [U]<sup>T</sup> b (project onto left singular vectors)
+     * <p>
+     * btran: y = [U] b (expand from left singular vector coordinates)
+     */
+    static final class FactorUT extends AbstractDecomposition.PrimitiveFactor {
+
+        private final double[][] myRows;
+        private final int myRank;
+        private final int myDim;
+
+        FactorUT(final double[][] rows, final int rank, final int dim) {
+            super();
+            myRows = rows;
+            myRank = rank;
+            myDim = dim;
+        }
+
+        @Override
+        public void btran(final double[] arg) {
+            double[] work = new double[myDim];
+            for (int i = 0; i < myRank; i++) {
+                AXPY.invoke(work, 0, arg[i], myRows[i], 0, 0, myDim);
+            }
+            System.arraycopy(work, 0, arg, 0, myDim);
+        }
+
+        @Override
+        public void ftran(final double[] arg) {
+            double[] work = new double[myRank];
+            for (int i = 0; i < myRank; i++) {
+                work[i] = DOT.invoke(myRows[i], 0, arg, 0, 0, myDim);
+            }
+            System.arraycopy(work, 0, arg, 0, myRank);
+            for (int i = myRank; i < myDim; i++) {
+                arg[i] = ZERO;
+            }
+        }
+
+        @Override
+        public MatrixStore<Double> get() {
+            return RawStore.wrap(myRows);
+        }
+
+        @Override
+        public int getColDim() {
+            return myDim;
+        }
+
+        @Override
+        public int getRowDim() {
+            return myDim;
+        }
+
+    }
+
+    /**
+     * [A]=[U][S][V]<sup>T</sup> — scale by [S]<sup>-1</sup> (reciprocal singular values).
+     * <p>
+     * ftran: y[i] /= s[i] for i &lt; rank
+     * <p>
+     * btran: same as ftran (diagonal is symmetric)
+     */
+    static final class FactorSinv extends AbstractDecomposition.PrimitiveFactor {
+
+        private final double[] mySingularValues;
+        private final int myRank;
+        private final int myDim;
+
+        FactorSinv(final double[] singularValues, final int rank, final int dim) {
+            super();
+            mySingularValues = singularValues;
+            myRank = rank;
+            myDim = dim;
+        }
+
+        @Override
+        public void btran(final double[] arg) {
+            this.ftran(arg);
+        }
+
+        @Override
+        public void ftran(final double[] arg) {
+            for (int i = 0; i < myRank; i++) {
+                arg[i] /= mySingularValues[i];
+            }
+        }
+
+        @Override
+        public MatrixStore<Double> get() {
+            return null;
+        }
+
+        @Override
+        public int getColDim() {
+            return myDim;
+        }
+
+        @Override
+        public int getRowDim() {
+            return myDim;
+        }
+
+    }
+
+    /**
+     * [A]=[U][S][V]<sup>T</sup> — multiply by [V] (stored as [V]<sup>T</sup> rows).
+     * <p>
+     * ftran: x = [V] y (expand from right singular vector coordinates)
+     * <p>
+     * btran: y = [V]<sup>T</sup> x (project onto right singular vectors)
+     */
+    static final class FactorV extends AbstractDecomposition.PrimitiveFactor {
+
+        private final double[][] myRows;
+        private final int myRank;
+        private final int myDim;
+
+        FactorV(final double[][] rows, final int rank, final int dim) {
+            super();
+            myRows = rows;
+            myRank = rank;
+            myDim = dim;
+        }
+
+        @Override
+        public void btran(final double[] arg) {
+            double[] work = new double[myRank];
+            for (int i = 0; i < myRank; i++) {
+                work[i] = DOT.invoke(myRows[i], 0, arg, 0, 0, myDim);
+            }
+            System.arraycopy(work, 0, arg, 0, myRank);
+            for (int i = myRank; i < myDim; i++) {
+                arg[i] = ZERO;
+            }
+        }
+
+        @Override
+        public void ftran(final double[] arg) {
+            double[] work = new double[myDim];
+            for (int i = 0; i < myRank; i++) {
+                AXPY.invoke(work, 0, arg[i], myRows[i], 0, 0, myDim);
+            }
+            System.arraycopy(work, 0, arg, 0, myDim);
+        }
+
+        @Override
+        public MatrixStore<Double> get() {
+            return RawStore.wrap(myRows).transpose();
+        }
+
+        @Override
+        public int getColDim() {
+            return myDim;
+        }
+
+        @Override
+        public int getRowDim() {
+            return myDim;
+        }
+
+    }
 
     private double[] e;
     /**
@@ -83,14 +251,27 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
     @Override
     public void btran(final double[] arg) {
-        DecompositionStore<Double> x = this.copyRow(arg);
-        this.btran(x);
-        x.supplyTo(arg);
+
+        int rank = this.getRank();
+        int dim = arg.length;
+
+        double[][] vt = myTransposed ? myUt : myVt;
+        double[][] ut = myTransposed ? myVt : myUt;
+
+        double[] work = new double[rank];
+        for (int i = 0; i < rank; i++) {
+            work[i] = DOT.invoke(vt[i], 0, arg, 0, 0, dim) / s[i];
+        }
+
+        java.util.Arrays.fill(arg, ZERO);
+        for (int i = 0; i < rank; i++) {
+            AXPY.invoke(arg, 0, work[i], ut[i], 0, 0, dim);
+        }
     }
 
     @Override
     public void btran(final PhysicalStore<Double> arg) {
-        arg.fillByMultiplying(this.getInverse().transpose(), arg.copy());
+        InvertibleFactor.doPrimitive(arg, this);
     }
 
     @Override
@@ -116,14 +297,44 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
     @Override
     public void ftran(final double[] arg) {
-        DecompositionStore<Double> x = this.copyColumn(arg);
-        this.ftran(x);
-        x.supplyTo(arg);
+
+        int rank = this.getRank();
+        int dim = arg.length;
+
+        double[][] ut = myTransposed ? myVt : myUt;
+        double[][] vt = myTransposed ? myUt : myVt;
+
+        double[] work = new double[rank];
+        for (int i = 0; i < rank; i++) {
+            work[i] = DOT.invoke(ut[i], 0, arg, 0, 0, dim) / s[i];
+        }
+
+        java.util.Arrays.fill(arg, ZERO);
+        for (int i = 0; i < rank; i++) {
+            AXPY.invoke(arg, 0, work[i], vt[i], 0, 0, dim);
+        }
+    }
+
+    @Override
+    public void ftran(final PhysicalStore<Double> arg) {
+        InvertibleFactor.doPrimitive(this, arg);
     }
 
     @Override
     public double getCondition() {
         return s[0] / s[n - 1];
+    }
+
+    @Override
+    public List<InvertibleFactor<Double>> getFactors() {
+        if (myUt == null || myVt == null) {
+            return List.of(this);
+        }
+        int rank = this.getRank();
+        int dim = n;
+        double[][] ut = myTransposed ? myVt : myUt;
+        double[][] vt = myTransposed ? myUt : myVt;
+        return List.of(new FactorUT(ut, rank, dim), new FactorSinv(s, rank, dim), new FactorV(vt, rank, dim));
     }
 
     @Override

@@ -77,7 +77,7 @@ public interface LU<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition
 
     Factory<Quadruple> R128 = typical -> new DenseLU.R128();
 
-    public static LU<Double> newSparseR064() {
+    static LU<Double> newSparseR064() {
         return new SparseLU();
     }
 

@@ -23,8 +23,6 @@ package org.ojalgo.array.operation;
 
 public abstract class IndexOf implements ArrayOperation {
 
-    public static int THRESHOLD = 128;
-
     public static int indexOf(final int[] array, final int value) {
         return IndexOf.indexOf(array, 0, array.length, value);
     }

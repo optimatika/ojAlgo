@@ -37,8 +37,6 @@ import org.ojalgo.structure.Access1D;
 
 public abstract class OperationUnary implements ArrayOperation {
 
-    public static int THRESHOLD = 256;
-
     public static <N extends Comparable<N>> void invoke(final BasicArray<N> data, final long first, final long limit, final long step, final Access1D<N> values,
             final UnaryFunction<N> function) {
 

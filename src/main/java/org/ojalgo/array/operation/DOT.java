@@ -37,8 +37,6 @@ import org.ojalgo.structure.Access1D;
  */
 public abstract class DOT implements ArrayOperation {
 
-    public static int THRESHOLD = 128;
-
     public static double invoke(final Access1D<?> array1, final int offset1, final double[] array2, final int offset2, final int first, final int limit) {
         double retVal = PrimitiveMath.ZERO;
         for (int i = first; i < limit; i++) {
@@ -80,6 +78,15 @@ public abstract class DOT implements ArrayOperation {
 
     public static double invoke(final double[] array1, final double[] array2) {
         return DOT.plain(array1, 0, array2, 0, 0, Math.min(array1.length, array2.length));
+    }
+
+    public static double invoke(final double[] array1, final double[] array2, final int first, final int limit) {
+
+        double retVal = 0D;
+        for (int i = first; i < limit; i++) {
+            retVal += array1[i] * array2[i];
+        }
+        return retVal;
     }
 
     public static double invoke(final double[] array1, final int offset1, final Access1D<?> array2, final int offset2, final int first, final int limit) {
@@ -141,9 +148,35 @@ public abstract class DOT implements ArrayOperation {
         return retVal;
     }
 
+    /**
+     * Strided dot product matching the BLAS ddot convention. Computes
+     * {@code sum(array1[base1 + i*inc1] * array2[base2 + i*inc2])} for {@code i = 0..count-1}.
+     */
+    public static double invoke(final double[] array1, final int base1, final int inc1, final double[] array2, final int base2, final int inc2,
+            final int count) {
+        double retVal = 0D;
+        for (int i = 0, ix = base1, iy = base2; i < count; i++, ix += inc1, iy += inc2) {
+            retVal += array1[ix] * array2[iy];
+        }
+        return retVal;
+    }
+
+    /**
+     * Strided dot product matching the BLAS sdot convention.
+     *
+     * @see #invoke(double[], int, int, double[], int, int, int)
+     */
+    public static float invoke(final float[] array1, final int base1, final int inc1, final float[] array2, final int base2, final int inc2, final int count) {
+        float retVal = 0F;
+        for (int i = 0, ix = base1, iy = base2; i < count; i++, ix += inc1, iy += inc2) {
+            retVal += array1[ix] * array2[iy];
+        }
+        return retVal;
+    }
+
     static double plain(final double[] array1, final int offset1, final double[] array2, final int offset2, final int first, final int limit) {
 
-        double retVal = 0F;
+        double retVal = 0D;
         for (int i = first; i < limit; i++) {
             retVal += array1[offset1 + i] * array2[offset2 + i];
         }

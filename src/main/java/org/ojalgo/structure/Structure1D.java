@@ -220,7 +220,7 @@ public interface Structure1D {
          *
          * @param first The initial value
          * @param limit The value limit
-         * @param step The increment size
+         * @param step  The increment size
          */
         void call(long first, long limit, long step);
 

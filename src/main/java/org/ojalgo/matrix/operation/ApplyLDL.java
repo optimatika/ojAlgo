@@ -19,11 +19,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.array.operation;
+package org.ojalgo.matrix.operation;
 
+import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.scalar.Scalar;
 
-public abstract class ApplyLDL implements ArrayOperation {
+public abstract class ApplyLDL implements MatrixOperation {
 
     public static int THRESHOLD = 256;
 

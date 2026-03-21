@@ -135,7 +135,7 @@ public final class BlackLittermanModel extends EquilibriumModel {
 
     /**
      * @param marketEquilibrium The covariance matrix, and market risk aversion
-     * @param originalWeights The market portfolio
+     * @param originalWeights   The market portfolio
      */
     public BlackLittermanModel(final MarketEquilibrium marketEquilibrium, final MatrixR064 originalWeights) {
 

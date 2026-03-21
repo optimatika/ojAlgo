@@ -239,7 +239,7 @@ final class FileFormatMPS {
         /**
          * Test if the field is "correct".
          *
-         * @param line The full line being parsed
+         * @param line  The full line being parsed
          * @param start The styart index of the current field as specified in the original MPS format
          * @param index The current index of that full line
          * @param field The part of the line that being investigated

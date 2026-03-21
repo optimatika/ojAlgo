@@ -28,7 +28,6 @@ import java.math.BigDecimal;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -219,20 +218,20 @@ public class IntegerProblems extends OptimisationIntegerTests {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        Variable[] variables = { model.newVariable("x1").lower(BigMath.ZERO).weight(BigMath.ONE), model.newVariable("x2013").lower(BigMath.ZERO).integer(),
-                model.newVariable("x2014").lower(BigMath.ZERO).integer() };
+        Variable[] variables = { model.newVariable("x1").lower(ZERO).weight(ONE), model.newVariable("x2013").lower(ZERO).integer(),
+                model.newVariable("x2014").lower(ZERO).integer() };
 
         Expression expr1 = model.newExpression("Expr1");
         expr1.set(0, -1);
         expr1.set(1, 5100);
         expr1.set(2, -5000);
-        expr1.upper(BigMath.ZERO);
+        expr1.upper(ZERO);
 
         Expression expr2 = model.newExpression("Expr2");
         expr2.set(0, 1);
         expr2.set(1, 5100);
         expr2.set(2, -5000);
-        expr2.lower(BigMath.ZERO);
+        expr2.lower(ZERO);
 
         Expression expr3 = model.newExpression("Expr3");
         expr3.set(1, 5000);

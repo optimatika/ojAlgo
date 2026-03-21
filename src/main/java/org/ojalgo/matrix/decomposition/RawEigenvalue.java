@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.ojalgo.RecoverableCondition;
@@ -42,6 +43,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.store.TransformableRegion;
+import org.ojalgo.matrix.transformation.InvertibleFactor;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
@@ -137,14 +139,12 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         @Override
         public void btran(final double[] arg) {
-            DecompositionStore<Double> x = this.copyRow(arg);
-            this.btran(x);
-            x.supplyTo(arg);
+            this.ftran(arg);
         }
 
         @Override
         public void btran(final PhysicalStore<Double> arg) {
-            arg.fillByMultiplying(this.getInverse(), arg.copy());
+            InvertibleFactor.doPrimitive(arg, this);
         }
 
         @Override
@@ -163,20 +163,45 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         @Override
         public void ftran(final double[] arg) {
-            DecompositionStore<Double> x = this.copyColumn(arg);
-            this.ftran(x);
-            x.supplyTo(arg);
+
+            double[] eigenvalues = this.getRealParts();
+            double[][] vt = this.getTransposedV();
+            int rank = this.getRank();
+            int dim = arg.length;
+
+            double[] work = new double[rank];
+            for (int i = 0; i < rank; i++) {
+                work[i] = DOT.invoke(vt[i], 0, arg, 0, 0, dim) / eigenvalues[i];
+            }
+
+            java.util.Arrays.fill(arg, ZERO);
+            for (int i = 0; i < rank; i++) {
+                AXPY.invoke(arg, 0, work[i], vt[i], 0, 0, dim);
+            }
         }
 
         @Override
         public void ftran(final PhysicalStore<Double> arg) {
-            this.getSolution(arg.copy(), arg);
+            InvertibleFactor.doPrimitive(this, arg);
         }
 
         @Override
         public double getCondition() {
             double[] d = this.getRealParts();
             return Math.abs(d[0]) / Math.abs(d[d.length - 1]);
+        }
+
+        @Override
+        public List<InvertibleFactor<Double>> getFactors() {
+            double[][] vt = this.getTransposedV();
+            if (vt == null) {
+                return List.of(this);
+            }
+            double[] eigenvalues = this.getRealParts();
+            int rank = this.getRank();
+            int dim = eigenvalues.length;
+            return List.of(new RawSingularValue.FactorUT(vt, rank, dim), new RawSingularValue.FactorSinv(eigenvalues, rank, dim),
+                    new RawSingularValue.FactorV(vt, rank, dim));
         }
 
         @Override
@@ -803,6 +828,10 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      */
     double[] getRealParts() {
         return d;
+    }
+
+    double[][] getTransposedV() {
+        return myTransposedV;
     }
 
     boolean isValuesOnly() {

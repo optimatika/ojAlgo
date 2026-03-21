@@ -147,9 +147,9 @@ public abstract class MatrixDecompositionTests {
 
         List<MatrixDecomposition<Double>> retVal = new ArrayList<>();
 
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getPrimitiveLU()));
         retVal.addAll(Arrays.asList(MatrixDecompositionTests.getPrimitiveCholesky()));
         retVal.addAll(Arrays.asList(MatrixDecompositionTests.getPrimitiveLDL()));
-        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getPrimitiveLU()));
 
         retVal.addAll(Arrays.asList(MatrixDecompositionTests.getPrimitiveQR()));
 

@@ -315,10 +315,10 @@ public final class BatchNode<T> {
      * {@link Builder#fragmentation(int)} and which item goes in which shard via
      * {@link Builder#distributor(ToIntFunction)}.
      *
-     * @param <R> The mapped/derived data holding type
+     * @param <R>               The mapped/derived data holding type
      * @param aggregatorFactory Produces the {@link TwoStepMapper} mapping instances
-     * @param processor Consumes the mapped/derived data - the results of one whole {@link TwoStepMapper}
-     *        instance at the time
+     * @param processor         Consumes the mapped/derived data - the results of one whole
+     *                          {@link TwoStepMapper} instance at the time
      * @deprecated v54 Use {@link #processMergeable(Supplier<? extends TwoStepMapper<T, H>>,Consumer<H>)}
      *             instead
      */
@@ -341,8 +341,8 @@ public final class BatchNode<T> {
      * in which shard via {@link Builder#distributor(ToIntFunction)}.
      *
      * @param aggregatorFactory Produces the {@link TwoStepMapper} aggregator instances
-     * @param processor Consumes the aggregated/derived data - the results of one whole {@link TwoStepMapper}
-     *        instance at the time
+     * @param processor         Consumes the aggregated/derived data - the results of one whole
+     *                          {@link TwoStepMapper} instance at the time
      */
     public <R, A extends TwoStepMapper<T, R>> void processMergeable(final Supplier<A> aggregatorFactory, final Consumer<R> processor) {
         ThreadLocal<TwoStepMapper<T, R>> threadLocal = ThreadLocal.withInitial(aggregatorFactory);

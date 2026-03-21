@@ -129,170 +129,170 @@ public enum MathType {
     public MathType common(final MathType other) {
 
         switch (this) {
-        case Z008:
-            return Z008;
-        case Z016:
-            switch (other) {
-            case Z008:
-                return Z008;
-            default:
-                return Z016;
-            }
-        case Z032:
-            switch (other) {
             case Z008:
                 return Z008;
             case Z016:
-                return Z016;
-            default:
-                return Z032;
-            }
-        case Z064:
-            switch (other) {
-            case Z008:
-                return Z008;
-            case Z016:
-                return Z016;
+                switch (other) {
+                    case Z008:
+                        return Z008;
+                    default:
+                        return Z016;
+                }
             case Z032:
-                return Z032;
-            default:
-                return Z064;
-            }
-        case Q128:
-            switch (other) {
-            case Z008:
-                return Z008;
-            case Z016:
-                return Z016;
-            case Z032:
-                return Z032;
+                switch (other) {
+                    case Z008:
+                        return Z008;
+                    case Z016:
+                        return Z016;
+                    default:
+                        return Z032;
+                }
             case Z064:
-                return Z064;
-            default:
-                return Q128;
-            }
-        case R032:
-            switch (other) {
-            case Z008:
-                return Z008;
-            case Z016:
-                return Z016;
-            case Z032:
-                return Z032;
-            case Z064:
-                return Z064;
+                switch (other) {
+                    case Z008:
+                        return Z008;
+                    case Z016:
+                        return Z016;
+                    case Z032:
+                        return Z032;
+                    default:
+                        return Z064;
+                }
             case Q128:
-                return Q128;
-            default:
-                return R032;
-            }
-        case R064:
-            switch (other) {
-            case Z008:
-                return Z008;
-            case Z016:
-                return Z016;
-            case Z032:
-                return Z032;
-            case Z064:
-                return Z064;
-            case Q128:
-                return Q128;
+                switch (other) {
+                    case Z008:
+                        return Z008;
+                    case Z016:
+                        return Z016;
+                    case Z032:
+                        return Z032;
+                    case Z064:
+                        return Z064;
+                    default:
+                        return Q128;
+                }
             case R032:
-                return R032;
-            default:
-                return R064;
-            }
-        case R128:
-            switch (other) {
-            case Z008:
-                return Z008;
-            case Z016:
-                return Z016;
-            case Z032:
-                return Z032;
-            case Z064:
-                return Z064;
-            case Q128:
-                return Q128;
-            case R032:
-                return R032;
+                switch (other) {
+                    case Z008:
+                        return Z008;
+                    case Z016:
+                        return Z016;
+                    case Z032:
+                        return Z032;
+                    case Z064:
+                        return Z064;
+                    case Q128:
+                        return Q128;
+                    default:
+                        return R032;
+                }
             case R064:
-                return R064;
-            default:
-                return R128;
-            }
-        case R256:
-            switch (other) {
-            case Z008:
-                return Z008;
-            case Z016:
-                return Z016;
-            case Z032:
-                return Z032;
-            case Z064:
-                return Z064;
-            case Q128:
-                return Q128;
-            case R032:
-                return R032;
-            case R064:
-                return R064;
+                switch (other) {
+                    case Z008:
+                        return Z008;
+                    case Z016:
+                        return Z016;
+                    case Z032:
+                        return Z032;
+                    case Z064:
+                        return Z064;
+                    case Q128:
+                        return Q128;
+                    case R032:
+                        return R032;
+                    default:
+                        return R064;
+                }
             case R128:
-                return R128;
-            default:
-                return R256;
-            }
-        case C128:
-            switch (other) {
-            case Z008:
-                return Z008;
-            case Z016:
-                return Z016;
-            case Z032:
-                return Z032;
-            case Z064:
-                return Z064;
-            case Q128:
-                return Q128;
-            case R032:
-                return R032;
-            case R064:
-                return R064;
-            case R128:
-                return R128;
+                switch (other) {
+                    case Z008:
+                        return Z008;
+                    case Z016:
+                        return Z016;
+                    case Z032:
+                        return Z032;
+                    case Z064:
+                        return Z064;
+                    case Q128:
+                        return Q128;
+                    case R032:
+                        return R032;
+                    case R064:
+                        return R064;
+                    default:
+                        return R128;
+                }
             case R256:
-                return R256;
-            default:
-                return C128;
-            }
-        case H256:
-            switch (other) {
-            case Z008:
-                return Z008;
-            case Z016:
-                return Z016;
-            case Z032:
-                return Z032;
-            case Z064:
-                return Z064;
-            case Q128:
-                return Q128;
-            case R032:
-                return R032;
-            case R064:
-                return R064;
-            case R128:
-                return R128;
-            case R256:
-                return R256;
+                switch (other) {
+                    case Z008:
+                        return Z008;
+                    case Z016:
+                        return Z016;
+                    case Z032:
+                        return Z032;
+                    case Z064:
+                        return Z064;
+                    case Q128:
+                        return Q128;
+                    case R032:
+                        return R032;
+                    case R064:
+                        return R064;
+                    case R128:
+                        return R128;
+                    default:
+                        return R256;
+                }
             case C128:
-                return C128;
+                switch (other) {
+                    case Z008:
+                        return Z008;
+                    case Z016:
+                        return Z016;
+                    case Z032:
+                        return Z032;
+                    case Z064:
+                        return Z064;
+                    case Q128:
+                        return Q128;
+                    case R032:
+                        return R032;
+                    case R064:
+                        return R064;
+                    case R128:
+                        return R128;
+                    case R256:
+                        return R256;
+                    default:
+                        return C128;
+                }
+            case H256:
+                switch (other) {
+                    case Z008:
+                        return Z008;
+                    case Z016:
+                        return Z016;
+                    case Z032:
+                        return Z032;
+                    case Z064:
+                        return Z064;
+                    case Q128:
+                        return Q128;
+                    case R032:
+                        return R032;
+                    case R064:
+                        return R064;
+                    case R128:
+                        return R128;
+                    case R256:
+                        return R256;
+                    case C128:
+                        return C128;
+                    default:
+                        return H256;
+                }
             default:
-                return H256;
-            }
-        default:
-            return R064;
+                return R064;
         }
     }
 
@@ -305,24 +305,24 @@ public enum MathType {
         FunctionSet<N> retVal = null;
 
         switch (this) {
-        case C128:
-            retVal = (FunctionSet<N>) ComplexFunction.getSet();
-            break;
-        case H256:
-            retVal = (FunctionSet<N>) QuaternionFunction.getSet();
-            break;
-        case Q128:
-            retVal = (FunctionSet<N>) RationalFunction.getSet();
-            break;
-        case R128:
-            retVal = (FunctionSet<N>) QuadrupleFunction.getSet();
-            break;
-        case R256:
-            retVal = (FunctionSet<N>) BigFunction.getSet();
-            break;
-        default:
-            retVal = (FunctionSet<N>) PrimitiveFunction.getSet();
-            break;
+            case C128:
+                retVal = (FunctionSet<N>) ComplexFunction.getSet();
+                break;
+            case H256:
+                retVal = (FunctionSet<N>) QuaternionFunction.getSet();
+                break;
+            case Q128:
+                retVal = (FunctionSet<N>) RationalFunction.getSet();
+                break;
+            case R128:
+                retVal = (FunctionSet<N>) QuadrupleFunction.getSet();
+                break;
+            case R256:
+                retVal = (FunctionSet<N>) BigFunction.getSet();
+                break;
+            default:
+                retVal = (FunctionSet<N>) PrimitiveFunction.getSet();
+                break;
         }
 
         return retVal;
@@ -345,24 +345,24 @@ public enum MathType {
         Scalar.Factory<N> retVal = null;
 
         switch (this) {
-        case C128:
-            retVal = (Scalar.Factory<N>) ComplexNumber.FACTORY;
-            break;
-        case H256:
-            retVal = (Scalar.Factory<N>) Quaternion.FACTORY;
-            break;
-        case Q128:
-            retVal = (Scalar.Factory<N>) RationalNumber.FACTORY;
-            break;
-        case R128:
-            retVal = (Scalar.Factory<N>) Quadruple.FACTORY;
-            break;
-        case R256:
-            retVal = (Scalar.Factory<N>) BigScalar.FACTORY;
-            break;
-        default:
-            retVal = (Scalar.Factory<N>) PrimitiveScalar.FACTORY;
-            break;
+            case C128:
+                retVal = (Scalar.Factory<N>) ComplexNumber.FACTORY;
+                break;
+            case H256:
+                retVal = (Scalar.Factory<N>) Quaternion.FACTORY;
+                break;
+            case Q128:
+                retVal = (Scalar.Factory<N>) RationalNumber.FACTORY;
+                break;
+            case R128:
+                retVal = (Scalar.Factory<N>) Quadruple.FACTORY;
+                break;
+            case R256:
+                retVal = (Scalar.Factory<N>) BigScalar.FACTORY;
+                break;
+            default:
+                retVal = (Scalar.Factory<N>) PrimitiveScalar.FACTORY;
+                break;
         }
 
         return retVal;

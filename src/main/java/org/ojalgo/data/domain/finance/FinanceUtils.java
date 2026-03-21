@@ -164,7 +164,7 @@ public abstract class FinanceUtils {
     }
 
     /**
-     * @param listOfTimeSeries An ordered collection of time series
+     * @param listOfTimeSeries   An ordered collection of time series
      * @param mayBeMissingValues Individual series may be missing some values - try to fix this or not
      * @return Annualised covariances
      */
@@ -219,9 +219,9 @@ public abstract class FinanceUtils {
     }
 
     /**
-     * @param priceSeries A series of prices
+     * @param priceSeries                A series of prices
      * @param riskFreeInterestRateSeries A series of interest rates (risk free return expressed in %, 5.0
-     *        means 5.0% annualized risk free return)
+     *                                   means 5.0% annualized risk free return)
      * @return A sample set of price growth rates adjusted for risk free return
      */
     public static SampleSet makeExcessGrowthRateSampleSet(final CalendarDateSeries<?> priceSeries, final CalendarDateSeries<?> riskFreeInterestRateSeries) {
@@ -268,9 +268,9 @@ public abstract class FinanceUtils {
     }
 
     /**
-     * @param priceSeries A series of prices
+     * @param priceSeries                A series of prices
      * @param riskFreeInterestRateSeries A series of interest rates (risk free return expressed in %, 5.0
-     *        means 5.0% annualized risk free return)
+     *                                   means 5.0% annualized risk free return)
      * @return A sample set of price growth rates adjusted for risk free return
      */
     public static CalendarDateSeries<Double> makeNormalisedExcessPrice(final CalendarDateSeries<?> priceSeries,
@@ -325,7 +325,7 @@ public abstract class FinanceUtils {
     /**
      * GrowthRate = ln(GrowthFactor)
      *
-     * @param growthFactor A growth factor per unit (day, week, month, year...)
+     * @param growthFactor     A growth factor per unit (day, week, month, year...)
      * @param growthFactorUnit A growth factor unit
      * @return Annualised return (percentage per year)
      */
@@ -337,7 +337,7 @@ public abstract class FinanceUtils {
     /**
      * AnnualReturn = exp(GrowthRate * GrowthRateUnitsPerYear) - 1.0
      *
-     * @param growthRate A growth rate per unit (day, week, month, year...)
+     * @param growthRate     A growth rate per unit (day, week, month, year...)
      * @param growthRateUnit A growth rate unit
      * @return Annualised return (percentage per year)
      */
@@ -440,7 +440,7 @@ public abstract class FinanceUtils {
     /**
      * GrowthFactor = exp(GrowthRate)
      *
-     * @param annualReturn Annualised return (percentage per year)
+     * @param annualReturn     Annualised return (percentage per year)
      * @param growthFactorUnit A growth factor unit
      * @return A growth factor per unit (day, week, month, year...)
      */
@@ -453,7 +453,7 @@ public abstract class FinanceUtils {
     /**
      * GrowthRate = ln(1.0 + InterestRate) / GrowthRateUnitsPerYear
      *
-     * @param annualReturn Annualised return (percentage per year)
+     * @param annualReturn   Annualised return (percentage per year)
      * @param growthRateUnit A growth rate unit
      * @return A growth rate per unit (day, week, month, year...)
      */

@@ -26,8 +26,6 @@ import org.ojalgo.function.VoidFunction;
 
 public abstract class OperationVoid implements ArrayOperation {
 
-    public static int THRESHOLD = 256;
-
     public static <N extends Comparable<N>> void invoke(final BasicArray<N> data, final int first, final int limit, final int step,
             final VoidFunction<N> visitor) {
         for (int i = first; i < limit; i += step) {

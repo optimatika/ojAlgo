@@ -21,6 +21,7 @@
  */
 package org.ojalgo.function.constant;
 
+import org.ojalgo.array.operation.SQRT;
 import org.ojalgo.function.QuaternionFunction;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Quaternion;

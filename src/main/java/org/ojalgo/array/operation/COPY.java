@@ -35,8 +35,6 @@ import org.ojalgo.structure.Mutate1D;
  */
 public abstract class COPY implements ArrayOperation {
 
-    public static int THRESHOLD = 128;
-
     public static void column(final Access2D<?> source, final long col, final double[] destination, final int first, final int limit) {
         for (int i = first; i < limit; i++) {
             destination[i] = source.doubleValue(i, col);

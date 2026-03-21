@@ -42,18 +42,12 @@ package org.ojalgo.machine;
  */
 public enum JavaType {
 
-    BOOLEAN(boolean.class, 1, 1L),
-    BYTE(byte.class, 8, 1L),
-    CHAR(char.class, 16, 2L),
-    DOUBLE(double.class, 64, 8L),
-    FLOAT(float.class, 32, 4L),
-    INT(int.class, 32, 4L),
-    LONG(long.class, 64, 8L),
+    BOOLEAN(boolean.class, 1, 1L), BYTE(byte.class, 8, 1L), CHAR(char.class, 16, 2L), DOUBLE(double.class, 64, 8L), FLOAT(float.class, 32, 4L),
+    INT(int.class, 32, 4L), LONG(long.class, 64, 8L),
     /**
      * 4 bytes with 32-bit JVM or 64-bit JVM with compressed pointers (All JVM:s assigned less than 32GB)
      */
-    REFERENCE(Object.class, 64, 4L),
-    SHORT(short.class, 16, 2L);
+    REFERENCE(Object.class, 64, 4L), SHORT(short.class, 16, 2L);
 
     /**
      * Return the boxed wrapper type for a primitive {@code Class}. If the input is {@code null} or not a
@@ -64,15 +58,24 @@ public enum JavaType {
         if (type == null || !type.isPrimitive()) {
             return type;
         }
-        if (type == boolean.class) return Boolean.class;
-        if (type == byte.class) return Byte.class;
-        if (type == char.class) return Character.class;
-        if (type == short.class) return Short.class;
-        if (type == int.class) return Integer.class;
-        if (type == long.class) return Long.class;
-        if (type == float.class) return Float.class;
-        if (type == double.class) return Double.class;
-        if (type == void.class) return Void.class;
+        if (type == boolean.class)
+            return Boolean.class;
+        if (type == byte.class)
+            return Byte.class;
+        if (type == char.class)
+            return Character.class;
+        if (type == short.class)
+            return Short.class;
+        if (type == int.class)
+            return Integer.class;
+        if (type == long.class)
+            return Long.class;
+        if (type == float.class)
+            return Float.class;
+        if (type == double.class)
+            return Double.class;
+        if (type == void.class)
+            return Void.class;
         return type; // fallback
     }
 
@@ -81,16 +84,26 @@ public enum JavaType {
      * wrapper, it is returned unchanged. Examples: {@code Integer.class -> int.class}.
      */
     public static Class<?> unbox(final Class<?> type) {
-        if (type == null) return null;
-        if (type == Boolean.class) return boolean.class;
-        if (type == Byte.class) return byte.class;
-        if (type == Character.class) return char.class;
-        if (type == Short.class) return short.class;
-        if (type == Integer.class) return int.class;
-        if (type == Long.class) return long.class;
-        if (type == Float.class) return float.class;
-        if (type == Double.class) return double.class;
-        if (type == Void.class) return void.class;
+        if (type == null)
+            return null;
+        if (type == Boolean.class)
+            return boolean.class;
+        if (type == Byte.class)
+            return byte.class;
+        if (type == Character.class)
+            return char.class;
+        if (type == Short.class)
+            return short.class;
+        if (type == Integer.class)
+            return int.class;
+        if (type == Long.class)
+            return long.class;
+        if (type == Float.class)
+            return float.class;
+        if (type == Double.class)
+            return double.class;
+        if (type == Void.class)
+            return void.class;
         return type; // not a wrapper
     }
 
@@ -131,63 +144,63 @@ public enum JavaType {
 
     public static Class<?> resolveType(final String name) throws ClassNotFoundException {
         switch (name) {
-        case "boolean":
-            return boolean.class;
-        case "byte":
-            return byte.class;
-        case "char":
-            return char.class;
-        case "short":
-            return short.class;
-        case "int":
-            return int.class;
-        case "long":
-            return long.class;
-        case "float":
-            return float.class;
-        case "double":
-            return double.class;
-        case "void":
-            return void.class;
-        default:
-            // Handle array types like "int[]" or "java.lang.String[]" via Class.forName syntax
-            if (name.endsWith("[]")) {
-                // Use reflection array name: for non-primitive arrays, prefix "[L" + nameWithoutBrackets + ";"
-                String elem = name.substring(0, name.length() - 2);
-                String jvmName;
-                switch (elem) {
-                case "boolean":
-                    jvmName = "[Z";
-                    break;
-                case "byte":
-                    jvmName = "[B";
-                    break;
-                case "char":
-                    jvmName = "[C";
-                    break;
-                case "short":
-                    jvmName = "[S";
-                    break;
-                case "int":
-                    jvmName = "[I";
-                    break;
-                case "long":
-                    jvmName = "[J";
-                    break;
-                case "float":
-                    jvmName = "[F";
-                    break;
-                case "double":
-                    jvmName = "[D";
-                    break;
-                default:
-                    jvmName = "[L" + elem + ";";
-                    break;
+            case "boolean":
+                return boolean.class;
+            case "byte":
+                return byte.class;
+            case "char":
+                return char.class;
+            case "short":
+                return short.class;
+            case "int":
+                return int.class;
+            case "long":
+                return long.class;
+            case "float":
+                return float.class;
+            case "double":
+                return double.class;
+            case "void":
+                return void.class;
+            default:
+                // Handle array types like "int[]" or "java.lang.String[]" via Class.forName syntax
+                if (name.endsWith("[]")) {
+                    // Use reflection array name: for non-primitive arrays, prefix "[L" + nameWithoutBrackets + ";"
+                    String elem = name.substring(0, name.length() - 2);
+                    String jvmName;
+                    switch (elem) {
+                        case "boolean":
+                            jvmName = "[Z";
+                            break;
+                        case "byte":
+                            jvmName = "[B";
+                            break;
+                        case "char":
+                            jvmName = "[C";
+                            break;
+                        case "short":
+                            jvmName = "[S";
+                            break;
+                        case "int":
+                            jvmName = "[I";
+                            break;
+                        case "long":
+                            jvmName = "[J";
+                            break;
+                        case "float":
+                            jvmName = "[F";
+                            break;
+                        case "double":
+                            jvmName = "[D";
+                            break;
+                        default:
+                            jvmName = "[L" + elem + ";";
+                            break;
+                    }
+                    return Class.forName(jvmName);
+                } else {
+                    return Class.forName(name);
                 }
-                return Class.forName(jvmName);
-            } else {
-                return Class.forName(name);
-            }
         }
     }
 

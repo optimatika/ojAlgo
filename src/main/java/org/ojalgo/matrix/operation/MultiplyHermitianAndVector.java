@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.array.operation;
+package org.ojalgo.matrix.operation;
 
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
@@ -31,7 +31,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public abstract class MultiplyHermitianAndVector implements ArrayOperation {
+public abstract class MultiplyHermitianAndVector implements MatrixOperation {
 
     public static int THRESHOLD = 256;
 

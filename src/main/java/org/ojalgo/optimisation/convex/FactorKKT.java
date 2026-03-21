@@ -397,9 +397,7 @@ final class FactorKKT implements InvertibleFactor<Double> {
         int m = myInvDiagW.length;
         int n = myWork1.length - m;
 
-        for (int j = 0; j < n; j++) {
-            arg[j] = myWork2[j];
-        }
+        System.arraycopy(myWork2, 0, arg, 0, n);
 
         for (int i = 0; i < m; i++) {
             arg[n + i] += myInvDiagW[i] * myWork2[n + i];

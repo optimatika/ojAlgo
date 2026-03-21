@@ -21,7 +21,11 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.MACHINE_SMALLEST;
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+
+import java.util.List;
+import java.util.Optional;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.BasicArray;
@@ -33,6 +37,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.TransformableRegion;
+import org.ojalgo.matrix.transformation.InvertibleFactor;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
@@ -48,6 +53,110 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
         C128() {
             super(GenericStore.C128);
+        }
+
+    }
+
+    /**
+     * [A]=[P][L][U][Q]
+     */
+    static final class FactorL<N extends Comparable<N>> implements MatrixDecomposition.Factor<N> {
+
+        private final DecompositionStore<N> myBody;
+
+        FactorL(final DecompositionStore<N> body) {
+            super();
+            myBody = body;
+        }
+
+        @Override
+        public void btran(final double[] arg) {
+            myBody.substituteBackwards(true, true, arg);
+        }
+
+        @Override
+        public void btran(final PhysicalStore<N> arg) {
+            myBody.substituteBackwards(true, true, arg);
+        }
+
+        @Override
+        public void ftran(final double[] arg) {
+            myBody.substituteForwards(false, true, arg);
+        }
+
+        @Override
+        public void ftran(final PhysicalStore<N> arg) {
+            myBody.substituteForwards(false, true, arg);
+        }
+
+        @Override
+        public MatrixStore<N> get() {
+            return myBody.triangular(false, true).limits(this.getRowDim(), this.getColDim());
+        }
+
+        @Override
+        public int getColDim() {
+            return myBody.getMinDim();
+        }
+
+        @Override
+        public int getRowDim() {
+            return myBody.getRowDim();
+        }
+
+    }
+
+    /**
+     * [A]=[P][L][U][Q]
+     */
+    static final class FactorU<N extends Comparable<N>> implements MatrixDecomposition.Factor<N> {
+
+        private final DecompositionStore<N> myBody;
+        private final Pivot myColPivot;
+
+        FactorU(final DecompositionStore<N> body, final Pivot colPivot) {
+            super();
+            myBody = body;
+            myColPivot = colPivot;
+        }
+
+        @Override
+        public void btran(final double[] arg) {
+            myBody.substituteForwards(true, false, arg);
+        }
+
+        @Override
+        public void btran(final PhysicalStore<N> arg) {
+            myBody.substituteForwards(true, false, arg);
+        }
+
+        @Override
+        public void ftran(final double[] arg) {
+            myBody.substituteBackwards(false, false, arg);
+        }
+
+        @Override
+        public void ftran(final PhysicalStore<N> arg) {
+            myBody.substituteBackwards(false, false, arg);
+        }
+
+        @Override
+        public MatrixStore<N> get() {
+            MatrixStore<N> retVal = myBody.triangular(true, false).limits(this.getRowDim(), this.getColDim());
+            if (myColPivot != null && myColPivot.isModified()) {
+                retVal = retVal.columns(myColPivot.reverseOrder());
+            }
+            return retVal;
+        }
+
+        @Override
+        public int getColDim() {
+            return myBody.getColDim();
+        }
+
+        @Override
+        public int getRowDim() {
+            return myBody.getMinDim();
         }
 
     }
@@ -95,25 +204,34 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
     @Override
     public void btran(final double[] arg) {
-        DecompositionStore<N> x = this.copyRow(arg);
-        this.btran(x);
-        x.supplyTo(arg);
+
+        if (myColPivot != null) {
+            myColPivot.applyPivotOrder(arg);
+        }
+
+        DecompositionStore<N> body = this.getInPlace();
+
+        body.substituteForwards(true, false, arg);
+
+        body.substituteBackwards(true, true, arg);
+
+        myPivot.applyReverseOrder(arg);
     }
 
     @Override
     public void btran(final PhysicalStore<N> arg) {
 
         if (myColPivot != null) {
-            this.applyPivotOrder(myColPivot, arg);
+            myColPivot.applyPivotOrder(arg);
         }
 
         DecompositionStore<N> body = this.getInPlace();
 
-        arg.substituteForwards(body, false, true, false);
+        body.substituteForwards(true, false, arg);
 
-        arg.substituteBackwards(body, true, true, false);
+        body.substituteBackwards(true, true, arg);
 
-        this.applyReverseOrder(myPivot, arg);
+        myPivot.applyReverseOrder(arg);
     }
 
     @Override
@@ -149,24 +267,33 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
     @Override
     public void ftran(final double[] arg) {
-        DecompositionStore<N> x = this.copyColumn(arg);
-        this.ftran(x);
-        x.supplyTo(arg);
+
+        myPivot.applyPivotOrder(arg);
+
+        DecompositionStore<N> body = this.getInPlace();
+
+        body.substituteForwards(false, true, arg);
+
+        body.substituteBackwards(false, false, arg);
+
+        if (myColPivot != null) {
+            myColPivot.applyReverseOrder(arg);
+        }
     }
 
     @Override
     public void ftran(final PhysicalStore<N> arg) {
 
-        this.applyPivotOrder(myPivot, arg);
+        myPivot.applyPivotOrder(arg);
 
         DecompositionStore<N> body = this.getInPlace();
 
-        arg.substituteForwards(body, true, false, false);
+        body.substituteForwards(false, true, arg);
 
-        arg.substituteBackwards(body, false, false, false);
+        body.substituteBackwards(false, false, arg);
 
         if (myColPivot != null) {
-            this.applyReverseOrder(myColPivot, arg);
+            myColPivot.applyReverseOrder(arg);
         }
     }
 
@@ -181,6 +308,19 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
             return aggrFunc.toScalar().negate().get();
         } else {
             return aggrFunc.get();
+        }
+    }
+
+    /**
+     * [A]=[P][L][U][Q]
+     */
+    @Override
+    public List<InvertibleFactor<N>> getFactors() {
+
+        if (myColPivot != null) {
+            return List.of(this.getFactorP(), this.getFactorL(), this.getFactorU(), this.getFactorQ().get());
+        } else {
+            return List.of(this.getFactorP(), this.getFactorL(), this.getFactorU());
         }
     }
 
@@ -211,13 +351,7 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
     @Override
     public MatrixStore<N> getL() {
-        MatrixStore<N> logical = this.getInPlace().triangular(false, true);
-        int nbRows = this.getRowDim();
-        if (nbRows < this.getColDim()) {
-            return logical.limits(nbRows, nbRows);
-        }
-        return logical;
-
+        return this.getFactorL().get();
     }
 
     @Override
@@ -277,15 +411,7 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
     @Override
     public MatrixStore<N> getU() {
-        MatrixStore<N> retVal = this.getInPlace().triangular(true, false);
-        int nbCols = this.getColDim();
-        if (this.getRowDim() > nbCols) {
-            retVal = retVal.limits(nbCols, nbCols);
-        }
-        if (myColPivot != null && myColPivot.isModified()) {
-            retVal = retVal.columns(myColPivot.reverseOrder());
-        }
-        return retVal;
+        return this.getFactorU().get();
     }
 
     @Override
@@ -403,6 +529,39 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
     @Override
     protected boolean checkSolvability() {
         return this.isSquare() && this.isFullRank();
+    }
+
+    /**
+     * [A]=[P][L][U][Q]
+     */
+    MatrixDecomposition.Factor<N> getFactorL() {
+        return new FactorL<>(this.getInPlace());
+    }
+
+    /**
+     * [A]=[P][L][U][Q]
+     */
+    MatrixDecomposition.Factor<N> getFactorP() {
+        return new FactorPivot<>(this.makeIdentity(this.getRowDim()), myPivot, true);
+    }
+
+    /**
+     * [A]=[P][L][U][Q]
+     */
+    Optional<MatrixDecomposition.Factor<N>> getFactorQ() {
+
+        if (myColPivot != null) {
+            return Optional.of(new FactorPivot<>(this.makeIdentity(this.getColDim()), myColPivot, false));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * [A]=[P][L][U][Q]
+     */
+    MatrixDecomposition.Factor<N> getFactorU() {
+        return new FactorU<>(this.getInPlace(), myColPivot);
     }
 
     int[] getReducedPivots() {

@@ -21,6 +21,10 @@
  */
 package org.ojalgo.matrix.transformation;
 
+import java.util.List;
+
+import org.ojalgo.array.ArrayR064;
+import org.ojalgo.array.operation.COPY;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.structure.Structure2D;
 
@@ -92,6 +96,56 @@ public interface InvertibleFactor<N extends Comparable<N>> extends Structure2D {
             return myDim;
         }
 
+    }
+
+    static <N extends Comparable<N>> void btran(final List<InvertibleFactor<N>> factors, final double[] arg) {
+        for (int i = factors.size() - 1; i >= 0; i--) {
+            factors.get(i).btran(arg);
+        }
+    }
+
+    static <N extends Comparable<N>> void btran(final List<InvertibleFactor<N>> factors, final PhysicalStore<N> arg) {
+        for (int i = factors.size() - 1; i >= 0; i--) {
+            factors.get(i).btran(arg);
+        }
+    }
+
+    /**
+     * Do primitive {@link #ftran(double[])}
+     */
+    static void doPrimitive(final InvertibleFactor<Double> factor, final PhysicalStore<Double> arg) {
+        if (arg instanceof ArrayR064) {
+            factor.ftran(((ArrayR064) arg).data);
+        } else {
+            double[] x = arg.toRawCopy1D();
+            factor.ftran(x);
+            COPY.invoke(x, arg);
+        }
+    }
+
+    /**
+     * Do primitive {@link #btran(double[])}
+     */
+    static void doPrimitive(final PhysicalStore<Double> arg, final InvertibleFactor<Double> factor) {
+        if (arg instanceof ArrayR064) {
+            factor.btran(((ArrayR064) arg).data);
+        } else {
+            double[] x = arg.toRawCopy1D();
+            factor.btran(x);
+            COPY.invoke(x, arg);
+        }
+    }
+
+    static <N extends Comparable<N>> void ftran(final List<InvertibleFactor<N>> factors, final double[] arg) {
+        for (int i = 0, limit = factors.size(); i < limit; i++) {
+            factors.get(i).ftran(arg);
+        }
+    }
+
+    static <N extends Comparable<N>> void ftran(final List<InvertibleFactor<N>> factors, final PhysicalStore<N> arg) {
+        for (int i = 0, limit = factors.size(); i < limit; i++) {
+            factors.get(i).ftran(arg);
+        }
     }
 
     static <N extends Comparable<N>> InvertibleFactor<N> identity(final int dim) {

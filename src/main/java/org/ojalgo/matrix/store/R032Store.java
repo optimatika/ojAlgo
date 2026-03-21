@@ -30,10 +30,6 @@ import org.ojalgo.array.ArrayR032;
 import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.array.operation.FillCompatible;
 import org.ojalgo.array.operation.FillMatchingSingle;
-import org.ojalgo.array.operation.RotateLeft;
-import org.ojalgo.array.operation.RotateRight;
-import org.ojalgo.array.operation.SubstituteBackwards;
-import org.ojalgo.array.operation.SubstituteForwards;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
@@ -41,12 +37,7 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.operation.HouseholderLeft;
-import org.ojalgo.matrix.operation.HouseholderRight;
-import org.ojalgo.matrix.operation.MultiplyBoth;
-import org.ojalgo.matrix.operation.MultiplyLeft;
-import org.ojalgo.matrix.operation.MultiplyNeither;
-import org.ojalgo.matrix.operation.MultiplyRight;
+import org.ojalgo.matrix.operation.*;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
@@ -790,6 +781,22 @@ public final class R032Store extends ArrayR032 implements PhysicalStore<Double>,
     }
 
     @Override
+    public void substituteBackwards(final boolean conjugated, final boolean unitDiagonal, final double[] arg) {
+
+        int n = arg.length;
+        float[] work = new float[n];
+        for (int i = 0; i < n; i++) {
+            work[i] = (float) arg[i];
+        }
+
+        SubstituteBackwards.invoke(work, data, myRowDim, unitDiagonal, conjugated);
+
+        for (int i = 0; i < n; i++) {
+            arg[i] = work[i];
+        }
+    }
+
+    @Override
     public void substituteForwards(final Access2D<Double> body, final boolean unitDiagonal, final boolean conjugated, final boolean identity) {
 
         final int tmpRowDim = myRowDim;
@@ -811,6 +818,22 @@ public final class R032Store extends ArrayR032 implements PhysicalStore<Double>,
         } else {
 
             SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, identity);
+        }
+    }
+
+    @Override
+    public void substituteForwards(final boolean conjugated, final boolean unitDiagonal, final double[] arg) {
+
+        int n = arg.length;
+        float[] work = new float[n];
+        for (int i = 0; i < n; i++) {
+            work[i] = (float) arg[i];
+        }
+
+        SubstituteForwards.invoke(work, data, myRowDim, unitDiagonal, conjugated);
+
+        for (int i = 0; i < n; i++) {
+            arg[i] = work[i];
         }
     }
 

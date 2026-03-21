@@ -1,5 +1,6 @@
 package org.ojalgo.optimisation.linear;
 
+import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -48,7 +49,11 @@ final class DecomposedInverse implements BasisRepresentation {
     public void btran(final PhysicalStore<Double> arg) {
 
         if (myDecomposition.isComputed()) {
-            myDecomposition.btran(arg);
+            if (arg instanceof ArrayR064) {
+                myDecomposition.btran(((ArrayR064) arg).data);
+            } else {
+                myDecomposition.btran(arg);
+            }
         }
     }
 
@@ -68,7 +73,11 @@ final class DecomposedInverse implements BasisRepresentation {
     public void ftran(final PhysicalStore<Double> arg) {
 
         if (myDecomposition.isComputed()) {
-            myDecomposition.ftran(arg);
+            if (arg instanceof ArrayR064) {
+                myDecomposition.ftran(((ArrayR064) arg).data);
+            } else {
+                myDecomposition.ftran(arg);
+            }
         }
     }
 

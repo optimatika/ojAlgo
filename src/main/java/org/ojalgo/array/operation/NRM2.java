@@ -41,8 +41,4 @@ public abstract class NRM2 implements ArrayOperation {
         return scale * Math.sqrt(sum2);
     }
 
-    private NRM2() {
-        super();
-    }
-
 }

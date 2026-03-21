@@ -62,7 +62,7 @@ final class RevisedStore extends SimplexStore {
      * Pivot row for dual simplex. Contains coefficients of non-basic variables in the tableau row for the
      * exiting basic variable. Updated incrementally with each dual simplex iteration.
      */
-    private final PhysicalStore<Double> a;
+    private final R064Store a;
 
     /**
      * Reduced costs for non-basic variables. Shows objective change per unit increase in a non-basic
@@ -165,12 +165,12 @@ final class RevisedStore extends SimplexStore {
 
         z.reset();
         z.set(i, ONE);
-        myInvBasis.btran(z); // i:th row of inv B
+        myInvBasis.btran(z.data); // i:th row of inv B
 
-        this.doExclTranspMult(z, destination);
+        this.doExclTranspMult(z.data, destination);
     }
 
-    private void doExclTranspMult(final MatrixStore<Double> lambda, final PhysicalStore<Double> results) {
+    private void doExclTranspMult(final double[] lambda, final PhysicalStore<Double> results) {
         for (int je = 0; je < excluded.length; je++) {
             int column = excluded[je];
 
@@ -178,15 +178,14 @@ final class RevisedStore extends SimplexStore {
             if (!this.isArtificial(column)) {
                 results.set(je, myConstraintsBody.getColumn(column).dot(lambda));
             }
-
         }
     }
 
     private void updateDualsAndReducedCosts() {
         R064Store objective = myPhase1Objective != null ? myPhase1Objective : myObjective;
         objective.rows(included).supplyTo(l);
-        myInvBasis.btran(l);
-        this.doExclTranspMult(l, r);
+        myInvBasis.btran(l.data);
+        this.doExclTranspMult(l.data, r);
         d.fillMatching(objective.rows(excluded), SUBTRACT, r);
     }
 
@@ -206,7 +205,7 @@ final class RevisedStore extends SimplexStore {
         super.shiftColumn(col, shift);
         myConstraintsBody.column(col).axpy(-shift, myConstraintsRHS);
         myConstraintsRHS.supplyTo(x);
-        myInvBasis.ftran(x);
+        myInvBasis.ftran(x.data);
     }
 
     @Override
@@ -240,14 +239,14 @@ final class RevisedStore extends SimplexStore {
         } else {
 
             myConstraintsRHS.supplyTo(x);
-            myInvBasis.ftran(x);
+            myInvBasis.ftran(x.data);
         }
     }
 
     @Override
     void calculatePrimalDirection(final EnterInfo enter) {
         myConstraintsBody.getColumn(enter.column()).supplyTo(y);
-        myInvBasis.ftran(y);
+        myInvBasis.ftran(y.data);
     }
 
     @Override
@@ -347,7 +346,7 @@ final class RevisedStore extends SimplexStore {
         myInvBasis.reset(myBasis);
         this.updateDualsAndReducedCosts();
         myConstraintsRHS.supplyTo(x);
-        myInvBasis.ftran(x);
+        myInvBasis.ftran(x.data);
     }
 
     @Override

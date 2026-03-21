@@ -15,19 +15,39 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 #### org.ojalgo.optimisation
 
-- New ADMM (OSQP) QP-solver named `AlternatingDirectionSolver`. The `ConvexSolver.Configuration` now lets you specify either the `ACTIVE_SET` or `ADMM` algorithm. If you don't specify which, simple logic will select for you.
+- New ADMM (OSQP-style) QP-solver named `AlternatingDirectionSolver`. The `ConvexSolver.Configuration` now lets you specify either the `ACTIVE_SET` or `ADMM` algorithm. If you don't specify which, simple logic will select for you. The new solver also works with iterative-refinement.
+- New `Optimisation.Environment` class that holds solver integrations, presolvers, variable/expression factories, and 3rd-party configurators. Use `Optimisation.newEnvironment()` to create isolated configurations and `Environment.newModel()` as the model factory.
+- New `FactorKKT` – a dedicated KKT factorisation helper used by the convex solvers.
+- New `RuizScaling` – Ruiz equilibration for KKT/constraint systems in the convex solver pipeline.
+
+#### org.ojalgo.matrix
+
+- Decompositions now expose individual factors via `MatrixDecomposition.Solver.getFactors()` returning `List<InvertibleFactor>`. Each factor supports `ftran`/`btran` operations on both `PhysicalStore` and raw `double[]` arrays.
+- New `MatrixDecomposition.Factor` interface extending `InvertibleFactor` with a `get()` method returning the factor as a `MatrixStore`.
+- Enhanced `SubstituteBackwards`/`SubstituteForwards` with `double[]`-based overloads, supporting the new ftran/btran machinery.
+- `InvertibleFactor` gained static helper methods for composing ftran/btran over a list of factors.
+
+#### org.ojalgo.scalar
+
+- `RationalNumber.getNumerator()` and `RationalNumber.getDenominator()` are now `public`.
 
 ### Changed
 
 #### org.ojalgo.optimisation
 
 - Cleaned up the `UpdatableSolver` interface – everything is now optional with default implementations that do nothing. All the quirky stuff is moved to `ExpressionsBasedModel.EntityMap`. This also required `ConstraintsMetaData` to be somewhat refactored, and the `Optimisation.ConstraintType` enum gained another instance `RANGE`.
+- Deprecated `Constraint.isLowerConstraint()` and `Constraint.isUpperConstraint()` in favour of `Constraint.getConstraintType()`.
+
+#### org.ojalgo.matrix
+
+- Major internal refactoring of dense decompositions (`DenseCholesky`, `DenseLDL`, `DenseLU`, `DenseQR`, `DenseSingularValue`) and raw decompositions (`RawLU`, `RawQR`, `RawSingularValue`, `RawCholesky`, `RawEigenvalue`) to use the new factor-based infrastructure.
+- Reworked `SparseLU` and `SparseQDLDL` for better performance and integration with `InvertibleFactor`.
 
 ### Fixed
 
 #### org.ojalgo.scalar
 
-- Improved `Quadruple` division accuracy
+- Improved `Quadruple` division accuracy.
 
 ### Removed
 

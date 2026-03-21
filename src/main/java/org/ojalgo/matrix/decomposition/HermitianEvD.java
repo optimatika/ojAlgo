@@ -23,6 +23,7 @@ package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.ojalgo.ProgrammingError;
@@ -41,6 +42,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.TransformableRegion;
+import org.ojalgo.matrix.transformation.InvertibleFactor;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
@@ -222,14 +224,12 @@ abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> 
 
     @Override
     public void btran(final double[] arg) {
-        DecompositionStore<N> x = this.copyRow(arg);
-        this.btran(x);
-        x.supplyTo(arg);
+        this.ftran(arg);
     }
 
     @Override
-    public final void btran(final PhysicalStore<N> arg) {
-        arg.fillByMultiplying(this.getInverse(), arg.copy());
+    public void btran(final PhysicalStore<N> arg) {
+        this.ftran(arg);
     }
 
     @Override
@@ -255,14 +255,48 @@ abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> 
 
     @Override
     public void ftran(final double[] arg) {
-        DecompositionStore<N> x = this.copyColumn(arg);
-        this.ftran(x);
-        x.supplyTo(arg);
+
+        MatrixStore<N> mV = this.getV();
+
+        int rank = this.getRank();
+        int dim = arg.length;
+
+        double[] work = new double[rank];
+        for (int i = 0; i < rank; i++) {
+            double sum = ZERO;
+            for (int j = 0; j < dim; j++) {
+                sum += mV.doubleValue(j, i) * arg[j];
+            }
+            work[i] = sum / d[i];
+        }
+
+        java.util.Arrays.fill(arg, ZERO);
+        for (int i = 0; i < rank; i++) {
+            double wi = work[i];
+            for (int j = 0; j < dim; j++) {
+                arg[j] += mV.doubleValue(j, i) * wi;
+            }
+        }
     }
 
     @Override
     public void ftran(final PhysicalStore<N> arg) {
         arg.fillByMultiplying(this.getInverse(), arg.copy());
+    }
+
+    @Override
+    public List<InvertibleFactor<N>> getFactors() {
+        if (this.isValuesOnly()) {
+            return List.of(this);
+        }
+        MatrixStore<N> mV = this.getV();
+        if (mV == null) {
+            return List.of(this);
+        }
+        int rank = this.getRank();
+        int dim = d.length;
+        return List.of(new DenseSingularValue.FactorUT<>(mV, rank, dim), new DenseSingularValue.FactorSinv<>(d, rank, dim),
+                new DenseSingularValue.FactorV<>(mV, rank, dim));
     }
 
     @Override

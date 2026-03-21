@@ -166,7 +166,7 @@ public interface StructureAnyD extends Structure1D {
     public interface ReducibleTo1D<R extends Structure1D> extends StructureAnyD {
 
         /**
-         * @param dimension Which of the AnyD-dimensions should be mapped to the resulting 1D structure.
+         * @param dimension  Which of the AnyD-dimensions should be mapped to the resulting 1D structure.
          * @param aggregator How to aggregate the values of the reduction
          * @return A 1D data structure with aggregated values
          */
@@ -177,11 +177,11 @@ public interface StructureAnyD extends Structure1D {
     public interface ReducibleTo2D<R extends Structure2D> extends StructureAnyD {
 
         /**
-         * @param rowDimension Which of the AnyD-dimensions should be mapped to the rows of the resulting 2D
-         *        structure.
+         * @param rowDimension    Which of the AnyD-dimensions should be mapped to the rows of the resulting
+         *                        2D structure.
          * @param columnDimension Which of the AnyD-dimensions should be mapped to the columns of the
-         *        resulting 2D structure.
-         * @param aggregator How to aggregate the values of the reduction
+         *                        resulting 2D structure.
+         * @param aggregator      How to aggregate the values of the reduction
          * @return A 2D data structure with aggregated values
          */
         R reduce(int rowDimension, int columnDimension, Aggregator aggregator);
@@ -329,7 +329,7 @@ public interface StructureAnyD extends Structure1D {
     }
 
     /**
-     * @param shape An access structure
+     * @param shape     An access structure
      * @param dimension A dimension index
      * @return The size of that dimension
      */
@@ -377,7 +377,7 @@ public interface StructureAnyD extends Structure1D {
     }
 
     /**
-     * @param shape An access structure
+     * @param shape     An access structure
      * @param reference An access element reference
      * @return The index of that element
      */
@@ -433,8 +433,8 @@ public interface StructureAnyD extends Structure1D {
     /**
      * Based on the input index and structure/shape the reference array will derived.
      *
-     * @param index Input index
-     * @param shape Relevant structure/shape
+     * @param index     Input index
+     * @param shape     Relevant structure/shape
      * @param reference Will be updated to the correct reference array given the index and structure
      */
     static void reference(final long index, final long[] shape, final long[] reference) {
@@ -481,7 +481,7 @@ public interface StructureAnyD extends Structure1D {
     }
 
     /**
-     * @param shape An access structure
+     * @param shape     An access structure
      * @param dimension A dimension index
      * @return The size of that dimension
      */
@@ -490,7 +490,7 @@ public interface StructureAnyD extends Structure1D {
     }
 
     /**
-     * @param shape An access structure
+     * @param shape     An access structure
      * @param dimension A dimension index indication a direction
      * @return The step size (index change) in that direction
      */
@@ -505,7 +505,7 @@ public interface StructureAnyD extends Structure1D {
     /**
      * A more complex/general version of {@linkplain #step(int[], int)}.
      *
-     * @param shape An access structure
+     * @param shape     An access structure
      * @param increment A vector indication a direction (and size)
      * @return The step size (index change)
      */
@@ -524,7 +524,7 @@ public interface StructureAnyD extends Structure1D {
      * How does the index change when stepping to the next dimensional unit (next row, next column. next
      * matrix/area, next cube...)
      *
-     * @param shape An access structure
+     * @param shape     An access structure
      * @param dimension Which reference index to increment
      * @return The step size (index change)
      */
@@ -539,7 +539,7 @@ public interface StructureAnyD extends Structure1D {
     /**
      * A more complex/general version of {@linkplain #step(int[], int)}.
      *
-     * @param shape An access structure
+     * @param shape     An access structure
      * @param increment A vector indication a direction (and size)
      * @return The step size (index change)
      */
@@ -591,9 +591,10 @@ public interface StructureAnyD extends Structure1D {
      * Will loop through this multidimensional data structure so that one index value of one dimension is
      * fixed. (Ex: Loop through all items with row index == 5.)
      *
-     * @param dimension The dimension with a fixed/supplied index. (0==row, 1==column, 2=matrix/area...)
+     * @param dimension        The dimension with a fixed/supplied index. (0==row, 1==column,
+     *                         2=matrix/area...)
      * @param dimensionalIndex The index value that dimension is fixed to. (Which row, column or matrix/area)
-     * @param callback A callback with parameters that define a sub-loop
+     * @param callback         A callback with parameters that define a sub-loop
      */
     default void loop(final int dimension, final long dimensionalIndex, final LoopCallback callback) {
 

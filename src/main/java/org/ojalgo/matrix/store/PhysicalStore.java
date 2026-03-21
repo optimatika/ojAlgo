@@ -25,18 +25,19 @@ import java.util.List;
 
 import org.ojalgo.array.PlainArray;
 import org.ojalgo.array.operation.AMAX;
-import org.ojalgo.array.operation.SubstituteBackwards;
-import org.ojalgo.array.operation.SubstituteForwards;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.matrix.decomposition.function.TriangularSolveBackwards;
+import org.ojalgo.matrix.decomposition.function.TriangularSolveForwards;
+import org.ojalgo.matrix.operation.SubstituteBackwards;
+import org.ojalgo.matrix.operation.SubstituteForwards;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Factory2D;
-import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.structure.Transformation2D;
 import org.ojalgo.tensor.TensorFactory1D;
@@ -53,7 +54,8 @@ import org.ojalgo.tensor.TensorFactory2D;
  *
  * @author apete
  */
-public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, TransformableRegion<N>, Access1D.Collectable<N, Mutate1D> {
+public interface PhysicalStore<N extends Comparable<N>>
+        extends MatrixStore<N>, TransformableRegion<N>, TriangularSolveForwards<N>, TriangularSolveBackwards<N> {
 
     public interface Factory<N extends Comparable<N>, I extends PhysicalStore<N> & Factory2D.Builder<I>> extends Factory2D.TwoStep<I, I> {
 
@@ -234,7 +236,9 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
      * </ul>
      *
      * @see SubstituteBackwards#invoke(double[], int, int, int, Access2D, boolean, boolean, boolean)
+     * @deprecated Use {@link SubstituteBackwards} instead.
      */
+    @Deprecated
     void substituteBackwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean hermitian);
 
     /**
@@ -246,7 +250,9 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
      * </ul>
      *
      * @see SubstituteForwards#invoke(double[], int, int, int, Access2D, boolean, boolean, boolean)
+     * @deprecated Use {@link SubstituteForwards} instead.
      */
+    @Deprecated
     void substituteForwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean identity);
 
     @Override

@@ -36,8 +36,6 @@ import org.ojalgo.structure.Mutate1D;
  */
 public abstract class AXPY implements ArrayOperation {
 
-    public static int THRESHOLD = 128;
-
     public static void invoke(final BigDecimal[] y, final int basey, final BigDecimal a, final BigDecimal[] x, final int basex, final int first,
             final int limit) {
         for (int i = first; i < limit; i++) {

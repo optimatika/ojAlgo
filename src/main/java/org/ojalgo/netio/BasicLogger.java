@@ -437,7 +437,7 @@ public interface BasicLogger {
     /**
      * Will print 1 line/row with the objects in fixed width columns
      *
-     * @param width The exact witdth of each column
+     * @param width   The exact witdth of each column
      * @param columns The column objects, {@link #toString()} and then fix the length/width
      */
     default void columns(final int width, final Object... columns) {

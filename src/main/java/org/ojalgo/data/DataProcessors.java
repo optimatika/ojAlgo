@@ -193,9 +193,9 @@ public class DataProcessors {
     }
 
     /**
-     * @param factory A factory that will produce the returned covariance matrix
-     * @param svd A pre-decomposed SVD instance. The original matrix is assumed to have centered data in its
-     *        columns
+     * @param factory    A factory that will produce the returned covariance matrix
+     * @param svd        A pre-decomposed SVD instance. The original matrix is assumed to have centered data
+     *                   in its columns
      * @param complexity The maximum number of singular values that should be considered
      */
     public static <M extends PhysicalStore<Double>> M covariances(final Factory2D<M> factory, final SingularValue<Double> svd, final int complexity) {
@@ -247,7 +247,7 @@ public class DataProcessors {
      * are predefined {@link Transformation2D} instances created by calling this method.
      *
      * @param definition A {@link Function} that will create a {@link UnaryFunction} from a {@link SampleSet}
-     *        to be applied to each column
+     *                   to be applied to each column
      * @return A {@link Transformation2D} that will apply a {@link UnaryFunction} to each column
      */
     public static Transformation2D<Double> newColumnsTransformer(final Function<SampleSet, UnaryFunction<Double>> definition) {

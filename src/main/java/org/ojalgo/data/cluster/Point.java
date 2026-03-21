@@ -121,30 +121,30 @@ public final class Point implements Comparable<Point> {
      */
     public double distance(final DistanceMeasure measure, final Point other) {
         switch (measure) {
-        case CHEBYSHEV:
-            return Distance.chebyshev(coordinates, other.coordinates);
-        case COSINE:
-            return Distance.cosine(coordinates, other.coordinates);
-        case ANGULAR:
-            return Distance.angular(coordinates, other.coordinates);
-        case CORRELATION:
-            return Distance.correlation(coordinates, other.coordinates);
-        case EUCLIDEAN:
-            return Distance.euclidean(coordinates, other.coordinates);
-        case CANBERRA:
-            return Distance.canberra(coordinates, other.coordinates);
-        case HAMMING:
-            return Distance.hamming(coordinates, other.coordinates);
-        case HELLINGER:
-            return Distance.hellinger(coordinates, other.coordinates);
-        case JACCARD:
-            return Distance.jaccard(coordinates, other.coordinates);
-        case MANHATTAN:
-            return Distance.manhattan(coordinates, other.coordinates);
-        case SQUARED_EUCLIDEAN:
-            return Distance.squaredEuclidean(coordinates, other.coordinates);
-        default:
-            throw new IllegalArgumentException("Unknown measure: " + measure);
+            case CHEBYSHEV:
+                return Distance.chebyshev(coordinates, other.coordinates);
+            case COSINE:
+                return Distance.cosine(coordinates, other.coordinates);
+            case ANGULAR:
+                return Distance.angular(coordinates, other.coordinates);
+            case CORRELATION:
+                return Distance.correlation(coordinates, other.coordinates);
+            case EUCLIDEAN:
+                return Distance.euclidean(coordinates, other.coordinates);
+            case CANBERRA:
+                return Distance.canberra(coordinates, other.coordinates);
+            case HAMMING:
+                return Distance.hamming(coordinates, other.coordinates);
+            case HELLINGER:
+                return Distance.hellinger(coordinates, other.coordinates);
+            case JACCARD:
+                return Distance.jaccard(coordinates, other.coordinates);
+            case MANHATTAN:
+                return Distance.manhattan(coordinates, other.coordinates);
+            case SQUARED_EUCLIDEAN:
+                return Distance.squaredEuclidean(coordinates, other.coordinates);
+            default:
+                throw new IllegalArgumentException("Unknown measure: " + measure);
         }
     }
 

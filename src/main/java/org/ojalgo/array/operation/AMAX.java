@@ -42,8 +42,6 @@ import org.ojalgo.structure.Structure2D;
  */
 public abstract class AMAX implements ArrayOperation {
 
-    public static int THRESHOLD = 128;
-
     public static long invoke(final Access1D<?> data, final long first, final long limit, final long step) {
 
         long retVal = first;

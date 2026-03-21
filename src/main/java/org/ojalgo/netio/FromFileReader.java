@@ -101,7 +101,7 @@ public interface FromFileReader<T> extends Iterable<T>, Closeable {
     /**
      * Read the properties file and copy the entries to the supplied destination {@link Properties} instance.
      *
-     * @param sourceFile Source properties file
+     * @param sourceFile     Source properties file
      * @param destinationMap Destination properties map
      */
     static void copy(final File sourceFile, final Properties destinationMap) {
