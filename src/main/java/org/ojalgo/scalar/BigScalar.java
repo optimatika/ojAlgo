@@ -25,7 +25,6 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 
 import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
@@ -267,7 +266,16 @@ public final class BigScalar implements Scalar<BigDecimal>, Enforceable<BigScala
 
     @Override
     public double norm() {
-        return PrimitiveMath.ABS.invoke(myNumber.doubleValue());
+        return myNumber.abs().doubleValue();
+    }
+
+    @Override
+    public BigScalar normalised() {
+        if (myNumber.signum() < 0) {
+            return NEG;
+        } else {
+            return ONE;
+        }
     }
 
     @Override
@@ -284,7 +292,14 @@ public final class BigScalar implements Scalar<BigDecimal>, Enforceable<BigScala
 
     @Override
     public BigScalar signum() {
-        return new BigScalar(BigMath.SIGNUM.invoke(myNumber));
+        int sign = myNumber.signum();
+        if (sign < 0) {
+            return NEG;
+        } else if (sign > 0) {
+            return ONE;
+        } else {
+            return ZERO;
+        }
     }
 
     @Override

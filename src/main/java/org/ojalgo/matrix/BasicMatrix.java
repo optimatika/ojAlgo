@@ -527,6 +527,11 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     @Override
+    public M normalised() {
+        return this.newInstance(this.store().normalised());
+    }
+
+    @Override
     public M offsets(final long rowOffset, final long columnOffset) {
         return this.newInstance(this.store().offsets(rowOffset, columnOffset));
     }
@@ -669,11 +674,6 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     @Override
     public M select(final long[] rows, final long[] columns) {
         return this.newInstance(this.store().select(rows, columns));
-    }
-
-    @Override
-    public M signum() {
-        return this.newInstance(this.store().signum());
     }
 
     @Override

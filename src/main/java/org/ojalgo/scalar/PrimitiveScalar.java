@@ -198,8 +198,7 @@ public final class PrimitiveScalar implements Scalar<Double>, Enforceable<Primit
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        long temp;
-        temp = Double.doubleToLongBits(myValue);
+        long temp = Double.doubleToLongBits(myValue);
         return (prime * result) + (int) (temp ^ (temp >>> 32));
     }
 
@@ -259,6 +258,15 @@ public final class PrimitiveScalar implements Scalar<Double>, Enforceable<Primit
     }
 
     @Override
+    public PrimitiveScalar normalised() {
+        if (myValue < PrimitiveMath.ZERO) {
+            return NEG;
+        } else {
+            return ONE;
+        }
+    }
+
+    @Override
     public PrimitiveScalar power(final int power) {
 
         double retVal = PrimitiveMath.ONE;
@@ -272,7 +280,7 @@ public final class PrimitiveScalar implements Scalar<Double>, Enforceable<Primit
 
     @Override
     public PrimitiveScalar signum() {
-        return new PrimitiveScalar(PrimitiveMath.SIGNUM.invoke(myValue));
+        return new PrimitiveScalar(Math.signum(myValue));
     }
 
     @Override

@@ -37,17 +37,28 @@ public interface NormedVectorSpace<T, N extends Comparable<N>> extends VectorSpa
     }
 
     /**
-     * <code>this == this.signum().multiply(this.norm())</code>
+     * <code>this == this.normalised().multiply(this.norm())</code>
      *
      * @return The norm
      */
     double norm();
 
     /**
-     * <code>this == this.signum().multiply(this.norm())</code>
+     * <code>this == this.normalised().multiply(this.norm())</code>
+     * <p>
+     * When <code>this.norm() == 0.0</code> it becomes arbitrary or undefined what this method should return.
+     * It is up to specific implementors to document their behaviour in this case.
      *
      * @return A unit "vector"
      */
-    T signum();
+    T normalised();
+
+    /**
+     * @deprecated v57 Use {@link #normalised()} instead
+     */
+    @Deprecated
+    default T signum() {
+        return this.normalised();
+    }
 
 }

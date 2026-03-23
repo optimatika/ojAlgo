@@ -154,7 +154,6 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> implements SelfDec
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public final S get() {
         return (S) this;
     }
@@ -210,8 +209,16 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> implements SelfDec
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public S power(final int power) {
+    public final S normalised() {
+        if (myNumerator < 0L) {
+            return this.wrap(-this.descriptor().denominator());
+        } else {
+            return this.wrap(this.descriptor().denominator());
+        }
+    }
+
+    @Override
+    public final S power(final int power) {
 
         if (power == 0) {
 
@@ -235,11 +242,8 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> implements SelfDec
     public final S signum() {
         if (myNumerator == 0L) {
             return this.wrap(0L);
-        }
-        if (myNumerator < 0L) {
-            return this.wrap(-this.descriptor().denominator());
         } else {
-            return this.wrap(this.descriptor().denominator());
+            return this.normalised();
         }
     }
 

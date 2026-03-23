@@ -117,7 +117,7 @@ public class QuaternionTest extends ScalarTests {
     @Test
     public void testRandomMultiplication() {
 
-        Quaternion normalizedRandomRotation = Quaternion.of(Math.random(), Math.random(), Math.random(), Math.random()).signum();
+        Quaternion normalizedRandomRotation = Quaternion.of(Math.random(), Math.random(), Math.random(), Math.random()).normalised();
 
         TestUtils.assertEquals(normalizedRandomRotation, normalizedRandomRotation.toMultiplicationMatrix());
 
@@ -133,7 +133,7 @@ public class QuaternionTest extends ScalarTests {
     @Test
     public void testRandomRotation() {
 
-        Quaternion normalizedRandomRotation = Quaternion.of(Math.random(), Math.random(), Math.random(), Math.random()).signum();
+        Quaternion normalizedRandomRotation = Quaternion.of(Math.random(), Math.random(), Math.random(), Math.random()).normalised();
 
         Quaternion randomPureQuat = Quaternion.of(Math.random(), Math.random(), Math.random());
 

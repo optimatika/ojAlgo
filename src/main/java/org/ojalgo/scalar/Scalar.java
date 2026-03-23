@@ -177,7 +177,7 @@ public interface Scalar<N extends Comparable<N>> extends AccessScalar<N>, Field<
      * This method should NOT use tolerance-based comparisons or approximate zero detection, as those are
      * better handled by context-aware methods like {@link #isSmall(double)}.
      * </p>
-     * 
+     *
      * @return true if this scalar represents exactly zero, false otherwise
      * @see #isSmall(double)
      */
@@ -188,10 +188,27 @@ public interface Scalar<N extends Comparable<N>> extends AccessScalar<N>, Field<
         return this.multiply(multiplicand.get());
     }
 
+    /**
+     * When/if {@link #isZero()} then this method should return a scalar that is equal to its own norm (Real
+     * 1.0). If you need/prefer it to return "zero" instead then use {@link #signum()}.
+     */
+    @Override
+    Scalar<N> normalised();
+
     @Override
     default int rank() {
         return 0;
     }
+
+    /**
+     * Re-defined to mimic the behaviour of {@link Math#signum(float)}, {@link Math#signum(double)} and
+     * {@link BigDecimal#signum()}.
+     * <p>
+     * If {@link #isZero()} then this method should return "zero", otherwise the same as
+     * {@link #normalised()}.
+     */
+    @Override
+    Scalar<N> signum();
 
     @Override
     default Scalar<N> subtract(final Scalar<N> subtrahend) {

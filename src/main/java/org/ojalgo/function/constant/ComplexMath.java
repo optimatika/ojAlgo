@@ -172,7 +172,7 @@ public abstract class ComplexMath {
         final double tmpIm = PrimitiveMath.SCALE.invoke(arg.i, param);
         return ComplexNumber.of(tmpRe, tmpIm);
     };
-    public static final ComplexFunction.Unary SIGNUM = ComplexNumber::signum;
+    public static final ComplexFunction.Unary SIGNUM = ComplexNumber::normalised;
     public static final ComplexFunction.Unary SIN = arg -> ComplexMath.SINH.invoke(arg.multiply(ComplexNumber.I)).multiply(ComplexNumber.I.negate());
     public static final ComplexFunction.Unary SINH = arg -> EXP.invoke(arg).subtract(EXP.invoke(arg.negate())).divide(TWO);
     public static final ComplexFunction.Unary SQRT = arg -> {

@@ -68,8 +68,7 @@ abstract class ArrayBasedTensor<N extends Comparable<N>, T extends ArrayBasedTen
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + (myArrayFactory == null ? 0 : myArrayFactory.hashCode());
-            return result;
+            return prime * result + (myArrayFactory == null ? 0 : myArrayFactory.hashCode());
         }
 
         public Scalar.Factory<N> scalar() {
@@ -95,6 +94,7 @@ abstract class ArrayBasedTensor<N extends Comparable<N>, T extends ArrayBasedTen
         myScalarFactory = scalarFactory;
     }
 
+    @Override
     public final int dimensions() {
         return myDimensions;
     }
@@ -138,16 +138,22 @@ abstract class ArrayBasedTensor<N extends Comparable<N>, T extends ArrayBasedTen
         result = prime * result + myDimensions;
         result = prime * result + (myFunctionSet == null ? 0 : myFunctionSet.hashCode());
         result = prime * result + myRank;
-        result = prime * result + (myScalarFactory == null ? 0 : myScalarFactory.hashCode());
-        return result;
+        return prime * result + (myScalarFactory == null ? 0 : myScalarFactory.hashCode());
     }
 
+    @Override
+    public T normalised() {
+        double norm = this.norm();
+        if (norm == PrimitiveMath.ZERO) {
+            return (T) this;
+        } else {
+            return this.multiply(PrimitiveMath.ONE / norm);
+        }
+    }
+
+    @Override
     public final int rank() {
         return myRank;
-    }
-
-    public T signum() {
-        return this.multiply(PrimitiveMath.ONE / this.norm());
     }
 
     void add(final Mutate1D.Fillable<N> receiver, final Access1D<N> left, final Access1D<N> right) {

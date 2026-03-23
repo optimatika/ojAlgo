@@ -119,7 +119,7 @@ public abstract class NonPhysicalTest extends MatrixStoreTests {
     }
 
     protected static MatrixStore<ComplexNumber> makeRandomMatrix(final int numberOfRows, final int numberOfColumns) {
-        return TestUtils.makeRandomComplexStore(numberOfRows, numberOfColumns).signum();
+        return TestUtils.makeRandomComplexStore(numberOfRows, numberOfColumns).normalised();
     }
 
     MatrixStore<ComplexNumber> complexStore;

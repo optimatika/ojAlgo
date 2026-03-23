@@ -165,10 +165,9 @@ public abstract class GenerateApplyAndCopyHouseholderRow implements MatrixOperat
             tmpNorm2 += tmpScale.norm() * tmpScale.norm();
             tmpNorm2 = PrimitiveMath.SQRT.invoke(tmpNorm2);
 
-            // data[(row + (col * structure))] = ComplexNumber.makePolar(tmpNorm2 * tmpNormInf, tmpScale.phase());
-            data[row + col * structure] = tmpScale.signum().multiply(tmpNorm2 * tmpNormInf).get();
-            // tmpScale = tmpScale.subtract(ComplexNumber.makePolar(tmpNorm2, tmpScale.phase()));
-            tmpScale = tmpScale.subtract(tmpScale.signum().multiply(tmpNorm2)).get();
+            N tmpSignum = tmpScale.normalised().get();
+            data[row + col * structure] = tmpSignum.negate().multiply(tmpNorm2 * tmpNormInf).get();
+            tmpScale = tmpScale.add(tmpSignum.multiply(tmpNorm2)).get();
 
             tmpVector[col] = scalar.one().get();
 

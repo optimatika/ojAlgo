@@ -617,8 +617,7 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        long temp;
-        temp = Double.doubleToLongBits(i);
+        long temp = Double.doubleToLongBits(i);
         result = prime * result + (int) (temp ^ temp >>> 32);
         temp = Double.doubleToLongBits(j);
         result = prime * result + (int) (temp ^ temp >>> 32);
@@ -733,6 +732,15 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
     }
 
     @Override
+    public Quaternion normalised() {
+        double norm = this.norm();
+        if (norm == PrimitiveMath.ZERO) {
+            return ONE;
+        }
+        return this.versor();
+    }
+
+    @Override
     public Quaternion power(final int power) {
 
         Quaternion retVal = ONE;
@@ -750,7 +758,11 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
     @Override
     public Quaternion signum() {
-        return this.versor();
+        if (this.isZero()) {
+            return ZERO;
+        } else {
+            return this.normalised();
+        }
     }
 
     @Override

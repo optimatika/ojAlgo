@@ -541,6 +541,14 @@ public final class RationalNumber implements SelfDeclaringScalar<RationalNumber>
         return this;
     }
 
+    public long getDenominator() {
+        return myDenominator;
+    }
+
+    public long getNumerator() {
+        return myNumerator;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -618,6 +626,15 @@ public final class RationalNumber implements SelfDeclaringScalar<RationalNumber>
     }
 
     @Override
+    public RationalNumber normalised() {
+        if (this.sign() == -1) {
+            return NEG;
+        } else {
+            return ONE;
+        }
+    }
+
+    @Override
     public RationalNumber power(final int power) {
 
         RationalNumber retVal = ONE;
@@ -631,12 +648,10 @@ public final class RationalNumber implements SelfDeclaringScalar<RationalNumber>
 
     @Override
     public RationalNumber signum() {
-        if (!this.isInfinite() && RationalNumber.isSmall(PrimitiveMath.ONE, this)) {
+        if (this.isZero()) {
             return ZERO;
-        } else if (this.sign() == -1) {
-            return NEG;
         } else {
-            return ONE;
+            return this.normalised();
         }
     }
 
@@ -719,14 +734,6 @@ public final class RationalNumber implements SelfDeclaringScalar<RationalNumber>
         } else {
             return new BigDecimal(myNumerator).divide(new BigDecimal(myDenominator), context);
         }
-    }
-
-    public long getDenominator() {
-        return myDenominator;
-    }
-
-    public long getNumerator() {
-        return myNumerator;
     }
 
 }

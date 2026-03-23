@@ -515,8 +515,7 @@ public final class ComplexNumber
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        long temp;
-        temp = Double.doubleToLongBits(i);
+        long temp = Double.doubleToLongBits(i);
         result = prime * result + (int) (temp ^ temp >>> 32);
         temp = Double.doubleToLongBits(myRealValue);
         return prime * result + (int) (temp ^ temp >>> 32);
@@ -627,6 +626,15 @@ public final class ComplexNumber
         return PrimitiveMath.HYPOT.invoke(myRealValue, i);
     }
 
+    @Override
+    public ComplexNumber normalised() {
+        if (ComplexNumber.isSmall(PrimitiveMath.ONE, this)) {
+            return ComplexNumber.makeRotation(PrimitiveMath.ZERO);
+        } else {
+            return ComplexNumber.makeRotation(this.phase());
+        }
+    }
+
     /**
      * Returns the phase of this complex number. The phase of a complex number Z is the angle between the
      * positive real axis and the straight line defined by origin and Z in complex plane.
@@ -648,10 +656,11 @@ public final class ComplexNumber
 
     @Override
     public ComplexNumber signum() {
-        if (ComplexNumber.isSmall(PrimitiveMath.ONE, this)) {
-            return ComplexNumber.makeRotation(PrimitiveMath.ZERO);
+        if (this.isZero()) {
+            return ZERO;
+        } else {
+            return this.normalised();
         }
-        return ComplexNumber.makeRotation(this.phase());
     }
 
     /**

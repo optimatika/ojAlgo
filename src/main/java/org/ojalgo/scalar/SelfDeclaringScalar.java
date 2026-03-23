@@ -47,6 +47,9 @@ interface SelfDeclaringScalar<S extends SelfDeclaringScalar<S>> extends Scalar<S
     S negate();
 
     @Override
+    S normalised();
+
+    @Override
     S power(int power);
 
     @Override

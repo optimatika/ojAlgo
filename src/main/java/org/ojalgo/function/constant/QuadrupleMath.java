@@ -144,7 +144,7 @@ public abstract class QuadrupleMath {
     public static final QuadrupleFunction.Unary RINT = arg -> Quadruple.valueOf(BigMath.RINT.invoke(arg.toBigDecimal()));
     public static final QuadrupleFunction.Parameter ROOT = (arg, param) -> Quadruple.valueOf(BigMath.ROOT.invoke(arg.toBigDecimal(), param));
     public static final QuadrupleFunction.Parameter SCALE = (arg, param) -> Quadruple.valueOf(BigMath.SCALE.invoke(arg.toBigDecimal(), param));
-    public static final QuadrupleFunction.Unary SIGNUM = Quadruple::signum;
+    public static final QuadrupleFunction.Unary SIGNUM = Quadruple::normalised;
     public static final QuadrupleFunction.Unary SIN = arg -> Quadruple.valueOf(BigMath.SIN.invoke(arg.toBigDecimal()));
     public static final QuadrupleFunction.Unary SINH = arg -> EXP.invoke(arg).subtract(EXP.invoke(arg.negate())).divide(Quadruple.TWO);
     public static final QuadrupleFunction.Unary SQRT = arg -> Quadruple.valueOf(BigMath.SQRT.invoke(arg.toBigDecimal()));

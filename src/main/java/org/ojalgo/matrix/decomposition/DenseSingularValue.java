@@ -64,6 +64,200 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
 
     }
 
+    /**
+     * Scale by [S]<sup>-1</sup> (reciprocal singular values).
+     */
+    static final class FactorSinv<N extends Comparable<N>> implements InvertibleFactor<N> {
+
+        private final int myDim;
+        private final int myRank;
+        private final double[] mySingularValues;
+
+        FactorSinv(final double[] singularValues, final int rank, final int dim) {
+            super();
+            mySingularValues = singularValues;
+            myRank = rank;
+            myDim = dim;
+        }
+
+        @Override
+        public void btran(final double[] arg) {
+            this.ftran(arg);
+        }
+
+        @Override
+        public void btran(final PhysicalStore<N> arg) {
+            double[] tmp = arg.toRawCopy1D();
+            this.ftran(tmp);
+            arg.fillMatching(tmp);
+        }
+
+        @Override
+        public void ftran(final double[] arg) {
+            for (int i = 0; i < myRank; i++) {
+                arg[i] /= mySingularValues[i];
+            }
+        }
+
+        @Override
+        public void ftran(final PhysicalStore<N> arg) {
+            double[] tmp = arg.toRawCopy1D();
+            this.ftran(tmp);
+            arg.fillMatching(tmp);
+        }
+
+        @Override
+        public int getColDim() {
+            return myDim;
+        }
+
+        @Override
+        public int getRowDim() {
+            return myDim;
+        }
+
+    }
+
+    /**
+     * Multiply by [U]<sup>T</sup>.
+     */
+    static final class FactorUT<N extends Comparable<N>> implements InvertibleFactor<N> {
+
+        private final int myDim;
+        private final MatrixStore<N> myMatrix;
+        private final int myRank;
+
+        FactorUT(final MatrixStore<N> u, final int rank, final int dim) {
+            super();
+            myMatrix = u;
+            myRank = rank;
+            myDim = dim;
+        }
+
+        @Override
+        public void btran(final double[] arg) {
+            double[] work = new double[myDim];
+            for (int i = 0; i < myRank; i++) {
+                double ai = arg[i];
+                for (int j = 0; j < myDim; j++) {
+                    work[j] += myMatrix.doubleValue(j, i) * ai;
+                }
+            }
+            System.arraycopy(work, 0, arg, 0, myDim);
+        }
+
+        @Override
+        public void btran(final PhysicalStore<N> arg) {
+            double[] tmp = arg.toRawCopy1D();
+            this.btran(tmp);
+            arg.fillMatching(tmp);
+        }
+
+        @Override
+        public void ftran(final double[] arg) {
+            double[] work = new double[myRank];
+            for (int i = 0; i < myRank; i++) {
+                double sum = ZERO;
+                for (int j = 0; j < myDim; j++) {
+                    sum += myMatrix.doubleValue(j, i) * arg[j];
+                }
+                work[i] = sum;
+            }
+            System.arraycopy(work, 0, arg, 0, myRank);
+            for (int i = myRank; i < myDim; i++) {
+                arg[i] = ZERO;
+            }
+        }
+
+        @Override
+        public void ftran(final PhysicalStore<N> arg) {
+            double[] tmp = arg.toRawCopy1D();
+            this.ftran(tmp);
+            arg.fillMatching(tmp);
+        }
+
+        @Override
+        public int getColDim() {
+            return myDim;
+        }
+
+        @Override
+        public int getRowDim() {
+            return myDim;
+        }
+
+    }
+
+    /**
+     * Multiply by [V].
+     */
+    static final class FactorV<N extends Comparable<N>> implements InvertibleFactor<N> {
+
+        private final int myDim;
+        private final MatrixStore<N> myMatrix;
+        private final int myRank;
+
+        FactorV(final MatrixStore<N> v, final int rank, final int dim) {
+            super();
+            myMatrix = v;
+            myRank = rank;
+            myDim = dim;
+        }
+
+        @Override
+        public void btran(final double[] arg) {
+            double[] work = new double[myRank];
+            for (int i = 0; i < myRank; i++) {
+                double sum = ZERO;
+                for (int j = 0; j < myDim; j++) {
+                    sum += myMatrix.doubleValue(j, i) * arg[j];
+                }
+                work[i] = sum;
+            }
+            System.arraycopy(work, 0, arg, 0, myRank);
+            for (int i = myRank; i < myDim; i++) {
+                arg[i] = ZERO;
+            }
+        }
+
+        @Override
+        public void btran(final PhysicalStore<N> arg) {
+            double[] tmp = arg.toRawCopy1D();
+            this.btran(tmp);
+            arg.fillMatching(tmp);
+        }
+
+        @Override
+        public void ftran(final double[] arg) {
+            double[] work = new double[myDim];
+            for (int i = 0; i < myRank; i++) {
+                double ai = arg[i];
+                for (int j = 0; j < myDim; j++) {
+                    work[j] += myMatrix.doubleValue(j, i) * ai;
+                }
+            }
+            System.arraycopy(work, 0, arg, 0, myDim);
+        }
+
+        @Override
+        public void ftran(final PhysicalStore<N> arg) {
+            double[] tmp = arg.toRawCopy1D();
+            this.ftran(tmp);
+            arg.fillMatching(tmp);
+        }
+
+        @Override
+        public int getColDim() {
+            return myDim;
+        }
+
+        @Override
+        public int getRowDim() {
+            return myDim;
+        }
+
+    }
+
     static final class H256 extends DenseSingularValue<Quaternion> {
 
         H256() {
@@ -335,200 +529,6 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
         } // while
     }
 
-    /**
-     * Multiply by [U]<sup>T</sup>.
-     */
-    static final class FactorUT<N extends Comparable<N>> implements InvertibleFactor<N> {
-
-        private final MatrixStore<N> myMatrix;
-        private final int myRank;
-        private final int myDim;
-
-        FactorUT(final MatrixStore<N> u, final int rank, final int dim) {
-            super();
-            myMatrix = u;
-            myRank = rank;
-            myDim = dim;
-        }
-
-        @Override
-        public void btran(final double[] arg) {
-            double[] work = new double[myDim];
-            for (int i = 0; i < myRank; i++) {
-                double ai = arg[i];
-                for (int j = 0; j < myDim; j++) {
-                    work[j] += myMatrix.doubleValue(j, i) * ai;
-                }
-            }
-            System.arraycopy(work, 0, arg, 0, myDim);
-        }
-
-        @Override
-        public void btran(final PhysicalStore<N> arg) {
-            double[] tmp = arg.toRawCopy1D();
-            this.btran(tmp);
-            arg.fillMatching(tmp);
-        }
-
-        @Override
-        public void ftran(final double[] arg) {
-            double[] work = new double[myRank];
-            for (int i = 0; i < myRank; i++) {
-                double sum = ZERO;
-                for (int j = 0; j < myDim; j++) {
-                    sum += myMatrix.doubleValue(j, i) * arg[j];
-                }
-                work[i] = sum;
-            }
-            System.arraycopy(work, 0, arg, 0, myRank);
-            for (int i = myRank; i < myDim; i++) {
-                arg[i] = ZERO;
-            }
-        }
-
-        @Override
-        public void ftran(final PhysicalStore<N> arg) {
-            double[] tmp = arg.toRawCopy1D();
-            this.ftran(tmp);
-            arg.fillMatching(tmp);
-        }
-
-        @Override
-        public int getColDim() {
-            return myDim;
-        }
-
-        @Override
-        public int getRowDim() {
-            return myDim;
-        }
-
-    }
-
-    /**
-     * Scale by [S]<sup>-1</sup> (reciprocal singular values).
-     */
-    static final class FactorSinv<N extends Comparable<N>> implements InvertibleFactor<N> {
-
-        private final double[] mySingularValues;
-        private final int myRank;
-        private final int myDim;
-
-        FactorSinv(final double[] singularValues, final int rank, final int dim) {
-            super();
-            mySingularValues = singularValues;
-            myRank = rank;
-            myDim = dim;
-        }
-
-        @Override
-        public void btran(final double[] arg) {
-            this.ftran(arg);
-        }
-
-        @Override
-        public void btran(final PhysicalStore<N> arg) {
-            double[] tmp = arg.toRawCopy1D();
-            this.ftran(tmp);
-            arg.fillMatching(tmp);
-        }
-
-        @Override
-        public void ftran(final double[] arg) {
-            for (int i = 0; i < myRank; i++) {
-                arg[i] /= mySingularValues[i];
-            }
-        }
-
-        @Override
-        public void ftran(final PhysicalStore<N> arg) {
-            double[] tmp = arg.toRawCopy1D();
-            this.ftran(tmp);
-            arg.fillMatching(tmp);
-        }
-
-        @Override
-        public int getColDim() {
-            return myDim;
-        }
-
-        @Override
-        public int getRowDim() {
-            return myDim;
-        }
-
-    }
-
-    /**
-     * Multiply by [V].
-     */
-    static final class FactorV<N extends Comparable<N>> implements InvertibleFactor<N> {
-
-        private final MatrixStore<N> myMatrix;
-        private final int myRank;
-        private final int myDim;
-
-        FactorV(final MatrixStore<N> v, final int rank, final int dim) {
-            super();
-            myMatrix = v;
-            myRank = rank;
-            myDim = dim;
-        }
-
-        @Override
-        public void btran(final double[] arg) {
-            double[] work = new double[myRank];
-            for (int i = 0; i < myRank; i++) {
-                double sum = ZERO;
-                for (int j = 0; j < myDim; j++) {
-                    sum += myMatrix.doubleValue(j, i) * arg[j];
-                }
-                work[i] = sum;
-            }
-            System.arraycopy(work, 0, arg, 0, myRank);
-            for (int i = myRank; i < myDim; i++) {
-                arg[i] = ZERO;
-            }
-        }
-
-        @Override
-        public void btran(final PhysicalStore<N> arg) {
-            double[] tmp = arg.toRawCopy1D();
-            this.btran(tmp);
-            arg.fillMatching(tmp);
-        }
-
-        @Override
-        public void ftran(final double[] arg) {
-            double[] work = new double[myDim];
-            for (int i = 0; i < myRank; i++) {
-                double ai = arg[i];
-                for (int j = 0; j < myDim; j++) {
-                    work[j] += myMatrix.doubleValue(j, i) * ai;
-                }
-            }
-            System.arraycopy(work, 0, arg, 0, myDim);
-        }
-
-        @Override
-        public void ftran(final PhysicalStore<N> arg) {
-            double[] tmp = arg.toRawCopy1D();
-            this.ftran(tmp);
-            arg.fillMatching(tmp);
-        }
-
-        @Override
-        public int getColDim() {
-            return myDim;
-        }
-
-        @Override
-        public int getRowDim() {
-            return myDim;
-        }
-
-    }
-
     private double[] e = null;
     private final DenseBidiagonal<N> myBidiagonal;
     private final boolean myFullSize;
@@ -653,21 +653,6 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
     }
 
     @Override
-    public List<InvertibleFactor<N>> getFactors() {
-        if (myValuesOnly) {
-            return List.of(this);
-        }
-        MatrixStore<N> mU = this.getU();
-        MatrixStore<N> mV = this.getV();
-        if (mU == null || mV == null) {
-            return List.of(this);
-        }
-        int rank = this.getRank();
-        int dim = s.length;
-        return List.of(new FactorUT<>(mU, rank, dim), new FactorSinv<>(s, rank, dim), new FactorV<>(mV, rank, dim));
-    }
-
-    @Override
     public MatrixStore<N> getCovariance() {
 
         MatrixStore<N> v = this.getV();
@@ -690,6 +675,21 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
     @Override
     public MatrixStore<N> getD() {
         return this.getS();
+    }
+
+    @Override
+    public List<InvertibleFactor<N>> getFactors() {
+        if (myValuesOnly) {
+            return List.of(this);
+        }
+        MatrixStore<N> mU = this.getU();
+        MatrixStore<N> mV = this.getV();
+        if (mU == null || mV == null) {
+            return List.of(this);
+        }
+        int rank = this.getRank();
+        int dim = s.length;
+        return List.of(new FactorUT<>(mU, rank, dim), new FactorSinv<>(s, rank, dim), new FactorV<>(mV, rank, dim));
     }
 
     @Override
@@ -989,12 +989,12 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
 
         this.computeBidiagonal(matrix, fullSize);
 
-        final DiagonalStore<N, Array1D<N>> tmpBidiagonal = myBidiagonal.doGetDiagonal();
+        DiagonalStore<N, Array1D<N>> tmpBidiagonal = myBidiagonal.doGetDiagonal();
 
-        final DecompositionStore<N> tmpQ1 = valuesOnly ? null : myBidiagonal.doGetLQ();
-        final DecompositionStore<N> tmpQ2 = valuesOnly ? null : myBidiagonal.doGetRQ();
+        DecompositionStore<N> tmpQ1 = valuesOnly ? null : myBidiagonal.doGetLQ();
+        DecompositionStore<N> tmpQ2 = valuesOnly ? null : myBidiagonal.doGetRQ();
 
-        final int size = tmpBidiagonal.getDimension();
+        int size = tmpBidiagonal.getDimension();
 
         if (s == null || s.length != size) {
             s = new double[size];
@@ -1004,11 +1004,11 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
         tmpBidiagonal.supplyMainDiagonalTo(s);
         tmpBidiagonal.supplySuperdiagonalTo(e);
 
-        final RotateRight q1RotR = tmpQ1 != null ? tmpQ1 : RotateRight.NULL;
-        final RotateRight q2RotR = tmpQ2 != null ? tmpQ2 : RotateRight.NULL;
-        final ExchangeColumns q1XchgCols = tmpQ1 != null ? tmpQ1 : ExchangeColumns.NULL;
-        final ExchangeColumns q2XchgCols = tmpQ2 != null ? tmpQ2 : ExchangeColumns.NULL;
-        final NegateColumn q2NegCol = tmpQ1 != null ? tmpQ2 : NegateColumn.NULL;
+        RotateRight q1RotR = tmpQ1 != null ? tmpQ1 : RotateRight.NULL;
+        RotateRight q2RotR = tmpQ2 != null ? tmpQ2 : RotateRight.NULL;
+        ExchangeColumns q1XchgCols = tmpQ1 != null ? tmpQ1 : ExchangeColumns.NULL;
+        ExchangeColumns q2XchgCols = tmpQ2 != null ? tmpQ2 : ExchangeColumns.NULL;
+        NegateColumn q2NegCol = tmpQ1 != null ? tmpQ2 : NegateColumn.NULL;
 
         DenseSingularValue.toDiagonal(s, e, q1RotR, q2RotR, q1XchgCols, q2XchgCols, q2NegCol);
 

@@ -266,6 +266,10 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
 
         super();
 
+        //        if ((!Double.isFinite(base) || !Double.isFinite(remainder))) {
+        //            BasicLogger.error("Invalid Quadruple: base={}, remainder={}", base, remainder);
+        //        }
+
         myBase = base;
         myRemainder = remainder;
     }
@@ -459,6 +463,15 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
     }
 
     @Override
+    public Quadruple normalised() {
+        if (this.sign() == -1) {
+            return NEG;
+        } else {
+            return ONE;
+        }
+    }
+
+    @Override
     public Quadruple power(final int power) {
 
         Quadruple retVal = ONE;
@@ -472,12 +485,10 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
 
     @Override
     public Quadruple signum() {
-        if (!Quadruple.isInfinite(this) && Quadruple.isSmall(PrimitiveMath.ONE, this)) {
+        if (this.isZero()) {
             return ZERO;
-        } else if (this.sign() == -1) {
-            return NEG;
         } else {
-            return ONE;
+            return this.normalised();
         }
     }
 

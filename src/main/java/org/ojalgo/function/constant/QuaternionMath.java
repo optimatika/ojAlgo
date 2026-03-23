@@ -161,7 +161,7 @@ public abstract class QuaternionMath {
         final double tmpK = PrimitiveMath.SCALE.invoke(arg.k, param);
         return Quaternion.of(tmpScalar, tmpI, tmpJ, tmpK);
     };
-    public static final QuaternionFunction.Unary SIGNUM = Quaternion::signum;
+    public static final QuaternionFunction.Unary SIGNUM = Quaternion::normalised;
     public static final QuaternionFunction.Unary SIN = arg -> QuaternionMath.SINH.invoke(arg.multiply(Quaternion.I)).multiply(Quaternion.I.negate());
     public static final QuaternionFunction.Unary SINH = arg -> EXP.invoke(arg).subtract(EXP.invoke(arg.negate())).divide(PrimitiveMath.TWO);
     public static final QuaternionFunction.Unary SQRT = arg -> ROOT.invoke(arg, 2);

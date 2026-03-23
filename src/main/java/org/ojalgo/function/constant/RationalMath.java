@@ -144,7 +144,7 @@ public abstract class RationalMath {
     public static final RationalFunction.Unary RINT = arg -> RationalNumber.valueOf(BigMath.RINT.invoke(arg.toBigDecimal()));
     public static final RationalFunction.Parameter ROOT = (arg, param) -> RationalNumber.valueOf(BigMath.ROOT.invoke(arg.toBigDecimal(), param));
     public static final RationalFunction.Parameter SCALE = (arg, param) -> RationalNumber.valueOf(BigMath.SCALE.invoke(arg.toBigDecimal(), param));
-    public static final RationalFunction.Unary SIGNUM = RationalNumber::signum;
+    public static final RationalFunction.Unary SIGNUM = RationalNumber::normalised;
     public static final RationalFunction.Unary SIN = arg -> RationalNumber.valueOf(BigMath.SIN.invoke(arg.toBigDecimal()));
     public static final RationalFunction.Unary SINH = arg -> EXP.invoke(arg).subtract(EXP.invoke(arg.negate())).divide(RationalNumber.TWO);
     public static final RationalFunction.Unary SQRT = arg -> RationalNumber.valueOf(BigMath.SQRT.invoke(arg.toBigDecimal()));

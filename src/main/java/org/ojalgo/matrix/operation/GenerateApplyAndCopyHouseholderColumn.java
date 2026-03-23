@@ -162,10 +162,9 @@ public abstract class GenerateApplyAndCopyHouseholderColumn implements MatrixOpe
             tmpNorm2 += tmpScale.norm() * tmpScale.norm();
             tmpNorm2 = PrimitiveMath.SQRT.invoke(tmpNorm2);
 
-            // data[row + tmpColBase] = ComplexNumber.makePolar(tmpNorm2 * tmpNormInf, tmpScale.phase());
-            data[row + col * structure] = tmpScale.signum().multiply(tmpNorm2 * tmpNormInf).get();
-            // tmpScale = tmpScale.subtract(ComplexNumber.makePolar(tmpNorm2, tmpScale.phase()));
-            tmpScale = tmpScale.subtract(tmpScale.signum().multiply(tmpNorm2)).get();
+            Scalar<N> tmpSignum = tmpScale.normalised();
+            data[row + col * structure] = tmpSignum.negate().multiply(tmpNorm2 * tmpNormInf).get();
+            tmpScale = tmpScale.add(tmpSignum.multiply(tmpNorm2)).get();
 
             tmpVector[row] = scalar.one().get();
 

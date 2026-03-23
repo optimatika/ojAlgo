@@ -203,6 +203,95 @@ public class FundamentalScalarTest extends ScalarTests {
         this.assertEqual(tmpExp, tmpBig, tmpComplex, tmpPrimitive, tmpQuaternion, tmpRational);
     }
 
+    /**
+     * Verify that normalised() always returns unit norm (1.0), including for zero input.
+     */
+    @Test
+    public void testNormalisedUnitNorm() {
+
+        TestUtils.assertEquals("Big +", 1.0, big1.normalised().norm(), CONTEXT);
+        TestUtils.assertEquals("Complex +", 1.0, complex1.normalised().norm(), CONTEXT);
+        TestUtils.assertEquals("Primitive +", 1.0, primitive1.normalised().norm(), CONTEXT);
+        TestUtils.assertEquals("Quaternion +", 1.0, quaternion1.normalised().norm(), CONTEXT);
+        TestUtils.assertEquals("Rational +", 1.0, rational1.normalised().norm(), CONTEXT);
+
+        TestUtils.assertEquals("Big zero", 1.0, BigScalar.ZERO.normalised().norm(), CONTEXT);
+        TestUtils.assertEquals("Complex zero", 1.0, ComplexNumber.ZERO.normalised().norm(), CONTEXT);
+        TestUtils.assertEquals("Primitive zero", 1.0, PrimitiveScalar.ZERO.normalised().norm(), CONTEXT);
+        TestUtils.assertEquals("Quaternion zero", 1.0, Quaternion.ZERO.normalised().norm(), CONTEXT);
+        TestUtils.assertEquals("Rational zero", 1.0, RationalNumber.ZERO.normalised().norm(), CONTEXT);
+        TestUtils.assertEquals("Quadruple zero", 1.0, Quadruple.ZERO.normalised().norm(), CONTEXT);
+
+        TestUtils.assertEquals("Big neg", 1.0, big1.negate().normalised().norm(), CONTEXT);
+        TestUtils.assertEquals("Complex neg", 1.0, complex1.negate().normalised().norm(), CONTEXT);
+        TestUtils.assertEquals("Primitive neg", 1.0, primitive1.negate().normalised().norm(), CONTEXT);
+        TestUtils.assertEquals("Quaternion neg", 1.0, quaternion1.negate().normalised().norm(), CONTEXT);
+        TestUtils.assertEquals("Rational neg", 1.0, rational1.negate().normalised().norm(), CONTEXT);
+    }
+
+    /**
+     * Verify the NormedVectorSpace contract: this == this.normalised().multiply(this.norm())
+     */
+    @Test
+    public void testNormalisedTimesNorm() {
+
+        double norm1 = big1.norm();
+        TestUtils.assertEquals("Big", value1, big1.normalised().multiply(norm1).doubleValue(), CONTEXT);
+        TestUtils.assertEquals("Complex", value1, complex1.normalised().multiply(norm1).doubleValue(), CONTEXT);
+        TestUtils.assertEquals("Primitive", value1, primitive1.normalised().multiply(norm1).doubleValue(), CONTEXT);
+        TestUtils.assertEquals("Quaternion", value1, quaternion1.normalised().multiply(norm1).doubleValue(), CONTEXT);
+        TestUtils.assertEquals("Rational", value1, rational1.normalised().multiply(norm1).doubleValue(), CONTEXT);
+    }
+
+    /**
+     * Verify that signum() returns zero for zero input and unit norm otherwise,
+     * mimicking the behaviour of {@link Math#signum(double)}.
+     */
+    @Test
+    public void testSignum() {
+
+        TestUtils.assertEquals("Big +", 1.0, big1.signum().norm(), CONTEXT);
+        TestUtils.assertEquals("Complex +", 1.0, complex1.signum().norm(), CONTEXT);
+        TestUtils.assertEquals("Primitive +", 1.0, primitive1.signum().norm(), CONTEXT);
+        TestUtils.assertEquals("Quaternion +", 1.0, quaternion1.signum().norm(), CONTEXT);
+        TestUtils.assertEquals("Rational +", 1.0, rational1.signum().norm(), CONTEXT);
+
+        TestUtils.assertTrue("Big zero", BigScalar.ZERO.signum().isZero());
+        TestUtils.assertTrue("Complex zero", ComplexNumber.ZERO.signum().isZero());
+        TestUtils.assertTrue("Primitive zero", PrimitiveScalar.ZERO.signum().isZero());
+        TestUtils.assertTrue("Quaternion zero", Quaternion.ZERO.signum().isZero());
+        TestUtils.assertTrue("Rational zero", RationalNumber.ZERO.signum().isZero());
+        TestUtils.assertTrue("Quadruple zero", Quadruple.ZERO.signum().isZero());
+    }
+
+    /**
+     * Verify normalised() for Quadruple specifically, including small and zero values.
+     */
+    @Test
+    public void testNormalisedQuadruple() {
+
+        Quadruple positive = Quadruple.valueOf(3.14);
+        Quadruple negative = Quadruple.valueOf(-2.72);
+        Quadruple small = Quadruple.valueOf(1E-300);
+        Quadruple negSmall = Quadruple.valueOf(-1E-300);
+
+        TestUtils.assertEquals("positive", 1.0, positive.normalised().norm(), CONTEXT);
+        TestUtils.assertEquals("negative", 1.0, negative.normalised().norm(), CONTEXT);
+        TestUtils.assertEquals("zero", 1.0, Quadruple.ZERO.normalised().norm(), CONTEXT);
+        TestUtils.assertEquals("small", 1.0, small.normalised().norm(), CONTEXT);
+        TestUtils.assertEquals("negSmall", 1.0, negSmall.normalised().norm(), CONTEXT);
+
+        TestUtils.assertTrue("positive direction", positive.normalised().doubleValue() > 0.0);
+        TestUtils.assertTrue("negative direction", negative.normalised().doubleValue() < 0.0);
+        TestUtils.assertTrue("zero direction", Quadruple.ZERO.normalised().doubleValue() > 0.0);
+        TestUtils.assertTrue("small direction", small.normalised().doubleValue() > 0.0);
+        TestUtils.assertTrue("negSmall direction", negSmall.normalised().doubleValue() < 0.0);
+
+        TestUtils.assertTrue("positive signum", positive.signum().doubleValue() > 0.0);
+        TestUtils.assertTrue("negative signum", negative.signum().doubleValue() < 0.0);
+        TestUtils.assertTrue("zero signum", Quadruple.ZERO.signum().isZero());
+    }
+
     private void assertEqual(final double expected, final BigScalar big, final ComplexNumber complex, final PrimitiveScalar primitive,
             final Quaternion quaternion, final RationalNumber rational) {
         TestUtils.assertEquals("Big", expected, big.doubleValue(), CONTEXT);

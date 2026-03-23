@@ -42,12 +42,31 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Major internal refactoring of dense decompositions (`DenseCholesky`, `DenseLDL`, `DenseLU`, `DenseQR`, `DenseSingularValue`) and raw decompositions (`RawLU`, `RawQR`, `RawSingularValue`, `RawCholesky`, `RawEigenvalue`) to use the new factor-based infrastructure.
 - Reworked `SparseLU` and `SparseQDLDL` for better performance and integration with `InvertibleFactor`.
+- Refined `MatrixStore.norm()` calculation and added a default `normalised()` implementation.
+
+#### org.ojalgo.algebra
+
+- Renamed `NormedVectorSpace.signum()` to `normalised()`. The old `signum()` method is retained as a deprecated default that delegates to `normalised()`.
+
+#### org.ojalgo.scalar
+
+- The new method `Scalar.normalised()` behaves the way `Scalar.signum()` used to (always return something of unit magnitude) and `Scalar.signum()` has been redefined to mirror `Math.signum`/`BigDecimal.signum` behaviour (returns zero for zero input). All scalar implementations updated accordingly. 
 
 ### Fixed
 
 #### org.ojalgo.scalar
 
 - Improved `Quadruple` division accuracy.
+
+#### org.ojalgo.matrix
+
+- Fixed potential infinite loop in `DenseSingularValue` decomposition for certain matrices (GitHub [#661](https://github.com/optimatika/ojAlgo/issues/661)). The problem was with the Householder transformations and related to the `Scalar.normalised()`/`Scalar.signum()` changes.
+
+### Deprecated
+
+#### org.ojalgo.algebra
+
+- `NormedVectorSpace.signum()` – use `normalised()` instead (scheduled for removal in v57).
 
 ### Removed
 

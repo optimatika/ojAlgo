@@ -72,14 +72,14 @@ abstract class DenseBidiagonal<N extends Comparable<N>> extends InPlaceDecomposi
                 for (int i = 0; i < tmpLimit; i++) {
 
                     if (!tmpMainDiagonal.get(i).isReal()) {
-                        ComplexNumber tmpSignum = tmpMainDiagonal.get(i).signum();
+                        ComplexNumber tmpSignum = tmpMainDiagonal.get(i).normalised();
                         tmpMainDiagonal.set(i, tmpMainDiagonal.get(i).divide(tmpSignum));
                         tmpSuperdiagonal.set(i, tmpSuperdiagonal.get(i).divide(tmpSignum));
                         tmpInitDiagQ1.set(i, tmpSignum);
                     }
 
                     if (!tmpSuperdiagonal.get(i).isReal()) {
-                        ComplexNumber tmpSignum = tmpSuperdiagonal.get(i).signum();
+                        ComplexNumber tmpSignum = tmpSuperdiagonal.get(i).normalised();
                         tmpSuperdiagonal.set(i, tmpSuperdiagonal.get(i).divide(tmpSignum));
                         tmpMainDiagonal.set(i + 1, tmpMainDiagonal.get(i + 1).divide(tmpSignum));
                         tmpInitDiagQ2.set(i + 1, tmpSignum.conjugate());
@@ -87,7 +87,7 @@ abstract class DenseBidiagonal<N extends Comparable<N>> extends InPlaceDecomposi
                 }
 
                 if (!tmpMainDiagonal.get(tmpLimit).isReal()) {
-                    ComplexNumber tmpSignum = tmpMainDiagonal.get(tmpLimit).signum();
+                    ComplexNumber tmpSignum = tmpMainDiagonal.get(tmpLimit).normalised();
                     tmpMainDiagonal.set(tmpLimit, tmpMainDiagonal.get(tmpLimit).divide(tmpSignum));
                     tmpInitDiagQ1.set(tmpLimit, tmpSignum);
                 }
@@ -101,14 +101,14 @@ abstract class DenseBidiagonal<N extends Comparable<N>> extends InPlaceDecomposi
                 for (int i = 0; i < tmpLimit; i++) {
 
                     if (!tmpMainDiagonal.get(i).isReal()) {
-                        ComplexNumber tmpSignum = tmpMainDiagonal.get(i).signum();
+                        ComplexNumber tmpSignum = tmpMainDiagonal.get(i).normalised();
                         tmpMainDiagonal.set(i, tmpMainDiagonal.get(i).divide(tmpSignum));
                         tmpSubdiagonal.set(i, tmpSubdiagonal.get(i).divide(tmpSignum));
                         tmpInitDiagQ2.set(i, tmpSignum.conjugate());
                     }
 
                     if (!tmpSubdiagonal.get(i).isReal()) {
-                        ComplexNumber tmpSignum = tmpSubdiagonal.get(i).signum();
+                        ComplexNumber tmpSignum = tmpSubdiagonal.get(i).normalised();
                         tmpSubdiagonal.set(i, tmpSubdiagonal.get(i).divide(tmpSignum));
                         tmpMainDiagonal.set(i + 1, tmpMainDiagonal.get(i + 1).divide(tmpSignum));
                         tmpInitDiagQ1.set(i + 1, tmpSignum);
@@ -116,7 +116,7 @@ abstract class DenseBidiagonal<N extends Comparable<N>> extends InPlaceDecomposi
                 }
 
                 if (!tmpMainDiagonal.get(tmpLimit).isReal()) {
-                    ComplexNumber tmpSignum = tmpMainDiagonal.get(tmpLimit).signum();
+                    ComplexNumber tmpSignum = tmpMainDiagonal.get(tmpLimit).normalised();
                     tmpMainDiagonal.set(tmpLimit, tmpMainDiagonal.get(tmpLimit).divide(tmpSignum));
                     tmpInitDiagQ2.set(tmpLimit, tmpSignum.conjugate());
                 }

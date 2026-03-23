@@ -60,7 +60,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends DenseTridiag
             ComplexNumber tmpVal = null;
             for (int i = 0; i < tmpSubdiagonal.count(); i++) {
 
-                tmpVal = tmpSubdiagonal.get(i).signum();
+                tmpVal = tmpSubdiagonal.get(i).normalised();
 
                 if (!tmpVal.isReal()) {
 
@@ -97,7 +97,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends DenseTridiag
             Quaternion tmpVal = null;
             for (int i = 0; i < tmpSubdiagonal.count(); i++) {
 
-                tmpVal = tmpSubdiagonal.get(i).signum();
+                tmpVal = tmpSubdiagonal.get(i).normalised();
 
                 if (!tmpVal.isReal()) {
 

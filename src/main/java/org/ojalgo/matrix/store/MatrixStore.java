@@ -486,10 +486,21 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
 
         if (this.isVector()) {
             return frobeniusNorm;
+        } else {
+            // Bringing it closer to what the operator norm would be
+            // In case of representing a ComplexNumber or Quaternion as a matrix this will match their norms
+            return frobeniusNorm / Math.sqrt(this.getMinDim());
         }
-        // Bringing it closer to what the operator norm would be
-        // In case of representing a ComplexNumber or Quaternion as a matrix this will match their norms
-        return frobeniusNorm / PrimitiveMath.SQRT.invoke((double) Math.min(this.countRows(), this.countColumns()));
+    }
+
+    @Override
+    default MatrixStore<N> normalised() {
+        double norm = this.norm();
+        if (norm == PrimitiveMath.ZERO) {
+            return this;
+        } else {
+            return this.multiply(PrimitiveMath.ONE / norm);
+        }
     }
 
     @Override
@@ -664,11 +675,6 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     @Override
     default MatrixStore<N> select(final long[] rows, final long[] columns) {
         return this.select(Structure1D.toIntIndexes(rows), Structure1D.toIntIndexes(columns));
-    }
-
-    @Override
-    default MatrixStore<N> signum() {
-        return this.multiply(PrimitiveMath.ONE / this.norm());
     }
 
     @Override
