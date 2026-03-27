@@ -144,9 +144,8 @@ public interface Structure2D extends Structure1D {
         }
 
         /**
-         * A selection (re-ordering) of columns. Note that it's ok to reference the same base column more than
-         * once, and any negative column reference/index will translate to a column of zeros. The number of
-         * columns in the resulting matrix is the same as the number of elements in the columns index array.
+         * A selection (re-ordering) of columns. It's ok to reference the same base column more than once. The
+         * number of columns in the resulting matrix equals the length of the columns index array.
          */
         B columns(int... columns);
 
@@ -220,9 +219,8 @@ public interface Structure2D extends Structure1D {
         }
 
         /**
-         * A selection (re-ordering) of rows. Note that it's ok to reference the same base row more than once,
-         * and any negative row reference/index will translate to a row of zeros. The number of rows in the
-         * resulting matrix is the same as the number of elements in the rows index array.
+         * A selection (re-ordering) of rows. It's ok to reference the same base row more than once. The
+         * number of rows in the resulting matrix equals the length of the rows index array.
          */
         B rows(final int... rows);
 
@@ -561,7 +559,7 @@ public interface Structure2D extends Structure1D {
 
     /**
      * Only need to implement if the structure may contain more than Integer.MAX_VALUE elements.
-     * 
+     *
      * @return The number of columns
      */
     default long countColumns() {
@@ -570,7 +568,7 @@ public interface Structure2D extends Structure1D {
 
     /**
      * Only need to implement if the structure may contain more than Integer.MAX_VALUE elements.
-     * 
+     *
      * @return The number of rows
      */
     default long countRows() {

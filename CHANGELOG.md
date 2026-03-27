@@ -40,12 +40,16 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - Cleaned up the `UpdatableSolver` interface – everything is now optional with default implementations that do nothing. All the quirky stuff is moved to `ExpressionsBasedModel.EntityMap`. This also required `ConstraintsMetaData` to be somewhat refactored, and the `Optimisation.ConstraintType` enum gained another instance `RANGE`.
 - Deprecated `Constraint.isLowerConstraint()` and `Constraint.isUpperConstraint()` in favour of `Constraint.getConstraintType()`.
 - `LinearSolver.Builder` now auto-selects the revised simplex (dual) solver when variable bounds have been modified; tableau (primal) remains the default for unchanged bounds. An explicit `Configuration` override still takes precedence.
+- `RevisedStore.updateDualsAndReducedCosts()` rewritten to use raw `double[]` operations instead of logical row/column selections, avoiding intermediate store allocations on every simplex iteration.
 
 #### org.ojalgo.matrix
 
 - Major internal refactoring of dense decompositions (`DenseCholesky`, `DenseLDL`, `DenseLU`, `DenseQR`, `DenseSingularValue`) and raw decompositions (`RawLU`, `RawQR`, `RawSingularValue`, `RawCholesky`, `RawEigenvalue`) to use the new factor-based infrastructure.
 - Reworked `SparseLU` and `SparseQDLDL` for better performance and integration with `InvertibleFactor`.
 - Refined `MatrixStore.norm()` calculation and added a default `normalised()` implementation.
+- `LogicalStore` hierarchy: exposed `base` as a direct field reference, eliminating the `base()` accessor call in all logical store subclasses. `ColumnsStore` and `RowsStore` simplified — removed the negative-index-as-zeros indirection and opened for subclassing.
+- New `ColumnsSupplier.Selection` and `RowsSupplier.Selection` inner classes that provide sparse-aware `supplyTo` and `sliceColumn`/`sliceRow` implementations, iterating nonzeros directly instead of delegating to the dense path.
+- The `columns(int...)` and `rows(int...)` contracts no longer accept negative indices as "zero row/column" placeholders.
 
 #### org.ojalgo.algebra
 

@@ -27,21 +27,21 @@ final class UnaryOperatoStore<N extends Comparable<N>> extends LogicalStore<N> {
 
     private final UnaryFunction<N> myOperator;
 
-    UnaryOperatoStore(final MatrixStore<N> base, final UnaryFunction<N> operator) {
+    UnaryOperatoStore(final MatrixStore<N> target, final UnaryFunction<N> operator) {
 
-        super(base, base.countRows(), base.countColumns());
+        super(target, target.countRows(), target.countColumns());
 
         myOperator = operator;
     }
 
     @Override
     public double doubleValue(final int row, final int col) {
-        return myOperator.invoke(this.base().doubleValue(row, col));
+        return myOperator.invoke(base.doubleValue(row, col));
     }
 
     @Override
     public N get(final int row, final int col) {
-        return myOperator.invoke(this.base().get(row, col));
+        return myOperator.invoke(base.get(row, col));
     }
 
 }

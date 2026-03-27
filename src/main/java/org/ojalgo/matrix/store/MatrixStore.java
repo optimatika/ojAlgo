@@ -210,9 +210,8 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     }
 
     /**
-     * A selection (re-ordering) of columns. Note that it's ok to reference the same base column more than
-     * once, and any negative column reference/index will translate to a column of zeros. The number of
-     * columns in the resulting matrix is the same as the number of elements in the columns index array.
+     * A selection (re-ordering) of columns. It's ok to reference the same base column more than once. The
+     * number of columns in the resulting matrix equals the length of the columns index array.
      */
     @Override
     default MatrixStore<N> columns(final int... columns) {
@@ -642,9 +641,8 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     }
 
     /**
-     * A selection (re-ordering) of rows. Note that it's ok to reference the same base row more than once, and
-     * any negative row reference/index will translate to a row of zeros. The number of rows in the resulting
-     * matrix is the same as the number of elements in the rows index array.
+     * A selection (re-ordering) of rows. It's ok to reference the same base row more than once. The number of
+     * rows in the resulting matrix equals the length of the rows index array.
      */
     @Override
     default MatrixStore<N> rows(final int... rows) {

@@ -28,26 +28,26 @@ final class RepeatedRowsStore<N extends Comparable<N>> extends ComposingStore<N>
     private final long myBaseRows;
     private final int myRepetitions;
 
-    RepeatedRowsStore(final MatrixStore<N> base, final int repetitions) {
-        super(base, base.countRows() * repetitions, base.countColumns());
+    RepeatedRowsStore(final MatrixStore<N> target, final int repetitions) {
+        super(target, target.countRows() * repetitions, target.countColumns());
         myRepetitions = repetitions;
-        myBaseRows = base.countRows();
+        myBaseRows = target.countRows();
     }
 
     @Override
     public double doubleValue(final int row, final int col) {
-        return this.base().doubleValue(row % myBaseRows, col);
+        return base.doubleValue(row % myBaseRows, col);
     }
 
     @Override
     public N get(final int row, final int col) {
-        return this.base().get(row % myBaseRows, col);
+        return base.get(row % myBaseRows, col);
     }
 
     @Override
     public void supplyTo(final TransformableRegion<N> receiver) {
         for (long br = 0L; br < myBaseRows; br++) {
-            Access1D<N> row = this.base().sliceRow(br);
+            Access1D<N> row = base.sliceRow(br);
             for (long r = 0L; r < myRepetitions; r++) {
                 receiver.fillRow(br + myBaseRows * r, row);
             }

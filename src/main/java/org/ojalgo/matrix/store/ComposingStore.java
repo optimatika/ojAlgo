@@ -23,12 +23,12 @@ package org.ojalgo.matrix.store;
 
 abstract class ComposingStore<N extends Comparable<N>> extends LogicalStore<N> {
 
-    protected ComposingStore(final MatrixStore<N> base, final int rowsCount, final int columnsCount) {
-        super(base, rowsCount, columnsCount);
+    ComposingStore(final MatrixStore<N> target, final int rowsCount, final int columnsCount) {
+        super(target, rowsCount, columnsCount);
     }
 
-    protected ComposingStore(final MatrixStore<N> base, final long rowsCount, final long columnsCount) {
-        super(base, rowsCount, columnsCount);
+    ComposingStore(final MatrixStore<N> target, final long rowsCount, final long columnsCount) {
+        super(target, rowsCount, columnsCount);
     }
 
 }

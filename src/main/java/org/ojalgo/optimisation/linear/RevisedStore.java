@@ -193,10 +193,17 @@ final class RevisedStore extends SimplexStore {
 
     private void updateDualsAndReducedCosts() {
         R064Store objective = myPhase1Objective != null ? myPhase1Objective : myObjective;
-        objective.rows(included).supplyTo(l);
+        double[] objData = objective.data;
+        for (int ji = 0; ji < included.length; ji++) {
+            l.data[ji] = objData[included[ji]];
+        }
         myInvBasis.btran(l.data);
         this.doExclTranspMult(l.data, r);
-        d.fillMatching(objective.rows(excluded), SUBTRACT, r);
+        double[] dData = d.data;
+        double[] rData = r.data;
+        for (int je = 0; je < excluded.length; je++) {
+            dData[je] = objData[excluded[je]] - rData[je];
+        }
     }
 
     @Override

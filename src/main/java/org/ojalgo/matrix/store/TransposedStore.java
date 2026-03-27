@@ -34,17 +34,17 @@ final class TransposedStore<N extends Comparable<N>> extends TransjugatedStore<N
 
     @Override
     public N aggregateColumn(final long col, final Aggregator aggregator) {
-        return this.base().aggregateRow(col, aggregator);
+        return base.aggregateRow(col, aggregator);
     }
 
     @Override
     public N aggregateRow(final long row, final Aggregator aggregator) {
-        return this.base().aggregateColumn(row, aggregator);
+        return base.aggregateColumn(row, aggregator);
     }
 
     @Override
     public N get(final int aRow, final int aCol) {
-        return this.base().get(aCol, aRow);
+        return base.get(aCol, aRow);
     }
 
     @Override
@@ -54,7 +54,7 @@ final class TransposedStore<N extends Comparable<N>> extends TransjugatedStore<N
 
         if (right instanceof TransposedStore<?>) {
 
-            retVal = ((TransposedStore<N>) right).getOriginal().multiply(this.base());
+            retVal = ((TransposedStore<N>) right).getOriginal().multiply(base);
 
             retVal = new TransposedStore<>(retVal);
 
@@ -68,37 +68,37 @@ final class TransposedStore<N extends Comparable<N>> extends TransjugatedStore<N
 
     @Override
     public Access1D<N> sliceColumn(final long col) {
-        return this.base().sliceRow(col);
+        return base.sliceRow(col);
     }
 
     @Override
     public Access1D<N> sliceRow(final long row) {
-        return this.base().sliceColumn(row);
+        return base.sliceColumn(row);
     }
 
     @Override
     public void supplyTo(final TransformableRegion<N> receiver) {
-        this.base().supplyTo(receiver.regionByTransposing());
+        base.supplyTo(receiver.regionByTransposing());
     }
 
     @Override
     public Scalar<N> toScalar(final int row, final int col) {
-        return this.base().toScalar(col, row);
+        return base.toScalar(col, row);
     }
 
     @Override
     public MatrixStore<N> transpose() {
-        return this.base();
+        return base;
     }
 
     @Override
     public void visitColumn(final long col, final VoidFunction<N> visitor) {
-        this.base().visitRow(col, visitor);
+        base.visitRow(col, visitor);
     }
 
     @Override
     public void visitRow(final long row, final VoidFunction<N> visitor) {
-        this.base().visitColumn(row, visitor);
+        base.visitColumn(row, visitor);
     }
 
 }

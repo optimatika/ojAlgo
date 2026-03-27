@@ -37,9 +37,9 @@ final class SuperimposedStore<N extends Comparable<N>> extends ComposingStore<N>
     private final int myRowFirst;
     private final int myRowLimit;
 
-    SuperimposedStore(final MatrixStore<N> base, final long row, final long col, final MatrixStore<N> diff) {
+    SuperimposedStore(final MatrixStore<N> target, final long row, final long col, final MatrixStore<N> diff) {
 
-        super(base, base.countRows(), base.countColumns());
+        super(target, target.countRows(), target.countColumns());
 
         myRowFirst = Math.toIntExact(row);
         myColFirst = Math.toIntExact(col);
@@ -63,7 +63,7 @@ final class SuperimposedStore<N extends Comparable<N>> extends ComposingStore<N>
     @Override
     public double doubleValue(final int row, final int col) {
 
-        double retVal = this.base().doubleValue(row, col);
+        double retVal = base.doubleValue(row, col);
 
         if (this.isCovered(row, col)) {
             retVal += myDiff.doubleValue(row - myRowFirst, col - myColFirst);
@@ -75,7 +75,7 @@ final class SuperimposedStore<N extends Comparable<N>> extends ComposingStore<N>
     @Override
     public N get(final int row, final int col) {
 
-        N retVal = this.base().get(row, col);
+        N retVal = base.get(row, col);
 
         if (this.isCovered(row, col)) {
             retVal = myDiff.toScalar(row - myRowFirst, col - myColFirst).add(retVal).get();
@@ -122,14 +122,14 @@ final class SuperimposedStore<N extends Comparable<N>> extends ComposingStore<N>
 
     @Override
     public void supplyTo(final TransformableRegion<N> consumer) {
-        consumer.fillMatching(this.base());
+        consumer.fillMatching(base);
         consumer.regionByLimits(myRowLimit, myColLimit).regionByOffsets(myRowFirst, myColFirst).modifyMatching(this.physical().function().add(), myDiff);
     }
 
     @Override
     public Scalar<N> toScalar(final int row, final int col) {
 
-        Scalar<N> retVal = this.base().toScalar(row, col);
+        Scalar<N> retVal = base.toScalar(row, col);
 
         if (this.isCovered(row, col)) {
             retVal = retVal.add(myDiff.get(row - myRowFirst, col - myColFirst));

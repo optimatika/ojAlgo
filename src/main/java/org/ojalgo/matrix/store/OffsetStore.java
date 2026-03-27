@@ -33,9 +33,9 @@ final class OffsetStore<N extends Comparable<N>> extends SelectingStore<N> {
         myColumnOffset = columnOffset;
     }
 
-    OffsetStore(final MatrixStore<N> base, final long rowOffset, final long columnOffset) {
+    OffsetStore(final MatrixStore<N> target, final long rowOffset, final long columnOffset) {
 
-        super(base, base.countRows() - rowOffset, base.countColumns() - columnOffset);
+        super(target, target.countRows() - rowOffset, target.countColumns() - columnOffset);
 
         myRowOffset = Math.toIntExact(rowOffset);
         myColumnOffset = Math.toIntExact(columnOffset);
@@ -43,32 +43,32 @@ final class OffsetStore<N extends Comparable<N>> extends SelectingStore<N> {
 
     @Override
     public double doubleValue(final int row, final int col) {
-        return this.base().doubleValue(myRowOffset + row, myColumnOffset + col);
+        return base.doubleValue(myRowOffset + row, myColumnOffset + col);
     }
 
     @Override
     public int firstInColumn(final int col) {
-        return Math.max(this.base().firstInColumn(col) - myRowOffset, 0);
+        return Math.max(base.firstInColumn(col) - myRowOffset, 0);
     }
 
     @Override
     public int firstInRow(final int row) {
-        return Math.max(this.base().firstInRow(row) - myColumnOffset, 0);
+        return Math.max(base.firstInRow(row) - myColumnOffset, 0);
     }
 
     @Override
     public N get(final int row, final int col) {
-        return this.base().get(myRowOffset + row, myColumnOffset + col);
+        return base.get(myRowOffset + row, myColumnOffset + col);
     }
 
     @Override
     public int limitOfColumn(final int col) {
-        return Math.min(this.base().limitOfColumn(col) - myRowOffset, this.getRowDim());
+        return Math.min(base.limitOfColumn(col) - myRowOffset, this.getRowDim());
     }
 
     @Override
     public int limitOfRow(final int row) {
-        return Math.min(this.base().limitOfRow(row) - myColumnOffset, this.getColDim());
+        return Math.min(base.limitOfRow(row) - myColumnOffset, this.getColDim());
     }
 
 }

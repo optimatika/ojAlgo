@@ -125,12 +125,12 @@ abstract class AbstractStore<N extends Comparable<N>> implements MatrixStore<N> 
     }
 
     @Override
-    public long countColumns() {
+    public final long countColumns() {
         return myColDim;
     }
 
     @Override
-    public long countRows() {
+    public final long countRows() {
         return myRowDim;
     }
 
@@ -142,7 +142,7 @@ abstract class AbstractStore<N extends Comparable<N>> implements MatrixStore<N> 
         if (!(obj instanceof AbstractStore)) {
             return false;
         }
-        AbstractStore other = (AbstractStore) obj;
+        AbstractStore<?> other = (AbstractStore<?>) obj;
         if (myColDim != other.myColDim) {
             return false;
         }
@@ -185,8 +185,7 @@ abstract class AbstractStore<N extends Comparable<N>> implements MatrixStore<N> 
         int result = 1;
         result = prime * result + myColDim;
         result = prime * result + (myComponentType == null ? 0 : myComponentType.hashCode());
-        result = prime * result + myRowDim;
-        return result;
+        return prime * result + myRowDim;
     }
 
     @Override
@@ -212,8 +211,10 @@ abstract class AbstractStore<N extends Comparable<N>> implements MatrixStore<N> 
 
             return tmpStep2.get(0L);
 
+        } else {
+
+            return MatrixStore.super.multiplyBoth(leftAndRight);
         }
-        return MatrixStore.super.multiplyBoth(leftAndRight);
     }
 
     @Override

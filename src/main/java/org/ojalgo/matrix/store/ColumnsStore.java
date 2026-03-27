@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -29,86 +28,47 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-final class ColumnsStore<N extends Comparable<N>> extends SelectingStore<N> {
+class ColumnsStore<N extends Comparable<N>> extends SelectingStore<N> {
 
-    private final int[] myColumns;
+    final int[] columns;
 
-    ColumnsStore(final MatrixStore<N> base, final int[] columns) {
+    ColumnsStore(final MatrixStore<N> target, final int[] selection) {
 
-        super(base, (int) base.countRows(), columns.length);
+        super(target, target.getRowDim(), selection.length);
 
-        myColumns = columns;
+        columns = selection;
     }
 
     @Override
     public double doubleValue(final int row, final int col) {
-        int colIndex = this.toBaseIndex(col);
-        if (colIndex >= 0) {
-            return this.base().doubleValue(row, colIndex);
-        } else {
-            return PrimitiveMath.ZERO;
-        }
+        return base.doubleValue(row, columns[col]);
     }
 
     @Override
     public int firstInColumn(final int col) {
-        int colIndex = this.toBaseIndex(col);
-        if (colIndex >= 0) {
-            return this.base().firstInColumn(colIndex);
-        } else {
-            return this.getRowDim();
-        }
+        return base.firstInColumn(columns[col]);
     }
 
     @Override
     public N get(final int row, final int col) {
-        int colIndex = this.toBaseIndex(col);
-        if (colIndex >= 0) {
-            return this.base().get(row, colIndex);
-        } else {
-            return this.zero().get();
-        }
+        return base.get(row, columns[col]);
     }
 
     @Override
     public int limitOfColumn(final int col) {
-        int colIndex = this.toBaseIndex(col);
-        if (colIndex >= 0) {
-            return this.base().limitOfColumn(colIndex);
-        } else {
-            return 0;
-        }
+        return base.limitOfColumn(columns[col]);
     }
 
     @Override
     public void supplyTo(final TransformableRegion<N> consumer) {
-        final MatrixStore<N> base = this.base();
-        for (int j = 0; j < myColumns.length; j++) {
-            int colIndex = this.toBaseIndex(j);
-            if (colIndex >= 0) {
-                consumer.fillColumn(j, base.sliceColumn(colIndex));
-            } else {
-                consumer.fillColumn(j, this.zero().get());
-            }
+        for (int j = 0, limit = columns.length; j < limit; j++) {
+            consumer.fillColumn(j, base.sliceColumn(columns[j]));
         }
     }
 
     @Override
     public Scalar<N> toScalar(final int row, final int col) {
-        int colIndex = this.toBaseIndex(col);
-        if (colIndex >= 0) {
-            return this.base().toScalar(row, colIndex);
-        } else {
-            return this.zero();
-        }
-    }
-
-    private int toBaseIndex(final int col) {
-        return myColumns[col];
-    }
-
-    private int toBaseIndex(final long col) {
-        return myColumns[Math.toIntExact(col)];
+        return base.toScalar(row, columns[col]);
     }
 
 }

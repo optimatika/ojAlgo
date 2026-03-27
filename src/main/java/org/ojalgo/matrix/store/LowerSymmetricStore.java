@@ -27,17 +27,17 @@ final class LowerSymmetricStore<N extends Comparable<N>> extends ShadingStore<N>
 
     private final boolean myHermitian;
 
-    LowerSymmetricStore(final MatrixStore<N> base, final boolean hermitian) {
-        super(base);
+    LowerSymmetricStore(final MatrixStore<N> target, final boolean hermitian) {
+        super(target);
         myHermitian = hermitian;
     }
 
     @Override
     public double doubleValue(final int row, final int col) {
         if (row < col) {
-            return this.base().doubleValue(col, row);
+            return base.doubleValue(col, row);
         }
-        return this.base().doubleValue(row, col);
+        return base.doubleValue(row, col);
     }
 
     @Override
@@ -46,21 +46,21 @@ final class LowerSymmetricStore<N extends Comparable<N>> extends ShadingStore<N>
             return this.toScalar(row, col).get();
         }
         if (row < col) {
-            return this.base().get(col, row);
+            return base.get(col, row);
         } else {
-            return this.base().get(row, col);
+            return base.get(row, col);
         }
     }
 
     @Override
     public Scalar<N> toScalar(final int row, final int col) {
         if (row >= col) {
-            return this.base().toScalar(row, col);
+            return base.toScalar(row, col);
         }
         if (myHermitian) {
-            return this.base().toScalar(col, row).conjugate();
+            return base.toScalar(col, row).conjugate();
         } else {
-            return this.base().toScalar(col, row);
+            return base.toScalar(col, row);
         }
     }
 

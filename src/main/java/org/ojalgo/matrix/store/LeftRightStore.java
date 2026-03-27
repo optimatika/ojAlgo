@@ -39,14 +39,14 @@ final class LeftRightStore<N extends Comparable<N>> extends ComposingStore<N> {
     private final MatrixStore<N> myRight;
     private final int mySplit;
 
-    LeftRightStore(final MatrixStore<N> base, final MatrixStore<N> right) {
+    LeftRightStore(final MatrixStore<N> left, final MatrixStore<N> right) {
 
-        super(base, base.countRows(), base.countColumns() + right.countColumns());
+        super(left, left.countRows(), left.countColumns() + right.countColumns());
 
         myRight = right;
-        mySplit = Math.toIntExact(base.countColumns());
+        mySplit = Math.toIntExact(left.countColumns());
 
-        if (base.countRows() != right.countRows()) {
+        if (left.countRows() != right.countRows()) {
             throw new IllegalArgumentException();
         }
     }
@@ -56,34 +56,34 @@ final class LeftRightStore<N extends Comparable<N>> extends ComposingStore<N> {
      */
     @Override
     public double doubleValue(final int row, final int col) {
-        return col >= mySplit ? myRight.doubleValue(row, col - mySplit) : this.base().doubleValue(row, col);
+        return col >= mySplit ? myRight.doubleValue(row, col - mySplit) : base.doubleValue(row, col);
     }
 
     @Override
     public int firstInColumn(final int col) {
-        return col < mySplit ? this.base().firstInColumn(col) : myRight.firstInColumn(col - mySplit);
+        return col < mySplit ? base.firstInColumn(col) : myRight.firstInColumn(col - mySplit);
     }
 
     @Override
     public int firstInRow(final int row) {
-        final int baseFirst = this.base().firstInRow(row);
+        final int baseFirst = base.firstInRow(row);
         return baseFirst < mySplit ? baseFirst : mySplit + myRight.firstInRow(row);
     }
 
     @Override
     public N get(final int row, final int col) {
-        return col >= mySplit ? myRight.get(row, col - mySplit) : this.base().get(row, col);
+        return col >= mySplit ? myRight.get(row, col - mySplit) : base.get(row, col);
     }
 
     @Override
     public int limitOfColumn(final int col) {
-        return col < mySplit ? this.base().limitOfColumn(col) : myRight.limitOfColumn(col - mySplit);
+        return col < mySplit ? base.limitOfColumn(col) : myRight.limitOfColumn(col - mySplit);
     }
 
     @Override
     public int limitOfRow(final int row) {
         final int rightLimit = myRight.limitOfRow(row);
-        return rightLimit == 0 ? this.base().limitOfRow(row) : mySplit + rightLimit;
+        return rightLimit == 0 ? base.limitOfRow(row) : mySplit + rightLimit;
     }
 
     @Override
@@ -151,13 +151,13 @@ final class LeftRightStore<N extends Comparable<N>> extends ComposingStore<N> {
 
     @Override
     public void supplyTo(final TransformableRegion<N> receiver) {
-        this.base().supplyTo(receiver.regionByLimits(this.getRowDim(), mySplit));
+        base.supplyTo(receiver.regionByLimits(this.getRowDim(), mySplit));
         myRight.supplyTo(receiver.regionByOffsets(0, mySplit));
     }
 
     @Override
     public Scalar<N> toScalar(final int row, final int col) {
-        return col >= mySplit ? myRight.toScalar(row, col - mySplit) : this.base().toScalar(row, col);
+        return col >= mySplit ? myRight.toScalar(row, col - mySplit) : base.toScalar(row, col);
     }
 
 }

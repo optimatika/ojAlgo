@@ -22,6 +22,51 @@ import org.ojalgo.structure.Transformation2D;
  */
 public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixStore<N>, SparseStructure2D, Mutate2D.ModifiableReceiver<N> {
 
+    public static final class Selection<N extends Comparable<N>> extends ColumnsStore<N> {
+
+        private final ColumnsSupplier<N> myBase;
+
+        Selection(final ColumnsSupplier<N> target, final int[] selection) {
+            super(target, selection);
+            myBase = target;
+        }
+
+        @Override
+        public SparseArray<N> sliceColumn(final long col) {
+            return myBase.getColumn(columns[(int) col]);
+        }
+
+        @Override
+        public void supplyTo(final TransformableRegion<N> receiver) {
+
+            receiver.reset();
+
+            if (this.isPrimitive()) {
+
+                for (int j = 0, limit = columns.length; j < limit; j++) {
+
+                    SparseArray<N> column = myBase.getColumn(columns[j]);
+
+                    for (NonzeroView<N> nz : column.nonzeros()) {
+                        receiver.set((int) nz.index(), j, nz.doubleValue());
+                    }
+                }
+
+            } else {
+
+                for (int j = 0, limit = columns.length; j < limit; j++) {
+
+                    SparseArray<N> column = myBase.getColumn(columns[j]);
+
+                    for (NonzeroView<N> nz : column.nonzeros()) {
+                        receiver.set(nz.index(), j, nz.get());
+                    }
+                }
+            }
+        }
+
+    }
+
     public static final class SingleView<N extends Comparable<N>> extends ColumnView<N> implements Access2D.Collectable<N, PhysicalStore<N>> {
 
         private final ColumnsSupplier<N> myBase;
@@ -120,57 +165,8 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixSto
     }
 
     @Override
-    public MatrixStore<N> columns(final int... columns) {
-        return new MatrixStore<>() {
-
-            public long countColumns() {
-                return columns.length;
-            }
-
-            public long countRows() {
-                return ColumnsSupplier.this.countRows();
-            }
-
-            public double doubleValue(final int row, final int col) {
-                return ColumnsSupplier.this.doubleValue(row, columns[col]);
-            }
-
-            public N get(final int row, final int col) {
-                return ColumnsSupplier.this.get(row, columns[col]);
-            }
-
-            public int getColDim() {
-                return columns.length;
-            }
-
-            public int getRowDim() {
-                return ColumnsSupplier.this.getRowDim();
-            }
-
-            public Factory<N, ?> physical() {
-                return ColumnsSupplier.this.physical();
-            }
-
-            public void supplyTo(final TransformableRegion<N> receiver) {
-
-                receiver.reset();
-
-                for (int j = 0; j < columns.length; j++) {
-
-                    SparseArray<N> column = ColumnsSupplier.this.getColumn(columns[j]);
-
-                    for (NonzeroView<N> nz : column.nonzeros()) {
-                        receiver.set(nz.index(), j, nz.get());
-                    }
-                }
-            }
-
-            @Override
-            public String toString() {
-                return Access2D.toString(this);
-            }
-
-        };
+    public Selection<N> columns(final int... columns) {
+        return new Selection<>(this, columns);
     }
 
     @Override
@@ -262,7 +258,7 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixSto
      * <p>
      * This method assumes that the supplied {@code row} is strictly greater than all existing row indices in
      * the specified column. No search is performed; the value is simply appended. If the ascending order of
-     * row indices is broken, future behavior is unspecified. If the value is zero, nothing is stored.
+     * row indices is broken, future behaviour is unspecified. If the value is zero, nothing is stored.
      *
      * @param row   the row index (must be after all existing row indices in the column)
      * @param col   the column to which the value should be appended

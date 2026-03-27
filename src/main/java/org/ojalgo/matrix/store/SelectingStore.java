@@ -28,12 +28,12 @@ package org.ojalgo.matrix.store;
  */
 abstract class SelectingStore<N extends Comparable<N>> extends LogicalStore<N> {
 
-    protected SelectingStore(final MatrixStore<N> base, final int rowsCount, final int columnsCount) {
-        super(base, rowsCount, columnsCount);
+    SelectingStore(final MatrixStore<N> target, final int rowsCount, final int columnsCount) {
+        super(target, rowsCount, columnsCount);
     }
 
-    protected SelectingStore(final MatrixStore<N> base, final long rowsCount, final long columnsCount) {
-        super(base, rowsCount, columnsCount);
+    SelectingStore(final MatrixStore<N> target, final long rowsCount, final long columnsCount) {
+        super(target, rowsCount, columnsCount);
     }
 
 }

@@ -34,54 +34,51 @@ import org.ojalgo.structure.Access1D;
  */
 abstract class LogicalStore<N extends Comparable<N>> extends AbstractStore<N> {
 
-    private final MatrixStore<N> myBase;
     private final Scalar<N> myOne;
     private final Scalar<N> myZero;
+    final MatrixStore<N> base;
 
-    protected LogicalStore(final MatrixStore<N> base, final int rowsCount, final int columnsCount) {
+    protected LogicalStore(final MatrixStore<N> target, final int rowsCount, final int columnsCount) {
 
         super(rowsCount, columnsCount);
 
-        myBase = base;
+        base = target;
 
-        myZero = base.physical().scalar().zero();
-        myOne = base.physical().scalar().one();
+        myZero = target.physical().scalar().zero();
+        myOne = target.physical().scalar().one();
     }
 
-    protected LogicalStore(final MatrixStore<N> base, final long rowsCount, final long columnsCount) {
-        this(base, Math.toIntExact(rowsCount), Math.toIntExact(columnsCount));
+    protected LogicalStore(final MatrixStore<N> target, final long rowsCount, final long columnsCount) {
+        this(target, Math.toIntExact(rowsCount), Math.toIntExact(columnsCount));
     }
 
-    public PhysicalStore.Factory<N, ?> physical() {
-        return myBase.physical();
+    @Override
+    public final PhysicalStore.Factory<N, ?> physical() {
+        return base.physical();
     }
 
     protected final Future<?> executeMultiply(final Access1D<N> right, final TransformableRegion<N> target) {
-        return DaemonPoolExecutor.invoke(() -> myBase.multiply(right, target));
+        return DaemonPoolExecutor.invoke(() -> base.multiply(right, target));
     }
 
     protected final Future<MatrixStore<N>> executeMultiply(final double scalar) {
-        return DaemonPoolExecutor.invoke(() -> myBase.multiply(scalar));
+        return DaemonPoolExecutor.invoke(() -> base.multiply(scalar));
     }
 
     protected final Future<MatrixStore<N>> executeMultiply(final MatrixStore<N> right) {
-        return DaemonPoolExecutor.invoke(() -> myBase.multiply(right));
+        return DaemonPoolExecutor.invoke(() -> base.multiply(right));
     }
 
     protected final Future<MatrixStore<N>> executeMultiply(final N scalar) {
-        return DaemonPoolExecutor.invoke(() -> myBase.multiply(scalar));
+        return DaemonPoolExecutor.invoke(() -> base.multiply(scalar));
     }
 
     protected final Future<N> executeMultiplyBoth(final Access1D<N> leftAndRight) {
-        return DaemonPoolExecutor.invoke(() -> myBase.multiplyBoth(leftAndRight));
+        return DaemonPoolExecutor.invoke(() -> base.multiplyBoth(leftAndRight));
     }
 
     protected final Future<ElementsSupplier<N>> executePremultiply(final Access1D<N> left) {
-        return DaemonPoolExecutor.invoke(() -> myBase.premultiply(left));
-    }
-
-    final MatrixStore<N> base() {
-        return myBase;
+        return DaemonPoolExecutor.invoke(() -> base.premultiply(left));
     }
 
     final Scalar<N> one() {

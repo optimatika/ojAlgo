@@ -28,9 +28,9 @@ final class LowerTriangularStore<N extends Comparable<N>> extends ShadingStore<N
 
     private final boolean myUnitDiagonal;
 
-    LowerTriangularStore(final MatrixStore<N> base, final boolean unitDiagonal) {
+    LowerTriangularStore(final MatrixStore<N> target, final boolean unitDiagonal) {
 
-        super(base);
+        super(target);
 
         myUnitDiagonal = unitDiagonal;
     }
@@ -43,7 +43,7 @@ final class LowerTriangularStore<N extends Comparable<N>> extends ShadingStore<N
         if (myUnitDiagonal && row == col) {
             return PrimitiveMath.ONE;
         } else {
-            return this.base().doubleValue(row, col);
+            return base.doubleValue(row, col);
         }
     }
 
@@ -60,7 +60,7 @@ final class LowerTriangularStore<N extends Comparable<N>> extends ShadingStore<N
         if (myUnitDiagonal && row == col) {
             return this.one().get();
         } else {
-            return this.base().get(row, col);
+            return base.get(row, col);
         }
     }
 
@@ -77,7 +77,7 @@ final class LowerTriangularStore<N extends Comparable<N>> extends ShadingStore<N
         if (myUnitDiagonal && row == col) {
             return this.one();
         } else {
-            return this.base().toScalar(row, col);
+            return base.toScalar(row, col);
         }
     }
 

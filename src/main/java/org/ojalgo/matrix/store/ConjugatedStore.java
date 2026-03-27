@@ -30,18 +30,18 @@ import org.ojalgo.scalar.Scalar;
  */
 final class ConjugatedStore<N extends Comparable<N>> extends TransjugatedStore<N> {
 
-    ConjugatedStore(final MatrixStore<N> base) {
-        super(base);
+    ConjugatedStore(final MatrixStore<N> target) {
+        super(target);
     }
 
     @Override
     public MatrixStore<N> conjugate() {
-        return this.base();
+        return base;
     }
 
     @Override
     public N get(final int aRow, final int aCol) {
-        return this.base().toScalar(aCol, aRow).conjugate().get();
+        return base.toScalar(aCol, aRow).conjugate().get();
     }
 
     @Override
@@ -51,7 +51,7 @@ final class ConjugatedStore<N extends Comparable<N>> extends TransjugatedStore<N
 
         if (right instanceof ConjugatedStore<?>) {
 
-            retVal = ((ConjugatedStore<N>) right).getOriginal().multiply(this.base());
+            retVal = ((ConjugatedStore<N>) right).getOriginal().multiply(base);
 
             retVal = new ConjugatedStore<>(retVal);
 
@@ -65,7 +65,7 @@ final class ConjugatedStore<N extends Comparable<N>> extends TransjugatedStore<N
 
     @Override
     public Scalar<N> toScalar(final int row, final int col) {
-        return this.base().toScalar(col, row).conjugate();
+        return base.toScalar(col, row).conjugate();
     }
 
 }

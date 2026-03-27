@@ -23,6 +23,53 @@ import org.ojalgo.structure.Transformation2D;
  */
 public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<N>, SparseStructure2D, Mutate2D.ModifiableReceiver<N> {
 
+    public static final class Selection<N extends Comparable<N>> extends RowsStore<N> {
+
+        private final RowsSupplier<N> myBase;
+
+        Selection(final RowsSupplier<N> target, final int[] selection) {
+
+            super(target, selection);
+
+            myBase = target;
+        }
+
+        @Override
+        public Access1D<N> sliceRow(final long row) {
+            return myBase.getRow(rows[(int) row]);
+        }
+
+        @Override
+        public void supplyTo(final TransformableRegion<N> receiver) {
+
+            receiver.reset();
+
+            if (this.isPrimitive()) {
+
+                for (int i = 0, limit = rows.length; i < limit; i++) {
+
+                    SparseArray<N> row = myBase.getRow(rows[i]);
+
+                    for (NonzeroView<N> nz : row.nonzeros()) {
+                        receiver.set((int) nz.index(), i, nz.doubleValue());
+                    }
+                }
+
+            } else {
+
+                for (int i = 0, limit = rows.length; i < limit; i++) {
+
+                    SparseArray<N> row = myBase.getRow(rows[i]);
+
+                    for (NonzeroView<N> nz : row.nonzeros()) {
+                        receiver.set(nz.index(), i, nz.get());
+                    }
+                }
+            }
+        }
+
+    }
+
     public static final class SingleView<N extends Comparable<N>> extends RowView<N> implements Access2D.Collectable<N, PhysicalStore<N>> {
 
         private final RowsSupplier<N> myBase;
@@ -263,56 +310,8 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
     }
 
     @Override
-    public MatrixStore<N> rows(final int... rows) {
-        return new MatrixStore<>() {
-
-            public long countColumns() {
-                return RowsSupplier.this.countColumns();
-            }
-
-            public long countRows() {
-                return rows.length;
-            }
-
-            public double doubleValue(final int row, final int col) {
-                return RowsSupplier.this.doubleValue(rows[row], col);
-            }
-
-            public N get(final int row, final int col) {
-                return RowsSupplier.this.get(rows[row], col);
-            }
-
-            public int getColDim() {
-                return RowsSupplier.this.getColDim();
-            }
-
-            public int getRowDim() {
-                return rows.length;
-            }
-
-            public Factory<N, ?> physical() {
-                return RowsSupplier.this.physical();
-            }
-
-            public void supplyTo(final TransformableRegion<N> receiver) {
-
-                receiver.reset();
-
-                for (int i = 0; i < rows.length; i++) {
-
-                    SparseArray<N> row = RowsSupplier.this.getRow(rows[i]);
-
-                    for (NonzeroView<N> nz : row.nonzeros()) {
-                        receiver.set(nz.index(), i, nz.get());
-                    }
-                }
-            }
-
-            @Override
-            public String toString() {
-                return Access2D.toString(this);
-            }
-        };
+    public Selection<N> rows(final int... rows) {
+        return new Selection<>(this, rows);
     }
 
     public RowsSupplier<N> selectRows(final int[] indices) {
