@@ -2,7 +2,6 @@
 /dist
 /target
 **CVS**
-*.log
 .DS_Store
 /.apt_generated/
 .idea
