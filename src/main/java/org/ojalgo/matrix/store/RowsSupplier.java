@@ -128,13 +128,18 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
     private final int myColumnsCount;
     private final PhysicalStore.Factory<N, ?> myPhysicalStoreFactory;
     private final SparseFactory<N> myRowFactory;
-    private final List<SparseArray<N>> myRows = new ArrayList<>();
+    private final List<SparseArray<N>> myRows;
 
-    RowsSupplier(final Factory<N, ?> factory, final int numberOfColumns) {
+    private RowsSupplier(final Factory<N, ?> factory, final int numberOfColumns, final int initialCapacity) {
         super();
+        myRows = new ArrayList<>(initialCapacity);
         myColumnsCount = numberOfColumns;
         myPhysicalStoreFactory = factory;
         myRowFactory = SparseArray.factory(factory.array());
+    }
+
+    RowsSupplier(final Factory<N, ?> factory, final int numberOfColumns) {
+        this(factory, numberOfColumns, 1);
     }
 
     @Override
@@ -315,9 +320,10 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
     }
 
     public RowsSupplier<N> selectRows(final int[] indices) {
-        RowsSupplier<N> retVal = new RowsSupplier<>(myPhysicalStoreFactory, myColumnsCount);
-        for (int i = 0; i < indices.length; i++) {
-            retVal.addRow(this.getRow(indices[i]));
+        int limit = indices.length;
+        RowsSupplier<N> retVal = new RowsSupplier<>(myPhysicalStoreFactory, myColumnsCount, limit);
+        for (int i = 0; i < limit; i++) {
+            retVal.addRow(myRows.get(indices[i]));
         }
         return retVal;
     }

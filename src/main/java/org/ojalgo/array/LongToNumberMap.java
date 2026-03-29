@@ -217,7 +217,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
 
     @Override
     public Long firstKey() {
-        return myStorage.firstIndex();
+        return Long.valueOf(myStorage.firstIndex());
     }
 
     @Override
@@ -256,7 +256,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
 
     @Override
     public Long lastKey() {
-        return myStorage.lastIndex();
+        return Long.valueOf(myStorage.lastIndex());
     }
 
     @Override

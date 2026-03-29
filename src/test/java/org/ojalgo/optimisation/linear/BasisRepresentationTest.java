@@ -14,7 +14,7 @@ class BasisRepresentationTest {
     private static final double TOL = 1e-10;
 
     private BasisRepresentation[] createVariants(final int dim) {
-        return new BasisRepresentation[] { new ProductFormInverse(dim, 1e-6), new DecomposedInverse(false, dim), new DecomposedInverse(true, dim) };
+        return new BasisRepresentation[] { new ProductFormInverse(dim, 1e-6), new SparseDecomposition(), new DenseDecomposition(dim) };
     }
 
     @Test

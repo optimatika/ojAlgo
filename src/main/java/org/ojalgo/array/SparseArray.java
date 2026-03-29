@@ -278,13 +278,13 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
      * The number of nonzero elements
      */
     private int myActualLength = 0;
+    private final PlainArray.Factory<N, ?> myDenseFactory;
+    private final GrowthStrategy myGrowthStrategy;
+    private int[] myIndices;
     /**
      * The capacity
      */
     private final int mySize;
-    private final PlainArray.Factory<N, ?> myDenseFactory;
-    private final GrowthStrategy myGrowthStrategy;
-    private int[] myIndices;
     private PlainArray<N> myValues;
 
     SparseArray(final PlainArray.Factory<N, ?> denseFactory, final GrowthStrategy growthStrategy, final int size) {
@@ -340,19 +340,19 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
         }
     }
 
-    @Override
-    public void axpy(final double a, final Mutate1D.Modifiable<?> y) {
-        for (int n = 0; n < myActualLength; n++) {
-            y.add(myIndices[n], a * myValues.doubleValue(n));
-        }
-    }
-
     /**
      * AXPY using a raw {@code double[]} vector — avoids {@link NonzeroView} allocation.
      */
     public void axpy(final double a, final double[] y) {
         for (int n = 0; n < myActualLength; n++) {
             y[myIndices[n]] += a * myValues.doubleValue(n);
+        }
+    }
+
+    @Override
+    public void axpy(final double a, final Mutate1D.Modifiable<?> y) {
+        for (int n = 0; n < myActualLength; n++) {
+            y.add(myIndices[n], a * myValues.doubleValue(n));
         }
     }
 
@@ -542,6 +542,13 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
         this.fill(first, limit, 1L, supplier);
     }
 
+    /**
+     * @return The index of the first nonzero element, or -1 if empty
+     */
+    public int firstIndex() {
+        return myActualLength > 0 ? myIndices[0] : -1;
+    }
+
     public long firstInRange(final long rangeFirst, final long rangeLimit) {
         int tmpFoundAt = this.index(rangeFirst);
         if (tmpFoundAt < 0) {
@@ -567,6 +574,13 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
     @Override
     public long indexOfLargest() {
         return myIndices[myValues.indexOfLargest(0, myActualLength, 1)];
+    }
+
+    /**
+     * @return The index of the last nonzero element, or -1 if empty
+     */
+    public int lastIndex() {
+        return myActualLength > 0 ? myIndices[myActualLength - 1] : -1;
     }
 
     public long limitOfRange(final long rangeFirst, final long rangeLimit) {
@@ -1065,10 +1079,6 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
         return myValues.doubleValue(internalIndex);
     }
 
-    long firstIndex() {
-        return myIndices[0];
-    }
-
     int getActualLength() {
         return myActualLength;
     }
@@ -1130,10 +1140,6 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
     IntStream indices() {
         return Arrays.stream(myIndices, 0, myActualLength);
-    }
-
-    long lastIndex() {
-        return myIndices[myActualLength - 1];
     }
 
     void put(final long key, final int index, final double value) {

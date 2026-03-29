@@ -48,10 +48,9 @@ import org.ojalgo.structure.Primitive1D;
  */
 final class RevisedStore extends SimplexStore {
 
-    private static BasisRepresentation newBasisRepresentation(final int nbConstraints) {
-        // return new ProductFormInverse(nbConstraints, Prefix.MICRO); // 0 + 0
-        // return new DecomposedInverse(false, nbConstraints); // 1 + 0
-        return new DecomposedInverse(true, nbConstraints); // 0 + 0
+    private static BasisRepresentation newBasisRepresentation() {
+        // return new ProductFormInverse(nbConstraints, Prefix.MICRO);
+        return new SparseDecomposition();
     }
 
     private static R064Store newColumn(final int nbRows) {
@@ -168,7 +167,7 @@ final class RevisedStore extends SimplexStore {
         r = RevisedStore.newColumn(n - m);
 
         myBasis = myConstraintsBody.columns(included);
-        myInvBasis = RevisedStore.newBasisRepresentation(m);
+        myInvBasis = RevisedStore.newBasisRepresentation();
     }
 
     private void doBodyRow(final int i, final PhysicalStore<Double> destination) {

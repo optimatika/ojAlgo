@@ -123,15 +123,20 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixSto
     }
 
     private final SparseFactory<N> myColumnFactory;
-    private final List<SparseArray<N>> myColumns = new ArrayList<>();
+    private final List<SparseArray<N>> myColumns;
     private final PhysicalStore.Factory<N, ?> myPhysicalStoreFactory;
     private final int myRowsCount;
 
-    ColumnsSupplier(final PhysicalStore.Factory<N, ?> factory, final int numberOfRows) {
+    private ColumnsSupplier(final PhysicalStore.Factory<N, ?> factory, final int numberOfRows, final int initialCapacity) {
         super();
+        myColumns = new ArrayList<>(initialCapacity);
         myRowsCount = numberOfRows;
         myPhysicalStoreFactory = factory;
         myColumnFactory = SparseArray.factory(factory.array());
+    }
+
+    ColumnsSupplier(final PhysicalStore.Factory<N, ?> factory, final int numberOfRows) {
+        this(factory, numberOfRows, 1);
     }
 
     @Override
@@ -280,9 +285,10 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixSto
     }
 
     public ColumnsSupplier<N> selectColumns(final int[] indices) {
-        ColumnsSupplier<N> retVal = new ColumnsSupplier<>(myPhysicalStoreFactory, myRowsCount);
-        for (int i = 0; i < indices.length; i++) {
-            retVal.addColumn(this.getColumn(indices[i]));
+        int limit = indices.length;
+        ColumnsSupplier<N> retVal = new ColumnsSupplier<>(myPhysicalStoreFactory, myRowsCount, limit);
+        for (int i = 0; i < limit; i++) {
+            retVal.addColumn(myColumns.get(indices[i]));
         }
         return retVal;
     }

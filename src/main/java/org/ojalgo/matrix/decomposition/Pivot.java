@@ -229,6 +229,11 @@ final class Pivot {
         return myReverse;
     }
 
+    void setModified(final boolean modified) {
+        myModified = modified;
+        myReverseNeedsUpdate = modified;
+    }
+
     int signum() {
         return mySign;
     }

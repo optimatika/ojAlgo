@@ -28,6 +28,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - New `MatrixDecomposition.Factor` interface extending `InvertibleFactor` with a `get()` method returning the factor as a `MatrixStore`.
 - Enhanced `SubstituteBackwards`/`SubstituteForwards` with `double[]`-based overloads, supporting the new ftran/btran machinery.
 - `InvertibleFactor` gained static helper methods for composing ftran/btran over a list of factors.
+- `SparseArray.firstIndex()` and `lastIndex()` are now `public` (were package-private) and return `int` instead of `long`, with safe `-1` on empty arrays.
+- New `SortAll.sort(long[], int[])` overload for co-sorting a long key array with an int permutation array.
 
 #### org.ojalgo.scalar
 
@@ -46,10 +48,17 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Major internal refactoring of dense decompositions (`DenseCholesky`, `DenseLDL`, `DenseLU`, `DenseQR`, `DenseSingularValue`) and raw decompositions (`RawLU`, `RawQR`, `RawSingularValue`, `RawCholesky`, `RawEigenvalue`) to use the new factor-based infrastructure.
 - Reworked `SparseLU` and `SparseQDLDL` for better performance and integration with `InvertibleFactor`.
+- `SparseLU` is now `public` and accepts `ColumnsSupplier.Selection` directly via a new `factor(...)` method that applies column-ordering by sparsity/last-index to reduce fill-in.
 - Refined `MatrixStore.norm()` calculation and added a default `normalised()` implementation.
 - `LogicalStore` hierarchy: exposed `base` as a direct field reference, eliminating the `base()` accessor call in all logical store subclasses. `ColumnsStore` and `RowsStore` simplified — removed the negative-index-as-zeros indirection and opened for subclassing.
 - New `ColumnsSupplier.Selection` and `RowsSupplier.Selection` inner classes that provide sparse-aware `supplyTo` and `sliceColumn`/`sliceRow` implementations, iterating nonzeros directly instead of delegating to the dense path.
+- `ColumnsSupplier.selectColumns(int[])` and `RowsSupplier.selectRows(int[])` now pre-size the internal `ArrayList` and avoid a redundant copy.
 - The `columns(int...)` and `rows(int...)` contracts no longer accept negative indices as "zero row/column" placeholders.
+
+#### org.ojalgo.optimisation
+
+- Replaced `DecomposedInverse` with two focused implementations: `SparseDecomposition` (backed by `SparseLU`, the new default) and `DenseDecomposition` (dense LU baseline).
+- `RevisedStore` now uses `SparseDecomposition` by default; dimension parameter removed from the factory method.
 
 #### org.ojalgo.algebra
 

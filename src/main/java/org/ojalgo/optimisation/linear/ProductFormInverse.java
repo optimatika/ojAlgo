@@ -43,7 +43,7 @@ import org.ojalgo.type.ObjectPool;
  * vector (elementary column operation). Solving a system with B applies the sequence of eta factors in
  * order. Periodically re-inverts via LU to bound numerical drift and factor count.
  *
- * @see DecomposedInverse
+ * @see SparseDecomposition
  */
 final class ProductFormInverse implements BasisRepresentation {
 

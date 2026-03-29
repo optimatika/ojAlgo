@@ -114,12 +114,11 @@ public class BasisRepresentationBenchmark {
     public int dim;
     private MatrixStore<Double> basis;
     private final int[] columnIndex = new int[LOOP];
-    private final DecomposedInverse denseDecomp = new DecomposedInverse(false, 1_000);
+    private final DenseDecomposition denseDecomp = new DenseDecomposition(1_000);
     private final SparseArray<Double>[] newColumn = new SparseArray[LOOP];
     private final ProductFormInverse productForm = new ProductFormInverse(1_000, 1E-4);
-
     private PhysicalStore<Double> rhs;
-    private final DecomposedInverse sparseDecomp = new DecomposedInverse(true, 1_000);
+    private final SparseDecomposition sparseDecomp = new SparseDecomposition();
 
     public BasisRepresentationBenchmark() {
 

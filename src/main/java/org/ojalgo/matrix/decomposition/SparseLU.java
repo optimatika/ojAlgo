@@ -31,16 +31,10 @@ import java.util.Optional;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.SparseArray;
+import org.ojalgo.array.operation.SortAll;
 import org.ojalgo.matrix.operation.SubstituteBackwards;
 import org.ojalgo.matrix.operation.SubstituteForwards;
-import org.ojalgo.matrix.store.DiagonalStore;
-import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.R064CSR;
-import org.ojalgo.matrix.store.R064Store;
-import org.ojalgo.matrix.store.RowsSupplier;
-import org.ojalgo.matrix.store.SparseStore;
-import org.ojalgo.matrix.store.TransformableRegion;
+import org.ojalgo.matrix.store.*;
 import org.ojalgo.matrix.transformation.InvertibleFactor;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
@@ -53,7 +47,7 @@ import org.ojalgo.type.NumberDefinition;
 /**
  * A sparse, primitive double based, LU decomposition with support for incremental Forrest-Tomlin updates.
  */
-final class SparseLU extends AbstractDecomposition<Double, R064Store> implements LU<Double> {
+public final class SparseLU extends AbstractDecomposition<Double, R064Store> implements LU<Double> {
 
     /**
      * [A]=[P][L][U][Q]
@@ -101,13 +95,11 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
 
         private final double[] myBodyDiagonal;
         private final RowsSupplier<Double> myBodyMain;
-        private final Pivot myColPivot;
 
-        FactorU(final RowsSupplier<Double> u, final double[] diagU, final Pivot colPivot) {
+        FactorU(final RowsSupplier<Double> u, final double[] diagU) {
             super();
             myBodyMain = u;
             myBodyDiagonal = diagU;
-            myColPivot = colPivot;
         }
 
         @Override
@@ -134,9 +126,6 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
             int nbCols = this.getColDim();
             if (this.getRowDim() > nbCols) {
                 retVal = retVal.limits(nbCols, nbCols);
-            }
-            if (myColPivot != null && myColPivot.isModified()) {
-                retVal = retVal.columns(myColPivot.reverseOrder());
             }
             return retVal;
         }
@@ -260,10 +249,11 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
     private RowsSupplier<Double> myL;
     private final Pivot myPivot;
     private RowsSupplier<Double> myU;
+    private transient long[] myValuesToSort = null;
     private transient R064Store myWorkerColumn = null;
     private transient R064Store myWorkerRow = null;
 
-    SparseLU() {
+    public SparseLU() {
 
         super(R064Store.FACTORY);
 
@@ -276,7 +266,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
 
         int r = this.getMinDim();
 
-        if (myColPivot != null) {
+        if (myColPivot != null && myColPivot.isModified()) {
             myColPivot.applyPivotOrder(arg);
         }
 
@@ -316,68 +306,43 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
     @Override
     public boolean decompose(final Collectable<Double, ? super TransformableRegion<Double>> matrix) {
 
+        if (matrix instanceof ColumnsSupplier.Selection<?>) {
+            return this.factor((ColumnsSupplier.Selection<Double>) matrix);
+        }
+
         this.reset(matrix);
 
         Sliceable<Double> columns = SparseLU.cast(matrix);
 
+        // Don't sort on this path
+
+        return this.doFactor(columns, null, matrix.getRowDim(), matrix.getColDim());
+    }
+
+    /**
+     * Primary factorisation entry point taking the exact type produced by
+     * {@link ColumnsSupplier#columns(int...)}. Columns are {@link SparseArray} instances — no wrapping, no
+     * element-by-element access, and the {@link SparseArray#FULLNESS} comparator can be used directly for
+     * column ordering.
+     */
+    public boolean factor(final ColumnsSupplier.Selection<Double> matrix) {
+
+        this.reset(matrix);
+
         int m = matrix.getRowDim();
         int n = matrix.getColDim();
-        int r = matrix.getMinDim();
 
-        R064Store wCol = this.getWorkerColumn(m);
-        double[] wColData = wCol.data;
+        long[] keys = this.getValuesToSort(matrix, n);
 
-        for (int j = 0; j < n; j++) {
-
-            Access1D<Double> sliced = columns.sliceColumn(j);
-            sliced.supplyTo(wColData);
-
-            myPivot.applyPivotOrder(wCol);
-
-            this.ftranL(wCol);
-
-            int p = j;
-            double magnP = Math.abs(wColData[p]);
-            double magnI;
-            for (int i = j + 1; i < m; i++) {
-                magnI = Math.abs(wColData[i]);
-                if (magnI > magnP) {
-                    p = i;
-                    magnP = magnI;
-                }
-            }
-            if (p != j) {
-
-                myPivot.change(p, j);
-
-                double tmpVal = wColData[p];
-                wColData[p] = wColData[j];
-                wColData[j] = tmpVal;
-
-                myL.exchangeRows(p, j);
-            }
-
-            double tmpNumer, tmpDenom = wColData[j];
-
-            for (int i = 0, limit = Math.min(m, j); i < limit; i++) {
-                tmpNumer = wColData[i];
-                myU.putLast(i, j, tmpNumer);
-            }
-            if (j < r) {
-                myDiagU[j] = tmpDenom;
-            }
-
-            if (j < m && tmpDenom != ZERO) {
-                for (int i = j + 1; i < m; i++) {
-                    tmpNumer = wColData[i];
-                    myL.putLast(i, j, tmpNumer / tmpDenom);
-                }
-            }
+        if (myColPivot == null) {
+            myColPivot = new Pivot();
         }
+        myColPivot.reset(n);
+        int[] order = myColPivot.getOrder();
 
-        myFixedL = myL.toCSR();
+        myColPivot.setModified(SortAll.sort(keys, order));
 
-        return this.computed(true);
+        return this.doFactor(matrix, order, m, n);
     }
 
     @Override
@@ -391,7 +356,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
 
         this.ftranU(arg);
 
-        if (myColPivot != null) {
+        if (myColPivot != null && myColPivot.isModified()) {
             myColPivot.applyReverseOrder(arg);
         }
     }
@@ -430,7 +395,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
         retVal.addAll(myFactors);
         retVal.add(this.getFactorU());
 
-        if (myColPivot != null) {
+        if (myColPivot != null && myColPivot.isModified()) {
             retVal.add(this.getFactorQ().get());
         }
 
@@ -508,7 +473,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
             this.ftranU(preallocated);
         }
 
-        if (myColPivot != null) {
+        if (myColPivot != null && myColPivot.isModified()) {
             this.applyReverseOrder(myColPivot, preallocated);
         }
 
@@ -522,7 +487,11 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
      */
     @Override
     public MatrixStore<Double> getU() {
-        return this.getFactorU().get();
+        MatrixStore<Double> retVal = this.getFactorU().get();
+        if (myColPivot != null && myColPivot.isModified()) {
+            retVal = retVal.columns(myColPivot.reverseOrder());
+        }
+        return retVal;
     }
 
     @Override
@@ -697,6 +666,65 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
         }
     }
 
+    private boolean doFactor(final Sliceable<Double> columns, final int[] colOrder, final int m, final int n) {
+
+        int r = Math.min(m, n);
+
+        R064Store wCol = this.getWorkerColumn(m);
+        double[] wColData = wCol.data;
+
+        for (int j = 0; j < n; j++) {
+
+            columns.sliceColumn(colOrder != null ? colOrder[j] : j).supplyTo(wColData);
+
+            myPivot.applyPivotOrder(wCol);
+
+            this.ftranL(wCol);
+
+            int p = j;
+            double maxMag = Math.abs(wColData[j]);
+            for (int i = j + 1; i < m; i++) {
+                double mag = Math.abs(wColData[i]);
+                if (mag > maxMag) {
+                    p = i;
+                    maxMag = mag;
+                }
+            }
+
+            if (p != j) {
+
+                myPivot.change(p, j);
+
+                double tmpVal = wColData[p];
+                wColData[p] = wColData[j];
+                wColData[j] = tmpVal;
+
+                myL.exchangeRows(p, j);
+            }
+
+            double tmpNumer, tmpDenom = wColData[j];
+
+            for (int i = 0, limit = Math.min(m, j); i < limit; i++) {
+                tmpNumer = wColData[i];
+                myU.putLast(i, j, tmpNumer);
+            }
+            if (j < r) {
+                myDiagU[j] = tmpDenom;
+            }
+
+            if (j < m && tmpDenom != ZERO) {
+                for (int i = j + 1; i < m; i++) {
+                    tmpNumer = wColData[i];
+                    myL.putLast(i, j, tmpNumer / tmpDenom);
+                }
+            }
+        }
+
+        myFixedL = myL.toCSR();
+
+        return this.computed(true);
+    }
+
     private void ftranL(final double[] arg) {
         SubstituteForwards.invoke(arg, myFixedL);
     }
@@ -746,7 +774,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
      */
     Optional<MatrixDecomposition.Factor<Double>> getFactorQ() {
 
-        if (myColPivot != null) {
+        if (myColPivot != null && myColPivot.isModified()) {
             return Optional.of(new FactorPivot<>(this.makeIdentity(this.getColDim()), myColPivot, false));
         } else {
             return Optional.empty();
@@ -757,7 +785,22 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
      * [A]=[P][L][U][Q]
      */
     MatrixDecomposition.Factor<Double> getFactorU() {
-        return new FactorU(myU, myDiagU, myColPivot);
+        return new FactorU(myU, myDiagU);
+    }
+
+    long[] getValuesToSort(final ColumnsSupplier.Selection<Double> matrix, final int n) {
+
+        if (myValuesToSort == null || myValuesToSort.length != n) {
+            myValuesToSort = new long[n];
+        }
+
+        SparseArray<?> array;
+        for (int j = 0; j < n; j++) {
+            array = matrix.sliceColumn(j);
+            myValuesToSort[j] = ((long) (array.lastIndex() + 1) << 32) | (array.countNonzeros() & 0xFFFFFFFFL);
+        }
+
+        return myValuesToSort;
     }
 
     R064Store getWorkerColumn(final int nbRows) {

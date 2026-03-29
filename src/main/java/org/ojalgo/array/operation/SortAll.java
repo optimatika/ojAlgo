@@ -45,6 +45,40 @@ public abstract class SortAll implements ArrayOperation {
         } while (tmpSwapped);
     }
 
+    public static boolean sort(final long[] primary, final int[] secondary) {
+
+        boolean retVal = false;
+        boolean swapped;
+
+        int limit = Math.min(primary.length, secondary.length) - 1;
+
+        long p0, p1;
+        int tmp;
+
+        do {
+            swapped = false;
+            for (int i = 0; i < limit; i++) {
+
+                p0 = primary[i];
+                p1 = primary[i + 1];
+                if (p0 > p1) {
+
+                    primary[i] = p1;
+                    primary[i + 1] = p0;
+
+                    tmp = secondary[i];
+                    secondary[i] = secondary[i + 1];
+                    secondary[i + 1] = tmp;
+
+                    swapped = true;
+                }
+            }
+            retVal |= swapped;
+        } while (swapped);
+
+        return retVal;
+    }
+
     public static void sort(final long[] primary, final Object[] secondary) {
 
         boolean tmpSwapped;

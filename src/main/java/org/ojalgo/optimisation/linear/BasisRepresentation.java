@@ -10,7 +10,8 @@ import org.ojalgo.matrix.transformation.InvertibleFactor;
  * <p>
  * Implementations:
  * <ul>
- * <li>{@link DecomposedInverse} — uses a matrix decomposition (LU) that is periodically re-factored.
+ * <li>{@link SparseDecomposition} — sparse LU ({@link org.ojalgo.matrix.decomposition.SparseLU}) with Forrest-Tomlin updates.
+ * <li>{@link DenseDecomposition} — dense LU, useful as a benchmark baseline.
  * <li>{@link ProductFormInverse} — accumulates elementary column operations (eta vectors).
  * </ul>
  *
