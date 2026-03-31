@@ -49,6 +49,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - Major internal refactoring of dense decompositions (`DenseCholesky`, `DenseLDL`, `DenseLU`, `DenseQR`, `DenseSingularValue`) and raw decompositions (`RawLU`, `RawQR`, `RawSingularValue`, `RawCholesky`, `RawEigenvalue`) to use the new factor-based infrastructure.
 - Reworked `SparseLU` and `SparseQDLDL` for better performance and integration with `InvertibleFactor`.
 - `SparseLU` is now `public` and accepts `ColumnsSupplier.Selection` directly via a new `factor(...)` method that applies column-ordering by sparsity/last-index to reduce fill-in.
+- `SparseLU` gained `countFactorNonzeros()` and `countEtaNonzeros()` for querying L+U and eta-chain fill-in, used by the adaptive refactorisation heuristic in `SparseDecomposition`.
 - Refined `MatrixStore.norm()` calculation and added a default `normalised()` implementation.
 - `LogicalStore` hierarchy: exposed `base` as a direct field reference, eliminating the `base()` accessor call in all logical store subclasses. `ColumnsStore` and `RowsStore` simplified — removed the negative-index-as-zeros indirection and opened for subclassing.
 - New `ColumnsSupplier.Selection` and `RowsSupplier.Selection` inner classes that provide sparse-aware `supplyTo` and `sliceColumn`/`sliceRow` implementations, iterating nonzeros directly instead of delegating to the dense path.
@@ -58,6 +59,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.optimisation
 
 - Replaced `DecomposedInverse` with two focused implementations: `SparseDecomposition` (backed by `SparseLU`, the new default) and `DenseDecomposition` (dense LU baseline).
+- `SparseDecomposition` now uses adaptive refactorisation: a fill-in heuristic triggers re-decomposition when eta-chain nonzeros exceed 1.5× the L+U factor nonzeros, with a dimension-scaled ceiling (`min(300, 3×m)`) as a safety net. Benchmarked across the Netlib LP suite — ~9% median speedup with 50 models improved vs 22 regressed.
 - `RevisedStore` now uses `SparseDecomposition` by default; dimension parameter removed from the factory method.
 
 #### org.ojalgo.algebra

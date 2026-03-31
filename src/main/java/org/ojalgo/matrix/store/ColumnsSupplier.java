@@ -22,13 +22,22 @@ import org.ojalgo.structure.Transformation2D;
  */
 public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixStore<N>, SparseStructure2D, Mutate2D.ModifiableReceiver<N> {
 
-    public static final class Selection<N extends Comparable<N>> extends ColumnsStore<N> {
+    public static final class Selection<N extends Comparable<N>> extends ColumnsStore<N> implements SparseStructure2D {
 
         private final ColumnsSupplier<N> myBase;
 
         Selection(final ColumnsSupplier<N> target, final int[] selection) {
             super(target, selection);
             myBase = target;
+        }
+
+        @Override
+        public int countNonzeros() {
+            int retVal = 0;
+            for (int j = 0, limit = columns.length; j < limit; j++) {
+                retVal += myBase.getColumn(columns[j]).countNonzeros();
+            }
+            return retVal;
         }
 
         @Override
@@ -63,6 +72,68 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixSto
                     }
                 }
             }
+        }
+
+        @Override
+        public R064CSC toCSC() {
+
+            int nbRows = this.getRowDim();
+            int nbCols = columns.length;
+            int nbNz = this.countNonzeros();
+
+            double[] values = new double[nbNz];
+            int[] rowIndices = new int[nbNz];
+            int[] colPointers = new int[nbCols + 1];
+
+            int pos = 0;
+            for (int j = 0; j < nbCols; j++) {
+                colPointers[j] = pos;
+                SparseArray<N> col = myBase.getColumn(columns[j]);
+                for (NonzeroView<N> nz : col.nonzeros()) {
+                    values[pos] = nz.doubleValue();
+                    rowIndices[pos] = (int) nz.index();
+                    pos++;
+                }
+            }
+            colPointers[nbCols] = pos;
+
+            return new R064CSC(nbRows, nbCols, values, rowIndices, colPointers);
+        }
+
+        @Override
+        public R064CSR toCSR() {
+
+            int nbRows = this.getRowDim();
+            int nbCols = columns.length;
+            int nbNz = this.countNonzeros();
+
+            double[] values = new double[nbNz];
+            int[] colIndices = new int[nbNz];
+            int[] rowPointers = new int[nbRows + 1];
+
+            for (int j = 0; j < nbCols; j++) {
+                SparseArray<N> col = myBase.getColumn(columns[j]);
+                for (NonzeroView<N> nz : col.nonzeros()) {
+                    rowPointers[(int) nz.index() + 1]++;
+                }
+            }
+
+            for (int i = 0; i < nbRows; i++) {
+                rowPointers[i + 1] += rowPointers[i];
+            }
+
+            int[] next = Arrays.copyOf(rowPointers, nbRows);
+            for (int j = 0; j < nbCols; j++) {
+                SparseArray<N> col = myBase.getColumn(columns[j]);
+                for (NonzeroView<N> nz : col.nonzeros()) {
+                    int row = (int) nz.index();
+                    int pos2 = next[row]++;
+                    values[pos2] = nz.doubleValue();
+                    colIndices[pos2] = j;
+                }
+            }
+
+            return new R064CSR(nbRows, nbCols, values, colIndices, rowPointers);
         }
 
     }

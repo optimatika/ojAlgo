@@ -245,6 +245,10 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
      */
     private double[] myDiagU;
     private final List<InvertibleFactor<Double>> myFactors = new ArrayList<>();
+    /**
+     * Total nonzeros in L + U at last factorisation. Used by {@link #countFactorNonzeros()}.
+     */
+    private int myFactorNonzeros = 0;
     private R064CSR myFixedL;
     private RowsSupplier<Double> myL;
     private final Pivot myPivot;
@@ -400,6 +404,28 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
         }
 
         return retVal;
+    }
+
+    /**
+     * Total nonzeros across all eta factors accumulated since the last factorisation. Each eta factor
+     * corresponds to one Forrest-Tomlin update (column replacement in the basis).
+     */
+    public int countEtaNonzeros() {
+        int total = 0;
+        for (InvertibleFactor<Double> factor : myFactors) {
+            if (factor instanceof PermutationEta) {
+                total += ((PermutationEta) factor).myElements.countNonzeros();
+            }
+        }
+        return total;
+    }
+
+    /**
+     * Total nonzeros in the L and U factors at the time of the last full factorisation (excluding the U
+     * diagonal which is always dense). Returns 0 before the first factorisation.
+     */
+    public int countFactorNonzeros() {
+        return myFactorNonzeros;
     }
 
     @Override
@@ -721,6 +747,8 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
         }
 
         myFixedL = myL.toCSR();
+
+        myFactorNonzeros = myFixedL.countNonzeros() + myU.countNonzeros();
 
         return this.computed(true);
     }

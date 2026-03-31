@@ -11,15 +11,35 @@ import org.ojalgo.matrix.store.PhysicalStore;
  * Maintains a {@link SparseLU} decomposition of the basis matrix for efficient solving of linear systems in
  * the revised simplex method. Supports incremental updates using the Forrest-Tomlin algorithm when columns
  * change, with periodic refactorization to maintain numerical stability.
+ * <p>
+ * Refactorisation is triggered dynamically when the accumulated eta-chain fill-in exceeds a configurable
+ * ratio of the original L+U nonzero count, or when a dimension-scaled update ceiling is reached.
  */
 final class SparseDecomposition implements BasisRepresentation {
 
     /**
-     * Maximum number of updates before forcing a complete refactorization to prevent numerical instability
-     * from accumulated roundoff errors.
+     * Ratio threshold: refactorise when eta-chain nonzeros exceed this multiple of the L+U factor nonzeros. A
+     * lower value refactorises more frequently (better btran/ftran speed, more factorisation overhead); a
+     * higher value delays refactorisation (faster pivots, slower solves as the chain grows).
      */
-    private static final int UPDATES_LIMIT = 100;
+    private static final double ETA_FILL_RATIO = 1.5;
 
+    /**
+     * Hard ceiling on updates between refactorisations. The effective ceiling is
+     * {@code min(UPDATES_LIMIT, UPDATES_MULTIPLIER * m)} where m is the basis dimension. This ensures small
+     * bases (like FIT2D with m=26) refactorise frequently enough to maintain accuracy, while large bases get
+     * the full ceiling.
+     */
+    private static final int UPDATES_LIMIT = 300;
+
+    /**
+     * Per-dimension multiplier for the update ceiling. The effective ceiling for a basis of dimension m is
+     * {@code min(UPDATES_LIMIT, UPDATES_MULTIPLIER * m)}. A value of 3 means the ceiling scales as 3x the
+     * basis dimension for small models.
+     */
+    private static final int UPDATES_MULTIPLIER = 3;
+
+    private int myEffectiveLimit = UPDATES_LIMIT;
     private final SparseLU mySparse = new SparseLU();
     private int myUpdateCounter = 0;
 
@@ -81,18 +101,35 @@ final class SparseDecomposition implements BasisRepresentation {
             mySparse.decompose(basis);
         }
         myUpdateCounter = 0;
+        myEffectiveLimit = Math.min(UPDATES_LIMIT, UPDATES_MULTIPLIER * mySparse.getRowDim());
     }
 
     /**
      * Updates the decomposition to reflect a change in the basis matrix. Uses the Forrest-Tomlin update
-     * algorithm to efficiently modify the LU factors. Falls back to a complete refactorization if the update
-     * counter exceeds the limit, the decomposition is not computed, or the update fails.
+     * algorithm to efficiently modify the LU factors. Falls back to a complete refactorization when:
+     * <ul>
+     * <li>The eta-chain fill-in exceeds {@link #ETA_FILL_RATIO} times the original factor nonzeros
+     * <li>The dimension-scaled update ceiling is reached
+     * <li>The decomposition is not computed
+     * <li>The update itself fails (e.g. singular pivot)
+     * </ul>
      */
     @Override
     public void update(final MatrixStore<Double> basis, final int col, final SparseArray<Double> values) {
-        if (myUpdateCounter++ >= UPDATES_LIMIT || !mySparse.isComputed() || !mySparse.updateColumn(col, values)) {
+        if (!mySparse.isComputed() || !mySparse.updateColumn(col, values) || this.shouldRefactorise()) {
             this.reset(basis);
         }
+    }
+
+    private boolean shouldRefactorise() {
+        if (++myUpdateCounter >= myEffectiveLimit) {
+            return true;
+        }
+        int factorNnz = mySparse.countFactorNonzeros();
+        if (factorNnz > 0) {
+            return mySparse.countEtaNonzeros() > ETA_FILL_RATIO * factorNnz;
+        }
+        return false;
     }
 
 }
