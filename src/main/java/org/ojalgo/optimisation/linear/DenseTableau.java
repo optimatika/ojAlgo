@@ -37,8 +37,8 @@ import org.ojalgo.structure.Primitive2D;
  * (constraint body, RHS, objective, and phase-1 row) are stored explicitly and updated in-place on each
  * pivot.
  * <p>
- * Best suited for smaller or denser LP problems. For large sparse problems {@link SparseTableau} may be
- * more efficient. Also used as a dense backing option by the {@link SimplexSolver} family (via
+ * Best suited for smaller or denser LP problems. For large sparse problems {@link SparseTableau} may be more
+ * efficient. Also used as a dense backing option by the {@link SimplexSolver} family (via
  * {@link SimplexStore#newStoreFactory(org.ojalgo.optimisation.Optimisation.Options)}).
  */
 final class DenseTableau extends SimplexTableau {

@@ -1,11 +1,9 @@
 package org.ojalgo.optimisation.linear;
 
 import org.ojalgo.array.ArrayR064;
-import org.ojalgo.array.SparseArray;
 import org.ojalgo.matrix.decomposition.SparseLU;
-import org.ojalgo.matrix.store.ColumnsSupplier;
-import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.R064CSC;
 
 /**
  * Maintains a {@link SparseLU} decomposition of the basis matrix for efficient solving of linear systems in
@@ -39,12 +37,13 @@ final class SparseDecomposition implements BasisRepresentation {
      */
     private static final int UPDATES_MULTIPLIER = 3;
 
-    private int myEffectiveLimit = UPDATES_LIMIT;
+    private final int myEffectiveLimit;
     private final SparseLU mySparse = new SparseLU();
     private int myUpdateCounter = 0;
 
-    SparseDecomposition() {
+    SparseDecomposition(final int dim) {
         super();
+        myEffectiveLimit = Math.min(UPDATES_LIMIT, UPDATES_MULTIPLIER * dim);
     }
 
     @Override
@@ -94,14 +93,9 @@ final class SparseDecomposition implements BasisRepresentation {
     }
 
     @Override
-    public void reset(final MatrixStore<Double> basis) {
-        if (basis instanceof ColumnsSupplier.Selection<?>) {
-            mySparse.factor((ColumnsSupplier.Selection<Double>) basis);
-        } else {
-            mySparse.decompose(basis);
-        }
+    public void reset(final R064CSC matrix, final int[] included) {
+        mySparse.factor(matrix, included);
         myUpdateCounter = 0;
-        myEffectiveLimit = Math.min(UPDATES_LIMIT, UPDATES_MULTIPLIER * mySparse.getRowDim());
     }
 
     /**
@@ -115,10 +109,12 @@ final class SparseDecomposition implements BasisRepresentation {
      * </ul>
      */
     @Override
-    public void update(final MatrixStore<Double> basis, final int col, final SparseArray<Double> values) {
-        if (!mySparse.isComputed() || !mySparse.updateColumn(col, values) || this.shouldRefactorise()) {
-            this.reset(basis);
+    public boolean update(final R064CSC matrix, final int[] included, final int exitIndex, final int enterColumn) {
+        if (!mySparse.isComputed() || !mySparse.updateColumn(exitIndex, matrix, enterColumn) || this.shouldRefactorise()) {
+            this.reset(matrix, included);
+            return true;
         }
+        return false;
     }
 
     private boolean shouldRefactorise() {

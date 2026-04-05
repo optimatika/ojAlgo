@@ -181,6 +181,10 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
             arg.set(myFrom, tmp);
         }
 
+        public int countNonzeros() {
+            return myElements.countNonzeros();
+        }
+
         @Override
         public void ftran(final double[] arg) {
 
@@ -244,11 +248,16 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
      * U diagonal elements
      */
     private double[] myDiagU;
-    private final List<InvertibleFactor<Double>> myFactors = new ArrayList<>();
+    /**
+     * Running total of nonzeros across eta factors accumulated since the last factorisation. Incremented in
+     * {@link #doUpdateColumn} and reset alongside {@link #myFactors}.
+     */
+    private int myEtaNonzeros = 0;
     /**
      * Total nonzeros in L + U at last factorisation. Used by {@link #countFactorNonzeros()}.
      */
     private int myFactorNonzeros = 0;
+    private final List<InvertibleFactor<Double>> myFactors = new ArrayList<>();
     private R064CSR myFixedL;
     private RowsSupplier<Double> myL;
     private final Pivot myPivot;
@@ -267,8 +276,6 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
 
     @Override
     public void btran(final double[] arg) {
-
-        int r = this.getMinDim();
 
         if (myColPivot != null && myColPivot.isModified()) {
             myColPivot.applyPivotOrder(arg);
@@ -294,6 +301,22 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
         return this.getDeterminant();
     }
 
+    /**
+     * Total nonzeros across all eta factors accumulated since the last factorisation. Each eta factor
+     * corresponds to one Forrest-Tomlin update (column replacement in the basis).
+     */
+    public int countEtaNonzeros() {
+        return myEtaNonzeros;
+    }
+
+    /**
+     * Total nonzeros in the L and U factors at the time of the last full factorisation (excluding the U
+     * diagonal which is always dense). Returns 0 before the first factorisation.
+     */
+    public int countFactorNonzeros() {
+        return myFactorNonzeros;
+    }
+
     @Override
     public int countSignificant(final double threshold) {
 
@@ -310,33 +333,40 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
     @Override
     public boolean decompose(final Collectable<Double, ? super TransformableRegion<Double>> matrix) {
 
-        if (matrix instanceof ColumnsSupplier.Selection<?>) {
-            return this.factor((ColumnsSupplier.Selection<Double>) matrix);
-        }
-
-        this.reset(matrix);
-
-        Sliceable<Double> columns = SparseLU.cast(matrix);
-
-        // Don't sort on this path
-
-        return this.doFactor(columns, null, matrix.getRowDim(), matrix.getColDim());
-    }
-
-    /**
-     * Primary factorisation entry point taking the exact type produced by
-     * {@link ColumnsSupplier#columns(int...)}. Columns are {@link SparseArray} instances — no wrapping, no
-     * element-by-element access, and the {@link SparseArray#FULLNESS} comparator can be used directly for
-     * column ordering.
-     */
-    public boolean factor(final ColumnsSupplier.Selection<Double> matrix) {
-
         this.reset(matrix);
 
         int m = matrix.getRowDim();
         int n = matrix.getColDim();
+        int r = Math.min(m, n);
 
-        long[] keys = this.getValuesToSort(matrix, n);
+        Sliceable<Double> columns = SparseLU.cast(matrix);
+
+        double[] wColData = this.getWorkerColumn(m).data;
+
+        for (int j = 0; j < n; j++) {
+            columns.sliceColumn(j).supplyTo(wColData);
+            this.doFactorColumn(j, m, r, wColData);
+        }
+
+        return this.doFactorFinish();
+    }
+
+    /**
+     * Factorises the basis formed by selecting columns from a CSC matrix. This is the primary entry point for
+     * the revised simplex solver.
+     *
+     * @param matrix  The full constraint matrix in CSC format
+     * @param columns The indices of the columns that form the basis
+     */
+    public boolean factor(final R064CSC matrix, final int[] columns) {
+
+        int m = matrix.getRowDim();
+        int n = columns.length;
+        int r = Math.min(m, n);
+
+        this.reset(m, n);
+
+        long[] keys = this.getValuesToSort(matrix, columns, n);
 
         if (myColPivot == null) {
             myColPivot = new Pivot();
@@ -346,7 +376,14 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
 
         myColPivot.setModified(SortAll.sort(keys, order));
 
-        return this.doFactor(matrix, order, m, n);
+        double[] wColData = this.getWorkerColumn(m).data;
+
+        for (int j = 0; j < n; j++) {
+            matrix.supplyTo(columns[order != null ? order[j] : j], wColData);
+            this.doFactorColumn(j, m, r, wColData);
+        }
+
+        return this.doFactorFinish();
     }
 
     @Override
@@ -406,28 +443,6 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
         return retVal;
     }
 
-    /**
-     * Total nonzeros across all eta factors accumulated since the last factorisation. Each eta factor
-     * corresponds to one Forrest-Tomlin update (column replacement in the basis).
-     */
-    public int countEtaNonzeros() {
-        int total = 0;
-        for (InvertibleFactor<Double> factor : myFactors) {
-            if (factor instanceof PermutationEta) {
-                total += ((PermutationEta) factor).myElements.countNonzeros();
-            }
-        }
-        return total;
-    }
-
-    /**
-     * Total nonzeros in the L and U factors at the time of the last full factorisation (excluding the U
-     * diagonal which is always dense). Returns 0 before the first factorisation.
-     */
-    public int countFactorNonzeros() {
-        return myFactorNonzeros;
-    }
-
     @Override
     public MatrixStore<Double> getInverse(final PhysicalStore<Double> preallocated) {
         return this.getSolution(R064Store.FACTORY.makeIdentity(this.getMinDim()), preallocated);
@@ -476,27 +491,30 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
         if (nbSolutions > 1) {
 
             R064Store column = R064Store.FACTORY.make(rhs.getRowDim(), 1);
+            double[] colData = column.data;
 
             for (int col = 0; col < nbSolutions; col++) {
 
                 column.fillMatching(preallocated.sliceColumn(col));
 
-                this.ftranL(column);
+                this.ftranL(colData);
 
-                InvertibleFactor.ftran(myFactors, column);
+                InvertibleFactor.ftran(myFactors, colData);
 
-                this.ftranU(column);
+                this.ftranU(colData);
 
                 preallocated.fillColumn(col, column);
             }
 
         } else {
 
-            this.ftranL(preallocated);
+            double[] data = ((R064Store) preallocated).data;
 
-            InvertibleFactor.ftran(myFactors, preallocated);
+            this.ftranL(data);
 
-            this.ftranU(preallocated);
+            InvertibleFactor.ftran(myFactors, data);
+
+            this.ftranU(data);
         }
 
         if (myColPivot != null && myColPivot.isModified()) {
@@ -565,6 +583,103 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
     @Override
     public boolean updateColumn(final int specifiedColumn, final Access1D.Collectable<Double, ? super TransformableRegion<Double>> newColumn) {
 
+        newColumn.supplyTo(this.getWorkerColumn(this.getRowDim()));
+
+        return this.doUpdateColumn(specifiedColumn);
+    }
+
+    /**
+     * Forrest-Tomlin update reading the new column directly from a CSC matrix.
+     *
+     * @param specifiedColumn The basis position being replaced
+     * @param matrix          The full constraint matrix in CSC format
+     * @param sourceColumn    The column index in the CSC matrix to read
+     * @return true if the update succeeded
+     */
+    public boolean updateColumn(final int specifiedColumn, final R064CSC matrix, final int sourceColumn) {
+
+        double[] wColData = this.getWorkerColumn(this.getRowDim()).data;
+        matrix.supplyTo(sourceColumn, wColData);
+
+        return this.doUpdateColumn(specifiedColumn);
+    }
+
+    private void btranL(final double[] arg) {
+        SubstituteBackwards.invoke(arg, myFixedL);
+    }
+
+    private void btranU(final double[] arg) {
+        int r = myDiagU.length;
+        for (int ij = 0; ij < r; ij++) {
+            double varJ = arg[ij] / myDiagU[ij];
+            arg[ij] = varJ;
+            myU.getRow(ij).axpy(-varJ, arg);
+        }
+    }
+
+    /**
+     * Processes one column during factorisation. Caller must have filled wColData with the raw column values.
+     */
+    private void doFactorColumn(final int j, final int m, final int r, final double[] column) {
+
+        myPivot.applyPivotOrder(column);
+
+        this.ftranMutableL(column);
+
+        int p = j;
+        double maxMag = Math.abs(column[j]);
+        for (int i = j + 1; i < m; i++) {
+            double mag = Math.abs(column[i]);
+            if (mag > maxMag) {
+                p = i;
+                maxMag = mag;
+            }
+        }
+
+        if (p != j) {
+
+            myPivot.change(p, j);
+
+            double tmpVal = column[p];
+            column[p] = column[j];
+            column[j] = tmpVal;
+
+            myL.exchangeRows(p, j);
+        }
+
+        double tmpNumer, tmpDenom = column[j];
+
+        for (int i = 0, limit = Math.min(m, j); i < limit; i++) {
+            tmpNumer = column[i];
+            myU.putLast(i, j, tmpNumer);
+        }
+        if (j < r) {
+            myDiagU[j] = tmpDenom;
+        }
+
+        if (j < m && tmpDenom != ZERO) {
+            for (int i = j + 1; i < m; i++) {
+                tmpNumer = column[i];
+                myL.putLast(i, j, tmpNumer / tmpDenom);
+            }
+        }
+    }
+
+    private boolean doFactorFinish() {
+
+        myFixedL = myL.toCSR();
+
+        myFactorNonzeros = myFixedL.countNonzeros() + myU.countNonzeros();
+
+        return this.computed(true);
+    }
+
+    /**
+     * Shared Forrest-Tomlin update logic. Assumes wColData (from {@link #getWorkerColumn(int)}) is already
+     * filled with the raw new column values.
+     */
+    private boolean doUpdateColumn(final int specifiedColumn) {
+
         int m = this.getRowDim();
         int n = this.getColDim();
         int r = this.getMinDim();
@@ -581,38 +696,32 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
 
         int columnIndex = myColPivot.locationOf(specifiedColumn);
 
-        newColumn.supplyTo(wCol);
         myPivot.applyPivotOrder(wColData);
 
         this.ftranL(wColData);
 
-        // Apply any existing transformations to the new column
         InvertibleFactor.ftran(myFactors, wColData);
 
-        // After forward substitution is complete, find the last non-zero row
         double diag = NaN;
         int lastRowNonZero = -1;
         for (int i = m - 1; i >= 0; i--) {
             if (!FletcherMatthews.PRECISION.isZero(wColData[i])) {
                 lastRowNonZero = i;
                 diag = wColData[i];
-                break; // Stop as soon as we find a non-zero value
+                break;
             }
         }
 
         if (lastRowNonZero < columnIndex) {
 
-            // This means the updated matrix is singular
             return false;
 
         } else if (FletcherMatthews.SAFE.isZero(diag)) {
 
-            // Numerically unstable
             return false;
 
         } else if (lastRowNonZero == columnIndex) {
 
-            // Lucky!
             for (int i = 0; i < columnIndex; i++) {
                 myU.set(i, columnIndex, wColData[i]);
             }
@@ -628,9 +737,6 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
                 myDiagU[i] = myDiagU[i + 1];
             }
 
-            // Permutation perm = new Permutation(r, columnIndex, lastRowNonZero);
-            // myFactors.add(perm);
-
             PermutationEta eta = new PermutationEta(r, columnIndex, lastRowNonZero);
 
             for (int ij = columnIndex; ij < lastRowNonZero; ij++) {
@@ -640,14 +746,10 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
 
                 eta.set(ij, -ratio);
 
-                // wRowData[ij] = ZERO;
-
                 myU.getRow(ij).axpy(-ratio, wRow);
-
             }
 
             if (FletcherMatthews.SAFE.isZero(wRowData[lastRowNonZero])) {
-                // zero on diagonal
                 return false;
             }
 
@@ -657,124 +759,30 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
             }
 
             myFactors.add(eta);
+            myEtaNonzeros += eta.countNonzeros();
         }
 
         return true;
-    }
-
-    private void btranL(final double[] arg) {
-        SubstituteBackwards.invoke(arg, myFixedL);
-    }
-
-    private void btranL(final PhysicalStore<Double> arg) {
-        int r = myL.getMinDim();
-        for (int ij = r - 1; ij > 0; ij--) {
-            double varJ = arg.doubleValue(ij);
-            myL.getRow(ij).axpy(-varJ, arg);
-        }
-    }
-
-    private void btranU(final double[] arg) {
-        int r = myDiagU.length;
-        for (int ij = 0; ij < r; ij++) {
-            double varJ = arg[ij] / myDiagU[ij];
-            arg[ij] = varJ;
-            myU.getRow(ij).axpy(-varJ, arg);
-        }
-    }
-
-    private void btranU(final PhysicalStore<Double> arg) {
-        int r = myDiagU.length;
-        for (int ij = 0; ij < r; ij++) {
-            double varJ = arg.doubleValue(ij) / myDiagU[ij];
-            arg.set(ij, varJ);
-            myU.getRow(ij).axpy(-varJ, arg);
-        }
-    }
-
-    private boolean doFactor(final Sliceable<Double> columns, final int[] colOrder, final int m, final int n) {
-
-        int r = Math.min(m, n);
-
-        R064Store wCol = this.getWorkerColumn(m);
-        double[] wColData = wCol.data;
-
-        for (int j = 0; j < n; j++) {
-
-            columns.sliceColumn(colOrder != null ? colOrder[j] : j).supplyTo(wColData);
-
-            myPivot.applyPivotOrder(wCol);
-
-            this.ftranL(wCol);
-
-            int p = j;
-            double maxMag = Math.abs(wColData[j]);
-            for (int i = j + 1; i < m; i++) {
-                double mag = Math.abs(wColData[i]);
-                if (mag > maxMag) {
-                    p = i;
-                    maxMag = mag;
-                }
-            }
-
-            if (p != j) {
-
-                myPivot.change(p, j);
-
-                double tmpVal = wColData[p];
-                wColData[p] = wColData[j];
-                wColData[j] = tmpVal;
-
-                myL.exchangeRows(p, j);
-            }
-
-            double tmpNumer, tmpDenom = wColData[j];
-
-            for (int i = 0, limit = Math.min(m, j); i < limit; i++) {
-                tmpNumer = wColData[i];
-                myU.putLast(i, j, tmpNumer);
-            }
-            if (j < r) {
-                myDiagU[j] = tmpDenom;
-            }
-
-            if (j < m && tmpDenom != ZERO) {
-                for (int i = j + 1; i < m; i++) {
-                    tmpNumer = wColData[i];
-                    myL.putLast(i, j, tmpNumer / tmpDenom);
-                }
-            }
-        }
-
-        myFixedL = myL.toCSR();
-
-        myFactorNonzeros = myFixedL.countNonzeros() + myU.countNonzeros();
-
-        return this.computed(true);
     }
 
     private void ftranL(final double[] arg) {
         SubstituteForwards.invoke(arg, myFixedL);
     }
 
-    private void ftranL(final PhysicalStore<Double> arg) {
+    /**
+     * Forward substitution using the mutable L factor (RowsSupplier). Used during factorisation before
+     * myFixedL is available.
+     */
+    private void ftranMutableL(final double[] arg) {
         int r = myL.getMinDim();
         for (int ij = 1; ij < r; ij++) {
-            arg.add(ij, 0, -myL.getRow(ij).dot(arg));
+            arg[ij] -= myL.getRow(ij).dot(arg);
         }
     }
 
     private void ftranU(final double[] arg) {
         for (int ij = myDiagU.length - 1; ij >= 0; ij--) {
             arg[ij] = (arg[ij] - myU.getRow(ij).dot(arg)) / myDiagU[ij];
-        }
-    }
-
-    private void ftranU(final PhysicalStore<Double> arg) {
-        for (int ij = myDiagU.length - 1; ij >= 0; ij--) {
-            double sum = arg.doubleValue(ij);
-            sum -= myU.getRow(ij).dot(arg);
-            arg.set(ij, 0, sum / myDiagU[ij]);
         }
     }
 
@@ -816,16 +824,24 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
         return new FactorU(myU, myDiagU);
     }
 
-    long[] getValuesToSort(final ColumnsSupplier.Selection<Double> matrix, final int n) {
+    /**
+     * Builds column-ordering keys from a CSC matrix with a column selection. The key for each selected column
+     * encodes (lastRowIndex + 1) in the upper 32 bits and nnz in the lower 32 bits — same encoding as the
+     * {@link ColumnsSupplier.Selection} variant.
+     */
+    long[] getValuesToSort(final R064CSC matrix, final int[] columns, final int n) {
 
         if (myValuesToSort == null || myValuesToSort.length != n) {
             myValuesToSort = new long[n];
         }
 
-        SparseArray<?> array;
         for (int j = 0; j < n; j++) {
-            array = matrix.sliceColumn(j);
-            myValuesToSort[j] = ((long) (array.lastIndex() + 1) << 32) | (array.countNonzeros() & 0xFFFFFFFFL);
+            int col = columns[j];
+            int p0 = matrix.pointers[col];
+            int pm = matrix.pointers[col + 1];
+            int nnz = pm - p0;
+            long lastRow = nnz > 0 ? matrix.indices[pm - 1] + 1L : 0L;
+            myValuesToSort[j] = (lastRow << 32) | (nnz & 0xFFFFFFFFL);
         }
 
         return myValuesToSort;
@@ -845,10 +861,11 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
         return myWorkerRow;
     }
 
-    void reset(final Structure2D matrix) {
+    /**
+     * Reset for a specified m x n factorisation — used by {@link #factor(R064CSC, int[])}.
+     */
+    void reset(final int m, final int n) {
 
-        int m = matrix.getRowDim();
-        int n = matrix.getColDim();
         int r = Math.min(m, n);
 
         myPivot.reset(m);
@@ -877,8 +894,13 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
         }
 
         myFactors.clear();
+        myEtaNonzeros = 0;
 
         myFixedL = null;
+    }
+
+    void reset(final Structure2D matrix) {
+        this.reset(matrix.getRowDim(), matrix.getColDim());
     }
 
 }

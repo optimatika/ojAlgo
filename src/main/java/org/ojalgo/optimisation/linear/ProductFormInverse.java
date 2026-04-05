@@ -30,18 +30,18 @@ import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.array.SparseArray.SparseFactory;
-import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.decomposition.LU;
-import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.R064CSC;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.transformation.InvertibleFactor;
 import org.ojalgo.type.ObjectPool;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * Product-form-of-the-inverse (PFI) {@link BasisRepresentation}. Each basis update is recorded as an eta
- * vector (elementary column operation). Solving a system with B applies the sequence of eta factors in
- * order. Periodically re-inverts via LU to bound numerical drift and factor count.
+ * vector (elementary column operation). Solving a system with B applies the sequence of eta factors in order.
+ * Periodically re-inverts via LU to bound numerical drift and factor count.
  *
  * @see SparseDecomposition
  */
@@ -180,14 +180,20 @@ final class ProductFormInverse implements BasisRepresentation {
 
     }
 
+    private static final NumberContext SAFE = NumberContext.of(3);
+    /**
+     * Maximum number of eta factors before forcing a full refactorisation. Benchmarking showed only ~15%
+     * solve-cost degradation at 200 updates (dim=1000), so 100 is conservative.
+     */
+    private static final int UPDATES_LIMIT = 100;
+
     private final ObjectPool<SparseArray<Double>> myArrayPool;
     private final int myDim;
-    private final List<ElementaryFactor> myFactors = new ArrayList<>();
+    private final List<ElementaryFactor> myFactors = new ArrayList<>(UPDATES_LIMIT);
     private final LU<Double> myRoot;
-    private final double myScalingThreshold;
     private final R064Store myWork;
 
-    ProductFormInverse(final int dim, final double scalingThreshold) {
+    ProductFormInverse(final int dim) {
 
         super();
 
@@ -195,7 +201,6 @@ final class ProductFormInverse implements BasisRepresentation {
         myRoot = LU.R064.make(dim, dim);
         myWork = R064Store.FACTORY.make(dim, 1);
         myArrayPool = new ArrayPool(dim);
-        myScalingThreshold = scalingThreshold;
     }
 
     @Override
@@ -254,40 +259,34 @@ final class ProductFormInverse implements BasisRepresentation {
 
     /**
      * Update the product form inverse to reflect a replaced column.
-     *
-     * @param basis Full basis, with the column already exchanged.
      */
     @Override
-    public void reset(final MatrixStore<Double> basis) {
-
+    public void reset(final R064CSC matrix, final int[] included) {
         this.clearFactors();
-        myRoot.decompose(basis.transpose());
+        myRoot.decompose(matrix.columns(included).transpose());
     }
 
     /**
      * Update the inverse to reflect a replaced column in the basis.
-     *
-     * @param basis  Full basis, with the column already exchanged.
-     * @param col    The index, of the column, that was exchanged.
-     * @param values The (non zero) values of that column.
      */
     @Override
-    public void update(final MatrixStore<Double> basis, final int col, final SparseArray<Double> values) {
+    public boolean update(final R064CSC matrix, final int[] included, final int exitIndex, final int enterColumn) {
 
-        values.supplyTo(myWork);
+        matrix.supplyTo(enterColumn, myWork.data);
 
-        this.ftran(myWork);
+        this.ftran(myWork.data);
 
-        double diagonalElement = myWork.doubleValue(col);
+        double diagonalElement = myWork.doubleValue(exitIndex);
 
-        if (Math.abs(diagonalElement) >= myScalingThreshold
-                && (Math.abs(diagonalElement) / myWork.aggregateAll(Aggregator.LARGEST).doubleValue()) >= myScalingThreshold) {
+        if (myFactors.size() >= UPDATES_LIMIT || SAFE.isZero(diagonalElement)) {
 
-            myFactors.add(this.newFactor(myWork, col, diagonalElement));
+            this.reset(matrix, included);
+            return true;
 
         } else {
 
-            this.reset(basis);
+            myFactors.add(this.newFactor(myWork, exitIndex, diagonalElement));
+            return false;
         }
     }
 

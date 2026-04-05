@@ -57,9 +57,8 @@ import org.ojalgo.type.context.NumberContext;
  * <ul>
  * <li>{@link SimplexTableau} — stores the full (or sparse) simplex tableau explicitly. Used by
  * {@link SimplexTableauSolver}.
- * <li>{@link RevisedStore} — maintains the basis inverse in factored form via a
- * {@link BasisRepresentation}, computing tableau elements on demand. Used by {@link SimplexSolver} and its
- * subclasses.
+ * <li>{@link RevisedStore} — maintains the basis inverse in factored form via a {@link BasisRepresentation},
+ * computing tableau elements on demand. Used by {@link SimplexSolver} and its subclasses.
  * </ul>
  * Non-basic variables are partitioned into {@link ColumnState#LOWER}, {@link ColumnState#UPPER}, or
  * {@link ColumnState#UNBOUNDED}; basic variables are {@link ColumnState#BASIS}. The partition is updated on
@@ -189,6 +188,7 @@ abstract class SimplexStore {
 
     private <S extends SimplexSolver> S newSolver(final BiFunction<Optimisation.Options, SimplexStore, S> constructor, final Optimisation.Options options,
             final int... basis) {
+        this.doneBuilding();
         S solver = constructor.apply(options, this);
         if (basis.length > 0) {
             solver.basis(basis);
@@ -236,6 +236,15 @@ abstract class SimplexStore {
      */
     final int countRemainingArtificials() {
         return myRemainingArtificials;
+    }
+
+    /**
+     * Called once after the constraint matrix, RHS, and objective have been fully populated and before any
+     * solver operations (basis reset, shift, iteration). Subclasses may override to freeze mutable build-time
+     * data structures into efficient solve-time representations.
+     */
+    void doneBuilding() {
+        // no-op by default
     }
 
     /**

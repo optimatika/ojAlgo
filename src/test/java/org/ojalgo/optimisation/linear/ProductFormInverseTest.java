@@ -23,18 +23,31 @@ package org.ojalgo.optimisation.linear;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.array.ArrayR064;
-import org.ojalgo.array.SparseArray;
 import org.ojalgo.matrix.decomposition.LU;
+import org.ojalgo.matrix.store.R064CSC;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.random.Uniform;
 
 public class ProductFormInverseTest extends OptimisationLinearTests {
 
+    private static R064CSC buildCSC(final double[][] data) {
+        int m = data.length;
+        int n = data[0].length;
+        R064CSC.Builder builder = R064CSC.newBuilder(m, n);
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (data[i][j] != 0.0) {
+                    builder.set(i, j, data[i][j]);
+                }
+            }
+        }
+        return builder.build();
+    }
+
     /**
      * Product Form example from: lecture6-revisedsimplex.pdf
-     * <P>
+     * <p>
      * Revised Simplex or How to Use the Simplex without the Tableau
      *
      * @see ElementaryFactorTest
@@ -42,26 +55,17 @@ public class ProductFormInverseTest extends OptimisationLinearTests {
     @Test
     public void testLecture6Example() {
 
-        SparseArray<Double> arr0 = SparseArray.factory(ArrayR064.FACTORY).make(3);
-        arr0.set(0, 8);
-        arr0.set(1, 4);
-        arr0.set(2, 2);
-        SparseArray<Double> arr1 = SparseArray.factory(ArrayR064.FACTORY).make(3);
-        arr1.set(0, 6);
-        arr1.set(1, 2);
-        arr1.set(2, 1.5);
-        SparseArray<Double> arr2 = SparseArray.factory(ArrayR064.FACTORY).make(3);
-        arr2.set(0, 1);
-        arr2.set(1, 1.5);
-        arr2.set(2, 0.5);
+        // Full 3x3 identity — all 3 columns form the initial basis
+        R064CSC csc0 = ProductFormInverseTest.buildCSC(new double[][] { { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } });
+        int[] included0 = { 0, 1, 2 };
 
-        R064Store col0 = R064Store.FACTORY.column(8, 4, 2);
-        R064Store col1 = R064Store.FACTORY.column(6, 2, 1.5);
-        R064Store col2 = R064Store.FACTORY.column(1, 1.5, 0.5);
+        // After replacing column 2 with [8,4,2]
+        R064CSC csc1 = ProductFormInverseTest.buildCSC(new double[][] { { 1, 0, 8 }, { 0, 1, 4 }, { 0, 0, 2 } });
+        int[] included1 = { 0, 1, 2 };
 
-        TestUtils.assertEquals(col0, arr0);
-        TestUtils.assertEquals(col1, arr1);
-        TestUtils.assertEquals(col2, arr2);
+        // After replacing column 1 with [1,1.5,0.5]
+        R064CSC csc2 = ProductFormInverseTest.buildCSC(new double[][] { { 1, 1, 8 }, { 0, 1.5, 4 }, { 0, 0.5, 2 } });
+        int[] included2 = { 0, 1, 2 };
 
         RawStore expBase0 = RawStore.wrap(new double[][] { { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } });
         RawStore expBase1 = RawStore.wrap(new double[][] { { 1, 0, 8 }, { 0, 1, 4 }, { 0, 0, 2 } });
@@ -73,8 +77,8 @@ public class ProductFormInverseTest extends OptimisationLinearTests {
 
         LU<Double> lu = LU.R064.make();
         lu.decompose(expBase0);
-        ProductFormInverse factors = new ProductFormInverse(3, 1E-32);
-        factors.reset(expBase0);
+        ProductFormInverse factors = new ProductFormInverse(3);
+        factors.reset(csc0, included0);
         random.supplyTo(exp);
         lu.ftran(exp);
         random.supplyTo(act);
@@ -87,7 +91,7 @@ public class ProductFormInverseTest extends OptimisationLinearTests {
         TestUtils.assertEquals(exp, act);
 
         lu.decompose(expBase1);
-        factors.update(expBase1, 2, arr0);
+        factors.update(csc1, included1, 2, 2);
         random.supplyTo(exp);
         lu.ftran(exp);
         random.supplyTo(act);
@@ -100,7 +104,7 @@ public class ProductFormInverseTest extends OptimisationLinearTests {
         TestUtils.assertEquals(exp, act);
 
         lu.decompose(expBase2);
-        factors.update(expBase2, 1, arr2);
+        factors.update(csc2, included2, 1, 1);
         random.supplyTo(exp);
         lu.ftran(exp);
         random.supplyTo(act);

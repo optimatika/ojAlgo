@@ -1,10 +1,9 @@
 package org.ojalgo.optimisation.linear;
 
 import org.ojalgo.array.ArrayR064;
-import org.ojalgo.array.SparseArray;
 import org.ojalgo.matrix.decomposition.LU;
-import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.R064CSC;
 
 /**
  * Dense LU based {@link BasisRepresentation}. Uses {@link LU#R064} for the factorisation. Useful as a
@@ -16,10 +15,12 @@ final class DenseDecomposition implements BasisRepresentation {
 
     private final LU<Double> myDense;
     private int myUpdateCounter = 0;
+    private final ArrayR064 myWork;
 
     DenseDecomposition(final int dim) {
         super();
         myDense = LU.R064.make(dim, dim);
+        myWork = ArrayR064.make(dim);
     }
 
     @Override
@@ -69,16 +70,32 @@ final class DenseDecomposition implements BasisRepresentation {
     }
 
     @Override
-    public void reset(final MatrixStore<Double> basis) {
-        myDense.decompose(basis);
+    public void reset(final R064CSC matrix, final int[] included) {
+        myDense.decompose(matrix.columns(included));
         myUpdateCounter = 0;
     }
 
     @Override
-    public void update(final MatrixStore<Double> basis, final int col, final SparseArray<Double> values) {
-        if (myUpdateCounter++ >= UPDATES_LIMIT || !myDense.isComputed() || !myDense.updateColumn(col, values)) {
-            this.reset(basis);
+    public boolean update(final R064CSC matrix, final int[] included, final int exitIndex, final int enterColumn) {
+
+        if (myUpdateCounter >= UPDATES_LIMIT || !myDense.isComputed()) {
+            this.reset(matrix, included);
+            return true;
         }
+
+        myUpdateCounter++;
+
+        if (!this.doUpdate(matrix, exitIndex, enterColumn)) {
+            this.reset(matrix, included);
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean doUpdate(final R064CSC matrix, final int exitIndex, final int enterColumn) {
+        matrix.supplyTo(enterColumn, myWork.data);
+        return myDense.updateColumn(exitIndex, myWork);
     }
 
 }

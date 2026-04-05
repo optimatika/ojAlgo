@@ -37,8 +37,14 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Changed
 
+#### org.ojalgo.matrix
+
+- `SparseLU` gained `factor(R064CSC, int[])` for direct CSC-based basis factorisation, and `updateColumn(int, R064CSC, int)` for Forrest-Tomlin updates reading from CSC — avoiding intermediate wrapping.
+- `R064CSC` and `R064CSR` gained `axpy(int, double, double[])`, `dot(int, double[])`, `supplyTo(int, double[])`, and `capacity(int)` methods for efficient row/column-level operations on compressed sparse matrices.
+
 #### org.ojalgo.optimisation
 
+- Revised simplex (`RevisedStore`) now freezes the constraint matrix to `R064CSC` before solving and uses raw `double[]` working vectors, reducing per-iteration allocations and improving cache locality.
 - Cleaned up the `UpdatableSolver` interface – everything is now optional with default implementations that do nothing. All the quirky stuff is moved to `ExpressionsBasedModel.EntityMap`. This also required `ConstraintsMetaData` to be somewhat refactored, and the `Optimisation.ConstraintType` enum gained another instance `RANGE`.
 - Deprecated `Constraint.isLowerConstraint()` and `Constraint.isUpperConstraint()` in favour of `Constraint.getConstraintType()`.
 - `LinearSolver.Builder` now auto-selects the revised simplex (dual) solver when variable bounds have been modified; tableau (primal) remains the default for unchanged bounds. An explicit `Configuration` override still takes precedence.

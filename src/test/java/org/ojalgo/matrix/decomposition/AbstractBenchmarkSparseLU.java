@@ -65,7 +65,7 @@ public abstract class AbstractBenchmarkSparseLU {
         return vector;
     }
 
-    public static MatrixStore<Double> newSparseMatrix(final int dim, final double density) {
+    public static ColumnsSupplier<Double> newSparseMatrix(final int dim, final double density) {
 
         // Create sparse matrix with specified density
         ColumnsSupplier<Double> builder = R064Store.FACTORY.makeColumnsSupplier(dim);
