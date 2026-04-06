@@ -266,10 +266,6 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
 
         super();
 
-        //        if ((!Double.isFinite(base) || !Double.isFinite(remainder))) {
-        //            BasicLogger.error("Invalid Quadruple: base={}, remainder={}", base, remainder);
-        //        }
-
         myBase = base;
         myRemainder = remainder;
     }

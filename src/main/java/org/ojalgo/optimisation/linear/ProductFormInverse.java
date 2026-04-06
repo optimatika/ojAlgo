@@ -24,16 +24,12 @@ package org.ojalgo.optimisation.linear;
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import org.ojalgo.array.ArrayR064;
-import org.ojalgo.array.SparseArray;
-import org.ojalgo.array.SparseArray.NonzeroView;
-import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064CSC;
-import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.transformation.InvertibleFactor;
 import org.ojalgo.type.ObjectPool;
 import org.ojalgo.type.context.NumberContext;
@@ -47,9 +43,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 final class ProductFormInverse implements BasisRepresentation {
 
-    static final class ArrayPool extends ObjectPool<SparseArray<Double>> {
-
-        private static final SparseFactory<Double> FACTORY = SparseArray.factory(ArrayR064.FACTORY);
+    static final class ArrayPool extends ObjectPool<double[]> {
 
         private final int myDim;
 
@@ -59,23 +53,23 @@ final class ProductFormInverse implements BasisRepresentation {
         }
 
         @Override
-        protected SparseArray<Double> newObject() {
-            return FACTORY.make(myDim);
+        protected double[] newObject() {
+            return new double[myDim];
         }
 
         @Override
-        protected void reset(final SparseArray<Double> object) {
-            object.reset();
+        protected void reset(final double[] object) {
+            Arrays.fill(object, ZERO);
         }
     }
 
     static final class ElementaryFactor implements InvertibleFactor<Double> {
 
-        private final SparseArray<Double> myColumn;
+        private final double[] myColumn;
         private final int myIndex;
         private final double myNegatedDiagonal;
 
-        ElementaryFactor(final SparseArray<Double> column, final int index, final double diagonalElement) {
+        ElementaryFactor(final double[] column, final int index, final double diagonalElement) {
             super();
             myColumn = column;
             myIndex = index;
@@ -87,10 +81,9 @@ final class ProductFormInverse implements BasisRepresentation {
 
             double f = -arg[myIndex];
 
-            for (NonzeroView<Double> nz : myColumn.nonzeros()) {
-                int index = (int) nz.index();
-                if (index != myIndex) {
-                    f += nz.doubleValue() * arg[index];
+            for (int i = 0, lim = arg.length; i < lim; i++) {
+                if (i != myIndex) {
+                    f += myColumn[i] * arg[i];
                 }
             }
 
@@ -107,10 +100,9 @@ final class ProductFormInverse implements BasisRepresentation {
 
             double f = -arg.doubleValue(myIndex);
 
-            for (NonzeroView<Double> nz : myColumn.nonzeros()) {
-                int index = (int) nz.index();
-                if (index != myIndex) {
-                    f += nz.doubleValue() * arg.doubleValue(index);
+            for (int i = 0, lim = arg.size(); i < lim; i++) {
+                if (i != myIndex) {
+                    f += myColumn[i] * arg.doubleValue(i);
                 }
             }
 
@@ -133,12 +125,11 @@ final class ProductFormInverse implements BasisRepresentation {
 
             d /= myNegatedDiagonal;
 
-            for (NonzeroView<Double> nz : myColumn.nonzeros()) {
-                int index = (int) nz.index();
-                if (index == myIndex) {
-                    arg[index] = -d;
+            for (int i = 0, lim = arg.length; i < lim; i++) {
+                if (i == myIndex) {
+                    arg[i] = -d;
                 } else {
-                    arg[index] += nz.doubleValue() * d;
+                    arg[i] += myColumn[i] * d;
                 }
             }
         }
@@ -154,27 +145,26 @@ final class ProductFormInverse implements BasisRepresentation {
 
             d /= myNegatedDiagonal;
 
-            for (NonzeroView<Double> nz : myColumn.nonzeros()) {
-                int index = (int) nz.index();
-                if (index == myIndex) {
-                    arg.set(index, -d);
+            for (int i = 0, lim = arg.size(); i < lim; i++) {
+                if (i == myIndex) {
+                    arg.set(i, -d);
                 } else {
-                    arg.add(index, nz.doubleValue() * d);
+                    arg.add(i, myColumn[i] * d);
                 }
             }
         }
 
         @Override
         public int getColDim() {
-            return myColumn.size();
+            return myColumn.length;
         }
 
         @Override
         public int getRowDim() {
-            return myColumn.size();
+            return myColumn.length;
         }
 
-        SparseArray<Double> getColumn() {
+        double[] getColumn() {
             return myColumn;
         }
 
@@ -187,11 +177,10 @@ final class ProductFormInverse implements BasisRepresentation {
      */
     private static final int UPDATES_LIMIT = 100;
 
-    private final ObjectPool<SparseArray<Double>> myArrayPool;
+    private final ObjectPool<double[]> myArrayPool;
     private final int myDim;
     private final List<ElementaryFactor> myFactors = new ArrayList<>(UPDATES_LIMIT);
     private final LU<Double> myRoot;
-    private final R064Store myWork;
 
     ProductFormInverse(final int dim) {
 
@@ -199,7 +188,6 @@ final class ProductFormInverse implements BasisRepresentation {
 
         myDim = dim;
         myRoot = LU.R064.make(dim, dim);
-        myWork = R064Store.FACTORY.make(dim, 1);
         myArrayPool = new ArrayPool(dim);
     }
 
@@ -262,7 +250,12 @@ final class ProductFormInverse implements BasisRepresentation {
      */
     @Override
     public void reset(final R064CSC matrix, final int[] included) {
-        this.clearFactors();
+
+        for (ElementaryFactor factor : myFactors) {
+            myArrayPool.giveBack(factor.getColumn());
+        }
+        myFactors.clear();
+
         myRoot.decompose(matrix.columns(included).transpose());
     }
 
@@ -272,43 +265,25 @@ final class ProductFormInverse implements BasisRepresentation {
     @Override
     public boolean update(final R064CSC matrix, final int[] included, final int exitIndex, final int enterColumn) {
 
-        matrix.supplyTo(enterColumn, myWork.data);
+        double[] column = myArrayPool.borrow();
 
-        this.ftran(myWork.data);
+        matrix.supplyTo(enterColumn, column);
 
-        double diagonalElement = myWork.doubleValue(exitIndex);
+        this.ftran(column);
+
+        double diagonalElement = column[exitIndex];
 
         if (myFactors.size() >= UPDATES_LIMIT || SAFE.isZero(diagonalElement)) {
 
+            myArrayPool.giveBack(column);
             this.reset(matrix, included);
             return true;
 
         } else {
 
-            myFactors.add(this.newFactor(myWork, exitIndex, diagonalElement));
+            myFactors.add(new ElementaryFactor(column, exitIndex, diagonalElement));
             return false;
         }
-    }
-
-    private void clearFactors() {
-        for (ElementaryFactor factor : myFactors) {
-            myArrayPool.giveBack(factor.getColumn());
-        }
-        myFactors.clear();
-    }
-
-    private ElementaryFactor newFactor(final R064Store values, final int col, final double diagonalElement) {
-
-        SparseArray<Double> sparse = myArrayPool.borrow();
-
-        for (int i = 0, limit = values.size(); i < limit; i++) {
-            double value = values.doubleValue(i);
-            if (value != ZERO) {
-                sparse.set(i, value);
-            }
-        }
-
-        return new ElementaryFactor(sparse, col, diagonalElement);
     }
 
 }
