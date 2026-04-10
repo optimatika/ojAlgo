@@ -21,6 +21,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - New `RuizScaling` – Ruiz equilibration for KKT/constraint systems in the convex solver pipeline.
 - `UpdatableSolver` gained `getDualMultiplier(int)` and `getReducedGradient(int)` for querying dual variables and reduced gradients after a solve.
 - `Optimisation.Result` now carries an optional reduced gradient via `getReducedGradient()` / `withReducedGradient(Supplier)`.
+- `ExpressionsBasedModel.Simplifier`, `ExpressionAnalyser`, and `VariableAnalyser` are now `public`, enabling custom presolver-like hooks that plug into the standard presolve pipeline.
 
 #### org.ojalgo.matrix
 
@@ -34,6 +35,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.scalar
 
 - `RationalNumber.getNumerator()` and `RationalNumber.getDenominator()` are now `public`.
+
+#### org.ojalgo.type
+
+- `NumberContext.common(BigDecimal, BigDecimal)` returns the average of two values if they are within precision, otherwise null.
 
 ### Changed
 
@@ -49,6 +54,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - Deprecated `Constraint.isLowerConstraint()` and `Constraint.isUpperConstraint()` in favour of `Constraint.getConstraintType()`.
 - `LinearSolver.Builder` now auto-selects the revised simplex (dual) solver when variable bounds have been modified; tableau (primal) remains the default for unchanged bounds. An explicit `Configuration` override still takes precedence.
 - `RevisedStore.updateDualsAndReducedCosts()` rewritten to use raw `double[]` operations instead of logical row/column selections, avoiding intermediate store allocations on every simplex iteration.
+- `Optimisation.Environment.addPresolver()`/`removePresolver()` now accept any `Simplifier` — not just `Presolver` — so `VariableAnalyser` and `ExpressionAnalyser` instances can be registered.
+- The default presolver set (via `resetPresolvers()`) now includes `LINEAR_OBJECTIVE` and `UNREFERENCED`; execution order among built-in presolvers has been revised.
+- `VariableAnalyser.simplify()` return type changed from `boolean` to `void`.
+- The presolve pipeline in `ExpressionsBasedModel` now dispatches through the unified `Simplifier` hierarchy, making the scan/simplify phase extensible.
 
 #### org.ojalgo.matrix
 
@@ -97,6 +106,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.optimisation
 
 - The `ExpressionsBasedModel.Validator` class and all functionality related to it. The related `ExpressionsBasedModel.setKnownSolution(...)` methods are also removed.
+- `Presolvers.checkFeasibility(...)` static method removed.
 
 ## [56.2.1] – 2026-01-21
 

@@ -159,7 +159,7 @@ public interface Optimisation {
         private final Map<Class<?>, Object> myConfigurators = new ConcurrentHashMap<>();
         private Expression.Factory<?> myExpressionFactory = Expression::new;
         private final List<ExpressionsBasedModel.Integration<?>> myIntegrations = new ArrayList<>();
-        private final TreeSet<ExpressionsBasedModel.Presolver> myPresolvers = new TreeSet<>();
+        private final TreeSet<ExpressionsBasedModel.Simplifier<?, ?>> myPresolvers = new TreeSet<>();
         private Variable.Factory<?> myVariableFactory = Variable::new;
 
         Environment() {
@@ -170,7 +170,7 @@ public interface Optimisation {
             return myIntegrations.add(integration);
         }
 
-        public boolean addPresolver(final ExpressionsBasedModel.Presolver presolver) {
+        public boolean addPresolver(final ExpressionsBasedModel.Simplifier<?, ?> presolver) {
             return myPresolvers.add(presolver);
         }
 
@@ -218,8 +218,23 @@ public interface Optimisation {
             return myIntegrations.remove(integration);
         }
 
-        public boolean removePresolver(final ExpressionsBasedModel.Presolver presolver) {
+        public boolean removePresolver(final ExpressionsBasedModel.Simplifier<?, ?> presolver) {
             return myPresolvers.remove(presolver);
+        }
+
+        /**
+         * Resets the default environment's presolvers to the built-in set, removing any previously registered
+         * presolvers.
+         */
+        public void resetPresolvers() {
+
+            this.clearPresolvers();
+
+            this.addPresolver(Presolvers.LINEAR_OBJECTIVE); // 10
+            this.addPresolver(Presolvers.UNREFERENCED); // 30
+            this.addPresolver(Presolvers.ZERO_ONE_TWO); // 50
+            this.addPresolver(Presolvers.INTEGER); // 70
+            this.addPresolver(Presolvers.REDUNDANT_CONSTRAINT); // 90
         }
 
         /**
@@ -262,7 +277,7 @@ public interface Optimisation {
             return myIntegrations;
         }
 
-        Iterable<ExpressionsBasedModel.Presolver> getPresolvers() {
+        TreeSet<ExpressionsBasedModel.Simplifier<?, ?>> getPresolvers() {
             return myPresolvers;
         }
 

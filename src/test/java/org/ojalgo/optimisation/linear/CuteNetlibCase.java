@@ -58,6 +58,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     private static final NumberContext ACCURACY = NumberContext.of(6, 4);
 
     private static void doTest(final String name, final String expMinValString, final String expMaxValString, final NumberContext accuracy) {
+
         ExpressionsBasedModel model = ModelFileTest.makeModel("netlib", name, false);
 
         // model.options.debug(Optimisation.Solver.class);
@@ -70,6 +71,8 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
         // model.options.validate = false;
         // model.options.mip_defer = 0.25;
         // model.options.mip_gap = 1.0E-5;
+
+        // model.options.sparse = Boolean.TRUE;
 
         // long time = 10_000L;
         // model.options.time_abort = time;

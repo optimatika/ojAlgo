@@ -1368,7 +1368,13 @@ abstract class SimplexSolver extends LinearSolver {
 
                 } else {
 
-                    this.setState(State.INFEASIBLE);
+                    double infeasibility = Math.abs(mySimplex.getInfeasibility(iteration.exit.index));
+                    if (infeasibility < 1E-9) {
+                        this.setState(State.FEASIBLE);
+                        done = true;
+                    } else {
+                        this.setState(State.INFEASIBLE);
+                    }
                 }
 
             } else {

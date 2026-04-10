@@ -255,6 +255,16 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     }
 
+    public static abstract class ExpressionAnalyser extends Simplifier<Expression, ExpressionAnalyser> {
+
+        protected ExpressionAnalyser(final int executionOrder) {
+            super(executionOrder);
+        }
+
+        public abstract void simplify(Expression target, ExpressionsBasedModel model);
+
+    }
+
     public enum FileFormat {
 
         EBM, MPS;
@@ -491,52 +501,13 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         public abstract boolean simplify(Expression expression, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper, NumberContext precision);
 
         @Override
-        boolean isApplicable(final Expression target) {
+        protected boolean isApplicable(final Expression target) {
             return target.isConstraint() && !target.isInfeasible() && !target.isRedundant() && target.countQuadraticFactors() == 0;
         }
 
     }
 
-    static final class DefaultIntermediate extends IntermediateSolver {
-
-        DefaultIntermediate(final ExpressionsBasedModel model) {
-            super(model);
-        }
-
-    }
-
-    static final class IntegrationWrapper extends ExpressionsBasedModel.Integration<Optimisation.Solver> {
-
-        private final Optimisation.Integration<ExpressionsBasedModel, ?> myDelegate;
-
-        IntegrationWrapper(final Optimisation.Integration<ExpressionsBasedModel, ?> delegate) {
-            super();
-            myDelegate = delegate;
-        }
-
-        @Override
-        public Solver build(final ExpressionsBasedModel model) {
-            return myDelegate.build(model);
-        }
-
-        @Override
-        public boolean isCapable(final ExpressionsBasedModel model) {
-            return myDelegate.isCapable(model);
-        }
-
-        @Override
-        public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
-            return myDelegate.toModelState(solverState, model);
-        }
-
-        @Override
-        public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
-            return myDelegate.toSolverState(modelState, model);
-        }
-
-    }
-
-    static abstract class Simplifier<ME extends ModelEntity<?>, S extends Simplifier<?, ?>> implements Comparable<S> {
+    public static abstract class Simplifier<ME extends ModelEntity<?>, S extends Simplifier<?, ?>> implements Comparable<S> {
 
         private final int myExecutionOrder;
         private final UUID myUUID = UUID.randomUUID();
@@ -577,25 +548,59 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             return prime * result + (myUUID == null ? 0 : myUUID.hashCode());
         }
 
+        protected abstract boolean isApplicable(final ME target);
+
         final int getExecutionOrder() {
             return myExecutionOrder;
         }
 
-        abstract boolean isApplicable(final ME target);
-
     }
 
-    static abstract class VariableAnalyser extends Simplifier<Variable, VariableAnalyser> {
+    public static abstract class VariableAnalyser extends Simplifier<Variable, VariableAnalyser> {
 
         protected VariableAnalyser(final int executionOrder) {
             super(executionOrder);
         }
 
-        public abstract boolean simplify(Variable variable, ExpressionsBasedModel model);
+        public abstract void simplify(Variable target, ExpressionsBasedModel model);
+
+    }
+
+    static final class DefaultIntermediate extends IntermediateSolver {
+
+        DefaultIntermediate(final ExpressionsBasedModel model) {
+            super(model);
+        }
+
+    }
+
+    static final class IntegrationWrapper extends ExpressionsBasedModel.Integration<Optimisation.Solver> {
+
+        private final Optimisation.Integration<ExpressionsBasedModel, ?> myDelegate;
+
+        IntegrationWrapper(final Optimisation.Integration<ExpressionsBasedModel, ?> delegate) {
+            super();
+            myDelegate = delegate;
+        }
 
         @Override
-        boolean isApplicable(final Variable target) {
-            return true;
+        public Solver build(final ExpressionsBasedModel model) {
+            return myDelegate.build(model);
+        }
+
+        @Override
+        public boolean isCapable(final ExpressionsBasedModel model) {
+            return myDelegate.isCapable(model);
+        }
+
+        @Override
+        public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
+            return myDelegate.toModelState(solverState, model);
+        }
+
+        @Override
+        public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
+            return myDelegate.toSolverState(modelState, model);
         }
 
     }
@@ -768,7 +773,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      *
      * @see Optimisation.Environment#addPresolver(Presolver)
      */
-    public static boolean addPresolver(final Presolver presolver) {
+    public static boolean addPresolver(final ExpressionsBasedModel.Simplifier<?, ?> presolver) {
         return Optimisation.ENVIRONMENT.addPresolver(presolver);
     }
 
@@ -862,10 +867,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      * presolvers.
      */
     public static void resetPresolvers() {
-        ExpressionsBasedModel.clearPresolvers();
-        ExpressionsBasedModel.addPresolver(Presolvers.ZERO_ONE_TWO);
-        ExpressionsBasedModel.addPresolver(Presolvers.INTEGER);
-        ExpressionsBasedModel.addPresolver(Presolvers.REDUNDANT_CONSTRAINT);
+        Optimisation.ENVIRONMENT.resetPresolvers();
     }
 
     /**
@@ -1806,35 +1808,68 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     private void scanEntities() {
 
-        boolean anyVarInt = this.isAnyVariableInteger();
+        boolean mip = this.isAnyVariableInteger();
 
-        Set<IntIndex> allVars = new HashSet<>();
-
-        for (Expression expr : myExpressions.values()) {
-
-            expr.addAll(allVars);
-
-            BigDecimal lower = expr.getLowerLimit();
-            BigDecimal upper = expr.getUpperLimit();
-
-            if (expr.isObjective()) {
-                Presolvers.LINEAR_OBJECTIVE.simplify(expr, allVars, lower, upper, options.feasibility);
-            }
-
-            if (expr.isConstraint()) {
-                if (anyVarInt) {
-                    expr.isInteger();
+        if (mip) {
+            for (Variable tmpVar : myVariables) {
+                if (tmpVar.isInteger() && tmpVar.isConstraint()) {
+                    tmpVar.doIntegerRounding();
                 }
-                Presolvers.ZERO_ONE_TWO.simplify(expr, allVars, lower, upper, options.feasibility);
             }
-
-            allVars.clear();
         }
 
-        for (Variable tmpVar : myVariables) {
-            Presolvers.UNREFERENCED.simplify(tmpVar, this);
-            if (anyVarInt && tmpVar.isInteger() && tmpVar.isConstraint()) {
-                tmpVar.doIntegerRounding();
+        Set<IntIndex> fixedVariables = this.getFixedVariables();
+
+        for (Simplifier<?, ?> simplifier : myEnvironment.getPresolvers()) {
+
+            if (simplifier instanceof VariableAnalyser) {
+                VariableAnalyser analyser = (VariableAnalyser) simplifier;
+
+                for (Variable tmpVar : myVariables) {
+                    if (analyser.isApplicable(tmpVar)) {
+                        analyser.simplify(tmpVar, this);
+                    }
+                }
+
+            } else if (simplifier instanceof ExpressionAnalyser) {
+                ExpressionAnalyser analyser = (ExpressionAnalyser) simplifier;
+
+                for (Expression tmpExpr : myExpressions.values()) {
+                    if (analyser.isApplicable(tmpExpr)) {
+                        analyser.simplify(tmpExpr, this);
+                    }
+                }
+
+            } else if (simplifier instanceof Presolver) {
+                Presolver presolver = (Presolver) simplifier;
+
+                for (Expression tmpExpr : myExpressions.values()) {
+                    if (presolver.isApplicable(tmpExpr)) {
+
+                        BigDecimal setValue = tmpExpr.calculateSetValue(fixedVariables);
+
+                        BigDecimal lower = tmpExpr.getCompensatedLowerLimit(setValue);
+                        BigDecimal upper = tmpExpr.getCompensatedUpperLimit(setValue);
+
+                        myTemporary.clear();
+                        myTemporary.addAll(tmpExpr.getLinearKeySet());
+                        myTemporary.removeAll(fixedVariables);
+
+                        ((Presolver) simplifier).simplify(tmpExpr, myTemporary, lower, upper, options.feasibility);
+
+                        myTemporary.clear();
+                    }
+                }
+
+            } else {
+
+                throw new ProgrammingError("Unknown simplifier type: " + simplifier.getClass().getName());
+            }
+        }
+
+        if (mip) {
+            for (Expression tmpExpr : myExpressions.values()) {
+                tmpExpr.isInteger();
             }
         }
     }
@@ -1975,8 +2010,6 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     void presolve() {
 
-        // myExpressions.values().forEach(expr -> expr.reset());
-
         boolean needToRepeat = false;
 
         BigDecimal compensatedLowerLimit;
@@ -1988,6 +2021,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             needToRepeat = false;
 
             for (Expression expr : this.getExpressions()) {
+
                 if (!needToRepeat && expr.isConstraint() && !expr.isInfeasible() && !expr.isRedundant() && expr.countQuadraticFactors() == 0) {
 
                     BigDecimal calculateSetValue = expr.calculateSetValue(fixedVariables);
@@ -1999,41 +2033,13 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
                     myTemporary.addAll(expr.getLinearKeySet());
                     myTemporary.removeAll(fixedVariables);
 
-                    for (Presolver presolver : myEnvironment.getPresolvers()) {
-                        if (!needToRepeat) {
-                            needToRepeat |= presolver.simplify(expr, myTemporary, compensatedLowerLimit, compensatedUpperLimit, options.feasibility);
-                        }
-                    }
-
+                    needToRepeat |= Presolvers.ZERO_ONE_TWO.simplify(expr, myTemporary, compensatedLowerLimit, compensatedUpperLimit, options.feasibility);
                 }
             }
-
         } while (needToRepeat);
 
-        if (!this.isInfeasible()) {
-            Set<IntIndex> fixedVariables = this.getFixedVariables();
-            for (Expression expr : this.getExpressions()) {
-                if (expr.isConstraint() && expr.isRedundant() && expr.countQuadraticFactors() == 0) {
-                    // Specifically need to check that constraints that have been determined redundant
-                    // are not infeasible
-
-                    BigDecimal calculateSetValue = expr.calculateSetValue(fixedVariables);
-
-                    compensatedLowerLimit = expr.getCompensatedLowerLimit(calculateSetValue);
-                    compensatedUpperLimit = expr.getCompensatedUpperLimit(calculateSetValue);
-
-                    myTemporary.clear();
-                    myTemporary.addAll(expr.getLinearKeySet());
-                    myTemporary.removeAll(fixedVariables);
-
-                    Presolvers.checkFeasibility(expr, myTemporary, compensatedLowerLimit, compensatedUpperLimit, options.feasibility, myRelaxed);
-                }
-            }
-        }
-
-        if (!myShallowCopy) {
-            // this.identifyRedundantConstraints();
-        }
+        // Used to be additional code here to specifically check that constraints that have been determined redundant
+        // are not infeasible - as that would hide the infeasibility.  Believe this is now handled elsewhere.
 
         myVariablesCategorisation.update(myVariables);
     }

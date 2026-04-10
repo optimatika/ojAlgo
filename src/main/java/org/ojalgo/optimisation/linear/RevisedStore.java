@@ -110,7 +110,7 @@ final class RevisedStore extends SimplexStore {
      * Set by {@link #pivot} when the basis representation performed a full refactorisation rather than an
      * incremental update. Cleared by {@link #calculateIteration} after refreshing reduced costs.
      */
-    private boolean myNeedsReducedCostRefresh;
+    private int myNeedsReducedCostRefresh = 0;
 
     /**
      * Objective function coefficients c for all variables. Static during solve. Used to compute duals and
@@ -221,7 +221,9 @@ final class RevisedStore extends SimplexStore {
 
         super.pivot(iteration);
 
-        myNeedsReducedCostRefresh = myInvBasis.update(myConstraintsCSC, included, iterExitInd, iterEnterCol);
+        if (myInvBasis.update(myConstraintsCSC, included, iterExitInd, iterEnterCol)) {
+            myNeedsReducedCostRefresh = 0;
+        }
     }
 
     @Override
@@ -245,13 +247,14 @@ final class RevisedStore extends SimplexStore {
 
         if (iteration.isBasisUpdate()) {
 
-            if (myNeedsReducedCostRefresh) {
+            if (myNeedsReducedCostRefresh >= 150) {
                 this.updateDualsAndReducedCosts();
-                myNeedsReducedCostRefresh = false;
+                myNeedsReducedCostRefresh = 0;
             } else {
                 double stepD = d[enter] / a[enter];
                 AXPY.invoke(d, -stepD, a);
                 d[enter] = -stepD;
+                myNeedsReducedCostRefresh++;
             }
         }
 

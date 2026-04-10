@@ -222,6 +222,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
 
         //        model.options.convex().solverSPD(LU.R064::make);
         //        model.options.convex().projection(Boolean.TRUE);
+        // model.options.convex().algorithm(Algorithm.ADMM);
 
         ModelFileTest.assertValues(model, expMinValString, null, accuracy != null ? accuracy : ACCURACY);
 

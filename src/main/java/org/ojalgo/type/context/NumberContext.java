@@ -197,6 +197,26 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     }
 
     /**
+     * If the two numbers are close enough to each other, this method returns their average value. Otherwise
+     * null.
+     */
+    public BigDecimal common(final BigDecimal a, final BigDecimal b) {
+
+        if (a.compareTo(b) == 0) {
+            return a;
+        }
+
+        BigDecimal enforcedA = this.enforce(a);
+        BigDecimal enforcedB = this.enforce(b);
+
+        if (enforcedA.compareTo(enforcedB) == 0) {
+            return BigMath.DIVIDE.invoke(a.add(b), BigMath.TWO);
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Will first enforce the precision, and then the scale. Both operations will comply with the rounding
      * mode.
      */
