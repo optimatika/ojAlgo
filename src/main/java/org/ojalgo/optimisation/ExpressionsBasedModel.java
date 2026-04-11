@@ -295,12 +295,13 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
-     * {@link Optimisation.Solver}s usable from {@link ExpressionsBasedModel} need to implement a subclass of
-     * this. Integrations are registered on an {@link Optimisation.Environment} (or the default
-     * {@link Optimisation#ENVIRONMENT} via
-     * {@link ExpressionsBasedModel#addIntegration(Optimisation.Integration)}).
-     *
-     * @author apete
+     * Simplifies creating {@link Integration}s by providing some default implementations and helper methods
+     * for common cases.
+     * <p>
+     * The defaults assume that the solver state and model state (variable indices) are identical.
+     * <p>
+     * The helper methods are for the very common case when the solver only works with free (not eliminated by
+     * the pre-solver) variables, and need to map between the solver state and the full model state.
      */
     public static abstract class Integration<S extends Optimisation.Solver> implements Optimisation.Integration<ExpressionsBasedModel, S> {
 
@@ -351,6 +352,14 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             return retVal;
         }
 
+        protected static int getIndexOfFreeInSolver(final ExpressionsBasedModel model, final Variable variable) {
+            return model.indexOfFreeVariable(variable);
+        }
+
+        protected final static boolean isSwitch(final ExpressionsBasedModel model, final IntegrationProperty property) {
+            return model.isIntegrationSwitch(property);
+        }
+
         protected static Result reduceFullToFree(final Result modelState, final ExpressionsBasedModel model, final DenseArray.Factory<?, ?> factory) {
 
             List<Variable> freeVariables = model.getFreeVariables();
@@ -367,9 +376,10 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             return modelState.withSolution(solverSolution);
         }
 
-        /**
-         * @see Optimisation.Integration#extractSolverState(Optimisation.Model)
-         */
+        protected final static void setSwitch(final ExpressionsBasedModel model, final IntegrationProperty property, final boolean value) {
+            model.setIntegrationSwitch(property, value);
+        }
+
         @Override
         public final Result extractSolverState(final ExpressionsBasedModel model) {
             return this.toSolverState(model.getVariableValues(), model);
@@ -424,18 +434,14 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         }
 
         /**
+         * This implementation returns the index of the variable in the model. Override if you need something
+         * else. The utility {@link #getIndexOfFreeInSolver(ExpressionsBasedModel, Variable)} can be used if
+         * the solver only works with free variables.
+         *
          * @return The index with which one can reference parameters related to this variable in the solver.
          */
         protected int getIndexInSolver(final ExpressionsBasedModel model, final Variable variable) {
-            return model.indexOfFreeVariable(variable);
-        }
-
-        protected final boolean isSwitch(final ExpressionsBasedModel model, final IntegrationProperty property) {
-            return model.isIntegrationSwitch(property);
-        }
-
-        protected final void setSwitch(final ExpressionsBasedModel model, final IntegrationProperty property, final boolean value) {
-            model.setIntegrationSwitch(property, value);
+            return variable.getIndex().index;
         }
 
     }

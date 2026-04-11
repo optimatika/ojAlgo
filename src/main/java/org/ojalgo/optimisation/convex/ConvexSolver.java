@@ -638,10 +638,10 @@ public abstract class ConvexSolver extends GenericSolver {
             }
 
             if (algorithm == Algorithm.ACTIVE_SET) {
-                this.setSwitch(model, ExpressionsBasedModel.IntegrationProperty.ACTIVE_SET_OR_ADMM, false);
+                ExpressionsBasedModel.Integration.setSwitch(model, ExpressionsBasedModel.IntegrationProperty.ACTIVE_SET_OR_ADMM, false);
                 return BasePrimitiveSolver.INTEGRATION.build(model);
             } else if (algorithm == Algorithm.ADMM) {
-                this.setSwitch(model, ExpressionsBasedModel.IntegrationProperty.ACTIVE_SET_OR_ADMM, true);
+                ExpressionsBasedModel.Integration.setSwitch(model, ExpressionsBasedModel.IntegrationProperty.ACTIVE_SET_OR_ADMM, true);
                 return AlternatingDirectionSolver.INTEGRATION.build(model);
             } else {
                 throw new IllegalStateException("Unknown algorithm: " + algorithm);
@@ -655,7 +655,7 @@ public abstract class ConvexSolver extends GenericSolver {
 
         @Override
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
-            if (this.isSwitch(model, ExpressionsBasedModel.IntegrationProperty.ACTIVE_SET_OR_ADMM)) {
+            if (ExpressionsBasedModel.Integration.isSwitch(model, ExpressionsBasedModel.IntegrationProperty.ACTIVE_SET_OR_ADMM)) {
                 return AlternatingDirectionSolver.INTEGRATION.toModelState(solverState, model);
             } else {
                 return BasePrimitiveSolver.INTEGRATION.toModelState(solverState, model);
@@ -664,11 +664,16 @@ public abstract class ConvexSolver extends GenericSolver {
 
         @Override
         public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
-            if (this.isSwitch(model, ExpressionsBasedModel.IntegrationProperty.ACTIVE_SET_OR_ADMM)) {
+            if (ExpressionsBasedModel.Integration.isSwitch(model, ExpressionsBasedModel.IntegrationProperty.ACTIVE_SET_OR_ADMM)) {
                 return AlternatingDirectionSolver.INTEGRATION.toSolverState(modelState, model);
             } else {
                 return BasePrimitiveSolver.INTEGRATION.toSolverState(modelState, model);
             }
+        }
+
+        @Override
+        protected int getIndexInSolver(final ExpressionsBasedModel model, final Variable variable) {
+            return ExpressionsBasedModel.Integration.getIndexOfFreeInSolver(model, variable);
         }
 
     }

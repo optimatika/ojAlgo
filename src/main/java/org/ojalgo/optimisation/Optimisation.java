@@ -305,7 +305,10 @@ public interface Optimisation {
 
         /**
          * Extract state from the model and convert it to solver state.
+         *
+         * @deprecated v57 Not needed
          */
+        @Deprecated
         Optimisation.Result extractSolverState(M model);
 
         /**

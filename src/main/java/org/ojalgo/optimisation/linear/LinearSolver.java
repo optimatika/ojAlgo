@@ -520,7 +520,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
                 newerDualSolver = false;
             }
 
-            this.setSwitch(model, ExpressionsBasedModel.IntegrationProperty.PRIMAL_OR_DUAL_LP, newerDualSolver);
+            ExpressionsBasedModel.Integration.setSwitch(model, ExpressionsBasedModel.IntegrationProperty.PRIMAL_OR_DUAL_LP, newerDualSolver);
 
             if (newerDualSolver) {
                 return NEWER_DUAL_SOLVER.build(model);
@@ -536,7 +536,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
         @Override
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
-            if (this.isSwitch(model, ExpressionsBasedModel.IntegrationProperty.PRIMAL_OR_DUAL_LP)) {
+            if (ExpressionsBasedModel.Integration.isSwitch(model, ExpressionsBasedModel.IntegrationProperty.PRIMAL_OR_DUAL_LP)) {
                 return NEWER_DUAL_SOLVER.toModelState(solverState, model);
             } else {
                 return OLDER_PRIMAL_SOLVER.toModelState(solverState, model);
@@ -545,7 +545,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
         @Override
         public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
-            if (this.isSwitch(model, ExpressionsBasedModel.IntegrationProperty.PRIMAL_OR_DUAL_LP)) {
+            if (ExpressionsBasedModel.Integration.isSwitch(model, ExpressionsBasedModel.IntegrationProperty.PRIMAL_OR_DUAL_LP)) {
                 return NEWER_DUAL_SOLVER.toSolverState(modelState, model);
             } else {
                 return OLDER_PRIMAL_SOLVER.toSolverState(modelState, model);
@@ -554,7 +554,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
         @Override
         protected int getIndexInSolver(final ExpressionsBasedModel model, final Variable variable) {
-            if (this.isSwitch(model, ExpressionsBasedModel.IntegrationProperty.PRIMAL_OR_DUAL_LP)) {
+            if (ExpressionsBasedModel.Integration.isSwitch(model, ExpressionsBasedModel.IntegrationProperty.PRIMAL_OR_DUAL_LP)) {
                 return NEWER_DUAL_SOLVER.getIndexInSolver(model, variable);
             } else {
                 return OLDER_PRIMAL_SOLVER.getIndexInSolver(model, variable);
@@ -597,7 +597,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
         @Override
         protected int getIndexInSolver(final ExpressionsBasedModel model, final Variable variable) {
-            return super.getIndexInSolver(model, variable);
+            return ExpressionsBasedModel.Integration.getIndexOfFreeInSolver(model, variable);
         }
 
     }
