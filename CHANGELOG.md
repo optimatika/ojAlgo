@@ -49,6 +49,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 #### org.ojalgo.optimisation
 
+- Internal refactoring of variable-bound shifting in the simplex solvers — shifting logic moved from `SimplexSolver` into `SimplexStore` for better separation of concerns.
 - Revised simplex (`RevisedStore`) now freezes the constraint matrix to `R064CSC` before solving and uses raw `double[]` working vectors, reducing per-iteration allocations and improving cache locality.
 - Cleaned up the `UpdatableSolver` interface – everything is now optional with default implementations that do nothing. All the quirky stuff is moved to `ExpressionsBasedModel.EntityMap`. This also required `ConstraintsMetaData` to be somewhat refactored, and the `Optimisation.ConstraintType` enum gained another instance `RANGE`.
 - Deprecated `Constraint.isLowerConstraint()` and `Constraint.isUpperConstraint()` in favour of `Constraint.getConstraintType()`.

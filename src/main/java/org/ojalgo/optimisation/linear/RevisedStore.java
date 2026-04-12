@@ -240,7 +240,16 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
-    void calculateIteration(final SimplexSolver.IterDescr iteration, final double shift) {
+    void calculateIteration(final SimplexSolver.IterDescr iteration) {
+
+        int col = iteration.enter.column();
+        ColumnState state = iteration.exit.to;
+        double shift = ZERO;
+        if (state == ColumnState.LOWER) {
+            shift = this.getLowerBound(col);
+        } else if (state == ColumnState.UPPER) {
+            shift = this.getUpperBound(col);
+        }
 
         int exit = iteration.exit.index;
         int enter = iteration.enter.index;
@@ -258,8 +267,9 @@ final class RevisedStore extends SimplexStore {
             }
         }
 
-        if (shift == ZERO) {
-
+        if (shift != ZERO) {
+            this.shiftColumn(col, shift);
+        } else {
             double exitX = x[exit];
             double enterY = y[exit];
             double stepX = exitX / enterY;

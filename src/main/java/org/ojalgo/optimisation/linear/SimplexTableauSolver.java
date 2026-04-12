@@ -757,7 +757,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
         NumberContext integralityTolerance = options.integer().getIntegralityTolerance();
 
-        return myTableau.generateCutCandidates(integer, integralityTolerance, fractionality);
+        return myTableau.generateSimpleCutCandidates(integer, integralityTolerance, fractionality);
     }
 
     @Override

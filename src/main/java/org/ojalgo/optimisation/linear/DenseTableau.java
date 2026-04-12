@@ -169,7 +169,7 @@ final class DenseTableau extends SimplexTableau {
             }
         }
 
-        return retVal;
+        return retVal + this.getValueShift();
     }
 
     @Override

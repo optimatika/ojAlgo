@@ -71,14 +71,14 @@ public class DesignCase extends OptimisationIntegerTests {
     }
 
     /**
-     * Test based on exaple from IE 511: Integer Programming, Spring 2021 22 Apr, 2021 Lecture 25: Mixed
+     * Test based on example from IE 511: Integer Programming, Spring 2021 22 Apr, 2021 Lecture 25: Mixed
      * Integer Cuts Lecturer: Karthik Chandrasekaran Scribe: Karthik
      * <p>
      * lecture-25.pdf
      * <p>
      * Actually a bad example:
      * <ol>
-     * <li>There is a mistake in the "Gomory Mixed Integer Cut" defintion (equation 25.2) – missed a minus
+     * <li>There is a mistake in the "Gomory Mixed Integer Cut" definition (equation 25.2) – missed a minus
      * sign.
      * <li>When suggesting a cut the example does not use the cut definition directly, and it seems states an
      * incorrect final simplex row. Which results in not being able to reproduce the same cut here as in the

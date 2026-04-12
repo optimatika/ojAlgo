@@ -29,6 +29,7 @@ import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.OptimisationCase;
+import org.ojalgo.optimisation.Variable;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -104,12 +105,74 @@ public class GeneratedCutTest extends OptimisationIntegerTests implements ModelF
         }
     }
 
+    /**
+     * MIP with non-zero lower bounds (shifted variables) solved with both the newer dual SimplexSolver and
+     * the older primal SimplexTableauSolver, verifying that GMI cuts are actually generated and that both
+     * solvers produce the correct optimum. Uses a model known to need cuts for proof of optimality.
+     */
+    @Test
+    public void testCutGenerationWithShiftedVariables() {
+
+        // Based on the branch-and-cut example but with shifted (non-zero) lower bounds
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x1 = model.newVariable("x1").integer(true).lower(1).weight(-6);
+        Variable x2 = model.newVariable("x2").integer(true).lower(1).weight(-5);
+
+        model.addExpression().upper(11).set(x1, 3).set(x2, 1);
+        model.addExpression().upper(5).set(x1, -1).set(x2, 2);
+
+        // Known MIP optimum: x1=3, x2=2 => -28
+        Result expected = Result.of(-28, Optimisation.State.OPTIMAL, 3, 2);
+
+        // Solve with newer dual SimplexSolver
+        ExpressionsBasedModel dualModel = model.copy();
+        dualModel.options.linear().dual();
+        dualModel.options.validate = true;
+
+        Result dualResult = dualModel.minimise();
+        TestUtils.assertStateNotLessThanOptimal(dualResult);
+        TestUtils.assertResult(expected, dualResult, ACCURACY);
+
+        // Solve with older primal SimplexTableauSolver
+        ExpressionsBasedModel primalModel = model.copy();
+        primalModel.options.linear().primal();
+        primalModel.options.validate = true;
+
+        Result primalResult = primalModel.minimise();
+        TestUtils.assertStateNotLessThanOptimal(primalResult);
+        TestUtils.assertResult(expected, primalResult, ACCURACY);
+    }
+
     @Test
     public void testFacilityLocationCase() {
 
         OptimisationCase testCase = DesignCase.makeFacilityLocationCase();
 
         GeneratedCutTest.doTest(testCase.model, null, testCase.result);
+    }
+
+    /**
+     * Verify cut generation with a model that has variables with non-zero lower bounds. The GomorySolver
+     * always uses cuts rather than branching, so it reliably exercises the cut generation path. Combined with
+     * non-zero lower bounds this verifies that shift handling in cut generation is correct.
+     */
+    @Test
+    public void testGomoryCutsWithShiftedBounds() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x1 = model.newVariable("x1").integer(true).lower(1).weight(-6);
+        Variable x2 = model.newVariable("x2").integer(true).lower(1).weight(-5);
+
+        model.addExpression().upper(11).set(x1, 3).set(x2, 1);
+        model.addExpression().upper(5).set(x1, -1).set(x2, 2);
+
+        Result expected = Result.of(-28, Optimisation.State.OPTIMAL, 3, 2);
+
+        GomorySolver solver = new GomorySolver(model);
+        Result result = solver.solve();
+        TestUtils.assertStateAndSolution(expected, result, NumberContext.of(11));
     }
 
     @Test

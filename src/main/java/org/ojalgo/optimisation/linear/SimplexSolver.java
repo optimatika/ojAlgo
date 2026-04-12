@@ -660,13 +660,10 @@ abstract class SimplexSolver extends LinearSolver {
     }
 
     private final SimplexStore mySimplex;
-    private final double[] mySolutionShift;
-    private double myValueShift = ZERO;
 
     SimplexSolver(final Optimisation.Options solverOptions, final SimplexStore simplexStore) {
         super(solverOptions);
         mySimplex = simplexStore;
-        mySolutionShift = new double[simplexStore.n];
     }
 
     @Override
@@ -679,7 +676,7 @@ abstract class SimplexSolver extends LinearSolver {
 
         NumberContext integralityTolerance = options.integer().getIntegralityTolerance();
 
-        return mySimplex.generateCutCandidates(integer, integralityTolerance, fractionality, mySolutionShift);
+        return mySimplex.generateCutCandidates(integer, integralityTolerance, fractionality);
     }
 
     @Override
@@ -689,10 +686,9 @@ abstract class SimplexSolver extends LinearSolver {
 
     @Override
     public boolean updateRange(final int index, final double lower, final double upper) {
-        double shift = mySolutionShift[index];
         this.setState(State.UNEXPLORED);
         this.invalidateCache();
-        return mySimplex.updateRange(index, lower - shift, upper - shift);
+        return mySimplex.updateRange(index, lower, upper);
     }
 
     private Access1D<?> extractMultipliers() {
@@ -724,18 +720,11 @@ abstract class SimplexSolver extends LinearSolver {
     }
 
     private double[] extractSolution() {
-
-        double[] retVal = mySimplex.extractSolution();
-
-        for (int i = 0; i < mySolutionShift.length; i++) {
-            retVal[i] += mySolutionShift[i];
-        }
-
-        return retVal;
+        return mySimplex.extractSolution();
     }
 
     private double extractValue() {
-        return mySimplex.extractValue() + myValueShift;
+        return mySimplex.extractValue();
     }
 
     private boolean getDualExitCandidate(final IterDescr iteration) {
@@ -800,15 +789,15 @@ abstract class SimplexSolver extends LinearSolver {
     }
 
     private double getLowerBound(final int index) {
-        return mySimplex.getLowerBound(index) + mySolutionShift[index];
+        return mySimplex.getOriginalLowerBound(index);
     }
 
     private double[] getLowerBounds() {
 
-        double[] retVal = new double[mySolutionShift.length];
+        double[] retVal = new double[mySimplex.n];
 
         for (int j = 0; j < retVal.length; j++) {
-            retVal[j] = mySimplex.getLowerBound(j) + mySolutionShift[j];
+            retVal[j] = mySimplex.getOriginalLowerBound(j);
         }
 
         return retVal;
@@ -893,15 +882,15 @@ abstract class SimplexSolver extends LinearSolver {
     }
 
     private double getUpperBound(final int index) {
-        return mySimplex.getUpperBound(index) + mySolutionShift[index];
+        return mySimplex.getOriginalUpperBound(index);
     }
 
     private double[] getUpperBounds() {
 
-        double[] retVal = new double[mySolutionShift.length];
+        double[] retVal = new double[mySimplex.n];
 
         for (int j = 0; j < retVal.length; j++) {
-            retVal[j] = mySimplex.getUpperBound(j) + mySolutionShift[j];
+            retVal[j] = mySimplex.getOriginalUpperBound(j);
         }
 
         return retVal;
@@ -932,24 +921,6 @@ abstract class SimplexSolver extends LinearSolver {
         }
     }
 
-    private double shift(final int column, final ColumnState state) {
-
-        double shift = ZERO;
-        if (state == ColumnState.LOWER) {
-            shift = mySimplex.getLowerBound(column);
-        } else if (state == ColumnState.UPPER) {
-            shift = mySimplex.getUpperBound(column);
-        }
-
-        if (shift != ZERO) {
-            mySimplex.shiftColumn(column, shift);
-            mySolutionShift[column] += shift;
-            myValueShift += mySimplex.getCost(column) * shift;
-        }
-
-        return shift;
-    }
-
     private Optimisation.Result solveUnconstrained() {
 
         int nbVars = mySimplex.n;
@@ -964,8 +935,8 @@ abstract class SimplexSolver extends LinearSolver {
             double value;
 
             if (cost == ZERO) {
-                value = mySolutionShift[j];
-                retSolution[j] = value;
+                value = mySimplex.getOriginalLowerBound(j);
+                retSolution[j] = Double.isFinite(value) ? value : ZERO;
             } else if (cost > ZERO) {
                 value = this.getLowerBound(j);
                 if (Double.isFinite(value)) {
@@ -1218,20 +1189,11 @@ abstract class SimplexSolver extends LinearSolver {
                 this.log("Cost={}, Pivot1={}, Pivot2={}, RHS={}, Inf={}", mySimplex.getReducedCost(iteration.enter.index),
                         mySimplex.getCurrentElement(iteration.exit, iteration.enter.index), mySimplex.getCurrentElement(iteration.exit.index, iteration.enter),
                         mySimplex.getCurrentRHS(iteration.exit.row()), mySimplex.getInfeasibility(iteration.exit.index));
-                this.log("Shift Exit: {}, Enter: {}", mySolutionShift[iteration.exit.column()], mySolutionShift[iteration.enter.column()]);
             }
-
-            int exitCol = iteration.exit.column();
-            int enterCol = iteration.enter.column();
 
             mySimplex.pivot(iteration);
 
-            double shift = this.shift(iteration.enter.column(), iteration.exit.to);
-
-            // mySimplex.calculateIteration();
-
-            // mySimplex.calculateIterationOld(iteration, exitCol, enterCol, shift);
-            mySimplex.calculateIteration(iteration, shift);
+            mySimplex.calculateIteration(iteration);
 
         } else if (iteration.isBoundFlip()) {
 
@@ -1245,11 +1207,9 @@ abstract class SimplexSolver extends LinearSolver {
 
             ColumnState from = iteration.enter.from;
             if (from == ColumnState.LOWER) {
-                mySimplex.upper(j);
-                this.shift(j, ColumnState.UPPER);
+                mySimplex.shiftToUpper(j);
             } else if (from == ColumnState.UPPER) {
-                mySimplex.lower(j);
-                this.shift(j, ColumnState.LOWER);
+                mySimplex.shiftToLower(j);
             } else if (from == ColumnState.UNBOUNDED) {
                 this.setState(State.UNBOUNDED);
             } else {
@@ -1525,14 +1485,6 @@ abstract class SimplexSolver extends LinearSolver {
      * </ul>
      */
     abstract void setup(SimplexStore simplex);
-
-    final void shift(final int index, final double shift, final double weight) {
-        if (shift != ZERO) {
-            mySimplex.shiftColumn(index, shift);
-            mySolutionShift[index] += shift;
-            myValueShift += weight * shift;
-        }
-    }
 
     void switchToPhase2() {
         mySimplex.removePhase1();

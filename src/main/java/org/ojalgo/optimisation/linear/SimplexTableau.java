@@ -129,11 +129,6 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
     }
 
     @Override
-    void calculateIteration(final IterDescr iteration, final double shift) {
-        //
-    }
-
-    @Override
     final void calculatePrimalDirection(final EnterInfo enter) {
         // With a tableau all calculations are continuously done when pivoting
     }
@@ -191,11 +186,11 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
     abstract boolean fixVariable(int index, double value);
 
     /**
-     * Simplified version of {@link #generateCutCandidates(boolean[], NumberContext, double, double[])} for
+     * Simplified version of {@link SimplexStore#generateCutCandidates(boolean[], NumberContext, double)} for
      * specific use with {@link SimplexTableauSolver}. {@link SimplexSolver} and {@link SimplexTableauSolver}
      * can both use {@link SimplexTableau}, but they use them differently.
      */
-    final Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality) {
+    final Collection<Equation> generateSimpleCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality) {
 
         if (this.countRemainingArtificials() > 0) {
             return Collections.emptyList();

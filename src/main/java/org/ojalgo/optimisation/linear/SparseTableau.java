@@ -234,7 +234,7 @@ final class SparseTableau extends SimplexTableau {
             }
         }
 
-        return retVal;
+        return retVal + this.getValueShift();
     }
 
     @Override

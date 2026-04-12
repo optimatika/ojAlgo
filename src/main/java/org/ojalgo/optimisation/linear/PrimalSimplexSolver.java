@@ -61,7 +61,6 @@ final class PrimalSimplexSolver extends SimplexSolver {
         for (int je = 0, limit = excluded.length; je < limit; je++) {
             int j = excluded[je];
 
-            double rc = simplex.getCost(j);
             double lb = simplex.getLowerBound(j);
             double ub = simplex.getUpperBound(j);
 
@@ -72,11 +71,9 @@ final class PrimalSimplexSolver extends SimplexSolver {
             if (!Double.isFinite(lb) && !Double.isFinite(ub)) {
                 simplex.unbounded(j);
             } else if (Math.abs(lb) <= Math.abs(ub)) {
-                simplex.lower(j);
-                this.shift(j, lb, rc);
+                simplex.shiftToLower(j);
             } else if (Math.abs(lb) >= Math.abs(ub)) {
-                simplex.upper(j);
-                this.shift(j, ub, rc);
+                simplex.shiftToUpper(j);
             } else {
                 simplex.lower(j);
             }

@@ -27,9 +27,8 @@ import org.ojalgo.structure.Mutate1D;
 
 /**
  * Two-phase revised simplex. Phase 1 constructs a modified objective that makes the starting point dual
- * feasible and then runs dual simplex iterations to achieve primal feasibility. Phase 2 restores the
- * original objective and runs primal simplex iterations (maintaining primal feasibility) to reach
- * optimality.
+ * feasible and then runs dual simplex iterations to achieve primal feasibility. Phase 2 restores the original
+ * objective and runs primal simplex iterations (maintaining primal feasibility) to reach optimality.
  * <p>
  * This is the most general {@link SimplexSolver} subclass and the one normally instantiated by
  * {@link LinearSolver.Builder} and the {@link LinearSolver.ModelIntegration}. It handles explicit finite
@@ -76,23 +75,19 @@ final class PhasedSimplexSolver extends SimplexSolver {
             }
 
             if (rc > ZERO && Double.isFinite(lb)) {
-                simplex.lower(j);
-                this.shift(j, lb, rc);
+                simplex.shiftToLower(j);
                 phase1.set(j, rc);
             } else if (rc < ZERO && Double.isFinite(ub)) {
-                simplex.upper(j);
-                this.shift(j, ub, rc);
+                simplex.shiftToUpper(j);
                 phase1.set(j, rc);
             } else if (!Double.isFinite(lb) && !Double.isFinite(ub)) {
                 simplex.unbounded(j);
                 phase1.set(j, ZERO);
             } else if (Math.abs(lb) <= Math.abs(ub)) {
-                simplex.lower(j);
-                this.shift(j, lb, rc);
+                simplex.shiftToLower(j);
                 phase1.set(j, Math.max(ONE, simplex.getReducedCost(je)));
             } else if (Math.abs(lb) >= Math.abs(ub)) {
-                simplex.upper(j);
-                this.shift(j, ub, rc);
+                simplex.shiftToUpper(j);
                 phase1.set(j, Math.min(NEG, simplex.getReducedCost(je)));
             } else {
                 simplex.lower(j);
