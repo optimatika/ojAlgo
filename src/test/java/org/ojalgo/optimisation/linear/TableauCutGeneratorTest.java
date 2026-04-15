@@ -121,17 +121,23 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
 
         Equation revised = TableauCutGenerator.doGomoryMixedInteger(body, basis, rhs, PrimitiveMath.ELEVENTH, excluded, integer, lower, upper, shift);
 
+        Equation noShift = TableauCutGenerator.doGomoryMixedInteger(body, basis, rhs, PrimitiveMath.ELEVENTH, excluded, integer, lower, upper);
+
         TestUtils.assertEquals(base.index, tableau.index);
         TestUtils.assertEquals(base.index, revised.index);
+        TestUtils.assertEquals(base.index, noShift.index);
 
         TestUtils.assertEquals(base.getPivot(), tableau.getPivot());
         TestUtils.assertEquals(base.getPivot(), revised.getPivot());
+        TestUtils.assertEquals(base.getPivot(), noShift.getPivot());
 
         TestUtils.assertEquals(base.getRHS(), tableau.getRHS());
         TestUtils.assertEquals(base.getRHS(), revised.getRHS());
+        TestUtils.assertEquals(base.getRHS(), noShift.getRHS());
 
         TestUtils.assertEquals(base.getBody(), tableau.getBody());
         TestUtils.assertEquals(base.getBody(), revised.getBody());
+        TestUtils.assertEquals(base.getBody(), noShift.getBody());
 
         return revised;
     }
@@ -397,6 +403,32 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
 
         // The coefficient should be negated
         TestUtils.assertEquals(-baseline.doubleValue(1), shifted.doubleValue(1));
+    }
+
+    /**
+     * Verify that the no-shift overload produces the same result as the shift-aware overload when shifts are
+     * all zero. Uses mixed integer/continuous variables and includes a negated variable.
+     */
+    @Test
+    public void testNoShiftMatchesZeroShift() {
+
+        Primitive1D body = Primitive1D.of(1.0, 1.5, -0.5, 2.3);
+        int index = 0;
+        double rhs = 2.3;
+        double fractionality = PrimitiveMath.ELEVENTH;
+        int[] excluded = { 1, 2, 3 };
+        boolean[] integer = { true, true, false, true };
+
+        double[] lower = { 0, 0, 0, -5 };
+        double[] upper = { Double.POSITIVE_INFINITY, 10, Double.POSITIVE_INFINITY, 0 };
+        double[] shift = { 0, 0, 0, 0 };
+
+        Equation withShift = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lower, upper, shift);
+        Equation noShift = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lower, upper);
+
+        TestUtils.assertEquals(withShift.index, noShift.index);
+        TestUtils.assertEquals(withShift.getRHS(), noShift.getRHS());
+        TestUtils.assertEquals(withShift.getBody(), noShift.getBody());
     }
 
     /**

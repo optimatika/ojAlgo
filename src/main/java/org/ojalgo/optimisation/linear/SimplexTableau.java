@@ -76,9 +76,12 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
     private transient Primitive2D myConstraintsBody = null;
     private transient Primitive1D myConstraintsRHS = null;
     private transient Primitive1D myObjective = null;
+    private final double[] mySolutionShift;
+    private double myValueShift = ZERO;
 
     SimplexTableau(final LinearStructure linearStructure) {
         super(linearStructure);
+        mySolutionShift = new double[n];
     }
 
     @Override
@@ -123,9 +126,30 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
         this.update(row, col);
     }
 
+    protected void shiftColumn(final int col, final double shift) {
+        this.shiftBounds(col, shift);
+        mySolutionShift[col] += shift;
+        myValueShift += this.getCost(col) * shift;
+    }
+
     @Override
     final void calculateDualDirection(final ExitInfo exit) {
         // With a tableau all calculations are continuously done when pivoting
+    }
+
+    @Override
+    void calculateIteration(final IterDescr iteration) {
+        int col = iteration.enter.column();
+        ColumnState state = iteration.exit.to;
+        double shift = ZERO;
+        if (state == ColumnState.LOWER) {
+            shift = this.getLowerBound(col);
+        } else if (state == ColumnState.UPPER) {
+            shift = this.getUpperBound(col);
+        }
+        if (shift != ZERO) {
+            this.shiftColumn(col, shift);
+        }
     }
 
     @Override
@@ -159,6 +183,37 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
         return myConstraintsRHS;
     }
 
+    @Override
+    double[] extractSolution() {
+
+        double[] retVal = new double[n];
+
+        for (int je = 0; je < excluded.length; je++) {
+            int j = excluded[je];
+            ColumnState columnState = this.getColumnState(j);
+
+            if (columnState == ColumnState.LOWER) {
+                double lowerBound = this.getLowerBound(j);
+                if (Double.isFinite(lowerBound)) {
+                    retVal[j] = lowerBound;
+                }
+            } else if (columnState == ColumnState.UPPER) {
+                double upperBound = this.getUpperBound(j);
+                if (Double.isFinite(upperBound)) {
+                    retVal[j] = upperBound;
+                }
+            }
+        }
+
+        this.copyBasicSolution(retVal);
+
+        for (int i = 0; i < n; i++) {
+            retVal[i] += mySolutionShift[i];
+        }
+
+        return retVal;
+    }
+
     final int findNextPivotColumn(final Access1D<Double> auxiliaryRow, final Access1D<Double> objectiveRow) {
 
         int retVal = -1;
@@ -184,6 +239,12 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
     }
 
     abstract boolean fixVariable(int index, double value);
+
+    @Override
+    Equation generateCut(final Primitive1D body, final int index, final double rhs, final double fractionality, final int[] excluded, final boolean[] integers,
+            final double[] lowers, final double[] uppers) {
+        return TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integers, lowers, uppers, mySolutionShift);
+    }
 
     /**
      * Simplified version of {@link SimplexStore#generateCutCandidates(boolean[], NumberContext, double)} for
@@ -271,10 +332,27 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
         }
     }
 
+    @Override
+    double getOriginalLowerBound(final int index) {
+        return this.getLowerBound(index) + mySolutionShift[index];
+    }
+
+    @Override
+    double getOriginalUpperBound(final int index) {
+        return this.getUpperBound(index) + mySolutionShift[index];
+    }
+
     /**
      * @return The (phase 2) objective function value
      */
     abstract double getValue();
+
+    /**
+     * The cumulative objective value adjustment due to shifting.
+     */
+    final double getValueShift() {
+        return myValueShift;
+    }
 
     abstract Primitive2D newConstraintsBody();
 
@@ -301,7 +379,7 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
 
     @Override
     void prepareToIterate() {
-        // TODO Auto-generated method stub
+        // no-op: the tableau is always up to date
     }
 
     @Override
@@ -311,6 +389,24 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
 
         for (int i = 0; i < newBasis.length; i++) {
             this.doPivot(i, newBasis[i]);
+        }
+    }
+
+    @Override
+    void setToLower(final int col) {
+        this.lower(col);
+        double lb = this.getLowerBound(col);
+        if (lb != ZERO) {
+            this.shiftColumn(col, lb);
+        }
+    }
+
+    @Override
+    void setToUpper(final int col) {
+        this.upper(col);
+        double ub = this.getUpperBound(col);
+        if (ub != ZERO) {
+            this.shiftColumn(col, ub);
         }
     }
 
@@ -491,6 +587,13 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
 
             edgeWeights[p] = ONE;
         }
+    }
+
+    @Override
+    boolean updateRange(final int index, final double lower, final double upper) {
+        double shift = mySolutionShift[index];
+        this.setBounds(index, lower - shift, upper - shift);
+        return true;
     }
 
     /**

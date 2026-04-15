@@ -16,26 +16,26 @@ import org.ojalgo.matrix.store.R064CSC;
 final class SparseDecomposition implements BasisRepresentation {
 
     /**
-     * Ratio threshold: refactorise when eta-chain nonzeros exceed this multiple of the L+U factor nonzeros. A
-     * lower value refactorises more frequently (better btran/ftran speed, more factorisation overhead); a
-     * higher value delays refactorisation (faster pivots, slower solves as the chain grows).
+     * Ratio threshold: refactorise when eta-chain nonzeros exceed this multiple of the L+U factor nonzeros.
+     * This is the primary refactorisation trigger — it adapts naturally to problem size and sparsity since
+     * sparser factors trigger sooner. A lower value refactorises more frequently (better accuracy, more
+     * overhead); a higher value delays refactorisation (faster pivots, more numerical drift).
      */
-    private static final double ETA_FILL_RATIO = 1.5;
+    private static final double ETA_FILL_RATIO = 1.25;
 
     /**
-     * Hard ceiling on updates between refactorisations. The effective ceiling is
-     * {@code min(UPDATES_LIMIT, UPDATES_MULTIPLIER * m)} where m is the basis dimension. This ensures small
-     * bases (like FIT2D with m=26) refactorise frequently enough to maintain accuracy, while large bases get
-     * the full ceiling.
+     * Hard ceiling on updates between refactorisations, intended as a safety valve that rarely triggers. The
+     * eta fill-ratio check should be the primary trigger for most problems. The effective ceiling is
+     * {@code min(UPDATES_LIMIT, UPDATES_MULTIPLIER * m)} where m is the basis dimension.
      */
-    private static final int UPDATES_LIMIT = 300;
+    private static final int UPDATES_LIMIT = 250;
 
     /**
      * Per-dimension multiplier for the update ceiling. The effective ceiling for a basis of dimension m is
-     * {@code min(UPDATES_LIMIT, UPDATES_MULTIPLIER * m)}. A value of 3 means the ceiling scales as 3x the
+     * {@code min(UPDATES_LIMIT, UPDATES_MULTIPLIER * m)}. A value of 2 means the ceiling scales as 2x the
      * basis dimension for small models.
      */
-    private static final int UPDATES_MULTIPLIER = 3;
+    private static final int UPDATES_MULTIPLIER = 2;
 
     private final int myEffectiveLimit;
     private final SparseLU mySparse = new SparseLU();

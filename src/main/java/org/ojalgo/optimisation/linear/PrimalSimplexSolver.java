@@ -71,9 +71,9 @@ final class PrimalSimplexSolver extends SimplexSolver {
             if (!Double.isFinite(lb) && !Double.isFinite(ub)) {
                 simplex.unbounded(j);
             } else if (Math.abs(lb) <= Math.abs(ub)) {
-                simplex.shiftToLower(j);
+                simplex.setToLower(j);
             } else if (Math.abs(lb) >= Math.abs(ub)) {
-                simplex.shiftToUpper(j);
+                simplex.setToUpper(j);
             } else {
                 simplex.lower(j);
             }

@@ -82,6 +82,13 @@ final class RevisedStore extends SimplexStore {
     private final double[] l;
 
     /**
+     * Set after the basic solution has been fully computed (via {@link #refreshBasicSolution()}). Cleared on
+     * {@link #resetBasis} so that {@link #setToLower}/{@link #setToUpper} skip redundant ftran calls during
+     * the subsequent setup phase — {@link #prepareToIterate()} will recompute x from scratch anyway.
+     */
+    private boolean myBasicSolutionReady = false;
+
+    /**
      * Complete constraint matrix A (all variables). Mutable during build; frozen to {@link #myConstraintsCSC}
      * before iteration.
      */
@@ -107,10 +114,11 @@ final class RevisedStore extends SimplexStore {
     private BasisRepresentation myInvBasis;
 
     /**
-     * Set by {@link #pivot} when the basis representation performed a full refactorisation rather than an
-     * incremental update. Cleared by {@link #calculateIteration} after refreshing reduced costs.
+     * Set when the basis representation was fully refactored (rather than incrementally updated). Both the
+     * basic solution x and reduced costs d are recomputed from scratch after refactorisation, since the fresh
+     * factors make the recompute accurate. Between refactorisations, x and d are maintained incrementally.
      */
-    private int myNeedsReducedCostRefresh = 0;
+    private boolean myRefactored = false;
 
     /**
      * Objective function coefficients c for all variables. Static during solve. Used to compute duals and
@@ -167,7 +175,6 @@ final class RevisedStore extends SimplexStore {
 
         d = new double[n - m];
         a = new double[n - m];
-
     }
 
     private void doBodyRow(final int row, final double[] destination) {
@@ -191,6 +198,35 @@ final class RevisedStore extends SimplexStore {
                 destination[je] = w[col];
             }
         }
+    }
+
+    private double nonBasicValue(final int col, final ColumnState state) {
+        if (state == ColumnState.LOWER) {
+            return this.getLowerBound(col);
+        } else if (state == ColumnState.UPPER) {
+            return this.getUpperBound(col);
+        } else {
+            return ZERO;
+        }
+    }
+
+    /**
+     * Recompute x = B^{-1}(b - N*x_N) from scratch, eliminating accumulated rounding errors.
+     */
+    private void refreshBasicSolution() {
+
+        System.arraycopy(myConstraintsRHS.data, 0, x, 0, m);
+
+        for (int je = 0; je < excluded.length; je++) {
+            int j = excluded[je];
+            double v = this.nonBasicValue(j, this.getColumnState(j));
+            if (v != ZERO) {
+                myConstraintsCSC.axpy(j, -v, x);
+            }
+        }
+
+        myInvBasis.ftran(x);
+        myBasicSolutionReady = true;
     }
 
     private void updateDualsAndReducedCosts() {
@@ -222,16 +258,8 @@ final class RevisedStore extends SimplexStore {
         super.pivot(iteration);
 
         if (myInvBasis.update(myConstraintsCSC, included, iterExitInd, iterEnterCol)) {
-            myNeedsReducedCostRefresh = 0;
+            myRefactored = true;
         }
-    }
-
-    @Override
-    protected void shiftColumn(final int col, final double shift) {
-        super.shiftColumn(col, shift);
-        myConstraintsCSC.axpy(col, -shift, myConstraintsRHS.data);
-        System.arraycopy(myConstraintsRHS.data, 0, x, 0, m);
-        myInvBasis.ftran(x);
     }
 
     @Override
@@ -242,39 +270,34 @@ final class RevisedStore extends SimplexStore {
     @Override
     void calculateIteration(final SimplexSolver.IterDescr iteration) {
 
-        int col = iteration.enter.column();
-        ColumnState state = iteration.exit.to;
-        double shift = ZERO;
-        if (state == ColumnState.LOWER) {
-            shift = this.getLowerBound(col);
-        } else if (state == ColumnState.UPPER) {
-            shift = this.getUpperBound(col);
-        }
-
         int exit = iteration.exit.index;
         int enter = iteration.enter.index;
 
         if (iteration.isBasisUpdate()) {
 
-            if (myNeedsReducedCostRefresh >= 150) {
+            if (myRefactored) {
                 this.updateDualsAndReducedCosts();
-                myNeedsReducedCostRefresh = 0;
             } else {
                 double stepD = d[enter] / a[enter];
                 AXPY.invoke(d, -stepD, a);
                 d[enter] = -stepD;
-                myNeedsReducedCostRefresh++;
             }
         }
 
-        if (shift != ZERO) {
-            this.shiftColumn(col, shift);
+        if (myRefactored) {
+            this.refreshBasicSolution();
+            myRefactored = false;
         } else {
-            double exitX = x[exit];
-            double enterY = y[exit];
-            double stepX = exitX / enterY;
-            AXPY.invoke(x, -stepX, y);
-            x[exit] = stepX;
+            // Post-pivot: exit.column() = old entering column, enter.column() = old exiting column
+            int enterCol = iteration.exit.column();
+            int exitCol = iteration.enter.column();
+
+            double enterValue = this.nonBasicValue(enterCol, iteration.enter.from);
+            double exitBound = this.nonBasicValue(exitCol, iteration.exit.to);
+
+            double theta = (x[exit] - exitBound) / y[exit];
+            AXPY.invoke(x, -theta, y);
+            x[exit] = enterValue + theta;
         }
     }
 
@@ -309,14 +332,45 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
+    double[] extractSolution() {
+
+        double[] retVal = new double[n];
+
+        for (int je = 0; je < excluded.length; je++) {
+            int j = excluded[je];
+            ColumnState columnState = this.getColumnState(j);
+
+            if (columnState == ColumnState.LOWER) {
+                double lb = this.getLowerBound(j);
+                retVal[j] = Double.isFinite(lb) ? lb : ZERO;
+            } else if (columnState == ColumnState.UPPER) {
+                double ub = this.getUpperBound(j);
+                retVal[j] = Double.isFinite(ub) ? ub : ZERO;
+            }
+        }
+
+        for (int ji = 0; ji < included.length; ji++) {
+            retVal[included[ji]] = x[ji];
+        }
+
+        return retVal;
+    }
+
+    @Override
     double extractValue() {
 
         double retVal = ZERO;
 
-        double[] solution = this.extractSolution();
+        for (int ji = 0; ji < included.length; ji++) {
+            retVal += x[ji] * myObjective.doubleValue(included[ji]);
+        }
 
-        for (int i = 0; i < solution.length; i++) {
-            retVal += solution[i] * myObjective.doubleValue(i);
+        for (int je = 0; je < excluded.length; je++) {
+            int j = excluded[je];
+            double v = this.nonBasicValue(j, this.getColumnState(j));
+            if (v != ZERO) {
+                retVal += v * myObjective.doubleValue(j);
+            }
         }
 
         return retVal;
@@ -386,8 +440,7 @@ final class RevisedStore extends SimplexStore {
     void prepareToIterate() {
         myInvBasis.reset(myConstraintsCSC, included);
         this.updateDualsAndReducedCosts();
-        System.arraycopy(myConstraintsRHS.data, 0, x, 0, m);
-        myInvBasis.ftran(x);
+        this.refreshBasicSolution();
     }
 
     @Override
@@ -402,6 +455,35 @@ final class RevisedStore extends SimplexStore {
         super.resetBasis(basis);
 
         myInvBasis.reset(myConstraintsCSC, included);
+        myBasicSolutionReady = false;
+    }
+
+    @Override
+    void setToLower(final int col) {
+        ColumnState prevState = this.getColumnState(col);
+        this.lower(col);
+        if (myBasicSolutionReady) {
+            double delta = this.getLowerBound(col) - this.nonBasicValue(col, prevState);
+            if (delta != ZERO) {
+                myConstraintsCSC.supplyTo(col, y);
+                myInvBasis.ftran(y);
+                AXPY.invoke(x, -delta, y);
+            }
+        }
+    }
+
+    @Override
+    void setToUpper(final int col) {
+        ColumnState prevState = this.getColumnState(col);
+        this.upper(col);
+        if (myBasicSolutionReady) {
+            double delta = this.getUpperBound(col) - this.nonBasicValue(col, prevState);
+            if (delta != ZERO) {
+                myConstraintsCSC.supplyTo(col, y);
+                myInvBasis.ftran(y);
+                AXPY.invoke(x, -delta, y);
+            }
+        }
     }
 
     @Override
@@ -515,6 +597,12 @@ final class RevisedStore extends SimplexStore {
 
             edgeWeights[p] = ONE;
         }
+    }
+
+    @Override
+    boolean updateRange(final int index, final double lower, final double upper) {
+        this.setBounds(index, lower, upper);
+        return true;
     }
 
 }

@@ -27,6 +27,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 import java.util.Arrays;
 
 import org.ojalgo.equation.Equation;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Primitive1D;
 import org.ojalgo.type.context.NumberContext;
@@ -50,7 +51,7 @@ abstract class TableauCutGenerator {
 
     /**
      * Calculates a Gomory cut – all variables must be integer.
-     * 
+     *
      * @param body          Simplex tableau row (excluding the RHS column)
      * @param index         The pivot index of the returned equation. Otherwise not used in the generation.
      * @param rhs           The right hand side value of the row – the value that should be an integer.
@@ -93,7 +94,7 @@ abstract class TableauCutGenerator {
      * <li>integer[index] == true
      * <li>rhs > 0.0
      * </ul>
-     * 
+     *
      * @param body    The equation body.
      * @param index   The index of the variable that should integer valued, but is not.
      * @param rhs     The equation right hand side – the value of the variable that should be integer, but is
@@ -207,8 +208,80 @@ abstract class TableauCutGenerator {
     }
 
     /**
+     * No-shift variant for stores that do not shift variables (e.g. {@link RevisedStore}). Equivalent to
+     * calling the shift-aware overload with an all-zero shifts array, but avoids allocating it.
+     * <p>
+     * Variables at their lower bound are non-negative; variables at their upper bound are non-positive
+     * (negated). The cut limit is always {@link PrimitiveMath#ONE ONE} since there is no shift adjustment.
+     */
+    static Equation doGomoryMixedInteger(final Primitive1D body, final int index, final double rhs, final double fractionality, final int[] excluded,
+            final boolean[] integers, final double[] lowers, final double[] uppers) {
+
+        int nbVariables = integers.length;
+        if (body.size() < nbVariables || lowers.length < nbVariables || uppers.length < nbVariables) {
+            throw new IllegalArgumentException();
+        }
+
+        boolean negRHS = rhs < ZERO;
+
+        double f0 = TableauCutGenerator.fraction(negRHS ? -rhs : rhs);
+        if (!TableauCutGenerator.isFractionalEnough(rhs, f0, fractionality)) {
+            return null;
+        }
+        double cf0 = ONE - f0;
+
+        double[] cut = new double[nbVariables];
+
+        for (int je = 0; je < excluded.length; je++) {
+            int j = excluded[je];
+
+            if (j < nbVariables) {
+
+                boolean negVar = uppers[j] <= ZERO;
+
+                double aj = body.doubleValue(j);
+                if (negRHS ^ negVar) {
+                    aj = -aj;
+                }
+
+                if (!ACCURACY.isZero(aj)) {
+
+                    if (integers[j]) {
+
+                        double fj = TableauCutGenerator.fraction(aj);
+
+                        if (fj <= f0) {
+                            if (!ACCURACY.isZero(fj)) {
+                                cut[j] = fj / f0;
+                            }
+                        } else {
+                            double cfj = ONE - fj;
+                            if (!ACCURACY.isZero(cfj)) {
+                                cut[j] = cfj / cf0;
+                            }
+                        }
+
+                    } else if (aj > ZERO) {
+                        cut[j] = aj / f0;
+                    } else if (aj < ZERO) {
+                        cut[j] = -aj / cf0;
+                    }
+                }
+
+            } else {
+
+                if (DEBUG) {
+                    BasicLogger.debug("Artificial variable: {} {}", j, body.doubleValue(j));
+                }
+            }
+        }
+
+        return Equation.of(ONE, index, cut);
+    }
+
+    /**
      * Calculates a Gomory Mixed Integer (GMI) cut.
-     * 
+     *
      * @param body          The equation body (simplex tableau row). The tableau is assumed to be in an
      *                      optimal (phase 2) state. Any reference to artificial variables will be ignored.
      * @param index         Index (tableau column) of the variable to be cut. A basic variable that should be

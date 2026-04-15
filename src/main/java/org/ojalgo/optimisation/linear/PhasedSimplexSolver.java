@@ -75,19 +75,19 @@ final class PhasedSimplexSolver extends SimplexSolver {
             }
 
             if (rc > ZERO && Double.isFinite(lb)) {
-                simplex.shiftToLower(j);
+                simplex.setToLower(j);
                 phase1.set(j, rc);
             } else if (rc < ZERO && Double.isFinite(ub)) {
-                simplex.shiftToUpper(j);
+                simplex.setToUpper(j);
                 phase1.set(j, rc);
             } else if (!Double.isFinite(lb) && !Double.isFinite(ub)) {
                 simplex.unbounded(j);
                 phase1.set(j, ZERO);
             } else if (Math.abs(lb) <= Math.abs(ub)) {
-                simplex.shiftToLower(j);
+                simplex.setToLower(j);
                 phase1.set(j, Math.max(ONE, simplex.getReducedCost(je)));
             } else if (Math.abs(lb) >= Math.abs(ub)) {
-                simplex.shiftToUpper(j);
+                simplex.setToUpper(j);
                 phase1.set(j, Math.min(NEG, simplex.getReducedCost(je)));
             } else {
                 simplex.lower(j);

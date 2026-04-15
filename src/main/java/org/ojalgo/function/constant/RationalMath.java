@@ -21,6 +21,7 @@
  */
 package org.ojalgo.function.constant;
 
+import org.ojalgo.array.operation.SQRT;
 import org.ojalgo.function.RationalFunction;
 import org.ojalgo.scalar.RationalNumber;
 

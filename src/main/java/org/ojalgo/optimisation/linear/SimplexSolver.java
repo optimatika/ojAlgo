@@ -1207,9 +1207,9 @@ abstract class SimplexSolver extends LinearSolver {
 
             ColumnState from = iteration.enter.from;
             if (from == ColumnState.LOWER) {
-                mySimplex.shiftToUpper(j);
+                mySimplex.setToUpper(j);
             } else if (from == ColumnState.UPPER) {
-                mySimplex.shiftToLower(j);
+                mySimplex.setToLower(j);
             } else if (from == ColumnState.UNBOUNDED) {
                 this.setState(State.UNBOUNDED);
             } else {

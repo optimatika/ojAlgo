@@ -121,10 +121,8 @@ abstract class SimplexStore {
     private final double[] myLowerBounds;
     private final EnumPartition<SimplexStore.ColumnState> myPartition;
     private int myRemainingArtificials;
-    private final double[] mySolutionShift;
     private final List<String> myToStringList = new ArrayList<>();
     private final double[] myUpperBounds;
-    private double myValueShift = ZERO;
 
     /**
      * Either the primal or dual devex edge weights, depending on the algorithm used. Sized so that it can
@@ -159,7 +157,6 @@ abstract class SimplexStore {
         n = linearStructure.countVariablesTotally();
 
         myLowerBounds = new double[n];
-        mySolutionShift = new double[n];
         myUpperBounds = new double[n];
 
         excluded = Structure1D.newIncreasingRange(0, n - m);
@@ -211,32 +208,30 @@ abstract class SimplexStore {
         this.updateBasis(exit.index, exit.to, enter.index);
     }
 
-    protected void shiftColumn(final int col, final double shift) {
+    /**
+     * Directly set the internal (possibly shifted) bounds for a variable. For use by subclasses that manage
+     * their own bound shifting.
+     */
+    protected void setBounds(final int index, final double lower, final double upper) {
+        myLowerBounds[index] = lower;
+        myUpperBounds[index] = upper;
+    }
+
+    /**
+     * Directly shift the internal bounds for a variable. For use by subclasses that implement shifting.
+     */
+    protected void shiftBounds(final int col, final double shift) {
         myLowerBounds[col] -= shift;
         myUpperBounds[col] -= shift;
-        mySolutionShift[col] += shift;
-        myValueShift += this.getCost(col) * shift;
     }
 
     abstract void calculateDualDirection(ExitInfo exit);
 
     /**
-     * Post-pivot processing: shifts the entering variable to its new bound and performs any additional
-     * iteration calculations. Subclasses may override to add reduced cost and basic solution updates.
+     * Post-pivot processing: updates the basic solution and reduced costs after a pivot or bound flip.
+     * Subclasses implement the mechanics appropriate to their representation.
      */
-    void calculateIteration(final IterDescr iteration) {
-        int col = iteration.enter.column();
-        ColumnState state = iteration.exit.to;
-        double shift = ZERO;
-        if (state == ColumnState.LOWER) {
-            shift = this.getLowerBound(col);
-        } else if (state == ColumnState.UPPER) {
-            shift = this.getUpperBound(col);
-        }
-        if (shift != ZERO) {
-            this.shiftColumn(col, shift);
-        }
-    }
+    abstract void calculateIteration(IterDescr iteration);
 
     abstract void calculatePrimalDirection(EnterInfo enter);
 
@@ -292,44 +287,14 @@ abstract class SimplexStore {
         }
     }
 
-    final double[] extractSolution() {
-
-        double[] retVal = new double[n];
-
-        for (int je = 0; je < excluded.length; je++) {
-            int j = excluded[je];
-            ColumnState columnState = myPartition.get(j);
-
-            if (columnState == ColumnState.LOWER) {
-
-                double lowerBound = this.getLowerBound(j);
-                if (Double.isFinite(lowerBound)) {
-                    retVal[j] = lowerBound;
-                } else {
-                    retVal[j] = ZERO;
-                }
-
-            } else if (columnState == ColumnState.UPPER) {
-
-                double upperBound = this.getUpperBound(j);
-                if (Double.isFinite(upperBound)) {
-                    retVal[j] = upperBound;
-                } else {
-                    retVal[j] = ZERO;
-                }
-            }
-        }
-
-        this.copyBasicSolution(retVal);
-
-        for (int i = 0; i < n; i++) {
-            retVal[i] += mySolutionShift[i];
-        }
-
-        return retVal;
-    }
+    abstract double[] extractSolution();
 
     abstract double extractValue();
+
+    Equation generateCut(final Primitive1D body, final int index, final double rhs, final double fractionality, final int[] excluded, final boolean[] integers,
+            final double[] lowers, final double[] uppers) {
+        return TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integers, lowers, uppers);
+    }
 
     /**
      * When {@link SimplexSolver} is used as node solver for {@link IntegerSolver} this method generates cut
@@ -356,8 +321,7 @@ abstract class SimplexStore {
 
             if (j >= 0 && j < nbVars && integer[j] && !accuracy.isInteger(rhs)) {
 
-                Equation maybe = TableauCutGenerator.doGomoryMixedInteger(this.sliceBodyRow(i), j, rhs, fractionality, excluded, integer, myLowerBounds,
-                        myUpperBounds, mySolutionShift);
+                Equation maybe = this.generateCut(this.sliceBodyRow(i), j, rhs, fractionality, excluded, integer, myLowerBounds, myUpperBounds);
 
                 if (maybe != null) {
                     retVal.add(maybe);
@@ -415,17 +379,17 @@ abstract class SimplexStore {
     }
 
     /**
-     * The lower bound in original (unshifted) space.
+     * The lower bound in original (unshifted) space. Subclasses that shift bounds must override.
      */
-    final double getOriginalLowerBound(final int index) {
-        return myLowerBounds[index] + mySolutionShift[index];
+    double getOriginalLowerBound(final int index) {
+        return myLowerBounds[index];
     }
 
     /**
-     * The upper bound in original (unshifted) space.
+     * The upper bound in original (unshifted) space. Subclasses that shift bounds must override.
      */
-    final double getOriginalUpperBound(final int index) {
-        return myUpperBounds[index] + mySolutionShift[index];
+    double getOriginalUpperBound(final int index) {
+        return myUpperBounds[index];
     }
 
     /**
@@ -458,13 +422,6 @@ abstract class SimplexStore {
         } else {
             return ZERO;
         }
-    }
-
-    /**
-     * The cumulative objective value adjustment due to shifting.
-     */
-    final double getValueShift() {
-        return myValueShift;
     }
 
     final boolean isArtificial(final int col) {
@@ -554,29 +511,19 @@ abstract class SimplexStore {
         Arrays.fill(edgeWeights, ONE);
     }
 
+    /**
+     * Set the non-basic variable to its lower bound. Updates the partition and performs any subclass-specific
+     * bookkeeping (e.g. shifting for tableau, value tracking for revised).
+     */
+    abstract void setToLower(int col);
+
+    /**
+     * Set the non-basic variable to its upper bound. Updates the partition and performs any subclass-specific
+     * bookkeeping.
+     */
+    abstract void setToUpper(int col);
+
     abstract void setupClassicPhase1Objective();
-
-    /**
-     * Set the variable to its lower bound state and shift so that the lower bound becomes zero.
-     */
-    final void shiftToLower(final int col) {
-        myPartition.update(col, ColumnState.LOWER);
-        double lb = myLowerBounds[col];
-        if (lb != ZERO) {
-            this.shiftColumn(col, lb);
-        }
-    }
-
-    /**
-     * Set the variable to its upper bound state and shift so that the upper bound becomes zero.
-     */
-    final void shiftToUpper(final int col) {
-        myPartition.update(col, ColumnState.UPPER);
-        double ub = myUpperBounds[col];
-        if (ub != ZERO) {
-            this.shiftColumn(col, ub);
-        }
-    }
 
     abstract Primitive1D sliceBodyRow(final int row);
 
@@ -635,14 +582,9 @@ abstract class SimplexStore {
     abstract void updatePrimalEdgeWeights(final IterDescr iteration);
 
     /**
-     * Accepts bounds in original (unshifted) space and converts to shifted space internally.
+     * Accepts bounds in original (unshifted) space and updates the internal representation.
      */
-    boolean updateRange(final int index, final double lower, final double upper) {
-        double shift = mySolutionShift[index];
-        myLowerBounds[index] = lower - shift;
-        myUpperBounds[index] = upper - shift;
-        return true;
-    }
+    abstract boolean updateRange(int index, double lower, double upper);
 
     final SimplexStore upper(final int index) {
         myPartition.update(index, ColumnState.UPPER);
