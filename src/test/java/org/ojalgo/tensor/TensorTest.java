@@ -249,7 +249,7 @@ public class TensorTest {
 
         // Check last element
         double expectedLast = vectorA.doubleValue(lastIndex) * vectorB.doubleValue(lastIndex) * vectorC.doubleValue(lastIndex);
-        TestUtils.assertEquals(expectedLast, vectorProduct.doubleValue(new long[] { lastIndex, lastIndex, lastIndex }));
+        TestUtils.assertEquals(expectedLast, vectorProduct.doubleValue(lastIndex, lastIndex, lastIndex));
     }
 
     @Test

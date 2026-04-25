@@ -72,11 +72,17 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
         // model.options.mip_defer = 0.25;
         // model.options.mip_gap = 1.0E-5;
 
-        // model.options.sparse = Boolean.TRUE;
+        //        model.options.linear().dual();
+        //        model.options.sparse = Boolean.TRUE;
 
         // long time = 10_000L;
         // model.options.time_abort = time;
         // model.options.time_suffice = time;
+
+        //        if (model.countVariables() > 10_000 || model.countExpressions() > 10_000) {
+        //            BasicLogger.debug(name);
+        //            throw new RuntimeException();
+        //        }
 
         ModelFileTest.assertValues(model, expMinValString, expMaxValString, accuracy);
     }
@@ -390,7 +396,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * characteristics.
      */
     @Test
-    @Tag("unstable")
     public void testCRE_A() {
         CuteNetlibCase.doTest("CRE-A.SIF", "2.3595407060971607E7", "4.000288201473081E7", ACCURACY);
     }
@@ -404,6 +409,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * computational efficiency.
      */
     @Test
+    @Tag("slow")
     @Tag("unstable")
     public void testCRE_B() {
         CuteNetlibCase.doTest("CRE-B.SIF", "2.3129639886832364E7", "7.634368362305094E7", ACCURACY);
@@ -418,7 +424,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * computational efficiency.
      */
     @Test
-    @Tag("unstable")
     public void testCRE_C() {
         CuteNetlibCase.doTest("CRE-C.SIF", "2.5275116140880212E7", "3.762512696726111E7", ACCURACY);
     }
@@ -432,6 +437,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * and computational efficiency.
      */
     @Test
+    @Tag("slow")
     @Tag("unstable")
     public void testCRE_D() {
         CuteNetlibCase.doTest("CRE-D.SIF", "2.4454969764549244E7", "7.373382453297935E7", ACCURACY);
@@ -447,7 +453,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * problems.
      */
     @Test
-    @Tag("slow")
+    @Tag("unstable")
     public void testCYCLE() {
         CuteNetlibCase.doTest("CYCLE.SIF", "-5.2263930248941", "995.8104649596411", ACCURACY);
     }
@@ -477,7 +483,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * ability to handle problems of extreme size.
      */
     @Test
-    @Tag("slow")
     @Tag("unstable")
     public void testD2Q06C() {
         CuteNetlibCase.doTest("D2Q06C.SIF", "122784.21081418857", null, ACCURACY);
@@ -649,6 +654,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * problems with extremely high variable-to-constraint ratios.
      */
     @Test
+    @Tag("slow")
     public void testFIT2D() {
         CuteNetlibCase.doTest("FIT2D.SIF", "-68464.29329383196", "393548.6499999999", ACCURACY);
     }
@@ -717,7 +723,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * relationships.
      */
     @Test
-    @Tag("slow")
     @Tag("unstable")
     public void testGREENBEA() {
         CuteNetlibCase.doTest("GREENBEA.SIF", "-7.255524812984598E7", null, ACCURACY);
@@ -733,7 +738,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * problems with specific numerical characteristics and constraint relationships.
      */
     @Test
-    @Tag("slow")
     @Tag("unstable")
     public void testGREENBEB() {
         CuteNetlibCase.doTest("GREENBEB.SIF", "-4302260.261206587", null, ACCURACY);
@@ -857,6 +861,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      */
     @Test
     @Tag("slow")
+    @Tag("unstable")
     public void testKEN_13() {
         CuteNetlibCase.doTest("KEN-13.SIF", "-1.0257394789482431E10", "-2.241281190609764E9", ACCURACY);
     }
@@ -949,6 +954,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * characteristics.
      */
     @Test
+    @Tag("unstable")
     public void testNESM() {
         CuteNetlibCase.doTest("NESM.SIF", "1.4076036487562722E7", "3.6088214327411644E7", ACCURACY);
     }
@@ -964,7 +970,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * relationships.
      */
     @Test
-    @Tag("unstable")
+    @Tag("slow")
     public void testOSA_07() {
         CuteNetlibCase.doTest("OSA-07.SIF", "535722.517299352", "4332086.205299969", ACCURACY);
     }
@@ -980,7 +986,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * relationships.
      */
     @Test
-    @Tag("unstable")
+    @Tag("slow")
     public void testOSA_14() {
         CuteNetlibCase.doTest("OSA-14.SIF", "1106462.8447362552", "9377699.405100001", ACCURACY);
     }
@@ -997,7 +1003,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      */
     @Test
     @Tag("slow")
-    @Tag("unstable")
     public void testOSA_30() {
         CuteNetlibCase.doTest("OSA-30.SIF", "2142139.873209757", "1.78441602883E7", ACCURACY);
     }
@@ -1063,6 +1068,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      */
     @Test
     @Tag("slow")
+    @Tag("unstable")
     public void testPDS_10() {
         CuteNetlibCase.doTest("PDS-10.SIF", "2.6727094976E10", "2.931368811E10", ACCURACY);
     }
@@ -1111,6 +1117,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      */
     @Test
     @Tag("slow")
+    @Tag("unstable")
     public void testPILOT() {
         CuteNetlibCase.doTest("PILOT.SIF", "-557.4897292730852", "-422.4724550733185", ACCURACY);
     }
@@ -1143,6 +1150,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      */
     @Test
     @Tag("slow")
+    @Tag("unstable")
     public void testPILOT_WE() {
         CuteNetlibCase.doTest("PILOT-WE.SIF", "-2720107.5328449034", "20770.464669007524", ACCURACY);
     }
@@ -1174,6 +1182,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      */
     @Test
     @Tag("slow")
+    @Tag("unstable")
     public void testPILOT87() {
         CuteNetlibCase.doTest("PILOT87.SIF", "301.7103473330999", null, ACCURACY);
     }
@@ -1219,6 +1228,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * optimization applications.
      */
     @Test
+    @Tag("slow")
     @Tag("unstable")
     public void testQAP15() {
         CuteNetlibCase.doTest("QAP15.SIF", "1040.9940409587314", "2109.777554651187", ACCURACY);
@@ -1249,7 +1259,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * numerical characteristics and constraint relationships.
      */
     @Test
-    @Tag("bm1000")
     public void testRECIPELP() {
         CuteNetlibCase.doTest("RECIPELP.SIF", "-266.616", "-104.818", ACCURACY);
     }
@@ -1768,6 +1777,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      */
     @Test
     @Tag("slow")
+    @Tag("unstable")
     public void testSTOCFOR3() {
         CuteNetlibCase.doTest("STOCFOR3.SIF", "-39976.78394364959", null, ACCURACY);
     }

@@ -318,6 +318,10 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
         return mySize;
     }
 
+    public final DensityTrackingArray toDensityTrackingArray() {
+        return new DensityTrackingArray(this.toRawCopy1D());
+    }
+
     @Override
     public final void visitOne(final long index, final VoidFunction<N> visitor) {
         this.visitOne(Math.toIntExact(index), visitor);

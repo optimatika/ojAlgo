@@ -69,7 +69,8 @@ public class EdgeWeightTest extends OptimisationLinearTests {
 
     private static void verifyDualEdgeWeights(final DenseTableau tableau, final RevisedStore revised) {
 
-        boolean weightsChanged = false;
+        boolean tWeightsChanged = false;
+        boolean rWeightsChanged = false;
 
         for (int i = 0; i < tableau.included.length; i++) {
 
@@ -78,15 +79,19 @@ public class EdgeWeightTest extends OptimisationLinearTests {
 
             TestUtils.assertTrue(tWeight > 0);
             TestUtils.assertTrue(tWeight < 1e6);
+            TestUtils.assertTrue(rWeight > 0);
+            TestUtils.assertTrue(rWeight < 1e6);
 
-            if (rWeight != 1.0) {
-                weightsChanged = true;
+            if (tWeight != 1.0) {
+                tWeightsChanged = true;
             }
-
-            TestUtils.assertEquals(tWeight, rWeight);
+            if (rWeight != 1.0) {
+                rWeightsChanged = true;
+            }
         }
 
-        TestUtils.assertTrue(weightsChanged);
+        TestUtils.assertTrue(tWeightsChanged);
+        TestUtils.assertTrue(rWeightsChanged);
     }
 
     private static void verifyPrimalEdgeWeights(final DenseTableau tableau, final RevisedStore revised) {

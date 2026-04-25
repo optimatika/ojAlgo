@@ -32,14 +32,7 @@ interface BasisRepresentation extends InvertibleFactor<Double> {
      * unreliable.
      */
     static BasisRepresentation newInstance(final SparseStructure2D sparse2D) {
-
-        int dim = sparse2D.getMinDim();
-
-        if (dim < 1_000 && sparse2D.density() > PrimitiveMath.QUARTER) {
-            return new ProductFormInverse(dim);
-        } else {
-            return new SparseDecomposition(dim);
-        }
+        return new SparseDecomposition(sparse2D.getMinDim());
     }
 
     /**

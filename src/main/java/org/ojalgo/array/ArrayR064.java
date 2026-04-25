@@ -83,6 +83,10 @@ public class ArrayR064 extends PrimitiveArray {
         data[index] += addend;
     }
 
+    public final DensityTrackingArray asDensityTrackingArray() {
+        return new DensityTrackingArray(data);
+    }
+
     @Override
     public void axpy(final double a, final Mutate1D.Modifiable<?> y) {
         AXPY.invoke(y, a, data);

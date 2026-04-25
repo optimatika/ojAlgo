@@ -21,8 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
-import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
-
+import org.ojalgo.structure.Structure1D;
 import org.ojalgo.structure.Structure2D;
 
 /**
@@ -48,26 +47,7 @@ import org.ojalgo.structure.Structure2D;
  *
  * @author apete
  */
-public interface SparseStructure2D extends Structure2D {
-
-    int countNonzeros();
-
-    /**
-     * Returns the density of the matrix, defined as the ratio of non-zero elements to the total number of
-     * elements in the matrix.
-     *
-     * @return The density of the matrix, between 0.0 and 1.0
-     */
-    default double density() {
-
-        double totalCount = this.count();
-
-        if (totalCount == ZERO) {
-            return ZERO;
-        } else {
-            return this.countNonzeros() / totalCount;
-        }
-    }
+public interface SparseStructure2D extends Structure2D, Structure1D.Sparse {
 
     R064CSC toCSC();
 

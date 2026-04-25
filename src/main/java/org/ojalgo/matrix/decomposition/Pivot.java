@@ -152,14 +152,21 @@ final class Pivot {
 
         if (ind1 != ind2) {
 
-            int tmpRow = myOrder[ind1];
-            myOrder[ind1] = myOrder[ind2];
-            myOrder[ind2] = tmpRow;
+            int original1 = myOrder[ind1];
+            int original2 = myOrder[ind2];
+            myOrder[ind1] = original2;
+            myOrder[ind2] = original1;
+
+            if (myReverse != null && !myReverseNeedsUpdate && myReverse.length == myOrder.length) {
+                myReverse[original1] = ind2;
+                myReverse[original2] = ind1;
+            } else {
+                myReverseNeedsUpdate = true;
+            }
 
             mySign = -mySign;
 
             myModified = true;
-            myReverseNeedsUpdate = true;
 
         } else {
             // Why?!
@@ -231,7 +238,9 @@ final class Pivot {
 
     void setModified(final boolean modified) {
         myModified = modified;
-        myReverseNeedsUpdate = modified;
+        if (modified) {
+            myReverseNeedsUpdate = true;
+        }
     }
 
     int signum() {

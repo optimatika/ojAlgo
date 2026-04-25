@@ -502,9 +502,7 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
 
     default double[] toRawCopy1D() {
 
-        int tmpLength = (int) this.count();
-
-        double[] retVal = new double[tmpLength];
+        double[] retVal = new double[this.size()];
 
         this.supplyTo(retVal);
 

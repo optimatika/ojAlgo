@@ -21,6 +21,8 @@
  */
 package org.ojalgo.structure;
 
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -223,6 +225,29 @@ public interface Structure1D {
          * @param step  The increment size
          */
         void call(long first, long limit, long step);
+
+    }
+
+    interface Sparse extends Structure1D {
+
+        int countNonzeros();
+
+        /**
+         * Returns the density of the matrix, defined as the ratio of non-zero elements to the total number of
+         * elements in the matrix.
+         *
+         * @return The density of the matrix, between 0.0 and 1.0
+         */
+        default double density() {
+
+            double totalCount = this.count();
+
+            if (totalCount == ZERO) {
+                return ZERO;
+            } else {
+                return this.countNonzeros() / totalCount;
+            }
+        }
 
     }
 

@@ -15,35 +15,19 @@ import org.ojalgo.matrix.store.R064CSC;
  */
 final class SparseDecomposition implements BasisRepresentation {
 
-    /**
-     * Ratio threshold: refactorise when eta-chain nonzeros exceed this multiple of the L+U factor nonzeros.
-     * This is the primary refactorisation trigger — it adapts naturally to problem size and sparsity since
-     * sparser factors trigger sooner. A lower value refactorises more frequently (better accuracy, more
-     * overhead); a higher value delays refactorisation (faster pivots, more numerical drift).
-     */
-    private static final double ETA_FILL_RATIO = 1.25;
+    private static final int ETA_MULTIPLIER = 3;
+    private static final int MAX_UPDATES = 250;
+    private static final int MIN_UPDATES = 25;
 
-    /**
-     * Hard ceiling on updates between refactorisations, intended as a safety valve that rarely triggers. The
-     * eta fill-ratio check should be the primary trigger for most problems. The effective ceiling is
-     * {@code min(UPDATES_LIMIT, UPDATES_MULTIPLIER * m)} where m is the basis dimension.
-     */
-    private static final int UPDATES_LIMIT = 250;
-
-    /**
-     * Per-dimension multiplier for the update ceiling. The effective ceiling for a basis of dimension m is
-     * {@code min(UPDATES_LIMIT, UPDATES_MULTIPLIER * m)}. A value of 2 means the ceiling scales as 2x the
-     * basis dimension for small models.
-     */
-    private static final int UPDATES_MULTIPLIER = 2;
-
-    private final int myEffectiveLimit;
+    private final int myUpperLimit;
+    private final int myLowerLimit;
     private final SparseLU mySparse = new SparseLU();
     private int myUpdateCounter = 0;
 
     SparseDecomposition(final int dim) {
         super();
-        myEffectiveLimit = Math.min(UPDATES_LIMIT, UPDATES_MULTIPLIER * dim);
+        myUpperLimit = Math.min(dim, MAX_UPDATES);
+        myLowerLimit = Math.min(MIN_UPDATES, myUpperLimit);
     }
 
     @Override
@@ -110,22 +94,22 @@ final class SparseDecomposition implements BasisRepresentation {
      */
     @Override
     public boolean update(final R064CSC matrix, final int[] included, final int exitIndex, final int enterColumn) {
-        if (!mySparse.isComputed() || !mySparse.updateColumn(exitIndex, matrix, enterColumn) || this.shouldRefactorise()) {
+        if (!mySparse.isComputed() || this.shouldRefactor() || !mySparse.updateColumn(exitIndex, matrix, enterColumn)) {
             this.reset(matrix, included);
             return true;
         }
+        ++myUpdateCounter;
         return false;
     }
 
-    private boolean shouldRefactorise() {
-        if (++myUpdateCounter >= myEffectiveLimit) {
+    private boolean shouldRefactor() {
+        if (myUpdateCounter < myLowerLimit) {
+            return false;
+        } else if (myUpdateCounter >= myUpperLimit) {
             return true;
+        } else {
+            return ETA_MULTIPLIER * mySparse.countEtaNonzeros() > mySparse.countFactorNonzeros();
         }
-        int factorNnz = mySparse.countFactorNonzeros();
-        if (factorNnz > 0) {
-            return mySparse.countEtaNonzeros() > ETA_FILL_RATIO * factorNnz;
-        }
-        return false;
     }
 
 }

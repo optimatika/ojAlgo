@@ -47,7 +47,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
+public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> implements Structure1D.Sparse {
 
     @FunctionalInterface
     public interface NonzeroPrimitiveCallback {
@@ -356,11 +356,21 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
         }
     }
 
+    /**
+     * AXPY where stored indices are translated through {@code lookup} before indexing {@code y}.
+     */
+    public void axpyViaLookup(final double a, final double[] y, final int[] lookup) {
+        for (int n = 0; n < myActualLength; n++) {
+            y[lookup[myIndices[n]]] += a * myValues.doubleValue(n);
+        }
+    }
+
     @Override
     public long count() {
         return mySize;
     }
 
+    @Override
     public int countNonzeros() {
         return myActualLength;
     }
@@ -390,6 +400,22 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
         for (int n = 0; n < myActualLength; n++) {
             retVal += myValues.doubleValue(n) * vector[myIndices[n]];
+        }
+
+        return retVal;
+    }
+
+    /**
+     * Dot product where stored indices are translated through {@code lookup} before indexing {@code vector}.
+     * Intended for sparse LU factors stored in a stable column frame that differs from the frame of the solve
+     * vector.
+     */
+    public double dotViaLookup(final double[] vector, final int[] lookup) {
+
+        double retVal = PrimitiveMath.ZERO;
+
+        for (int n = 0; n < myActualLength; n++) {
+            retVal += myValues.doubleValue(n) * vector[lookup[myIndices[n]]];
         }
 
         return retVal;
@@ -621,13 +647,21 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
      * <p>
      * This method assumes that the supplied {@code index} is strictly greater than all existing indices in
      * the array. No search is performed; the value is simply appended. If the ascending order of indices is
-     * broken, future behavior is unspecified. If the value is zero, nothing is stored.
+     * broken, future behaviour is unspecified. If the value is zero, nothing is stored.
      *
      * @param index the index at which to insert the new value (must be after all existing indices)
      * @param value the value to insert (only nonzero values are actually stored)
      */
     public void putLast(final int index, final double value) {
         this.update(index, -(myActualLength + 1), value, false);
+    }
+
+    /**
+     * Remove the entry at the given index, if it exists. Does nothing if the index has no stored entry.
+     */
+    public void remove(final long index) {
+        int internalIndex = this.index(index);
+        this.remove(index, internalIndex);
     }
 
     /**
