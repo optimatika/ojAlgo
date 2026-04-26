@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.ojalgo.RecoverableCondition;
-import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.operation.SortAll;
 import org.ojalgo.matrix.operation.SubstituteBackwards;
@@ -40,9 +39,9 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Access2D.Sliceable;
-import org.ojalgo.structure.Mutate1D;
+import org.ojalgo.structure.Structure1D;
 import org.ojalgo.structure.Structure2D;
-import org.ojalgo.type.NumberDefinition;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * A sparse, primitive double based, LU decomposition with support for incremental Forrest-Tomlin updates.
@@ -93,118 +92,155 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
      */
     static final class FactorU extends AbstractDecomposition.PrimitiveFactor {
 
-        private final double[] myBodyDiagonal;
-        private final RowsSupplier<Double> myBodyMain;
+        private final int myCount;
+        private final DualSparse myDualBase;
+        private final int[] myPivotRow;
+        private final List<SparseArray<Double>> myUpdateColumns;
+        private final double[] myUpdateDiagonal;
+        private final int myUpdateOffset;
 
-        FactorU(final RowsSupplier<Double> u, final double[] diagU) {
+        FactorU(final DualSparse dualBase, final int[] pivotRow, final int count, final List<SparseArray<Double>> updateColumns, final double[] updateDiagonal,
+                final int updateOffset) {
             super();
-            myBodyMain = u;
-            myBodyDiagonal = diagU;
+            myDualBase = dualBase;
+            myPivotRow = pivotRow;
+            myCount = count;
+            myUpdateColumns = updateColumns;
+            myUpdateDiagonal = updateDiagonal;
+            myUpdateOffset = updateOffset;
         }
 
         @Override
         public void btran(final double[] arg) {
-            int r = myBodyDiagonal.length;
-            for (int ij = 0; ij < r; ij++) {
-                double varJ = arg[ij] / myBodyDiagonal[ij];
-                arg[ij] = varJ;
-                myBodyMain.getRow(ij).axpy(-varJ, arg);
+            int totalCols = myPivotRow.length;
+            double[] baseDiag = myDualBase.getDiagonal();
+            int splitEnd = Math.min(myUpdateOffset, totalCols);
+            for (int iLogic = 0; iLogic < splitEnd; iLogic++) {
+                int pivotRow = myPivotRow[iLogic];
+                if (pivotRow < 0) {
+                    continue;
+                }
+                arg[pivotRow] = (arg[pivotRow] - myDualBase.getColumn(iLogic).dot(arg)) / baseDiag[iLogic];
+            }
+            for (int iLogic = splitEnd; iLogic < totalCols; iLogic++) {
+                int pivotRow = myPivotRow[iLogic];
+                if (pivotRow < 0) {
+                    continue;
+                }
+                int k = iLogic - myUpdateOffset;
+                arg[pivotRow] = (arg[pivotRow] - myUpdateColumns.get(k).dot(arg)) / myUpdateDiagonal[k];
             }
         }
 
         @Override
         public void ftran(final double[] arg) {
-            int r = myBodyDiagonal.length;
-            for (int ij = r - 1; ij >= 0; ij--) {
-                arg[ij] = (arg[ij] - myBodyMain.getRow(ij).dot(arg)) / myBodyDiagonal[ij];
+            int totalCols = myPivotRow.length;
+            int splitEnd = Math.min(myUpdateOffset, totalCols);
+            for (int iLogic = totalCols - 1; iLogic >= splitEnd; iLogic--) {
+                int pivotRow = myPivotRow[iLogic];
+                if (pivotRow < 0) {
+                    continue;
+                }
+                int k = iLogic - myUpdateOffset;
+                double pivotMultiplier = arg[pivotRow] / myUpdateDiagonal[k];
+                arg[pivotRow] = pivotMultiplier;
+                if (pivotMultiplier != 0.0) {
+                    myUpdateColumns.get(k).axpy(-pivotMultiplier, arg);
+                }
+            }
+            double[] baseDiag = myDualBase.getDiagonal();
+            for (int iLogic = splitEnd - 1; iLogic >= 0; iLogic--) {
+                int pivotRow = myPivotRow[iLogic];
+                if (pivotRow < 0) {
+                    continue;
+                }
+                double pivotMultiplier = arg[pivotRow] / baseDiag[iLogic];
+                arg[pivotRow] = pivotMultiplier;
+                if (pivotMultiplier != 0.0) {
+                    myDualBase.getColumn(iLogic).axpy(-pivotMultiplier, arg);
+                }
             }
         }
 
         @Override
         public MatrixStore<Double> get() {
-            MatrixStore<Double> retVal = myBodyMain.triangular(true, false).superimpose(DiagonalStore.wrap(myBodyDiagonal));
-            int nbCols = this.getColDim();
-            if (this.getRowDim() > nbCols) {
-                retVal = retVal.limits(nbCols, nbCols);
-            }
-            return retVal;
+            return myDualBase.getColumns().limits(myCount, myCount).superimpose(DiagonalStore.wrap(Arrays.copyOf(myDualBase.getDiagonal(), myCount)));
         }
 
         @Override
         public int getColDim() {
-            return myBodyMain.getColDim();
+            return myCount;
         }
 
         @Override
         public int getRowDim() {
-            return myBodyDiagonal.length;
+            return myCount;
         }
 
     }
 
-    static final class PermutationEta implements InvertibleFactor<Double>, Mutate1D {
+    /**
+     * R-matrix (Forrest-Tomlin) eta factor for one basis update. Stores ep-based entries:
+     * {@code -epPartial[j] * oldPivot} for each non-pivot row j where epPartial is nonzero.
+     * <p>
+     * ftranFT (gather): {@code v[pivotRow] -= sum(v[index[k]] * value[k])}
+     * <p>
+     * btranFT (scatter): {@code v[index[k]] -= v[pivotRow] * value[k]}
+     */
+    static final class RMatrixEta implements InvertibleFactor<Double> {
 
+        private int myCount;
         private final int myDim;
-        private final SparseArray<Double> myElements;
-        private final int myFrom;
-        private final int myTo;
+        private int[] myIndices;
+        private final int myPivotRow;
+        private double[] myValues;
 
-        PermutationEta(final int dim, final int from, final int to) {
+        RMatrixEta(final int pivotRow, final int dim) {
             super();
+            myPivotRow = pivotRow;
             myDim = dim;
-            myFrom = from;
-            myTo = to;
-            myElements = SparseArray.factory(ArrayR064.FACTORY).make(dim);
+            myCount = 0;
+            myIndices = new int[8];
+            myValues = new double[8];
         }
 
         @Override
         public void btran(final double[] arg) {
-
-            double rowValue = arg[myTo];
-            myElements.axpy(rowValue, arg);
-
-            double tmp = arg[myTo];
-            System.arraycopy(arg, myFrom, arg, myFrom + 1, myTo - myFrom);
-            arg[myFrom] = tmp;
+            double pivVal = arg[myPivotRow];
+            if (pivVal != ZERO) {
+                for (int k = 0; k < myCount; k++) {
+                    arg[myIndices[k]] -= pivVal * myValues[k];
+                }
+            }
         }
 
         @Override
         public void btran(final PhysicalStore<Double> arg) {
-
-            double rowValue = arg.doubleValue(myTo);
-            myElements.axpy(rowValue, arg);
-
-            double tmp = arg.doubleValue(myTo);
-            for (int i = myTo; i > myFrom; i--) {
-                arg.set(i, arg.doubleValue(i - 1));
+            double pivVal = arg.doubleValue(myPivotRow);
+            if (pivVal != ZERO) {
+                for (int k = 0; k < myCount; k++) {
+                    int idx = myIndices[k];
+                    arg.set(idx, arg.doubleValue(idx) - pivVal * myValues[k]);
+                }
             }
-            arg.set(myFrom, tmp);
-        }
-
-        public int countNonzeros() {
-            return myElements.countNonzeros();
         }
 
         @Override
         public void ftran(final double[] arg) {
-
-            double tmp = arg[myFrom];
-            System.arraycopy(arg, myFrom + 1, arg, myFrom, myTo - myFrom);
-            arg[myTo] = tmp;
-
-            arg[myTo] += myElements.dot(arg);
+            double value = arg[myPivotRow];
+            for (int k = 0; k < myCount; k++) {
+                value -= arg[myIndices[k]] * myValues[k];
+            }
+            arg[myPivotRow] = value;
         }
 
         @Override
         public void ftran(final PhysicalStore<Double> arg) {
-
-            double tmp = arg.doubleValue(myFrom);
-            for (int i = myFrom; i < myTo; i++) {
-                arg.set(i, arg.doubleValue(i + 1));
+            double value = arg.doubleValue(myPivotRow);
+            for (int k = 0; k < myCount; k++) {
+                value -= arg.doubleValue(myIndices[k]) * myValues[k];
             }
-            arg.set(myTo, tmp);
-
-            arg.add(myTo, myElements.dot(arg));
+            arg.set(myPivotRow, value);
         }
 
         @Override
@@ -217,25 +253,33 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
             return myDim;
         }
 
-        @Override
-        public void reset() {
-            myElements.reset();
+        void addEntry(final int row, final double value) {
+            if (myCount == myIndices.length) {
+                myIndices = Arrays.copyOf(myIndices, myCount * 2);
+                myValues = Arrays.copyOf(myValues, myCount * 2);
+            }
+            myIndices[myCount] = row;
+            myValues[myCount] = value;
+            myCount++;
         }
 
-        @Override
-        public void set(final int j, final double value) {
-            myElements.set(j, value);
-        }
-
-        @Override
-        public void set(final long index, final Comparable<?> value) {
-            myElements.set(index, NumberDefinition.doubleValue(value));
+        int countNonzeros() {
+            return myCount;
         }
 
     }
 
-    private static Access2D.Sliceable<Double> cast(final Collectable<Double, ? super TransformableRegion<Double>> matrix) {
+    /**
+     * Relative-magnitude gate for accepting an FT update pivot. An update is rejected when {@code |alpha|} is
+     * small compared to {@code |oldPivot|}; this triggers a refactor before the roundoff in
+     * {@code oldPivot*alpha} and {@code 1/alpha} can poison subsequent solves.
+     * <p>
+     * Tighter than {@link FletcherMatthews#SAFE} ({@code of(4)} ≈ 1e-4) which was found to reject too
+     * aggressively on small/medium models, causing excessive refactors on the AGG/GROW/SCTAP family.
+     */
+    private static final NumberContext UPDATE_GATE = NumberContext.of(6);
 
+    private static Access2D.Sliceable<Double> cast(final Collectable<Double, ? super TransformableRegion<Double>> matrix) {
         if (matrix instanceof Access2D.Sliceable<?>) {
             return (Access2D.Sliceable<Double>) matrix;
         } else {
@@ -245,26 +289,65 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
 
     private Pivot myColPivot;
     /**
-     * U diagonal elements
+     * Base U factor: fixed-size columns, rows and diagonal populated during factorisation. Logical indices
+     * {@code 0 .. r-1} live here; FT updates never modify {@code myDualBase} structurally but do zero out
+     * entries of voided columns/rows in place.
      */
-    private double[] myDiagU;
+    private DualSparse myDualBase;
     /**
-     * Running total of nonzeros across eta factors accumulated since the last factorisation. Incremented in
+     * Running total of nonzeros across R-factors accumulated since the last factorisation. Incremented in
      * {@link #doUpdateColumn} and reset alongside {@link #myFactors}.
      */
     private int myEtaNonzeros = 0;
     /**
-     * Total nonzeros in L + U at last factorisation. Used by {@link #countFactorNonzeros()}.
+     * Total nonzeros in L + U (off-diagonal) at last factorisation. Used by {@link #countFactorNonzeros()}.
      */
     private int myFactorNonzeros = 0;
     private final List<InvertibleFactor<Double>> myFactors = new ArrayList<>();
+    private double myMaxPivotMagnitude = ZERO;
+    private double myMinPivotMagnitude = Double.MAX_VALUE;
+    /**
+     * Diagonal magnitude bounds at the moment of {@link #doFactorFinish()}. Snapshot of the basis-only
+     * spread; used as the baseline against which FT-update degradation is measured.
+     */
+    private double myFactorMaxPivotMagnitude = ZERO;
+    private double myFactorMinPivotMagnitude = Double.MAX_VALUE;
     private R064CSR myFixedL;
     private RowsSupplier<Double> myL;
     private final Pivot myPivot;
-    private RowsSupplier<Double> myU;
+    /**
+     * Number of active (non-voided) logical columns. Equals the basis dimension after factorisation; stays
+     * constant through updates (one void + one append per update).
+     */
+    private int myUActive;
+    /**
+     * Replacement columns created during FT updates, appended in order. Logical index {@code iLogic >=
+     * myUpdateOffset} maps to {@code myUpdateColumns.get(iLogic - myUpdateOffset)}.
+     */
+    private final List<SparseArray<Double>> myUpdateColumns = new ArrayList<>();
+    /**
+     * Diagonal elements for update-appended columns, indexed by update offset. Parallel to
+     * {@link #myUpdateColumns}. Grown via {@link Arrays#copyOf} as needed.
+     */
+    private double[] myUpdateDiagonal;
+    /**
+     * Logical-index boundary between {@link #myDualBase} and the update-appended storage. Set in
+     * {@link #reset(int, int)} to {@code r} and never changes until the next reset.
+     */
+    private int myUpdateOffset;
+    /**
+     * Physical row → logical column that pivots on this row. Inverse of {@link #myUPivotRow} for active
+     * entries. Analogous to HiGHS's {@code u_pivot_lookup}.
+     */
+    private int[] myUPivotLookup;
+    /**
+     * Logical column → pivot row. After factorisation, {@code myUPivotRow[j] = j} (identity). During FT
+     * updates, voided columns get {@code -1}; appended columns get the new pivot row. This is analogous to
+     * HiGHS's {@code u_pivot_index}.
+     */
+    private int[] myUPivotRow;
     private transient long[] myValuesToSort = null;
     private transient R064Store myWorkerColumn = null;
-    private transient R064Store myWorkerRow = null;
 
     public SparseLU() {
 
@@ -317,12 +400,50 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
         return myFactorNonzeros;
     }
 
+    /**
+     * Largest pivot magnitude observed across the U diagonal — both the initial entries from factorisation
+     * and the new diagonals produced by FT updates since.
+     */
+    public double getMaxPivotMagnitude() {
+        return myMaxPivotMagnitude;
+    }
+
+    /**
+     * Smallest pivot magnitude observed across the U diagonal — both the initial entries from factorisation
+     * and the new diagonals produced by FT updates since.
+     */
+    public double getMinPivotMagnitude() {
+        return myMinPivotMagnitude;
+    }
+
+    /**
+     * {@link #getMaxPivotMagnitude()} as snapshotted at the moment of the last factorisation. Captures the
+     * basis-only diagonal range, before any FT updates contributed.
+     */
+    public double getFactorMaxPivotMagnitude() {
+        return myFactorMaxPivotMagnitude;
+    }
+
+    /**
+     * {@link #getMinPivotMagnitude()} as snapshotted at the moment of the last factorisation. Captures the
+     * basis-only diagonal range, before any FT updates contributed.
+     */
+    public double getFactorMinPivotMagnitude() {
+        return myFactorMinPivotMagnitude;
+    }
+
     @Override
     public int countSignificant(final double threshold) {
 
         int significant = 0;
-        for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
-            if (Math.abs(myDiagU[ij]) > threshold) {
+        double[] baseDiag = myDualBase.getDiagonal();
+        for (int iLogic = 0; iLogic < myUpdateOffset; iLogic++) {
+            if (myUPivotRow[iLogic] >= 0 && Math.abs(baseDiag[iLogic]) > threshold) {
+                significant++;
+            }
+        }
+        for (int iLogic = myUpdateOffset, limit = myUPivotRow.length; iLogic < limit; iLogic++) {
+            if (myUPivotRow[iLogic] >= 0 && Math.abs(myUpdateDiagonal[iLogic - myUpdateOffset]) > threshold) {
                 significant++;
             }
         }
@@ -409,7 +530,7 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
 
     @Override
     public int getColDim() {
-        return myU.getColDim();
+        return myUActive;
     }
 
     @Override
@@ -417,15 +538,23 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
 
         double retVal = myPivot.signum();
 
-        for (int j = 0, limit = myDiagU.length; j < limit; j++) {
-            retVal *= myDiagU[j];
+        double[] baseDiag = myDualBase.getDiagonal();
+        for (int iLogic = 0; iLogic < myUpdateOffset; iLogic++) {
+            if (myUPivotRow[iLogic] >= 0) {
+                retVal *= baseDiag[iLogic];
+            }
+        }
+        for (int iLogic = myUpdateOffset, limit = myUPivotRow.length; iLogic < limit; iLogic++) {
+            if (myUPivotRow[iLogic] >= 0) {
+                retVal *= myUpdateDiagonal[iLogic - myUpdateOffset];
+            }
         }
 
         return Double.valueOf(retVal);
     }
 
     /**
-     * [A]=[P][L][etas...][U][Q]
+     * [A]=[P][L][U][etas...][Q]
      */
     @Override
     public List<InvertibleFactor<Double>> getFactors() {
@@ -462,8 +591,16 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
     public double getRankThreshold() {
 
         double largest = MACHINE_SMALLEST;
-        for (int j = 0, limit = myDiagU.length; j < limit; j++) {
-            largest = Math.max(largest, Math.abs(myDiagU[j]));
+        double[] baseDiag = myDualBase.getDiagonal();
+        for (int iLogic = 0; iLogic < myUpdateOffset; iLogic++) {
+            if (myUPivotRow[iLogic] >= 0) {
+                largest = Math.max(largest, Math.abs(baseDiag[iLogic]));
+            }
+        }
+        for (int iLogic = myUpdateOffset, limit = myUPivotRow.length; iLogic < limit; iLogic++) {
+            if (myUPivotRow[iLogic] >= 0) {
+                largest = Math.max(largest, Math.abs(myUpdateDiagonal[iLogic - myUpdateOffset]));
+            }
         }
 
         return largest * this.getDimensionalEpsilon();
@@ -583,9 +720,10 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
     @Override
     public boolean updateColumn(final int specifiedColumn, final Access1D.Collectable<Double, ? super TransformableRegion<Double>> newColumn) {
 
-        newColumn.supplyTo(this.getWorkerColumn(this.getRowDim()));
+        R064Store wCol = this.getWorkerColumn(this.getRowDim());
+        newColumn.supplyTo(wCol);
 
-        return this.doUpdateColumn(specifiedColumn);
+        return this.doUpdateColumn(specifiedColumn, wCol.data);
     }
 
     /**
@@ -601,7 +739,7 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
         double[] wColData = this.getWorkerColumn(this.getRowDim()).data;
         matrix.supplyTo(sourceColumn, wColData);
 
-        return this.doUpdateColumn(specifiedColumn);
+        return this.doUpdateColumn(specifiedColumn, wColData);
     }
 
     private void btranL(final double[] arg) {
@@ -609,11 +747,21 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
     }
 
     private void btranU(final double[] arg) {
-        int r = myDiagU.length;
-        for (int ij = 0; ij < r; ij++) {
-            double varJ = arg[ij] / myDiagU[ij];
-            arg[ij] = varJ;
-            myU.getRow(ij).axpy(-varJ, arg);
+        double[] baseDiag = myDualBase.getDiagonal();
+        for (int iLogic = 0; iLogic < myUpdateOffset; iLogic++) {
+            int pivotRow = myUPivotRow[iLogic];
+            if (pivotRow < 0) {
+                continue;
+            }
+            arg[pivotRow] = (arg[pivotRow] - myDualBase.getColumn(iLogic).dot(arg)) / baseDiag[iLogic];
+        }
+        for (int iLogic = myUpdateOffset, limit = myUPivotRow.length; iLogic < limit; iLogic++) {
+            int pivotRow = myUPivotRow[iLogic];
+            if (pivotRow < 0) {
+                continue;
+            }
+            int k = iLogic - myUpdateOffset;
+            arg[pivotRow] = (arg[pivotRow] - myUpdateColumns.get(k).dot(arg)) / myUpdateDiagonal[k];
         }
     }
 
@@ -651,10 +799,12 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
 
         for (int i = 0, limit = Math.min(m, j); i < limit; i++) {
             tmpNumer = column[i];
-            myU.putLast(i, j, tmpNumer);
+            myDualBase.putLast(i, j, tmpNumer);
         }
         if (j < r) {
-            myDiagU[j] = tmpDenom;
+            myDualBase.getDiagonal()[j] = tmpDenom;
+            myUPivotRow[j] = j;
+            myUPivotLookup[j] = j;
         }
 
         if (j < m && tmpDenom != ZERO) {
@@ -669,98 +819,127 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
 
         myFixedL = myL.toCSR();
 
-        myFactorNonzeros = myFixedL.countNonzeros() + myU.countNonzeros();
+        myFactorNonzeros = myFixedL.countNonzeros() + myDualBase.countNonzeros();
+
+        double[] baseDiag = myDualBase.getDiagonal();
+        for (int i = 0, limit = baseDiag.length; i < limit; i++) {
+            double mag = Math.abs(baseDiag[i]);
+            if (mag > myMaxPivotMagnitude) {
+                myMaxPivotMagnitude = mag;
+            }
+            if (mag < myMinPivotMagnitude) {
+                myMinPivotMagnitude = mag;
+            }
+        }
+        myFactorMaxPivotMagnitude = myMaxPivotMagnitude;
+        myFactorMinPivotMagnitude = myMinPivotMagnitude;
 
         return this.computed(true);
     }
 
     /**
-     * Shared Forrest-Tomlin update logic. Assumes wColData (from {@link #getWorkerColumn(int)}) is already
-     * filled with the raw new column values.
+     * HiGHS-style Forrest-Tomlin update. Voids the leaving column in U, deletes the leaving row from other U
+     * columns, and appends the partially-solved entering column as a new logical column. An ep-based R-factor
+     * is stored in {@link #myFactors} to compensate.
+     * <p>
+     * The key insight: the values stored in U are the intermediate FTRAN result after L and R but before U
+     * solve (i.e., R^{-1}*L^{-1}*P*a_q). The alpha for the new pivot comes from the fully-solved result.
      */
-    private boolean doUpdateColumn(final int specifiedColumn) {
+    private boolean doUpdateColumn(final int specifiedColumn, final double[] columnData) {
 
         int m = this.getRowDim();
-        int n = this.getColDim();
-        int r = this.getMinDim();
 
-        R064Store wRow = this.getWorkerRow(n);
-        double[] wRowData = wRow.data;
-        R064Store wCol = this.getWorkerColumn(m);
-        double[] wColData = wCol.data;
+        // For any basis position, the pivot row is fixed across updates: a replacement column always
+        // inherits the leaving column's pivot row. So the pivot row is simply the initial logical column
+        // for that basis position — the column permutation applied by {@link #factor(R064CSC, int[])}.
+        int leavingPivotRow = myColPivot != null ? myColPivot.locationOf(specifiedColumn) : specifiedColumn;
+        int pLogic = myUPivotLookup[leavingPivotRow];
+        double oldPivot = pLogic < myUpdateOffset ? myDualBase.getDiagonal()[pLogic] : myUpdateDiagonal[pLogic - myUpdateOffset];
 
-        if (myColPivot == null) {
-            myColPivot = new Pivot();
-            myColPivot.reset(n);
-        }
+        // Step-by-step FTRAN to capture the intermediate value (R^{-1} L^{-1} P a_q) before the U solve.
+        myPivot.applyPivotOrder(columnData);
+        this.ftranL(columnData);
+        InvertibleFactor.ftran(myFactors, columnData);
+        double[] intermediate = Arrays.copyOf(columnData, m);
 
-        int columnIndex = myColPivot.locationOf(specifiedColumn);
-
-        myPivot.applyPivotOrder(wColData);
-
-        this.ftranL(wColData);
-
-        InvertibleFactor.ftran(myFactors, wColData);
-
-        double diag = NaN;
-        int lastRowNonZero = -1;
-        for (int i = m - 1; i >= 0; i--) {
-            if (!FletcherMatthews.PRECISION.isZero(wColData[i])) {
-                lastRowNonZero = i;
-                diag = wColData[i];
-                break;
-            }
-        }
-
-        if (lastRowNonZero < columnIndex) {
-
+        // Complete the U solve to obtain alpha (the new pivot value before combining with oldPivot).
+        // Reject not only an absolute-zero alpha but also one that is small relative to the leaving pivot:
+        // proceeding would amplify roundoff through the new diagonal (oldPivot*alpha) and through 1/alpha
+        // in subsequent ftranU calls. This restores develop's effective spike-stability check inside the
+        // HiGHS-FT append-only structure.
+        this.ftranU(columnData);
+        double alpha = columnData[leavingPivotRow];
+        if (FletcherMatthews.SAFE.isZero(alpha) || UPDATE_GATE.isSmall(oldPivot, alpha)) {
             return false;
-
-        } else if (FletcherMatthews.SAFE.isZero(diag)) {
-
-            return false;
-
-        } else if (lastRowNonZero == columnIndex) {
-
-            for (int i = 0; i < columnIndex; i++) {
-                myU.set(i, columnIndex, wColData[i]);
-            }
-            myDiagU[columnIndex] = wColData[columnIndex];
-
-        } else {
-
-            myColPivot.cycle(columnIndex, lastRowNonZero);
-
-            myU.doCyclicFT(columnIndex, wRow, lastRowNonZero, wCol);
-
-            for (int i = columnIndex; i < lastRowNonZero; i++) {
-                myDiagU[i] = myDiagU[i + 1];
-            }
-
-            PermutationEta eta = new PermutationEta(r, columnIndex, lastRowNonZero);
-
-            for (int ij = columnIndex; ij < lastRowNonZero; ij++) {
-                double denom = myDiagU[ij];
-                double numer = wRowData[ij];
-                double ratio = numer / denom;
-
-                eta.set(ij, -ratio);
-
-                myU.getRow(ij).axpy(-ratio, wRow);
-            }
-
-            if (FletcherMatthews.SAFE.isZero(wRowData[lastRowNonZero])) {
-                return false;
-            }
-
-            myDiagU[lastRowNonZero] = wRowData[lastRowNonZero];
-            for (int j = lastRowNonZero + 1; j < n; j++) {
-                myU.set(lastRowNonZero, j, wRowData[j]);
-            }
-
-            myFactors.add(eta);
-            myEtaNonzeros += eta.countNonzeros();
         }
+
+        double newDiagMagnitude = Math.abs(oldPivot * alpha);
+        myMaxPivotMagnitude = Math.max(myMaxPivotMagnitude, newDiagMagnitude);
+        myMinPivotMagnitude = Math.min(myMinPivotMagnitude, newDiagMagnitude);
+
+        // ep_partial = U^{-T} e_p for the R-factor that compensates the column swap.
+        double[] epPartial = new double[m];
+        epPartial[leavingPivotRow] = ONE;
+        this.btranU(epPartial);
+
+        // Void the leaving logical column and reuse its storage for the new one.
+        myUPivotRow[pLogic] = -1;
+        SparseArray<Double> oldUCol = pLogic < myUpdateOffset ? myDualBase.getColumn(pLogic) : myUpdateColumns.get(pLogic - myUpdateOffset);
+        SparseArray<Double> urLeavingRow = myDualBase.getRow(leavingPivotRow);
+
+        // Delete the leaving row from all other U columns (walking its UR representation).
+        for (SparseArray.NonzeroView<Double> nz = urLeavingRow.nonzeros(); nz.hasNext();) {
+            nz.next();
+            int iLogic = (int) nz.index();
+            if (iLogic == pLogic) {
+                continue;
+            }
+            SparseArray<Double> col = iLogic < myUpdateOffset ? myDualBase.getColumn(iLogic) : myUpdateColumns.get(iLogic - myUpdateOffset);
+            col.remove(leavingPivotRow);
+        }
+        // Delete the leaving column from UR and clear both the old column and the leaving row.
+        for (SparseArray.NonzeroView<Double> nz = oldUCol.nonzeros(); nz.hasNext();) {
+            nz.next();
+            myDualBase.getRow((int) nz.index()).remove(pLogic);
+        }
+        oldUCol.reset();
+        urLeavingRow.reset();
+
+        // Build the new replacement column from the intermediate values and append it.
+        int newLogic = myUPivotRow.length;
+        SparseArray<Double> newUCol = oldUCol;
+        for (int row = 0; row < m; row++) {
+            double val = intermediate[row];
+            if (row != leavingPivotRow && !FletcherMatthews.PRECISION.isZero(val)) {
+                newUCol.set(row, val);
+                myDualBase.getRow(row).set(newLogic, val);
+            }
+        }
+        myUpdateColumns.add(newUCol);
+
+        // Extend pivot arrays and append the new diagonal.
+        myUPivotRow = Arrays.copyOf(myUPivotRow, newLogic + 1);
+        myUPivotRow[newLogic] = leavingPivotRow;
+        myUPivotLookup[leavingPivotRow] = newLogic;
+
+        int diagonalIndex = newLogic - myUpdateOffset;
+        if (diagonalIndex >= myUpdateDiagonal.length) {
+            myUpdateDiagonal = Arrays.copyOf(myUpdateDiagonal, Math.max(diagonalIndex + 1, myUpdateDiagonal.length * 2));
+        }
+        myUpdateDiagonal[diagonalIndex] = oldPivot * alpha;
+
+        // Store the R-factor: -epPartial[j] * oldPivot for j != leavingPivotRow. Keep every nonzero entry
+        // produced by btranU; R-eta size is bounded by the existing U sparsity pattern, so dropping small
+        // entries saves nothing structural but silently loses correction terms that compound over updates.
+        RMatrixEta rEta = new RMatrixEta(leavingPivotRow, m);
+        for (int j = 0; j < m; j++) {
+            double ep = epPartial[j];
+            if (j != leavingPivotRow && ep != ZERO) {
+                rEta.addEntry(j, -ep * oldPivot);
+            }
+        }
+        myFactors.add(rEta);
+        myEtaNonzeros += rEta.countNonzeros();
 
         return true;
     }
@@ -781,8 +960,30 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
     }
 
     private void ftranU(final double[] arg) {
-        for (int ij = myDiagU.length - 1; ij >= 0; ij--) {
-            arg[ij] = (arg[ij] - myU.getRow(ij).dot(arg)) / myDiagU[ij];
+        int totalCols = myUPivotRow.length;
+        for (int iLogic = totalCols - 1; iLogic >= myUpdateOffset; iLogic--) {
+            int pivotRow = myUPivotRow[iLogic];
+            if (pivotRow < 0) {
+                continue;
+            }
+            int k = iLogic - myUpdateOffset;
+            double pivotMultiplier = arg[pivotRow] / myUpdateDiagonal[k];
+            arg[pivotRow] = pivotMultiplier;
+            if (pivotMultiplier != 0.0) {
+                myUpdateColumns.get(k).axpy(-pivotMultiplier, arg);
+            }
+        }
+        double[] baseDiag = myDualBase.getDiagonal();
+        for (int iLogic = myUpdateOffset - 1; iLogic >= 0; iLogic--) {
+            int pivotRow = myUPivotRow[iLogic];
+            if (pivotRow < 0) {
+                continue;
+            }
+            double pivotMultiplier = arg[pivotRow] / baseDiag[iLogic];
+            arg[pivotRow] = pivotMultiplier;
+            if (pivotMultiplier != 0.0) {
+                myDualBase.getColumn(iLogic).axpy(-pivotMultiplier, arg);
+            }
         }
     }
 
@@ -821,7 +1022,7 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
      * [A]=[P][L][U][Q]
      */
     MatrixDecomposition.Factor<Double> getFactorU() {
-        return new FactorU(myU, myDiagU);
+        return new FactorU(myDualBase, myUPivotRow, myUActive, myUpdateColumns, myUpdateDiagonal, myUpdateOffset);
     }
 
     /**
@@ -854,13 +1055,6 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
         return myWorkerColumn;
     }
 
-    R064Store getWorkerRow(final int nbCols) {
-        if (myWorkerRow == null || myWorkerRow.getColDim() != nbCols) {
-            myWorkerRow = R064Store.FACTORY.make(1, nbCols);
-        }
-        return myWorkerRow;
-    }
-
     /**
      * Reset for a specified m x n factorisation — used by {@link #factor(R064CSC, int[])}.
      */
@@ -880,21 +1074,36 @@ public final class SparseLU extends AbstractDecomposition<Double, R064Store> imp
             myL.addRows(m);
         }
 
-        if (myDiagU != null && myDiagU.length == r) {
-            Arrays.fill(myDiagU, ZERO);
+        myDualBase = new DualSparse(m, r);
+        myUpdateOffset = r;
+        myUActive = r;
+
+        if (myUPivotRow == null || myUPivotRow.length != n) {
+            myUPivotRow = Structure1D.newIncreasingRange(0, n);
         } else {
-            myDiagU = new double[r];
+            for (int j = 0; j < n; j++) {
+                myUPivotRow[j] = j;
+            }
         }
 
-        if (myU != null && myU.getRowDim() == r && myU.getColDim() == n) {
-            myU.reset();
+        if (myUPivotLookup == null || myUPivotLookup.length != m) {
+            myUPivotLookup = Structure1D.newIncreasingRange(0, m);
         } else {
-            myU = R064Store.FACTORY.makeRowsSupplier(n);
-            myU.addRows(r);
+            for (int i = 0; i < m; i++) {
+                myUPivotLookup[i] = i;
+            }
         }
 
         myFactors.clear();
         myEtaNonzeros = 0;
+        myMaxPivotMagnitude = ZERO;
+        myMinPivotMagnitude = Double.MAX_VALUE;
+        myFactorMaxPivotMagnitude = ZERO;
+        myFactorMinPivotMagnitude = Double.MAX_VALUE;
+        myUpdateColumns.clear();
+        if (myUpdateDiagonal == null) {
+            myUpdateDiagonal = new double[Math.max(r, 16)];
+        }
 
         myFixedL = null;
     }

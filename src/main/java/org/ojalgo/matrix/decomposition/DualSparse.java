@@ -12,8 +12,8 @@ import org.ojalgo.structure.Primitive2D;
 final class DualSparse extends Primitive2D implements SparseStructure2D {
 
     private final ColumnsSupplier<Double> myColumns;
-    private final RowsSupplier<Double> myRows;
     private final double[] myDiagonal;
+    private final RowsSupplier<Double> myRows;
 
     DualSparse(final int nbRows, final int nbCols) {
         super();
@@ -72,12 +72,20 @@ final class DualSparse extends Primitive2D implements SparseStructure2D {
         return myColumns.getColumn(index);
     }
 
+    ColumnsSupplier<Double> getColumns() {
+        return myColumns;
+    }
+
     double[] getDiagonal() {
         return myDiagonal;
     }
 
     SparseArray<Double> getRow(final int index) {
         return myRows.getRow(index);
+    }
+
+    RowsSupplier<Double> getRows() {
+        return myRows;
     }
 
     /**
