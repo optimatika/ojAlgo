@@ -109,7 +109,7 @@ abstract class SimplexStore {
             } else if (Boolean.FALSE.equals(options.sparse)) {
                 return new DenseTableau(structure);
             } else {
-                if ((size > 2_400_000L && ratio > 2.6) || size >= 100_000_000L || ratio >= 10.0) {
+                if ((size > 2_400_000L && ratio > 3.5) || size >= 25_000_000L || ratio >= 11.0) {
                     return new RevisedStore(structure);
                 } else {
                     return new DenseTableau(structure);
