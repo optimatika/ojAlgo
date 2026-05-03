@@ -23,7 +23,6 @@ package org.ojalgo.optimisation.linear;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -324,8 +323,10 @@ abstract class SimplexSolver extends LinearSolver {
 
     }
 
-    private static final NumberContext PIVOT = NumberContext.of(6).withMode(RoundingMode.HALF_DOWN);
-    private static final NumberContext RATIO = NumberContext.of(8).withMode(RoundingMode.HALF_DOWN);
+    private static final NumberContext COST = NumberContext.of(7);
+    private static final NumberContext INFEASIBILITY = NumberContext.of(9);
+    private static final NumberContext PIVOT = NumberContext.of(6);
+    private static final NumberContext RATIO = NumberContext.of(8, 8);
 
     static <S extends SimplexStore> S build(final ExpressionsBasedModel model, final Function<LinearStructure, S> factory) {
 
@@ -749,15 +750,14 @@ abstract class SimplexSolver extends LinearSolver {
             int j = included[ji];
 
             double candidate = mySimplex.getInfeasibility(ji);
-            double magnitude = Math.abs(candidate);
             double weight = mySimplex.edgeWeights[ji];
-            double score = (magnitude * magnitude) / weight;
+            double score = (candidate * candidate) / weight;
 
             if (printable && this.isLogDebug()) {
                 this.log(1, "{}({}) {}", j, ji, candidate);
             }
 
-            if (magnitude > 1e-10 && score > largest) {
+            if (score > largest && !INFEASIBILITY.isZero(candidate)) {
 
                 if (exit != null) {
 
@@ -828,15 +828,14 @@ abstract class SimplexSolver extends LinearSolver {
 
                 ColumnState columnState = mySimplex.getColumnState(j);
                 double candidate = mySimplex.getReducedCost(je);
-                double magnitude = Math.abs(candidate);
                 double weight = mySimplex.edgeWeights[je];
-                double score = (magnitude * magnitude) / weight;
+                double score = (candidate * candidate) / weight;
 
                 if (printable && this.isLogDebug()) {
                     this.log(1, "{}({}) {} @ {}", j, je, candidate, columnState);
                 }
 
-                if (magnitude > 1e-10 && score > largest) {
+                if (score > largest && !COST.isZero(candidate)) {
 
                     if (candidate <= ZERO && columnState != ColumnState.UPPER) {
 
@@ -979,8 +978,10 @@ abstract class SimplexSolver extends LinearSolver {
         double ratio = ZERO;
         double scale = ONE;
 
-        double iterationRatio = Double.MAX_VALUE;
+        double iterationRatio = MACHINE_LARGEST;
         double iterationScale = MACHINE_LARGEST;
+
+        double tolerance = COST.getAbsoluteError();
 
         int n = mySimplex.structure.countVariables();
         int[] excluded = mySimplex.excluded;
@@ -1007,15 +1008,15 @@ abstract class SimplexSolver extends LinearSolver {
 
                         if (exitDirection == Direction.INCREASE) {
                             if (columnState == ColumnState.LOWER && denom < ZERO) {
-                                ratio = Math.max(ZERO, numer) / -denom;
+                                ratio = Math.max(ZERO, tolerance + numer) / -denom;
                             } else if (columnState == ColumnState.UPPER && denom > ZERO) {
-                                ratio = Math.max(ZERO, -numer) / denom;
+                                ratio = Math.max(ZERO, tolerance - numer) / denom;
                             }
                         } else if (exitDirection == Direction.DECREASE) {
                             if (columnState == ColumnState.LOWER && denom > ZERO) {
-                                ratio = Math.max(ZERO, numer) / denom;
+                                ratio = Math.max(ZERO, tolerance + numer) / denom;
                             } else if (columnState == ColumnState.UPPER && denom < ZERO) {
-                                ratio = Math.max(ZERO, -numer) / -denom;
+                                ratio = Math.max(ZERO, tolerance - numer) / -denom;
                             }
                         }
                     }
@@ -1024,8 +1025,7 @@ abstract class SimplexSolver extends LinearSolver {
                         this.log(1, "{}({}) {} / {} = {}", j, je, numer, denom, ratio);
                     }
 
-                    if (ratio < iterationRatio
-                            || scale > iterationScale && PIVOT.isDifferent(iterationScale, scale) && !RATIO.isDifferent(iterationRatio, ratio)) {
+                    if (RATIO.isDifferent(iterationRatio, ratio) ? ratio < iterationRatio : scale > iterationScale) {
 
                         enter.index = je;
                         enter.from = columnState;
@@ -1072,6 +1072,8 @@ abstract class SimplexSolver extends LinearSolver {
         double iterationRatio = range;
         double iterationScale = MACHINE_LARGEST;
 
+        double tolerance = INFEASIBILITY.getAbsoluteError();
+
         int[] included = mySimplex.included;
         for (int ji = included.length - 1; ji >= 0; ji--) {
             int j = included[ji];
@@ -1086,11 +1088,11 @@ abstract class SimplexSolver extends LinearSolver {
 
                     if (denom < ZERO) {
                         // Basic (exiting) variable will increase
-                        numer = mySimplex.getUpperGap(ji); // How much can it increase?
+                        numer = mySimplex.getUpperGap(ji) + tolerance; // How much can it increase?
                         ratio = numer / -denom;
                     } else if (denom > ZERO) {
                         // Basic (exiting) variable will decrease
-                        numer = mySimplex.getLowerGap(ji); // How much can it decrease?
+                        numer = mySimplex.getLowerGap(ji) + tolerance; // How much can it decrease?
                         ratio = numer / denom;
                     }
 
@@ -1098,8 +1100,7 @@ abstract class SimplexSolver extends LinearSolver {
                         this.log(1, "{}({}) {} / {} = {}", j, ji, numer, denom, ratio);
                     }
 
-                    if (ratio < iterationRatio
-                            || scale > iterationScale && PIVOT.isDifferent(iterationScale, scale) && !RATIO.isDifferent(iterationRatio, ratio)) {
+                    if (RATIO.isDifferent(iterationRatio, ratio) ? ratio < iterationRatio : scale > iterationScale) {
 
                         exit.index = ji;
                         if (denom < ZERO) {
@@ -1123,11 +1124,11 @@ abstract class SimplexSolver extends LinearSolver {
 
                     if (denom < ZERO) {
                         // Basic (exiting) variable will decrease
-                        numer = mySimplex.getLowerGap(ji); // How much can it decrease?
+                        numer = mySimplex.getLowerGap(ji) + tolerance; // How much can it decrease?
                         ratio = numer / -denom;
                     } else if (denom > ZERO) {
                         // Basic (exiting) variable will increase
-                        numer = mySimplex.getUpperGap(ji); // How much can it increase?
+                        numer = mySimplex.getUpperGap(ji) + tolerance; // How much can it increase?
                         ratio = numer / denom;
                     }
 
@@ -1135,8 +1136,7 @@ abstract class SimplexSolver extends LinearSolver {
                         this.log(1, "{}({}) {} / {} = {}", j, ji, numer, denom, ratio);
                     }
 
-                    if (ratio < iterationRatio
-                            || scale > iterationScale && PIVOT.isDifferent(iterationScale, scale) && !RATIO.isDifferent(iterationRatio, ratio)) {
+                    if (RATIO.isDifferent(iterationRatio, ratio) ? ratio < iterationRatio : scale > iterationScale) {
 
                         exit.index = ji;
                         if (denom > ZERO) {
