@@ -326,7 +326,6 @@ abstract class SimplexSolver extends LinearSolver {
     private static final NumberContext COST = NumberContext.of(7);
     private static final NumberContext INFEASIBILITY = NumberContext.of(9);
     private static final NumberContext PIVOT = NumberContext.of(6);
-    private static final NumberContext RATIO = NumberContext.of(8, 8);
 
     static <S extends SimplexStore> S build(final ExpressionsBasedModel model, final Function<LinearStructure, S> factory) {
 
@@ -660,6 +659,23 @@ abstract class SimplexSolver extends LinearSolver {
         return (nbLinEqus + 2) * (nbLinVars + 1);
     }
 
+    /**
+     * Scratch storage shared between the two passes of the Harris ratio tests. Pass 1 fills these arrays for
+     * every valid candidate; pass 2 reads them sequentially. Sized to fit either {@code excluded.length}
+     * (dual enter test) or {@code included.length} (primal exit test). Allocated lazily on first use.
+     * <p>
+     * {@code myRatioCacheExitDirection[k]} encodes the (direction, destination) pair for the cached row in
+     * {@link #testPrimalExitRatio}: {@code true} = exit variable INCREASEs to its UPPER bound, {@code false}
+     * = exit variable DECREASEs to its LOWER bound.
+     */
+    private boolean[] myRatioCacheExitDirection;
+    private int[] myRatioCacheIdx;
+    private double[] myRatioCacheScale;
+    private ColumnState[] myRatioCacheState;
+    private double[] myRatioCacheTrueRatio;
+    /**
+     * The simplex data structure (tableau) the algorithm operates on.
+     */
     private final SimplexStore mySimplex;
 
     SimplexSolver(final Optimisation.Options solverOptions, final SimplexStore simplexStore) {
@@ -690,6 +706,16 @@ abstract class SimplexSolver extends LinearSolver {
         this.setState(State.UNEXPLORED);
         this.invalidateCache();
         return mySimplex.updateRange(index, lower, upper);
+    }
+
+    private void ensureRatioCacheCapacity(final int needed) {
+        if (myRatioCacheIdx == null || myRatioCacheIdx.length < needed) {
+            myRatioCacheIdx = new int[needed];
+            myRatioCacheScale = new double[needed];
+            myRatioCacheTrueRatio = new double[needed];
+            myRatioCacheState = new ColumnState[needed];
+            myRatioCacheExitDirection = new boolean[needed];
+        }
     }
 
     private Access1D<?> extractMultipliers() {
@@ -973,71 +999,106 @@ abstract class SimplexSolver extends LinearSolver {
         EnterInfo enter = iteration.enter;
         Direction exitDirection = exit.direction;
 
-        double numer = ZERO;
-        double denom = ONE;
-        double ratio = ZERO;
-        double scale = ONE;
-
-        double iterationRatio = MACHINE_LARGEST;
-        double iterationScale = MACHINE_LARGEST;
-
         double tolerance = COST.getAbsoluteError();
 
         int n = mySimplex.structure.countVariables();
         int[] excluded = mySimplex.excluded;
+
+        this.ensureRatioCacheCapacity(excluded.length);
+
+        // Pass 1: compute the relaxed minimum theta_max = min over valid candidates of
+        // (gap + tolerance) / |denom|, while caching per-candidate (idx, scale, trueRatio, state)
+        // for sequential reuse in pass 2.
+        double thetaMax = MACHINE_LARGEST;
+        int cachedCount = 0;
+
         for (int je = 0; je < excluded.length; je++) {
             int j = excluded[je];
-            if (j < n) {
+            if (j >= n) {
+                continue;
+            }
 
-                denom = mySimplex.getCurrentElement(exit, je);
-                scale = Math.abs(denom);
+            double denom = mySimplex.getCurrentElement(exit, je);
+            if (PIVOT.isZero(denom)) {
+                continue;
+            }
 
-                if (!PIVOT.isZero(denom)) {
+            double scale = Math.abs(denom);
+            ColumnState columnState = mySimplex.getColumnState(j);
+            double relaxed;
+            double trueRatio;
 
-                    ColumnState columnState = mySimplex.getColumnState(j);
+            if (columnState == ColumnState.UNBOUNDED) {
+                relaxed = ZERO;
+                trueRatio = ZERO;
+            } else {
+                double numer = mySimplex.getReducedCost(je);
+                double gap = ZERO;
+                boolean valid = false;
 
-                    ratio = Double.MAX_VALUE;
-
-                    if (columnState == ColumnState.UNBOUNDED) {
-
-                        ratio = ZERO;
-
-                    } else {
-
-                        numer = mySimplex.getReducedCost(je);
-
-                        if (exitDirection == Direction.INCREASE) {
-                            if (columnState == ColumnState.LOWER && denom < ZERO) {
-                                ratio = Math.max(ZERO, tolerance + numer) / -denom;
-                            } else if (columnState == ColumnState.UPPER && denom > ZERO) {
-                                ratio = Math.max(ZERO, tolerance - numer) / denom;
-                            }
-                        } else if (exitDirection == Direction.DECREASE) {
-                            if (columnState == ColumnState.LOWER && denom > ZERO) {
-                                ratio = Math.max(ZERO, tolerance + numer) / denom;
-                            } else if (columnState == ColumnState.UPPER && denom < ZERO) {
-                                ratio = Math.max(ZERO, tolerance - numer) / -denom;
-                            }
-                        }
+                if (exitDirection == Direction.INCREASE) {
+                    if (columnState == ColumnState.LOWER && denom < ZERO) {
+                        gap = numer;
+                        valid = true;
+                    } else if (columnState == ColumnState.UPPER && denom > ZERO) {
+                        gap = -numer;
+                        valid = true;
                     }
-
-                    if (ratio < ZERO || printable && this.isLogDebug()) {
-                        this.log(1, "{}({}) {} / {} = {}", j, je, numer, denom, ratio);
+                } else if (exitDirection == Direction.DECREASE) {
+                    if (columnState == ColumnState.LOWER && denom > ZERO) {
+                        gap = numer;
+                        valid = true;
+                    } else if (columnState == ColumnState.UPPER && denom < ZERO) {
+                        gap = -numer;
+                        valid = true;
                     }
+                }
 
-                    if (RATIO.isDifferent(iterationRatio, ratio) ? ratio < iterationRatio : scale > iterationScale) {
+                if (!valid) {
+                    continue;
+                }
 
-                        enter.index = je;
-                        enter.from = columnState;
-                        enter.direction = columnState == ColumnState.UPPER ? Direction.DECREASE : Direction.INCREASE;
+                relaxed = Math.max(ZERO, gap + tolerance) / scale;
+                trueRatio = Math.max(ZERO, gap) / scale;
+            }
 
-                        if (this.isLogDebug()) {
-                            this.log(2, "{} => {}", ratio, enter);
-                        }
+            if (printable && this.isLogDebug()) {
+                this.log(1, "{}({}) relaxed = {}", j, je, relaxed);
+            }
 
-                        iterationRatio = ratio;
-                        iterationScale = scale;
-                    }
+            if (relaxed < thetaMax) {
+                thetaMax = relaxed;
+            }
+
+            myRatioCacheIdx[cachedCount] = je;
+            myRatioCacheScale[cachedCount] = scale;
+            myRatioCacheTrueRatio[cachedCount] = trueRatio;
+            myRatioCacheState[cachedCount] = columnState;
+            cachedCount++;
+        }
+
+        if (cachedCount == 0) {
+            // No valid candidate found
+            if (this.isLogDebug()) {
+                this.log("==>> {}", enter);
+            }
+            return false;
+        }
+
+        // Pass 2: among cached candidates with true ratio <= thetaMax, pick the largest |denom|.
+        double bestScale = -ONE;
+
+        for (int k = 0; k < cachedCount; k++) {
+            double scale = myRatioCacheScale[k];
+            if (myRatioCacheTrueRatio[k] <= thetaMax && scale > bestScale) {
+                bestScale = scale;
+                ColumnState columnState = myRatioCacheState[k];
+                enter.index = myRatioCacheIdx[k];
+                enter.from = columnState;
+                enter.direction = columnState == ColumnState.UPPER ? Direction.DECREASE : Direction.INCREASE;
+
+                if (this.isLogDebug()) {
+                    this.log(2, "{} (scale {}) => {}", myRatioCacheTrueRatio[k], scale, enter);
                 }
             }
         }
@@ -1063,112 +1124,105 @@ abstract class SimplexSolver extends LinearSolver {
         Direction enterDirection = enter.direction;
 
         double range = mySimplex.getRange(enter.column());
-
-        double numer = ZERO;
-        double denom = ONE;
-        double ratio = ZERO;
-        double scale = ONE;
-
-        double iterationRatio = range;
-        double iterationScale = MACHINE_LARGEST;
-
         double tolerance = INFEASIBILITY.getAbsoluteError();
 
         int[] included = mySimplex.included;
+
+        this.ensureRatioCacheCapacity(included.length);
+
+        // Pass 1: relaxed minimum, capped at the entering variable's range. While iterating, cache per-row
+        // (idx, scale, trueRatio, exit-to-upper) so pass 2 can iterate the cache sequentially.
+        double thetaMax = range;
+        int cachedCount = 0;
+
         for (int ji = included.length - 1; ji >= 0; ji--) {
-            int j = included[ji];
-
-            denom = mySimplex.getCurrentElement(ji, enter);
-            scale = Math.abs(denom);
-
-            if (!PIVOT.isZero(denom)) {
-
-                if (enterDirection == Direction.INCREASE) {
-                    // Entering variable will increase
-
-                    if (denom < ZERO) {
-                        // Basic (exiting) variable will increase
-                        numer = mySimplex.getUpperGap(ji) + tolerance; // How much can it increase?
-                        ratio = numer / -denom;
-                    } else if (denom > ZERO) {
-                        // Basic (exiting) variable will decrease
-                        numer = mySimplex.getLowerGap(ji) + tolerance; // How much can it decrease?
-                        ratio = numer / denom;
-                    }
-
-                    if (ratio < ZERO || printable && this.isLogDebug()) {
-                        this.log(1, "{}({}) {} / {} = {}", j, ji, numer, denom, ratio);
-                    }
-
-                    if (RATIO.isDifferent(iterationRatio, ratio) ? ratio < iterationRatio : scale > iterationScale) {
-
-                        exit.index = ji;
-                        if (denom < ZERO) {
-                            exit.direction = Direction.INCREASE;
-                            exit.to = ColumnState.UPPER;
-                        } else {
-                            exit.direction = Direction.DECREASE;
-                            exit.to = ColumnState.LOWER;
-                        }
-
-                        if (this.isLogDebug()) {
-                            this.log(2, "{} => {}", ratio, exit);
-                        }
-
-                        iterationRatio = ratio;
-                        iterationScale = scale;
-                    }
-
-                } else if (enterDirection == Direction.DECREASE) {
-                    // Entering variable will decrease
-
-                    if (denom < ZERO) {
-                        // Basic (exiting) variable will decrease
-                        numer = mySimplex.getLowerGap(ji) + tolerance; // How much can it decrease?
-                        ratio = numer / -denom;
-                    } else if (denom > ZERO) {
-                        // Basic (exiting) variable will increase
-                        numer = mySimplex.getUpperGap(ji) + tolerance; // How much can it increase?
-                        ratio = numer / denom;
-                    }
-
-                    if (ratio < ZERO || printable && this.isLogDebug()) {
-                        this.log(1, "{}({}) {} / {} = {}", j, ji, numer, denom, ratio);
-                    }
-
-                    if (RATIO.isDifferent(iterationRatio, ratio) ? ratio < iterationRatio : scale > iterationScale) {
-
-                        exit.index = ji;
-                        if (denom > ZERO) {
-                            exit.direction = Direction.INCREASE;
-                            exit.to = ColumnState.UPPER;
-                        } else {
-                            exit.direction = Direction.DECREASE;
-                            exit.to = ColumnState.LOWER;
-                        }
-
-                        if (this.isLogDebug()) {
-                            this.log(2, "{} => {}", ratio, exit);
-                        }
-
-                        iterationRatio = ratio;
-                        iterationScale = scale;
-                    }
-
-                } else {
-
-                    throw new IllegalStateException();
-                }
+            double denom = mySimplex.getCurrentElement(ji, enter);
+            if (PIVOT.isZero(denom)) {
+                continue;
             }
+
+            double scale = Math.abs(denom);
+            double numer;
+            boolean exitDirection;
+
+            if (enterDirection == Direction.INCREASE) {
+                if (denom < ZERO) {
+                    numer = mySimplex.getUpperGap(ji);
+                    exitDirection = true;
+                } else {
+                    numer = mySimplex.getLowerGap(ji);
+                    exitDirection = false;
+                }
+            } else if (enterDirection == Direction.DECREASE) {
+                if (denom < ZERO) {
+                    numer = mySimplex.getLowerGap(ji);
+                    exitDirection = false;
+                } else {
+                    numer = mySimplex.getUpperGap(ji);
+                    exitDirection = true;
+                }
+            } else {
+                throw new IllegalStateException();
+            }
+
+            double relaxed = (numer + tolerance) / scale;
+            double trueRatio = numer / scale;
+
+            if (printable && this.isLogDebug()) {
+                this.log(1, "{}({}) relaxed = {}", included[ji], ji, relaxed);
+            }
+
+            if (relaxed < thetaMax) {
+                thetaMax = relaxed;
+            }
+
+            myRatioCacheIdx[cachedCount] = ji;
+            myRatioCacheScale[cachedCount] = scale;
+            myRatioCacheTrueRatio[cachedCount] = trueRatio;
+            myRatioCacheExitDirection[cachedCount] = exitDirection;
+            cachedCount++;
         }
 
-        if (iterationRatio >= range && Double.isFinite(iterationRatio)) {
+        if (thetaMax >= range) {
+
+            if (Double.isFinite(thetaMax)) {
+
+                if (this.isLogDebug()) {
+                    this.log("Bound switch!");
+                }
+
+                iteration.markAsBoundFlip();
+            }
+            // If thetaMax is non-finite, no candidate provides a bounded step:
+            // the entering direction is unbounded. Caller will set State.UNBOUNDED.
 
             if (this.isLogDebug()) {
-                this.log("Bound switch!");
+                this.log("==>> {}", exit);
             }
 
-            iteration.markAsBoundFlip();
+            return iteration.isBoundFlip();
+        }
+
+        // Pass 2: among cached rows with true ratio <= thetaMax, pick the largest |denom|.
+        double bestScale = -ONE;
+
+        for (int k = 0; k < cachedCount; k++) {
+            double scale = myRatioCacheScale[k];
+            if (myRatioCacheTrueRatio[k] <= thetaMax && scale > bestScale) {
+                bestScale = scale;
+                exit.index = myRatioCacheIdx[k];
+                if (myRatioCacheExitDirection[k]) {
+                    exit.direction = Direction.INCREASE;
+                    exit.to = ColumnState.UPPER;
+                } else {
+                    exit.direction = Direction.DECREASE;
+                    exit.to = ColumnState.LOWER;
+                }
+
+                if (this.isLogDebug()) {
+                    this.log(2, "{} (scale {}) => {}", myRatioCacheTrueRatio[k], scale, exit);
+                }
+            }
         }
 
         if (this.isLogDebug()) {
