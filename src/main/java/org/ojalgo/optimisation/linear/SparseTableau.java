@@ -23,13 +23,18 @@ package org.ojalgo.optimisation.linear;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.Arrays;
+
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.array.SparseArray;
+import org.ojalgo.array.SparseArray.NonzeroView;
+import org.ojalgo.array.operation.INV;
 import org.ojalgo.array.operation.IndexOf;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.optimisation.Equilibrator;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Primitive1D;
@@ -43,6 +48,124 @@ import org.ojalgo.structure.Primitive2D;
  * Preferred over {@link DenseTableau} for large or highly sparse LP problems.
  */
 final class SparseTableau extends SimplexTableau {
+
+    /**
+     * Ruiz-style diagonal equilibration for an LP held in a {@link SparseTableau}. Mirrors
+     * {@link DenseTableau.Scaling} and {@link RevisedStore.Scaling}: each iteration computes per-row and
+     * per-model-column infinity norms, clamps and inverse-square-roots them into row/column scaling factors,
+     * and applies them in place. Slack and artificial columns are not column-scaled — their ±1 coefficients
+     * exist outside the original LP data and the unit-vector basis structure is preserved.
+     */
+    static final class Scaling extends Equilibrator<SparseTableau> {
+
+        Scaling(final int nbIterations, final int nbModelVars, final int nbConstraints) {
+            super(nbIterations, nbModelVars, nbConstraints);
+        }
+
+        @Override
+        protected void doAfterUpdate(final SparseTableau tableau) {
+
+            tableau.scaleBounds(primal.inverse);
+
+            tableau.recomputePhase1Objective();
+        }
+
+        @Override
+        protected void doUpdateIteration(final SparseTableau tableau, final double[] wPrimal, final double[] wDual) {
+
+            int nbVars = wPrimal.length;
+            int m = tableau.m;
+
+            if (nbVars == 0 || m == 0) {
+                return;
+            }
+
+            SparseArray<Double>[] body = tableau.myBody;
+
+            // Single sweep: per-row max (for wDual[i]) and per-column max (for wPrimal[j]) over the
+            // model-variable columns of A.
+            Arrays.fill(wPrimal, ZERO);
+            for (int i = 0; i < m; i++) {
+                SparseArray<Double> row = body[i];
+                double rowNorm = ZERO;
+                for (NonzeroView<Double> nz : row.nonzeros()) {
+                    int j = (int) nz.index();
+                    if (j < nbVars) {
+                        double abs = Math.abs(nz.doubleValue());
+                        if (abs > rowNorm) {
+                            rowNorm = abs;
+                        }
+                        if (abs > wPrimal[j]) {
+                            wPrimal[j] = abs;
+                        }
+                    }
+                }
+                wDual[i] = rowNorm;
+            }
+
+            Equilibrator.clamp(wPrimal);
+            Equilibrator.clamp(wDual);
+            org.ojalgo.array.operation.SQRT.invoke(wPrimal);
+            org.ojalgo.array.operation.SQRT.invoke(wDual);
+            INV.invoke(wPrimal, wPrimal);
+            INV.invoke(wDual, wDual);
+
+            // Apply scaling to the constraint body in two sweeps, matching DenseTableau.Scaling so the
+            // resulting scaled values are bit-identical between backends. Sweep 1: column-scale model
+            // columns. Sweep 2: row-scale (model columns only — slack/artificial columns left untouched).
+            for (int i = 0; i < m; i++) {
+                SparseArray<Double> row = body[i];
+                for (NonzeroView<Double> nz : row.nonzeros()) {
+                    int j = (int) nz.index();
+                    if (j < nbVars) {
+                        double p = wPrimal[j];
+                        if (p != ONE) {
+                            row.set(j, nz.doubleValue() * p);
+                        }
+                    }
+                }
+            }
+            for (int i = 0; i < m; i++) {
+                double d = wDual[i];
+                if (d != ONE) {
+                    SparseArray<Double> row = body[i];
+                    for (NonzeroView<Double> nz : row.nonzeros()) {
+                        int j = (int) nz.index();
+                        if (j < nbVars) {
+                            row.set(j, nz.doubleValue() * d);
+                        }
+                    }
+                }
+            }
+
+            // Scale the model-variable region of the objective row by column factors.
+            Array1D<Double> objective = tableau.myObjective;
+            for (int j = 0; j < nbVars; j++) {
+                double p = wPrimal[j];
+                if (p != ONE) {
+                    objective.set(j, objective.doubleValue(j) * p);
+                }
+            }
+
+            // Scale RHS by row factors.
+            Array1D<Double> rhs = tableau.myRHS;
+            for (int i = 0; i < m; i++) {
+                double d = wDual[i];
+                if (d != ONE) {
+                    rhs.set(i, rhs.doubleValue(i) * d);
+                }
+            }
+
+            // Accumulate cumulative column and row scales.
+            for (int j = 0; j < nbVars; j++) {
+                primal.values[j] *= wPrimal[j];
+            }
+            for (int i = 0; i < m; i++) {
+                dual.values[i] *= wDual[i];
+            }
+        }
+
+    }
 
     private static final Array1D.Factory<Double> ARRAY1D_FACTORY = Array1D.factory(ArrayR064.FACTORY);
     private static final PrimitiveArray.Factory DENSE_FACTORY = ArrayR064.FACTORY;
@@ -246,6 +369,13 @@ final class SparseTableau extends SimplexTableau {
             return false;
         }
 
+        // Incoming value is in original (unscaled) variable space; convert to scaled space so the
+        // comparison against the current (scaled) RHS is consistent.
+        double scaledValue = value;
+        if (equilibrator != null && index < structure.countModelVariables()) {
+            scaledValue *= equilibrator.primal.inverse[index];
+        }
+
         // Diff begin
 
         SparseArray<Double> currentRow = myBody[row];
@@ -254,14 +384,14 @@ final class SparseTableau extends SimplexTableau {
         SparseArray<Double> auxiliaryRow = mySparseFactory.make(n);
         double auxiliaryRHS = ZERO;
 
-        if (currentRHS > value) {
+        if (currentRHS > scaledValue) {
             currentRow.axpy(NEG, auxiliaryRow);
             auxiliaryRow.set(index, ZERO);
-            auxiliaryRHS = value - currentRHS;
-        } else if (currentRHS < value) {
+            auxiliaryRHS = scaledValue - currentRHS;
+        } else if (currentRHS < scaledValue) {
             currentRow.axpy(ONE, auxiliaryRow);
             auxiliaryRow.set(index, ZERO);
-            auxiliaryRHS = currentRHS - value;
+            auxiliaryRHS = currentRHS - scaledValue;
         } else {
             return true;
         }
@@ -397,6 +527,16 @@ final class SparseTableau extends SimplexTableau {
     }
 
     @Override
+    Scaling newEquilibrator(final int nbIterations, final int nbPrimals, final int nbDuals) {
+
+        Scaling retVal = new Scaling(nbIterations, nbPrimals, nbDuals);
+
+        retVal.update(this);
+
+        return retVal;
+    }
+
+    @Override
     Primitive1D newObjective() {
 
         return new Primitive1D() {
@@ -444,6 +584,30 @@ final class SparseTableau extends SimplexTableau {
             }
 
         };
+    }
+
+    void recomputePhase1Objective() {
+
+        if (myPhase1Objective != null) {
+
+            int nbVars = structure.countVariables();
+
+            for (int j = 0; j < nbVars; j++) {
+                myPhase1Objective.set(j, ZERO);
+            }
+            myPhase1Value = ZERO;
+
+            for (int i = structure.nbIdty; i < m; i++) {
+                SparseArray<Double> row = myBody[i];
+                for (NonzeroView<Double> nz : row.nonzeros()) {
+                    int j = (int) nz.index();
+                    if (j < nbVars) {
+                        myPhase1Objective.add(j, -nz.doubleValue());
+                    }
+                }
+                myPhase1Value -= myRHS.doubleValue(i);
+            }
+        }
     }
 
     @Override

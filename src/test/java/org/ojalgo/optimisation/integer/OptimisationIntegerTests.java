@@ -24,11 +24,6 @@ package org.ojalgo.optimisation.integer;
 import org.ojalgo.concurrent.Parallelism;
 import org.ojalgo.optimisation.integer.IntegerStrategy.ConfigurableStrategy;
 
-/**
- * OptimisationIntegerPackageTests
- *
- * @author apete
- */
 abstract class OptimisationIntegerTests {
 
     static final boolean DEBUG = false;

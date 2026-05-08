@@ -32,6 +32,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.Sense;
 import org.ojalgo.optimisation.Optimisation.State;
@@ -128,7 +129,7 @@ public class DesignCase extends OptimisationIntegerTests {
         // First test if the GomorySolver can solve this
         GomorySolver sEg0 = new GomorySolver(mEg0);
         if (DEBUG) {
-            sEg0.options.debug(GomorySolver.class);
+            sEg0.options.debug(Optimisation.Solver.class);
         }
         Result actEg0 = sEg0.solve();
         TestUtils.assertStateAndSolution(expEg0, actEg0, NumberContext.of(11));

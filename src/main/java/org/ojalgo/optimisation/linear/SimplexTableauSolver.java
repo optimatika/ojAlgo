@@ -256,8 +256,6 @@ final class SimplexTableauSolver extends LinearSolver {
             }
         }
 
-        // BasicLogger.debug("objective", retVal);
-
         int indCnstr = 0;
         int indSlack = baseIdSlackVars;
 
@@ -440,8 +438,6 @@ final class SimplexTableauSolver extends LinearSolver {
 
             indCnstr++;
         }
-
-        // BasicLogger.debug("exprEqNeg", retVal);
 
         return retVal;
     }
@@ -1048,6 +1044,7 @@ final class SimplexTableauSolver extends LinearSolver {
     double[] extractReducedGradients() {
         double[] gradients = new double[myTableau.n];
         myTableau.extractReducedCosts(gradients);
+        myTableau.unscaleReducedCosts(gradients);
         return gradients;
     }
 

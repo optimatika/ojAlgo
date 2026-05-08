@@ -19,6 +19,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - New `Optimisation.Environment` class that holds solver integrations, presolvers, variable/expression factories, and 3rd-party configurators. Use `Optimisation.newEnvironment()` to create isolated configurations and `Environment.newModel()` as the model factory.
 - New `FactorKKT` – a dedicated KKT factorisation helper used by the convex solvers.
 - New `RuizScaling` – Ruiz equilibration for KKT/constraint systems in the convex solver pipeline.
+- New `Equilibrator` abstract class for matrix equilibration (row and column scaling). Provides utility methods for clamping scaling factors to safe bounds and is used by scaling implementations across the optimisation pipeline.
 - `UpdatableSolver` gained `getDualMultiplier(int)` and `getReducedGradient(int)` for querying dual variables and reduced gradients after a solve.
 - `Optimisation.Result` now carries an optional reduced gradient via `getReducedGradient()` / `withReducedGradient(Supplier)`.
 - `ExpressionsBasedModel.Simplifier`, `ExpressionAnalyser`, and `VariableAnalyser` are now `public`, enabling custom presolver-like hooks that plug into the standard presolve pipeline.
@@ -31,6 +32,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - `InvertibleFactor` gained static helper methods for composing ftran/btran over a list of factors.
 - `SparseArray.firstIndex()` and `lastIndex()` are now `public` (were package-private) and return `int` instead of `long`, with safe `-1` on empty arrays.
 - New `SortAll.sort(long[], int[])` overload for co-sorting a long key array with an int permutation array.
+
+#### org.ojalgo.array
+
+- New `DensityTrackingArray` – a primitive 1D array that incrementally tracks its nonzero pattern alongside stored values. Backed by a plain `double[]` with an explicit index list for nonzero positions, enabling efficient traversal of sparse arrays while supporting direct indexed access to all elements.
 
 #### org.ojalgo.scalar
 
@@ -59,6 +64,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - The default presolver set (via `resetPresolvers()`) now includes `LINEAR_OBJECTIVE` and `UNREFERENCED`; execution order among built-in presolvers has been revised.
 - `VariableAnalyser.simplify()` return type changed from `boolean` to `void`.
 - The presolve pipeline in `ExpressionsBasedModel` now dispatches through the unified `Simplifier` hierarchy, making the scan/simplify phase extensible.
+- Simplex solver pivot selection now uses Harris ratio test in both passes for more numerically stable entry and exit pivots. Tuned thresholds for dense versus sparse tableau selection based on problem dimensions to optimise performance.
 
 #### org.ojalgo.matrix
 
@@ -66,6 +72,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - Reworked `SparseLU` and `SparseQDLDL` for better performance and integration with `InvertibleFactor`.
 - `SparseLU` is now `public` and accepts `ColumnsSupplier.Selection` directly via a new `factor(...)` method that applies column-ordering by sparsity/last-index to reduce fill-in.
 - `SparseLU` gained `countFactorNonzeros()` and `countEtaNonzeros()` for querying L+U and eta-chain fill-in, used by the adaptive refactorisation heuristic in `SparseDecomposition`.
+- New internal `DualSparse` structure for sparse matrix decompositions that maintains both row and column views alongside a diagonal, supporting efficient dual representation of sparse matrices.
 - Refined `MatrixStore.norm()` calculation and added a default `normalised()` implementation.
 - `LogicalStore` hierarchy: exposed `base` as a direct field reference, eliminating the `base()` accessor call in all logical store subclasses. `ColumnsStore` and `RowsStore` simplified — removed the negative-index-as-zeros indirection and opened for subclassing.
 - New `ColumnsSupplier.Selection` and `RowsSupplier.Selection` inner classes that provide sparse-aware `supplyTo` and `sliceColumn`/`sliceRow` implementations, iterating nonzeros directly instead of delegating to the dense path.

@@ -3,6 +3,7 @@ package org.ojalgo.optimisation.convex;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.R064CSC;
+import org.ojalgo.optimisation.Equilibrator;
 
 /**
  * Tests for {@link RuizScaling}, verifying clamping behaviour, round-trip scaling/unscaling, and sparsity
@@ -11,38 +12,38 @@ import org.ojalgo.matrix.store.R064CSC;
 public class RuizScalingTest extends OptimisationConvexTests {
 
     /**
-     * Verifies that {@link RuizScaling#clamp(double)} replaces invalid or out-of-range values with sensible
+     * Verifies that {@link Equilibrator#clamp(double)} replaces invalid or out-of-range values with sensible
      * defaults.
      */
     @Test
     public void testLimitScalingScalar() {
 
-        double min = RuizScaling.MIN;
-        double max = RuizScaling.MAX;
+        double min = Equilibrator.MIN;
+        double max = Equilibrator.MAX;
 
-        TestUtils.assertEquals(1.0, RuizScaling.clamp(0.0), 0.0);
-        TestUtils.assertEquals(1.0, RuizScaling.clamp(min / 2.0), 0.0);
-        TestUtils.assertEquals(max, RuizScaling.clamp(max * 2.0), 0.0);
+        TestUtils.assertEquals(1.0, Equilibrator.clamp(0.0), 0.0);
+        TestUtils.assertEquals(1.0, Equilibrator.clamp(min / 2.0), 0.0);
+        TestUtils.assertEquals(max, Equilibrator.clamp(max * 2.0), 0.0);
 
         double mid = 0.5 * (min + max);
-        TestUtils.assertEquals(mid, RuizScaling.clamp(mid), 0.0);
+        TestUtils.assertEquals(mid, Equilibrator.clamp(mid), 0.0);
     }
 
     /**
-     * Verifies that {@link RuizScaling#clamp(double[])} corrects each element of a scaling vector in place.
+     * Verifies that {@link Equilibrator#clamp(double[])} corrects each element of a scaling vector in place.
      */
     @Test
     public void testLimitScalingVector() {
 
-        double[] v = { 0.0, RuizScaling.MIN / 2.0, RuizScaling.MIN, RuizScaling.MAX, RuizScaling.MAX * 2.0 };
+        double[] v = { 0.0, Equilibrator.MIN / 2.0, Equilibrator.MIN, Equilibrator.MAX, Equilibrator.MAX * 2.0 };
 
-        RuizScaling.clamp(v);
+        Equilibrator.clamp(v);
 
         TestUtils.assertEquals(1.0, v[0], 0.0);
         TestUtils.assertEquals(1.0, v[1], 0.0);
-        TestUtils.assertEquals(RuizScaling.MIN, v[2], 0.0);
-        TestUtils.assertEquals(RuizScaling.MAX, v[3], 0.0);
-        TestUtils.assertEquals(RuizScaling.MAX, v[4], 0.0);
+        TestUtils.assertEquals(Equilibrator.MIN, v[2], 0.0);
+        TestUtils.assertEquals(Equilibrator.MAX, v[3], 0.0);
+        TestUtils.assertEquals(Equilibrator.MAX, v[4], 0.0);
     }
 
     /**

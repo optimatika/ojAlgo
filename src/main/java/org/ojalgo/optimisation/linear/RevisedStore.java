@@ -26,16 +26,22 @@ import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import java.util.Arrays;
 
+import org.ojalgo.array.SparseArray;
+import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.array.operation.AXPY;
+import org.ojalgo.array.operation.INV;
+import org.ojalgo.array.operation.SQRT;
 import org.ojalgo.matrix.store.R064CSC;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RowsSupplier;
+import org.ojalgo.optimisation.Equilibrator;
 import org.ojalgo.optimisation.linear.SimplexSolver.EnterInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.ExitInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.IterDescr;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Primitive1D;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * Revised simplex data structure. Instead of materialising the full tableau, this class stores the original
@@ -48,6 +54,123 @@ import org.ojalgo.structure.Primitive1D;
  * ({@link PhasedSimplexSolver}, {@link DualSimplexSolver}, {@link PrimalSimplexSolver}).
  */
 final class RevisedStore extends SimplexStore {
+
+    /**
+     * Ruiz-style diagonal equilibration for an LP held in a {@link RevisedStore}. Mirrors
+     * {@link DenseTableau.Scaling}: each iteration computes per-row and per-model-column infinity norms (over
+     * the model-variable region of A only), clamps and inverse-square-roots them into row/column scaling
+     * factors, and applies them in place to the constraint body, RHS, and objective. Slack and artificial
+     * columns are not column-scaled — their ±1 coefficients live outside the original LP data and the
+     * unit-vector basis structure is preserved.
+     * <p>
+     * Operates on the build-time {@link #myConstraintsBody} ({@link RowsSupplier}). Must run before the
+     * matrix is frozen to {@link #myConstraintsCSC} in {@link #doneBuilding()}.
+     */
+    static final class Scaling extends Equilibrator<RevisedStore> {
+
+        Scaling(final int nbIterations, final int nbModelVars, final int nbConstraints) {
+            super(nbIterations, nbModelVars, nbConstraints);
+        }
+
+        @Override
+        protected void doAfterUpdate(final RevisedStore store) {
+            store.scaleBounds(primal.inverse);
+        }
+
+        @Override
+        protected void doUpdateIteration(final RevisedStore store, final double[] wPrimal, final double[] wDual) {
+
+            int nbVars = wPrimal.length;
+            int m = store.m;
+
+            if (nbVars == 0 || m == 0) {
+                return;
+            }
+
+            RowsSupplier<Double> body = store.myConstraintsBody;
+
+            // Single sweep: per-row max (for wDual[i]) and per-column max (for wPrimal[j]) over the
+            // model-variable columns of A.
+            Arrays.fill(wPrimal, ZERO);
+            for (int i = 0; i < m; i++) {
+                SparseArray<Double> row = body.getRow(i);
+                double rowNorm = ZERO;
+                for (NonzeroView<Double> nz : row.nonzeros()) {
+                    int j = (int) nz.index();
+                    if (j < nbVars) {
+                        double abs = Math.abs(nz.doubleValue());
+                        if (abs > rowNorm) {
+                            rowNorm = abs;
+                        }
+                        if (abs > wPrimal[j]) {
+                            wPrimal[j] = abs;
+                        }
+                    }
+                }
+                wDual[i] = rowNorm;
+            }
+
+            Equilibrator.clamp(wPrimal);
+            Equilibrator.clamp(wDual);
+            SQRT.invoke(wPrimal);
+            SQRT.invoke(wDual);
+            INV.invoke(wPrimal, wPrimal);
+            INV.invoke(wDual, wDual);
+
+            // Apply scaling to the constraint body in two sweeps, matching DenseTableau.Scaling so the
+            // resulting scaled values are bit-identical between backends. Sweep 1: column-scale model
+            // columns. Sweep 2: row-scale (model columns only — slack/artificial columns left untouched).
+            for (int i = 0; i < m; i++) {
+                SparseArray<Double> row = body.getRow(i);
+                for (NonzeroView<Double> nz : row.nonzeros()) {
+                    int j = (int) nz.index();
+                    if (j < nbVars) {
+                        double p = wPrimal[j];
+                        if (p != ONE) {
+                            row.set(j, nz.doubleValue() * p);
+                        }
+                    }
+                }
+            }
+            for (int i = 0; i < m; i++) {
+                double d = wDual[i];
+                if (d != ONE) {
+                    SparseArray<Double> row = body.getRow(i);
+                    for (NonzeroView<Double> nz : row.nonzeros()) {
+                        int j = (int) nz.index();
+                        if (j < nbVars) {
+                            row.set(j, nz.doubleValue() * d);
+                        }
+                    }
+                }
+            }
+
+            // Scale the model-variable region of the objective row by column factors.
+            for (int j = 0; j < nbVars; j++) {
+                double p = wPrimal[j];
+                if (p != ONE) {
+                    store.myObjective.set(j, 0, store.myObjective.doubleValue(j, 0) * p);
+                }
+            }
+
+            // Scale RHS by row factors.
+            for (int i = 0; i < m; i++) {
+                double d = wDual[i];
+                if (d != ONE) {
+                    store.myConstraintsRHS.set(i, 0, store.myConstraintsRHS.doubleValue(i, 0) * d);
+                }
+            }
+
+            // Accumulate cumulative column and row scales.
+            for (int j = 0; j < nbVars; j++) {
+                primal.values[j] *= wPrimal[j];
+            }
+            for (int i = 0; i < m; i++) {
+                dual.values[i] *= wDual[i];
+            }
+        }
+
+    }
 
     private static R064Store newColumn(final int nbRows) {
         return R064Store.FACTORY.make(nbRows, 1);
@@ -114,13 +237,6 @@ final class RevisedStore extends SimplexStore {
     private BasisRepresentation myInvBasis;
 
     /**
-     * Set when the basis representation was fully refactored (rather than incrementally updated). Both the
-     * basic solution x and reduced costs d are recomputed from scratch after refactorisation, since the fresh
-     * factors make the recompute accurate. Between refactorisations, x and d are maintained incrementally.
-     */
-    private boolean myRefactored = false;
-
-    /**
      * Objective function coefficients c for all variables. Static during solve. Used to compute duals and
      * objective value.
      */
@@ -131,6 +247,22 @@ final class RevisedStore extends SimplexStore {
      * at the start of phase-1, and set to null after phase-1.
      */
     private R064Store myPhase1Objective = null;
+
+    /**
+     * Set when the basis representation was fully refactored (rather than incrementally updated). Both the
+     * basic solution x and reduced costs d are recomputed from scratch after refactorisation, since the fresh
+     * factors make the recompute accurate. Between refactorisations, x and d are maintained incrementally.
+     */
+    private boolean myRefactored = false;
+
+    /**
+     * Per-instance scratch for {@link #sliceBodyRow(int)}: holds the non-basic part of the current tableau
+     * row produced by {@link #doBodyRow(int, double[])}. Reused across calls — the returned
+     * {@link Primitive1D} view is consumed synchronously by the caller (see
+     * {@link SimplexStore#generateCutCandidates(boolean[], NumberContext, double)}) before the next
+     * {@code sliceBodyRow} call, so reuse is safe.
+     */
+    private final double[] mySliceBodyRowScratch;
 
     /**
      * Scratch buffer for row-scatter transpose-multiply. Length {@code n}, reused across iterations.
@@ -175,6 +307,7 @@ final class RevisedStore extends SimplexStore {
 
         d = new double[n - m];
         a = new double[n - m];
+        mySliceBodyRowScratch = new double[n - m];
     }
 
     private void doBodyRow(final int row, final double[] destination) {
@@ -326,7 +459,10 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
-    void doneBuilding() {
+    void doneBuilding(final LinearSolver.Configuration configuration) {
+
+        super.doneBuilding(configuration);
+
         myConstraintsCSC = myConstraintsBody.toCSC();
         myInvBasis = BasisRepresentation.newInstance(myConstraintsCSC);
     }
@@ -422,6 +558,16 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
+    Scaling newEquilibrator(final int nbIterations, final int nbPrimals, final int nbDuals) {
+
+        Scaling retVal = new Scaling(nbIterations, nbPrimals, nbDuals);
+
+        retVal.update(this);
+
+        return retVal;
+    }
+
+    @Override
     Mutate1D objective() {
         return myObjective;
     }
@@ -511,15 +657,37 @@ final class RevisedStore extends SimplexStore {
     @Override
     Primitive1D sliceBodyRow(final int i) {
 
-        double[] exclPart = new double[n - m];
-
+        // Reuse a per-instance scratch for the non-basic part to avoid a fresh allocation per cut row.
+        final double[] exclPart = mySliceBodyRowScratch;
         this.doBodyRow(i, exclPart);
 
-        Primitive1D retVal = Primitive1D.newInstance(n);
-        for (int je = 0; je < excluded.length; je++) {
-            retVal.set(excluded[je], exclPart[je]);
-        }
-        return retVal;
+        // Return a view backed by exclPart and the cached excluded-reverse-map for O(1) doubleValue(k):
+        // - basic columns (reverse[k] == -1) → ZERO (the tableau row of a basic var has 0 at other basic cols)
+        // - non-basic columns → exclPart[reverse[k]]
+        // This avoids allocating a full-size Primitive1D and copying n-m entries on every cut row.
+        final int[] reverse = this.getExcludedReverseMap();
+        final int nLocal = n;
+        return new Primitive1D() {
+
+            @Override
+            public double doubleValue(final int k) {
+                if (k < 0 || k >= nLocal) {
+                    return ZERO;
+                }
+                int je = reverse[k];
+                return je >= 0 ? exclPart[je] : ZERO;
+            }
+
+            @Override
+            public void set(final int k, final double value) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public int size() {
+                return nLocal;
+            }
+        };
     }
 
     @Override
@@ -601,7 +769,13 @@ final class RevisedStore extends SimplexStore {
 
     @Override
     boolean updateRange(final int index, final double lower, final double upper) {
-        this.setBounds(index, lower, upper);
+        // Incoming bounds are in original (unscaled) variable space. Convert to scaled space before storing
+        // so that branch-and-bound updates remain consistent with the scaled internal data.
+        double scale = ONE;
+        if (equilibrator != null && index < structure.countModelVariables()) {
+            scale = equilibrator.primal.inverse[index];
+        }
+        this.setBounds(index, lower * scale, upper * scale);
         return true;
     }
 

@@ -23,10 +23,13 @@ package org.ojalgo.optimisation.linear;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.Arrays;
+
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.CorePrimitiveOperation;
 import org.ojalgo.array.operation.IndexOf;
+import org.ojalgo.optimisation.Equilibrator;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Primitive1D;
@@ -42,6 +45,111 @@ import org.ojalgo.structure.Primitive2D;
  * {@link SimplexStore#newStoreFactory(org.ojalgo.optimisation.Optimisation.Options)}).
  */
 final class DenseTableau extends SimplexTableau {
+
+    /**
+     * Ruiz-style diagonal equilibration for an LP held in a {@link DenseTableau}.
+     * <p>
+     * Scales the model-variable columns and constraint rows of the dense tableau in place. The model-variable
+     * columns and the objective row are multiplied by the column factors; the full constraint rows (body,
+     * slack/artificial columns, and RHS) are multiplied by the row factors. Slack and artificial columns are
+     * not independently column-scaled, preserving the natural BFS structure.
+     */
+    static final class Scaling extends Equilibrator<DenseTableau> {
+
+        Scaling(final int nbIterations, final int nbModelVars, final int nbConstraints) {
+            super(nbIterations, nbModelVars, nbConstraints);
+        }
+
+        @Override
+        protected void doAfterUpdate(final DenseTableau tableau) {
+
+            tableau.scaleBounds(primal.inverse);
+
+            tableau.recomputePhase1Objective();
+        }
+
+        @Override
+        protected void doUpdateIteration(final DenseTableau tableau, final double[] wPrimal, final double[] wDual) {
+
+            int nbVars = wPrimal.length;
+            int m = tableau.m;
+            int rhsCol = tableau.n;
+            double[][] body = tableau.myTableau;
+
+            if (nbVars == 0 || m == 0) {
+                return;
+            }
+
+            // Column infinity norms over constraint rows
+            for (int j = 0; j < nbVars; j++) {
+                double norm = ZERO;
+                for (int i = 0; i < m; i++) {
+                    double abs = Math.abs(body[i][j]);
+                    if (abs > norm) {
+                        norm = abs;
+                    }
+                }
+                wPrimal[j] = norm;
+            }
+
+            // Row infinity norms over model-variable columns
+            for (int i = 0; i < m; i++) {
+                double norm = ZERO;
+                double[] row = body[i];
+                for (int j = 0; j < nbVars; j++) {
+                    double abs = Math.abs(row[j]);
+                    if (abs > norm) {
+                        norm = abs;
+                    }
+                }
+                wDual[i] = norm;
+            }
+
+            Equilibrator.clamp(wPrimal);
+            Equilibrator.clamp(wDual);
+            org.ojalgo.array.operation.SQRT.invoke(wPrimal);
+            org.ojalgo.array.operation.SQRT.invoke(wDual);
+            org.ojalgo.array.operation.INV.invoke(wPrimal, wPrimal);
+            org.ojalgo.array.operation.INV.invoke(wDual, wDual);
+
+            // Column scaling: model-variable columns of the body and the objective row
+            for (int j = 0; j < nbVars; j++) {
+                double p = wPrimal[j];
+                if (p != ONE) {
+                    for (int i = 0; i < m; i++) {
+                        body[i][j] *= p;
+                    }
+                    body[m][j] *= p;
+                }
+            }
+
+            // Row scaling: only the model-variable columns and the RHS get row-scaled. Slack and
+            // artificial columns are left untouched — conceptually, they belong to the post-scaling
+            // tableau-building step (their ±1 coefficients exist independently of the original LP
+            // data). Skipping them is what we'd get if Ruiz had been applied to A, b, c before the
+            // tableau was assembled. This also preserves the unit-vector structure of the initial
+            // basis so the simplex can read basic values directly from the RHS column.
+            for (int i = 0; i < m; i++) {
+                double d = wDual[i];
+                if (d != ONE) {
+                    double[] row = body[i];
+                    for (int j = 0; j < nbVars; j++) {
+                        row[j] *= d;
+                    }
+                    row[rhsCol] *= d;
+                }
+            }
+
+            // Accumulate cumulative column and row scales
+            for (int j = 0; j < nbVars; j++) {
+                primal.values[j] *= wPrimal[j];
+            }
+            for (int i = 0; i < m; i++) {
+                dual.values[i] *= wDual[i];
+            }
+        }
+
+    }
 
     private final int myColDim;
     private double[] myPhase1Row = null;
@@ -181,6 +289,13 @@ final class DenseTableau extends SimplexTableau {
             return false;
         }
 
+        // Incoming value is in original (unscaled) variable space; convert to scaled space so the
+        // comparison against the current (scaled) RHS is consistent.
+        double scaledValue = value;
+        if (equilibrator != null && index < structure.countModelVariables()) {
+            scaledValue *= equilibrator.primal.inverse[index];
+        }
+
         // Diff begin
 
         // Array1D<Double> currentRow = myTransposed.sliceColumn(row);
@@ -188,14 +303,14 @@ final class DenseTableau extends SimplexTableau {
         double currentRHS = currentRow.doubleValue(myColDim - 1);
 
         final ArrayR064 auxiliaryRow = ArrayR064.make(myColDim);
-        if (currentRHS > value) {
+        if (currentRHS > scaledValue) {
             currentRow.axpy(NEG, auxiliaryRow);
             auxiliaryRow.set(index, ZERO);
-            auxiliaryRow.set(myColDim - 1, value - currentRHS);
-        } else if (currentRHS < value) {
+            auxiliaryRow.set(myColDim - 1, scaledValue - currentRHS);
+        } else if (currentRHS < scaledValue) {
             currentRow.axpy(ONE, auxiliaryRow);
             auxiliaryRow.set(index, ZERO);
-            auxiliaryRow.set(myColDim - 1, currentRHS - value);
+            auxiliaryRow.set(myColDim - 1, currentRHS - scaledValue);
         } else {
             return true;
         }
@@ -328,6 +443,16 @@ final class DenseTableau extends SimplexTableau {
     }
 
     @Override
+    Scaling newEquilibrator(final int nbIterations, final int nbPrimals, final int nbDuals) {
+
+        Scaling retVal = new Scaling(nbIterations, nbPrimals, nbDuals);
+
+        retVal.update(this);
+
+        return retVal;
+    }
+
+    @Override
     Primitive1D newObjective() {
 
         return new Primitive1D() {
@@ -375,6 +500,24 @@ final class DenseTableau extends SimplexTableau {
             }
 
         };
+    }
+
+    void recomputePhase1Objective() {
+
+        if (myPhase1Row != null) {
+
+            int nbVars = structure.countVariables();
+
+            Arrays.fill(myPhase1Row, ZERO);
+
+            for (int i = structure.nbIdty; i < m; i++) {
+                double[] row = myTableau[i];
+                for (int j = 0; j < nbVars; j++) {
+                    myPhase1Row[j] -= row[j];
+                }
+                myPhase1Row[n] -= row[n];
+            }
+        }
     }
 
     @Override

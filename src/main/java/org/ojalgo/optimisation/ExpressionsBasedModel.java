@@ -1415,15 +1415,11 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         return retVal;
     }
 
-    public boolean isAnyVariableFixed() {
-        return myVariables.stream().anyMatch(Variable::isFixed);
-    }
-
-    public boolean isAnyVariableInteger() {
-
-        if (myRelaxed) {
-            return false;
-        }
+    /**
+     * Return true if any variable is (was originally) declared integer. When/if the model relaxes the integer
+     * constraints, this will still return true.
+     */
+    public boolean isAnyVariableDeclaredInteger() {
 
         boolean retVal = false;
 
@@ -1433,6 +1429,23 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         }
 
         return retVal;
+    }
+
+    public boolean isAnyVariableFixed() {
+        return myVariables.stream().anyMatch(Variable::isFixed);
+    }
+
+    /**
+     * If the model has relaxed the integer constraints this will return false, otherwise the same as
+     * {@link #isAnyVariableDeclaredInteger()}.
+     */
+    public boolean isAnyVariableInteger() {
+
+        if (myRelaxed) {
+            return false;
+        } else {
+            return this.isAnyVariableDeclaredInteger();
+        }
     }
 
     public Expression limitObjective(final BigDecimal lower, final BigDecimal upper) {

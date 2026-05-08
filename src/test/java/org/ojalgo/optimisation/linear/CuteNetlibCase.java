@@ -31,24 +31,21 @@ import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * A collection of linear optimisation problems found here: http://www.numerical.rl.ac.uk/cute/netlib.html
+ * The CUTE/netlib collection of linear programming test problems
+ * (<a href="http://www.numerical.rl.ac.uk/cute/netlib.html">www.numerical.rl.ac.uk/cute/netlib.html</a>), an
+ * industry-standard benchmark suite. Each test corresponds to one SIF file under
+ * {@code src/test/resources/optimisation/netlib/}.
  * <p>
- * netlib is an industry standard collection of linear optimisation problems.
- * <P>
- * The Constrained and Unconstrained Testing Environment with safe threads (CUTEst) for optimization software.
- * <p>
- * Min/Max have have been verified by CPLEX or OR-Tools (GLOP).
+ * Per-problem expected min/max values were verified with CPLEX or OR-Tools (GLOP). Per-problem javadoc lists
+ * the constraint matrix size and non-zero count from the netlib README's PROBLEM SUMMARY TABLE, any
+ * variable-bound or constraint-range markers (B/R/BR), the bound types declared in the SIF (UP/LO/FX/FR), and
+ * the published optimal value.
  * <ul>
- * <li>One problem is disabled since we have not been able to get a solution from either CPLEX or OR-Tools.
- * <li>Some problems are tagged as "slow" because they take too long for ojAlgo to solve to be suitable as a
- * unit test.
- * <li>Some problems are tagged as "unstable" because ojAlgo does not return the same solution as CPLEX or
- * OR-Tools.
+ * <li>{@code @Disabled} — neither CPLEX nor OR-Tools produced a reference solution, so we have nothing to
+ * compare against.
+ * <li>{@code @Tag("slow")} — solves but takes too long to run as a default unit test.
+ * <li>{@code @Tag("unstable")} — solves but the answer differs from CPLEX/OR-Tools.
  * </ul>
- * The description of each problem is AI-generated, and may not be entirely accurate. The problems are
- * described in terms of their size, structure, and the numerical challenges they present to linear
- * programming solvers. The descriptions are intended to provide context for the problems and to highlight the
- * specific aspects that make them interesting or challenging for optimization algorithms.
  *
  * @author apete
  */
@@ -88,13 +85,8 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * 25FV47 is a large-scale linear programming problem from the netlib collection that tests the solver's
-     * ability to handle problems with significant size and complexity. This problem has 822 rows and 1571
-     * columns with 11,127 nonzeros, making it a substantial test case for computational efficiency and
-     * numerical stability. The problem is known for its challenging structure that can expose weaknesses in
-     * simplex implementations, particularly around basis factorization and pivot selection strategies. It
-     * tests the solver's ability to maintain numerical accuracy while processing large constraint matrices
-     * and handling potential degeneracy issues that arise in real-world optimization problems.
+     * 25FV47 — 822 rows × 1571 columns, 11127 non-zeros.<br>
+     * Optimal value: 5.5018458883E+03.<br>
      */
     @Test
     public void test25FV47() {
@@ -102,13 +94,9 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * 80BAU3B is a very large-scale linear programming problem with 2263 rows and 9799 columns, containing
-     * 29,063 nonzeros. This problem tests the solver's ability to handle extremely large constraint matrices
-     * and demonstrates the importance of efficient sparse matrix operations. The problem's size makes it
-     * particularly challenging for memory management and computational efficiency, testing the solver's
-     * ability to maintain numerical stability while processing massive amounts of data. It serves as a
-     * benchmark for testing the scalability of linear programming algorithms and their ability to handle
-     * real-world problems of substantial size.
+     * 80BAU3B — 2263 rows × 9799 columns, 29063 non-zeros.<br>
+     * Has variable bounds (UP LO FX).<br>
+     * Optimal value: 9.8723216072E+05.<br>
      */
     @Test
     public void test80BAU3B() {
@@ -116,31 +104,19 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * ADLITTLE is a medium-sized linear programming problem with 57 rows and 97 columns that represents a
-     * real-world optimization scenario. This problem tests the solver's ability to handle problems with a mix
-     * of constraint types and variable bounds, including both equality and inequality constraints. The
-     * problem structure includes various constraint coefficients that test numerical precision and the
-     * solver's ability to handle different scaling factors. It serves as a good benchmark for testing the
-     * robustness of linear programming algorithms on problems of moderate size with realistic constraint
-     * structures. 53x149
+     * ADLITTLE — 57 rows × 97 columns, 465 non-zeros.<br>
+     * Optimal value: 2.2549496316E+05.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testADLITTLE() {
         CuteNetlibCase.doTest("ADLITTLE.SIF", "225494.96316238036", null, ACCURACY);
     }
 
     /**
-     * AFIRO is a small but well-known linear programming problem with 28 rows and 32 columns that serves as a
-     * fundamental test case for linear programming solvers. This problem is particularly interesting because
-     * it tests the solver's ability to handle problems with multiple optimal solutions and degenerate cases.
-     * The problem structure includes both equality and inequality constraints with various coefficient
-     * patterns, making it an excellent test for numerical stability and pivot selection strategies. AFIRO is
-     * often used as a first validation case for new linear programming implementations due to its manageable
-     * size and known solution characteristics. 24x56
+     * AFIRO — 28 rows × 32 columns, 88 non-zeros.<br>
+     * Optimal value: -4.6475314286E+02.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testAFIRO() {
 
         // CPLEX MIN OPTIMAL -464.7531428571429 @ { 8E+1, 25.5, 54.5, 84.80, 18.21428571428572, 0, 0, 0, 0, 0,
@@ -186,112 +162,62 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * AGG is a large-scale linear programming problem with 489 rows and 163 columns that tests the solver's
-     * ability to handle problems with significant constraint density and complex objective functions. This
-     * problem is particularly challenging due to its large objective value range and the presence of both
-     * minimization and maximization objectives, testing the solver's numerical precision and scaling
-     * capabilities. The problem structure includes various constraint types and coefficient patterns that can
-     * expose weaknesses in basis factorization and pivot selection algorithms. AGG serves as a benchmark for
-     * testing the robustness of linear programming solvers on problems with challenging numerical
-     * characteristics. This file contained this section:
-     *
-     * <pre>
-     * BJECT BOUND
-     *
-     *   Solution
-     *
-     * LO SOLTN                   ???
-     * </pre>
-     *
-     * As far as I know that's not standard MPS. Assume it's something SIF specific, but don't understand what
-     * it would do. Removed this section.
+     * AGG — 489 rows × 163 columns, 2541 non-zeros.<br>
+     * Optimal value: -3.5991767287E+07.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testAGG() {
         CuteNetlibCase.doTest("AGG.SIF", "-3.599176728657652E7", "2.8175579434489565E9", ACCURACY);
     }
 
     /**
-     * AGG2 is a variant of the AGG problem with 517 rows and 302 columns that tests similar numerical
-     * challenges as AGG but with a different constraint structure. This problem is particularly interesting
-     * because it demonstrates how slight modifications to problem structure can significantly impact solver
-     * performance and numerical behavior. The problem tests the solver's ability to handle problems with
-     * large objective value ranges and complex constraint matrices, making it a good benchmark for testing
-     * numerical stability and computational efficiency in linear programming algorithms.
+     * AGG2 — 517 rows × 302 columns, 4515 non-zeros.<br>
+     * Optimal value: -2.0239252356E+07.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testAGG2() {
         CuteNetlibCase.doTest("AGG2.SIF", "-2.0239252355977114E7", "5.71551859632249E9", ACCURACY);
     }
 
     /**
-     * AGG3 is another variant of the AGG problem family with 517 rows and 302 columns that provides a third
-     * perspective on the numerical challenges present in this problem class. This problem tests the solver's
-     * ability to handle problems with positive objective values and complex constraint structures,
-     * complementing the testing provided by AGG and AGG2. The problem serves as a benchmark for testing the
-     * consistency of linear programming solvers across different problem formulations and objective function
-     * characteristics.
+     * AGG3 — 517 rows × 302 columns, 4531 non-zeros.<br>
+     * Optimal value: 1.0312115935E+07.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testAGG3() {
         CuteNetlibCase.doTest("AGG3.SIF", "1.031211593508922E7", "5.746768863949547E9", ACCURACY);
     }
 
     /**
-     * BANDM is a linear programming problem with 306 rows and 472 columns that tests the solver's ability to
-     * handle problems with banded matrix structures. This problem is particularly interesting because it
-     * demonstrates how matrix structure can influence solver performance and numerical behavior. The banded
-     * nature of the constraint matrix can be exploited by specialized algorithms, making BANDM a good test
-     * case for evaluating the efficiency of different linear programming approaches and their ability to
-     * recognize and utilize problem structure.
+     * BANDM — 306 rows × 472 columns, 2659 non-zeros.<br>
+     * Optimal value: -1.5862801845E+02.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testBANDM() {
         CuteNetlibCase.doTest("BANDM.SIF", "-158.6280184501187", null, ACCURACY);
     }
 
     /**
-     * BEACONFD is a linear programming problem with 174 rows and 262 columns that represents a real-world
-     * optimization scenario. This problem tests the solver's ability to handle problems with realistic
-     * constraint structures and coefficient patterns that arise in practical applications. The problem
-     * includes various constraint types and variable bounds that test the solver's numerical precision and
-     * ability to handle different scaling factors. BEACONFD serves as a benchmark for testing the robustness
-     * of linear programming algorithms on problems with realistic problem characteristics.
+     * BEACONFD — 174 rows × 262 columns, 3476 non-zeros.<br>
+     * Optimal value: 3.3592485807E+04.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testBEACONFD() {
         CuteNetlibCase.doTest("BEACONFD.SIF", "33592.4858072", null, ACCURACY);
     }
 
     /**
-     * BLEND is a classic linear programming problem with 75 rows and 83 columns that represents an oil
-     * refinery blending problem. This problem is particularly interesting because it tests the solver's
-     * ability to handle problems with specific industry-relevant structures and constraint patterns. The
-     * blending problem involves mixing different components to meet quality specifications while minimizing
-     * cost, creating a problem structure that tests numerical precision and constraint handling. BLEND serves
-     * as a benchmark for testing linear programming solvers on problems with realistic industrial
-     * applications and specific constraint characteristics. 72x155
+     * BLEND — 75 rows × 83 columns, 521 non-zeros.<br>
+     * Optimal value: -3.0812149846E+01.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testBLEND() {
         CuteNetlibCase.doTest("BLEND.SIF", "-3.0812149846E+01", null, ACCURACY);
     }
 
     /**
-     * BNL1 is a large-scale linear programming problem with 644 rows and 1175 columns that tests the solver's
-     * ability to handle problems with significant size and complexity. This problem is particularly
-     * challenging due to its large constraint matrix and the presence of both minimization and maximization
-     * objectives, testing the solver's numerical precision and computational efficiency. The problem
-     * structure includes various constraint types and coefficient patterns that can expose weaknesses in
-     * basis factorization and pivot selection algorithms. BNL1 serves as a benchmark for testing the
-     * robustness of linear programming solvers on large-scale problems with challenging numerical
-     * characteristics.
+     * BNL1 — 644 rows × 1175 columns, 6129 non-zeros.<br>
+     * Optimal value: 1.9776292856E+03.<br>
      */
     @Test
     public void testBNL1() {
@@ -299,101 +225,67 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * BNL2 is an even larger linear programming problem with 2325 rows and 3489 columns that represents an
-     * extreme test case for linear programming solvers. This problem tests the solver's ability to handle
-     * problems with massive constraint matrices and complex numerical characteristics. The problem's size
-     * makes it particularly challenging for memory management and computational efficiency, testing the
-     * solver's ability to maintain numerical stability while processing enormous amounts of data. BNL2 serves
-     * as a benchmark for testing the scalability limits of linear programming algorithms and their ability to
-     * handle problems of extreme size.
+     * BNL2 — 2325 rows × 3489 columns, 16124 non-zeros.<br>
+     * Optimal value: 1.8112365404E+03.<br>
      */
     @Test
-    @Tag("unstable")
     public void testBNL2() {
         CuteNetlibCase.doTest("BNL2.SIF", "1811.2365403585452", null, ACCURACY);
     }
 
     /**
-     * BOEING1 is a linear programming problem with 351 rows and 384 columns that represents aircraft flap
-     * settings optimization for economical operations. This problem is particularly interesting because it
-     * tests the solver's ability to handle problems with specific engineering applications and realistic
-     * constraint structures. The problem includes various constraint types related to aircraft operations,
-     * testing the solver's numerical precision and ability to handle problems with industry-specific
-     * characteristics. BOEING1 serves as a benchmark for testing linear programming solvers on problems with
-     * realistic engineering applications and complex constraint relationships.
+     * BOEING1 — 351 rows × 384 columns, 3865 non-zeros.<br>
+     * Has variable bounds (UP LO) and ranges on constraints.<br>
+     * Optimal value: -3.3521356751E+02.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testBOEING1() {
         CuteNetlibCase.doTest("BOEING1.SIF", "-335.2135675071266", "286.9746573387996", ACCURACY);
     }
 
     /**
-     * BOEING2 is a variant of the BOEING1 problem with 167 rows and 143 columns that provides a different
-     * perspective on aircraft optimization problems. This problem tests the solver's ability to handle
-     * problems with similar engineering applications but different problem structures and constraint
-     * characteristics. The problem includes various constraint types related to aircraft operations, testing
-     * the solver's numerical precision and ability to handle problems with industry-specific characteristics.
-     * BOEING2 serves as a benchmark for testing the consistency of linear programming solvers across
-     * different problem formulations within the same application domain. 144x287
+     * BOEING2 — 167 rows × 143 columns, 1339 non-zeros.<br>
+     * Has variable bounds (UP LO) and ranges on constraints.<br>
+     * Optimal value: -3.1501872802E+02.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testBOEING2() {
         CuteNetlibCase.doTest("BOEING2.SIF", "-3.1501872802E+02", "-73.36896910872208", ACCURACY);
     }
 
     /**
-     * BORE3D is a linear programming problem with 234 rows and 315 columns that tests the solver's ability to
-     * handle problems with specific geometric or structural characteristics. This problem is particularly
-     * interesting because it may involve three-dimensional constraints or relationships that test the
-     * solver's ability to handle problems with complex spatial or structural relationships. The problem
-     * structure includes various constraint types and coefficient patterns that can expose weaknesses in
-     * numerical algorithms and constraint handling capabilities.
+     * BORE3D — 234 rows × 315 columns, 1525 non-zeros.<br>
+     * Has variable bounds (UP LO FX).<br>
+     * Optimal value: 1.3730803942E+03.<br>
+     * RHS section is empty in the original SIF.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testBORE3D() {
         CuteNetlibCase.doTest("BORE3D.SIF", "1373.0803942085367", null, ACCURACY);
     }
 
     /**
-     * BRANDY is a linear programming problem with 221 rows and 249 columns that represents a real-world
-     * optimization scenario. This problem tests the solver's ability to handle problems with realistic
-     * constraint structures and coefficient patterns that arise in practical applications. The problem
-     * includes various constraint types and variable bounds that test the solver's numerical precision and
-     * ability to handle different scaling factors. BRANDY serves as a benchmark for testing the robustness of
-     * linear programming algorithms on problems with realistic problem characteristics and constraint
-     * relationships.
+     * BRANDY — 221 rows × 249 columns, 2150 non-zeros.<br>
+     * Optimal value: 1.5185098965E+03.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testBRANDY() {
         CuteNetlibCase.doTest("BRANDY.SIF", "1518.509896488128", null, ACCURACY);
     }
 
     /**
-     * CAPRI is a linear programming problem with 272 rows and 353 columns that tests the solver's ability to
-     * handle problems with specific constraint structures and coefficient patterns. This problem is
-     * particularly interesting because it may involve constraints related to capacity planning or resource
-     * allocation, testing the solver's ability to handle problems with realistic operational constraints. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and constraint handling capabilities.
+     * CAPRI — 272 rows × 353 columns, 1786 non-zeros.<br>
+     * Has variable bounds (UP FX FR).<br>
+     * Optimal value: 2.6900129138E+03.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testCAPRI() {
         CuteNetlibCase.doTest("CAPRI.SIF", "2690.0129137681624", null, ACCURACY);
     }
 
     /**
-     * CRE-A is a large-scale linear programming problem from the Kennington subset that tests the solver's
-     * ability to handle problems with significant size and complexity. This problem is particularly
-     * challenging due to its large constraint matrix and complex numerical characteristics. The problem
-     * structure includes various constraint types and coefficient patterns that can expose weaknesses in
-     * basis factorization and pivot selection algorithms. CRE-A serves as a benchmark for testing the
-     * robustness of linear programming solvers on large-scale problems with challenging numerical
-     * characteristics.
+     * CRE-A — 3517 rows × 4067 columns.<br>
+     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
      */
     @Test
     public void testCRE_A() {
@@ -401,12 +293,8 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * CRE-B is another large-scale linear programming problem from the Kennington subset that provides a
-     * different perspective on the numerical challenges present in this problem class. This problem tests the
-     * solver's ability to handle problems with large constraint matrices and complex numerical
-     * characteristics, complementing the testing provided by CRE-A. The problem structure includes various
-     * constraint types and coefficient patterns that can expose weaknesses in numerical algorithms and
-     * computational efficiency.
+     * CRE-B.<br>
+     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
      */
     @Test
     @Tag("slow")
@@ -416,12 +304,8 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * CRE-C is a third large-scale linear programming problem from the Kennington subset that provides
-     * additional testing of numerical challenges in this problem class. This problem tests the solver's
-     * ability to handle problems with large constraint matrices and complex numerical characteristics,
-     * further complementing the testing provided by CRE-A and CRE-B. The problem structure includes various
-     * constraint types and coefficient patterns that can expose weaknesses in numerical algorithms and
-     * computational efficiency.
+     * CRE-C — 3069 rows × 3678 columns.<br>
+     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
      */
     @Test
     public void testCRE_C() {
@@ -429,12 +313,8 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * CRE-D is a fourth large-scale linear programming problem from the Kennington subset that completes the
-     * testing of numerical challenges in this problem class. This problem tests the solver's ability to
-     * handle problems with large constraint matrices and complex numerical characteristics, providing
-     * comprehensive testing when combined with CRE-A, CRE-B, and CRE-C. The problem structure includes
-     * various constraint types and coefficient patterns that can expose weaknesses in numerical algorithms
-     * and computational efficiency.
+     * CRE-D.<br>
+     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
      */
     @Test
     @Tag("slow")
@@ -444,29 +324,20 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * CYCLE is a large-scale linear programming problem with 1904 rows and 2857 columns that tests the
-     * solver's ability to handle problems with significant degeneracy and cycling issues. This problem is
-     * particularly challenging because it can cause simplex algorithms to cycle or take excessive iterations
-     * due to degenerate pivots. The problem structure includes various constraint types and coefficient
-     * patterns that can expose weaknesses in anti-cycling strategies and numerical stability. CYCLE serves as
-     * a benchmark for testing the robustness of linear programming solvers against degeneracy and cycling
-     * problems.
+     * CYCLE — 1904 rows × 2857 columns, 21322 non-zeros.<br>
+     * Has variable bounds (UP FR).<br>
+     * Optimal value: -5.2263930249E+00.<br>
+     * RHS section is empty in the original SIF.<br>
      */
     @Test
-    @Tag("unstable")
     public void testCYCLE() {
         CuteNetlibCase.doTest("CYCLE.SIF", "-5.2263930248941", "995.8104649596411", ACCURACY);
     }
 
     /**
-     * CZPROB is a large-scale linear programming problem with 930 rows and 3523 columns that tests the
-     * solver's ability to handle problems with significant size and complexity. This problem is particularly
-     * challenging due to its large constraint matrix and the presence of both minimization and maximization
-     * objectives, testing the solver's numerical precision and computational efficiency. The problem
-     * structure includes various constraint types and coefficient patterns that can expose weaknesses in
-     * basis factorization and pivot selection algorithms. CZPROB serves as a benchmark for testing the
-     * robustness of linear programming solvers on large-scale problems with challenging numerical
-     * characteristics.
+     * CZPROB — 930 rows × 3523 columns, 14173 non-zeros.<br>
+     * Has variable bounds (FX).<br>
+     * Optimal value: 2.1851966989E+06.<br>
      */
     @Test
     public void testCZPROB() {
@@ -474,13 +345,8 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * D2Q06C is a very large-scale linear programming problem with 2172 rows and 5167 columns that represents
-     * an extreme test case for linear programming solvers. This problem tests the solver's ability to handle
-     * problems with massive constraint matrices and complex numerical characteristics. The problem's size
-     * makes it particularly challenging for memory management and computational efficiency, testing the
-     * solver's ability to maintain numerical stability while processing enormous amounts of data. D2Q06C
-     * serves as a benchmark for testing the scalability limits of linear programming algorithms and their
-     * ability to handle problems of extreme size.
+     * D2Q06C — 2172 rows × 5167 columns, 35674 non-zeros.<br>
+     * Optimal value: 1.2278423615E+05.<br>
      */
     @Test
     @Tag("unstable")
@@ -489,43 +355,27 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * D6CUBE is a linear programming problem with 416 rows and 6184 columns that tests the solver's ability
-     * to handle problems with specific geometric characteristics related to six-dimensional cube
-     * triangulation. This problem is particularly interesting because it involves finding the minimum
-     * cardinality of triangulations of a 6-dimensional cube, creating a problem structure that tests the
-     * solver's ability to handle problems with complex geometric relationships and high-dimensional
-     * constraints. The problem serves as a benchmark for testing linear programming solvers on problems with
-     * specific mathematical and geometric applications.
+     * D6CUBE — 416 rows × 6184 columns, 43888 non-zeros.<br>
+     * Has variable bounds (LO).<br>
+     * Optimal value: 3.1549166667E+02.<br>
      */
     @Test
-    @Tag("unstable")
     public void testD6CUBE() {
         CuteNetlibCase.doTest("D6CUBE.SIF", "315.49166666667315", "693.0000000000005", ACCURACY);
     }
 
     /**
-     * DEGEN2 is a linear programming problem with 445 rows and 534 columns that is specifically designed to
-     * test the solver's ability to handle degenerate problems. This problem is particularly challenging
-     * because it exhibits significant degeneracy, where multiple basis pivots may lead to the same basic
-     * feasible solution. The problem structure includes various constraint types and coefficient patterns
-     * that can cause cycling or excessive iterations in simplex algorithms. DEGEN2 serves as a benchmark for
-     * testing the robustness of linear programming solvers against degeneracy problems and their anti-cycling
-     * strategies.
+     * DEGEN2 — 445 rows × 534 columns, 4449 non-zeros.<br>
+     * Optimal value: -1.4351780000E+03.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testDEGEN2() {
         CuteNetlibCase.doTest("DEGEN2.SIF", "-1435.1779999999999", "-1226.12", ACCURACY);
     }
 
     /**
-     * DEGEN3 is a larger linear programming problem with 1504 rows and 1818 columns that is specifically
-     * designed to test the solver's ability to handle degenerate problems at scale. This problem is
-     * particularly challenging because it exhibits significant degeneracy across a larger problem size, where
-     * multiple basis pivots may lead to the same basic feasible solution. The problem structure includes
-     * various constraint types and coefficient patterns that can cause cycling or excessive iterations in
-     * simplex algorithms. DEGEN3 serves as a benchmark for testing the robustness of linear programming
-     * solvers against degeneracy problems in larger-scale scenarios.
+     * DEGEN3 — 1504 rows × 1818 columns, 26230 non-zeros.<br>
+     * Optimal value: -9.8729400000E+02.<br>
      */
     @Test
     public void testDEGEN3() {
@@ -533,13 +383,9 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * DFL001 is a large-scale linear programming problem with 6071 rows and 12230 columns that represents a
-     * real-world airline schedule planning (fleet assignment) problem. This problem is particularly
-     * interesting because it was preprocessed by a modified version of the KORBX System preprocessor, which
-     * significantly reduced the problem size while maintaining the essential characteristics. The problem
-     * tests the solver's ability to handle large-scale real-world optimization problems with complex
-     * constraint structures and variable relationships. DFL001 serves as a benchmark for testing linear
-     * programming solvers on problems with realistic airline operations and fleet management applications.
+     * DFL001 — 6072 rows × 12230 columns, 41873 non-zeros.<br>
+     * Has variable bounds (UP).<br>
+     * Estimated optimal value: 1.12664E+07.<br>
      */
     @Test
     @Tag("slow")
@@ -549,81 +395,47 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * E226 is a linear programming problem with 224 rows and 282 columns that tests the solver's ability to
-     * handle problems with specific numerical characteristics related to objective function shifts. This
-     * problem is particularly interesting because it demonstrates how objective function modifications can
-     * affect the optimal solution value, testing the solver's numerical precision and ability to handle
-     * problems with specific objective function structures. The problem structure includes various constraint
-     * types and coefficient patterns that can expose weaknesses in numerical algorithms and objective
-     * function handling. Optimal value is stated to be -1.8751929066E+01 but there is a "RHS" of -7.113 given
-     * for the objective row which should shift the solution by that amount to instead be -1.1638929066e+01.
-     * Using CPLEX to parse the MPS file and then solve the problem confirms this.
-     *
-     * <pre>
-     * 2021-10-01:
-     * Dual simplex - Optimal:  Objective = -1.1638929066e+01
-     * Solution time =    0.01 sec.  Iterations = 256 (58)
-     * Deterministic time = 4.70 ticks  (710.92 ticks/sec)
-     * </pre>
+     * E226 — 224 rows × 282 columns, 2767 non-zeros.<br>
+     * Optimal value: -1.8751929066E+01.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testE226() {
         CuteNetlibCase.doTest("E226.SIF", "-11.638929066370546", "111.65096068931459", ACCURACY);
     }
 
     /**
-     * ETAMACRO is a linear programming problem with 401 rows and 688 columns that tests the solver's ability
-     * to handle problems with macro-level constraints and complex objective functions. This problem is
-     * particularly interesting because it may involve constraints that represent aggregated or macro-level
-     * relationships, testing the solver's ability to handle problems with specific constraint structures and
-     * objective function characteristics. The problem structure includes various constraint types and
-     * coefficient patterns that can expose weaknesses in numerical algorithms and constraint handling
-     * capabilities.
+     * ETAMACRO — 401 rows × 688 columns, 2489 non-zeros.<br>
+     * Has variable bounds (UP LO FX).<br>
+     * Optimal value: -7.5571521774E+02.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testETAMACRO() {
         CuteNetlibCase.doTest("ETAMACRO.SIF", "-755.7152312325337", "258.71905646302014", ACCURACY);
     }
 
     /**
-     * FFFFF800 (also known as POWELL) is a linear programming problem with 525 rows and 854 columns that
-     * tests the solver's ability to handle problems with specific numerical characteristics and constraint
-     * structures. This problem is particularly interesting because it may involve constraints with specific
-     * patterns or relationships that test the solver's numerical precision and ability to handle problems
-     * with particular objective function characteristics. The problem structure includes various constraint
-     * types and coefficient patterns that can expose weaknesses in numerical algorithms and computational
-     * efficiency.
+     * FFFFF800 — 525 rows × 854 columns, 6235 non-zeros.<br>
+     * Optimal value: 5.5567961165E+05.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testFFFFF800() {
         CuteNetlibCase.doTest("FFFFF800.SIF", "555679.5648174941", "1858776.4328128027", ACCURACY);
     }
 
     /**
-     * FINNIS is a linear programming problem with 498 rows and 614 columns that represents a model for the
-     * selection of alternative fuel types. This problem is particularly interesting because it tests the
-     * solver's ability to handle problems with specific industry applications and realistic constraint
-     * structures related to fuel selection and energy optimization. The problem includes various constraint
-     * types and variable bounds that test the solver's numerical precision and ability to handle problems
-     * with industry-specific characteristics. FINNIS serves as a benchmark for testing linear programming
-     * solvers on problems with realistic energy and fuel optimization applications.
+     * FINNIS — 498 rows × 614 columns, 2714 non-zeros.<br>
+     * Has variable bounds (UP LO FX).<br>
+     * Optimal value: 1.7279096547E+05.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testFINNIS() {
         CuteNetlibCase.doTest("FINNIS.SIF", "172791.0655956116", null, ACCURACY);
     }
 
     /**
-     * FIT1D is a linear programming problem with 25 rows and 1026 columns that represents a data fitting
-     * problem with a large number of variables. This problem is particularly interesting because it tests the
-     * solver's ability to handle problems with a small number of constraints but a large number of variables,
-     * creating a specific problem structure that can expose weaknesses in variable selection and basis
-     * management algorithms. The problem structure includes various constraint types and coefficient patterns
-     * that can test the solver's efficiency in handling problems with high variable-to-constraint ratios.
+     * FIT1D — 25 rows × 1026 columns, 14430 non-zeros.<br>
+     * Has variable bounds (UP).<br>
+     * Optimal value: -9.1463780924E+03.<br>
      */
     @Test
     public void testFIT1D() {
@@ -631,13 +443,9 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * FIT1P is a linear programming problem with 628 rows and 1677 columns that represents a data fitting
-     * problem with a different structure than FIT1D. This problem is particularly interesting because it
-     * tests the solver's ability to handle problems with a larger number of constraints and variables,
-     * creating a different problem structure that can expose weaknesses in constraint handling and basis
-     * management algorithms. The problem structure includes various constraint types and coefficient patterns
-     * that can test the solver's efficiency in handling problems with different constraint-to-variable
-     * ratios.
+     * FIT1P — 628 rows × 1677 columns, 10894 non-zeros.<br>
+     * Has variable bounds (UP).<br>
+     * Optimal value: 9.1463780924E+03.<br>
      */
     @Test
     public void testFIT1P() {
@@ -645,13 +453,9 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * FIT2D is a linear programming problem with 26 rows and 10500 columns that represents a two-dimensional
-     * data fitting problem with an extremely large number of variables. This problem is particularly
-     * challenging because it tests the solver's ability to handle problems with a very small number of
-     * constraints but an enormous number of variables, creating a specific problem structure that can expose
-     * weaknesses in memory management and variable selection algorithms. The problem structure includes
-     * various constraint types and coefficient patterns that can test the solver's efficiency in handling
-     * problems with extremely high variable-to-constraint ratios.
+     * FIT2D — 26 rows × 10500 columns, 138018 non-zeros.<br>
+     * Has variable bounds (UP).<br>
+     * Optimal value: -6.8464293294E+04.<br>
      */
     @Test
     @Tag("slow")
@@ -660,6 +464,9 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
+     * FIT2P — 3001 rows × 13525 columns, 60784 non-zeros.<br>
+     * Has variable bounds (UP).<br>
+     * Optimal value: 6.8464293232E+04.<br>
      */
     @Test
     @Tag("slow")
@@ -669,28 +476,19 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * FORPLAN is a linear programming problem with 162 rows and 421 columns that represents a forest planning
-     * optimization problem. This problem is particularly interesting because it tests the solver's ability to
-     * handle problems with specific industry applications related to forestry and resource management. The
-     * problem includes various constraint types and variable bounds that test the solver's numerical
-     * precision and ability to handle problems with industry-specific characteristics. FORPLAN serves as a
-     * benchmark for testing linear programming solvers on problems with realistic forestry and resource
-     * planning applications.
+     * FORPLAN — 162 rows × 421 columns, 4916 non-zeros.<br>
+     * Has variable bounds (UP FX) and ranges on constraints.<br>
+     * Optimal value: -6.6421873953E+02.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testFORPLAN() {
         CuteNetlibCase.doTest("FORPLAN.SIF", "-664.2189612722054", "2862.4274777342266", ACCURACY);
     }
 
     /**
-     * GANGES is a linear programming problem with 1309 rows and 1681 columns that represents a large-scale
-     * optimization problem with specific numerical characteristics. This problem is particularly interesting
-     * because it tests the solver's ability to handle problems with a large number of constraints and
-     * variables, creating a specific problem structure that can expose weaknesses in constraint handling and
-     * basis management algorithms. The problem structure includes various constraint types and coefficient
-     * patterns that can test the solver's efficiency in handling large-scale problems with complex numerical
-     * characteristics.
+     * GANGES — 1310 rows × 1681 columns, 7021 non-zeros.<br>
+     * Has variable bounds (UP LO).<br>
+     * Optimal value: -1.0958636356E+05.<br>
      */
     @Test
     public void testGANGES() {
@@ -698,14 +496,9 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * GFRD-PNC is a large-scale linear programming problem with 1092 rows and 542 columns that represents a
-     * specific type of optimization problem with particular numerical characteristics. This problem is
-     * particularly interesting because it tests the solver's ability to handle problems with specific
-     * constraint structures and objective function characteristics that may arise in real-world applications.
-     * The problem structure includes various constraint types and coefficient patterns that can expose
-     * weaknesses in numerical algorithms and computational efficiency. GFRD-PNC serves as a benchmark for
-     * testing linear programming solvers on problems with specific numerical characteristics and constraint
-     * relationships.
+     * GFRD-PNC — 617 rows × 1092 columns, 3467 non-zeros.<br>
+     * Has variable bounds (UP LO).<br>
+     * Optimal value: 6.9022359995E+06.<br>
      */
     @Test
     public void testGFRD_PNC() {
@@ -713,14 +506,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * GREENBEA is a large-scale linear programming problem with 2393 rows and 5405 columns that represents a
-     * specific type of optimization problem with particular numerical characteristics. This problem is
-     * particularly interesting because it tests the solver's ability to handle problems with specific
-     * constraint structures and objective function characteristics that may arise in real-world applications.
-     * The problem structure includes various constraint types and coefficient patterns that can expose
-     * weaknesses in numerical algorithms and computational efficiency. GREENBEA serves as a benchmark for
-     * testing linear programming solvers on problems with specific numerical characteristics and constraint
-     * relationships.
+     * GREENBEA — 2393 rows × 5405 columns, 31499 non-zeros.<br>
+     * Has variable bounds (UP LO FX).<br>
+     * Optimal value: -7.2462405908E+07.<br>
+     * RHS section is empty in the original SIF.<br>
      */
     @Test
     @Tag("unstable")
@@ -729,13 +518,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * GREENBEB is a large-scale linear programming problem with 2393 rows and 5405 columns that represents a
-     * variant of the GREENBEA problem with different bounds. This problem is particularly interesting because
-     * it tests the solver's ability to handle problems with specific constraint structures and objective
-     * function characteristics that may arise in real-world applications. The problem structure includes
-     * various constraint types and coefficient patterns that can expose weaknesses in numerical algorithms
-     * and computational efficiency. GREENBEB serves as a benchmark for testing linear programming solvers on
-     * problems with specific numerical characteristics and constraint relationships.
+     * GREENBEB — 2393 rows × 5405 columns, 31499 non-zeros.<br>
+     * Has variable bounds (UP LO FX FR).<br>
+     * Optimal value: -4.3021476065E+06.<br>
+     * RHS section is empty in the original SIF.<br>
      */
     @Test
     @Tag("unstable")
@@ -744,89 +530,58 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * GROW15 is a linear programming problem with 301 rows and 645 columns that represents a specific type of
-     * optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. GROW15 serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * GROW15 — 301 rows × 645 columns, 5665 non-zeros.<br>
+     * Has variable bounds (UP).<br>
+     * Optimal value: -1.0687094129E+08.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testGROW15() {
         CuteNetlibCase.doTest("GROW15.SIF", "-1.068709412935753E8", "0.0", ACCURACY);
     }
 
     /**
-     * GROW22 is a linear programming problem with 441 rows and 946 columns that represents a specific type of
-     * optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. GROW22 serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * GROW22 — 441 rows × 946 columns, 8318 non-zeros.<br>
+     * Has variable bounds (UP).<br>
+     * Optimal value: -1.6083433648E+08.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testGROW22() {
         CuteNetlibCase.doTest("GROW22.SIF", "-1.608343364825636E8", "0.0", ACCURACY);
     }
 
     /**
-     * GROW7 is a linear programming problem with 141 rows and 301 columns that represents a specific type of
-     * optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. GROW7 serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * GROW7 — 141 rows × 301 columns, 2633 non-zeros.<br>
+     * Has variable bounds (UP).<br>
+     * Optimal value: -4.7787811815E+07.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testGROW7() {
         CuteNetlibCase.doTest("GROW7.SIF", "-4.7787811814711526E7", "0.0", ACCURACY);
     }
 
     /**
-     * ISRAEL is a linear programming problem with 175 rows and 142 columns that represents a specific type of
-     * optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. ISRAEL serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * ISRAEL — 175 rows × 142 columns, 2358 non-zeros.<br>
+     * Optimal value: -8.9664482186E+05.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testISRAEL() {
         CuteNetlibCase.doTest("ISRAEL.SIF", "-896644.8218630457", null, ACCURACY);
     }
 
     /**
-     * KB2 is a linear programming problem with 44 rows and 41 columns that represents a specific type of
-     * optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. KB2 serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * KB2 — 44 rows × 41 columns, 291 non-zeros.<br>
+     * Has variable bounds (UP).<br>
+     * Optimal value: -1.7499001299E+03.<br>
+     * RHS section is empty in the original SIF.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testKB2() {
         CuteNetlibCase.doTest("KB2.SIF", "-1.74990012991E+03", "0.0", ACCURACY);
     }
 
     /**
-     * KEN-07 is a large-scale linear programming problem with 2427 rows and 3602 columns that represents a
-     * specific type of optimization problem with particular numerical characteristics. This problem is
-     * particularly interesting because it tests the solver's ability to handle problems with specific
-     * constraint structures and objective function characteristics that may arise in real-world applications.
-     * The problem structure includes various constraint types and coefficient patterns that can expose
-     * weaknesses in numerical algorithms and computational efficiency. KEN-07 serves as a benchmark for
-     * testing linear programming solvers on problems with specific numerical characteristics and constraint
-     * relationships.
+     * KEN-07 — 2427 rows × 3602 columns.<br>
+     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
      */
     @Test
     public void testKEN_07() {
@@ -834,14 +589,8 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * KEN-11 is a large-scale linear programming problem with 14695 rows and 21349 columns that represents a
-     * specific type of optimization problem with particular numerical characteristics. This problem is
-     * particularly interesting because it tests the solver's ability to handle problems with specific
-     * constraint structures and objective function characteristics that may arise in real-world applications.
-     * The problem structure includes various constraint types and coefficient patterns that can expose
-     * weaknesses in numerical algorithms and computational efficiency. KEN-11 serves as a benchmark for
-     * testing linear programming solvers on problems with specific numerical characteristics and constraint
-     * relationships.
+     * KEN-11.<br>
+     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
      */
     @Test
     @Tag("slow")
@@ -850,14 +599,8 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * KEN-13 is a large-scale linear programming problem with 28633 rows and 42659 columns that represents a
-     * specific type of optimization problem with particular numerical characteristics. This problem is
-     * particularly interesting because it tests the solver's ability to handle problems with specific
-     * constraint structures and objective function characteristics that may arise in real-world applications.
-     * The problem structure includes various constraint types and coefficient patterns that can expose
-     * weaknesses in numerical algorithms and computational efficiency. KEN-13 serves as a benchmark for
-     * testing linear programming solvers on problems with specific numerical characteristics and constraint
-     * relationships.
+     * KEN-13.<br>
+     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
      */
     @Test
     @Tag("slow")
@@ -867,17 +610,8 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * KEN-18 is an extremely large-scale linear programming problem with 105,127 rows and 154,699 columns
-     * that represents the largest member of the KEN family of optimization problems. This problem is
-     * particularly challenging because it tests the solver's ability to handle problems of massive scale,
-     * with over 100,000 constraints and 150,000 variables, making it one of the largest problems in the
-     * netlib collection. The problem structure includes various constraint types and coefficient patterns
-     * that can expose weaknesses in memory management, numerical algorithms, and computational efficiency
-     * when dealing with problems of this magnitude. KEN-18 serves as a benchmark for testing the absolute
-     * scalability limits of linear programming solvers and their ability to handle problems that approach the
-     * practical limits of current computational resources. The problem's size makes it particularly
-     * challenging for memory management and computational efficiency, testing the solver's ability to
-     * maintain numerical stability while processing enormous amounts of data.
+     * KEN-18.<br>
+     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
      */
     @Test
     @Disabled
@@ -886,43 +620,27 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * LOTFI is a linear programming problem with 154 rows and 308 columns that involves audit staff
-     * scheduling. This problem is particularly interesting because it represents a real-world multi-objective
-     * linear programming problem that has been aggregated into a single objective. The problem tests the
-     * solver's ability to handle problems with realistic scheduling constraints and operational
-     * relationships. LOTFI serves as a benchmark for testing linear programming solvers on problems with
-     * realistic business applications and complex constraint structures related to personnel scheduling and
-     * resource allocation.
+     * LOTFI — 154 rows × 308 columns, 1086 non-zeros.<br>
+     * Optimal value: -2.5264706062E+01.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testLOTFI() {
         CuteNetlibCase.doTest("LOTFI.SIF", "-25.26470606188002", null, ACCURACY);
     }
 
     /**
-     * MAROS is a large-scale linear programming problem that represents an industrial production/allocation
-     * model. This problem is particularly interesting because it tests the solver's ability to handle
-     * problems with specific industrial applications and complex constraint structures. The problem includes
-     * various constraint types and variable bounds that test the solver's numerical precision and ability to
-     * handle problems with industry-specific characteristics. MAROS serves as a benchmark for testing linear
-     * programming solvers on problems with realistic industrial applications and complex constraint
-     * relationships.
+     * MAROS — 847 rows × 1443 columns, 10006 non-zeros.<br>
+     * Has variable bounds.<br>
+     * Optimal value: -5.8063743701E+04.<br>
      */
     @Test
-    @Tag("unstable")
     public void testMAROS() {
         CuteNetlibCase.doTest("MAROS.SIF", "-58063.743701138235", "-10623.409207717115", ACCURACY);
     }
 
     /**
-     * MAROS-R7 is a large-scale linear programming problem that represents an image restoration problem done
-     * via a goal programming approach. This problem is particularly interesting because it has a structured
-     * constraint matrix with a band matrix in the first section and another band matrix with bandwidth 2 in
-     * the second section. The problem tests the solver's ability to handle problems with specific matrix
-     * structures and numerical characteristics that arise in image processing applications. MAROS-R7 serves
-     * as a benchmark for testing linear programming solvers on problems with specific mathematical structures
-     * and applications.
+     * MAROS-R7 — 3137 rows × 9408 columns, 151120 non-zeros.<br>
+     * Optimal value: 1.4971851665E+06.<br>
      */
     @Test
     @Tag("slow")
@@ -931,13 +649,9 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * MODSZK1 is a linear programming problem that represents a real-life multi-sector economic planning
-     * model. This problem is particularly interesting because it is very degenerate and demonstrates that a
-     * dual simplex algorithm may require up to 10 times fewer iterations than a primal simplex algorithm. The
-     * problem tests the solver's ability to handle problems with significant degeneracy and specific
-     * numerical characteristics that can expose differences between primal and dual simplex approaches.
-     * MODSZK1 serves as a benchmark for testing the efficiency of different linear programming algorithms on
-     * degenerate problems.
+     * MODSZK1 — 688 rows × 1620 columns, 4158 non-zeros.<br>
+     * Has variable bounds (FR).<br>
+     * Optimal value: 3.2061972906E+02.<br>
      */
     @Test
     public void testMODSZK1() {
@@ -945,29 +659,18 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * NESM is a large-scale linear programming problem with 2923 rows and 662 columns that represents a
-     * real-world optimization scenario. This problem is particularly interesting because it tests the
-     * solver's ability to handle problems with a large number of constraints and a moderate number of
-     * variables, creating a specific problem structure that can expose weaknesses in constraint handling and
-     * basis management algorithms. The problem structure includes various constraint types and coefficient
-     * patterns that can test the solver's efficiency in handling large-scale problems with complex numerical
-     * characteristics.
+     * NESM — 663 rows × 2923 columns, 13988 non-zeros.<br>
+     * Has variable bounds (UP LO FX) and ranges on constraints.<br>
+     * Optimal value: 1.4076073035E+07.<br>
      */
     @Test
-    @Tag("unstable")
     public void testNESM() {
         CuteNetlibCase.doTest("NESM.SIF", "1.4076036487562722E7", "3.6088214327411644E7", ACCURACY);
     }
 
     /**
-     * OSA-07 is a large-scale linear programming problem with 1118 rows and 25067 columns that represents a
-     * specific type of optimization problem with particular numerical characteristics. This problem is
-     * particularly interesting because it tests the solver's ability to handle problems with specific
-     * constraint structures and objective function characteristics that may arise in real-world applications.
-     * The problem structure includes various constraint types and coefficient patterns that can expose
-     * weaknesses in numerical algorithms and computational efficiency. OSA-07 serves as a benchmark for
-     * testing linear programming solvers on problems with specific numerical characteristics and constraint
-     * relationships.
+     * OSA-07.<br>
+     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
      */
     @Test
     @Tag("slow")
@@ -976,14 +679,8 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * OSA-14 is a large-scale linear programming problem with 2337 rows and 52461 columns that represents a
-     * specific type of optimization problem with particular numerical characteristics. This problem is
-     * particularly interesting because it tests the solver's ability to handle problems with specific
-     * constraint structures and objective function characteristics that may arise in real-world applications.
-     * The problem structure includes various constraint types and coefficient patterns that can expose
-     * weaknesses in numerical algorithms and computational efficiency. OSA-14 serves as a benchmark for
-     * testing linear programming solvers on problems with specific numerical characteristics and constraint
-     * relationships.
+     * OSA-14.<br>
+     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
      */
     @Test
     @Tag("slow")
@@ -992,14 +689,8 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * OSA-30 is a large-scale linear programming problem with 4350 rows and 100024 columns that represents a
-     * specific type of optimization problem with particular numerical characteristics. This problem is
-     * particularly interesting because it tests the solver's ability to handle problems with specific
-     * constraint structures and objective function characteristics that may arise in real-world applications.
-     * The problem structure includes various constraint types and coefficient patterns that can expose
-     * weaknesses in numerical algorithms and computational efficiency. OSA-30 serves as a benchmark for
-     * testing linear programming solvers on problems with specific numerical characteristics and constraint
-     * relationships.
+     * OSA-30.<br>
+     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
      */
     @Test
     @Tag("slow")
@@ -1008,14 +699,8 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * OSA-60 is a large-scale linear programming problem with 10280 rows and 232966 columns that represents a
-     * specific type of optimization problem with particular numerical characteristics. This problem is
-     * particularly interesting because it tests the solver's ability to handle problems with specific
-     * constraint structures and objective function characteristics that may arise in real-world applications.
-     * The problem structure includes various constraint types and coefficient patterns that can expose
-     * weaknesses in numerical algorithms and computational efficiency. OSA-60 serves as a benchmark for
-     * testing linear programming solvers on problems with specific numerical characteristics and constraint
-     * relationships.
+     * OSA-60.<br>
+     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
      */
     @Test
     @Tag("slow")
@@ -1025,14 +710,8 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * PDS-02 is a large-scale linear programming problem with 2953 rows and 7716 columns that represents a
-     * specific type of optimization problem with particular numerical characteristics. This problem is
-     * particularly interesting because it tests the solver's ability to handle problems with specific
-     * constraint structures and objective function characteristics that may arise in real-world applications.
-     * The problem structure includes various constraint types and coefficient patterns that can expose
-     * weaknesses in numerical algorithms and computational efficiency. PDS-02 serves as a benchmark for
-     * testing linear programming solvers on problems with specific numerical characteristics and constraint
-     * relationships.
+     * PDS-02 — 2954 rows × 7535 columns.<br>
+     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
      */
     @Test
     public void testPDS_02() {
@@ -1040,14 +719,8 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * PDS-06 is a large-scale linear programming problem with 9881 rows and 28655 columns that represents a
-     * specific type of optimization problem with particular numerical characteristics. This problem is
-     * particularly interesting because it tests the solver's ability to handle problems with specific
-     * constraint structures and objective function characteristics that may arise in real-world applications.
-     * The problem structure includes various constraint types and coefficient patterns that can expose
-     * weaknesses in numerical algorithms and computational efficiency. PDS-06 serves as a benchmark for
-     * testing linear programming solvers on problems with specific numerical characteristics and constraint
-     * relationships.
+     * PDS-06.<br>
+     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
      */
     @Test
     @Tag("slow")
@@ -1057,14 +730,8 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * PDS-10 is a large-scale linear programming problem with 16558 rows and 48763 columns that represents a
-     * specific type of optimization problem with particular numerical characteristics. This problem is
-     * particularly interesting because it tests the solver's ability to handle problems with specific
-     * constraint structures and objective function characteristics that may arise in real-world applications.
-     * The problem structure includes various constraint types and coefficient patterns that can expose
-     * weaknesses in numerical algorithms and computational efficiency. PDS-10 serves as a benchmark for
-     * testing linear programming solvers on problems with specific numerical characteristics and constraint
-     * relationships.
+     * PDS-10.<br>
+     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
      */
     @Test
     @Tag("slow")
@@ -1074,14 +741,8 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * PDS-20 is a large-scale linear programming problem with 33874 rows and 105728 columns that represents a
-     * specific type of optimization problem with particular numerical characteristics. This problem is
-     * particularly interesting because it tests the solver's ability to handle problems with specific
-     * constraint structures and objective function characteristics that may arise in real-world applications.
-     * The problem structure includes various constraint types and coefficient patterns that can expose
-     * weaknesses in numerical algorithms and computational efficiency. PDS-20 serves as a benchmark for
-     * testing linear programming solvers on problems with specific numerical characteristics and constraint
-     * relationships.
+     * PDS-20.<br>
+     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
      */
     @Test
     @Tag("slow")
@@ -1091,29 +752,19 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * PEROLD is a linear programming problem with 626 rows and 1376 columns that represents a specific type
-     * of optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. PEROLD serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * PEROLD — 626 rows × 1376 columns, 6026 non-zeros.<br>
+     * Has variable bounds (UP LO FX FR).<br>
+     * Optimal value: -9.3807580773E+03.<br>
      */
     @Test
-    @Tag("unstable")
     public void testPEROLD() {
         CuteNetlibCase.doTest("PEROLD.SIF", "-9380.755278235429", "-5878.539464724801", ACCURACY);
     }
 
     /**
-     * PILOT is a large-scale linear programming problem with 1441 rows and 3652 columns that represents a
-     * specific type of optimization problem with particular numerical characteristics. This problem is
-     * particularly interesting because it tests the solver's ability to handle problems with specific
-     * constraint structures and objective function characteristics that may arise in real-world applications.
-     * The problem structure includes various constraint types and coefficient patterns that can expose
-     * weaknesses in numerical algorithms and computational efficiency. PILOT serves as a benchmark for
-     * testing linear programming solvers on problems with specific numerical characteristics and constraint
-     * relationships.
+     * PILOT — 1442 rows × 3652 columns, 43220 non-zeros.<br>
+     * Has variable bounds (UP LO FX).<br>
+     * Optimal value: -5.5740430007E+02.<br>
      */
     @Test
     @Tag("slow")
@@ -1123,14 +774,9 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * PILOT-JA is a large-scale linear programming problem with 941 rows and 1988 columns that represents a
-     * specific type of optimization problem with particular numerical characteristics. This problem is
-     * particularly interesting because it tests the solver's ability to handle problems with specific
-     * constraint structures and objective function characteristics that may arise in real-world applications.
-     * The problem structure includes various constraint types and coefficient patterns that can expose
-     * weaknesses in numerical algorithms and computational efficiency. PILOT-JA serves as a benchmark for
-     * testing linear programming solvers on problems with specific numerical characteristics and constraint
-     * relationships.
+     * PILOT-JA — 941 rows × 1988 columns, 14706 non-zeros.<br>
+     * Has variable bounds (UP LO FX FR).<br>
+     * Optimal value: -6.1131344111E+03.<br>
      */
     @Test
     @Tag("unstable")
@@ -1139,14 +785,9 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * PILOT-WE is a large-scale linear programming problem with 723 rows and 2789 columns that represents a
-     * specific type of optimization problem with particular numerical characteristics. This problem is
-     * particularly interesting because it tests the solver's ability to handle problems with specific
-     * constraint structures and objective function characteristics that may arise in real-world applications.
-     * The problem structure includes various constraint types and coefficient patterns that can expose
-     * weaknesses in numerical algorithms and computational efficiency. PILOT-WE serves as a benchmark for
-     * testing linear programming solvers on problems with specific numerical characteristics and constraint
-     * relationships.
+     * PILOT-WE — 723 rows × 2789 columns, 9218 non-zeros.<br>
+     * Has variable bounds (UP LO FX FR).<br>
+     * Optimal value: -2.7201027439E+06.<br>
      */
     @Test
     @Tag("slow")
@@ -1156,29 +797,19 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * PILOT4 is a linear programming problem with 411 rows and 1000 columns that represents a specific type
-     * of optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. PILOT4 serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * PILOT4 — 411 rows × 1000 columns, 5145 non-zeros.<br>
+     * Has variable bounds (UP FX FR PL).<br>
+     * Optimal value: -2.5811392641E+03.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testPILOT4() {
         CuteNetlibCase.doTest("PILOT4.SIF", "-2581.1392612778604", "0.0", ACCURACY);
     }
 
     /**
-     * PILOT87 is a large-scale linear programming problem with 2031 rows and 4883 columns that represents a
-     * specific type of optimization problem with particular numerical characteristics. This problem is
-     * particularly interesting because it tests the solver's ability to handle problems with specific
-     * constraint structures and objective function characteristics that may arise in real-world applications.
-     * The problem structure includes various constraint types and coefficient patterns that can expose
-     * weaknesses in numerical algorithms and computational efficiency. PILOT87 serves as a benchmark for
-     * testing linear programming solvers on problems with specific numerical characteristics and constraint
-     * relationships.
+     * PILOT87 — 2031 rows × 4883 columns, 73804 non-zeros.<br>
+     * Has variable bounds.<br>
+     * Optimal value: 3.0171072827E+02.<br>
      */
     @Test
     @Tag("slow")
@@ -1188,14 +819,9 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * PILOTNOV is a large-scale linear programming problem with 976 rows and 2172 columns that represents a
-     * specific type of optimization problem with particular numerical characteristics. This problem is
-     * particularly interesting because it tests the solver's ability to handle problems with specific
-     * constraint structures and objective function characteristics that may arise in real-world applications.
-     * The problem structure includes various constraint types and coefficient patterns that can expose
-     * weaknesses in numerical algorithms and computational efficiency. PILOTNOV serves as a benchmark for
-     * testing linear programming solvers on problems with specific numerical characteristics and constraint
-     * relationships.
+     * PILOTNOV — 976 rows × 2172 columns, 13129 non-zeros.<br>
+     * Has variable bounds (UP FX).<br>
+     * Optimal value: -4.4972761882E+03.<br>
      */
     @Test
     @Tag("unstable")
@@ -1204,13 +830,9 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * QAP12 is a linear programming problem with 3193 rows and 8856 columns that represents a quadratic
-     * assignment problem with 12 facilities. This problem is particularly interesting because it tests the
-     * solver's ability to handle problems with specific combinatorial optimization characteristics and
-     * complex constraint structures. The problem structure includes various constraint types and coefficient
-     * patterns that can expose weaknesses in numerical algorithms and computational efficiency. QAP12 serves
-     * as a benchmark for testing linear programming solvers on problems with specific combinatorial
-     * optimization applications.
+     * QAP12 — 3193 rows × 8856 columns, 44244 non-zeros.<br>
+     * Optimal value: 5.2289435056E+02.<br>
+     * Non-zero count not reported in the netlib summary table.<br>
      */
     @Test
     @Tag("unstable")
@@ -1219,13 +841,9 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * QAP15 is a linear programming problem with 6331 rows and 18000 columns that represents a quadratic
-     * assignment problem with 15 facilities. This problem is particularly interesting because it tests the
-     * solver's ability to handle problems with specific combinatorial optimization characteristics and
-     * complex constraint structures. The problem structure includes various constraint types and coefficient
-     * patterns that can expose weaknesses in numerical algorithms and computational efficiency. QAP15 serves
-     * as a benchmark for testing linear programming solvers on problems with specific combinatorial
-     * optimization applications.
+     * QAP15 — 6331 rows × 22275 columns, 110700 non-zeros.<br>
+     * Optimal value: 1.0409940410E+03.<br>
+     * Non-zero count not reported in the netlib summary table.<br>
      */
     @Test
     @Tag("slow")
@@ -1235,13 +853,9 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * QAP8 is a linear programming problem with 912 rows and 2048 columns that represents a quadratic
-     * assignment problem with 8 facilities. This problem is particularly interesting because it tests the
-     * solver's ability to handle problems with specific combinatorial optimization characteristics and
-     * complex constraint structures. The problem structure includes various constraint types and coefficient
-     * patterns that can expose weaknesses in numerical algorithms and computational efficiency. QAP8 serves
-     * as a benchmark for testing linear programming solvers on problems with specific combinatorial
-     * optimization applications.
+     * QAP8 — 913 rows × 1632 columns, 8304 non-zeros.<br>
+     * Optimal value: 2.0350000000E+02.<br>
+     * Non-zero count not reported in the netlib summary table.<br>
      */
     @Test
     @Tag("unstable")
@@ -1250,13 +864,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * RECIPELP is a linear programming problem with 92 rows and 180 columns that represents a recipe
-     * optimization problem. This problem is particularly interesting because it tests the solver's ability to
-     * handle problems with specific constraint structures and objective function characteristics that may
-     * arise in real-world applications. The problem structure includes various constraint types and
-     * coefficient patterns that can expose weaknesses in numerical algorithms and computational efficiency.
-     * RECIPELP serves as a benchmark for testing linear programming solvers on problems with specific
-     * numerical characteristics and constraint relationships.
+     * RECIPELP — 92 rows × 180 columns.<br>
      */
     @Test
     public void testRECIPELP() {
@@ -1264,133 +872,80 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SC105 is a linear programming problem with 106 rows and 103 columns that represents a specific type of
-     * optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. SC105 serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * SC105 — 106 rows × 103 columns, 281 non-zeros.<br>
+     * Optimal value: -5.2202061212E+01.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testSC105() {
         CuteNetlibCase.doTest("SC105.SIF", "-52.202061211707246", "0.0", ACCURACY);
     }
 
     /**
-     * SC205 is a linear programming problem with 206 rows and 203 columns that represents a specific type of
-     * optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. SC205 serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * SC205 — 206 rows × 203 columns, 552 non-zeros.<br>
+     * Optimal value: -5.2202061212E+01.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testSC205() {
         CuteNetlibCase.doTest("SC205.SIF", "-52.202061211707246", "0.0", ACCURACY);
     }
 
     /**
-     * SC50A is a linear programming problem with 51 rows and 48 columns that represents a specific type of
-     * optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. SC50A serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * SC50A — 51 rows × 48 columns, 131 non-zeros.<br>
+     * Optimal value: -6.4575077059E+01.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testSC50A() {
         CuteNetlibCase.doTest("SC50A.SIF", "-64.57507705856449", "0.0", ACCURACY);
     }
 
     /**
-     * SC50B is a linear programming problem with 51 rows and 48 columns that represents a specific type of
-     * optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. SC50B serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * SC50B — 51 rows × 48 columns, 119 non-zeros.<br>
+     * Optimal value: -7.0000000000E+01.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testSC50B() {
         CuteNetlibCase.doTest("SC50B.SIF", "-7.0000000000E+01", "0.0", ACCURACY);
     }
 
     /**
-     * SCAGR25 is a linear programming problem with 472 rows and 500 columns that represents a specific type
-     * of optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. SCAGR25 serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * SCAGR25 — 472 rows × 500 columns, 2029 non-zeros.<br>
+     * Optimal value: -1.4753433061E+07.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testSCAGR25() {
         CuteNetlibCase.doTest("SCAGR25.SIF", "-1.475343306076852E7", null, ACCURACY);
     }
 
     /**
-     * SCAGR7 is a linear programming problem with 130 rows and 140 columns that represents a specific type of
-     * optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. SCAGR7 serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * SCAGR7 — 130 rows × 140 columns, 553 non-zeros.<br>
+     * Optimal value: -2.3313892548E+06.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testSCAGR7() {
         CuteNetlibCase.doTest("SCAGR7.SIF", "-2331389.8243309837", null, ACCURACY);
     }
 
     /**
-     * SCFXM1 is a linear programming problem with 331 rows and 457 columns that represents a specific type of
-     * optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. SCFXM1 serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * SCFXM1 — 331 rows × 457 columns, 2612 non-zeros.<br>
+     * Optimal value: 1.8416759028E+04.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testSCFXM1() {
         CuteNetlibCase.doTest("SCFXM1.SIF", "18416.75902834894", null, ACCURACY);
     }
 
     /**
-     * SCFXM2 is a linear programming problem with 661 rows and 914 columns that represents a specific type of
-     * optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. SCFXM2 serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * SCFXM2 — 661 rows × 914 columns, 5229 non-zeros.<br>
+     * Optimal value: 3.6660261565E+04.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testSCFXM2() {
         CuteNetlibCase.doTest("SCFXM2.SIF", "36660.261564998815", null, ACCURACY);
     }
 
     /**
-     * SCFXM3 is a linear programming problem with 991 rows and 1371 columns that represents a specific type
-     * of optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. SCFXM3 serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * SCFXM3 — 991 rows × 1371 columns, 7846 non-zeros.<br>
+     * Optimal value: 5.4901254550E+04.<br>
      */
     @Test
     public void testSCFXM3() {
@@ -1398,28 +953,17 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SCORPION is a linear programming problem with 389 rows and 358 columns that represents a specific type
-     * of optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. SCORPION serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * SCORPION — 389 rows × 358 columns, 1708 non-zeros.<br>
+     * Optimal value: 1.8781248227E+03.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testSCORPION() {
         CuteNetlibCase.doTest("SCORPION.SIF", "1878.1248227381068", null, ACCURACY);
     }
 
     /**
-     * SCRS8 is a linear programming problem with 491 rows and 1169 columns that represents a specific type of
-     * optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. SCRS8 serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * SCRS8 — 491 rows × 1169 columns, 4029 non-zeros.<br>
+     * Optimal value: 9.0429998619E+02.<br>
      */
     @Test
     public void testSCRS8() {
@@ -1427,28 +971,17 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SCSD1 is a linear programming problem with 78 rows and 760 columns that represents a specific type of
-     * optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. SCSD1 serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * SCSD1 — 78 rows × 760 columns, 3148 non-zeros.<br>
+     * Optimal value: 8.6666666743E+00.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testSCSD1() {
         CuteNetlibCase.doTest("SCSD1.SIF", "8.666666674333367", null, ACCURACY);
     }
 
     /**
-     * SCSD6 is a linear programming problem with 148 rows and 1350 columns that represents a specific type of
-     * optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. SCSD6 serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * SCSD6 — 148 rows × 1350 columns, 5666 non-zeros.<br>
+     * Optimal value: 5.0500000078E+01.<br>
      */
     @Test
     public void testSCSD6() {
@@ -1456,13 +989,8 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SCSD8 is a linear programming problem with 398 rows and 2750 columns that represents a specific type of
-     * optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. SCSD8 serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * SCSD8 — 398 rows × 2750 columns, 11334 non-zeros.<br>
+     * Optimal value: 9.0499999993E+02.<br>
      */
     @Test
     public void testSCSD8() {
@@ -1470,28 +998,17 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SCTAP1 is a linear programming problem with 301 rows and 480 columns that represents a specific type of
-     * optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. SCTAP1 serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * SCTAP1 — 301 rows × 480 columns, 2052 non-zeros.<br>
+     * Optimal value: 1.4122500000E+03.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testSCTAP1() {
         CuteNetlibCase.doTest("SCTAP1.SIF", "1412.25", null, ACCURACY);
     }
 
     /**
-     * SCTAP2 is a linear programming problem with 1091 rows and 1880 columns that represents a specific type
-     * of optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. SCTAP2 serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * SCTAP2 — 1091 rows × 1880 columns, 8124 non-zeros.<br>
+     * Optimal value: 1.7248071429E+03.<br>
      */
     @Test
     public void testSCTAP2() {
@@ -1499,13 +1016,8 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SCTAP3 is a linear programming problem with 1481 rows and 2480 columns that represents a specific type
-     * of optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. SCTAP3 serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * SCTAP3 — 1481 rows × 2480 columns, 10734 non-zeros.<br>
+     * Optimal value: 1.4240000000E+03.<br>
      */
     @Test
     public void testSCTAP3() {
@@ -1513,61 +1025,37 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SEBA is a linear programming problem with 516 rows and 1028 columns that represents a specific type of
-     * optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. SEBA serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * SEBA — 516 rows × 1028 columns, 4874 non-zeros.<br>
+     * Has variable bounds (UP LO) and ranges on constraints.<br>
+     * Optimal value: 1.5711600000E+04.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testSEBA() {
         CuteNetlibCase.doTest("SEBA.SIF", "15711.6", "35160.46056", ACCURACY);
     }
 
     /**
-     * SHARE1B is a linear programming problem with 118 rows and 225 columns that represents a specific type
-     * of optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. SHARE1B serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
-     * 110x330
+     * SHARE1B — 118 rows × 225 columns, 1182 non-zeros.<br>
+     * Optimal value: -7.6589318579E+04.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testSHARE1B() {
         CuteNetlibCase.doTest("SHARE1B.SIF", "-76589.31857918584", "74562.53714565346", ACCURACY.withPrecision(3));
     }
 
     /**
-     * SHARE2B is a linear programming problem with 97 rows and 79 columns that represents a specific type of
-     * optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. SHARE2B serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
-     * 93x172
+     * SHARE2B — 97 rows × 79 columns, 730 non-zeros.<br>
+     * Optimal value: -4.1573224074E+02.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testSHARE2B() {
         CuteNetlibCase.doTest("SHARE2B.SIF", "-4.1573224074E+02", "-265.0981144446295", ACCURACY);
     }
 
     /**
-     * SHELL is a large-scale linear programming problem with 536 rows and 1775 columns that represents a
-     * specific type of optimization problem with particular numerical characteristics. This problem is
-     * particularly interesting because it tests the solver's ability to handle problems with specific
-     * constraint structures and objective function characteristics that may arise in real-world applications.
-     * The problem structure includes various constraint types and coefficient patterns that can expose
-     * weaknesses in numerical algorithms and computational efficiency. SHELL serves as a benchmark for
-     * testing linear programming solvers on problems with specific numerical characteristics and constraint
-     * relationships.
+     * SHELL — 537 rows × 1775 columns, 4900 non-zeros.<br>
+     * Has variable bounds (UP LO FX).<br>
+     * Optimal value: 1.2088253460E+09.<br>
      */
     @Test
     public void testSHELL() {
@@ -1575,14 +1063,8 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SHIP04L is a large-scale linear programming problem with 403 rows and 2118 columns that represents a
-     * specific type of optimization problem with particular numerical characteristics. This problem is
-     * particularly interesting because it tests the solver's ability to handle problems with specific
-     * constraint structures and objective function characteristics that may arise in real-world applications.
-     * The problem structure includes various constraint types and coefficient patterns that can expose
-     * weaknesses in numerical algorithms and computational efficiency. SHIP04L serves as a benchmark for
-     * testing linear programming solvers on problems with specific numerical characteristics and constraint
-     * relationships.
+     * SHIP04L — 403 rows × 2118 columns, 8450 non-zeros.<br>
+     * Optimal value: 1.7933245380E+06.<br>
      */
     @Test
     public void testSHIP04L() {
@@ -1590,14 +1072,8 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SHIP04S is a large-scale linear programming problem with 403 rows and 1458 columns that represents a
-     * specific type of optimization problem with particular numerical characteristics. This problem is
-     * particularly interesting because it tests the solver's ability to handle problems with specific
-     * constraint structures and objective function characteristics that may arise in real-world applications.
-     * The problem structure includes various constraint types and coefficient patterns that can expose
-     * weaknesses in numerical algorithms and computational efficiency. SHIP04S serves as a benchmark for
-     * testing linear programming solvers on problems with specific numerical characteristics and constraint
-     * relationships.
+     * SHIP04S — 403 rows × 1458 columns, 5810 non-zeros.<br>
+     * Optimal value: 1.7987147004E+06.<br>
      */
     @Test
     public void testSHIP04S() {
@@ -1605,74 +1081,45 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SHIP08L is a large-scale linear programming problem with 779 rows and 4283 columns that represents a
-     * specific type of optimization problem with particular numerical characteristics. This problem is
-     * particularly interesting because it tests the solver's ability to handle problems with specific
-     * constraint structures and objective function characteristics that may arise in real-world applications.
-     * The problem structure includes various constraint types and coefficient patterns that can expose
-     * weaknesses in numerical algorithms and computational efficiency. SHIP08L serves as a benchmark for
-     * testing linear programming solvers on problems with specific numerical characteristics and constraint
-     * relationships.
+     * SHIP08L — 779 rows × 4283 columns, 17085 non-zeros.<br>
+     * Optimal value: 1.9090552114E+06.<br>
      */
     @Test
     public void testSHIP08L() {
-        CuteNetlibCase.doTest("SHIP04L.SIF", "1793324.5379703548", null, ACCURACY);
+        CuteNetlibCase.doTest("SHIP08L.SIF", "1909055.211378393", null, ACCURACY);
     }
 
     /**
-     * SHIP08S is a large-scale linear programming problem with 779 rows and 2387 columns that represents a
-     * specific type of optimization problem with particular numerical characteristics. This problem is
-     * particularly interesting because it tests the solver's ability to handle problems with specific
-     * constraint structures and objective function characteristics that may arise in real-world applications.
-     * The problem structure includes various constraint types and coefficient patterns that can expose
-     * weaknesses in numerical algorithms and computational efficiency. SHIP08S serves as a benchmark for
-     * testing linear programming solvers on problems with specific numerical characteristics and constraint
-     * relationships.
+     * SHIP08S — 779 rows × 2387 columns, 9501 non-zeros.<br>
+     * Optimal value: 1.9200982105E+06.<br>
      */
     @Test
     public void testSHIP08S() {
-        CuteNetlibCase.doTest("SHIP04L.SIF", "1793324.5379703548", null, ACCURACY);
+        CuteNetlibCase.doTest("SHIP08S.SIF", "1920098.210516164", null, ACCURACY);
     }
 
     /**
-     * SHIP12L is a large-scale linear programming problem with 1152 rows and 5427 columns that represents a
-     * specific type of optimization problem with particular numerical characteristics. This problem is
-     * particularly interesting because it tests the solver's ability to handle problems with specific
-     * constraint structures and objective function characteristics that may arise in real-world applications.
-     * The problem structure includes various constraint types and coefficient patterns that can expose
-     * weaknesses in numerical algorithms and computational efficiency. SHIP12L serves as a benchmark for
-     * testing linear programming solvers on problems with specific numerical characteristics and constraint
-     * relationships.
+     * SHIP12L — 1152 rows × 5427 columns, 21597 non-zeros.<br>
+     * Optimal value: 1.4701879193E+06.<br>
      */
     @Test
     public void testSHIP12L() {
-        CuteNetlibCase.doTest("SHIP04L.SIF", "1793324.5379703548", null, ACCURACY);
+        CuteNetlibCase.doTest("SHIP12L.SIF", "1470187.919328858", null, ACCURACY);
     }
 
     /**
-     * SHIP12S is a large-scale linear programming problem with 1152 rows and 2763 columns that represents a
-     * specific type of optimization problem with particular numerical characteristics. This problem is
-     * particularly interesting because it tests the solver's ability to handle problems with specific
-     * constraint structures and objective function characteristics that may arise in real-world applications.
-     * The problem structure includes various constraint types and coefficient patterns that can expose
-     * weaknesses in numerical algorithms and computational efficiency. SHIP12S serves as a benchmark for
-     * testing linear programming solvers on problems with specific numerical characteristics and constraint
-     * relationships.
+     * SHIP12S — 1152 rows × 2763 columns, 10941 non-zeros.<br>
+     * Optimal value: 1.4892361344E+06.<br>
      */
     @Test
     public void testSHIP12S() {
-        CuteNetlibCase.doTest("SHIP04L.SIF", "1793324.5379703548", null, ACCURACY);
+        CuteNetlibCase.doTest("SHIP12S.SIF", "1489236.134420166", null, ACCURACY);
     }
 
     /**
-     * SIERRA is a large-scale linear programming problem with 1228 rows and 2036 columns that represents a
-     * specific type of optimization problem with particular numerical characteristics. This problem is
-     * particularly interesting because it tests the solver's ability to handle problems with specific
-     * constraint structures and objective function characteristics that may arise in real-world applications.
-     * The problem structure includes various constraint types and coefficient patterns that can expose
-     * weaknesses in numerical algorithms and computational efficiency. SIERRA serves as a benchmark for
-     * testing linear programming solvers on problems with specific numerical characteristics and constraint
-     * relationships.
+     * SIERRA — 1228 rows × 2036 columns, 9252 non-zeros.<br>
+     * Has variable bounds (UP).<br>
+     * Optimal value: 1.5394362184E+07.<br>
      */
     @Test
     public void testSIERRA() {
@@ -1680,28 +1127,19 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * STAIR is a linear programming problem with 357 rows and 467 columns that represents a specific type of
-     * optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. STAIR serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * STAIR — 357 rows × 467 columns, 3857 non-zeros.<br>
+     * Has variable bounds (UP FX FR).<br>
+     * Optimal value: -2.5126695119E+02.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testSTAIR() {
         CuteNetlibCase.doTest("STAIR.SIF", "-251.26695119296787", "-208.79999", ACCURACY);
     }
 
     /**
-     * STANDATA is a linear programming problem with 360 rows and 1075 columns that represents a specific type
-     * of optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. STANDATA serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * STANDATA — 360 rows × 1075 columns, 3038 non-zeros.<br>
+     * Has variable bounds (UP FX).<br>
+     * Optimal value: 1.2576995000E+03.<br>
      */
     @Test
     public void testSTANDATA() {
@@ -1709,13 +1147,8 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * STANDGUB is a linear programming problem with 360 rows and 1075 columns that represents a specific type
-     * of optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. STANDGUB serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * STANDGUB — 362 rows × 1184 columns.<br>
+     * Optimal value depends on a generalised upper bound (GUB) reformulation; see netlib README NOTES.<br>
      */
     @Test
     public void testSTANDGUB() {
@@ -1723,13 +1156,9 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * STANDMPS is a linear programming problem with 468 rows and 1075 columns that represents a specific type
-     * of optimization problem with particular numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. STANDMPS serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * STANDMPS — 468 rows × 1075 columns, 3686 non-zeros.<br>
+     * Has variable bounds (UP FX).<br>
+     * Optimal value: 1.4060175000E+03.<br>
      */
     @Test
     public void testSTANDMPS() {
@@ -1737,28 +1166,17 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * STOCFOR1 is a linear programming problem with 118 rows and 111 columns that represents a stochastic
-     * programming problem with specific numerical characteristics. This problem is particularly interesting
-     * because it tests the solver's ability to handle problems with specific constraint structures and
-     * objective function characteristics that may arise in real-world applications. The problem structure
-     * includes various constraint types and coefficient patterns that can expose weaknesses in numerical
-     * algorithms and computational efficiency. STOCFOR1 serves as a benchmark for testing linear programming
-     * solvers on problems with specific numerical characteristics and constraint relationships.
+     * STOCFOR1 — 118 rows × 111 columns, 474 non-zeros.<br>
+     * Optimal value: -4.1131976219E+04.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testSTOCFOR1() {
         CuteNetlibCase.doTest("STOCFOR1.SIF", "-41131.97621943626", null, ACCURACY);
     }
 
     /**
-     * STOCFOR2 is a large-scale linear programming problem with 2158 rows and 2031 columns that represents a
-     * stochastic programming problem with specific numerical characteristics. This problem is particularly
-     * interesting because it tests the solver's ability to handle problems with specific constraint
-     * structures and objective function characteristics that may arise in real-world applications. The
-     * problem structure includes various constraint types and coefficient patterns that can expose weaknesses
-     * in numerical algorithms and computational efficiency. STOCFOR2 serves as a benchmark for testing linear
-     * programming solvers on problems with specific numerical characteristics and constraint relationships.
+     * STOCFOR2 — 2158 rows × 2031 columns, 9492 non-zeros.<br>
+     * Optimal value: -3.9024408538E+04.<br>
      */
     @Test
     public void testSTOCFOR2() {
@@ -1766,14 +1184,9 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * STOCFOR3 is a very large-scale linear programming problem with 16676 rows and 15695 columns that
-     * represents a stochastic programming problem with specific numerical characteristics. This problem is
-     * particularly interesting because it tests the solver's ability to handle problems with specific
-     * constraint structures and objective function characteristics that may arise in real-world applications.
-     * The problem structure includes various constraint types and coefficient patterns that can expose
-     * weaknesses in numerical algorithms and computational efficiency. STOCFOR3 serves as a benchmark for
-     * testing linear programming solvers on problems with specific numerical characteristics and constraint
-     * relationships.
+     * STOCFOR3 — 16676 rows × 15695 columns, 74004 non-zeros.<br>
+     * Optimal value: -3.9976661576E+04.<br>
+     * Non-zero count not reported in the netlib summary table.<br>
      */
     @Test
     @Tag("slow")
@@ -1783,14 +1196,9 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * TRUSS is a large-scale linear programming problem with 1001 rows and 8806 columns that represents a
-     * structural optimization problem for truss design. This problem is particularly interesting because it
-     * tests the solver's ability to handle problems with specific engineering applications and complex
-     * constraint structures related to structural analysis and design optimization. The problem includes
-     * various constraint types and variable bounds that test the solver's numerical precision and ability to
-     * handle problems with industry-specific characteristics. TRUSS serves as a benchmark for testing linear
-     * programming solvers on problems with realistic engineering applications and complex constraint
-     * relationships.
+     * TRUSS — 1001 rows × 8806 columns, 36642 non-zeros.<br>
+     * Optimal value: 4.5881584719E+05.<br>
+     * Non-zero count not reported in the netlib summary table.<br>
      */
     @Test
     @Tag("unstable")
@@ -1799,43 +1207,38 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * TUFF is a linear programming problem with 334 rows and 587 columns that is known for its challenging
-     * numerical characteristics. This problem is particularly interesting because it tests the solver's
-     * ability to handle problems with ill-conditioned basis matrices, dense matrix structures, and
-     * significant degeneracy. The problem can cause issues like cycling or excessive iterations in simplex
-     * algorithms, making it a benchmark for testing numerical stability and anti-cycling strategies. TUFF is
-     * also known to have multiple optimal solutions, testing the solver's ability to handle problems with
-     * non-unique solutions.
+     * TUFF — 334 rows × 587 columns, 4523 non-zeros.<br>
+     * Has variable bounds (UP LO FX FR).<br>
+     * Optimal value: 2.9214776509E-01.<br>
+     * RHS section is empty in the original SIF.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testTUFF() {
         CuteNetlibCase.doTest("TUFF.SIF", "0.292147765093613", "0.894990186757432", ACCURACY);
     }
 
     /**
-     * VTP-BASE is a linear programming problem with 199 rows and 203 columns that represents a base case for
-     * a specific optimization problem. This problem is particularly interesting because it tests the solver's
-     * ability to handle problems with balanced constraint and variable counts, creating a specific problem
-     * structure that can expose weaknesses in basis management and pivot selection algorithms. The problem
-     * structure includes various constraint types and coefficient patterns that can test the solver's
-     * efficiency in handling problems with specific numerical characteristics.
+     * VTP-BASE — 199 rows × 203 columns, 914 non-zeros.<br>
+     * Has variable bounds (UP LO FX FR).<br>
+     * Optimal value: 1.2983146246E+05.<br>
      */
     @Test
-    @Tag("bm1000")
     public void testVTP_BASE() {
         CuteNetlibCase.doTest("VTP-BASE.SIF", "129831.46246136136", null, ACCURACY);
     }
 
     /**
+     * WOOD1P — 245 rows × 2594 columns, 70216 non-zeros.<br>
+     * Optimal value: 1.4429024116E+00.<br>
      */
     @Test
-    @Tag("unstable")
     public void testWOOD1P() {
         CuteNetlibCase.doTest("WOOD1P.SIF", "1.44290241157344", "9.99999999999964", ACCURACY);
     }
 
     /**
+     * WOODW — 1099 rows × 8405 columns, 37478 non-zeros.<br>
+     * Optimal value: 1.3044763331E+00.<br>
      */
     @Test
     public void testWOODW() {

@@ -73,6 +73,15 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
         }
     }
 
+    /**
+     * Per-instance scratch for
+     * {@link #generateCut(Primitive1D, int, double, double, int[], boolean[], double[], double[])} when
+     * scaling is active. Holds {@code mySolutionShift} transformed to original-variable space
+     * ({@code shift_orig = shift_scaled * primal.values[j]} for model variables). Invalidated by
+     * {@link #invalidateCachedScaledShifts()}, which is called wherever {@code mySolutionShift} is mutated.
+     */
+    private transient double[] myCachedScaledShifts = null;
+    private transient boolean myCachedScaledShiftsValid = false;
     private transient Primitive2D myConstraintsBody = null;
     private transient Primitive1D myConstraintsRHS = null;
     private transient Primitive1D myObjective = null;
@@ -97,6 +106,14 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
     @Override
     public String toString() {
         return super.toString();
+    }
+
+    /**
+     * Invalidate the cached scaled-shifts array used by {@link #generateCut}. Must be called whenever
+     * {@link #mySolutionShift} is mutated.
+     */
+    private void invalidateCachedScaledShifts() {
+        myCachedScaledShiftsValid = false;
     }
 
     /**
@@ -130,6 +147,7 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
         this.shiftBounds(col, shift);
         mySolutionShift[col] += shift;
         myValueShift += this.getCost(col) * shift;
+        this.invalidateCachedScaledShifts();
     }
 
     @Override
@@ -243,7 +261,30 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
     @Override
     Equation generateCut(final Primitive1D body, final int index, final double rhs, final double fractionality, final int[] excluded, final boolean[] integers,
             final double[] lowers, final double[] uppers) {
-        return TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integers, lowers, uppers, mySolutionShift);
+        // SimplexStore.generateCutCandidates passes body/rhs/bounds already converted to original (unscaled)
+        // space when scaling is active. mySolutionShift is in scaled-internal space, so it must be unscaled
+        // to match. For a model variable j: shift_orig = shift_scaled * primal.values[j]. The transformed
+        // array is cached in myCachedScaledShifts and invalidated whenever mySolutionShift is mutated.
+        double[] shifts = mySolutionShift;
+        if (equilibrator != null) {
+            if (!myCachedScaledShiftsValid) {
+                if (myCachedScaledShifts == null || myCachedScaledShifts.length != mySolutionShift.length) {
+                    myCachedScaledShifts = new double[mySolutionShift.length];
+                }
+                double[] primalScale = equilibrator.primal.values;
+                int nbModelVars = primalScale.length;
+                int limModel = Math.min(myCachedScaledShifts.length, nbModelVars);
+                for (int j = 0; j < limModel; j++) {
+                    myCachedScaledShifts[j] = mySolutionShift[j] * primalScale[j];
+                }
+                if (limModel < myCachedScaledShifts.length) {
+                    System.arraycopy(mySolutionShift, limModel, myCachedScaledShifts, limModel, myCachedScaledShifts.length - limModel);
+                }
+                myCachedScaledShiftsValid = true;
+            }
+            shifts = myCachedScaledShifts;
+        }
+        return TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integers, lowers, uppers, shifts);
     }
 
     /**
@@ -591,8 +632,14 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
 
     @Override
     boolean updateRange(final int index, final double lower, final double upper) {
+        // Incoming bounds are in original (unscaled) variable space. Convert to the internal scaled+shifted
+        // space before storing so that branch-and-bound updates remain consistent across solves.
+        double scale = ONE;
+        if (equilibrator != null && index < structure.countModelVariables()) {
+            scale = equilibrator.primal.inverse[index];
+        }
         double shift = mySolutionShift[index];
-        this.setBounds(index, lower - shift, upper - shift);
+        this.setBounds(index, lower * scale - shift, upper * scale - shift);
         return true;
     }
 

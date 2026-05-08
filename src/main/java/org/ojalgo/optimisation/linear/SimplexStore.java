@@ -34,6 +34,7 @@ import java.util.function.Function;
 
 import org.ojalgo.equation.Equation;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.optimisation.Equilibrator;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Options;
 import org.ojalgo.optimisation.integer.IntegerSolver;
@@ -118,17 +119,40 @@ abstract class SimplexStore {
         };
     }
 
+    private transient boolean myCachedOriginalBoundsValid = false;
+    /**
+     * Per-instance scratch for {@link #generateCutCandidates(boolean[], NumberContext, double)} when scaling
+     * is active: model-variable bounds transformed back to original space (slack bounds copied through
+     * unchanged). Invalidated by {@link #invalidateCachedOriginalBounds()} whenever the bounds change.
+     */
+    private transient double[] myCachedOriginalLowerBounds = null;
+    private transient double[] myCachedOriginalUpperBounds = null;
+    /**
+     * Reverse map of {@link #excluded}: for column index {@code k}, holds the position in {@code excluded[]}
+     * where {@code k} appears, or {@code -1} if {@code k} is currently in the basis. Used by
+     * {@link RevisedStore#sliceBodyRow(int)} to provide O(1) {@code doubleValue(k)} on the returned view
+     * without materialising a full-size {@link Primitive1D}. Built lazily by
+     * {@link #getExcludedReverseMap()}; invalidated by {@link #invalidateExcludedReverseMap()} after every
+     * pivot ({@link #update}, {@link #updateBasis}, {@link #resetBasis}).
+     */
+    private transient int[] myExcludedReverseMap = null;
+    private transient boolean myExcludedReverseMapValid = false;
     private final double[] myLowerBounds;
     private final EnumPartition<SimplexStore.ColumnState> myPartition;
     private int myRemainingArtificials;
     private final List<String> myToStringList = new ArrayList<>();
     private final double[] myUpperBounds;
-
     /**
      * Either the primal or dual devex edge weights, depending on the algorithm used. Sized so that it can
      * hold either.
      */
     final double[] edgeWeights;
+    /**
+     * Optional Ruiz-style scaling installed by the concrete store in {@link #doneBuilding()}. When non-null,
+     * the LP data has been scaled and {@link #unscaleSolution(double[])} / {@link #unscaleDuals(double[])}
+     * map back to the original space.
+     */
+    Equilibrator<?> equilibrator = null;
     /**
      * excluded == not in the basis
      */
@@ -186,14 +210,90 @@ abstract class SimplexStore {
         return this;
     }
 
+    /**
+     * Invalidate the cached original-space bounds used by
+     * {@link #generateCutCandidates(boolean[], NumberContext, double)} when scaling is active. Called
+     * whenever {@link #myLowerBounds} or {@link #myUpperBounds} are mutated.
+     */
+    private void invalidateCachedOriginalBounds() {
+        myCachedOriginalBoundsValid = false;
+    }
+
+    /**
+     * Invalidate {@link #myExcludedReverseMap}. Called from every code path that mutates {@link #excluded}.
+     */
+    private void invalidateExcludedReverseMap() {
+        myExcludedReverseMapValid = false;
+    }
+
     private <S extends SimplexSolver> S newSolver(final BiFunction<Optimisation.Options, SimplexStore, S> constructor, final Optimisation.Options options,
             final int... basis) {
-        this.doneBuilding();
+        this.doneBuilding(options.linear());
         S solver = constructor.apply(options, this);
         if (basis.length > 0) {
             solver.basis(basis);
         }
         return solver;
+    }
+
+    /**
+     * Translate a tableau body row from scaled space to original-space coefficients. For row i with basic
+     * variable j_basic (caller must ensure j_basic is a model variable):
+     *
+     * <pre>
+     * row_orig[k] = primal.values[j_basic] / C_p[k] * row_scaled[k]
+     * </pre>
+     *
+     * where {@code C_p[k] = primal.values[k]} for model columns and {@code C_p[k] = 1 / dual.values[h]} for a
+     * slack/artificial at home row {@code h = k - nbModelVars}. No-op when no scaling has been installed.
+     */
+    private Primitive1D unscaleBodyRow(final Primitive1D scaledRow, final int basicVar) {
+        if (equilibrator == null) {
+            return scaledRow;
+        }
+        final double[] primalScale = equilibrator.primal.values;
+        final double[] dualScale = equilibrator.dual.values;
+        final int nbModelVars = primalScale.length;
+        // C_p[basicVar]: model column → primal.values; slack/artificial → 1 / dual.values[home]
+        final double cBasic;
+        if (basicVar < nbModelVars) {
+            cBasic = primalScale[basicVar];
+        } else {
+            int homeRow = basicVar - nbModelVars;
+            cBasic = homeRow < dualScale.length ? ONE / dualScale[homeRow] : ONE;
+        }
+        // The cut generator reads each entry once via doubleValue(k); a view that computes the unscaled
+        // value on demand avoids a per-cut-row Primitive1D allocation and full-row copy.
+        final int len = scaledRow.size();
+        return new Primitive1D() {
+
+            @Override
+            public double doubleValue(final int k) {
+                double v = scaledRow.doubleValue(k);
+                if (v == ZERO) {
+                    return ZERO;
+                }
+                if (k < nbModelVars) {
+                    return v * cBasic / primalScale[k];
+                }
+                int homeRow = k - nbModelVars;
+                if (homeRow < dualScale.length) {
+                    return v * cBasic * dualScale[homeRow];
+                }
+                // Out of dualScale range (e.g. artificial beyond the row count); cK = 1.
+                return v * cBasic;
+            }
+
+            @Override
+            public void set(final int k, final double value) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public int size() {
+                return len;
+            }
+        };
     }
 
     protected void pivot(final SimplexSolver.IterDescr iteration) {
@@ -215,6 +315,7 @@ abstract class SimplexStore {
     protected void setBounds(final int index, final double lower, final double upper) {
         myLowerBounds[index] = lower;
         myUpperBounds[index] = upper;
+        this.invalidateCachedOriginalBounds();
     }
 
     /**
@@ -223,6 +324,7 @@ abstract class SimplexStore {
     protected void shiftBounds(final int col, final double shift) {
         myLowerBounds[col] -= shift;
         myUpperBounds[col] -= shift;
+        this.invalidateCachedOriginalBounds();
     }
 
     abstract void calculateDualDirection(ExitInfo exit);
@@ -259,8 +361,17 @@ abstract class SimplexStore {
      * solver operations (basis reset, shift, iteration). Subclasses may override to freeze mutable build-time
      * data structures into efficient solve-time representations.
      */
-    void doneBuilding() {
-        // no-op by default
+    void doneBuilding(final LinearSolver.Configuration configuration) {
+
+        int nbPrims = structure.countModelVariables();
+        int nbDuals = m;
+        int nbIters = configuration.getEquilibrationIterations();
+
+        if (nbIters <= 0 || nbPrims <= 0 || nbDuals <= 0) {
+            equilibrator = null;
+        } else {
+            equilibrator = this.newEquilibrator(nbIters, nbPrims, nbDuals);
+        }
     }
 
     /**
@@ -312,16 +423,77 @@ abstract class SimplexStore {
             BasicLogger.debug("generateCutCandidates: integer.length != structure.countVariables()");
         }
 
+        // When scaling is active, transform the scaled tableau quantities back to original-space coefficients
+        // before passing to the cut generator. Cuts produced this way are in original-space and can be added
+        // directly to the model. The transformation factors per column k:
+        //   model var (k < nbModelVars):     C_p[k] = primal.values[k]
+        //   slack/artificial (home h = k - nbModelVars): C_p[k] = 1 / dual.values[h]
+        // For the basic variable j at row i (must be a model variable for an integer cut),
+        //   rhs_orig    = primal.values[j] * rhs_scaled
+        //   row_orig[k] = primal.values[j] / C_p[k] * row_scaled[k]
+        //   bound_orig[k] = bound_scaled[k] * C_p[k]   (only model-var bounds were scaled at build time;
+        //                                               slack bounds remain in original space already)
+        boolean scaled = equilibrator != null;
+        double[] primalScale = scaled ? equilibrator.primal.values : null;
+        double[] dualScale = scaled ? equilibrator.dual.values : null;
+        int nbModelVars = scaled ? primalScale.length : 0;
+
+        double[] origLowerBounds = myLowerBounds;
+        double[] origUpperBounds = myUpperBounds;
+        if (scaled) {
+            if (!myCachedOriginalBoundsValid) {
+                int len = myLowerBounds.length;
+                if (myCachedOriginalLowerBounds == null || myCachedOriginalLowerBounds.length != len) {
+                    myCachedOriginalLowerBounds = new double[len];
+                    myCachedOriginalUpperBounds = new double[len];
+                }
+                int limModel = Math.min(len, nbModelVars);
+                for (int k = 0; k < limModel; k++) {
+                    myCachedOriginalLowerBounds[k] = myLowerBounds[k] * primalScale[k];
+                    myCachedOriginalUpperBounds[k] = myUpperBounds[k] * primalScale[k];
+                }
+                if (limModel < len) {
+                    System.arraycopy(myLowerBounds, limModel, myCachedOriginalLowerBounds, limModel, len - limModel);
+                    System.arraycopy(myUpperBounds, limModel, myCachedOriginalUpperBounds, limModel, len - limModel);
+                }
+                myCachedOriginalBoundsValid = true;
+            }
+            origLowerBounds = myCachedOriginalLowerBounds;
+            origUpperBounds = myCachedOriginalUpperBounds;
+        }
+
         List<Equation> retVal = new ArrayList<>();
 
         for (int i = 0; i < m; i++) {
             int j = included[i];
 
+            if (j < 0 || j >= nbVars || !integer[j]) {
+                continue;
+            }
+
             double rhs = this.getCurrentRHS(i);
+            if (scaled) {
+                // Basic variable can be a model variable (j < nbModelVars) or a slack/artificial whose
+                // constraint expression itself is flagged integer (then integer[j] is true and we still
+                // generate a cut from it). The unscaling factor C_p[j] differs by column type.
+                if (j < nbModelVars) {
+                    rhs *= primalScale[j];
+                } else {
+                    int homeRow = j - nbModelVars;
+                    if (homeRow < dualScale.length) {
+                        rhs /= dualScale[homeRow];
+                    }
+                }
+            }
 
-            if (j >= 0 && j < nbVars && integer[j] && !accuracy.isInteger(rhs)) {
+            if (!accuracy.isInteger(rhs)) {
 
-                Equation maybe = this.generateCut(this.sliceBodyRow(i), j, rhs, fractionality, excluded, integer, myLowerBounds, myUpperBounds);
+                Primitive1D body = this.sliceBodyRow(i);
+                if (scaled) {
+                    body = this.unscaleBodyRow(body, j);
+                }
+
+                Equation maybe = this.generateCut(body, j, rhs, fractionality, excluded, integer, origLowerBounds, origUpperBounds);
 
                 if (maybe != null) {
                     retVal.add(maybe);
@@ -352,6 +524,24 @@ abstract class SimplexStore {
      * The current (tableau) constraint RHS.
      */
     abstract double getCurrentRHS(int i);
+
+    /**
+     * Lazy accessor for {@link #myExcludedReverseMap}. Builds the reverse map on first call and after each
+     * invalidation. Subsequent calls within the same B&B node (no pivots) return the cached map.
+     */
+    final int[] getExcludedReverseMap() {
+        if (!myExcludedReverseMapValid) {
+            if (myExcludedReverseMap == null || myExcludedReverseMap.length != n) {
+                myExcludedReverseMap = new int[n];
+            }
+            Arrays.fill(myExcludedReverseMap, -1);
+            for (int je = 0; je < excluded.length; je++) {
+                myExcludedReverseMap[excluded[je]] = je;
+            }
+            myExcludedReverseMapValid = true;
+        }
+        return myExcludedReverseMap;
+    }
 
     abstract double getInfeasibility(int i);
 
@@ -465,6 +655,8 @@ abstract class SimplexStore {
 
     }
 
+    abstract Equilibrator<?> newEquilibrator(int nbIterations, int nbPrimals, int nbDuals);
+
     final PhasedSimplexSolver newPhasedSimplexSolver(final Optimisation.Options options, final int... basis) {
         return this.newSolver(PhasedSimplexSolver::new, options, basis);
 
@@ -505,10 +697,22 @@ abstract class SimplexStore {
         }
 
         myPartition.extract(ColumnState.BASIS, true, excluded);
+        this.invalidateExcludedReverseMap();
     }
 
     void resetEdgeWeights() {
         Arrays.fill(edgeWeights, ONE);
+    }
+
+    final void scaleBounds(final double[] scalars) {
+
+        for (int j = 0, limit = scalars.length; j < limit; j++) {
+            double inv = scalars[j];
+            if (inv != ONE) {
+                myLowerBounds[j] *= inv;
+                myUpperBounds[j] *= inv;
+            }
+        }
     }
 
     /**
@@ -534,6 +738,76 @@ abstract class SimplexStore {
         return this;
     }
 
+    /**
+     * Unscale dual multipliers from the scaled problem back to the original constraint space. No-op when no
+     * scaling has been installed (i.e. {@link #equilibrator} is {@code null}).
+     */
+    final void unscaleDuals(final double[] duals) {
+        if (equilibrator != null) {
+            double[] dualScale = equilibrator.dual.values;
+            int lim = Math.min(duals.length, dualScale.length);
+            for (int i = 0; i < lim; i++) {
+                duals[i] *= dualScale[i];
+            }
+            if (equilibrator.cost != ONE) {
+                double inv = ONE / equilibrator.cost;
+                for (int i = 0; i < duals.length; i++) {
+                    duals[i] *= inv;
+                }
+            }
+        }
+    }
+
+    /**
+     * Unscale reduced costs (objective gradients) from the scaled problem back to the original cost space.
+     * For a model variable: {@code RC_orig[j] = RC_scaled[j] / (primal.values[j] * cost)}. For a slack at its
+     * home row {@code i}: {@code RC_orig[slack_i] = RC_scaled[slack_i] * dual.values[i] / cost}. No-op when
+     * no scaling has been installed.
+     */
+    final void unscaleReducedCosts(final double[] gradients) {
+        if (equilibrator != null) {
+            double[] primalScale = equilibrator.primal.values;
+            double[] dualScale = equilibrator.dual.values;
+            double cost = equilibrator.cost;
+            int nbModelVars = primalScale.length;
+            int limModel = Math.min(gradients.length, nbModelVars);
+            for (int j = 0; j < limModel; j++) {
+                gradients[j] /= primalScale[j] * cost;
+            }
+            int limSlack = Math.min(gradients.length, nbModelVars + dualScale.length);
+            for (int j = nbModelVars; j < limSlack; j++) {
+                int homeRow = j - nbModelVars;
+                gradients[j] *= dualScale[homeRow] / cost;
+            }
+        }
+    }
+
+    /**
+     * Unscale the primal solution from the scaled problem back to the original variable space. Model
+     * variables are multiplied by the column scaling factor; slack and artificial values are divided by the
+     * row scaling factor of the constraint they belong to (their "home row" — where their ±1 coefficient
+     * lives in the original tableau).
+     */
+    final void unscaleSolution(final double[] solution) {
+        if (equilibrator != null) {
+            double[] primalScale = equilibrator.primal.values;
+            double[] dualScale = equilibrator.dual.values;
+            int nbModelVars = primalScale.length;
+            int limModel = Math.min(solution.length, nbModelVars);
+            for (int j = 0; j < limModel; j++) {
+                solution[j] *= primalScale[j];
+            }
+            // Slack/artificial variables: home-row dual scaling. For the SimplexSolver/DenseTableau path
+            // (nbSlck == 0) the column at nbModelVars+i is the slack/artificial for row i. The scaled
+            // value satisfies s_scaled = d_i * s_orig, so divide by d_i to recover the original.
+            int limSlack = Math.min(solution.length, nbModelVars + dualScale.length);
+            for (int j = nbModelVars; j < limSlack; j++) {
+                int homeRow = j - nbModelVars;
+                solution[j] /= dualScale[homeRow];
+            }
+        }
+    }
+
     final void update(final int exit, final int exclEnter) {
 
         int inclExit = included[exit];
@@ -550,6 +824,7 @@ abstract class SimplexStore {
 
         included[exit] = exclEnter;
         myPartition.extract(ColumnState.BASIS, true, excluded);
+        this.invalidateExcludedReverseMap();
     }
 
     final void updateBasis(final int exit, final ColumnState exitToBound, final int enter) {
@@ -569,6 +844,7 @@ abstract class SimplexStore {
 
         included[exit] = exclEnter;
         excluded[enter] = inclExit;
+        this.invalidateExcludedReverseMap();
     }
 
     /**

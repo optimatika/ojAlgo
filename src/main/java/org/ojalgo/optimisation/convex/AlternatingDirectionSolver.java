@@ -53,6 +53,7 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ExpressionsBasedModel.EntityMap;
 import org.ojalgo.optimisation.ModelEntity;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.Equilibrator;
 import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.scalar.Quadruple;
@@ -693,7 +694,7 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
         }
     }
 
-    private static final double SCALED_INFINITY = Configuration.INFINITY * RuizScaling.MIN;
+    private static final double SCALED_INFINITY = Configuration.INFINITY * Equilibrator.MIN;
 
     static final Integration INTEGRATION = new Integration();
 
@@ -1336,7 +1337,7 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
             byte newType = oldType;
 
             if (recomputeConstraintTypes) {
-                if ((myData.l[i] < -Configuration.INFINITY * RuizScaling.MIN) && (myData.u[i] > SCALED_INFINITY)) {
+                if ((myData.l[i] < -Configuration.INFINITY * Equilibrator.MIN) && (myData.u[i] > SCALED_INFINITY)) {
                     newType = -1;
                 } else if (myData.u[i] - myData.l[i] < Configuration.RHO_TOL) {
                     newType = 1;

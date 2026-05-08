@@ -403,6 +403,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             LinearStructure structure = new LinearStructure(false, nbInes, nbEqus, nbVars, 0, nbOtherSlackVars, nbIdentSlackVars);
 
             SimplexTableau tableau = tableauFactory.apply(structure);
+
             Primitive2D constraintsBody = tableau.constraintsBody();
             Primitive1D constraintsRHS = tableau.constraintsRHS();
             Primitive1D objective = tableau.objective();
@@ -473,12 +474,24 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
         private Boolean myDualOrPrimal = null;
 
+        private int myEquilibrationIterations = 0;
+
         /**
          * Force use of the newer (mainly) dual simplex implementation. If you don't specify which to use,
          * there is internal logic that switches implementation based on problem size.
          */
         public Configuration dual() {
             myDualOrPrimal = Boolean.TRUE;
+            return this;
+        }
+
+        /**
+         * The number of Ruiz-style equilibration iterations to perform. The default is 0, as most test cases
+         * are NOT helped by this. But, in some cases it is beneficial, and then it can make a big difference.
+         * Don't turn this on without measuring if it really helps.
+         */
+        public Configuration equilibration(final int nbIterations) {
+            myEquilibrationIterations = nbIterations;
             return this;
         }
 
@@ -497,6 +510,10 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
          */
         Boolean getDualOrPrimal() {
             return myDualOrPrimal;
+        }
+
+        int getEquilibrationIterations() {
+            return myEquilibrationIterations;
         }
 
     }

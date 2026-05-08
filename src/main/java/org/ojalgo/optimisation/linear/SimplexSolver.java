@@ -1465,6 +1465,7 @@ abstract class SimplexSolver extends LinearSolver {
                 duals[i] = -duals[i];
             }
         }
+        mySimplex.unscaleDuals(duals);
         return duals;
     }
 
@@ -1472,6 +1473,7 @@ abstract class SimplexSolver extends LinearSolver {
     double[] extractReducedGradients() {
         double[] gradients = new double[mySimplex.n];
         mySimplex.extractReducedCosts(gradients);
+        mySimplex.unscaleReducedCosts(gradients);
         return gradients;
     }
 
@@ -1482,6 +1484,7 @@ abstract class SimplexSolver extends LinearSolver {
         State state = this.getState();
 
         double[] solution = this.extractSolution();
+        mySimplex.unscaleSolution(solution);
 
         Supplier<Access1D<?>> reducedGradient = () -> ArrayR064.wrap(this.extractReducedGradients());
 
