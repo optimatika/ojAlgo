@@ -23,6 +23,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - `UpdatableSolver` gained `getDualMultiplier(int)` and `getReducedGradient(int)` for querying dual variables and reduced gradients after a solve.
 - `Optimisation.Result` now carries an optional reduced gradient via `getReducedGradient()` / `withReducedGradient(Supplier)`.
 - `ExpressionsBasedModel.Simplifier`, `ExpressionAnalyser`, and `VariableAnalyser` are now `public`, enabling custom presolver-like hooks that plug into the standard presolve pipeline.
+- New `ExpressionsBasedModel.getVariableValuesValidated()` – the validated/state-resolving counterpart of `getVariableValues()` (see the corresponding behaviour change below).
+- New `Optimisation.Integration.prepareSolverCandidate(Result, Model)` – maps an optional kick-starter from model state to solver state, and may return `null`. Integrations whose solver ignores the kick-starter (e.g. the linear/simplex solver) return `null`, letting callers skip candidate extraction and conversion entirely.
 
 #### org.ojalgo.matrix
 
@@ -65,6 +67,9 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - `VariableAnalyser.simplify()` return type changed from `boolean` to `void`.
 - The presolve pipeline in `ExpressionsBasedModel` now dispatches through the unified `Simplifier` hierarchy, making the scan/simplify phase extensible.
 - Simplex solver pivot selection now uses Harris ratio test in both passes for more numerically stable entry and exit pivots. Tuned thresholds for dense versus sparse tableau selection based on problem dimensions to optimise performance.
+- `ExpressionsBasedModel.getVariableValues()` is now a cheap value extraction only — it no longer validates the solution or evaluates the objective, and returns `State.UNEXPLORED`. Code that relied on the previous validated state/objective behaviour must call the new `getVariableValuesValidated()` instead. (The `getVariableValues(NumberContext)` overload is unchanged.)
+- `IntermediateSolver.solve(...)` now has a cold/warm split: only the first solve (or one after `reset()`) runs presolve and the degenerate-model pre-checks; warm re-solves after bound-only `update(...)` calls skip those scans and, for solvers that ignore the kick-starter (LP/simplex), skip candidate extraction and `toSolverState` conversion as well. Substantially reduces per-solve overhead for `IntegerSolver` and other solvers that iteratively modify a model.
+- The `LinearSolver` model integration maps the solver reduced gradient back to model space, reconstructing reduced costs for variables eliminated by presolve so they are available in the returned `Optimisation.Result`.
 
 #### org.ojalgo.matrix
 
@@ -102,6 +107,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.matrix
 
 - Fixed potential infinite loop in `DenseSingularValue` decomposition for certain matrices (GitHub [#661](https://github.com/optimatika/ojAlgo/issues/661)). The problem was with the Householder transformations and related to the `Scalar.normalised()`/`Scalar.signum()` changes.
+
+#### org.ojalgo.optimisation
+
+- Branch-and-bound performance: the `NodeKey` variable sign-change condition was over-broad and fired on routine branching (e.g. every binary `[0,1]→[0,0]` branch), forcing a spurious full solver rebuild at each node instead of a cheap in-place bound update — badly degrading MIP solve times. It now triggers only on an actual column-negation sign change.
+- Quadratic models are no longer subjected to in-place bound updates during branch-and-bound (which could yield wrong results); `NodeSolver` forces a solver reset for any model with a quadratic expression.
+- Simplex warm-start: after bound-only changes from an optimal basis the solver restarts from the retained basis via dual iterations instead of re-solving cold.
 
 ### Deprecated
 

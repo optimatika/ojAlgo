@@ -676,7 +676,13 @@ abstract class SimplexStore {
      */
     abstract <T extends Mutate1D & Access1D<Double>> T phase1();
 
-    abstract void prepareToIterate();
+    /**
+     * Prepare the store for an iteration sequence. {@code warm == false} (cold solve) does the full prepare
+     * — recompute duals &amp; reduced costs and refresh the basic solution. {@code warm == true} (retained
+     * optimal basis after a bound-only change) does the lean prepare — duals/reduced costs are unchanged so
+     * they are kept; only the basic solution is refreshed.
+     */
+    abstract void prepareToIterate(boolean cold);
 
     abstract void removePhase1();
 

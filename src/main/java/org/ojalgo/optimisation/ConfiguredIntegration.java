@@ -38,6 +38,7 @@ final class ConfiguredIntegration<S extends Optimisation.Solver> extends Express
         myOptionsModifier = optionsModifier;
     }
 
+    @Override
     public S build(final ExpressionsBasedModel model) {
         if (myOptionsModifier != null) {
             myOptionsModifier.accept(model.options);
@@ -45,6 +46,7 @@ final class ConfiguredIntegration<S extends Optimisation.Solver> extends Express
         return myDelegate.build(model);
     }
 
+    @Override
     public boolean isCapable(final ExpressionsBasedModel model) {
         return (myCapabilityPredicate == null || myCapabilityPredicate.test(model)) && myDelegate.isCapable(model);
     }
@@ -57,6 +59,11 @@ final class ConfiguredIntegration<S extends Optimisation.Solver> extends Express
     @Override
     public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
         return myDelegate.toSolverState(modelState, model);
+    }
+
+    @Override
+    protected Sense getSolverSense() {
+        return myDelegate.getSolverSense();
     }
 
 }

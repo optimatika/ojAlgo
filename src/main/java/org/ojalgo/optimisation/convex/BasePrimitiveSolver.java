@@ -107,6 +107,11 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
             return ExpressionsBasedModel.Integration.reduceFullToFree(modelState, model, ArrayR064.FACTORY);
         }
 
+        @Override
+        protected Optimisation.Sense getSolverSense() {
+            return Optimisation.Sense.MIN;
+        }
+
     }
 
     private static final String Q_NOT_POSITIVE_SEMIDEFINITE = "Q not positive semidefinite!";
@@ -260,7 +265,6 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
 
         Access1D<?> solution = this.extractSolution();
         double value = this.evaluateFunction(solution);
-        Optimisation.State state = this.getState();
 
         Supplier<Access1D<?>> reducedGradient = () -> ArrayR064.wrap(this.computeReducedGradient());
 
@@ -395,13 +399,13 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
     protected boolean initialise(final Result kickStarter) {
 
         PhysicalStore<Double> matrixQ = this.getMatrixQ();
-        this.setState(State.VALID);
+        state = State.VALID;
 
         boolean symmetric = true;
         if (options.validate && !matrixQ.isHermitian()) {
 
             symmetric = false;
-            this.setState(State.INVALID);
+            state = State.INVALID;
 
             if (!this.isLogDebug()) {
                 throw new IllegalArgumentException(Q_NOT_SYMMETRIC);
@@ -436,7 +440,7 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
                 if (eigval.doubleValue() < ZERO && !eigval.isSmall(TEN) || !eigval.isReal()) {
 
                     semidefinite = false;
-                    this.setState(State.INVALID);
+                    state = State.INVALID;
 
                     if (!this.isLogDebug()) {
                         throw new IllegalArgumentException(Q_NOT_POSITIVE_SEMIDEFINITE);

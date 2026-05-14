@@ -43,12 +43,12 @@ final class DualSimplexSolver extends SimplexSolver {
     @Override
     public Result solve(final Result kickStarter) {
 
-        IterDescr iteration = this.prepareToIterate();
+        IterDescr iteration = this.prepareToIterate(!warm);
 
-        this.doDualIterations(iteration);
+        this.doDualIterations(iteration, true);
 
-        if (this.getState().isFeasible() && this.isDualFeasible()) {
-            this.setState(Optimisation.State.OPTIMAL);
+        if (state.isFeasible() && this.isDualFeasible()) {
+            state = Optimisation.State.OPTIMAL;
         }
 
         return this.extractResult();

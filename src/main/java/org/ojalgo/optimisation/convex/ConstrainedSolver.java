@@ -88,7 +88,7 @@ abstract class ConstrainedSolver extends BasePrimitiveSolver {
                 this.computeGeneral(iterationA.countRows() < iterationA.countColumns() ? iterationA.transpose() : iterationA);
                 if (this.getRankGeneral() != iterationA.countRows()) {
 
-                    this.setState(State.INVALID);
+                    state = State.INVALID;
 
                     if (!this.isLogDebug()) {
                         throw new IllegalArgumentException("A not full (row) rank!");

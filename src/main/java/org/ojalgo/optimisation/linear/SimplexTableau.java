@@ -419,8 +419,9 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
     }
 
     @Override
-    void prepareToIterate() {
-        // no-op: the tableau is always up to date
+    final void prepareToIterate(final boolean cold) {
+        // no-op: the tableau is always up to date (kept in-place on every pivot), so neither the cold
+        // nor the warm prepare needs to do anything here.
     }
 
     @Override
@@ -639,7 +640,15 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
             scale = equilibrator.primal.inverse[index];
         }
         double shift = mySolutionShift[index];
-        this.setBounds(index, lower * scale - shift, upper * scale - shift);
+        double scaledShiftedLower = lower * scale - shift;
+        double scaledShiftedUpper = upper * scale - shift;
+        // No-op shortcut: callers that re-assert every variable's bound each propagation (e.g.
+        // choco's PropSimplex) make most updateRange calls identity. Skip the cache invalidation
+        // and the downstream re-solve setup when nothing actually changed.
+        if (scaledShiftedLower == this.getLowerBound(index) && scaledShiftedUpper == this.getUpperBound(index)) {
+            return false;
+        }
+        this.setBounds(index, scaledShiftedLower, scaledShiftedUpper);
         return true;
     }
 

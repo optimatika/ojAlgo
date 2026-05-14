@@ -25,6 +25,7 @@ import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.ServiceClient;
 import org.ojalgo.netio.ServiceClient.Response;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.Optimisation;
 
 public final class ServiceIntegration extends ExpressionsBasedModel.Integration<ServiceSolver> {
 
@@ -60,6 +61,11 @@ public final class ServiceIntegration extends ExpressionsBasedModel.Integration<
         }
 
         return Boolean.TRUE.equals(myCapable);
+    }
+
+    @Override
+    protected Optimisation.Sense getSolverSense() {
+        return null;
     }
 
     public Boolean test() {

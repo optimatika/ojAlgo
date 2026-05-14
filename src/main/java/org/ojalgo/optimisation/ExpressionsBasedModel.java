@@ -305,12 +305,51 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      */
     public static abstract class Integration<S extends Optimisation.Solver> implements Optimisation.Integration<ExpressionsBasedModel, S> {
 
+        /**
+         * Reconstructs a model-level reduced cost from first principles: {@code rc_v = c_v - Σ a_iv · λ_i},
+         * using the variable's objective coefficient and the constraint multipliers reported on
+         * {@code solverState}. Useful for variables that the solver doesn't see (eliminated by presolve), and
+         * for solver paths whose internal index space prevents direct pass-through of the rc.
+         * <p>
+         * Returned value is in the same sense the multipliers are expressed in (i.e. typically MIN, the
+         * solver's internal sense). Callers should negate for MAX models if appropriate.
+         */
+        protected static double computeReducedCostFromMultipliers(final ExpressionsBasedModel model, final int variableIndex, final Result solverState) {
+
+            IntIndex key = new IntIndex(variableIndex);
+            double rc = model.objective().doubleValue(key, false);
+
+            for (EntryPair.KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>> kp : solverState.getMatchedMultipliers()) {
+                ModelEntity<?> entity = kp.getKey().getKey();
+                if (entity instanceof Expression) {
+                    Expression expression = (Expression) entity;
+                    if (expression.getLinearKeySet().contains(key)) {
+                        rc -= expression.doubleValue(key, false) * kp.doubleValue();
+                    }
+                }
+            }
+
+            return rc;
+        }
+
         protected static Result expandFreeToFull(final Result solverState, final ExpressionsBasedModel model, final DenseArray.Factory<?, ?> factory) {
-            return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, factory, Optional.empty());
+            return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, factory, Optional.empty(), Optimisation.Sense.MIN);
         }
 
         protected static Result expandFreeToFull(final Result solverState, final ExpressionsBasedModel model, final DenseArray.Factory<?, ?> factory,
                 final Optional<Supplier<Access1D<?>>> reducedGradient) {
+            return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, factory, reducedGradient, Optimisation.Sense.MIN);
+        }
+
+        /**
+         * @param solverSense the {@link Optimisation.Sense} the solver internally optimises in (usually fixed
+         *                    per solver — most simplex/QP solvers minimise). If this differs from the model's
+         *                    {@link ExpressionsBasedModel#getOptimisationSense() optimisation sense}, the
+         *                    reduced gradient values are negated when mapped back to the model so that
+         *                    callers always see them in the model's sense.
+         */
+        protected static Result expandFreeToFull(final Result solverState, final ExpressionsBasedModel model, final DenseArray.Factory<?, ?> factory,
+                final Optional<Supplier<Access1D<?>>> reducedGradient, final Optimisation.Sense solverSense) {
 
             List<Variable> freeVariables = model.getFreeVariables();
             Set<IntIndex> fixedVariables = model.getFixedVariables();
@@ -337,11 +376,21 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
             if (reducedGradient.isPresent()) {
 
+                Optimisation.Sense modelSense = model.getOptimisationSense();
+                boolean negate = solverSense != null && modelSense != null && solverSense != modelSense;
+
                 Supplier<Access1D<?>> gradientSupplier = () -> {
                     DenseArray<?> fullGradient = factory.make(nbModelVars);
                     Access1D<?> freeGradient = reducedGradient.get().get();
                     for (int i = 0; i < nbFreeVars; i++) {
-                        fullGradient.set(model.indexOf(freeVariables.get(i)), freeGradient.doubleValue(i));
+                        double v = freeGradient.doubleValue(i);
+                        fullGradient.set(model.indexOf(freeVariables.get(i)), negate ? -v : v);
+                    }
+                    // Variables eliminated by presolve aren't seen by the solver, so their reduced cost
+                    // must be reconstructed from first principles: rc_v = c_v - Σ a_iv · λ_i.
+                    for (IntIndex fixed : fixedVariables) {
+                        double rc = ExpressionsBasedModel.Integration.computeReducedCostFromMultipliers(model, fixed.index, solverState);
+                        fullGradient.set(fixed.index, negate ? -rc : rc);
                     }
                     return fullGradient;
                 };
@@ -380,9 +429,26 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             model.setIntegrationSwitch(property, value);
         }
 
+        /**
+         * @deprecated v57 Not needed. Use
+         *             {@link #prepareSolverCandidate(org.ojalgo.optimisation.Optimisation.Result, ExpressionsBasedModel)}
+         *             instead
+         */
+        @Deprecated
         @Override
         public final Result extractSolverState(final ExpressionsBasedModel model) {
             return this.toSolverState(model.getVariableValues(), model);
+        }
+
+        /**
+         * Preserves the historical kick-starter behaviour: when no candidate is supplied one is derived
+         * (cheaply) from the model, then converted to solver state. Solvers that ignore the kick-starter
+         * override this to always return {@code null}.
+         */
+        @Override
+        public Result prepareSolverCandidate(final Result candidateModelState, final ExpressionsBasedModel model) {
+            Result modelState = candidateModelState != null ? candidateModelState : model.getVariableValues();
+            return this.toSolverState(modelState, model);
         }
 
         /**
@@ -442,6 +508,22 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
          */
         protected int getIndexInSolver(final ExpressionsBasedModel model, final Variable variable) {
             return variable.getIndex().index;
+        }
+
+        /**
+         * Some solvers are hard-wired to solve either min or max problems. (Typically ojAlgo's built-in
+         * solvers are implemented that way.) If that's the case this method should indicate what the
+         * convention is. Returning null indicates there is no convention/hard-wire, and the solver will
+         * either min or max depending what's specified.
+         * <p>
+         * When the solver's sense is hard-wired some things, like the sign of the optimal value or the
+         * reduced costs, may have to be adjusted.
+         * <p>
+         * Since this was a late addition to this class a default implementation was needed, and null is
+         * commonly the correct return value for 3:d party solvers.
+         */
+        protected Optimisation.Sense getSolverSense() {
+            return null;
         }
 
     }
@@ -600,6 +682,11 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         }
 
         @Override
+        public Result prepareSolverCandidate(final Result candidateModelState, final ExpressionsBasedModel model) {
+            return myDelegate.prepareSolverCandidate(candidateModelState, model);
+        }
+
+        @Override
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
             return myDelegate.toModelState(solverState, model);
         }
@@ -607,6 +694,11 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         @Override
         public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
             return myDelegate.toSolverState(modelState, model);
+        }
+
+        @Override
+        protected Sense getSolverSense() {
+            return null;
         }
 
     }
@@ -1257,8 +1349,48 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         return Collections.unmodifiableList(myVariables);
     }
 
+    /**
+     * Cheaply extract the current variable values (null replaced by a sensible bound/derived value). Does NOT
+     * validate against the constraints and does NOT evaluate the objective — the returned state is always
+     * {@link State#UNEXPLORED} and the value {@code NaN}. Use {@link #getVariableValuesValidated()} (or
+     * {@link #getVariableValues(NumberContext)}) when the feasibility state / objective value matter.
+     */
     public Optimisation.Result getVariableValues() {
-        return this.getVariableValues(options.feasibility);
+
+        int nbVars = myVariables.size();
+
+        State retState = State.UNEXPLORED;
+        double retValue = Double.NaN;
+        final Array1D<BigDecimal> retSolution = Array1D.R256.make(nbVars);
+
+        boolean allVarsSomeInfo = true;
+
+        for (int i = 0; i < nbVars; i++) {
+            Variable variable = myVariables.get(i);
+
+            if (variable.getValue() != null) {
+                retSolution.set(i, variable.getValue());
+            } else if (variable.isEqualityConstraint()) {
+                retSolution.set(i, variable.getLowerLimit());
+            } else if (variable.isLowerLimitSet() && variable.isUpperLimitSet()) {
+                retSolution.set(i, BigMath.DIVIDE.invoke(variable.getLowerLimit().add(variable.getUpperLimit()), TWO));
+            } else if (variable.isLowerLimitSet()) {
+                retSolution.set(i, variable.getLowerLimit());
+            } else if (variable.isUpperLimitSet()) {
+                retSolution.set(i, variable.getUpperLimit());
+            } else {
+                retSolution.set(i, ZERO);
+                allVarsSomeInfo = false; // This variable no info
+            }
+        }
+
+        if (allVarsSomeInfo) {
+            retState = State.APPROXIMATE;
+        } else {
+            retState = State.UNEXPLORED;
+        }
+
+        return new Optimisation.Result(retState, retValue, retSolution);
     }
 
     /**
@@ -1268,47 +1400,28 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      */
     public Optimisation.Result getVariableValues(final NumberContext validationContext) {
 
-        final int numberOfVariables = myVariables.size();
+        Optimisation.Result result = this.getVariableValues();
+        boolean approximate = result.getState().isApproximate();
 
-        State retState = State.UNEXPLORED;
-        double retValue = Double.NaN;
-        final Array1D<BigDecimal> retSolution = Array1D.R256.make(numberOfVariables);
-
-        boolean allVarsSomeInfo = true;
-
-        for (int i = 0; i < numberOfVariables; i++) {
-            final Variable tmpVariable = myVariables.get(i);
-
-            if (tmpVariable.getValue() != null) {
-
-                retSolution.set(i, tmpVariable.getValue());
-
-            } else if (tmpVariable.isEqualityConstraint()) {
-                retSolution.set(i, tmpVariable.getLowerLimit());
-            } else if (tmpVariable.isLowerLimitSet() && tmpVariable.isUpperLimitSet()) {
-                retSolution.set(i, BigMath.DIVIDE.invoke(tmpVariable.getLowerLimit().add(tmpVariable.getUpperLimit()), TWO));
-            } else if (tmpVariable.isLowerLimitSet()) {
-                retSolution.set(i, tmpVariable.getLowerLimit());
-            } else if (tmpVariable.isUpperLimitSet()) {
-                retSolution.set(i, tmpVariable.getUpperLimit());
+        if (approximate) {
+            if (this.validate(result, validationContext, BasicLogger.NULL)) {
+                return result.withState(State.FEASIBLE).withValue(this.objective().evaluate(result).doubleValue());
             } else {
-                retSolution.set(i, ZERO);
-                allVarsSomeInfo = false; // This var no info
-            }
-        }
-
-        if (allVarsSomeInfo) {
-            if (this.validate(retSolution, validationContext, BasicLogger.NULL)) {
-                retState = State.FEASIBLE;
-                retValue = this.objective().evaluate(retSolution).doubleValue();
-            } else {
-                retState = State.APPROXIMATE;
+                return result.withState(State.APPROXIMATE);
             }
         } else {
-            retState = State.INFEASIBLE;
+            return result.withState(State.INFEASIBLE);
         }
+    }
 
-        return new Optimisation.Result(retState, retValue, retSolution);
+    /**
+     * The validated counterpart of {@link #getVariableValues()}: derives the values, then validates them
+     * against the constraints and evaluates the objective, returning the corresponding FEASIBLE / APPROXIMATE
+     * / INFEASIBLE state and objective value. This is the behaviour {@code getVariableValues()} had before it
+     * was split into a cheap extractor and this validated variant.
+     */
+    public Optimisation.Result getVariableValuesValidated() {
+        return this.getVariableValues(options.feasibility);
     }
 
     public int indexOf(final Variable variable) {

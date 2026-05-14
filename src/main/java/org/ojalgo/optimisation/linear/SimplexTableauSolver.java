@@ -872,7 +872,6 @@ final class SimplexTableauSolver extends LinearSolver {
 
         Access1D<?> solution = this.extractSolution();
         double value = this.evaluateFunction(solution);
-        Optimisation.State state = this.getState();
 
         Supplier<Access1D<?>> reducedGradient = () -> ArrayR064.wrap(this.extractReducedGradients());
 
@@ -974,7 +973,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
             myPoint.switchToPhase2();
             myTableau.removePhase1();
-            this.setState(Optimisation.State.FEASIBLE);
+            state = Optimisation.State.FEASIBLE;
         }
 
         myPoint.col = this.findNextPivotCol();
@@ -990,9 +989,9 @@ final class SimplexTableauSolver extends LinearSolver {
             } else {
 
                 if (myPoint.isPhase2()) {
-                    this.setState(State.UNBOUNDED);
+                    state = State.UNBOUNDED;
                 } else {
-                    this.setState(State.INFEASIBLE);
+                    state = State.INFEASIBLE;
                 }
 
                 retVal = false;
@@ -1001,9 +1000,9 @@ final class SimplexTableauSolver extends LinearSolver {
         } else {
 
             if (myPoint.isPhase1()) {
-                this.setState(State.INFEASIBLE);
+                state = State.INFEASIBLE;
             } else {
-                this.setState(State.OPTIMAL);
+                state = State.OPTIMAL;
             }
 
             retVal = false;
@@ -1023,7 +1022,7 @@ final class SimplexTableauSolver extends LinearSolver {
     protected boolean validate() {
 
         boolean retVal = true;
-        this.setState(State.VALID);
+        state = State.VALID;
 
         return retVal;
     }

@@ -75,7 +75,7 @@ final class IterativeRefinementSolver22 extends ConvexSolver {
         PhysicalStore<Quadruple> aggrX = GenericStore.R128.make(n, 1);
         PhysicalStore<Quadruple> aggrY = GenericStore.R128.make(m, 1);
 
-        this.setState(Optimisation.State.UNEXPLORED);
+        state = Optimisation.State.UNEXPLORED;
         double retValue = PrimitiveMath.ZERO;
         Optimisation.State iterState = Optimisation.State.UNEXPLORED;
 
@@ -184,7 +184,7 @@ final class IterativeRefinementSolver22 extends ConvexSolver {
                 didImprove = true;
                 retX.fillMatching(aggrX);
                 retY.fillMatching(aggrY);
-                this.setState(Optimisation.State.FEASIBLE);
+                state = Optimisation.State.FEASIBLE;
                 if (this.isLogDebug()) {
                     this.log("I.R. Solution: {}", retX.asList());
                 }
@@ -196,10 +196,10 @@ final class IterativeRefinementSolver22 extends ConvexSolver {
         } while (didImprove && iteration < 8 && this.isIterationAllowed());
 
         if (iterState.isOptimal()) {
-            this.setState(Optimisation.State.OPTIMAL);
+            state = Optimisation.State.OPTIMAL;
         }
 
-        return new Optimisation.Result(this.getState(), retValue, retX).multipliers(retY);
+        return new Optimisation.Result(state, retValue, retX).multipliers(retY);
     }
 
 }

@@ -308,7 +308,13 @@ public final class NodeKey implements Comparable<NodeKey> {
 
         int newVal = tmpUBs[branchIntegerIndex];
 
-        boolean changed = oldVal > 0 && newVal <= 0;
+        // A down-branch tightens only the upper bound. The solver treats a column as "negated" iff
+        // (ub <= 0 && lb < 0) — see SimplexStore.isNegated. With the lower bound unchanged here, that
+        // classification can flip only if the lower bound is itself negative; otherwise the upper bound
+        // crossing zero (e.g. the ubiquitous binary [0,1] -> [0,0] down-branch) is just a normal
+        // fix-to-zero the solver absorbs in place. Requiring lb < 0 avoids flagging a sign change — and
+        // thus forcing a full solver rebuild — on essentially every 0/1 down-branch.
+        boolean changed = oldVal > 0 && newVal <= 0 && tmpLBs[branchIntegerIndex] < 0;
 
         return new NodeKey(tmpLBs, tmpUBs, sequence, depth, branchIntegerIndex, value - floorValue, objVal, changed, false, myIntArrayPool);
     }
@@ -330,7 +336,10 @@ public final class NodeKey implements Comparable<NodeKey> {
 
         int newVal = tmpLBs[branchIntegerIndex];
 
-        boolean changed = oldVal < 0 && newVal >= 0;
+        // Mirror of createLowerBranch: an up-branch tightens only the lower bound, so the negated-class
+        // (ub <= 0 && lb < 0) can flip only if the upper bound is itself <= 0. Requiring ub <= 0 avoids
+        // forcing a rebuild on the common up-branch of a non-negative variable (e.g. [0,1] -> [1,1]).
+        boolean changed = oldVal < 0 && newVal >= 0 && tmpUBs[branchIntegerIndex] <= 0;
 
         return new NodeKey(tmpLBs, tmpUBs, sequence, depth, branchIntegerIndex, ceilValue - value, objVal, changed, true, myIntArrayPool);
     }
@@ -371,7 +380,11 @@ public final class NodeKey implements Comparable<NodeKey> {
             variable.setValue(value);
         }
 
-        if (this.isSignChanged()) {
+        // A genuine negated-class flip needs a full rebuild. So does every branch of a relaxation that
+        // can't absorb a bound change in place (quadratic / convex): those must rebuild fresh per node —
+        // the historical, numerically-stable behaviour the old over-broad sign-change condition gave
+        // them for free. Only the linear/simplex relaxation takes the in-place update path.
+        if (this.isSignChanged() || !nodeSolver.isInPlaceBoundUpdateSafe()) {
             nodeSolver.reset();
         } else {
             nodeSolver.update(variable);

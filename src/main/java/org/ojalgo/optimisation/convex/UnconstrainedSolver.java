@@ -75,9 +75,9 @@ final class UnconstrainedSolver extends BasePrimitiveSolver {
         }
 
         if (solved) {
-            this.setState(State.DISTINCT);
+            state = State.DISTINCT;
         } else {
-            this.setState(State.UNBOUNDED);
+            state = State.UNBOUNDED;
             this.getSolutionX().fillAll(ZERO);
         }
 

@@ -80,43 +80,58 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
     @Override
     public Optimisation.Result solve(final Optimisation.Result candidate) {
 
-        if (mySolver == null && myModel.getEnvironment().countPresolvers() > 0) {
-            myModel.presolve();
-        }
+        // Cold = first solve (or after reset()): the solver is (re)generated here. Only then do the
+        // O(model) presolve + degenerate-model pre-checks. On a warm re-solve (bound-only updates
+        // pushed via update()) the wrapped solver itself reports INFEASIBLE / UNBOUNDED, and
+        // toModelState carries that state back, so re-scanning the model every call is pure overhead.
+        boolean cold = mySolver == null;
 
-        if (myModel.isInfeasible()) {
+        if (cold) {
 
-            Optimisation.Result solution = candidate != null ? candidate : myModel.getVariableValues();
-
-            return new Optimisation.Result(State.INFEASIBLE, solution);
-        }
-
-        if (myModel.isUnbounded()) {
-
-            if (candidate != null && myModel.validate(candidate)) {
-                return new Optimisation.Result(State.UNBOUNDED, candidate);
+            if (myModel.getEnvironment().countPresolvers() > 0) {
+                myModel.presolve();
             }
 
-            Optimisation.Result derivedSolution = myModel.getVariableValues();
-            if (derivedSolution.getState().isFeasible()) {
-                return new Optimisation.Result(State.UNBOUNDED, derivedSolution);
+            if (myModel.isInfeasible()) {
+
+                Optimisation.Result solution = candidate != null ? candidate : myModel.getVariableValues();
+
+                return new Optimisation.Result(State.INFEASIBLE, solution);
+
+            } else if (myModel.isUnbounded()) {
+
+                if (candidate != null && myModel.validate(candidate)) {
+
+                    return new Optimisation.Result(State.UNBOUNDED, candidate);
+
+                } else {
+
+                    Optimisation.Result derivedSolution = myModel.getVariableValuesValidated();
+
+                    if (derivedSolution.getState().isFeasible()) {
+                        return new Optimisation.Result(State.UNBOUNDED, derivedSolution);
+                    }
+                }
+
+            } else if (myModel.isFixed()) {
+
+                Optimisation.Result derivedSolution = myModel.getVariableValuesValidated();
+
+                if (derivedSolution.getState().isFeasible()) {
+
+                    return new Optimisation.Result(State.DISTINCT, derivedSolution);
+
+                } else {
+
+                    return new Optimisation.Result(State.INVALID, derivedSolution);
+                }
             }
-
-        } else if (myModel.isFixed()) {
-
-            Optimisation.Result derivedSolution = myModel.getVariableValues();
-
-            if (derivedSolution.getState().isFeasible()) {
-                return new Optimisation.Result(State.DISTINCT, derivedSolution);
-            }
-            return new Optimisation.Result(State.INVALID, derivedSolution);
         }
 
         ExpressionsBasedModel.Integration<?> integration = this.getIntegration();
         Optimisation.Solver solver = this.getSolver();
 
-        Optimisation.Result retVal = candidate != null ? candidate : myModel.getVariableValues();
-        retVal = integration.toSolverState(retVal, myModel);
+        Optimisation.Result retVal = integration.prepareSolverCandidate(candidate, myModel);
         retVal = solver.solve(retVal);
         retVal = integration.toModelState(retVal, myModel);
 

@@ -46,13 +46,13 @@ final class PhasedSimplexSolver extends SimplexSolver {
     @Override
     public Result solve(final Result kickStarter) {
 
-        IterDescr iteration = this.prepareToIterate();
+        IterDescr iteration = this.prepareToIterate(!warm);
 
-        this.doDualIterations(iteration); // Phase-1
+        this.doDualIterations(iteration, !warm); // Phase-1
 
         this.switchToPhase2();
 
-        this.doPrimalIterations(iteration); // Phase-2
+        this.doPrimalIterations(iteration, !warm); // Phase-2 (warm retains primal devex weights)
 
         return this.extractResult();
     }

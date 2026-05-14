@@ -45,9 +45,10 @@ import org.ojalgo.optimisation.Variable;
 import org.ojalgo.random.SampleSet;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Primitive1D;
 import org.ojalgo.type.context.NumberContext;
 
-public class NextGenSysModTest {
+public class NextGenSysModTest extends OptimisationIntegerTests {
 
     public static final class Case010A extends CaseData {
 
@@ -1243,7 +1244,7 @@ public class NextGenSysModTest {
         TestUtils.assertTrue(model.validate(actual, accuracy, BasicLogger.ERROR));
 
         // Check that it is the expected solution
-        TestUtils.assertEquals(Access1D.wrap(expected), actual, accuracy);
+        TestUtils.assertEquals(Primitive1D.of(expected), actual, accuracy);
     }
 
     public static ExpressionsBasedModel buildModel(final CaseData data) {
@@ -1310,6 +1311,7 @@ public class NextGenSysModTest {
         ExpressionsBasedModel model = new ExpressionsBasedModel();
         // model.options.debug(ConvexSolver.class);
         model.options.solution = SOLUTION_ACCURACY;
+        // model.options.convex().algorithm(Algorithm.ADMM);
 
         double[] returnVctr = data.getReturnVctr();
         double[] marginVctr = data.getMarginVctr();

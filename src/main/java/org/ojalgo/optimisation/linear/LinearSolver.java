@@ -26,7 +26,9 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.ArrayR064;
@@ -551,6 +553,14 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return OLDER_PRIMAL_SOLVER.isCapable(model) || NEWER_DUAL_SOLVER.isCapable(model);
         }
 
+        /**
+         * The simplex solver ignores any kick-starter, so there is nothing to extract or convert.
+         */
+        @Override
+        public Result prepareSolverCandidate(final Result candidateModelState, final ExpressionsBasedModel model) {
+            return null;
+        }
+
         @Override
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
             if (ExpressionsBasedModel.Integration.isSwitch(model, ExpressionsBasedModel.IntegrationProperty.PRIMAL_OR_DUAL_LP)) {
@@ -578,6 +588,11 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             }
         }
 
+        @Override
+        protected Optimisation.Sense getSolverSense() {
+            return Optimisation.Sense.MIN;
+        }
+
     }
 
     /**
@@ -602,9 +617,18 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return !model.isAnyVariableInteger() && !model.isAnyExpressionQuadratic();
         }
 
+        /**
+         * The simplex solver ignores any kick-starter, so there is nothing to extract or convert.
+         */
+        @Override
+        public Result prepareSolverCandidate(final Result candidateModelState, final ExpressionsBasedModel model) {
+            return null;
+        }
+
         @Override
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
-            return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR064.FACTORY, solverState.getReducedGradient());
+            return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR064.FACTORY, solverState.getReducedGradient(),
+                    this.getSolverSense());
         }
 
         @Override
@@ -617,9 +641,55 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return ExpressionsBasedModel.Integration.getIndexOfFreeInSolver(model, variable);
         }
 
+        @Override
+        protected Optimisation.Sense getSolverSense() {
+            return Optimisation.Sense.MIN;
+        }
+
     }
 
     static final class OldIntegration extends ExpressionsBasedModel.Integration<SimplexTableauSolver> {
+
+        /**
+         * Maps a solver reduced-gradient (indexed by the simplex split-variable layout [positives | negatives
+         * | slacks/artificials]) back to a model-indexed reduced gradient. For variables present in both
+         * positives and negatives (x = x+ - x-), the model rc is taken as (rc<sub>positive</sub> -
+         * rc<sub>negative</sub>) — mirroring the value-mapping convention. Variables eliminated by presolve
+         * aren't present in the solver layout; their rc is reconstructed from the model's objective
+         * coefficient and the solver's constraint multipliers. If {@code negate} is true (MAX model — the
+         * solver minimises a negated objective), the result is negated so callers see rc in the model's
+         * optimisation sense.
+         */
+        private static double[] toModelReducedGradient(final Access1D<?> solverRg, final ExpressionsBasedModel model, final boolean negate,
+                final Result solverState) {
+
+            double[] modelRg = new double[model.countVariables()];
+
+            List<Variable> positives = model.getPositiveVariables();
+            int nbPos = positives.size();
+            for (int p = 0; p < nbPos; p++) {
+                int idx = model.indexOf(positives.get(p));
+                modelRg[idx] = solverRg.doubleValue(p);
+            }
+
+            List<Variable> negatives = model.getNegativeVariables();
+            for (int n = 0; n < negatives.size(); n++) {
+                int idx = model.indexOf(negatives.get(n));
+                modelRg[idx] -= solverRg.doubleValue(nbPos + n);
+            }
+
+            for (IntIndex fixed : model.getFixedVariables()) {
+                modelRg[fixed.index] = ExpressionsBasedModel.Integration.computeReducedCostFromMultipliers(model, fixed.index, solverState);
+            }
+
+            if (negate) {
+                for (int i = 0; i < modelRg.length; i++) {
+                    modelRg[i] = -modelRg[i];
+                }
+            }
+
+            return modelRg;
+        }
 
         private static ArrayR064 toModelVariableValues(final Access1D<?> solverVariableValues, final ExpressionsBasedModel model,
                 final ArrayR064 modelVariableValues) {
@@ -658,6 +728,14 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return !model.isAnyVariableInteger() && !model.isAnyExpressionQuadratic();
         }
 
+        /**
+         * The simplex solver ignores any kick-starter, so there is nothing to extract or convert.
+         */
+        @Override
+        public Result prepareSolverCandidate(final Result candidateModelState, final ExpressionsBasedModel model) {
+            return null;
+        }
+
         @Override
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
 
@@ -669,7 +747,24 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             OldIntegration.toModelVariableValues(solverState, model, modelSolution);
 
-            return solverState.withSolution(modelSolution);
+            Result retVal = solverState.withSolution(modelSolution);
+
+            // withSolution above drops the reduced gradient because solverState's solution is in the
+            // split (positive + negative + slack/artificial) layout, while modelSolution is indexed by
+            // model variable. Map and re-attach it explicitly.
+            Optional<Supplier<Access1D<?>>> solverRg = solverState.getReducedGradient();
+            if (solverRg.isPresent()) {
+
+                Optimisation.Sense solverSense = this.getSolverSense();
+                Optimisation.Sense modelSense = model.getOptimisationSense();
+                boolean negate = solverSense != null && modelSense != null && solverSense != modelSense;
+
+                Supplier<Access1D<?>> mapped = () -> ArrayR064.wrap(OldIntegration.toModelReducedGradient(solverRg.get().get(), model, negate, solverState));
+
+                retVal = retVal.withReducedGradient(mapped);
+            }
+
+            return retVal;
         }
 
         @Override
@@ -715,6 +810,11 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             }
 
             return -1;
+        }
+
+        @Override
+        protected Optimisation.Sense getSolverSense() {
+            return Optimisation.Sense.MIN;
         }
 
     }

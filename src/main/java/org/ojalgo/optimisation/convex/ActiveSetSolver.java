@@ -181,7 +181,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 this.log("Step too small!");
             }
 
-            this.setState(State.FEASIBLE);
+            state = State.FEASIBLE;
         }
 
         if (this.isLogDebug()) {
@@ -319,8 +319,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         myInvQC = this.getSolutionQ(this.getIterationC());
 
-        Optimisation.State state = this.getState();
-
         boolean usableKickStarter = kickStarter != null && kickStarter.getState().isApproximate();
 
         if (usableKickStarter) {
@@ -361,7 +359,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             this.log("Initial solution: {}", this.getSolutionX().copy().asList());
         }
 
-        this.setState(state);
         return ok && state.isFeasible();
     }
 
@@ -399,7 +396,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         if (this.isLogDebug()) {
             this.log("Stop!");
         }
-        this.setState(State.OPTIMAL);
+        state = State.OPTIMAL;
         return false;
     }
 
@@ -639,18 +636,18 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 // Should not be possible to end up here, infeasibility among
                 // the equality constraints should have been detected earlier.
 
-                this.setState(State.FAILED);
+                state = State.FAILED;
             }
 
         } else if (this.checkFeasibility()) {
             // Feasible current solution
 
-            this.setState(State.FEASIBLE);
+            state = State.FEASIBLE;
 
         } else {
             // Current solution somehow NOT feasible
 
-            this.setState(State.FAILED);
+            state = State.FAILED;
         }
 
     }

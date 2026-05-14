@@ -41,12 +41,12 @@ final class PrimalSimplexSolver extends SimplexSolver {
     @Override
     public Result solve(final Result kickStarter) {
 
-        IterDescr iteration = this.prepareToIterate();
+        IterDescr iteration = this.prepareToIterate(true);
 
-        this.doPrimalIterations(iteration);
+        this.doPrimalIterations(iteration, true);
 
-        if (this.getState().isOptimal() && !this.isPrimalFeasible()) {
-            this.setState(Optimisation.State.FAILED);
+        if (state.isOptimal() && !this.isPrimalFeasible()) {
+            state = Optimisation.State.FAILED;
         }
 
         return this.extractResult();

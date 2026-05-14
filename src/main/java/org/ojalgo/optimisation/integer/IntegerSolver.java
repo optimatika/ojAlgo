@@ -63,6 +63,11 @@ public final class IntegerSolver extends GenericSolver {
             return !model.isAnyConstraintQuadratic();
         }
 
+        @Override
+        protected Optimisation.Sense getSolverSense() {
+            return null;
+        }
+
     }
 
     /**
@@ -188,7 +193,7 @@ public final class IntegerSolver extends GenericSolver {
     @Override
     public Result solve(final Result kickStarter) {
 
-        Result point = kickStarter != null ? kickStarter : myIntegerModel.getVariableValues();
+        Result point = kickStarter != null ? kickStarter : myIntegerModel.getVariableValuesValidated();
 
         ModelStrategy strategy = options.integer().newModelStrategy(myIntegerModel).initialise(myFunction, point);
 
@@ -284,7 +289,6 @@ public final class IntegerSolver extends GenericSolver {
 
         Access1D<?> solution = this.extractSolution();
         double value = this.evaluateFunction(solution);
-        Optimisation.State state = this.getState();
 
         return new Optimisation.Result(state, value, solution);
     }
@@ -366,7 +370,7 @@ public final class IntegerSolver extends GenericSolver {
 
         if (previouslyTheBest == null) {
             myBestResultSoFar = result;
-            this.setState(Optimisation.State.FEASIBLE);
+            state = Optimisation.State.FEASIBLE;
         } else if (myMinimisation ? result.getValue() < previouslyTheBest.getValue() : result.getValue() > previouslyTheBest.getValue()) {
             myBestResultSoFar = result;
         }
@@ -397,25 +401,26 @@ public final class IntegerSolver extends GenericSolver {
     protected boolean validate() {
 
         boolean retVal = true;
-        this.setState(State.VALID);
+        state = State.VALID;
 
         try {
 
             if (!(retVal = myIntegerModel.validate())) {
                 retVal = false;
-                this.setState(State.INVALID);
+                state = State.INVALID;
             }
 
         } catch (Exception cause) {
 
             retVal = false;
-            this.setState(State.FAILED);
+            state = State.FAILED;
         }
 
         return retVal;
     }
 
     boolean compute(final NodeKey nodeKey, final NodeSolver nodeSolver, final RingLogger nodePrinter, final ModelStrategy strategy) {
+
         if (this.isLogDebug()) {
             nodePrinter.println();
             nodePrinter.println("Branch&Bound Node");

@@ -676,6 +676,11 @@ public abstract class ConvexSolver extends GenericSolver {
             return ExpressionsBasedModel.Integration.getIndexOfFreeInSolver(model, variable);
         }
 
+        @Override
+        protected Optimisation.Sense getSolverSense() {
+            return Optimisation.Sense.MIN;
+        }
+
     }
 
     public static final ExpressionsBasedModel.Integration<ConvexSolver> INTEGRATION = new ModelIntegration();

@@ -523,9 +523,11 @@ public abstract class GenericSolver implements Optimisation.Solver {
     public final Optimisation.Options options;
 
     private transient String myClassSimpleName = null;
+
     private final AtomicInteger myIterationsCount = new AtomicInteger(0);
-    private State myState = State.UNEXPLORED;
     private final Stopwatch myStopwatch = new Stopwatch();
+
+    protected State state = State.UNEXPLORED;
 
     protected GenericSolver(final Optimisation.Options optimisationOptions) {
 
@@ -569,10 +571,6 @@ public abstract class GenericSolver implements Optimisation.Solver {
         return myStopwatch.stop(unit);
     }
 
-    protected State getState() {
-        return myState;
-    }
-
     /**
      * Should be called after a completed iteration. The iterations count is not "1" untill the first
      * iteration is completed.
@@ -592,11 +590,11 @@ public abstract class GenericSolver implements Optimisation.Solver {
      */
     protected final boolean isIterationAllowed() {
 
-        if (myState.isFailure() || Thread.currentThread().isInterrupted() || myState.isOptimal()) {
+        if (state.isFailure() || Thread.currentThread().isInterrupted() || state.isOptimal()) {
             return false;
         }
 
-        if (myState.isFeasible() && (this.countTime() >= options.time_suffice || this.countIterations() >= options.iterations_suffice)) {
+        if (state.isFeasible() && (this.countTime() >= options.time_suffice || this.countIterations() >= options.iterations_suffice)) {
             return false;
         }
 
@@ -665,15 +663,6 @@ public abstract class GenericSolver implements Optimisation.Solver {
     protected final void resetIterationsCount() {
         myIterationsCount.set(0);
         myStopwatch.reset();
-    }
-
-    /**
-     * As the solver algorithm reaches various states it should be recorded here. It's particularly important
-     * to record when a feasible solution has been reached.
-     */
-    protected final void setState(final State state) {
-        Objects.requireNonNull(state);
-        myState = state;
     }
 
 }

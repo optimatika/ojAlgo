@@ -237,6 +237,15 @@ final class RevisedStore extends SimplexStore {
     private BasisRepresentation myInvBasis;
 
     /**
+     * True when {@link #myInvBasis} does not reflect the current {@link #included} basis and must be rebuilt
+     * via {@link BasisRepresentation#reset} before reuse. Set initially (no factorization yet) and on
+     * external basis swaps via {@link #resetBasis(int[])}; cleared once {@link #prepareToIterate()} has
+     * rebuilt the factorisation. Pivots performed during iteration keep the inverse in sync via
+     * {@link BasisRepresentation#update} and leave this flag {@code false}.
+     */
+    private boolean myInvBasisStale = true;
+
+    /**
      * Objective function coefficients c for all variables. Static during solve. Used to compute duals and
      * objective value.
      */
@@ -583,16 +592,34 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
-    void prepareToIterate() {
-        myInvBasis.reset(myConstraintsCSC, included);
-        this.updateDualsAndReducedCosts();
-        this.refreshBasicSolution();
+    void prepareToIterate(final boolean cold) {
+
+        if (myInvBasisStale) {
+            myInvBasis.reset(myConstraintsCSC, included);
+            myInvBasisStale = false;
+        }
+
+        // Cold: recompute duals, reduced costs and the basic solution from scratch.
+        //
+        // Warm: nothing to recompute — analogous to the tableau's in-place RHS/objective. The warm path
+        // is only reachable when every bound change since the last solve was on a *basic* variable (a
+        // non-basic move clears the warm flag in SimplexSolver.updateRange). Reduced costs / duals depend
+        // on basis × cost only, and x_B = B⁻¹(b − N·x_N) doesn't involve a basic variable's own bound and
+        // no non-basic value moved — so d[] and x[] already hold the retained optimal values.
+
+        if (cold) {
+            this.updateDualsAndReducedCosts();
+            this.refreshBasicSolution();
+        }
     }
 
     @Override
     void removePhase1() {
-        myPhase1Objective = null;
-        this.updateDualsAndReducedCosts();
+
+        if (myPhase1Objective != null) {
+            myPhase1Objective = null;
+            this.updateDualsAndReducedCosts();
+        }
     }
 
     @Override
@@ -601,6 +628,7 @@ final class RevisedStore extends SimplexStore {
         super.resetBasis(basis);
 
         myInvBasis.reset(myConstraintsCSC, included);
+        myInvBasisStale = false;
         myBasicSolutionReady = false;
     }
 
@@ -775,7 +803,15 @@ final class RevisedStore extends SimplexStore {
         if (equilibrator != null && index < structure.countModelVariables()) {
             scale = equilibrator.primal.inverse[index];
         }
-        this.setBounds(index, lower * scale, upper * scale);
+        double scaledLower = lower * scale;
+        double scaledUpper = upper * scale;
+        // No-op shortcut: a caller that re-asserts every variable's bound each propagation (e.g.
+        // choco's PropSimplex) makes most updateRange calls identity. Skip the cache invalidation
+        // and the downstream re-solve setup when nothing actually changed.
+        if (scaledLower == this.getLowerBound(index) && scaledUpper == this.getUpperBound(index)) {
+            return false;
+        }
+        this.setBounds(index, scaledLower, scaledUpper);
         return true;
     }
 

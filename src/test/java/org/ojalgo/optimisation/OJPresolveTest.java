@@ -20,6 +20,11 @@ public class OJPresolveTest extends OptimisationTests {
             return true;
         }
 
+        @Override
+        protected Optimisation.Sense getSolverSense() {
+            return null;
+        }
+
     }
 
     static final class DummySolver implements Optimisation.Solver {

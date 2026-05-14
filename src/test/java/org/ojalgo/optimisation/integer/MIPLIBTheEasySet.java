@@ -60,6 +60,9 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
         // model.options.integer(SIMPLE_FIFO_STRATEGY);
         // model.options.iterations_abort = 10;
 
+        // model.options.linear().dual();
+        // model.options.sparse = Boolean.TRUE;
+
         ModelFileTest.assertValues(model, expMinValString, expMaxValString, ACCURACY);
     }
 

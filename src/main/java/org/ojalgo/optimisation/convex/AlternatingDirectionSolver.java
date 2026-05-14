@@ -48,12 +48,12 @@ import org.ojalgo.matrix.store.R064CSC;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ConstraintsMetaData;
+import org.ojalgo.optimisation.Equilibrator;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ExpressionsBasedModel.EntityMap;
 import org.ojalgo.optimisation.ModelEntity;
 import org.ojalgo.optimisation.Optimisation;
-import org.ojalgo.optimisation.Equilibrator;
 import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.scalar.Quadruple;
@@ -325,6 +325,11 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
         @Override
         public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
             return ExpressionsBasedModel.Integration.reduceFullToFree(modelState, model, ArrayR064.FACTORY);
+        }
+
+        @Override
+        protected Optimisation.Sense getSolverSense() {
+            return Optimisation.Sense.MIN;
         }
 
     }
@@ -823,7 +828,7 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
 
         myKKT = FactorKKT.of(data.P, data.A, Configuration.SIGMA, myWork.rho);
 
-        this.setState(State.UNEXPLORED);
+        state = State.UNEXPLORED;
     }
 
     @Override
@@ -865,7 +870,7 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
         }
 
         double value = PrimitiveMath.NaN;
-        Optimisation.State state = Optimisation.State.UNEXPLORED;
+        state = Optimisation.State.UNEXPLORED;
 
         try {
 
@@ -902,7 +907,7 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
                 }
 
                 if ((iter % updateInterval == 0) && !this.adaptRho()) {
-                    this.setState(State.FAILED);
+                    state = State.FAILED;
                     break;
                 }
             }
@@ -911,8 +916,8 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
                 this.checkTermination(false);
             }
 
-            if (!this.getState().isFeasible() && !this.checkTermination(true)) {
-                this.setState(State.APPROXIMATE);
+            if (!state.isFeasible() && !this.checkTermination(true)) {
+                state = State.APPROXIMATE;
             }
 
             this.storeSolution();
@@ -921,7 +926,6 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
                 this.printRow(myWork);
             }
 
-            state = this.getState();
             value = this.calculateObjectiveValue();
 
         } catch (Exception cause) {
@@ -945,7 +949,7 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
         myData.l[index] = lower * scalar;
         myData.u[index] = upper * scalar;
 
-        this.setState(State.UNEXPLORED);
+        state = State.UNEXPLORED;
 
         return this.updateRho(true, true);
     }
@@ -967,7 +971,7 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
         u.supplyTo(myData.u);
         MULTIPLY.invoke(myData.u, myScaling.dual.values);
 
-        this.setState(State.UNEXPLORED);
+        state = State.UNEXPLORED;
 
         return this.updateRho(true, true);
     }
@@ -1044,7 +1048,7 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
         myWork.cachedDualResidual = dualResidual;
 
         if (primalResidual > Configuration.INFINITY || dualResidual > Configuration.INFINITY) {
-            this.setState(State.INVALID);
+            state = State.INVALID;
             return true;
         }
 
@@ -1069,16 +1073,16 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
         }
 
         if (iterationPrimalFeasible && iterationDualFeasible) {
-            this.setState(State.OPTIMAL);
+            state = State.OPTIMAL;
             exitflag = true;
         } else if (problemPrimalInfeasible) {
-            this.setState(State.INFEASIBLE);
+            state = State.INFEASIBLE;
             exitflag = true;
         } else if (problemDualInfeasible) {
-            this.setState(State.INFEASIBLE);
+            state = State.INFEASIBLE;
             exitflag = true;
         } else {
-            this.setState(State.APPROXIMATE);
+            state = State.APPROXIMATE;
         }
 
         return exitflag;
@@ -1288,15 +1292,13 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
         double dualRes = Double.isNaN(work.cachedDualResidual) ? this.calculateDualResidual() : work.cachedDualResidual;
 
         this.printf("%d\t%12.5e\t%12.5e\t%12.5e\t%12.5e\t%12.3f\t%12s", this.countIterations(), this.calculateObjectiveValue(), primalRes, dualRes,
-                work.baseRho, this.getDuration(CalendarDateUnit.MILLIS).measure, this.getState());
+                work.baseRho, this.getDuration(CalendarDateUnit.MILLIS).measure, state);
     }
 
     /**
      * Finalises and stores the solution; unscales if feasible, resets otherwise.
      */
     private void storeSolution() {
-
-        State state = this.getState();
 
         if (state.isFeasible()) {
 

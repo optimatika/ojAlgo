@@ -51,6 +51,11 @@ public final class GomorySolver extends GenericSolver {
             return model.isAnyVariableInteger() && !model.isAnyConstraintQuadratic();
         }
 
+        @Override
+        protected Optimisation.Sense getSolverSense() {
+            return null;
+        }
+
     }
 
     public static final ExpressionsBasedModel.Integration<GomorySolver> INTEGRATION = new GomorySolver.ModelIntegration();
@@ -103,7 +108,6 @@ public final class GomorySolver extends GenericSolver {
 
         Access1D<?> solution = this.extractSolution();
         double value = this.evaluateFunction(solution);
-        Optimisation.State state = this.getState();
 
         return new Optimisation.Result(state, value, solution);
     }
@@ -116,7 +120,7 @@ public final class GomorySolver extends GenericSolver {
     }
 
     protected Access1D<?> extractSolution() {
-        return myIntegerModel.getVariableValues();
+        return myIntegerModel.getVariableValuesValidated();
     }
 
 }

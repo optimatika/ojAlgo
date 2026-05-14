@@ -660,6 +660,13 @@ abstract class SimplexSolver extends LinearSolver {
     }
 
     /**
+     * Reused across solves. {@link IterDescr} only captures the (stable, lifetime-fixed) {@code excluded}
+     * /{@code included} arrays of the store, so a single instance can be {@code reset()} and reused every
+     * {@link #prepareToIterate(boolean)} instead of allocating one per solve — cuts per-B&amp;B-node GC
+     * pressure. Lazily created on first use.
+     */
+    private IterDescr myIteration = null;
+    /**
      * Scratch storage shared between the two passes of the Harris ratio tests. Pass 1 fills these arrays for
      * every valid candidate; pass 2 reads them sequentially. Sized to fit either {@code excluded.length}
      * (dual enter test) or {@code included.length} (primal exit test). Allocated lazily on first use.
@@ -673,10 +680,29 @@ abstract class SimplexSolver extends LinearSolver {
     private double[] myRatioCacheScale;
     private ColumnState[] myRatioCacheState;
     private double[] myRatioCacheTrueRatio;
+
     /**
      * The simplex data structure (tableau) the algorithm operates on.
      */
     private final SimplexStore mySimplex;
+
+    /**
+     * The single flag deciding which path {@link #solve(Result)} takes next: {@code true} ⇒ attempt the
+     * dual-simplex warm restart (retained optimal basis, no setup/phase-1); {@code false} ⇒ the cold
+     * two-phase solve. Ownership of the decision:
+     * <ul>
+     * <li>set to {@code state.isOptimal()} at the end of every solve — a warm restart is only possible from a
+     * retained optimal, dual-feasible basis;
+     * <li>cleared by {@link #updateRange} when a <em>non-basic</em> variable's bound moves (its at-bound
+     * value feeds the basic solution and the warm path doesn't re-place it / re-shift the tableau, so the
+     * retained state would be stale) — a change on a <em>basic</em> variable only moves a feasibility limit
+     * and is left warm;
+     * <li>cleared on any structural change (basis reset);
+     * <li>cleared by {@link #solve(Result)} itself before it re-enters when a warm attempt fails to certify
+     * (the fall-back to cold).
+     * </ul>
+     */
+    boolean warm = false;
 
     SimplexSolver(final Optimisation.Options solverOptions, final SimplexStore simplexStore) {
         super(solverOptions);
@@ -703,9 +729,28 @@ abstract class SimplexSolver extends LinearSolver {
 
     @Override
     public boolean updateRange(final int index, final double lower, final double upper) {
-        this.setState(State.UNEXPLORED);
-        this.invalidateCache();
-        return mySimplex.updateRange(index, lower, upper);
+
+        // The store's return tells us whether bounds actually moved; use it only to decide whether to
+        // invalidate cached state and force a re-solve. Always report success: the UpdatableSolver
+        // contract is "true if successfully applied", and a no-op IS successfully applied. Returning the
+        // changed-flag made IntermediateSolver.update mistake a no-op (e.g. enforceBounds re-asserting the
+        // same bound on the post-cut compute() recursion) for an unsupported update, tripping its one-way
+        // myInPlaceUpdatesOK latch and permanently forcing every later B&B node to rebuild.
+        boolean changed = mySimplex.updateRange(index, lower, upper);
+
+        if (changed) {
+            state = State.UNEXPLORED;
+            this.invalidateCache();
+            if (mySimplex.isExcluded(index)) {
+                // A non-basic variable's bound moved: its at-bound value feeds the basic solution and the
+                // warm path does not re-place it / re-shift the tableau, so the retained state would be
+                // stale. Force the next solve cold (it re-establishes consistency via setup()). A change
+                // on a basic variable only moves a feasibility limit, not x_B, so it stays warm.
+                warm = false;
+            }
+        }
+
+        return true;
     }
 
     private void ensureRatioCacheCapacity(final int needed) {
@@ -924,7 +969,7 @@ abstract class SimplexSolver extends LinearSolver {
     private void logCurrentState() {
 
         this.log();
-        this.log("{} iteration {}, partition {}", this.getState(), this.countIterations(), mySimplex.toString());
+        this.log("{} iteration {}, partition {}", state, this.countIterations(), mySimplex.toString());
 
         double[] lb = this.getLowerBounds();
         this.log("LB: {}", lb);
@@ -1265,7 +1310,7 @@ abstract class SimplexSolver extends LinearSolver {
             } else if (from == ColumnState.UPPER) {
                 mySimplex.setToLower(j);
             } else if (from == ColumnState.UNBOUNDED) {
-                this.setState(State.UNBOUNDED);
+                state = State.UNBOUNDED;
             } else {
                 throw new IllegalStateException();
             }
@@ -1349,16 +1394,19 @@ abstract class SimplexSolver extends LinearSolver {
 
     final SimplexSolver basis(final int[] basis) {
         mySimplex.resetBasis(basis);
+        warm = false; // structural change — the prior basis no longer applies
         return this;
     }
 
-    final void doDualIterations(final IterDescr iteration) {
+    final void doDualIterations(final IterDescr iteration, final boolean resetEdgeWeights) {
 
         if (options.validate) {
             this.verifyDualFeasibility();
         }
 
-        mySimplex.resetEdgeWeights();
+        if (resetEdgeWeights) {
+            mySimplex.resetEdgeWeights();
+        }
 
         boolean done = false;
         while (this.isIterationAllowed() && !done) {
@@ -1384,16 +1432,16 @@ abstract class SimplexSolver extends LinearSolver {
 
                     double infeasibility = Math.abs(mySimplex.getInfeasibility(iteration.exit.index));
                     if (infeasibility < 1E-9) {
-                        this.setState(State.FEASIBLE);
+                        state = State.FEASIBLE;
                         done = true;
                     } else {
-                        this.setState(State.INFEASIBLE);
+                        state = State.INFEASIBLE;
                     }
                 }
 
             } else {
 
-                this.setState(State.FEASIBLE);
+                state = State.FEASIBLE;
                 done = true;
             }
 
@@ -1407,13 +1455,15 @@ abstract class SimplexSolver extends LinearSolver {
         }
     }
 
-    final void doPrimalIterations(final IterDescr iteration) {
+    final void doPrimalIterations(final IterDescr iteration, final boolean resetEdgeWeights) {
 
         if (options.validate) {
             this.verifyPrimalFeasibility();
         }
 
-        mySimplex.resetEdgeWeights();
+        if (resetEdgeWeights) {
+            mySimplex.resetEdgeWeights();
+        }
 
         boolean done = false;
         while (this.isIterationAllowed() && !done) {
@@ -1437,12 +1487,12 @@ abstract class SimplexSolver extends LinearSolver {
 
                 } else {
 
-                    this.setState(State.UNBOUNDED);
+                    state = State.UNBOUNDED;
                 }
 
             } else {
 
-                this.setState(State.OPTIMAL);
+                state = State.OPTIMAL;
                 done = true;
             }
 
@@ -1481,7 +1531,7 @@ abstract class SimplexSolver extends LinearSolver {
 
         double value = this.extractValue();
 
-        State state = this.getState();
+        warm = state.isOptimal();
 
         double[] solution = this.extractSolution();
         mySimplex.unscaleSolution(solution);
@@ -1513,17 +1563,19 @@ abstract class SimplexSolver extends LinearSolver {
         return !this.getDualExitCandidate(null);
     }
 
-    final IterDescr prepareToIterate() {
+    final IterDescr prepareToIterate(final boolean cold) {
 
         this.invalidateCache();
 
-        this.setup(mySimplex);
+        if (cold) {
+            this.setup(mySimplex);
+        }
 
         if (mySimplex.m == 0) {
             this.solveUnconstrained(); // TODO return?
         }
 
-        mySimplex.prepareToIterate();
+        mySimplex.prepareToIterate(cold);
 
         this.resetIterationsCount();
 
@@ -1531,7 +1583,12 @@ abstract class SimplexSolver extends LinearSolver {
             this.logCurrentState();
         }
 
-        return new IterDescr(mySimplex);
+        if (myIteration == null) {
+            myIteration = new IterDescr(mySimplex);
+        } else {
+            myIteration.reset();
+        }
+        return myIteration;
     }
 
     /**

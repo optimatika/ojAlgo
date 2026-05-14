@@ -317,6 +317,23 @@ public interface Optimisation {
         boolean isCapable(M model);
 
         /**
+         * Map an optional candidate (kick-starter) from model state to solver state.
+         * <p>
+         * The input may be {@code null} (the caller supplied no candidate) and the returned value may also be
+         * {@code null} – returned when there is nothing useful to hand the solver, in which case the caller
+         * should skip both the value extraction and the
+         * {@link #toSolverState(Optimisation.Result, Optimisation.Model)} conversion entirely.
+         * <p>
+         * This default simply converts a supplied candidate and returns {@code null} when none was supplied.
+         * Integrations that can derive a useful starting point from the model should override to do so;
+         * solvers that ignore the kick-starter (e.g. the linear/simplex solver) should override to always
+         * return {@code null}.
+         */
+        default Optimisation.Result prepareSolverCandidate(final Optimisation.Result candidateModelState, final M model) {
+            return candidateModelState != null ? this.toSolverState(candidateModelState, model) : null;
+        }
+
+        /**
          * Convert solver state to model state. Transforming the solution (set of variable values) is the main
          * concern. Adjusting the objective function value (if needed) is best handled elsewhere, and is not
          * required here.

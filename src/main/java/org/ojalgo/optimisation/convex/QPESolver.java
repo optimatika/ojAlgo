@@ -60,7 +60,7 @@ final class QPESolver extends ConstrainedSolver {
             this.getSolutionX().fillMatching(kickStarter);
             myFeasible = true;
 
-            this.setState(State.FEASIBLE);
+            state = State.FEASIBLE;
 
         } else {
 
@@ -120,7 +120,7 @@ final class QPESolver extends ConstrainedSolver {
 
         if (solved) {
 
-            this.setState(State.OPTIMAL);
+            state = State.OPTIMAL;
 
             if (myFeasible) {
                 this.getSolutionX().modifyMatching(ADD, iterX);
@@ -130,11 +130,11 @@ final class QPESolver extends ConstrainedSolver {
 
         } else if (myFeasible) {
 
-            this.setState(State.FEASIBLE);
+            state = State.FEASIBLE;
 
         } else {
 
-            this.setState(State.INFEASIBLE);
+            state = State.INFEASIBLE;
             this.getSolutionX().fillAll(ZERO);
         }
 
