@@ -122,6 +122,16 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return super.equalities(mtrxAE, mtrxBE);
         }
 
+        /**
+         * Will discard any previously existing equality constraints to start fresh. You provide the RHS
+         * here/now, but the constraints body matrix is specified using the returned {@link Mutate2D}
+         * instance.
+         */
+        @Override
+        public Mutate2D equalities(final double[] rhs) {
+            return super.equalities(rhs);
+        }
+
         @Override
         public LinearSolver.Builder equality(final double rhs, final double... factors) {
             return super.equality(rhs, factors);
@@ -140,6 +150,16 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         @Override
         public LinearSolver.Builder inequalities(final Access2D<?> mtrxAI, final Access1D<?> mtrxBI) {
             return super.inequalities(mtrxAI, mtrxBI);
+        }
+
+        /**
+         * Will discard any previously existing inequality constraints to start fresh. You provide the RHS
+         * here/now, but the constraints body matrix is specified using the returned {@link Mutate2D}
+         * instance.
+         */
+        @Override
+        public Mutate2D inequalities(final double[] rhs) {
+            return super.inequalities(rhs);
         }
 
         @Override

@@ -25,7 +25,6 @@ import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.ProgrammingError;
@@ -43,6 +42,7 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.RowView;
 import org.ojalgo.structure.ElementView2D;
+import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.Stopwatch;
@@ -209,6 +209,10 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
         protected int doCountVariables() {
 
+            if (myObjective != null) {
+                return myObjective.arity();
+            }
+
             if (myAE != null) {
                 return myAE.getColDim();
             }
@@ -217,16 +221,16 @@ public abstract class GenericSolver implements Optimisation.Solver {
                 return myAI.getColDim();
             }
 
-            if (myObjective != null) {
-                return myObjective.arity();
-            }
-
             throw new ProgrammingError("Cannot deduce the number of variables!");
         }
 
         protected B equalities(final Access2D<?> mtrxAE, final Access1D<?> mtrxBE) {
-            this.setEqualities(mtrxAE, mtrxBE);
+            this.addEqualities(mtrxAE, mtrxBE);
             return (B) this;
+        }
+
+        protected Mutate2D equalities(final double[] rhs) {
+            return this.newEqualities(rhs);
         }
 
         protected B equality(final double rhs, final double... factors) {
@@ -285,7 +289,6 @@ public abstract class GenericSolver implements Optimisation.Solver {
         /**
          * Equality constraints RHS: [AE][X] == [BE]
          */
-
         protected MatrixStore<Double> getBE() {
             if (myBE != null) {
                 return myBE;
@@ -301,7 +304,6 @@ public abstract class GenericSolver implements Optimisation.Solver {
         /**
          * Inequality constraints RHS: [AI][X] <= [BI]
          */
-
         protected MatrixStore<Double> getBI() {
             if (myBI != null) {
                 return myBI;
@@ -355,8 +357,12 @@ public abstract class GenericSolver implements Optimisation.Solver {
         }
 
         protected B inequalities(final Access2D<?> mtrxAI, final Access1D<?> mtrxBI) {
-            this.setInequalities(mtrxAI, mtrxBI);
+            this.addInequalities(mtrxAI, mtrxBI);
             return (B) this;
+        }
+
+        protected Mutate2D inequalities(final double[] rhs) {
+            return this.newInequalities(rhs);
         }
 
         protected B inequality(final double rhs, final double... factors) {
@@ -397,7 +403,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
             myAdditionalConstraints.put(key, value);
         }
 
-        void addEqualities(final MatrixStore<?> mtrxAE, final MatrixStore<?> mtrxBE) {
+        void addEqualities(final Access2D<?> mtrxAE, final Access1D<?> mtrxBE) {
 
             ProgrammingError.throwIfNull(mtrxAE, mtrxBE);
             ProgrammingError.throwIfNotEqualRowDimensions(mtrxAE, mtrxBE);
@@ -410,7 +416,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
             myBE = Builder.add(myAE, myBE, mtrxAE, mtrxBE);
         }
 
-        void addInequalities(final MatrixStore<?> mtrxAI, final MatrixStore<?> mtrxBI) {
+        void addInequalities(final Access2D<?> mtrxAI, final Access1D<?> mtrxBI) {
 
             ProgrammingError.throwIfNull(mtrxAI, mtrxBI);
             ProgrammingError.throwIfNotEqualRowDimensions(mtrxAI, mtrxBI);
@@ -423,21 +429,28 @@ public abstract class GenericSolver implements Optimisation.Solver {
             myBI = Builder.add(myAI, myBI, mtrxAI, mtrxBI);
         }
 
-        void newEqualities(final int nbEqualities, final int nbVariables) {
+        Mutate2D newEqualities(final double[] mtrxBE) {
 
-            MatrixStore<Double> mtrxAE = FACTORY.make(nbEqualities, nbVariables);
-            MatrixStore<Double> mtrxBE = FACTORY.make(nbEqualities, 1);
+            int nbEqus = mtrxBE.length;
+            int nbVars = this.countVariables();
 
-            this.setEqualities(mtrxAE, mtrxBE);
+            myAE = FACTORY.makeRowsSupplier(nbVars);
+            myAE.addRows(nbEqus);
+            myBE = R064Store.wrap(mtrxBE);
+
+            return myAE;
         }
 
-        void newInequalities(final int nbInequalities, final int nbVariables) {
+        Mutate2D newInequalities(final double[] mtrxBI) {
 
-            RowsSupplier<Double> mtrxAI = FACTORY.makeRowsSupplier(nbVariables);
-            mtrxAI.addRows(nbInequalities);
-            MatrixStore<Double> mtrxBI = FACTORY.make(nbInequalities, 1);
+            int nbInes = mtrxBI.length;
+            int nbVars = this.countVariables();
 
-            this.setInequalities(mtrxAI, mtrxBI);
+            myAI = FACTORY.makeRowsSupplier(nbVars);
+            myAI.addRows(nbInes);
+            myBI = R064Store.wrap(mtrxBI);
+
+            return myAI;
         }
 
         void setBounds(final Access1D<Double> lower, final Access1D<Double> upper) {
@@ -455,28 +468,6 @@ public abstract class GenericSolver implements Optimisation.Solver {
             } else {
                 myUpperBounds = FACTORY.column(upper);
             }
-        }
-
-        void setEqualities(final Access2D<?> mtrxAE, final Access1D<?> mtrxBE) {
-
-            ProgrammingError.throwIfNull(mtrxAE, mtrxBE);
-            ProgrammingError.throwIfNotEqualRowDimensions(mtrxAE, mtrxBE);
-
-            myAE = FACTORY.makeRowsSupplier(mtrxAE.getColDim());
-            myBE = FACTORY.makeZero(0, 1);
-
-            myBE = Builder.add(myAE, myBE, mtrxAE, mtrxBE);
-        }
-
-        void setInequalities(final Access2D<?> mtrxAI, final Access1D<?> mtrxBI) {
-
-            ProgrammingError.throwIfNull(mtrxAI, mtrxBI);
-            ProgrammingError.throwIfNotEqualRowDimensions(mtrxAI, mtrxBI);
-
-            myAI = FACTORY.makeRowsSupplier(mtrxAI.getColDim());
-            myBI = FACTORY.makeZero(0, 1);
-
-            myBI = Builder.add(myAI, myBI, mtrxAI, mtrxBI);
         }
 
         void validate() {

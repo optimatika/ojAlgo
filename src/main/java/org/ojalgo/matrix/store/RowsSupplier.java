@@ -2,7 +2,6 @@ package org.ojalgo.matrix.store;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
@@ -199,7 +198,7 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
     private final int myColumnsCount;
     private final PhysicalStore.Factory<N, ?> myPhysicalStoreFactory;
     private final SparseFactory<N> myRowFactory;
-    private final List<SparseArray<N>> myRows;
+    private final ArrayList<SparseArray<N>> myRows;
 
     private RowsSupplier(final Factory<N, ?> factory, final int numberOfColumns, final int initialCapacity) {
         super();
@@ -210,7 +209,7 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
     }
 
     RowsSupplier(final Factory<N, ?> factory, final int numberOfColumns) {
-        this(factory, numberOfColumns, 1);
+        this(factory, numberOfColumns, 0);
     }
 
     @Override
@@ -233,6 +232,7 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
     }
 
     public void addRows(final int numberToAdd) {
+        myRows.ensureCapacity(myRows.size() + numberToAdd);
         for (int i = 0; i < numberToAdd; i++) {
             myRows.add(myRowFactory.make(myColumnsCount));
         }
