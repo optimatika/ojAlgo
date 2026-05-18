@@ -192,6 +192,13 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
         return integration.getIndexInSolver(myModel, variable);
     }
 
+    protected ExpressionsBasedModel.Integration<?> getIntegration() {
+        if (myIntegration == null) {
+            myIntegration = myModel.getIntegration();
+        }
+        return myIntegration;
+    }
+
     protected ExpressionsBasedModel getModel() {
         return myModel;
     }
@@ -212,13 +219,6 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
 
     protected boolean isSolved() {
         return mySolver != null && myResult != null;
-    }
-
-    ExpressionsBasedModel.Integration<?> getIntegration() {
-        if (myIntegration == null) {
-            myIntegration = myModel.getIntegration();
-        }
-        return myIntegration;
     }
 
 }

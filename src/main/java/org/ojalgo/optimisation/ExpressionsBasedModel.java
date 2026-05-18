@@ -443,7 +443,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         /**
          * Preserves the historical kick-starter behaviour: when no candidate is supplied one is derived
          * (cheaply) from the model, then converted to solver state. Solvers that ignore the kick-starter
-         * override this to always return {@code null}.
+         * should override this to always return {@code null}.
          */
         @Override
         public Result prepareSolverCandidate(final Result candidateModelState, final ExpressionsBasedModel model) {
@@ -1686,6 +1686,14 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
+     * @deprecated v57 Use {@link #prepare(org.ojalgo.optimisation.Optimisation.Sense, Function)} instead.
+     */
+    @Deprecated
+    public <T extends IntermediateSolver> T prepare(final Function<ExpressionsBasedModel, T> factory) {
+        return this.prepare(myOptimisationSense, factory);
+    }
+
+    /**
      * <p>
      * The general recommendation is to NOT call this method directly. Instead you should use/call
      * {@link #maximise()} or {@link #minimise()}.
@@ -1700,7 +1708,8 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      * <li>The solution is not validated by the model
      * </ul>
      */
-    public <T extends IntermediateSolver> T prepare(final Function<ExpressionsBasedModel, T> factory) {
+    public <T extends IntermediateSolver> T prepare(final Optimisation.Sense sense, final Function<ExpressionsBasedModel, T> factory) {
+        myOptimisationSense = sense;
         return factory.apply(this);
     }
 
@@ -1909,14 +1918,13 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     private Optimisation.Result optimise(final Optimisation.Sense sense, final Integration<?> forcedIntegration) {
 
-        this.setOptimisationSense(sense);
         myForcedIntegration = forcedIntegration;
 
         if (!myShallowCopy && myEnvironment.countPresolvers() > 0) {
             this.scanEntities();
         }
 
-        DefaultIntermediate prepared = this.prepare(DefaultIntermediate::new);
+        DefaultIntermediate prepared = this.prepare(sense, DefaultIntermediate::new);
 
         Optimisation.Result result = prepared.solve(null);
 
