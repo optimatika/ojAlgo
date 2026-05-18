@@ -372,12 +372,16 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
                 modelSolution.set(fixed.index, model.getVariable(fixed.index).getValue());
             }
 
+            Optimisation.Sense modelSense = model.getOptimisationSense();
+            boolean negate = solverSense != null && modelSense != null && solverSense != modelSense;
+
             Result retVal = solverState.withSolution(modelSolution);
 
-            if (reducedGradient.isPresent()) {
+            if (negate) {
+                retVal = retVal.withNegatedValue();
+            }
 
-                Optimisation.Sense modelSense = model.getOptimisationSense();
-                boolean negate = solverSense != null && modelSense != null && solverSense != modelSense;
+            if (reducedGradient.isPresent()) {
 
                 Supplier<Access1D<?>> gradientSupplier = () -> {
                     DenseArray<?> fullGradient = factory.make(nbModelVars);

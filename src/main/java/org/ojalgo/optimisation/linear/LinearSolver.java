@@ -767,17 +767,21 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             OldIntegration.toModelVariableValues(solverState, model, modelSolution);
 
+            Optimisation.Sense solverSense = this.getSolverSense();
+            Optimisation.Sense modelSense = model.getOptimisationSense();
+            boolean negate = solverSense != null && modelSense != null && solverSense != modelSense;
+
             Result retVal = solverState.withSolution(modelSolution);
+
+            if (negate) {
+                retVal = retVal.withNegatedValue();
+            }
 
             // withSolution above drops the reduced gradient because solverState's solution is in the
             // split (positive + negative + slack/artificial) layout, while modelSolution is indexed by
             // model variable. Map and re-attach it explicitly.
             Optional<Supplier<Access1D<?>>> solverRg = solverState.getReducedGradient();
             if (solverRg.isPresent()) {
-
-                Optimisation.Sense solverSense = this.getSolverSense();
-                Optimisation.Sense modelSense = model.getOptimisationSense();
-                boolean negate = solverSense != null && modelSense != null && solverSense != modelSense;
 
                 Supplier<Access1D<?>> mapped = () -> ArrayR064.wrap(OldIntegration.toModelReducedGradient(solverRg.get().get(), model, negate, solverState));
 
