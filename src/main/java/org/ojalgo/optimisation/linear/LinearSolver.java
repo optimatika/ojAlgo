@@ -183,6 +183,15 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return this;
         }
 
+        public LinearSolver.Builder lower(final int... bounds) {
+            myBoundsModified = true;
+            double[] lowerBounds = this.getLowerBounds();
+            for (int i = 0, limit = Math.min(lowerBounds.length, bounds.length); i < limit; i++) {
+                lowerBounds[i] = bounds[i];
+            }
+            return this;
+        }
+
         public LinearSolver.Builder objective(final double... factors) {
             this.setNumberOfVariables(factors.length);
             this.getObjective().linear().fillMatching(this.getFactory().column(factors));
@@ -300,6 +309,15 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             myBoundsModified = true;
             double[] upperBounds = this.getUpperBounds();
             Arrays.fill(upperBounds, bound);
+            return this;
+        }
+
+        public LinearSolver.Builder upper(final int... bounds) {
+            myBoundsModified = true;
+            double[] upperBounds = this.getUpperBounds();
+            for (int i = 0, limit = Math.min(upperBounds.length, bounds.length); i < limit; i++) {
+                upperBounds[i] = bounds[i];
+            }
             return this;
         }
 
