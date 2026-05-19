@@ -25,6 +25,15 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - `ExpressionsBasedModel.Simplifier`, `ExpressionAnalyser`, and `VariableAnalyser` are now `public`, enabling custom presolver-like hooks that plug into the standard presolve pipeline.
 - New `ExpressionsBasedModel.getVariableValuesValidated()` – the validated/state-resolving counterpart of `getVariableValues()` (see the corresponding behaviour change below).
 - New `Optimisation.Integration.prepareSolverCandidate(Result, Model)` – maps an optional kick-starter from model state to solver state, and may return `null`. Integrations whose solver ignores the kick-starter (e.g. the linear/simplex solver) return `null`, letting callers skip candidate extraction and conversion entirely.
+- New `LinearSolver.Builder.equalities(double[])` and `inequalities(double[])` overloads — supply the RHS as a `double[]` and get back a `Mutate2D` to fill in the constraint body matrix.
+- New `LinearSolver.Builder.lower(int...)` and `upper(int...)` convenience overloads for setting variable bounds from int arrays.
+- New `LinearSolver.Configuration.equilibration(int)` — configure the number of Ruiz-style equilibration iterations for the LP solver (default 0; enable only when measured beneficial).
+- New `ExpressionsBasedModel.prepare(Optimisation.Sense, Function)` — explicitly specifies the optimisation sense when preparing an `IntermediateSolver`.
+- New `Optimisation.Sense.solve(ExpressionsBasedModel, Integration)` overload — solve with a specific integration.
+- New `ExpressionsBasedModel.isAnyVariableDeclaredInteger()` — checks whether any variable is declared integer regardless of the model's relaxation flag.
+- New `Expression.Factory` and `Variable.Factory` functional interfaces, and corresponding `ExpressionsBasedModel.newExpression(String, Expression.Factory)` / `newVariable(String, Variable.Factory)` overloads enabling custom expression/variable subtypes in combination with `Optimisation.Environment`.
+- New `ExpressionsBasedModel.setConfigurator(Object)` static convenience and `getConfigurator(T defaultValue)` instance method — delegates to the model's `Optimisation.Environment`.
+- `ConstraintType` gained `isLower()` and `isUpper()` convenience methods that return `true` for any type that implies a lower or upper bound (including `RANGE` and `EQUALITY`).
 
 #### org.ojalgo.matrix
 
@@ -89,6 +98,9 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - Replaced `DecomposedInverse` with two focused implementations: `SparseDecomposition` (backed by `SparseLU`, the new default) and `DenseDecomposition` (dense LU baseline).
 - `SparseDecomposition` now uses adaptive refactorisation: a fill-in heuristic triggers re-decomposition when eta-chain nonzeros exceed 1.5× the L+U factor nonzeros, with a dimension-scaled ceiling (`min(300, 3×m)`) as a safety net. Benchmarked across the Netlib LP suite — ~9% median speedup with 50 models improved vs 22 regressed.
 - `RevisedStore` now uses `SparseDecomposition` by default; dimension parameter removed from the factory method.
+- `UpdatableSolver.getEntityMap()` now returns `Optional<EntityMap>` instead of a bare `EntityMap`. Callers that accessed the entity map directly must now unwrap the `Optional`.
+- `ExpressionsBasedModel.isAnyVariableInteger()` now returns `false` when the model is relaxed; use `isAnyVariableDeclaredInteger()` to check the underlying declaration regardless of relaxation.
+- `IntermediateSolver.getIntegration()` changed from package-private to `protected`, allowing subclasses outside the package to access the integration.
 
 #### org.ojalgo.algebra
 
@@ -113,6 +125,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - Branch-and-bound performance: the `NodeKey` variable sign-change condition was over-broad and fired on routine branching (e.g. every binary `[0,1]→[0,0]` branch), forcing a spurious full solver rebuild at each node instead of a cheap in-place bound update — badly degrading MIP solve times. It now triggers only on an actual column-negation sign change.
 - Quadratic models are no longer subjected to in-place bound updates during branch-and-bound (which could yield wrong results); `NodeSolver` forces a solver reset for any model with a quadratic expression.
 - Simplex warm-start: after bound-only changes from an optimal basis the solver restarts from the retained basis via dual iterations instead of re-solving cold.
+- Fixed objective function value sign: when the solver's internal sense (e.g. always-minimise) differs from the model's optimisation sense, the returned objective value is now correctly negated.
 
 ### Deprecated
 
@@ -120,12 +133,19 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - `NormedVectorSpace.signum()` – use `normalised()` instead (scheduled for removal in v57).
 
+#### org.ojalgo.optimisation
+
+- `ExpressionsBasedModel.prepare(Function)` – use `prepare(Optimisation.Sense, Function)` instead.
+- `Optimisation.Options.getConfigurator(Class)` and `Options.setConfigurator(Object)` – use `Optimisation.Environment.getConfigurator(Class)` or the model-level `getConfigurator(T)` / `setConfigurator(Object)` instead.
+- `Optimisation.Integration.extractSolverState(M)` – no longer needed internally.
+
 ### Removed
 
 #### org.ojalgo.optimisation
 
 - The `ExpressionsBasedModel.Validator` class and all functionality related to it. The related `ExpressionsBasedModel.setKnownSolution(...)` methods are also removed.
 - `Presolvers.checkFeasibility(...)` static method removed.
+- `UpdatableSolver.integers(ExpressionsBasedModel)` and `isMapped()` – removed (integer mask logic moved to `ExpressionsBasedModel.EntityMap`).
 
 ## [56.2.1] – 2026-01-21
 
