@@ -45,7 +45,7 @@ public class MeszarosCase extends OptimisationLinearTests implements ModelFileTe
         // model.options.debug(Optimisation.Solver.class);
         // model.options.debug(IntegerSolver.class);
         // model.options.debug(ConvexSolver.class);
-        // model.options.debug(LinearSolver.class);
+        model.options.debug(LinearSolver.class);
         // model.options.progress(IntegerSolver.class);
         // model.options.validate = false;
         // model.options.mip_defer = 0.25;
