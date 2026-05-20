@@ -144,7 +144,7 @@ public abstract class ModelStrategy implements IntegerStrategy {
          * Initialise the integer significances, based on the objective function gradient.
          */
         @Override
-        protected ModelStrategy initialise(final MultiaryFunction.TwiceDifferentiable<Double> function, final Access1D<?> point) {
+        protected void initialise(final MultiaryFunction.TwiceDifferentiable<Double> function, final Access1D<?> point) {
 
             Arrays.fill(myUpperPseudoWeight, ZERO);
             Arrays.fill(myLowerPseudoWeight, ZERO);
@@ -176,8 +176,6 @@ public abstract class ModelStrategy implements IntegerStrategy {
                     myLowerPseudoWeight[i] = NodeKey.MINIMUM_DISPLACEMENT;
                 }
             }
-
-            return this;
         }
 
         @Override
@@ -246,6 +244,11 @@ public abstract class ModelStrategy implements IntegerStrategy {
             // No-op for pseudo-costs. Updates happen when child nodes are solved or infeasible.
         }
 
+        @Override
+        protected void observeBranch(final int idx, final boolean upper, final double observation) {
+            this.updatePseudo(idx, upper, observation);
+        }
+
         /**
          * Called after a failed cut generation attempt (no cuts added). Original behaviour was to disable.
          */
@@ -290,42 +293,16 @@ public abstract class ModelStrategy implements IntegerStrategy {
             int nbUp = myUpperCount[idx];
 
             boolean reliable = Math.min(nbUp, nbDn) >= RELIABILITY_MIN;
-            if (!reliable && !found) {
-                // Original behaviour before any incumbent: closest-to-integer first
-                return Math.max(distanceDown, distanceUp);
-            }
             double base = distanceDown * distanceUp;
             double prod = DefaultStrategy.productScore(myLowerPseudoWeight[idx], myUpperPseudoWeight[idx], distanceDown, distanceUp);
 
+            if (!reliable || !found) {
+                return prod;
+            }
+
             double alpha = reliable ? ONE - TENTH : Math.min(ONE, (nbUp + nbDn) / (TWO * RELIABILITY_MIN));
 
-            // Blend lightly with base to avoid degeneracy
             return alpha * prod + (ONE - alpha) * base;
-            // Ramp-in blending until reliable (after an incumbent exists)
-        }
-
-        @Override
-        protected double scoreBranchDown(final int idx, final double distanceDown, final boolean found) {
-
-            boolean reliable = Math.min(myUpperCount[idx], myLowerCount[idx]) >= RELIABILITY_MIN;
-            if (!reliable && !found) {
-                // Before reliability and without an incumbent, prefer closest-to-integer (maximize score)
-                return ONE - distanceDown;
-            }
-
-            return myLowerPseudoWeight[idx] * distanceDown;
-        }
-
-        @Override
-        protected double scoreBranchUp(final int idx, final double distanceUp, final boolean found) {
-
-            boolean reliable = Math.min(myUpperCount[idx], myLowerCount[idx]) >= RELIABILITY_MIN;
-            if (!reliable && !found) {
-                // Before reliability and without an incumbent, prefer closest-to-integer (maximize score)
-                return ONE - distanceUp;
-            }
-
-            return myUpperPseudoWeight[idx] * distanceUp;
         }
 
     }
@@ -362,14 +339,24 @@ public abstract class ModelStrategy implements IntegerStrategy {
 
         myWorkerPriorities = strategy.getWorkerPriorities();
 
+        boolean didSetObj = false;
         for (int i = 0; i < myWorkerPriorities.size(); i++) {
             Comparator<NodeKey> prio = myWorkerPriorities.get(i);
             if (prio == NodeKey.MIN_OBJECTIVE || prio == NodeKey.MAX_OBJECTIVE) {
                 if (myOptimisationSense == Optimisation.Sense.MIN) {
                     myWorkerPriorities.set(i, NodeKey.MIN_OBJECTIVE);
+                    didSetObj = true;
                 } else if (myOptimisationSense == Optimisation.Sense.MAX) {
                     myWorkerPriorities.set(i, NodeKey.MAX_OBJECTIVE);
+                    didSetObj = true;
                 }
+            }
+        }
+        if (!didSetObj) {
+            if (myOptimisationSense == Optimisation.Sense.MIN) {
+                myWorkerPriorities.add(NodeKey.MIN_OBJECTIVE);
+            } else if (myOptimisationSense == Optimisation.Sense.MAX) {
+                myWorkerPriorities.add(NodeKey.MAX_OBJECTIVE);
             }
         }
     }
@@ -417,7 +404,7 @@ public abstract class ModelStrategy implements IntegerStrategy {
         return myIndices[idx];
     }
 
-    protected abstract ModelStrategy initialise(final MultiaryFunction.TwiceDifferentiable<Double> function, final Access1D<?> point);
+    protected abstract void initialise(final MultiaryFunction.TwiceDifferentiable<Double> function, final Access1D<?> point);
 
     /**
      * Decide if cuts should be attempted at this node.
@@ -454,6 +441,16 @@ public abstract class ModelStrategy implements IntegerStrategy {
     protected abstract void markInteger(NodeKey key, Optimisation.Result result);
 
     /**
+     * Inject a pseudo-cost observation (e.g. from root strong-branching probes). Default: no-op, so custom
+     * strategies are unaffected.
+     *
+     * @param idx         integer-variable index (same indexing as {@link #scoreBranch})
+     * @param upper       true for up-branch (lower bound tightened), false for down-branch
+     * @param observation degradation per unit displacement, same units as {@link #onNodeSolved}
+     */
+    protected void observeBranch(final int idx, final boolean upper, final double observation) {}
+
+    /**
      * Called when cut generation produced no cuts (default: disable further cutting).
      */
     protected abstract void onCutFailure();
@@ -469,10 +466,6 @@ public abstract class ModelStrategy implements IntegerStrategy {
     protected abstract void onNodeSolved(NodeKey key, Optimisation.Result child, double childObj, boolean minimisation);
 
     protected abstract double scoreBranch(int idx, double distanceDown, double distanceUp, boolean found);
-
-    protected abstract double scoreBranchDown(int idx, double distanceDown, boolean found);
-
-    protected abstract double scoreBranchUp(int idx, double distanceUp, boolean found);
 
     boolean isMinimisation() {
         return myOptimisationSense == Optimisation.Sense.MIN;

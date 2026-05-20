@@ -144,6 +144,37 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
         return myModel.toString();
     }
 
+    /**
+     * As {@link #update(Variable)}, but takes the variable's global (model) index and new bounds directly -
+     * no {@link Variable} or {@code BigDecimal} instances needed. The model {@link Variable} itself is not
+     * modified, only the solver.
+     * <p>
+     * Kind of the same thing as {@link #update(Variable)} but whole idea here is that we do not update/modify
+     * the model variable declarations. With this call the model and solver are no longer in sync.
+     * Regenerating the solver (calling {@link #reset()}) will loose any changes.
+     */
+    public void update(final int globalIndex, final double lowerBound, final double upperBound) {
+
+        if (myInPlaceUpdatesOK && mySolver instanceof UpdatableSolver) {
+            UpdatableSolver updatableSolver = (UpdatableSolver) mySolver;
+
+            if (updatableSolver.updateRange(this.getIndexInSolver(globalIndex), lowerBound, upperBound)) {
+                // Solver updated in-place
+                return;
+            }
+
+            myInPlaceUpdatesOK = false;
+        }
+
+        // Solver will be re-generated
+        mySolver = null;
+    }
+
+    /**
+     * The {@link Variable} instance should come from the enclosed {@link ExpressionsBasedModel} instance. It
+     * is assumed that it has been modified (the model is already updated) and this call will update the
+     * solver.
+     */
     public void update(final Variable variable) {
 
         if (myInPlaceUpdatesOK && mySolver instanceof UpdatableSolver) {

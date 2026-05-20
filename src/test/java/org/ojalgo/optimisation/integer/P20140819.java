@@ -101,7 +101,9 @@ public class P20140819 extends OptimisationIntegerTests {
             BasicLogger.debug(model);
         }
 
-        TestUtils.assertStateAndSolution(CPLEX_RESULTS, result, ACCURACY);
+        TestUtils.assertStateNotLessThanOptimal(result);
+        TestUtils.assertEquals(CPLEX_RESULTS.getValue(), result.getValue(), ACCURACY);
+        TestUtils.assertSolutionValid(model, result);
     }
 
     static ExpressionsBasedModel makeModel() {
@@ -192,25 +194,17 @@ public class P20140819 extends OptimisationIntegerTests {
         Result resLP1 = node.solve();
         TestUtils.assertTrue(relaxed.validate(resLP1));
 
-        if (DEBUG) {
-            BasicLogger.debug(relaxed);
-        }
-
         node.generateCuts(strategy);
-
-        if (DEBUG) {
-            BasicLogger.debug(relaxed);
-        }
 
         Result resLP2 = node.solve();
 
-        if (DEBUG) {
-            BasicLogger.debug(relaxed);
-        }
-
         TestUtils.assertTrue(relaxed.validate(resLP2));
-        // TestUtils.assertFalse(relaxed.validate(resLP1)); // TODO Fix so that there are cuts that cut off the original solution
-        // TestUtils.assertFalse(relaxed.validate(resLP0));
+        // Generated cuts must invalidate the LP optima that motivated them; otherwise the cut pass
+        // produced cuts that don't constrain anything (a real defect, previously documented as a
+        // TODO here - now actively asserted).
+        TestUtils.assertFalse("Cuts failed to invalidate resLP1", relaxed.validate(resLP1));
+        TestUtils.assertFalse("Cuts failed to invalidate resLP0", relaxed.validate(resLP0));
+        // ...and they must NOT excise the true integer optimum.
         TestUtils.assertTrue(relaxed.validate(CPLEX_RESULTS, BasicLogger.DEBUG));
     }
 

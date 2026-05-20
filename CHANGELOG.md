@@ -34,6 +34,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - New `Expression.Factory` and `Variable.Factory` functional interfaces, and corresponding `ExpressionsBasedModel.newExpression(String, Expression.Factory)` / `newVariable(String, Variable.Factory)` overloads enabling custom expression/variable subtypes in combination with `Optimisation.Environment`.
 - New `ExpressionsBasedModel.setConfigurator(Object)` static convenience and `getConfigurator(T defaultValue)` instance method — delegates to the model's `Optimisation.Environment`.
 - `ConstraintType` gained `isLower()` and `isUpper()` convenience methods that return `true` for any type that implies a lower or upper bound (including `RANGE` and `EQUALITY`).
+- `IntegerSolver` gained an explicit root-processing phase that solves the root LP and runs a one-shot strong-branching probe pass over the most fractional candidates — seeding pseudo-costs, accepting integer-feasible probe results as free incumbents, detecting root infeasibility from both-direction-infeasible probes, and applying single-direction probing fixings (permanent root-bound tightening when one branch direction is LP-infeasible).
+- `IntegerSolver` now computes a true global dual bound across the deferred frontier, terminating early when the gap to the incumbent closes within tolerance. A `logProgress` override prints incumbent / dual bound / absolute gap / relative gap / tolerance for diagnostics.
+- New `IntermediateSolver.update(int globalIndex, double lowerBound, double upperBound)` — primitive bound-update path that doesn't allocate `Variable`/`BigDecimal` and doesn't mutate the model. Suitable for transient probe-style updates.
+- `NodeKey` gained primitive bound accessors `getLower(int)` / `getUpper(int)` (returning `double` with `Integer.MIN/MAX_VALUE` sentinels mapped to `±Infinity`) and tightening mutators `tightenLower(int, int)` / `tightenUpper(int, int)` for root-phase probing fixings.
+- New `MultiviewSet.PrioritisedView.peek()` — O(1) head accessor on the shared concurrent set of deferred nodes.
+- `ModelStrategy.observeBranch(int idx, boolean upper, double observation)` — hook for injecting strong-branching probe observations into pseudo-cost arrays. Default no-op; `DefaultStrategy` overrides to feed its pseudo-cost weight arrays.
 
 #### org.ojalgo.matrix
 
@@ -79,6 +85,9 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - `ExpressionsBasedModel.getVariableValues()` is now a cheap value extraction only — it no longer validates the solution or evaluates the objective, and returns `State.UNEXPLORED`. Code that relied on the previous validated state/objective behaviour must call the new `getVariableValuesValidated()` instead. (The `getVariableValues(NumberContext)` overload is unchanged.)
 - `IntermediateSolver.solve(...)` now has a cold/warm split: only the first solve (or one after `reset()`) runs presolve and the degenerate-model pre-checks; warm re-solves after bound-only `update(...)` calls skip those scans and, for solvers that ignore the kick-starter (LP/simplex), skip candidate extraction and `toSolverState` conversion as well. Substantially reduces per-solve overhead for `IntegerSolver` and other solvers that iteratively modify a model.
 - The `LinearSolver` model integration maps the solver reduced gradient back to model space, reconstructing reduced costs for variables eliminated by presolve so they are available in the returned `Optimisation.Result`.
+- `IntegerSolver.markInteger`'s LP cutoff is now always strict-improvement (one ULP), decoupled from the gap tolerance. The previous gap-sized cutoff could excise the true optimum when an early incumbent landed within gap of it (e.g. `P20140819#testOriginalFullModel`). Gap tolerance still drives `isOptimalityProven` (early termination) and per-node `isGoodEnough` (bound-fathoming) — only the LP-cutoff portion is decoupled.
+- `IntegerStrategy.DEFAULT` gap tolerance loosened from `NumberContext.of(7, 8)` (relative 1e-6) to `NumberContext.of(5, 7)` (relative 1e-4), to the industry-standard 1e-4.
+- `DefaultStrategy.scoreBranch` — pre-reliability, pre-incumbent fallback switched from "closest-to-integer" (`max(distanceDown, distanceUp)`) to the gradient-seeded `productScore`, letting initial pseudo-cost seeds drive branching immediately.
 
 #### org.ojalgo.matrix
 

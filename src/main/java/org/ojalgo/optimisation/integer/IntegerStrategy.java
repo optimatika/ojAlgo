@@ -208,7 +208,7 @@ public interface IntegerStrategy {
                 NodeKey.BREADTH_FIRST_SEARCH };
 
         NumberContext integrality = NumberContext.of(12, 8);
-        NumberContext gap = NumberContext.of(7, 8);
+        NumberContext gap = NumberContext.of(5, 7);
 
         return new ConfigurableStrategy(Parallelism.CORES.require(definitions.length), definitions, integrality, gap, DefaultStrategy::new,
                 new GMICutConfiguration());

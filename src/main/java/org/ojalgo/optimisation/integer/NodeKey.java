@@ -59,25 +59,23 @@ public final class NodeKey implements Comparable<NodeKey> {
 
     }
 
-    static final double MINIMUM_DISPLACEMENT = 1E-9;
-
     public static final Comparator<NodeKey> BREADTH_FIRST_SEARCH = Comparator.comparingInt((final NodeKey nk) -> nk.depth).thenComparingLong(nk -> nk.sequence);
 
     public static final Comparator<NodeKey> DEPTH_FIRST_SEARCH = Comparator.comparingInt((final NodeKey nk) -> -nk.depth).thenComparingLong(nk -> -nk.sequence);
 
     public static final Comparator<NodeKey> FIFO_SEQUENCE = Comparator.comparingLong((final NodeKey nk) -> nk.sequence);
 
+    public static final Comparator<NodeKey> LARGE_DISPLACEMENT = Comparator.comparingDouble((final NodeKey nk) -> -nk.displacement);
+
     public static final Comparator<NodeKey> LIFO_SEQUENCE = Comparator.comparingLong((final NodeKey nk) -> -nk.sequence);
 
-    public static final Comparator<NodeKey> SMALL_DISPLACEMENT = Comparator.comparingDouble((final NodeKey nk) -> nk.displacement);
-
-    public static final Comparator<NodeKey> LARGE_DISPLACEMENT = Comparator.comparingDouble((final NodeKey nk) -> -nk.displacement);
+    public static final Comparator<NodeKey> MAX_OBJECTIVE = Comparator.comparingDouble((final NodeKey nk) -> -nk.objective)
+            .thenComparingDouble(nk -> -nk.displacement);
 
     public static final Comparator<NodeKey> MIN_OBJECTIVE = Comparator.comparingDouble((final NodeKey nk) -> nk.objective)
             .thenComparingDouble(nk -> -nk.displacement);
 
-    public static final Comparator<NodeKey> MAX_OBJECTIVE = Comparator.comparingDouble((final NodeKey nk) -> -nk.objective)
-            .thenComparingDouble(nk -> -nk.displacement);
+    public static final Comparator<NodeKey> SMALL_DISPLACEMENT = Comparator.comparingDouble((final NodeKey nk) -> nk.displacement);
 
     /**
      * Used for one thing only - to validate (log problems with) node solver results. Does not effect the
@@ -86,6 +84,8 @@ public final class NodeKey implements Comparable<NodeKey> {
     private static final NumberContext FEASIBILITY = NumberContext.of(8, 6);
 
     private static final AtomicLong SEQUENCE_GENERATOR = new AtomicLong();
+
+    static final double MINIMUM_DISPLACEMENT = 1E-9;
 
     /**
      * How far have we branched from the root
@@ -398,6 +398,15 @@ public final class NodeKey implements Comparable<NodeKey> {
         return true;
     }
 
+    /**
+     * Lower bound on the integer variable at {@code idx} (integer-local index), as a double. The
+     * {@link Integer#MIN_VALUE} sentinel for "unbounded" is mapped to {@link Double#NEGATIVE_INFINITY}.
+     */
+    double getLower(final int idx) {
+        int v = myLowerBounds[idx];
+        return v == Integer.MIN_VALUE ? Double.NEGATIVE_INFINITY : v;
+    }
+
     BigDecimal getLowerBound(final int idx) {
         int tmpLower = myLowerBounds[idx];
         if (tmpLower != Integer.MIN_VALUE) {
@@ -411,6 +420,15 @@ public final class NodeKey implements Comparable<NodeKey> {
         double feasibleValue = this.feasible(idx, value, true);
 
         return Math.abs(feasibleValue - Math.rint(feasibleValue));
+    }
+
+    /**
+     * Upper bound on the integer variable at {@code idx} (integer-local index), as a double. The
+     * {@link Integer#MAX_VALUE} sentinel for "unbounded" is mapped to {@link Double#POSITIVE_INFINITY}.
+     */
+    double getUpper(final int idx) {
+        int v = myUpperBounds[idx];
+        return v == Integer.MAX_VALUE ? Double.POSITIVE_INFINITY : v;
     }
 
     BigDecimal getUpperBound(final int idx) {
@@ -433,17 +451,30 @@ public final class NodeKey implements Comparable<NodeKey> {
         return myUpperBranch;
     }
 
-    double score(final ModelStrategy strategy, final boolean found) {
-        if (myUpperBranch) {
-            return strategy.scoreBranchUp(index, displacement, found);
-        } else {
-            return strategy.scoreBranchDown(index, displacement, found);
-        }
-    }
-
     void setNodeState(final ExpressionsBasedModel model, final ModelStrategy strategy) {
         for (int i = 0; i < strategy.countIntegerVariables(); i++) {
             this.enforceBounds(model, i, strategy);
+        }
+    }
+
+    /**
+     * Raise the lower bound on integer variable {@code idx} to {@code newLower} if that is strictly tighter;
+     * never loosens. NodeKeys are otherwise treated as immutable (children get new instances) - this mutator
+     * is intended for the root-phase probing pass before any worker can see the NodeKey.
+     */
+    void tightenLower(final int idx, final int newLower) {
+        if (newLower > myLowerBounds[idx]) {
+            myLowerBounds[idx] = newLower;
+        }
+    }
+
+    /**
+     * Lower the upper bound on integer variable {@code idx} to {@code newUpper} if that is strictly tighter;
+     * never loosens. See {@link #tightenLower}.
+     */
+    void tightenUpper(final int idx, final int newUpper) {
+        if (newUpper < myUpperBounds[idx]) {
+            myUpperBounds[idx] = newUpper;
         }
     }
 

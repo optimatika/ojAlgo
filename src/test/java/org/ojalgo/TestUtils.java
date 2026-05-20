@@ -76,7 +76,6 @@ public abstract class TestUtils {
 
     public static void assertArrayEquals(final double[] expected, final double[] actual) {
         Assertions.assertArrayEquals(expected, actual);
-
     }
 
     public static void assertArrayEquals(final double[] expected, final double[] actual, final double tolerance) {
