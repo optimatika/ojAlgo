@@ -96,7 +96,21 @@ final class QPESolver extends ConstrainedSolver {
 
             // Negated Schur complement
             MatrixStore<Double> negS = iterA.multiply(invQAt);
-            // TODO Symmetric, only need to calculate halv the Schur complement
+            int m = (int) iterA.countRows();
+            double diagMax = 1.0;
+            double diagMin = Double.POSITIVE_INFINITY;
+            for (int i = 0; i < m; i++) {
+                double sii = negS.doubleValue(i, i);
+                if (Double.isFinite(sii) && sii > diagMax) diagMax = sii;
+                if (Double.isFinite(sii) && sii > 0.0 && sii < diagMin) diagMin = sii;
+            }
+            double rho = DualRegularisation.strategy().compute(diagMax, diagMin, m, options.convex().isExtendedPrecision(), this.isZeroQ());
+            if (rho != 0.0) {
+                DualRegMetrics.recordSchur(rho);
+                PhysicalStore<Double> sStore = negS.copy();
+                sStore.modifyDiagonal(ADD.by(rho));
+                negS = sStore;
+            }
             if (solved = this.computeGeneral(negS)) {
 
                 // iterX temporarely used to store tmpInvQC
