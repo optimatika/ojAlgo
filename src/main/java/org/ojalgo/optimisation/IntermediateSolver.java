@@ -48,6 +48,7 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
         myModel = model;
         myIntegration = null;
         mySolver = null;
+        myResult = null;
     }
 
     @Override
@@ -73,12 +74,10 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
             mySolver.dispose();
             mySolver = null;
         }
-
-        myIntegration = null;
     }
 
     @Override
-    public Optimisation.Result solve(final Optimisation.Result candidate) {
+    public final Optimisation.Result solve(final Optimisation.Result candidate) {
 
         // Cold = first solve (or after reset()): the solver is (re)generated here. Only then do the
         // O(model) presolve + degenerate-model pre-checks. On a warm re-solve (bound-only updates
@@ -186,6 +185,10 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
         return myModel.validate(solution, appender);
     }
 
+    protected Optimisation.Solver generateSolver(final ExpressionsBasedModel model) {
+        return this.getIntegration().build(model);
+    }
+
     protected int getIndexInSolver(final int globalModelIndex) {
         Variable variable = myModel.getVariable(globalModelIndex);
         ExpressionsBasedModel.Integration<?> integration = this.getIntegration();
@@ -199,7 +202,7 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
         return myIntegration;
     }
 
-    protected ExpressionsBasedModel getModel() {
+    protected final ExpressionsBasedModel getModel() {
         return myModel;
     }
 
@@ -210,9 +213,9 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
         return myResult;
     }
 
-    protected Optimisation.Solver getSolver() {
+    protected final Optimisation.Solver getSolver() {
         if (mySolver == null) {
-            mySolver = this.getIntegration().build(myModel);
+            mySolver = this.generateSolver(myModel);
         }
         return mySolver;
     }
