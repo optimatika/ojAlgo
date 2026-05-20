@@ -29,23 +29,16 @@ import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.scalar.PrimitiveScalar;
 
-/**
- * Solves optimisation problems of the form:
- * <p>
- * min 1/2 [X]<sup>T</sup>[Q][X] - [C]<sup>T</sup>[X]<br>
- * when [AE][X] == [BE]<br>
- * and [AI][X] <= [BI]
- * </p>
- * Where [AE] and [BE] are optional.
- *
- * @author apete
- */
 final class DirectASS extends ActiveSetSolver {
 
     DirectASS(final ConvexData<Double> convexData, final Optimisation.Options optimisationOptions) {
         super(convexData, optimisationOptions);
+        disableScaling = optimisationOptions.convex().iterative().getPrecision() >= 16;
     }
+
+    private final boolean disableScaling;
 
     @Override
     protected void performIteration() {
@@ -88,33 +81,64 @@ final class DirectASS extends ActiveSetSolver {
                 MatrixStore<Double> iterC = this.getIterationC();
 
                 MatrixStore<Double> invQAt = this.getSolutionQ(iterA.transpose());
-                // TODO Only 1 column change inbetween active set iterations (add or remove 1 column)
                 if (this.isLogDebug()) {
                     this.log("invQAt", invQAt);
                 }
 
-                // Negated Schur complement
+                // Negated Schur complement base (unscaled) S = invQAt.premultiply(iterA)
                 ElementsSupplier<Double> tmpS = invQAt.premultiply(iterA);
-                // TODO Symmetric, only need to calculate half the Schur complement, and only 1 row/column changes per iteration
+                R064Store baseS = tmpS.collect(R064Store.FACTORY); // Materialise full Schur complement
 
-                if (this.isLogDebug()) {
-                    this.log("Negated Schur complement: " + Arrays.toString(incl), tmpS.collect(MATRIX_FACTORY));
+                // Compute & apply scaling
+                double[] diag = SchurScaling.computeDiagonal(iterA, invQAt); // S positive diag
+                double max = 0.0, min = Double.POSITIVE_INFINITY;
+                for (double v : diag) { if (v > max) max = v; if (v > 0 && v < min) min = v; }
+                boolean wellConditioned = min < Double.POSITIVE_INFINITY && max / min < 1.0e3;
+                boolean extremeSpread = min < Double.POSITIVE_INFINITY && max / min > 1.0e6;
+                boolean applyScaling = !disableScaling && !wellConditioned && !extremeSpread && (max / min >= 1.0e4);
+                double[] scale;
+                if (applyScaling) {
+                    SchurScaling.regulariseDiagonal(diag);
+                    scale = SchurScaling.buildScaling(diag);
+                    for (int i = 0; i < numbConstr; i++) {
+                        double di = scale[i];
+                        for (int j = 0; j < numbConstr; j++) {
+                            double dj = scale[j];
+                            baseS.set(i, j, baseS.doubleValue(i, j) * di * dj);
+                        }
+                    }
+                } else {
+                    scale = new double[diag.length];
+                    Arrays.fill(scale, ONE);
                 }
 
-                if (solved = this.computeGeneral(tmpS)) {
+                if (this.isLogDebug()) {
+                    this.log("Scaled Schur complement", baseS);
+                }
+
+                if (solved = this.computeGeneral(baseS)) {
 
                     ElementsSupplier<Double> rhsL = invQC.premultiply(iterA).onMatching(SUBTRACT, iterB);
-                    this.getSolutionGeneral(rhsL, iterL);
+                    double[] rhsArray = rhsL.collect(R064Store.FACTORY).toRawCopy1D();
+                    SchurScaling.scaleRHS(scale, rhsArray);
+                    R064Store rhsStore = R064Store.FACTORY.make(numbConstr, 1);
+                    for (int i = 0; i < numbConstr; i++) rhsStore.set(i, rhsArray[i]);
+
+                    this.getSolutionGeneral(rhsStore, iterL);
 
                     if (this.isLogDebug()) {
-                        this.log("RHS={}", rhsL.collect(MATRIX_FACTORY).toRawCopy1D());
-                        this.log("Relative error {} in solution for L={}", NaN, Arrays.toString(iterL.toRawCopy1D()));
+                        this.log("RHS (scaled)={}", rhsArray);
+                        this.log("Relative error {} in solution for L (scaled)={}", NaN, Arrays.toString(iterL.toRawCopy1D()));
                     }
 
-                    // ElementsSupplier<Double> rhsX = iterL.premultiply(iterA.transpose()).onMatching(iterC, SUBTRACT);
-                    // this.getSolutionQ(rhsX, iterX);
+                    // Unscale multipliers
+                    for (int i = 0; i < numbConstr; i++) {
+                        iterL.set(i, iterL.doubleValue(i) * scale[i]);
+                    }
 
-                    iterL.premultiply(invQAt).onMatching(invQC, SUBTRACT).supplyTo(iterX);
+                    // Recover primal using same formulation as IterativeASS: x solves Qx = C - A^T L
+                    ElementsSupplier<Double> rhsX = iterL.premultiply(iterA.transpose()).onMatching(iterC, SUBTRACT);
+                    this.getSolutionQ(rhsX, iterX);
                 }
             }
         }

@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation;
 
-import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -387,6 +387,10 @@ public class Expression extends ModelEntity<Expression> {
         return retVal;
     }
 
+    public final int countLinearFactors() {
+        return myLinear.size();
+    }
+
     public final double density() {
 
         int nbVars = myModel.countVariables();
@@ -638,6 +642,10 @@ public class Expression extends ModelEntity<Expression> {
      */
     public final boolean isLinearAndAnyInteger() {
         return myQuadratic.size() == 0 && myLinear.size() > 0 && myLinear.keySet().stream().anyMatch(i -> myModel.getVariable(i).isInteger());
+    }
+
+    public final boolean isRedundant() {
+        return myRedundant;
     }
 
     /**
@@ -1046,10 +1054,6 @@ public class Expression extends ModelEntity<Expression> {
         return myLinear.keySet().stream().map(this::resolve).filter(Variable::isInteger).count();
     }
 
-    final int countLinearFactors() {
-        return myLinear.size();
-    }
-
     final int countQuadraticFactors() {
         return myQuadratic.size();
     }
@@ -1341,10 +1345,6 @@ public class Expression extends ModelEntity<Expression> {
 
             return true;
         }
-    }
-
-    final boolean isRedundant() {
-        return myRedundant;
     }
 
     final Variable resolve(final Structure1D.IntIndex index) {

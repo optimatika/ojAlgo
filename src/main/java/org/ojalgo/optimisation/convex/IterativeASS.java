@@ -65,6 +65,8 @@ final class IterativeASS extends ActiveSetSolver {
         private final SparseArrayPool myEquationBodyPool;
         private final int myFullDim = myCountE + IterativeASS.this.countInequalityConstraints();
         private final Equation[] myIterationRows;
+        private double[] myScale; // d[i]
+        private final boolean disableScaling;
 
         SchurComplementSolver() {
 
@@ -73,20 +75,37 @@ final class IterativeASS extends ActiveSetSolver {
 
             myEquationBodyPool = new SparseArrayPool(myFullDim);
             myIterationRows = new Equation[myFullDim];
+            myScale = new double[myFullDim];
+            Arrays.fill(myScale, ONE);
+            disableScaling = true; // force scaling off
+        }
+
+        void setScaling(final double[] scale) {
+            System.arraycopy(scale, 0, myScale, 0, Math.min(scale.length, myScale.length));
+        }
+
+        double[] getScaling() {
+            return myScale;
+        }
+
+        void applyScalingBackTo(final R064Store solL) {
+            for (int i = 0; i < solL.countRows() && i < myScale.length; i++) {
+                solL.set(i, solL.doubleValue(i) * myScale[i]);
+            }
         }
 
         void add(final int j, final Access1D<Double> column, final double rhs) {
 
             int[] incl = IterativeASS.this.getIncluded();
 
-            Equation tmpNewRow = Equation.wrap(myEquationBodyPool.borrow(), j, rhs);
+            Equation tmpNewRow = Equation.wrap(myEquationBodyPool.borrow(), j, rhs); // no scaling
             myIterationRows[j] = tmpNewRow;
             this.add(tmpNewRow);
 
             if (myCountE > 0) {
                 for (int i = 0; i < myCountE; i++) {
                     double tmpVal = IterativeASS.this.getMatrixAE(i).dot(column);
-                    if (i == j || !PrimitiveScalar.isSmall(ONE, tmpVal)) {
+                    if ((i == j) || !PrimitiveScalar.isSmall(ONE, tmpVal)) {
                         Equation tmpRowE = myIterationRows[i];
                         if (tmpRowE != null) {
                             tmpRowE.set(j, tmpVal);
@@ -100,7 +119,7 @@ final class IterativeASS extends ActiveSetSolver {
                 for (int _i = 0; _i < incl.length; _i++) {
                     double tmpVal = IterativeASS.this.getMatrixAI(incl[_i]).dot(column);
                     int i = myCountE + incl[_i];
-                    if (i == j || !PrimitiveScalar.isSmall(ONE, tmpVal)) {
+                    if ((i == j) || !PrimitiveScalar.isSmall(ONE, tmpVal)) {
                         Equation tmpRowI = myIterationRows[i];
                         if (tmpRowI != null) {
                             tmpRowI.set(j, tmpVal);
@@ -282,6 +301,7 @@ final class IterativeASS extends ActiveSetSolver {
             MatrixStore<Double> tmpCols = this.getSolutionQ(iterA.transpose());
             MatrixStore<Double> tmpRHS = this.getInvQC().premultiply(iterA).onMatching(SUBTRACT, iterB).collect(MATRIX_FACTORY);
 
+            // scaling disabled, directly add rows
             for (int j = 0; j < nbEqus; j++) {
                 myS.add(j, tmpCols.sliceColumn(j), tmpRHS.doubleValue(j));
             }
