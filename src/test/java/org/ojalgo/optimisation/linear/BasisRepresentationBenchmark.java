@@ -184,8 +184,10 @@ public class BasisRepresentationBenchmark {
     private int[] included;
     private double[] rhsProduct;
     private double[] rhsSparse;
+    private double[] rhsMarkow;
     private BasisRepresentation productForm;
     private BasisRepresentation sparseDecomp;
+    private BasisRepresentation markowitzDecomp;
 
     public BasisRepresentationBenchmark() {
         super();
@@ -208,13 +210,16 @@ public class BasisRepresentationBenchmark {
 
         sparseDecomp = new SparseDecomposition(dim);
         productForm = new ProductFormInverse(dim);
+        markowitzDecomp = new MarkowitzDecomposition(dim);
 
         sparseDecomp.reset(csc, included);
         productForm.reset(csc, included);
+        markowitzDecomp.reset(csc, included);
 
         for (int u = 0; u < updates; u++) {
             sparseDecomp.update(csc, included, columnIndex[u], columnIndex[u]);
             productForm.update(csc, included, columnIndex[u], columnIndex[u]);
+            markowitzDecomp.update(csc, included, columnIndex[u], columnIndex[u]);
         }
     }
 
@@ -223,6 +228,13 @@ public class BasisRepresentationBenchmark {
         double[] base = AbstractBenchmarkSparseLU.newDenseVector(dim).toRawCopy1D();
         rhsProduct = base.clone();
         rhsSparse = base.clone();
+        rhsMarkow = base.clone();
+    }
+
+    @Benchmark
+    public void solveMarkow() {
+        markowitzDecomp.ftran(rhsMarkow);
+        markowitzDecomp.btran(rhsMarkow);
     }
 
     @Benchmark

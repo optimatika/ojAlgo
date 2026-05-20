@@ -448,7 +448,8 @@ public final class NodeKey implements Comparable<NodeKey> {
     }
 
     boolean isSignChanged() {
-        return mySignChanged;
+        // return mySignChanged;
+        return true;
     }
 
     boolean isUpperBranch() {

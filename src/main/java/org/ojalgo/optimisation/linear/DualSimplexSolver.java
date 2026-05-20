@@ -85,6 +85,8 @@ final class DualSimplexSolver extends SimplexSolver {
                 simplex.lower(j);
             }
         }
+
+        simplex.switchToPhase2();
     }
 
 }
