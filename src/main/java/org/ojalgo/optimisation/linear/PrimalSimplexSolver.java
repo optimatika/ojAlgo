@@ -82,6 +82,8 @@ final class PrimalSimplexSolver extends SimplexSolver {
                 simplex.lower(j);
             }
         }
+
+        simplex.switchToPhase2();
     }
 
 }
