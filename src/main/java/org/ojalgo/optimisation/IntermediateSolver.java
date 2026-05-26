@@ -158,7 +158,8 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
         if (myInPlaceUpdatesOK && mySolver instanceof UpdatableSolver) {
             UpdatableSolver updatableSolver = (UpdatableSolver) mySolver;
 
-            if (updatableSolver.updateRange(this.getIndexInSolver(globalIndex), lowerBound, upperBound)) {
+            int indexInSolver = this.getIndexInSolver(globalIndex);
+            if (indexInSolver >= 0 && updatableSolver.updateRange(indexInSolver, lowerBound, upperBound)) {
                 // Solver updated in-place
                 return;
             }
@@ -179,25 +180,27 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
 
         if (myInPlaceUpdatesOK && mySolver instanceof UpdatableSolver) {
             UpdatableSolver updatableSolver = (UpdatableSolver) mySolver;
+
             int indexInSolver = this.getIntegration().getIndexInSolver(myModel, variable);
+            if (indexInSolver >= 0) {
+                if (variable.isFixed()) {
 
-            if (variable.isFixed()) {
+                    double fixedValue = variable.getValue().doubleValue();
 
-                double fixedValue = variable.getValue().doubleValue();
+                    if (updatableSolver.fixVariable(indexInSolver, fixedValue)) {
+                        // Solver updated in-place
+                        return;
+                    }
 
-                if (updatableSolver.fixVariable(indexInSolver, fixedValue)) {
-                    // Solver updated in-place
-                    return;
-                }
+                } else {
 
-            } else {
+                    double lowerBound = variable.getLowerLimit(false, PrimitiveMath.NEGATIVE_INFINITY);
+                    double upperBound = variable.getUpperLimit(false, PrimitiveMath.POSITIVE_INFINITY);
 
-                double lowerBound = variable.getLowerLimit(false, PrimitiveMath.NEGATIVE_INFINITY);
-                double upperBound = variable.getUpperLimit(false, PrimitiveMath.POSITIVE_INFINITY);
-
-                if (updatableSolver.updateRange(indexInSolver, lowerBound, upperBound)) {
-                    // Solver updated in-place
-                    return;
+                    if (updatableSolver.updateRange(indexInSolver, lowerBound, upperBound)) {
+                        // Solver updated in-place
+                        return;
+                    }
                 }
             }
 
@@ -222,8 +225,7 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
 
     protected int getIndexInSolver(final int globalModelIndex) {
         Variable variable = myModel.getVariable(globalModelIndex);
-        ExpressionsBasedModel.Integration<?> integration = this.getIntegration();
-        return integration.getIndexInSolver(myModel, variable);
+        return this.getIntegration().getIndexInSolver(myModel, variable);
     }
 
     protected ExpressionsBasedModel.Integration<?> getIntegration() {
