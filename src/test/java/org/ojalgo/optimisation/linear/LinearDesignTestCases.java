@@ -204,7 +204,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
             Optimisation.Result actual = model.maximise();
             if (DEBUG) {
                 BasicLogger.debug("{}: {}", identifier, actual);
-                BasicLogger.debug("{}: {}", identifier, actual.getMatchedMultipliers());
+                BasicLogger.debug("{}: {}", identifier, actual.getDualValues());
             }
             TestUtils.assertStateAndSolution(expected, actual);
 

@@ -444,7 +444,7 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
             Optimisation.Result result = Optimisation.Result.of(value, state, x);
 
             if (state.isFeasible() && y != null && y.length > 0) {
-                result = result.multipliers(y);
+                result = result.withDualSolution(() -> ArrayR064.wrap(y));
             }
 
             return result;
@@ -866,7 +866,7 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
 
         if (kickStarter != null && kickStarter.getState().isFeasible()) {
             this.initialisePrimal(kickStarter);
-            kickStarter.getMultipliers().ifPresent(this::initialiseDual);
+            kickStarter.getDualSolution().map(Supplier::get).ifPresent(this::initialiseDual);
         }
 
         double value = PrimitiveMath.NaN;

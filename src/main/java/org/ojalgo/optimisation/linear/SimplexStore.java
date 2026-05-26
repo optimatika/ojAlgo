@@ -378,8 +378,8 @@ abstract class SimplexStore {
      * Extract the dual variables (Lagrange multipliers) for all constraints into the given array. The array
      * must have length {@link #m}.
      */
-    final void extractDualVariables(final double[] target) {
-        Primitive1D duals = this.sliceDualVariables();
+    final void extractDualValues(final double[] target) {
+        Primitive1D duals = this.sliceDualValues();
         for (int i = 0; i < m; i++) {
             target[i] = duals.doubleValue(i);
         }
@@ -737,7 +737,7 @@ abstract class SimplexStore {
 
     abstract Primitive1D sliceBodyRow(final int row);
 
-    abstract Primitive1D sliceDualVariables();
+    abstract Primitive1D sliceDualValues();
 
     final SimplexStore unbounded(final int index) {
         myPartition.update(index, ColumnState.UNBOUNDED);

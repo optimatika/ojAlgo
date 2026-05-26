@@ -719,7 +719,7 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
-    Primitive1D sliceDualVariables() {
+    Primitive1D sliceDualValues() {
 
         this.updateDualsAndReducedCosts();
 

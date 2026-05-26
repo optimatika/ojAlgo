@@ -667,8 +667,8 @@ public interface Optimisation {
         }
 
         private ConstraintsMetaData myConstraintsMap = null;
-        private List<KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>>> myMatchedMultipliers = null;
-        private Access1D<?> myMultipliers = null;
+        private Supplier<Access1D<?>> myDualSolution = null;
+        private transient List<KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>>> myDualValues = null;
         private Supplier<Access1D<?>> myReducedGradient = null;
         private final Access1D<?> mySolution;
         private final Optimisation.State myState;
@@ -729,25 +729,52 @@ public interface Optimisation {
         }
 
         /**
-         * The dual variables or Lagrange multipliers, matched to their respective constraints (model entity
-         * and constraint type pairs).
+         * The dual variable values (Lagrange multipliers) associated with the constraints.
+         * <p>
+         * If the {@link Optional} is empty the underlying {@link Solver} or {@link Integration} does not
+         * provide the dual variables.
+         * <p>
+         * If the {@link Optional} is not empty the {@link Supplier} always returns a non-null
+         * {@link Access1D} instance. The {@link Supplier} construct is to allow for lazy construction.
          */
-        public List<KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>>> getMatchedMultipliers() {
-            if (myMatchedMultipliers == null) {
-                if (myConstraintsMap != null && myMultipliers != null && myConstraintsMap.isEntityMap() && myConstraintsMap.size() == myMultipliers.size()) {
-                    myMatchedMultipliers = myConstraintsMap.match(myMultipliers);
-                } else {
-                    myMatchedMultipliers = List.of();
-                }
-            }
-            return myMatchedMultipliers;
+        public Optional<Supplier<Access1D<?>>> getDualSolution() {
+            return Optional.ofNullable(myDualSolution);
         }
 
         /**
-         * The dual variables or Lagrange multipliers associated with the problem.
+         * The dual variable values or Lagrange multipliers, matched to their respective constraints (model
+         * entity and constraint type pairs).
          */
+        public List<KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>>> getDualValues() {
+
+            if (myDualValues == null) {
+                Access1D<?> duals = myDualSolution != null ? myDualSolution.get() : null;
+                if (myConstraintsMap != null && duals != null && myConstraintsMap.isEntityMap() && myConstraintsMap.size() == duals.size()) {
+                    myDualValues = myConstraintsMap.match(duals);
+                } else {
+                    myDualValues = List.of();
+                }
+            }
+            return myDualValues;
+        }
+
+        /**
+         * The dual variables or Lagrange multipliers, matched to their respective constraints (model entity
+         * and constraint type pairs).
+         *
+         * @deprecated Use {@link #getDualValues()} instead
+         */
+        @Deprecated
+        public List<KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>>> getMatchedMultipliers() {
+            return this.getDualValues();
+        }
+
+        /**
+         * @deprecated v57 Use {@link #getDualSolution()} instead.
+         */
+        @Deprecated
         public Optional<Access1D<?>> getMultipliers() {
-            return Optional.ofNullable(myMultipliers);
+            return this.getDualSolution().map(Supplier::get);
         }
 
         /**
@@ -797,19 +824,28 @@ public interface Optimisation {
             return prime * result + (int) (temp ^ temp >>> 32);
         }
 
+        /**
+         * @deprecated v57 Use {@link #withDualSolution(Supplier)} instead.
+         */
+        @Deprecated
         public Result multipliers(final Access1D<?> multipliers) {
-            myMultipliers = multipliers;
-            return this;
+            return this.withDualSolution(() -> multipliers);
         }
 
+        /**
+         * @deprecated v57 Use {@link #withDualValues(ConstraintsMetaData, Supplier)} instead.
+         */
+        @Deprecated
         public Result multipliers(final ConstraintsMetaData constraintsMap, final Access1D<?> multipliers) {
-            myConstraintsMap = constraintsMap;
-            myMultipliers = multipliers;
-            return this;
+            return this.withDualValues(constraintsMap, () -> multipliers);
         }
 
+        /**
+         * @deprecated v57 Use {@link #withDualSolution(Supplier)} instead.
+         */
+        @Deprecated
         public Result multipliers(final double... multipliers) {
-            return this.multipliers(ArrayR064.wrap(multipliers));
+            return this.withDualSolution(() -> ArrayR064.wrap(multipliers));
         }
 
         @Override
@@ -824,6 +860,17 @@ public interface Optimisation {
         @Override
         public String toString() {
             return myState + " " + myValue + " @ " + Access1D.toString(mySolution);
+        }
+
+        public Result withDualSolution(final Supplier<Access1D<?>> dualSolution) {
+            myDualSolution = dualSolution;
+            return this;
+        }
+
+        public Result withDualValues(final ConstraintsMetaData constraintsMap, final Supplier<Access1D<?>> dualSolution) {
+            myConstraintsMap = constraintsMap;
+            myDualSolution = dualSolution;
+            return this;
         }
 
         public Result withNegatedValue() {
@@ -879,19 +926,19 @@ public interface Optimisation {
 
         private void multipliers(final Result target) {
 
-            Optional<Access1D<?>> multipliers = this.getMultipliers();
-            if (multipliers.isPresent()) {
-                target.multipliers(multipliers.get());
+            Optional<Supplier<Access1D<?>>> dualValues = this.getDualSolution();
+            if (dualValues.isPresent()) {
+                target.withDualSolution(dualValues.get());
             }
 
-            List<KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>>> matchedMultipliers = this.getMatchedMultipliers();
+            List<KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>>> matchedMultipliers = this.getDualValues();
             if (matchedMultipliers.size() > 0) {
                 target.multipliers(matchedMultipliers);
             }
         }
 
         Result multipliers(final List<KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>>> matchedMultipliers) {
-            myMatchedMultipliers = matchedMultipliers;
+            myDualValues = matchedMultipliers;
             return this;
         }
 

@@ -21,6 +21,8 @@
  */
 package org.ojalgo.optimisation.convex;
 
+import java.util.function.Supplier;
+
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.QuadrupleMath;
 import org.ojalgo.matrix.store.GenericStore;
@@ -41,7 +43,7 @@ final class IterativeRefinementSolver extends ConvexSolver {
             final MatrixStore<Quadruple> y, final State state) {
         Quadruple objectiveValue = Q.multiplyBoth(x).divide(2).subtract(x.transpose().multiply(C).get(0));
         Result result = new Result(state, objectiveValue.doubleValue(), x);
-        result.multipliers(y);
+        result.withDualSolution(() -> y);
         return result;
     }
 
@@ -135,7 +137,7 @@ final class IterativeRefinementSolver extends ConvexSolver {
         }
 
         MatrixStore<Quadruple> x0 = GenericStore.R128.column(x_y_double);
-        MatrixStore<Quadruple> y0 = GenericStore.R128.column(x_y_double.getMultipliers().orElseThrow());
+        MatrixStore<Quadruple> y0 = GenericStore.R128.column(x_y_double.getDualSolution().map(Supplier::get).orElseThrow());
         double initialSolutionValue = x_y_double.getValue();
 
         //  Set initial values
@@ -248,7 +250,7 @@ final class IterativeRefinementSolver extends ConvexSolver {
             } while (!x_y_double.getState().isOptimal());
 
             MatrixStore<Quadruple> x0_ = GenericStore.R128.column(x_y_double);
-            MatrixStore<Quadruple> y0_ = GenericStore.R128.column(x_y_double.getMultipliers().orElseThrow());
+            MatrixStore<Quadruple> y0_ = GenericStore.R128.column(x_y_double.getDualSolution().map(Supplier::get).orElseThrow());
             // refine the Quadruple precision solution
             MatrixStore<Quadruple> x1 = x0.add(x0_.divide(scaleP1));
             MatrixStore<Quadruple> y1 = y0.add(y0_.divide(scaleD1));

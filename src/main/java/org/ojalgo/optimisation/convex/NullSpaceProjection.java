@@ -199,7 +199,7 @@ class NullSpaceProjection {
         }
 
         Optimisation.Result retVal = new Optimisation.Result(reducedlState.getState(), NaN, x);
-        return retVal.multipliers(myOriginal.getConstraintsMetaData(), multipliers);
+        return retVal.withDualValues(myOriginal.getConstraintsMetaData(), () -> multipliers);
     }
 
     /**

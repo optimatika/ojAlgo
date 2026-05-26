@@ -55,9 +55,9 @@ abstract class ConstrainedSolver extends BasePrimitiveSolver {
         Result result = super.buildResult();
 
         if (this.getEntityMap().isPresent()) {
-            return result.multipliers(this.getConstraintsMetaData(), mySolutionL);
+            return result.withDualValues(this.getConstraintsMetaData(), () -> mySolutionL);
         } else {
-            return result.multipliers(mySolutionL);
+            return result.withDualSolution(() -> mySolutionL);
         }
     }
 

@@ -182,7 +182,7 @@ final class IterativeRefinementSolver2 extends ConvexSolver {
             retState = Optimisation.State.APPROXIMATE;
         }
 
-        return new Optimisation.Result(retState, retValue, retX).multipliers(retLE.below(retLI));
+        return new Optimisation.Result(retState, retValue, retX).withDualSolution(() -> retLE.below(retLI));
     }
 
     private final ConvexData<Quadruple> myData;

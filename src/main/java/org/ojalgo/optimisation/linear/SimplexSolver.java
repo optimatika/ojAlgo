@@ -525,7 +525,7 @@ abstract class SimplexSolver extends LinearSolver {
         };
 
         Optimisation.Result retVal = new Optimisation.Result(retState, retValue, retSolution);
-        retVal.multipliers(retMultipliers);
+        retVal.withDualSolution(() -> retMultipliers);
         return retVal;
     }
 
@@ -631,7 +631,7 @@ abstract class SimplexSolver extends LinearSolver {
         };
 
         Optimisation.Result retVal = new Optimisation.Result(retState, retValue, retSolution);
-        retVal.multipliers(retMultipliers);
+        retVal.withDualSolution(() -> retMultipliers);
         return retVal;
     }
 
@@ -1509,7 +1509,7 @@ abstract class SimplexSolver extends LinearSolver {
     @Override
     double[] extractDualMultipliers() {
         double[] duals = new double[mySimplex.m];
-        mySimplex.extractDualVariables(duals);
+        mySimplex.extractDualValues(duals);
         for (int i = 0; i < duals.length; i++) {
             if (mySimplex.structure.isConstraintNegated(i)) {
                 duals[i] = -duals[i];
@@ -1549,9 +1549,9 @@ abstract class SimplexSolver extends LinearSolver {
         }
 
         if (mySimplex.structure.isEntityMap()) {
-            return result.multipliers(mySimplex.structure.constraints, this.extractMultipliers());
+            return result.withDualValues(mySimplex.structure.constraints, this::extractMultipliers);
         } else {
-            return result.multipliers(this.extractMultipliers());
+            return result.withDualSolution(this::extractMultipliers);
         }
     }
 

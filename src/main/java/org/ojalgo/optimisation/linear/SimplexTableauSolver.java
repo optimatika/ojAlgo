@@ -553,7 +553,7 @@ final class SimplexTableauSolver extends LinearSolver {
         };
 
         Optimisation.Result retVal = new Optimisation.Result(retState, retValue, retSolution);
-        retVal.multipliers(retMultipliers);
+        retVal.withDualSolution(() -> retMultipliers);
         return retVal;
     }
 
@@ -637,7 +637,7 @@ final class SimplexTableauSolver extends LinearSolver {
         Access1D<?> retMultipliers = multiplierNumbers;
 
         Optimisation.Result retVal = new Optimisation.Result(retState, retValue, retSolution);
-        retVal.multipliers(retMultipliers);
+        retVal.withDualSolution(() -> retMultipliers);
         return retVal;
     }
 
@@ -878,9 +878,9 @@ final class SimplexTableauSolver extends LinearSolver {
         Result result = new Optimisation.Result(state, value, solution).withReducedGradient(reducedGradient);
 
         if (myTableau.structure.isEntityMap()) {
-            return result.multipliers(myTableau.structure.constraints, this.extractMultipliers());
+            return result.withDualValues(myTableau.structure.constraints, this::extractMultipliers);
         } else {
-            return result.multipliers(this.extractMultipliers());
+            return result.withDualSolution(this::extractMultipliers);
         }
     }
 
@@ -1030,7 +1030,7 @@ final class SimplexTableauSolver extends LinearSolver {
     @Override
     double[] extractDualMultipliers() {
         double[] duals = new double[myTableau.m];
-        myTableau.extractDualVariables(duals);
+        myTableau.extractDualValues(duals);
         for (int i = 0; i < duals.length; i++) {
             if (myTableau.structure.isConstraintNegated(i)) {
                 duals[i] = -duals[i];

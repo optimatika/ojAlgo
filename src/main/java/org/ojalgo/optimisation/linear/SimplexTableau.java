@@ -514,7 +514,7 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
      * @return An array of the dual variable values (of the original problem, never phase 1).
      */
     @Override
-    final Primitive1D sliceDualVariables() {
+    final Primitive1D sliceDualValues() {
 
         Primitive1D slice = this.objective();
         int base = n - m;

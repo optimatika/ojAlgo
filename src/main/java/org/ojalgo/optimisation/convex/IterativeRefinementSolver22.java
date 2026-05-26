@@ -199,7 +199,7 @@ final class IterativeRefinementSolver22 extends ConvexSolver {
             state = Optimisation.State.OPTIMAL;
         }
 
-        return new Optimisation.Result(state, retValue, retX).multipliers(retY);
+        return new Optimisation.Result(state, retValue, retX).withDualSolution(() -> retY);
     }
 
 }

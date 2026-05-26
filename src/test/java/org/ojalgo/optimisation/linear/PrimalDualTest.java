@@ -86,7 +86,7 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
             TestUtils.assertEquals(optimalSolution.get(variable.getName()).doubleValue(), variable.getValue().doubleValue());
         }
 
-        for (KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>> matched : actualResult.getMatchedMultipliers()) {
+        for (KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>> matched : actualResult.getDualValues()) {
             TestUtils.assertEquals(optimalSolution.get(matched.getKey().getKey().getName()).doubleValue(), matched.doubleValue());
         }
     }

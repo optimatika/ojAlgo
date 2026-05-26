@@ -37,7 +37,7 @@ final class IterativeRefinementSolverDouble extends ConvexSolver {
             final State state) {
         double objectiveValue = Q0.multiplyBoth(x0) / 2.0 - x0.dot(C0);
         Result result = new Result(state, objectiveValue, x0);
-        result.multipliers(y0);
+        result.withDualSolution(() -> y0);
         return result;
     }
 

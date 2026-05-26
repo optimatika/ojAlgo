@@ -319,7 +319,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             IntIndex key = new IntIndex(variableIndex);
             double rc = model.objective().doubleValue(key, false);
 
-            for (EntryPair.KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>> kp : solverState.getMatchedMultipliers()) {
+            for (EntryPair.KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>> kp : solverState.getDualValues()) {
                 ModelEntity<?> entity = kp.getKey().getKey();
                 if (entity instanceof Expression) {
                     Expression expression = (Expression) entity;

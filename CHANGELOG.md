@@ -22,6 +22,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - New `Equilibrator` abstract class for matrix equilibration (row and column scaling). Provides utility methods for clamping scaling factors to safe bounds and is used by scaling implementations across the optimisation pipeline.
 - `UpdatableSolver` gained `getDualMultiplier(int)` and `getReducedGradient(int)` for querying dual variables and reduced gradients after a solve.
 - `Optimisation.Result` now carries an optional reduced gradient via `getReducedGradient()` / `withReducedGradient(Supplier)`.
+- `Optimisation.Result` gained `getDualSolution()` returning `Optional<Supplier<Access1D<?>>>` (lazy dual variables), `getDualValues()` returning the dual values matched to their respective constraints, and the corresponding builder methods `withDualSolution(Supplier)` / `withDualValues(ConstraintsMetaData, Supplier)`. These replace the previous `getMultipliers()` / `getMatchedMultipliers()` / `multipliers(...)` API.
 - `ExpressionsBasedModel.Simplifier`, `ExpressionAnalyser`, and `VariableAnalyser` are now `public`, enabling custom presolver-like hooks that plug into the standard presolve pipeline.
 - New `ExpressionsBasedModel.getVariableValuesValidated()` – the validated/state-resolving counterpart of `getVariableValues()` (see the corresponding behaviour change below).
 - New `Optimisation.Integration.prepareSolverCandidate(Result, Model)` – maps an optional kick-starter from model state to solver state, and may return `null`. Integrations whose solver ignores the kick-starter (e.g. the linear/simplex solver) return `null`, letting callers skip candidate extraction and conversion entirely.
@@ -147,6 +148,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - `ExpressionsBasedModel.prepare(Function)` – use `prepare(Optimisation.Sense, Function)` instead.
 - `Optimisation.Options.getConfigurator(Class)` and `Options.setConfigurator(Object)` – use `Optimisation.Environment.getConfigurator(Class)` or the model-level `getConfigurator(T)` / `setConfigurator(Object)` instead.
 - `Optimisation.Integration.extractSolverState(M)` – no longer needed internally.
+- `Optimisation.Result.getMultipliers()`, `getMatchedMultipliers()`, and the `multipliers(...)` builder overloads – use `getDualSolution()`, `getDualValues()`, `withDualSolution(Supplier)` and `withDualValues(ConstraintsMetaData, Supplier)` instead (scheduled for removal in v57).
 
 ### Removed
 
