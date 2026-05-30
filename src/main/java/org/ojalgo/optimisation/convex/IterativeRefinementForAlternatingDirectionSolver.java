@@ -37,13 +37,13 @@ import org.ojalgo.structure.Access1D;
  * <p>
  * Mathematical Programming Computation (2019) 11:421–455 https://doi.org/10.1007/s12532-019-00154-6
  */
-final class IterativeRefinementSolver22 extends ConvexSolver {
+final class IterativeRefinementForAlternatingDirectionSolver extends ConvexSolver {
 
     private static final Quadruple ZOOM_STEP = Quadruple.valueOf(1E4);
 
     private final AlternatingDirectionSolver.Composer<Quadruple> myData;
 
-    IterativeRefinementSolver22(final Optimisation.Options optimisationOptions,
+    IterativeRefinementForAlternatingDirectionSolver(final Optimisation.Options optimisationOptions,
             final AlternatingDirectionSolver.Composer<Quadruple> alternatingDirectionSolverComposer) {
 
         super(optimisationOptions);

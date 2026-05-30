@@ -301,7 +301,7 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
 
             if (model.options.convex().isExtendedPrecision()) {
                 Composer<Quadruple> composer = AlternatingDirectionSolver.build(model, GenericStore.R128);
-                return new IterativeRefinementSolver22(model.options, composer);
+                return new IterativeRefinementForAlternatingDirectionSolver(model.options, composer);
             } else {
                 Composer<Double> composer = AlternatingDirectionSolver.build(model, R064Store.FACTORY);
                 return new AlternatingDirectionSolver(composer.toProblem(), model.options, composer.getStructure());
