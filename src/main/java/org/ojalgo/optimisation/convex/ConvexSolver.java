@@ -317,13 +317,8 @@ public abstract class ConvexSolver extends GenericSolver {
 
             if (options.convex().isExtendedPrecision()) {
 
-                if (options.experimental) {
-                    ConvexData<Double> data = this.getConvexData(R064Store.FACTORY);
-                    return new IterativeRefinementSolverDouble(options, data);
-                } else {
-                    ConvexData<Quadruple> data = this.getConvexData(GenericStore.R128);
-                    return new IterativeRefinementSolver(options, data);
-                }
+                ConvexData<Quadruple> data = this.getConvexData(GenericStore.R128);
+                return new IterativeRefinementSolver(options, data);
 
             } else {
 
