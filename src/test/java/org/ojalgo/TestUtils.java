@@ -631,7 +631,13 @@ public abstract class TestUtils {
     }
 
     public static InputStream getResource(final String... pathElements) {
-        return TestUtils.getResource(TestUtils.class, TestUtils.buildAbsoluteResourcePath(pathElements));
+        String absolutePath = TestUtils.buildAbsoluteResourcePath(pathElements);
+        InputStream input = TestUtils.class.getResourceAsStream(absolutePath);
+        if (input == null) {
+            String classLoaderPath = absolutePath.startsWith("/") ? absolutePath.substring(1) : absolutePath;
+            input = Thread.currentThread().getContextClassLoader().getResourceAsStream(classLoaderPath);
+        }
+        return input;
     }
 
     public static PhysicalStore<ComplexNumber> makeRandomComplexStore(final int numberOfRows, final int numberOfColumns) {

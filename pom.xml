@@ -6,7 +6,8 @@
     <artifactId>ojalgo</artifactId>
     <version>57.0.0-SNAPSHOT</version>
     <name>ojAlgo</name>
-    <description>oj! Algorithms - ojAlgo - is Open Source Java code that has to do with mathematics, linear algebra and optimisation.</description>
+    <description>oj! Algorithms - ojAlgo - is Open Source Java code that has to
+        do with mathematics, linear algebra and optimisation.</description>
     <packaging>jar</packaging>
     <url>http://ojalgo.org</url>
     <licenses>
@@ -44,7 +45,8 @@
         </snapshotRepository>
         <repository>
             <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <url>
+                https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
     <properties>
@@ -54,6 +56,12 @@
         <version.org.openjdk.jmh>1.37</version.org.openjdk.jmh>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>org.ojalgo</groupId>
+            <artifactId>optimisation-models</artifactId>
+            <version>1.0.0</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
