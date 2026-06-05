@@ -353,17 +353,13 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         <S extends SimplexStore> S newSimplexStore(final Function<LinearStructure, S> storeFactory, final int... basis) {
 
             MatrixStore<Double> builderC = this.getObjective().getLinearFactors(false);
-            MatrixStore<Double> builderAE = this.getAE();
-            MatrixStore<Double> builderBE = this.getBE();
-            MatrixStore<Double> builderAI = this.getAI();
-            MatrixStore<Double> builderBI = this.getBI();
 
             double[] builderLB = this.getLowerBounds();
             double[] builderUB = this.getUpperBounds();
 
-            int nbUpConstr = builderAI.getRowDim();
+            int nbUpConstr = this.countInequalityConstraints();
             int nbLoConstr = 0;
-            int nbEqConstr = builderAE.getRowDim();
+            int nbEqConstr = this.countEqualityConstraints();
 
             int nbProbVars = builderC.size();
             int nbSlckVars = nbUpConstr + nbLoConstr;
@@ -381,29 +377,27 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             Mutate1D mtrxC = simplex.objective();
 
             for (int i = 0; i < nbUpConstr; i++) {
-                for (int j = 0; j < nbProbVars; j++) {
-                    double factor = builderAI.doubleValue(i, j);
-                    mtrxA.set(i, j, factor);
+                for (NonzeroView<Double> nz : this.getAI(i).nonzeros()) {
+                    mtrxA.set(i, nz.index(), nz.doubleValue());
                 }
                 mtrxA.set(i, nbProbVars + i, ONE);
-                mtrxB.set(i, builderBI.doubleValue(i));
+                mtrxB.set(i, this.getBI(i));
                 lowerBounds[nbProbVars + i] = ZERO;
                 upperBounds[nbProbVars + i] = POSITIVE_INFINITY;
             }
 
             for (int i = 0; i < nbEqConstr; i++) {
-                for (int j = 0; j < nbProbVars; j++) {
-                    double factor = builderAE.doubleValue(i, j);
-                    mtrxA.set(nbUpConstr + nbLoConstr + i, j, factor);
+                int row = nbUpConstr + nbLoConstr + i;
+                for (NonzeroView<Double> nz : this.getAE(i).nonzeros()) {
+                    mtrxA.set(row, nz.index(), nz.doubleValue());
                 }
-                mtrxB.set(nbUpConstr + nbLoConstr + i, builderBE.doubleValue(i));
+                mtrxB.set(row, this.getBE(i));
             }
 
             for (int j = 0; j < nbProbVars; j++) {
                 lowerBounds[j] = builderLB[j];
                 upperBounds[j] = builderUB[j];
-                double weight = builderC.doubleValue(j);
-                mtrxC.set(j, weight);
+                mtrxC.set(j, builderC.doubleValue(j));
             }
 
             for (int j = 0; j < nbArtiVars; j++) {
