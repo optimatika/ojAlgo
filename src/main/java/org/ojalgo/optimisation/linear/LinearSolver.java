@@ -208,6 +208,15 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return this;
         }
 
+        public LinearSolver.Builder range(final int index, final double lower, final double upper) {
+            myBoundsModified = true;
+            double[] lowerBounds = this.getLowerBounds();
+            lowerBounds[index] = lower;
+            double[] upperBounds = this.getUpperBounds();
+            upperBounds[index] = upper;
+            return this;
+        }
+
         /**
          * Convert inequalities to equalities (adding slack variables) and make sure all RHS are non-negative.
          * <p>
@@ -788,6 +797,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             if (negate) {
                 retVal = retVal.withNegatedValue();
             }
+            retVal = retVal.withAdjustedValue(ExpressionsBasedModel.Integration.getObjectiveAdjustment(model));
 
             // withSolution above drops the reduced gradient because solverState's solution is in the
             // split (positive + negative + slack/artificial) layout, while modelSolution is indexed by

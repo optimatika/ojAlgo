@@ -862,6 +862,10 @@ public interface Optimisation {
             return myState + " " + myValue + " @ " + Access1D.toString(mySolution);
         }
 
+        public Result withAdjustedValue(final double adjustment) {
+            return this.withValue(myValue + adjustment);
+        }
+
         public Result withDualSolution(final Supplier<Access1D<?>> dualSolution) {
             myDualSolution = dualSolution;
             return this;

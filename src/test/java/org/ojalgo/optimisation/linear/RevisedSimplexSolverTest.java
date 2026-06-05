@@ -37,7 +37,7 @@ import org.ojalgo.optimisation.Variable;
 
 public class RevisedSimplexSolverTest extends OptimisationLinearTests {
 
-    static void assertEquals(final Result expected, final Result actual, final double adjustmentFactor) {
+    static void assertEquals(final Result expected, final Result actual) {
 
         TestUtils.assertEquals(expected.getState(), actual.getState());
 
@@ -48,7 +48,9 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
         }
 
         if (Double.isFinite(expected.getValue())) {
-            TestUtils.assertEquals(expected.getValue(), actual.getValue() / adjustmentFactor);
+            // The solver now reports the objective value in model space (already un-scaled by the
+            // objective adjustment factor), so no compensation is needed here.
+            TestUtils.assertEquals(expected.getValue(), actual.getValue());
         }
     }
 
@@ -109,9 +111,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
             TestUtils.assertSolutionValid(model, expected);
         }
 
-        double adjustmentFactor = model != null ? model.objective().getAdjustmentFactor() : 1.0;
-
-        RevisedSimplexSolverTest.assertEquals(expected, actual, adjustmentFactor);
+        RevisedSimplexSolverTest.assertEquals(expected, actual);
     }
 
     static void doTestOneVariant(final Result expected, final SimplexSolver solver, final Class<? extends SimplexStore> simplexType) {

@@ -380,6 +380,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             if (negate) {
                 retVal = retVal.withNegatedValue();
             }
+            retVal = retVal.withAdjustedValue(ExpressionsBasedModel.Integration.getObjectiveAdjustment(model));
 
             if (reducedGradient.isPresent()) {
 
@@ -407,6 +408,14 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
         protected static int getIndexOfFreeInSolver(final ExpressionsBasedModel model, final Variable variable) {
             return model.indexOfFreeVariable(variable);
+        }
+
+        /**
+         * Reads the {@linkplain #setObjectiveAdjustment(ExpressionsBasedModel, double) stashed} model-sense
+         * objective offset. Returns 0 if nothing has been stashed.
+         */
+        protected static double getObjectiveAdjustment(final ExpressionsBasedModel model) {
+            return model.getObjectiveAdjustment().doubleValue();
         }
 
         protected final static boolean isSwitch(final ExpressionsBasedModel model, final IntegrationProperty property) {
@@ -847,8 +856,8 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     private static final String NEW_LINE = "\n";
     private static final String OBJ_FUNC_AS_CONSTR_KEY = UUID.randomUUID().toString();
-    private static final String OBJECTIVE = "Generated/Aggregated Objective";
     private static final String START_END = "############################################\n";
+    static final String OBJECTIVE = "Generated/Aggregated Objective";
 
     static {
         ExpressionsBasedModel.resetPresolvers();
@@ -989,7 +998,14 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     private transient ExpressionsBasedModel.Integration<?> myForcedIntegration = null;
     private transient boolean myInfeasible = false;
     private final EnumBitSet<IntegrationProperty> myIntegrationProperties = new EnumBitSet<>();
-    private Optimisation.Result myKnownSolution = null;
+    /**
+     * Additive offset (in model sense) that an {@link Integration} can stash so that
+     * {@link #toModelState(Optimisation.Result, ExpressionsBasedModel) toModelState} can add it back to the
+     * solver-reported objective value. Use cases include the {@link #getObjectiveConstant() objective
+     * constant} and the contribution of presolve-fixed variables to the objective — both of which most
+     * solvers drop when they only see the reduced/free problem.
+     */
+    private BigDecimal myObjectiveAdjustment = BigMath.ZERO;
     private BigDecimal myObjectiveConstant = BigMath.ZERO;
     private Optimisation.Sense myOptimisationSense = null;
     private final Set<IntIndex> myReferences;
@@ -1043,7 +1059,6 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
         myShallowCopy = shallow || modelToCopy.isShallowCopy();
         myRelaxed = modelToCopy.isRelaxed();
-        myKnownSolution = modelToCopy.getKnownSolution(); // TODO Should this be copied?
 
         for (Expression tmpExpr : modelToCopy.getExpressions()) {
             if (shallow) {
@@ -2084,8 +2099,8 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         return retVal;
     }
 
-    Optimisation.Result getKnownSolution() {
-        return myKnownSolution;
+    BigDecimal getObjectiveAdjustment() {
+        return myObjectiveAdjustment;
     }
 
     BigDecimal getObjectiveConstant() {
@@ -2194,6 +2209,10 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     void setIntegrationSwitch(final IntegrationProperty property, final boolean value) {
         myIntegrationProperties.set(property, value);
+    }
+
+    void setObjectiveAdjustment(final BigDecimal objectiveAdjustment) {
+        myObjectiveAdjustment = objectiveAdjustment;
     }
 
     void setOptimisationSense(final Optimisation.Sense optimisationSense) {

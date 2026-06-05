@@ -323,6 +323,24 @@ abstract class SimplexSolver extends LinearSolver {
 
     }
 
+    /**
+     * Should variable lower/upper bounds be read in their numerically-adjusted form? Bounds are passed
+     * directly into the simplex store's primal bound arrays — keeping them in model space avoids the
+     * solution needing a second pass to be reported back in model units.
+     */
+    private static final boolean ADJUSTED_BOUNDS = false;
+    /**
+     * Should constraint coefficients and right-hand-sides be read in their numerically-adjusted form? Row
+     * scaling improves the conditioning of the constraint matrix the simplex factors.
+     */
+    private static final boolean ADJUSTED_CONSTRAINTS = true;
+    /**
+     * Should the objective's linear coefficients be read in their numerically-adjusted form? Scaling the
+     * cost row keeps reduced-cost magnitudes within the simplex's absolute tolerances. The reported value
+     * and reduced costs are un-scaled at the result boundary via {@code LinearStructure.getObjectiveAdjustmentFactor()}.
+     */
+    private static final boolean ADJUSTED_OBJECTIVE = true;
+
     private static final NumberContext COST = NumberContext.of(7);
     private static final NumberContext INFEASIBILITY = NumberContext.of(9);
     private static final NumberContext PIVOT = NumberContext.of(6);
@@ -372,11 +390,11 @@ abstract class SimplexSolver extends LinearSolver {
             Expression expression = upperConstraints.get(i);
             for (IntIndex key : expression.getLinearKeySet()) {
                 int column = model.indexOfFreeVariable(key);
-                double factor = expression.doubleValue(key, true);
+                double factor = expression.doubleValue(key, ADJUSTED_CONSTRAINTS);
                 mtrxA.set(i, column, factor);
             }
             mtrxA.set(i, nbProbVars + i, ONE);
-            mtrxB.set(i, expression.getUpperLimit(true, POSITIVE_INFINITY));
+            mtrxB.set(i, expression.getUpperLimit(ADJUSTED_CONSTRAINTS, POSITIVE_INFINITY));
             lowerBounds[nbProbVars + i] = ZERO;
             upperBounds[nbProbVars + i] = POSITIVE_INFINITY;
             structure.setConstraintMap(i, expression, ConstraintType.UPPER, false);
@@ -386,11 +404,11 @@ abstract class SimplexSolver extends LinearSolver {
             Expression expression = lowerConstraints.get(i);
             for (IntIndex key : expression.getLinearKeySet()) {
                 int column = model.indexOfFreeVariable(key);
-                double factor = expression.doubleValue(key, true);
+                double factor = expression.doubleValue(key, ADJUSTED_CONSTRAINTS);
                 mtrxA.set(nbUpConstr + i, column, factor);
             }
             mtrxA.set(nbUpConstr + i, nbProbVars + nbUpConstr + i, ONE);
-            mtrxB.set(nbUpConstr + i, expression.getLowerLimit(true, NEGATIVE_INFINITY));
+            mtrxB.set(nbUpConstr + i, expression.getLowerLimit(ADJUSTED_CONSTRAINTS, NEGATIVE_INFINITY));
             lowerBounds[nbProbVars + nbUpConstr + i] = NEGATIVE_INFINITY;
             upperBounds[nbProbVars + nbUpConstr + i] = ZERO;
             structure.setConstraintMap(nbUpConstr + i, expression, ConstraintType.LOWER, true);
@@ -400,11 +418,11 @@ abstract class SimplexSolver extends LinearSolver {
             Expression expression = equalConstraints.get(i);
             for (IntIndex key : expression.getLinearKeySet()) {
                 int column = model.indexOfFreeVariable(key);
-                double factor = expression.doubleValue(key, true);
+                double factor = expression.doubleValue(key, ADJUSTED_CONSTRAINTS);
                 mtrxA.set(nbUpConstr + nbLoConstr + i, column, factor);
             }
             mtrxA.set(nbUpConstr + nbLoConstr + i, nbProbVars + nbSlckVars + i, ONE);
-            mtrxB.set(nbUpConstr + nbLoConstr + i, expression.getUpperLimit(true, ZERO));
+            mtrxB.set(nbUpConstr + nbLoConstr + i, expression.getUpperLimit(ADJUSTED_CONSTRAINTS, ZERO));
             lowerBounds[nbProbVars + nbSlckVars + i] = ZERO;
             upperBounds[nbProbVars + nbSlckVars + i] = ZERO;
             structure.setConstraintMap(nbUpConstr + nbLoConstr + i, expression, ConstraintType.EQUALITY, false);
@@ -412,15 +430,15 @@ abstract class SimplexSolver extends LinearSolver {
 
         for (int i = 0; i < nbProbVars; i++) {
             Variable variable = freeVariables.get(i);
-            lowerBounds[i] = variable.getLowerLimit(false, NEGATIVE_INFINITY);
-            upperBounds[i] = variable.getUpperLimit(false, POSITIVE_INFINITY);
+            lowerBounds[i] = variable.getLowerLimit(ADJUSTED_BOUNDS, NEGATIVE_INFINITY);
+            upperBounds[i] = variable.getUpperLimit(ADJUSTED_BOUNDS, POSITIVE_INFINITY);
             structure.positivePartVariables[i] = model.indexOf(variable);
         }
 
         structure.setObjectiveAdjustmentFactor(objective.getAdjustmentFactor());
         boolean negate = model.getOptimisationSense() == Optimisation.Sense.MAX;
         for (IntIndex key : objective.getLinearKeySet()) {
-            double weight = objective.doubleValue(key, true);
+            double weight = objective.doubleValue(key, ADJUSTED_OBJECTIVE);
             mtrxC.set(model.indexOfFreeVariable(key), negate ? -weight : weight);
         }
 
@@ -1524,12 +1542,23 @@ abstract class SimplexSolver extends LinearSolver {
         double[] gradients = new double[mySimplex.n];
         mySimplex.extractReducedCosts(gradients);
         mySimplex.unscaleReducedCosts(gradients);
+        // Map reduced costs back to model space: the objective was scaled by the adjustment factor when the
+        // simplex was built, so the reduced costs come out scaled by the same factor.
+        double objectiveScale = mySimplex.structure.getObjectiveAdjustmentFactor();
+        if (objectiveScale != ONE) {
+            for (int j = 0; j < gradients.length; j++) {
+                gradients[j] /= objectiveScale;
+            }
+        }
         return gradients;
     }
 
     final Result extractResult() {
 
-        double value = this.extractValue();
+        // The objective was scaled by the adjustment factor at build time, so extractValue() is in scaled
+        // units. Divide by the factor to report the value in model space (consistent with the solution,
+        // reduced costs and dual multipliers, which are all mapped back to model space).
+        double value = this.extractValue() / mySimplex.structure.getObjectiveAdjustmentFactor();
 
         warm = state.isOptimal();
 

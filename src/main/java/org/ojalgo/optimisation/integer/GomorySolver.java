@@ -104,23 +104,11 @@ public final class GomorySolver extends GenericSolver {
         return retVal.withValue(this.evaluateFunction(retVal));
     }
 
-    protected Optimisation.Result buildResult() {
-
-        Access1D<?> solution = this.extractSolution();
-        double value = this.evaluateFunction(solution);
-
-        return new Optimisation.Result(state, value, solution);
-    }
-
     protected double evaluateFunction(final Access1D<?> solution) {
         if (myFunction != null && solution != null && myFunction.arity() == solution.count()) {
             return myFunction.invoke(Primitive1D.wrap(solution)).doubleValue();
         }
         return Double.NaN;
-    }
-
-    protected Access1D<?> extractSolution() {
-        return myIntegerModel.getVariableValuesValidated();
     }
 
 }

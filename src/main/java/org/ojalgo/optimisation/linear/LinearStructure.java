@@ -281,6 +281,16 @@ final class LinearStructure implements ExpressionsBasedModel.EntityMap {
         return variableIndex >= 0 && variableIndex < this.countModelVariables();
     }
 
+    /**
+     * The objective's adjustment factor (10^exponent) — the scaling applied to the objective coefficients
+     * when the simplex is built. The reported objective value and reduced costs come out of the simplex
+     * scaled by this factor; divide by it to map back to model space (the same factor un-scales the dual
+     * multipliers via {@link ConstraintsMetaData#getMultiplierScale()}). 1.0 means no scaling.
+     */
+    double getObjectiveAdjustmentFactor() {
+        return constraints.getMultiplierScale();
+    }
+
     void setObjectiveAdjustmentFactor(final double multiplierScale) {
         constraints.setMultiplierScale(multiplierScale);
     }

@@ -116,7 +116,7 @@ public final class ConstraintsMetaData implements Structure1D {
         return mySize;
     }
 
-    double getMultiplierScale() {
+    public double getMultiplierScale() {
         return myMultiplierScale;
     }
 }

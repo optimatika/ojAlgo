@@ -23,20 +23,16 @@ package org.ojalgo.optimisation.integer;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.multiary.MultiaryFunction;
-import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.Sense;
 import org.ojalgo.optimisation.Variable;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Primitive1D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -97,6 +93,16 @@ public abstract class ModelStrategy implements IntegerStrategy {
          * Pseudo-costs when down
          */
         private final double[] myLowerPseudoWeight;
+        /**
+         * Per-integer-variable seed copied into the pseudo-cost weights at every {@link #initialise()}.
+         * Derived once at construction from each integer variable's own
+         * {@link Variable#getContributionWeight() contribution weight} (normalised to {@code [0, 1]} by the
+         * largest magnitude). Variables without a non-zero contribution weight — or models whose objective is
+         * built via objective-marked expressions rather than per-variable weights — fall back to a uniform
+         * {@link NodeKey#MINIMUM_DISPLACEMENT} seed; the search-time {@code observeBranch} adapts
+         * pseudo-costs from there.
+         */
+        private final double[] mySeed;
         private final int[] myUpperCount;
         /**
          * Pseudo-costs when up
@@ -114,6 +120,26 @@ public abstract class ModelStrategy implements IntegerStrategy {
             myLowerPseudoWeight = new double[nbIntegers];
             myUpperCount = new int[nbIntegers];
             myLowerCount = new int[nbIntegers];
+
+            mySeed = new double[nbIntegers];
+            double largest = ZERO;
+            for (int i = 0; i < nbIntegers; i++) {
+                BigDecimal weight = integerVariables.get(i).getContributionWeight();
+                if (weight != null && weight.signum() != 0) {
+                    double abs = Math.abs(weight.doubleValue());
+                    mySeed[i] = abs;
+                    if (abs > largest) {
+                        largest = abs;
+                    }
+                }
+            }
+            if (!ROUGHLY.isZero(largest)) {
+                for (int i = 0; i < nbIntegers; i++) {
+                    mySeed[i] = Math.max(mySeed[i] / largest, NodeKey.MINIMUM_DISPLACEMENT);
+                }
+            } else {
+                Arrays.fill(mySeed, NodeKey.MINIMUM_DISPLACEMENT);
+            }
         }
 
         private void updatePseudo(final int idx, final boolean upper, final double observation) {
@@ -141,41 +167,15 @@ public abstract class ModelStrategy implements IntegerStrategy {
         }
 
         /**
-         * Initialise the integer significances, based on the objective function gradient.
+         * Reset per-solve state. The pseudo-cost weights are restored to the constructor-time seed (derived
+         * from each integer variable's objective contribution weight); the observation counts are zeroed.
          */
         @Override
-        protected void initialise(final MultiaryFunction.TwiceDifferentiable<Double> function, final Access1D<?> point) {
-
-            Arrays.fill(myUpperPseudoWeight, ZERO);
-            Arrays.fill(myLowerPseudoWeight, ZERO);
+        protected void initialise() {
             Arrays.fill(myUpperCount, 0);
             Arrays.fill(myLowerCount, 0);
-
-            int nbIntegers = this.countIntegerVariables();
-
-            Access1D<Double> iterationPoint = Primitive1D.wrap(point);
-            MatrixStore<Double> gradient = function.getGradient(iterationPoint);
-            double largest = gradient.aggregateAll(Aggregator.LARGEST).doubleValue();
-
-            if (!ROUGHLY.isZero(largest)) {
-                for (int i = 0; i < nbIntegers; i++) {
-                    int globalIndex = this.getIndex(i);
-                    double partial = Math.abs(gradient.doubleValue(globalIndex));
-                    double seed = 0.0;
-                    if (!ROUGHLY.isZero(partial)) {
-                        seed = partial / largest;
-                    }
-                    // Ensure strictly positive seeds to avoid zero product
-                    myUpperPseudoWeight[i] = Math.max(seed, NodeKey.MINIMUM_DISPLACEMENT);
-                    myLowerPseudoWeight[i] = Math.max(seed, NodeKey.MINIMUM_DISPLACEMENT);
-                }
-            } else {
-                // No gradient available; seed with small positive values
-                for (int i = 0; i < nbIntegers; i++) {
-                    myUpperPseudoWeight[i] = NodeKey.MINIMUM_DISPLACEMENT;
-                    myLowerPseudoWeight[i] = NodeKey.MINIMUM_DISPLACEMENT;
-                }
-            }
+            System.arraycopy(mySeed, 0, myUpperPseudoWeight, 0, mySeed.length);
+            System.arraycopy(mySeed, 0, myLowerPseudoWeight, 0, mySeed.length);
         }
 
         @Override
@@ -404,7 +404,13 @@ public abstract class ModelStrategy implements IntegerStrategy {
         return myIndices[idx];
     }
 
-    protected abstract void initialise(final MultiaryFunction.TwiceDifferentiable<Double> function, final Access1D<?> point);
+    /**
+     * Reset per-solve state. Called once per {@link IntegerSolver#solve(Optimisation.Result)} invocation,
+     * before any node is processed. Any model-static state (e.g. per-variable seeds derived from the
+     * objective) is established at construction; this hook is just for clearing observation counters and
+     * restoring those seeds.
+     */
+    protected abstract void initialise();
 
     /**
      * Decide if cuts should be attempted at this node.

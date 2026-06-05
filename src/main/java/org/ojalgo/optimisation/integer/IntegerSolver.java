@@ -35,7 +35,6 @@ import java.util.concurrent.atomic.LongAdder;
 
 import org.ojalgo.concurrent.MultiviewSet;
 import org.ojalgo.concurrent.ProcessingService;
-import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.netio.BasicLogger;
@@ -44,8 +43,6 @@ import org.ojalgo.netio.CharacterRing.RingLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Primitive1D;
 import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -196,7 +193,6 @@ public final class IntegerSolver extends GenericSolver {
      */
     private MultiviewSet<NodeKey>.PrioritisedView myBoundView = null;
     private final MultiviewSet<NodeKey> myDeferredNodes = new MultiviewSet<>();
-    private final MultiaryFunction.TwiceDifferentiable<Double> myFunction;
     /**
      * Gap tolerance cached during solve() for logProgress; null otherwise.
      */
@@ -212,7 +208,6 @@ public final class IntegerSolver extends GenericSolver {
         super(model.options);
 
         myIntegerModel = model.simplify();
-        myFunction = myIntegerModel.limitObjective(null, null).toFunction();
         mySense = myIntegerModel.getOptimisationSense();
         myStrategy = options.integer().newModelStrategy(myIntegerModel);
         myGapTolerance = myStrategy.getGapTolerance();
@@ -223,7 +218,14 @@ public final class IntegerSolver extends GenericSolver {
 
         Result point = kickStarter != null ? kickStarter : myIntegerModel.getVariableValues();
 
-        myStrategy.initialise(myFunction, point);
+        myStrategy.initialise();
+
+        // Pre-warm the "objective as constraint" expression on myIntegerModel before workers spawn.
+        // limitObjective(...) is called concurrently from compute() during search (for bound-objective
+        // pruning); the first such call lazily mutates myExpressions, which races with concurrent
+        // model.validate() iterations across other workers. Forcing creation here, single-threaded,
+        // makes those later calls pure updates and removes the race.
+        myIntegerModel.limitObjective(null, null);
 
         if (point != null && point.getState().isFeasible() && myIntegerModel.validate(point)) {
             // Must verify that it actually is an integer solution
@@ -400,7 +402,7 @@ public final class IntegerSolver extends GenericSolver {
 
         if (rootResult.getState().isOptimal() && rootSolver.isInPlaceBoundUpdateSafe()) {
 
-            double rootValue = this.evaluateFunction(rootResult);
+            double rootValue = rootResult.getValue();
 
             int nbIntegers = myStrategy.countIntegerVariables();
             int[] candidates = new int[nbIntegers];
@@ -456,7 +458,7 @@ public final class IntegerSolver extends GenericSolver {
                     Optimisation.Result downResult = rootSolver.solve(null);
                     boolean downOK = downResult.getState().isOptimal();
                     if (downOK) {
-                        double downLP = this.evaluateFunction(downResult);
+                        double downLP = downResult.getValue();
                         double deg = Math.max(ZERO, mySense == Optimisation.Sense.MIN ? downLP - rootValue : rootValue - downLP);
                         myStrategy.observeBranch(ii, false, Math.max(deg, NodeKey.MINIMUM_DISPLACEMENT) / downDisp);
                         this.acceptIfIntegerFeasible(downResult, downLP, rootNode);
@@ -470,7 +472,7 @@ public final class IntegerSolver extends GenericSolver {
                     Optimisation.Result upResult = rootSolver.solve(null);
                     boolean upOK = upResult.getState().isOptimal();
                     if (upOK) {
-                        double upLP = this.evaluateFunction(upResult);
+                        double upLP = upResult.getValue();
                         double deg = Math.max(ZERO, mySense == Optimisation.Sense.MIN ? upLP - rootValue : rootValue - upLP);
                         myStrategy.observeBranch(ii, true, Math.max(deg, NodeKey.MINIMUM_DISPLACEMENT) / upDisp);
                         this.acceptIfIntegerFeasible(upResult, upLP, rootNode);
@@ -509,25 +511,6 @@ public final class IntegerSolver extends GenericSolver {
         }
 
         return this.compute(rootNode, rootSolver, rootPrinter, myStrategy);
-    }
-
-    protected Optimisation.Result buildResult() {
-
-        Access1D<?> solution = this.extractSolution();
-        double value = this.evaluateFunction(solution);
-
-        return new Optimisation.Result(state, value, solution);
-    }
-
-    protected double evaluateFunction(final Access1D<?> solution) {
-        if (myFunction != null && solution != null && myFunction.arity() == solution.count()) {
-            return myFunction.invoke(Primitive1D.wrap(solution)).doubleValue();
-        }
-        return Double.NaN;
-    }
-
-    protected MatrixStore<Double> extractSolution() {
-        return R064Store.FACTORY.column(this.getBestResultSoFar());
     }
 
     protected Optimisation.Result getBestEstimate() {
@@ -737,7 +720,10 @@ public final class IntegerSolver extends GenericSolver {
             return myNodeStatistics.infeasible();
         }
 
-        double nodeValue = this.evaluateFunction(nodeResult);
+        // The solver now reports the objective value in model space (un-scaled, with the objective constant
+        // and presolve-fixed contributions folded in), so the node value can be read directly rather than
+        // re-evaluating the model objective at the solution.
+        double nodeValue = nodeResult.getValue();
         strategy.onNodeSolved(nodeKey, nodeResult, nodeValue, mySense == Optimisation.Sense.MIN);
 
         int branchIntegerIndex = this.identifyNonIntegerVariable(nodeResult, nodeKey, strategy);

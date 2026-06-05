@@ -111,6 +111,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - `UpdatableSolver.getEntityMap()` now returns `Optional<EntityMap>` instead of a bare `EntityMap`. Callers that accessed the entity map directly must now unwrap the `Optional`.
 - `ExpressionsBasedModel.isAnyVariableInteger()` now returns `false` when the model is relaxed; use `isAnyVariableDeclaredInteger()` to check the underlying declaration regardless of relaxation.
 - `IntermediateSolver.getIntegration()` changed from package-private to `protected`, allowing subclasses outside the package to access the integration.
+- `Expression.compensate(...)` now stashes the model's objective adjustment when applied to the (aggregated) objective expression — any solver integration that compensates the objective automatically gets the additive offset (objective constant + presolve-fixed-variable contribution) captured for `toModelState` to apply.
+- `SimplexSolver` / `SimplexTableauSolver` now un-scale the reported objective value and reduced costs by the objective adjustment factor in result extraction, mirroring the existing un-scaling of dual multipliers — the LP solver reports value and reduced costs in model space directly.
+- `IntegerSolver` no longer holds an internal `MultiaryFunction` reference and no longer re-evaluates the objective per node; it reads the (now correct) model-space `getValue()` from each node result directly. Dead `buildResult()` / `extractSolution()` removed from both `IntegerSolver` and `GomorySolver`.
+- `ModelStrategy.initialise(...)` signature simplified to no-arg — pseudo-cost seeds are now derived once at construction from each integer variable's own `Variable.getContributionWeight()` rather than from a per-solve objective-gradient evaluation. **Breaking change** for any third-party `ModelStrategy` subclass.
 
 #### org.ojalgo.algebra
 
@@ -136,6 +140,9 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - Quadratic models are no longer subjected to in-place bound updates during branch-and-bound (which could yield wrong results); `NodeSolver` forces a solver reset for any model with a quadratic expression.
 - Simplex warm-start: after bound-only changes from an optimal basis the solver restarts from the retained basis via dual iterations instead of re-solving cold.
 - Fixed objective function value sign: when the solver's internal sense (e.g. always-minimise) differs from the model's optimisation sense, the returned objective value is now correctly negated.
+- `LinearSolver.Builder.newSimplexStore` no longer materialises the inequality matrix as a dense `m × n` block — it walks the source rows sparsely (matching `newSimplexTableau`). Avoids `ArrayIndexOutOfBoundsException` / `NegativeArraySizeException` on large LPs where `m · n` overflows a Java `int`.
+- The LP solver's reported objective value now includes the model's objective constant and the contribution of any presolve-fixed variables — both were previously silently dropped because the compensated objective only fed its linear part into the simplex's cost row. Affected direct consumers of `Optimisation.Result.getValue()` reached through `IntermediateSolver` / `Integration.toModelState(...)`; `IntegerSolver` and `ExpressionsBasedModel.optimise(...)` were unaffected because they re-evaluate the objective from the solution vector.
+- The LP solver's reported objective value and reduced costs are now in model space — the objective's numerical-stability adjustment factor is un-applied at the result boundary (matching the existing dual-multiplier un-scaling). Fixes a latent `value ÷ 10^exponent` bug for any direct reader through `LinearSolver.ModelIntegration` whenever the objective coefficients triggered scaling.
 
 ### Deprecated
 

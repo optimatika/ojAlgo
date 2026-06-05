@@ -292,15 +292,18 @@ public class Expression extends ModelEntity<Expression> {
     public final Expression compensate(final Set<IntIndex> fixedVariables) {
 
         if (fixedVariables.size() == 0 || !this.isAnyQuadraticFactorNonZero() && Collections.disjoint(fixedVariables, this.getLinearKeySet())) {
-
-            return this; // No need to copy/compensate anything
-
+            // No need (not possible) to copy/compensate anything
+            if (this.isGeneratedObjective()) {
+                this.getModel().setObjectiveAdjustment(this.getConstant());
+            }
+            return this;
         }
-        ExpressionsBasedModel tmpModel = this.getModel();
 
-        Expression retVal = new Expression(this.getName(), tmpModel);
+        ExpressionsBasedModel model = this.getModel();
 
-        BigDecimal tmpFixedValue = BigMath.ZERO;
+        Expression retVal = new Expression(this.getName(), model);
+
+        BigDecimal fixedValue = BigMath.ZERO;
 
         for (Entry<IntIndex, BigDecimal> tmpEntry : myLinear.entrySet()) {
 
@@ -310,10 +313,10 @@ public class Expression extends ModelEntity<Expression> {
             if (fixedVariables.contains(tmpKey)) {
                 // Fixed
 
-                Variable variable = tmpModel.getVariable(tmpKey.index);
+                Variable variable = model.getVariable(tmpKey.index);
                 BigDecimal tmpValue = variable.getValue();
 
-                tmpFixedValue = tmpFixedValue.add(tmpFactor.multiply(tmpValue));
+                fixedValue = fixedValue.add(tmpFactor.multiply(tmpValue));
 
             } else {
                 // Not fixed
@@ -327,8 +330,8 @@ public class Expression extends ModelEntity<Expression> {
             IntRowColumn tmpKey = tmpEntry.getKey();
             BigDecimal tmpFactor = tmpEntry.getValue();
 
-            Variable tmpRowVariable = tmpModel.getVariable(tmpKey.row);
-            Variable tmpColVariable = tmpModel.getVariable(tmpKey.column);
+            Variable tmpRowVariable = model.getVariable(tmpKey.row);
+            Variable tmpColVariable = model.getVariable(tmpKey.column);
 
             IntIndex tmpRowKey = this.toIntIndex(tmpRowVariable);
             IntIndex tmpColKey = this.toIntIndex(tmpColVariable);
@@ -342,7 +345,7 @@ public class Expression extends ModelEntity<Expression> {
 
                     BigDecimal tmpColValue = tmpColVariable.getValue();
 
-                    tmpFixedValue = tmpFixedValue.add(tmpFactor.multiply(tmpRowValue).multiply(tmpColValue));
+                    fixedValue = fixedValue.add(tmpFactor.multiply(tmpRowValue).multiply(tmpColValue));
 
                 } else {
                     // Row fixed
@@ -365,19 +368,24 @@ public class Expression extends ModelEntity<Expression> {
         }
 
         if (this.isLowerLimitSet()) {
-            retVal.lower(this.getLowerLimit().subtract(tmpFixedValue));
+            retVal.lower(this.getLowerLimit().subtract(fixedValue));
         }
 
         if (this.isUpperLimitSet()) {
-            retVal.upper(this.getUpperLimit().subtract(tmpFixedValue));
+            retVal.upper(this.getUpperLimit().subtract(fixedValue));
         }
 
         if (this.isInteger()) {
             retVal.setInteger();
         }
 
-        return retVal;
+        if (this.isGeneratedObjective()) {
+            BigDecimal newConstant = this.getConstant().add(fixedValue);
+            retVal.setConstant(newConstant);
+            model.setObjectiveAdjustment(newConstant);
+        }
 
+        return retVal;
     }
 
     public final double density() {
@@ -585,6 +593,16 @@ public class Expression extends ModelEntity<Expression> {
 
     public final boolean isFunctionQuadratic() {
         return this.isAnyQuadraticFactorNonZero() && this.isAnyLinearFactorNonZero();
+    }
+
+    /**
+     * @return true if this is the aggregated objective expression produced by
+     *         {@link ExpressionsBasedModel#objective()} (identified by its reserved name). Distinct from
+     *         {@link ModelEntity#isObjective()}, which only reports whether an entity has a non-zero
+     *         contribution weight.
+     */
+    public final boolean isGeneratedObjective() {
+        return ExpressionsBasedModel.OBJECTIVE.equals(this.getName());
     }
 
     @Override
