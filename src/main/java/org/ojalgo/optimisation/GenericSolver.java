@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.array.NumberList;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.function.multiary.MultiaryFunction.TwiceDifferentiable;
@@ -42,6 +43,7 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.RowView;
 import org.ojalgo.structure.ElementView2D;
+import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.CalendarDateUnit;
@@ -53,46 +55,39 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
         private static final Factory<Double, R064Store> FACTORY = R064Store.FACTORY;
 
-        private static MatrixStore<Double> add(final RowsSupplier<Double> baseA, final MatrixStore<Double> baseB, final Access2D<?> addA,
-                final Access1D<?> addB) {
+        /**
+         * Converts any {@link Access2D} into a {@link RowsSupplier} – one {@link SparseArray} row per matrix
+         * row, storing nonzero elements only. This is the common "data structure containing SparseArray" that
+         * all the constraint-adding methods produce before merging it into {@code myAE} / {@code myAI}.
+         */
+        private static RowsSupplier<Double> toRowsSupplier(final Access2D<?> matrix) {
 
-            ProgrammingError.throwIfNull(addA, addB);
-            ProgrammingError.throwIfNotEqualRowDimensions(addA, addB);
+            int nbRows = matrix.getRowDim();
+            int nbCols = matrix.getColDim();
 
-            int baseRowDim = baseA.getRowDim();
-            int addRowDim = addA.getRowDim();
-            int addColDim = addA.getColDim();
+            RowsSupplier<Double> block = FACTORY.makeRowsSupplier(nbCols);
+            block.addRows(nbRows);
 
-            baseA.addRows(addRowDim);
+            if (matrix instanceof SparseStructure2D) {
 
-            if (addA instanceof SparseStructure2D) {
-
-                for (ElementView2D<?, ?> nz : addA.nonzeros()) {
-                    int row = baseRowDim + Math.toIntExact(nz.row());
-                    long col = nz.column();
-                    double val = nz.doubleValue();
-                    baseA.getRow(row).set(col, val);
+                for (ElementView2D<?, ?> nz : matrix.nonzeros()) {
+                    block.getRow(Math.toIntExact(nz.row())).set(nz.column(), nz.doubleValue());
                 }
 
             } else {
 
-                double value;
-                for (int i = 0; i < addRowDim; i++) {
-                    SparseArray<Double> tmpRow = baseA.getRow(baseRowDim + i);
-                    for (int j = 0; j < addColDim; j++) {
-                        value = addA.doubleValue(i, j);
+                for (int i = 0; i < nbRows; i++) {
+                    SparseArray<Double> row = block.getRow(i);
+                    for (int j = 0; j < nbCols; j++) {
+                        double value = matrix.doubleValue(i, j);
                         if (value != ZERO) {
-                            tmpRow.set(j, value);
+                            row.set(j, value);
                         }
                     }
                 }
             }
 
-            R064Store retB = FACTORY.make(baseRowDim + addRowDim, 1);
-            retB.fillMatching(baseB);
-            retB.regionByOffsets(baseRowDim, 0).fillMatching(addB);
-
-            return retB;
+            return block;
         }
 
         protected static final void append(final StringBuilder builder, final String label, final MatrixStore<Double> matrix) {
@@ -110,8 +105,8 @@ public abstract class GenericSolver implements Optimisation.Solver {
         private Map<String, MultiaryFunction.TwiceDifferentiable<Double>> myAdditionalConstraints = null;
         private RowsSupplier<Double> myAE = null;
         private RowsSupplier<Double> myAI = null;
-        private MatrixStore<Double> myBE = null;
-        private MatrixStore<Double> myBI = null;
+        private NumberList<Double> myBE = null;
+        private NumberList<Double> myBI = null;
         private R064Store myLowerBounds = null;
         private transient int myNumberOfVariables = -1;
         private MultiaryFunction.TwiceDifferentiable<Double> myObjective = null;
@@ -224,25 +219,50 @@ public abstract class GenericSolver implements Optimisation.Solver {
             throw new ProgrammingError("Cannot deduce the number of variables!");
         }
 
-        protected B equalities(final Access2D<?> mtrxAE, final Access1D<?> mtrxBE) {
-            this.addEqualities(mtrxAE, mtrxBE);
+        /**
+         * Appends the equality constraints {@code [mtrxAE][X] == [mtrxBE]} (one row each).
+         */
+        public final B equalities(final Access2D<?> mtrxAE, final Access1D<?> mtrxBE) {
+            ProgrammingError.throwIfNull(mtrxAE, mtrxBE);
+            ProgrammingError.throwIfNotEqualRowDimensions(mtrxAE, mtrxBE);
+            this.mergeEqualities(Builder.toRowsSupplier(mtrxAE), mtrxBE);
             return (B) this;
         }
 
-        protected Mutate2D equalities(final double[] rhs) {
-            return this.newEqualities(rhs);
+        /**
+         * Appends {@code rhs.length} equality constraints with the given right-hand side; returns a
+         * {@link Mutate2D} for filling in the (initially empty) constraint bodies.
+         */
+        public final Mutate2D equalities(final double[] rhs) {
+            RowsSupplier<Double> block = FACTORY.makeRowsSupplier(this.countVariables());
+            block.addRows(rhs.length);
+            this.mergeEqualities(block, R064Store.wrap(rhs));
+            return block;
         }
 
-        protected B equality(final double rhs, final double... factors) {
+        /**
+         * Appends a single equality constraint with the given right-hand side; returns a {@link Mutate1D} for
+         * filling in the (initially empty) constraint body.
+         */
+        public final Mutate1D equality(final double rhs) {
+            RowsSupplier<Double> block = FACTORY.makeRowsSupplier(this.countVariables());
+            SparseArray<Double> row = block.addRow();
+            this.mergeEqualities(block, FACTORY.makeSingle(rhs));
+            return row;
+        }
 
-            R064Store mBody = FACTORY.make(1, this.countVariables());
+        /**
+         * Appends the single equality constraint {@code [factors][X] == rhs}.
+         */
+        public final B equality(final double rhs, final double... factors) {
+
+            RowsSupplier<Double> block = FACTORY.makeRowsSupplier(this.countVariables());
+            SparseArray<Double> row = block.addRow();
             for (int i = 0, limit = Math.min(factors.length, this.countVariables()); i < limit; i++) {
-                mBody.set(i, factors[i]);
+                row.set(i, factors[i]);
             }
 
-            MatrixStore<Double> mRHS = FACTORY.makeSingle(rhs);
-
-            this.addEqualities(mBody, mRHS);
+            this.mergeEqualities(block, FACTORY.makeSingle(rhs));
 
             return (B) this;
         }
@@ -252,7 +272,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
          */
         protected MatrixStore<Double> getAE() {
             if (myAE != null) {
-                return myAE.get();
+                return myAE;
             } else {
                 return FACTORY.makeZero(0, this.countVariables());
             }
@@ -272,7 +292,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
         protected MatrixStore<Double> getAI() {
             if (myAI != null) {
-                return myAI.get();
+                return myAI;
             } else {
                 return FACTORY.makeZero(0, this.countVariables());
             }
@@ -291,7 +311,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
          */
         protected MatrixStore<Double> getBE() {
             if (myBE != null) {
-                return myBE;
+                return FACTORY.makeWrapperColumn(myBE);
             } else {
                 return FACTORY.makeZero(0, 1);
             }
@@ -306,7 +326,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
          */
         protected MatrixStore<Double> getBI() {
             if (myBI != null) {
-                return myBI;
+                return FACTORY.makeWrapperColumn(myBI);
             } else {
                 return FACTORY.makeZero(0, 1);
             }
@@ -356,25 +376,50 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return myUpperBounds;
         }
 
-        protected B inequalities(final Access2D<?> mtrxAI, final Access1D<?> mtrxBI) {
-            this.addInequalities(mtrxAI, mtrxBI);
+        /**
+         * Appends the inequality constraints {@code [mtrxAI][X] <= [mtrxBI]} (one row each).
+         */
+        public final B inequalities(final Access2D<?> mtrxAI, final Access1D<?> mtrxBI) {
+            ProgrammingError.throwIfNull(mtrxAI, mtrxBI);
+            ProgrammingError.throwIfNotEqualRowDimensions(mtrxAI, mtrxBI);
+            this.mergeInequalities(Builder.toRowsSupplier(mtrxAI), mtrxBI);
             return (B) this;
         }
 
-        protected Mutate2D inequalities(final double[] rhs) {
-            return this.newInequalities(rhs);
+        /**
+         * Appends {@code rhs.length} inequality constraints with the given right-hand side; returns a
+         * {@link Mutate2D} for filling in the (initially empty) constraint bodies.
+         */
+        public final Mutate2D inequalities(final double[] rhs) {
+            RowsSupplier<Double> block = FACTORY.makeRowsSupplier(this.countVariables());
+            block.addRows(rhs.length);
+            this.mergeInequalities(block, R064Store.wrap(rhs));
+            return block;
         }
 
-        protected B inequality(final double rhs, final double... factors) {
+        /**
+         * Appends a single inequality constraint with the given right-hand side; returns a {@link Mutate1D}
+         * for filling in the (initially empty) constraint body.
+         */
+        public final Mutate1D inequality(final double rhs) {
+            RowsSupplier<Double> block = FACTORY.makeRowsSupplier(this.countVariables());
+            SparseArray<Double> row = block.addRow();
+            this.mergeInequalities(block, FACTORY.makeSingle(rhs));
+            return row;
+        }
 
-            R064Store mBody = FACTORY.make(1, this.countVariables());
+        /**
+         * Appends the single inequality constraint {@code [factors][X] <= rhs}.
+         */
+        public final B inequality(final double rhs, final double... factors) {
+
+            RowsSupplier<Double> block = FACTORY.makeRowsSupplier(this.countVariables());
+            SparseArray<Double> row = block.addRow();
             for (int i = 0, limit = Math.min(factors.length, this.countVariables()); i < limit; i++) {
-                mBody.set(i, factors[i]);
+                row.set(i, factors[i]);
             }
 
-            MatrixStore<Double> mRHS = FACTORY.makeSingle(rhs);
-
-            this.addInequalities(mBody, mRHS);
+            this.mergeInequalities(block, FACTORY.makeSingle(rhs));
 
             return (B) this;
         }
@@ -403,54 +448,38 @@ public abstract class GenericSolver implements Optimisation.Solver {
             myAdditionalConstraints.put(key, value);
         }
 
-        void addEqualities(final Access2D<?> mtrxAE, final Access1D<?> mtrxBE) {
-
-            ProgrammingError.throwIfNull(mtrxAE, mtrxBE);
-            ProgrammingError.throwIfNotEqualRowDimensions(mtrxAE, mtrxBE);
+        /**
+         * Merges the supplied {@link RowsSupplier} block into {@code myAE} (appending its {@link SparseArray}
+         * rows by reference – no copy) and appends {@code addBE} to {@code myBE}.
+         */
+        void mergeEqualities(final RowsSupplier<Double> addAE, final Access1D<?> addBE) {
 
             if (myAE == null || myBE == null) {
-                myAE = FACTORY.makeRowsSupplier(mtrxAE.getColDim());
-                myBE = FACTORY.makeZero(0, 1);
+                myAE = FACTORY.makeRowsSupplier(addAE.getColDim());
+                myBE = NumberList.factory(FACTORY.array()).make();
             }
 
-            myBE = Builder.add(myAE, myBE, mtrxAE, mtrxBE);
+            myAE.append(addAE);
+            for (int i = 0, limit = Math.toIntExact(addBE.count()); i < limit; i++) {
+                myBE.add(addBE.doubleValue(i));
+            }
         }
 
-        void addInequalities(final Access2D<?> mtrxAI, final Access1D<?> mtrxBI) {
-
-            ProgrammingError.throwIfNull(mtrxAI, mtrxBI);
-            ProgrammingError.throwIfNotEqualRowDimensions(mtrxAI, mtrxBI);
+        /**
+         * Merges the supplied {@link RowsSupplier} block into {@code myAI} (appending its {@link SparseArray}
+         * rows by reference – no copy) and appends {@code addBI} to {@code myBI}.
+         */
+        void mergeInequalities(final RowsSupplier<Double> addAI, final Access1D<?> addBI) {
 
             if (myAI == null || myBI == null) {
-                myAI = FACTORY.makeRowsSupplier(mtrxAI.getColDim());
-                myBI = FACTORY.makeZero(0, 0);
+                myAI = FACTORY.makeRowsSupplier(addAI.getColDim());
+                myBI = NumberList.factory(FACTORY.array()).make();
             }
 
-            myBI = Builder.add(myAI, myBI, mtrxAI, mtrxBI);
-        }
-
-        Mutate2D newEqualities(final double[] mtrxBE) {
-
-            int nbEqus = mtrxBE.length;
-            int nbVars = this.countVariables();
-
-            myAE = FACTORY.makeRowsSupplier(nbVars);
-            myAE.addRows(nbEqus);
-            myBE = R064Store.wrap(mtrxBE);
-
-            return myAE;
-        }
-
-        Mutate2D newInequalities(final double[] mtrxBI) {
-
-            int nbInes = mtrxBI.length;
-            int nbVars = this.countVariables();
-
-            myAI = FACTORY.makeRowsSupplier(nbVars);
-            myAI.addRows(nbInes);
-            myBI = R064Store.wrap(mtrxBI);
-
-            return myAI;
+            myAI.append(addAI);
+            for (int i = 0, limit = Math.toIntExact(addBI.count()); i < limit; i++) {
+                myBI.add(addBI.doubleValue(i));
+            }
         }
 
         void setBounds(final Access1D<Double> lower, final Access1D<Double> upper) {
@@ -492,16 +521,8 @@ public abstract class GenericSolver implements Optimisation.Solver {
                 throw new ProgrammingError("AE has the wrong number of columns!");
             }
 
-            if (myBE != null && myBE.getColDim() != 1) {
-                throw new ProgrammingError("BE must have precisely one column!");
-            }
-
             if (myAI != null && myAI.getColDim() != nbVariables) {
                 throw new ProgrammingError("AI has the wrong number of columns!");
-            }
-
-            if (myBI != null && myBI.getColDim() != 1) {
-                throw new ProgrammingError("BI must have precisely one column!");
             }
 
             if (myObjective != null && myObjective.arity() != nbVariables) {

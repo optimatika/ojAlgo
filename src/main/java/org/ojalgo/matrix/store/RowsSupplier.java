@@ -238,6 +238,22 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
         }
     }
 
+    /**
+     * Appends all rows of {@code other} to this supplier, sharing the underlying {@link SparseArray}
+     * instances – no copying is done. The column dimensions must match. Since the rows are shared, subsequent
+     * mutations through either supplier are visible in both.
+     */
+    public void append(final RowsSupplier<N> other) {
+        if (other.getColDim() != myColumnsCount) {
+            throw new IllegalArgumentException("Column dimensions don't match!");
+        }
+        int nbRows = other.getRowDim();
+        myRows.ensureCapacity(myRows.size() + nbRows);
+        for (int i = 0; i < nbRows; i++) {
+            this.addRow(other.getRow(i));
+        }
+    }
+
     @Override
     public long countColumns() {
         return myColumnsCount;

@@ -235,6 +235,22 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixSto
         }
     }
 
+    /**
+     * Appends all columns of {@code other} to this supplier, sharing the underlying {@link SparseArray}
+     * instances – no copying is done. The row dimensions must match. Since the columns are shared, subsequent
+     * mutations through either supplier are visible in both.
+     */
+    public void append(final ColumnsSupplier<N> other) {
+        if (other.getRowDim() != myRowsCount) {
+            throw new IllegalArgumentException("Row dimensions don't match!");
+        }
+        int nbCols = other.getColDim();
+        myColumns.ensureCapacity(myColumns.size() + nbCols);
+        for (int j = 0; j < nbCols; j++) {
+            this.addColumn(other.getColumn(j));
+        }
+    }
+
     @Override
     public SingleView<N> columns() {
         return new SingleView<>(this);

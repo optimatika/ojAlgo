@@ -139,16 +139,6 @@ public abstract class ConvexSolver extends GenericSolver {
         }
 
         @Override
-        public Builder equalities(final Access2D<?> mtrxAE, final Access1D<?> mtrxBE) {
-            return super.equalities(mtrxAE, mtrxBE);
-        }
-
-        @Override
-        public Builder equality(final double rhs, final double... factors) {
-            return super.equality(rhs, factors);
-        }
-
-        @Override
         public ConvexObjectiveFunction<Double> getObjective() {
             ConvexObjectiveFunction<Double> retVal = this.getObjective(ConvexObjectiveFunction.class);
             if (retVal == null) {
@@ -159,16 +149,6 @@ public abstract class ConvexSolver extends GenericSolver {
                 super.setObjective(retVal);
             }
             return retVal;
-        }
-
-        @Override
-        public Builder inequalities(final Access2D<?> mtrxAI, final Access1D<?> mtrxBI) {
-            return super.inequalities(mtrxAI, mtrxBI);
-        }
-
-        @Override
-        public Builder inequality(final double rhs, final double... factors) {
-            return super.inequality(rhs, factors);
         }
 
         /**
