@@ -1449,7 +1449,20 @@ abstract class SimplexSolver extends LinearSolver {
                 } else {
 
                     double infeasibility = Math.abs(mySimplex.getInfeasibility(iteration.exit.index));
-                    if (infeasibility < 1E-9) {
+                    // Judge the residual relative to the magnitude of the basic solution rather than against
+                    // a fixed absolute tolerance. On badly-scaled problems the residual of a near-zero
+                    // variable is just floating-point noise proportional to the largest solution value
+                    // (e.g. b - Ax with large b, Ax), so it must be compared to that scale. The reference is
+                    // floored at 1 so well-scaled problems keep essentially the original absolute behaviour.
+                    double reference = ONE;
+                    int[] basics = mySimplex.included;
+                    for (int ji = 0; ji < basics.length; ji++) {
+                        double value = Math.abs(mySimplex.getCurrentRHS(ji));
+                        if (value > reference) {
+                            reference = value;
+                        }
+                    }
+                    if (INFEASIBILITY.isSmall(reference, infeasibility)) {
                         state = State.FEASIBLE;
                         done = true;
                     } else {
