@@ -43,7 +43,7 @@ final class DualSimplexSolver extends SimplexSolver {
     @Override
     public Result solve(final Result kickStarter) {
 
-        IterDescr iteration = this.prepareToIterate(!warm);
+        IterDescr iteration = this.prepareToIterate(!state.isSuccess());
 
         this.doDualIterations(iteration, true);
 

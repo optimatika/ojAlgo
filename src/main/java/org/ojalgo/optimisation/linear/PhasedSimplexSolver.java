@@ -46,15 +46,32 @@ final class PhasedSimplexSolver extends SimplexSolver {
     @Override
     public Result solve(final Result kickStarter) {
 
-        IterDescr iteration = this.prepareToIterate(!warm);
+        if (state == State.APPROXIMATE) {
+            // Warm start after variable range update
 
-        this.doDualIterations(iteration, !warm); // Phase-1
+            IterDescr iteration = this.prepareToIterate(false);
 
-        this.switchToPhase2();
+            this.doDualIterations(iteration, false);
 
-        this.doPrimalIterations(iteration, !warm); // Phase-2 (warm retains primal devex weights)
+            if (state.isFeasible() && this.isDualFeasible()) {
+                state = State.OPTIMAL;
+            }
 
-        return this.extractResult();
+            return this.extractResult();
+
+        } else {
+            // Normal cold start optimisation
+
+            IterDescr iteration = this.prepareToIterate(true);
+
+            this.doDualIterations(iteration, true);
+
+            this.switchToPhase2();
+
+            this.doPrimalIterations(iteration, true);
+
+            return this.extractResult();
+        }
     }
 
     @Override

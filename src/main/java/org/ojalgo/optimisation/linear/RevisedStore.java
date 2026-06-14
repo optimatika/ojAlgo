@@ -599,14 +599,6 @@ final class RevisedStore extends SimplexStore {
             myInvBasisStale = false;
         }
 
-        // Cold: recompute duals, reduced costs and the basic solution from scratch.
-        //
-        // Warm: nothing to recompute — analogous to the tableau's in-place RHS/objective. The warm path
-        // is only reachable when every bound change since the last solve was on a *basic* variable (a
-        // non-basic move clears the warm flag in SimplexSolver.updateRange). Reduced costs / duals depend
-        // on basis × cost only, and x_B = B⁻¹(b − N·x_N) doesn't involve a basic variable's own bound and
-        // no non-basic value moved — so d[] and x[] already hold the retained optimal values.
-
         if (cold) {
             this.updateDualsAndReducedCosts();
             this.refreshBasicSolution();
@@ -797,19 +789,27 @@ final class RevisedStore extends SimplexStore {
 
     @Override
     boolean updateRange(final int index, final double lower, final double upper) {
-        // Incoming bounds are in original (unscaled) variable space. Convert to scaled space before storing
-        // so that branch-and-bound updates remain consistent with the scaled internal data.
         double scale = ONE;
         if (equilibrator != null && index < structure.countModelVariables()) {
             scale = equilibrator.primal.inverse[index];
         }
         double scaledLower = lower * scale;
         double scaledUpper = upper * scale;
-        // No-op shortcut: a caller that re-asserts every variable's bound each propagation (e.g.
-        // choco's PropSimplex) makes most updateRange calls identity. Skip the cache invalidation
-        // and the downstream re-solve setup when nothing actually changed.
-        if (scaledLower == this.getLowerBound(index) && scaledUpper == this.getUpperBound(index)) {
-            return false;
+        double oldLower = this.getLowerBound(index);
+        double oldUpper = this.getUpperBound(index);
+        if (myBasicSolutionReady && this.isExcluded(index)) {
+            ColumnState columnState = this.getColumnState(index);
+            double delta = ZERO;
+            if (columnState == ColumnState.LOWER) {
+                delta = scaledLower - oldLower;
+            } else if (columnState == ColumnState.UPPER) {
+                delta = scaledUpper - oldUpper;
+            }
+            if (delta != ZERO && Double.isFinite(delta)) {
+                myConstraintsCSC.supplyTo(index, y);
+                myInvBasis.ftran(y);
+                AXPY.invoke(x, -delta, y);
+            }
         }
         this.setBounds(index, scaledLower, scaledUpper);
         return true;

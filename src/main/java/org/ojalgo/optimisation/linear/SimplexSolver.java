@@ -325,8 +325,8 @@ abstract class SimplexSolver extends LinearSolver {
 
     /**
      * Should variable lower/upper bounds be read in their numerically-adjusted form? Bounds are passed
-     * directly into the simplex store's primal bound arrays — keeping them in model space avoids the
-     * solution needing a second pass to be reported back in model units.
+     * directly into the simplex store's primal bound arrays — keeping them in model space avoids the solution
+     * needing a second pass to be reported back in model units.
      */
     private static final boolean ADJUSTED_BOUNDS = false;
     /**
@@ -335,9 +335,10 @@ abstract class SimplexSolver extends LinearSolver {
      */
     private static final boolean ADJUSTED_CONSTRAINTS = true;
     /**
-     * Should the objective's linear coefficients be read in their numerically-adjusted form? Scaling the
-     * cost row keeps reduced-cost magnitudes within the simplex's absolute tolerances. The reported value
-     * and reduced costs are un-scaled at the result boundary via {@code LinearStructure.getObjectiveAdjustmentFactor()}.
+     * Should the objective's linear coefficients be read in their numerically-adjusted form? Scaling the cost
+     * row keeps reduced-cost magnitudes within the simplex's absolute tolerances. The reported value and
+     * reduced costs are un-scaled at the result boundary via
+     * {@code LinearStructure.getObjectiveAdjustmentFactor()}.
      */
     private static final boolean ADJUSTED_OBJECTIVE = true;
 
@@ -491,7 +492,7 @@ abstract class SimplexSolver extends LinearSolver {
         LinearSolver solver = store.newPhasedSimplexSolver(options);
 
         Result result = solver.solve();
-        Access1D<?> multiplierNumbers = result.getMultipliers().get();
+        Access1D<?> multiplierNumbers = result.getDualSolution().map(Supplier::get).get();
 
         State retState = result.getState();
         if (retState == State.UNBOUNDED) {
@@ -600,7 +601,7 @@ abstract class SimplexSolver extends LinearSolver {
         LinearSolver solver = store.newPhasedSimplexSolver(options);
 
         Result result = solver.solve();
-        Access1D<?> multiplierNumbers = result.getMultipliers().get();
+        Access1D<?> multiplierNumbers = result.getDualSolution().map(Supplier::get).get();
 
         State retState = result.getState();
 
@@ -704,24 +705,6 @@ abstract class SimplexSolver extends LinearSolver {
      */
     private final SimplexStore mySimplex;
 
-    /**
-     * The single flag deciding which path {@link #solve(Result)} takes next: {@code true} ⇒ attempt the
-     * dual-simplex warm restart (retained optimal basis, no setup/phase-1); {@code false} ⇒ the cold
-     * two-phase solve. Ownership of the decision:
-     * <ul>
-     * <li>set to {@code state.isOptimal()} at the end of every solve — a warm restart is only possible from a
-     * retained optimal, dual-feasible basis;
-     * <li>cleared by {@link #updateRange} when a <em>non-basic</em> variable's bound moves (its at-bound
-     * value feeds the basic solution and the warm path doesn't re-place it / re-shift the tableau, so the
-     * retained state would be stale) — a change on a <em>basic</em> variable only moves a feasibility limit
-     * and is left warm;
-     * <li>cleared on any structural change (basis reset);
-     * <li>cleared by {@link #solve(Result)} itself before it re-enters when a warm attempt fails to certify
-     * (the fall-back to cold).
-     * </ul>
-     */
-    boolean warm = false;
-
     SimplexSolver(final Optimisation.Options solverOptions, final SimplexStore simplexStore) {
         super(solverOptions);
         mySimplex = simplexStore;
@@ -748,23 +731,20 @@ abstract class SimplexSolver extends LinearSolver {
     @Override
     public boolean updateRange(final int index, final double lower, final double upper) {
 
-        // The store's return tells us whether bounds actually moved; use it only to decide whether to
-        // invalidate cached state and force a re-solve. Always report success: the UpdatableSolver
-        // contract is "true if successfully applied", and a no-op IS successfully applied. Returning the
-        // changed-flag made IntermediateSolver.update mistake a no-op (e.g. enforceBounds re-asserting the
-        // same bound on the post-cut compute() recursion) for an unsupported update, tripping its one-way
-        // myInPlaceUpdatesOK latch and permanently forcing every later B&B node to rebuild.
         boolean changed = mySimplex.updateRange(index, lower, upper);
 
         if (changed) {
-            state = State.UNEXPLORED;
             this.invalidateCache();
-            if (mySimplex.isExcluded(index)) {
-                // A non-basic variable's bound moved: its at-bound value feeds the basic solution and the
-                // warm path does not re-place it / re-shift the tableau, so the retained state would be
-                // stale. Force the next solve cold (it re-establishes consistency via setup()). A change
-                // on a basic variable only moves a feasibility limit, not x_B, so it stays warm.
-                warm = false;
+            if (state.isSuccess() && mySimplex.isExcluded(index)) {
+                ColumnState columnState = mySimplex.getColumnState(index);
+                if (columnState == ColumnState.LOWER) {
+                    mySimplex.setToLower(index);
+                } else if (columnState == ColumnState.UPPER) {
+                    mySimplex.setToUpper(index);
+                }
+            }
+            if (state.isOptimal()) {
+                state = State.APPROXIMATE;
             }
         }
 
@@ -1412,7 +1392,7 @@ abstract class SimplexSolver extends LinearSolver {
 
     final SimplexSolver basis(final int[] basis) {
         mySimplex.resetBasis(basis);
-        warm = false; // structural change — the prior basis no longer applies
+        state = State.UNEXPLORED;
         return this;
     }
 
@@ -1573,8 +1553,6 @@ abstract class SimplexSolver extends LinearSolver {
         // reduced costs and dual multipliers, which are all mapped back to model space).
         double value = this.extractValue() / mySimplex.structure.getObjectiveAdjustmentFactor();
 
-        warm = state.isOptimal();
-
         double[] solution = this.extractSolution();
         mySimplex.unscaleSolution(solution);
 
@@ -1606,6 +1584,8 @@ abstract class SimplexSolver extends LinearSolver {
     }
 
     final IterDescr prepareToIterate(final boolean cold) {
+
+        state = State.UNEXPLORED;
 
         this.invalidateCache();
 
