@@ -87,6 +87,10 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2025-08-18: CPLEX ≈0.01s
      * <li>2025-08-22: 300s suffice with optimal solution
      * </ul>
+     * MacBook Air (15-inch, M4, 2025)
+     * <ul>
+     * <li>2026-06-15: 300s suffice with optimal solution
+     * </ul>
      */
     @Tag("slow")
     @Tag("unstable")
@@ -106,6 +110,10 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2025-08-18: CPLEX ≈600s
      * <li>2025-08-22: 900s timeout
+     * </ul>
+     * MacBook Air (15-inch, M4, 2025)
+     * <ul>
+     * <li>2026-06-15: 300s suffice with feasible solution, but 35260.0
      * </ul>
      */
     @Tag("slow")
@@ -136,6 +144,10 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2025-08-18: CPLEX ≈0.01s
      * <li>2025-08-22: ≈0.06s
      * </ul>
+     * MacBook Air (15-inch, M4, 2025)
+     * <ul>
+     * <li>2026-06-15: 0.5s
+     * </ul>
      */
     @Test
     public void testFlugpl() {
@@ -153,6 +165,10 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2025-08-18: CPLEX ≈110s
      * <li>2025-08-22: 300s suffice with optimal solution
+     * </ul>
+     * MacBook Air (15-inch, M4, 2025)
+     * <ul>
+     * <li>2026-06-15: 150s
      * </ul>
      */
     @Tag("slow")
@@ -173,6 +189,10 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2025-08-18: CPLEX takes forever
      * <li>2025-08-22: 300s suffice with feasible solution, but -9464.23...
      * </ul>
+     * MacBook Air (15-inch, M4, 2025)
+     * <ul>
+     * <li>2026-06-15: 300s suffice with feasible solution, but -9454.244443408
+     * </ul>
      */
     @Tag("slow")
     @Tag("unstable")
@@ -191,6 +211,10 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2025-08-18: CPLEX ≈48s
      * <li>2025-08-22: ≈93s
+     * </ul>
+     * MacBook Air (15-inch, M4, 2025)
+     * <ul>
+     * <li>2026-06-15: 90s
      * </ul>
      */
     @Tag("slow")
@@ -211,6 +235,10 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2025-08-18: CPLEX ≈52s
      * <li>2025-08-22: ≈115s
      * </ul>
+     * MacBook Air (15-inch, M4, 2025)
+     * <ul>
+     * <li>2026-06-15: 89s
+     * </ul>
      */
     @Tag("slow")
     @Test
@@ -228,6 +256,10 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2025-08-18: CPLEX ≈57s
      * <li>2025-08-22: ≈270s
+     * </ul>
+     * MacBook Air (15-inch, M4, 2025)
+     * <ul>
+     * <li>2026-06-15: 189s
      * </ul>
      */
     @Tag("slow")
@@ -257,6 +289,10 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2025-08-18: CPLEX ≈0.05s
      * <li>2025-08-22: ≈0.02s
      * </ul>
+     * MacBook Air (15-inch, M4, 2025)
+     * <ul>
+     * <li>2026-06-15: 0.2s
+     * </ul>
      */
     @Test
     public void testGr4x6() {
@@ -276,13 +312,16 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * </ul>
      * MacBook Pro (16-inch, 2019)
      * <ul>
-     * <li>2022-02-11: 11s finished with optimal solution
      * <li>2022-04-18: 22s finished with optimal solution
      * </ul>
      * MacBook Air (15-inch, M2, 2023)
      * <ul>
      * <li>2025-08-18: CPLEX ≈1s
      * <li>2025-08-22: ≈14s
+     * </ul>
+     * MacBook Air (15-inch, M4, 2025)
+     * <ul>
+     * <li>2026-06-15: 13s
      * </ul>
      */
     @Test
@@ -301,6 +340,10 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2025-08-18: CPLEX ≈2s
      * <li>2025-08-22: 300s suffice with feasible solution, but 3
+     * </ul>
+     * MacBook Air (15-inch, M4, 2025)
+     * <ul>
+     * <li>2026-06-15: 300s suffice with feasible solution, but 3
      * </ul>
      */
     @Tag("slow")
@@ -321,6 +364,10 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2025-08-18: CPLEX takes long time
      * <li>2025-08-22: 300s suffice with feasible solution, but 7
+     * </ul>
+     * MacBook Air (15-inch, M4, 2025)
+     * <ul>
+     * <li>2026-06-15: 300s suffice with feasible solution, but 4
      * </ul>
      */
     @Tag("slow")
@@ -352,6 +399,10 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2025-08-18: CPLEX ≈6s
      * <li>2025-08-22: 300s suffice with optimal solution
      * </ul>
+     * MacBook Air (15-inch, M4, 2025)
+     * <ul>
+     * <li>2026-06-15: 300s suffice with optimal solution
+     * </ul>
      */
     @Tag("slow")
     @Test
@@ -368,26 +419,20 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * Mac Pro (Early 2009)
      * <ul>
-     * <li>2013-04-01: (suffice=4h abort=8h) Stopped with optimal integer solution after 1h50min
-     * <li>2013-12-08: (suffice=4h abort=8h) Stopped with optimal integer solution after 412s
-     * <li>2015-11-07: (suffice=4h abort=8h) Stopped with optimal integer solution after 372s
-     * <li>2017-10-20: (suffice=4h abort=8h) Stopped with optimal integer solution after 796s
-     * <li>2017-10-20: (suffice=5min abort=1h) Stopped with optimal integer solution after 5min
-     * <li>2018-02-07: (suffice=5min, abort=15min, mip_gap=0.001) Suffice with optimal solution
-     * <li>2018-02-07: (suffice=15min, abort=15min, mip_gap=0.001) Found optimal solution in 344s
-     * <li>2018-04-47: (suffice=5min, abort=15min, mip_gap=0.001) Found optimal solution in 227s
-     * <li>2018-08-16: sufficed: <11.0> but was: <14.0>
      * <li>2019-01-28: 300s expected: <11.0> but was: <11.999999999999979>
      * </ul>
      * MacBook Pro (16-inch, 2019)
      * <ul>
-     * <li>2022-02-11: Finished with optimal solution in 251s. (optimal solution found after about 150s)
      * <li>2022-03-17: Finished with optimal solution in 159s.
      * </ul>
      * MacBook Air (15-inch, M2, 2023)
      * <ul>
      * <li>2025-08-18: CPLEX ≈4s
      * <li>2025-08-22: ≈29s
+     * </ul>
+     * MacBook Air (15-inch, M4, 2025)
+     * <ul>
+     * <li>2026-06-15: 18s
      * </ul>
      */
     @Test
@@ -400,11 +445,9 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * implications modeled via big-M constraints. Requires numerically safe M values, bound strengthening,
      * and effective probing/presolve.
      * <p>
-     * https://miplib.zib.de/instance_details_supportcase21i.html
-     * <p>
-     * MacBook Air (15-inch, M2, 2023)
+     * MacBook Air (15-inch, M4, 2025)
      * <ul>
-     * <li>2025-08-18: Can't parse the MPS file
+     * <li>2026-06-15: Can't parse the MPS file
      * </ul>
      */
     @Test
