@@ -115,7 +115,14 @@ public interface ModelFileTest {
 
         ExpressionsBasedModel.FileFormat format = ExpressionsBasedModel.FileFormat.from(name);
 
-        try (InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream("optimisation/" + dataset + "/" + name)) {
+        String resource = "optimisation/" + dataset + "/" + name;
+
+        InputStream found = ModelFileTest.class.getResourceAsStream("/" + resource);
+        if (found == null) {
+            found = Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
+        }
+
+        try (InputStream input = found) {
 
             ExpressionsBasedModel model = ExpressionsBasedModel.parse(input, format);
 

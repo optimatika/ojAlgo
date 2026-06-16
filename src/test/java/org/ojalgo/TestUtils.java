@@ -664,14 +664,7 @@ public abstract class TestUtils {
     }
 
     private static String buildAbsoluteResourcePath(final String... pathElements) {
-
-        File builder = new File(pathElements[0]);
-
-        for (int i = 1; i < pathElements.length; i++) {
-            builder = new File(builder, pathElements[i]);
-        }
-
-        return "/" + builder.toPath();
+        return "/" + String.join("/", pathElements);
     }
 
     static void assertOptimisationResult(final String message, final Optimisation.Result expected, final Optimisation.Result actual,
