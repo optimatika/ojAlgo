@@ -59,7 +59,7 @@
         <dependency>
             <groupId>org.ojalgo</groupId>
             <artifactId>optimisation-models</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -193,7 +193,7 @@
             <plugin>
                 <groupId>org.sonatype.central</groupId>
                 <artifactId>central-publishing-maven-plugin</artifactId>
-                <version>0.10.0</version>
+                <version>0.11.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <publishingServerId>central</publishingServerId>
