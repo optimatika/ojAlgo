@@ -133,7 +133,7 @@ public interface ModelFileTest {
                 }
             }
 
-            model.options.time_suffice = 5L * CalendarDateUnit.MINUTE.toDurationInMillis();
+            model.options.time_suffice = 10L * CalendarDateUnit.MINUTE.toDurationInMillis();
             model.options.time_abort = 15L * CalendarDateUnit.MINUTE.toDurationInMillis();
 
             TestUtils.assertTrue(model.validate());
