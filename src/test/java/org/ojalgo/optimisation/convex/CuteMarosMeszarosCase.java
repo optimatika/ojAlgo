@@ -462,6 +462,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
      * <p>
      * Just takes way too long – 275s
      */
+    @Tag("slow")
     @Test
     public void testMOSARQP2() {
         CuteMarosMeszarosCase.doTest("MOSARQP2.SIF");
@@ -486,6 +487,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     /**
      * <p>
      */
+    @Tag("slow")
     @Test
     public void testPRIMALC8() {
         CuteMarosMeszarosCase.doTest("PRIMALC8.SIF", ACCURACY.withScale(6));
@@ -502,6 +504,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     /**
      * <p>
      */
+    @Tag("slow")
     @Test
     public void testQPCBOEI1() {
         CuteMarosMeszarosCase.doTest("QPCBOEI1.SIF", ACCURACY.withScale(7));

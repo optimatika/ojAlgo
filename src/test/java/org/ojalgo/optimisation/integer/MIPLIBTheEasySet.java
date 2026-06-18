@@ -263,7 +263,6 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * </ul>
      */
     @Tag("slow")
-    @Tag("unstable")
     @Test
     public void testGen_ip054() {
         MIPLIBTheEasySet.doTest("gen-ip054.mps", "6840.965642", null);
@@ -435,6 +434,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-06-15: 18s
      * </ul>
      */
+    @Tag("slow")
     @Test
     public void testPk1() {
         MIPLIBTheEasySet.doTest("pk1.mps", "11", null);
