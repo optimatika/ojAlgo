@@ -384,6 +384,16 @@ public abstract class ModelStrategy implements IntegerStrategy {
     }
 
     @Override
+    public int getMaxRootCutRounds() {
+        return myStrategy.getMaxRootCutRounds();
+    }
+
+    @Override
+    public java.util.List<ModelCutGenerator> getRootCutGenerators() {
+        return myStrategy.getRootCutGenerators();
+    }
+
+    @Override
     public List<Comparator<NodeKey>> getWorkerPriorities() {
         return myWorkerPriorities;
     }

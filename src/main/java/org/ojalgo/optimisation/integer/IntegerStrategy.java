@@ -23,6 +23,8 @@ package org.ojalgo.optimisation.integer;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -47,11 +49,20 @@ public interface IntegerStrategy {
         private final NumberContext myGapTolerance;
         private final GMICutConfiguration myGMICutConfiguration;
         private final NumberContext myIntegralityTolerance;
+        private final int myMaxRootCutRounds;
         private final IntSupplier myParallelism;
         private final Comparator<NodeKey>[] myPriorityDefinitions;
+        private final List<ModelCutGenerator> myRootCutGenerators;
 
         ConfigurableStrategy(final IntSupplier parallelism, final Comparator<NodeKey>[] definitions, final NumberContext integrality, final NumberContext gap,
                 final BiFunction<ExpressionsBasedModel, IntegerStrategy, ModelStrategy> factory, final GMICutConfiguration configuration) {
+
+            this(parallelism, definitions, integrality, gap, factory, configuration, 1, Arrays.asList(new MIRCutGenerator(), new KnapsackCoverCutGenerator()));
+        }
+
+        ConfigurableStrategy(final IntSupplier parallelism, final Comparator<NodeKey>[] definitions, final NumberContext integrality, final NumberContext gap,
+                final BiFunction<ExpressionsBasedModel, IntegerStrategy, ModelStrategy> factory, final GMICutConfiguration configuration,
+                final int maxRootCutRounds, final List<ModelCutGenerator> rootCutGenerators) {
 
             super();
 
@@ -61,6 +72,8 @@ public interface IntegerStrategy {
             myGapTolerance = gap;
             myFactory = factory;
             myGMICutConfiguration = configuration;
+            myMaxRootCutRounds = maxRootCutRounds;
+            myRootCutGenerators = rootCutGenerators;
         }
 
         /**
@@ -79,7 +92,8 @@ public interface IntegerStrategy {
                 totalDefinitions[additionalDefinitions.length + i] = myPriorityDefinitions[i];
             }
 
-            return new ConfigurableStrategy(myParallelism, totalDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myGMICutConfiguration);
+            return new ConfigurableStrategy(myParallelism, totalDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myGMICutConfiguration,
+                    myMaxRootCutRounds, myRootCutGenerators);
         }
 
         @Override
@@ -122,36 +136,67 @@ public interface IntegerStrategy {
             return myFactory.apply(model, this);
         }
 
+        @Override
+        public int getMaxRootCutRounds() {
+            return myMaxRootCutRounds;
+        }
+
+        @Override
+        public List<ModelCutGenerator> getRootCutGenerators() {
+            return myRootCutGenerators;
+        }
+
         /**
          * Change the MIP gap
          */
         public ConfigurableStrategy withGapTolerance(final NumberContext newTolerance) {
-            return new ConfigurableStrategy(myParallelism, myPriorityDefinitions, myIntegralityTolerance, newTolerance, myFactory, myGMICutConfiguration);
+            return new ConfigurableStrategy(myParallelism, myPriorityDefinitions, myIntegralityTolerance, newTolerance, myFactory, myGMICutConfiguration,
+                    myMaxRootCutRounds, myRootCutGenerators);
         }
 
         public ConfigurableStrategy withGMICutConfiguration(final GMICutConfiguration newConfiguration) {
-            return new ConfigurableStrategy(myParallelism, myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, newConfiguration);
+            return new ConfigurableStrategy(myParallelism, myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, newConfiguration,
+                    myMaxRootCutRounds, myRootCutGenerators);
+        }
+
+        /**
+         * Maximum number of cut-solve-cut iterations at the root node before branching begins.
+         */
+        public ConfigurableStrategy withMaxRootCutRounds(final int newMaxRounds) {
+            return new ConfigurableStrategy(myParallelism, myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myGMICutConfiguration,
+                    newMaxRounds, myRootCutGenerators);
         }
 
         /**
          * Create a sub-class of {@link ModelStrategy} and provide a factory method for it here.
          */
         public ConfigurableStrategy withModelStrategyFactory(final BiFunction<ExpressionsBasedModel, IntegerStrategy, ModelStrategy> newFactory) {
-            return new ConfigurableStrategy(myParallelism, myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, newFactory, myGMICutConfiguration);
+            return new ConfigurableStrategy(myParallelism, myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, newFactory, myGMICutConfiguration,
+                    myMaxRootCutRounds, myRootCutGenerators);
         }
 
         /**
          * How many threads will be used? Perhaps use {@link Parallelism} to obtain a suitable value.
          */
         public ConfigurableStrategy withParallelism(final IntSupplier newParallelism) {
-            return new ConfigurableStrategy(newParallelism, myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myGMICutConfiguration);
+            return new ConfigurableStrategy(newParallelism, myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myGMICutConfiguration,
+                    myMaxRootCutRounds, myRootCutGenerators);
         }
 
         /**
          * Replace the priority definitions with these ones.
          */
         public ConfigurableStrategy withPriorityDefinitions(final Comparator<NodeKey>... newDefinitions) {
-            return new ConfigurableStrategy(myParallelism, newDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myGMICutConfiguration);
+            return new ConfigurableStrategy(myParallelism, newDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myGMICutConfiguration,
+                    myMaxRootCutRounds, myRootCutGenerators);
+        }
+
+        /**
+         * Replace the model-based root cut generators.
+         */
+        public ConfigurableStrategy withRootCutGenerators(final ModelCutGenerator... newGenerators) {
+            return new ConfigurableStrategy(myParallelism, myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myGMICutConfiguration,
+                    myMaxRootCutRounds, Arrays.asList(newGenerators));
         }
 
     }
@@ -233,6 +278,17 @@ public interface IntegerStrategy {
      * Used to determine if a variable value is integer or not
      */
     NumberContext getIntegralityTolerance();
+
+    /**
+     * Maximum number of cut-solve-cut iterations at the root node. Each round generates model-based
+     * cuts (MIR, cover, etc.) and re-solves the LP relaxation before branching begins.
+     */
+    int getMaxRootCutRounds();
+
+    /**
+     * The model-based cut generators to run at the root node.
+     */
+    List<ModelCutGenerator> getRootCutGenerators();
 
     /**
      * There will be 1 worker thread per item in the returned {@link List}. The {@link Comparator} instances
