@@ -189,10 +189,12 @@ public abstract class ModelStrategy implements IntegerStrategy {
             // Count each branching decision considered for cutting
             myCutNodesSinceLastSuccess++;
 
-            // Always allow at root
+            // Root handled separately
             if (nodeKey.depth == 0) {
-                return true;
-            } else if (bestResultSoFar == null) {
+                return false;
+            }
+
+            if (bestResultSoFar == null) {
                 return false;
             }
 

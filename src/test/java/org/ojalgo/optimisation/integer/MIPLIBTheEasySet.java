@@ -147,6 +147,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * MacBook Air (15-inch, M4, 2025)
      * <ul>
      * <li>2026-06-15: 0.5s
+     * <li>2026-06-26: 0.4s
      * </ul>
      */
     @Test
@@ -169,6 +170,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * MacBook Air (15-inch, M4, 2025)
      * <ul>
      * <li>2026-06-15: 150s
+     * <li>2026-06-26: 185s
      * </ul>
      */
     @Tag("slow")
@@ -215,6 +217,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * MacBook Air (15-inch, M4, 2025)
      * <ul>
      * <li>2026-06-15: 90s
+     * <li>2026-06-26: 63s
      * </ul>
      */
     @Tag("slow")
@@ -238,6 +241,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * MacBook Air (15-inch, M4, 2025)
      * <ul>
      * <li>2026-06-15: 89s
+     * <li>2026-06-26: 84s
      * </ul>
      */
     @Tag("slow")
@@ -260,6 +264,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * MacBook Air (15-inch, M4, 2025)
      * <ul>
      * <li>2026-06-15: 189s
+     * <li>2026-06-26: 289s
      * </ul>
      */
     @Tag("slow")
@@ -291,6 +296,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * MacBook Air (15-inch, M4, 2025)
      * <ul>
      * <li>2026-06-15: 0.2s
+     * <li>2026-06-26: 0.2s
      * </ul>
      */
     @Test
@@ -321,6 +327,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * MacBook Air (15-inch, M4, 2025)
      * <ul>
      * <li>2026-06-15: 13s
+     * <li>2026-06-26: 16s
      * </ul>
      */
     @Test
@@ -432,6 +439,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * MacBook Air (15-inch, M4, 2025)
      * <ul>
      * <li>2026-06-15: 18s
+     * <li>2026-06-26: 13s
      * </ul>
      */
     @Tag("slow")

@@ -342,6 +342,45 @@ public final class IntegerSolver extends GenericSolver {
     }
 
     /**
+     * Dedicated root cut loop — runs GMI cut generation multiple times before branching begins. Bypasses the
+     * full compute() path (pseudo-cost updates, reduced-cost fixing, variable selection) that is unnecessary
+     * at this stage. Stops on: no cuts generated, LP infeasibility, or tailing-off.
+     */
+    private void generateRootCuts(final NodeSolver rootSolver, Optimisation.Result rootResult) {
+
+        if (rootResult == null || !rootResult.getState().isOptimal()) {
+            return;
+        }
+
+        if (myStrategy.getGMICutConfiguration() == null) {
+            return;
+        }
+
+        int maxRounds = 10;
+        double previousObjective = rootResult.getValue();
+
+        for (int round = 0; round < maxRounds; round++) {
+
+            if (!rootSolver.generateCuts(myStrategy)) {
+                break;
+            }
+
+            rootResult = rootSolver.solve(this.getBestEstimate());
+
+            if (rootResult == null || !rootResult.getState().isOptimal()) {
+                break;
+            }
+
+            double currentObjective = rootResult.getValue();
+            double improvement = Math.abs(currentObjective - previousObjective);
+            if (improvement < 1E-6 * (ONE + Math.abs(currentObjective))) {
+                break;
+            }
+            previousObjective = currentObjective;
+        }
+    }
+
+    /**
      * Valid bound on the optimal integer objective: best relaxation bound over all open subtrees (deferred
      * frontier head + nodes currently checked out by workers). A non-finite contribution could hide an
      * arbitrarily good solution, so it collapses the bound to the pessimistic value — we never declare
@@ -506,9 +545,11 @@ public final class IntegerSolver extends GenericSolver {
                 }
 
                 // Re-establish the root LP basis so the upcoming compute() call warm-starts cleanly.
-                rootSolver.solve(null);
+                rootResult = rootSolver.solve(null);
             }
         }
+
+        this.generateRootCuts(rootSolver, rootResult);
 
         return this.compute(rootNode, rootSolver, rootPrinter, myStrategy);
     }

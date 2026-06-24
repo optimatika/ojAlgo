@@ -22,6 +22,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 #### org.ojalgo.optimisation
 
+- Changed the cut generation strategy, to try and get more/better cuts at the root.
+
 ## [57.0.0] – 2026-06-20
 
 ### Added
