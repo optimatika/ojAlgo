@@ -11,6 +11,17 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.optimisation
+
+- `IntegerSolver` now performs reduced-cost fixing at every B&B node: after solving the LP relaxation and when an incumbent exists, each non-fixed integer variable's reduced gradient is compared against the incumbent gap to derive tighter bounds — variables whose reduced cost exceeds the gap are fixed, potentially pruning large subtrees.
+- `IntegerSolver` gained a rounding heuristic that fires at nodes where no incumbent has been found yet. If all integer variables in the LP solution are within a quarter-unit of an integer value, the rounded candidate is validated against the original model and registered as an incumbent when feasible.
+
+### Changed
+
+#### org.ojalgo.optimisation
+
 ## [57.0.0] – 2026-06-20
 
 ### Added

@@ -351,8 +351,8 @@ public final class NodeKey implements Comparable<NodeKey> {
 
     void enforceBounds(final ExpressionsBasedModel model, final int idx, final ModelStrategy strategy) {
 
-        BigDecimal lowerBound = this.getLowerBound(idx);
-        BigDecimal upperBound = this.getUpperBound(idx);
+        BigDecimal lowerBound = this.getLower(idx);
+        BigDecimal upperBound = this.getUpper(idx);
 
         Variable variable = model.getVariable(strategy.getIndex(idx));
         variable.lower(lowerBound);
@@ -367,8 +367,8 @@ public final class NodeKey implements Comparable<NodeKey> {
 
     void enforceBounds(final NodeSolver nodeSolver, final ModelStrategy strategy) {
 
-        BigDecimal lowerBound = this.getLowerBound(index);
-        BigDecimal upperBound = this.getUpperBound(index);
+        BigDecimal lowerBound = this.getLower(index);
+        BigDecimal upperBound = this.getUpper(index);
 
         Variable variable = nodeSolver.getVariable(strategy.getIndex(index));
         variable.lower(lowerBound);
@@ -398,21 +398,23 @@ public final class NodeKey implements Comparable<NodeKey> {
         return true;
     }
 
+    BigDecimal getLower(final int idx) {
+
+        int bound = myLowerBounds[idx];
+
+        if (bound != Integer.MIN_VALUE) {
+            return BigDecimal.valueOf(bound);
+        } else {
+            return null;
+        }
+    }
+
     /**
      * Lower bound on the integer variable at {@code idx} (integer-local index), as a double. The
      * {@link Integer#MIN_VALUE} sentinel for "unbounded" is mapped to {@link Double#NEGATIVE_INFINITY}.
      */
-    double getLower(final int idx) {
-        int v = myLowerBounds[idx];
-        return v == Integer.MIN_VALUE ? Double.NEGATIVE_INFINITY : v;
-    }
-
-    BigDecimal getLowerBound(final int idx) {
-        int tmpLower = myLowerBounds[idx];
-        if (tmpLower != Integer.MIN_VALUE) {
-            return new BigDecimal(tmpLower);
-        }
-        return null;
+    int getLowerBound(final int idx) {
+        return myLowerBounds[idx];
     }
 
     double getMinimumDisplacement(final int idx, final double value) {
@@ -422,21 +424,23 @@ public final class NodeKey implements Comparable<NodeKey> {
         return Math.abs(feasibleValue - Math.rint(feasibleValue));
     }
 
+    BigDecimal getUpper(final int idx) {
+
+        int bound = myUpperBounds[idx];
+
+        if (bound != Integer.MAX_VALUE) {
+            return BigDecimal.valueOf(bound);
+        } else {
+            return null;
+        }
+    }
+
     /**
      * Upper bound on the integer variable at {@code idx} (integer-local index), as a double. The
      * {@link Integer#MAX_VALUE} sentinel for "unbounded" is mapped to {@link Double#POSITIVE_INFINITY}.
      */
-    double getUpper(final int idx) {
-        int v = myUpperBounds[idx];
-        return v == Integer.MAX_VALUE ? Double.POSITIVE_INFINITY : v;
-    }
-
-    BigDecimal getUpperBound(final int idx) {
-        int tmpUpper = myUpperBounds[idx];
-        if (tmpUpper != Integer.MAX_VALUE) {
-            return new BigDecimal(tmpUpper);
-        }
-        return null;
+    int getUpperBound(final int idx) {
+        return myUpperBounds[idx];
     }
 
     boolean isLowerBranch() {

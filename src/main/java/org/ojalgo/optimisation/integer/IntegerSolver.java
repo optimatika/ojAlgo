@@ -21,8 +21,7 @@
  */
 package org.ojalgo.optimisation.integer;
 
-import static org.ojalgo.function.constant.PrimitiveMath.ONE;
-import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -43,6 +42,7 @@ import org.ojalgo.netio.CharacterRing.RingLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -445,8 +445,8 @@ public final class IntegerSolver extends GenericSolver {
                     int gi = myStrategy.getIndex(ii);
                     double v = rootResult.doubleValue(gi);
 
-                    double origLower = rootNode.getLower(ii);
-                    double origUpper = rootNode.getUpper(ii);
+                    int origLower = rootNode.getLowerBound(ii);
+                    int origUpper = rootNode.getUpperBound(ii);
 
                     long floorVal = IntegerSolver.branchFloor(v);
                     long ceilVal = IntegerSolver.branchCeil(v, floorVal);
@@ -726,6 +726,14 @@ public final class IntegerSolver extends GenericSolver {
         double nodeValue = nodeResult.getValue();
         strategy.onNodeSolved(nodeKey, nodeResult, nodeValue, mySense == Optimisation.Sense.MIN);
 
+        if (nodeSolver.isInPlaceBoundUpdateSafe()) {
+            if (myBestResultSoFar != null) {
+                this.fixByReducedCost(nodeKey, nodeSolver, nodeResult, nodeValue, strategy);
+            } else {
+                this.tryRounding(nodeKey, nodeResult, strategy);
+            }
+        }
+
         int branchIntegerIndex = this.identifyNonIntegerVariable(nodeResult, nodeKey, strategy);
 
         if (branchIntegerIndex == -1) {
@@ -807,6 +815,51 @@ public final class IntegerSolver extends GenericSolver {
         }
     }
 
+    void fixByReducedCost(final NodeKey nodeKey, final NodeSolver nodeSolver, final Optimisation.Result nodeResult, final double nodeValue,
+            final ModelStrategy strategy) {
+
+        double incumbentValue = myBestResultSoFar.getValue();
+        double gap = mySense == Optimisation.Sense.MIN ? incumbentValue - nodeValue : nodeValue - incumbentValue;
+
+        if (gap <= ZERO) {
+            return;
+        }
+
+        for (int i = 0, limit = strategy.countIntegerVariables(); i < limit; i++) {
+
+            int lower = nodeKey.getLowerBound(i);
+            int upper = nodeKey.getUpperBound(i);
+
+            if (lower >= upper) {
+                continue;
+            }
+
+            int globalIndex = strategy.getIndex(i);
+            double value = nodeResult.doubleValue(globalIndex);
+
+            double rc = nodeSolver.getReducedGradient(globalIndex);
+            double absRC = Math.abs(rc);
+
+            if (absRC > ZERO) {
+                if (Math.abs(value - lower) < 0.5) {
+                    int maxSteps = (int) Math.floor(gap / absRC);
+                    int newUpper = lower + maxSteps;
+                    if (newUpper < upper) {
+                        nodeKey.tightenUpper(i, newUpper);
+                        nodeSolver.update(globalIndex, lower, newUpper);
+                    }
+                } else if (Math.abs(value - upper) < 0.5) {
+                    int maxSteps = (int) Math.floor(gap / absRC);
+                    int newLower = upper - maxSteps;
+                    if (newLower > lower) {
+                        nodeKey.tightenLower(i, newLower);
+                        nodeSolver.update(globalIndex, newLower, upper);
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Should return the index of the (best) integer variable to branch on. Returning a negative index means
      * an integer solution has been found (no further branching). Does NOT return a global variable index -
@@ -841,5 +894,43 @@ public final class IntegerSolver extends GenericSolver {
         }
 
         return retVal;
+    }
+
+    void tryRounding(final NodeKey nodeKey, final Optimisation.Result nodeResult, final ModelStrategy strategy) {
+
+        int nbVars = nodeResult.size();
+        int nbInts = strategy.countIntegerVariables();
+
+        double maxDisplacement = ZERO;
+
+        BigDecimal[] rounded = new BigDecimal[nbVars];
+
+        for (int i = 0; i < nbInts; i++) {
+            int globalIndex = strategy.getIndex(i);
+            double value = nodeResult.doubleValue(globalIndex);
+            long lower = nodeKey.getLowerBound(i);
+            long upper = nodeKey.getUpperBound(i);
+            long intValue = Math.min(upper, Math.max(lower, Math.round(value)));
+            maxDisplacement = Math.max(maxDisplacement, Math.abs(intValue - value));
+            rounded[globalIndex] = BigDecimal.valueOf(intValue);
+        }
+
+        if (maxDisplacement > QUARTER) {
+            return;
+        } else if (nbVars > nbInts) {
+            for (int j = 0; j < nbVars; j++) {
+                if (rounded[j] == null) {
+                    rounded[j] = BigDecimal.valueOf(nodeResult.doubleValue(j));
+                }
+            }
+        }
+
+        Access1D<BigDecimal> candidate = nodeResult.withSolution(Access1D.wrap(rounded));
+
+        if (myIntegerModel.validate(candidate)) {
+            double objectiveValue = myIntegerModel.objective().evaluate(candidate).doubleValue();
+            Optimisation.Result integerResult = new Optimisation.Result(Optimisation.State.FEASIBLE, objectiveValue, candidate);
+            this.markInteger(nodeKey, integerResult, strategy);
+        }
     }
 }

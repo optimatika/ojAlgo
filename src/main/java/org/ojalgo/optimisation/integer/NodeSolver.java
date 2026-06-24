@@ -68,25 +68,6 @@ public final class NodeSolver extends IntermediateSolver {
         super(model);
     }
 
-    /**
-     * Whether this node's relaxation can absorb a branch-induced bound change in place (via
-     * {@code update(variable)}) instead of being rebuilt from scratch.
-     * <p>
-     * True only for the linear/simplex relaxation: there {@code SimplexSolver.updateRange} genuinely
-     * applies the change in place. A quadratic relaxation is solved by a convex solver — ADMM drifts
-     * when warm-started across bound changes and the active-set path effectively rebuilds anyway — so
-     * those must keep the historical, numerically-stable behaviour of rebuilding fresh on every branch
-     * ({@link NodeKey#enforceBounds(NodeSolver, ModelStrategy)} forces a {@code reset()} for them, as the
-     * original over-broad sign-change condition implicitly did). The model's structure is fixed for this
-     * solver's lifetime, so the answer is cached.
-     */
-    boolean isInPlaceBoundUpdateSafe() {
-        if (myInPlaceBoundUpdateSafe == null) {
-            myInPlaceBoundUpdateSafe = Boolean.valueOf(!this.getModel().isAnyExpressionQuadratic());
-        }
-        return myInPlaceBoundUpdateSafe.booleanValue();
-    }
-
     private boolean doGenerateCuts(final ModelStrategy strategy, final NodeKey nodeKey, final ExpressionsBasedModel target) {
 
         if (!this.isSolved()) {
@@ -297,6 +278,35 @@ public final class NodeSolver extends IntermediateSolver {
             this.reset();
         }
         return retVal;
+    }
+
+    double getReducedGradient(final int globalModelIndex) {
+        if (this.isSolved() && this.getSolver() instanceof UpdatableSolver) {
+            int indexInSolver = this.getIndexInSolver(globalModelIndex);
+            if (indexInSolver >= 0) {
+                return ((UpdatableSolver) this.getSolver()).getReducedGradient(indexInSolver);
+            }
+        }
+        return 0.0;
+    }
+
+    /**
+     * Whether this node's relaxation can absorb a branch-induced bound change in place (via
+     * {@code update(variable)}) instead of being rebuilt from scratch.
+     * <p>
+     * True only for the linear/simplex relaxation: there {@code SimplexSolver.updateRange} genuinely applies
+     * the change in place. A quadratic relaxation is solved by a convex solver — ADMM drifts when
+     * warm-started across bound changes and the active-set path effectively rebuilds anyway — so those must
+     * keep the historical, numerically-stable behaviour of rebuilding fresh on every branch
+     * ({@link NodeKey#enforceBounds(NodeSolver, ModelStrategy)} forces a {@code reset()} for them, as the
+     * original over-broad sign-change condition implicitly did). The model's structure is fixed for this
+     * solver's lifetime, so the answer is cached.
+     */
+    boolean isInPlaceBoundUpdateSafe() {
+        if (myInPlaceBoundUpdateSafe == null) {
+            myInPlaceBoundUpdateSafe = Boolean.valueOf(!this.getModel().isAnyExpressionQuadratic());
+        }
+        return myInPlaceBoundUpdateSafe.booleanValue();
     }
 
 }
