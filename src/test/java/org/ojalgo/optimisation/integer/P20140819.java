@@ -371,6 +371,8 @@ public class P20140819 extends OptimisationIntegerTests {
         // model.options.mip_defer = 0.0;
         // model.options.progress(IntegerSolver.class);
 
+        model.options.integer(IntegerStrategy.DEFAULT.withGapTolerance(NumberContext.of(7, 8)));
+
         P20140819.doTestToMatchExpected(model);
     }
 
