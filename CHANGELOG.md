@@ -20,6 +20,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Changed
 
+- Removed everything related to JMH from this repository. All benchmarks remain, but are now in the ojAlgo-linear-algebra-benchmark repository.
+
 #### org.ojalgo.optimisation
 
 - Changed the cut generation strategy, to try and get more/better cuts at the root.

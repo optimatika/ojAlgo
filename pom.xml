@@ -53,7 +53,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.java>11</version.java>
         <version.org.junit.jupiter>5.14.4</version.org.junit.jupiter>
-        <version.org.openjdk.jmh>1.37</version.org.openjdk.jmh>
     </properties>
     <dependencies>
         <dependency>
@@ -80,18 +79,6 @@
             <version>${version.org.junit.jupiter}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.openjdk.jmh</groupId>
-            <artifactId>jmh-core</artifactId>
-            <version>${version.org.openjdk.jmh}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.openjdk.jmh</groupId>
-            <artifactId>jmh-generator-annprocess</artifactId>
-            <version>${version.org.openjdk.jmh}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -103,13 +90,6 @@
                     <source>${version.java}</source>
                     <target>${version.java}</target>
                     <release>${version.java}</release>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.openjdk.jmh</groupId>
-                            <artifactId>jmh-generator-annprocess</artifactId>
-                            <version>${version.org.openjdk.jmh}</version>
-                        </path>
-                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>
