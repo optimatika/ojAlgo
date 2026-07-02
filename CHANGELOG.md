@@ -13,8 +13,13 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Added
 
+#### org.ojalgo.netio
+
+- New `BasicJson` — minimal JSON parser and writer with no external dependencies. Supports objects, arrays, strings, numbers, booleans, and null. Convenience methods `toStringList(String)` and `toStringListMap(String)` for common patterns.
+
 #### org.ojalgo.optimisation
 
+- `Optimisation.Environment` gained `parse(File)` and `parse(InputStream, FileFormat)` methods — model parsing now goes through the environment, so parsed models inherit the environment's solver integrations, presolvers, and configurators.
 - `IntegerSolver` now performs reduced-cost fixing at every B&B node: after solving the LP relaxation and when an incumbent exists, each non-fixed integer variable's reduced gradient is compared against the incumbent gap to derive tighter bounds — variables whose reduced cost exceeds the gap are fixed, potentially pruning large subtrees.
 - `IntegerSolver` gained a rounding heuristic that fires at nodes where no incumbent has been found yet. If all integer variables in the LP solution are within a quarter-unit of an integer value, the rounded candidate is validated against the original model and registered as an incumbent when feasible.
 
@@ -24,7 +29,22 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 #### org.ojalgo.optimisation
 
-- Changed the cut generation strategy, to try and get more/better cuts at the root.
+- `ExpressionsBasedModel.parse(File)` and `parse(InputStream, FileFormat)` now delegate to `Optimisation.ENVIRONMENT`, so parsed models use the default environment's configuration.
+- `FileFormatMPS` and `FileFormatEBM` readers now accept a `Supplier<ExpressionsBasedModel>` factory, enabling parsed models to be created via an `Optimisation.Environment`.
+
+### Removed
+
+- Removed the `org.ojalgo.optimisation.service` package (`OptimisationService`, `ServiceIntegration`, `ServiceSolver`). This functionality has moved to the separate optimisation-service-server project.
+- Removed `exports org.ojalgo.optimisation.service` from `module-info.java`.
+
+#### org.ojalgo.matrix
+
+- `MatrixStore.isHermitian()` now uses element-magnitude-relative comparison instead of absolute-`ONE`-relative, avoiding false negatives on matrices with large entries.
+
+#### org.ojalgo.optimisation
+
+- Changed the cut generation strategy: dedicated root cut loop runs up to 10 rounds of GMI cut generation before branching begins, with tailing-off detection. Non-root cut generation is deferred until an incumbent exists.
+- Reduced-cost fixing and the rounding heuristic now also run at non-root B&B nodes (previously only at the root during the probing phase).
 
 ## [57.0.0] – 2026-06-20
 

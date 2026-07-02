@@ -21,6 +21,10 @@
  */
 package org.ojalgo.optimisation;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -36,6 +40,7 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.ArrayR256;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.optimisation.integer.IntegerStrategy;
@@ -212,6 +217,33 @@ public interface Optimisation {
          */
         public ExpressionsBasedModel newModel(final Optimisation.Options optimisationOptions) {
             return new ExpressionsBasedModel(this, optimisationOptions);
+        }
+
+        /**
+         * Apart from the "native" EBM file format, currently only supports the MPS file format, but with some
+         * of the various extensions. In particular it is possible to parse QP models using QUADOBJ or QMATRIX
+         * file sections.
+         */
+        public ExpressionsBasedModel parse(final File file) {
+
+            FileFormat fileFormat = FileFormat.from(file);
+
+            try (FileInputStream input = new FileInputStream(file)) {
+                return this.parse(input, fileFormat);
+            } catch (IOException cause) {
+                throw new RuntimeException(cause);
+            }
+        }
+
+        public ExpressionsBasedModel parse(final InputStream input, final FileFormat format) {
+            switch (format) {
+                case MPS:
+                    return FileFormatMPS.read(input, this::newModel);
+                case EBM:
+                    return FileFormatEBM.read(input, this::newModel);
+                default:
+                    throw new IllegalArgumentException();
+            }
         }
 
         public boolean removeIntegration(final ExpressionsBasedModel.Integration<?> integration) {

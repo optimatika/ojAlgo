@@ -42,7 +42,6 @@ module ojalgo {
     exports org.ojalgo.optimisation.convex;
     exports org.ojalgo.optimisation.integer;
     exports org.ojalgo.optimisation.linear;
-    exports org.ojalgo.optimisation.service;
     exports org.ojalgo.random;
     exports org.ojalgo.random.process;
     exports org.ojalgo.random.scedasticity;

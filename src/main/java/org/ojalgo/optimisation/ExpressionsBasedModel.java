@@ -24,7 +24,6 @@ package org.ojalgo.optimisation;
 import static org.ojalgo.function.constant.BigMath.*;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -934,25 +933,11 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      * sections.
      */
     public static ExpressionsBasedModel parse(final File file) {
-
-        FileFormat fileFormat = FileFormat.from(file);
-
-        try (FileInputStream input = new FileInputStream(file)) {
-            return ExpressionsBasedModel.parse(input, fileFormat);
-        } catch (IOException cause) {
-            throw new RuntimeException(cause);
-        }
+        return Optimisation.ENVIRONMENT.parse(file);
     }
 
     public static ExpressionsBasedModel parse(final InputStream input, final FileFormat format) {
-        switch (format) {
-            case MPS:
-                return FileFormatMPS.read(input);
-            case EBM:
-                return FileFormatEBM.read(input);
-            default:
-                throw new IllegalArgumentException();
-        }
+        return Optimisation.ENVIRONMENT.parse(input, format);
     }
 
     /**

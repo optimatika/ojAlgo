@@ -31,6 +31,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.ojalgo.netio.ASCII;
 
@@ -397,16 +398,16 @@ final class FileFormatMPS {
      * Seems to be used in problem headers/comment to mark references to authors and such
      */
     private static final String COMMENT_REF = "&";
-    private static final int[] FIELD_START = new int[] { 1, 4, 14, 24, 39, 49, 64 };
+    private static final int[] FIELD_START = { 1, 4, 14, 24, 39, 49, 64 };
     private static final String INTEND = "INTEND";
     private static final String INTORG = "INTORG";
     private static final String MARKER = "MARKER";
     private static final String MAX = "MAX";
     private static final String SPACE = " ";
 
-    static ExpressionsBasedModel read(final InputStream input) {
+    static ExpressionsBasedModel read(final InputStream input, final Supplier<ExpressionsBasedModel> factory) {
 
-        FileFormatMPS retVal = new FileFormatMPS();
+        FileFormatMPS retVal = new FileFormatMPS(factory);
 
         String line;
         FileSection section = null;
@@ -484,11 +485,11 @@ final class FileFormatMPS {
     private final FieldPredicate[] myVerifierRHS;
     private final FieldPredicate[] myVerifierROWS;
 
-    FileFormatMPS() {
+    FileFormatMPS(final Supplier<ExpressionsBasedModel> factory) {
 
         super();
 
-        myModel = new ExpressionsBasedModel();
+        myModel = factory.get();
 
         myVerifierROWS = new FieldPredicate[] { FieldPredicate.ROW_TYPE, FieldPredicate.ROW_NAME, FieldPredicate.NOT_USED, FieldPredicate.NOT_USED,
                 FieldPredicate.NOT_USED, FieldPredicate.NOT_USED };

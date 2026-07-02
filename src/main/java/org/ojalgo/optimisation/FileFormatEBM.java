@@ -30,6 +30,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.util.Map.Entry;
+import java.util.function.Supplier;
 
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.structure.Structure1D.IntIndex;
@@ -164,9 +165,9 @@ abstract class FileFormatEBM {
         writer.newLine();
     }
 
-    static ExpressionsBasedModel read(final InputStream input) {
+    static ExpressionsBasedModel read(final InputStream input, final Supplier<ExpressionsBasedModel> factory) {
 
-        ExpressionsBasedModel retVal = new ExpressionsBasedModel();
+        ExpressionsBasedModel retVal = factory.get();
 
         Expression current = null;
 
