@@ -19,7 +19,6 @@ on:
     branches: [ "develop" ]
   schedule:
     - cron: '24 22 * * 0'
-    - cron: '41 20 * * 4'
 
 jobs:
   analyze:
