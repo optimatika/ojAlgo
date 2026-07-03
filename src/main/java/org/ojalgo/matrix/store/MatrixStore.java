@@ -361,7 +361,8 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
                 for (int i = j + 1; retVal && i < numberOfRows; i++) {
                     lowerLeft = ComplexNumber.valueOf(this.get(i, j)).conjugate();
                     upperRight = ComplexNumber.valueOf(this.get(j, i));
-                    retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, lowerLeft.subtract(upperRight).norm());
+                    double magnitude = Math.max(PrimitiveMath.ONE, Math.max(lowerLeft.norm(), upperRight.norm()));
+                    retVal &= PrimitiveScalar.isSmall(magnitude, lowerLeft.subtract(upperRight).norm());
                 }
             }
 
@@ -369,7 +370,9 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
 
             for (int j = 0; retVal && j < numberOfColumns; j++) {
                 for (int i = j + 1; retVal && i < numberOfRows; i++) {
-                    retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, this.doubleValue(i, j) - this.doubleValue(j, i));
+                    double lower = this.doubleValue(i, j);
+                    double upper = this.doubleValue(j, i);
+                    retVal &= PrimitiveScalar.isSmall(Math.max(PrimitiveMath.ONE, Math.max(Math.abs(lower), Math.abs(upper))), lower - upper);
                 }
             }
         }
