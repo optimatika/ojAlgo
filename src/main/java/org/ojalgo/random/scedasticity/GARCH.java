@@ -82,7 +82,7 @@ public final class GARCH extends AbstractScedasticity {
 
     /**
      * Will create an instance configured with default parameters. What these are may change in the future.
-     * You're better of estimating suitable paramaters for your use case and then set {@link #base(double)},
+     * You're better of estimating suitable parameters for your use case and then set {@link #base(double)},
      * {@link #errorWeights(double...)} and {@link #varianceWeights(double...)}.
      */
     public static GARCH newInstance(final int p, final int q, final double mean, final double variance) {
