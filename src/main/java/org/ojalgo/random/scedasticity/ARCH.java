@@ -77,7 +77,7 @@ public final class ARCH extends AbstractScedasticity {
 
     /**
      * Will create an instance configured with default parameters. What these are may change in the future.
-     * You're better of estimating suitable paramaters for your use case and then set {@link #base(double)}
+     * You're better of estimating suitable parameters for your use case and then set {@link #base(double)}
      * and {@link #errorWeights(double...)}.
      */
     public static ARCH newInstance(final int q, final double mean, final double variance) {

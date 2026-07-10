@@ -317,7 +317,7 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
 
         /**
          * @param matrix A matrix to decompose
-         * @return true if the decomposition suceeded AND {@link #isSolvable()}; false if not
+         * @return true if the decomposition succeeded AND {@link #isSolvable()}; false if not
          */
         default boolean compute(final Access2D.Collectable<N, ? super TransformableRegion<N>> matrix) {
             return this.decompose(matrix) && this.isSolvable();
@@ -498,7 +498,7 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
 
     /**
      * @param matrix A matrix to decompose
-     * @return true if decomposition suceeded; false if not
+     * @return true if decomposition succeeded; false if not
      */
     boolean decompose(Access2D.Collectable<N, ? super TransformableRegion<N>> matrix);
 
