@@ -43,7 +43,7 @@ import org.ojalgo.type.context.NumberContext;
 @SuppressWarnings("rawtypes")
 public abstract class BasicMatrixTest extends MatrixTests {
 
-    protected static final NumberContext ACCURACY = NumberContext.of(6, 4);
+    protected static final NumberContext ACCURACY = NumberContext.of(5);
 
     public static MatrixR064 getIdentity(final long rows, final long columns, final NumberContext context) {
         MatrixR064 tmpMtrx = MatrixR064.FACTORY.makeEye(Math.toIntExact(rows), Math.toIntExact(columns));
