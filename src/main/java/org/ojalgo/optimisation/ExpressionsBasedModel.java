@@ -23,6 +23,7 @@ package org.ojalgo.optimisation;
 
 import static org.ojalgo.function.constant.BigMath.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -30,6 +31,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -41,6 +44,7 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.netio.BasicJson;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.InMemoryFile;
 import org.ojalgo.netio.ToFileWriter;
@@ -1791,6 +1795,10 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         return shallowCopy;
     }
 
+    public Future<Optimisation.Result> submit(final Optimisation.Sense sense) {
+        return this.submit(sense, myEnvironment.getModelSubmitter(), myEnvironment.getResultPoller());
+    }
+
     @Override
     public String toString() {
 
@@ -2016,6 +2024,47 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
                 tmpExpr.isInteger();
             }
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private Future<Optimisation.Result> submit(final Optimisation.Sense sense, final Optimisation.ModelSubmitter submitter,
+            final Optimisation.ResultPoller poller) {
+
+        byte[] data;
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            FileFormatEBM.write(this, baos);
+            data = baos.toByteArray();
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
+        }
+
+        boolean maximize = sense == Optimisation.Sense.MAX;
+
+        CompletableFuture<Optimisation.Result> future = new CompletableFuture<>();
+
+        Thread thread = new Thread(() -> {
+            try {
+                Map<String, Object> response = (Map<String, Object>) BasicJson.parse(submitter.submit(data, "EBM", maximize));
+                String key = (String) response.get("key");
+                String status = (String) response.get("status");
+
+                long counter = 0L;
+                while ("PENDING".equals(status)) {
+                    Thread.sleep(Math.min(10_000L, 100L * counter++));
+                    response = (Map<String, Object>) BasicJson.parse(poller.poll(key));
+                    status = (String) response.get("status");
+                }
+
+                String resultString = (String) response.get("result");
+                future.complete(Optimisation.Result.parse(resultString));
+            } catch (Exception cause) {
+                future.completeExceptionally(cause);
+            }
+        });
+        thread.setDaemon(true);
+        thread.start();
+
+        return future;
     }
 
     void addObjectiveConstant(final BigDecimal addition) {

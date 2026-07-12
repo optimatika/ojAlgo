@@ -21,6 +21,7 @@
  */
 package org.ojalgo.optimisation;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -164,7 +165,9 @@ public interface Optimisation {
         private final Map<Class<?>, Object> myConfigurators = new ConcurrentHashMap<>();
         private Expression.Factory<?> myExpressionFactory = Expression::new;
         private final List<ExpressionsBasedModel.Integration<?>> myIntegrations = new ArrayList<>();
+        private Optimisation.ModelSubmitter myModelSubmitter = this::solveLocally;
         private final TreeSet<ExpressionsBasedModel.Simplifier<?, ?>> myPresolvers = new TreeSet<>();
+        private Optimisation.ResultPoller myResultPoller = key -> key;
         private Variable.Factory<?> myVariableFactory = Variable::new;
 
         Environment() {
@@ -282,9 +285,20 @@ public interface Optimisation {
             myExpressionFactory = expressionFactory;
         }
 
+        public void setRemoteSolver(final Optimisation.ModelSubmitter submitter, final Optimisation.ResultPoller poller) {
+            myModelSubmitter = submitter;
+            myResultPoller = poller;
+        }
+
         public void setVariableFactory(final Variable.Factory<?> variableFactory) {
             ProgrammingError.throwIfNull(variableFactory);
             myVariableFactory = variableFactory;
+        }
+
+        private String solveLocally(final byte[] data, final String format, final boolean maximize) {
+            ExpressionsBasedModel model = this.parse(new ByteArrayInputStream(data), FileFormat.valueOf(format));
+            Optimisation.Result result = maximize ? model.maximise() : model.minimise();
+            return "{\"key\":\"local\",\"status\":\"DONE\",\"result\":\"" + result + "\"}";
         }
 
         int countIntegrations() {
@@ -309,8 +323,16 @@ public interface Optimisation {
             return myIntegrations;
         }
 
+        Optimisation.ModelSubmitter getModelSubmitter() {
+            return myModelSubmitter;
+        }
+
         TreeSet<ExpressionsBasedModel.Simplifier<?, ?>> getPresolvers() {
             return myPresolvers;
+        }
+
+        Optimisation.ResultPoller getResultPoller() {
+            return myResultPoller;
         }
 
         Variable.Factory<?> getVariableFactory() {
@@ -405,6 +427,24 @@ public interface Optimisation {
          *         constraints - the solution is infeasible.
          */
         boolean validate();
+
+    }
+
+    /**
+     * @see ResultPoller
+     */
+    @FunctionalInterface
+    interface ModelSubmitter {
+
+        /**
+         * @param data     The model "file" contents
+         * @param format   The model "file" format – should match the names of the
+         *                 {@link ExpressionsBasedModel.FileFormat} constants.
+         * @param maximize true == {@link Optimisation.Sense#MAX} and false == {@link Optimisation.Sense#MIN}
+         * @return
+         * @throws Exception
+         */
+        String submit(byte[] data, String format, boolean maximize) throws Exception;
 
     }
 
@@ -977,6 +1017,16 @@ public interface Optimisation {
             myDualValues = matchedMultipliers;
             return this;
         }
+
+    }
+
+    /**
+     * @see ModelSubmitter
+     */
+    @FunctionalInterface
+    interface ResultPoller {
+
+        String poll(String key) throws Exception;
 
     }
 
