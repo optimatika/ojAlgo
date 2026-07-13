@@ -19,10 +19,11 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 #### org.ojalgo.optimisation
 
+- `ExpressionsBasedModel.FileFormat.LP` — CPLEX LP format, supporting linear, quadratic, integer, and binary models. Full reader and writer for the CPLEX LP format, including quadratic objectives (`[ ... ] / 2` syntax), named constraints, bounds, generals/binaries sections, and comment stripping. 
+- `ExpressionsBasedModel.FileFormat.MPS` — Now also supports writing MPS files.
 - `Optimisation.ModelSubmitter` and `Optimisation.ResultPoller` functional interfaces for asynchronous remote solving.
 - `Optimisation.Environment.setRemoteSolver(ModelSubmitter, ResultPoller)` to configure a remote solver.
 - `ExpressionsBasedModel.submit(Sense)` — submits a model for solving asynchronously and returns a `Future<Result>`. Uses the environment's `ModelSubmitter` and `ResultPoller`; defaults to solving locally.
-- `ExpressionsBasedModel.maximise(ModelSubmitter, ResultPoller)` and `minimise(ModelSubmitter, ResultPoller)` convenience methods.
 - `Optimisation.Environment` gained `parse(File)` and `parse(InputStream, FileFormat)` methods — model parsing now goes through the environment, so parsed models inherit the environment's solver integrations, presolvers, and configurators.
 - `IntegerSolver` now performs reduced-cost fixing at every B&B node: after solving the LP relaxation and when an incumbent exists, each non-fixed integer variable's reduced gradient is compared against the incumbent gap to derive tighter bounds — variables whose reduced cost exceeds the gap are fixed, potentially pruning large subtrees.
 - `IntegerSolver` gained a rounding heuristic that fires at nodes where no incumbent has been found yet. If all integer variables in the LP solution are within a quarter-unit of an integer value, the rounded candidate is validated against the original model and registered as an incumbent when feasible.
@@ -34,7 +35,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.optimisation
 
 - `ExpressionsBasedModel.parse(File)` and `parse(InputStream, FileFormat)` now delegate to `Optimisation.ENVIRONMENT`, so parsed models use the default environment's configuration.
-- `FileFormatMPS` and `FileFormatEBM` readers now accept a `Supplier<ExpressionsBasedModel>` factory, enabling parsed models to be created via an `Optimisation.Environment`.
+- `ExpressionsBasedModel.writeTo(File)` and `writeTo(InMemoryFile)` now auto-detect the output format from the file name ending (previously always wrote EBM). Supported formats: `.ebm`, `.mps`/`.sif`/`.qps`, and `.lp`.
+- `ExpressionsBasedModel.FileFormat` now recognises `.qps` as an alias for MPS.
 
 ### Removed
 

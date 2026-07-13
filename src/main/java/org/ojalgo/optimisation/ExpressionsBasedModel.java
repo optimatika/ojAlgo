@@ -30,6 +30,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
@@ -268,24 +270,39 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     }
 
+    /**
+     * Supported file formats
+     */
     public enum FileFormat {
 
-        EBM, MPS;
-
         /**
-         * Apart from the "native" EBM file format, currently only supports the MPS file format, but with some
-         * of the various extensions. In particular it is possible to parse QP models using QUADOBJ or QMATRIX
-         * file sections.
+         * Native to ojAlgo and {@link ExpressionsBasedModel}
          */
-        public static FileFormat from(final File file) {
-            return FileFormat.from(file.getPath());
-        }
+        EBM,
+        /**
+         * CPLEX' LP format. Contrary to what the name suggests it's not just for LP. It can describe a
+         * variety of problem types.
+         * <p>
+         * There are also Xpress and lp_solve LP formats. The CPLEX and Xpress formats are supposedly similar.
+         * If possible to support both variants in one implementation, we'll do that. With any kind of
+         * conflict we follow the CPLEX format. The lp_solve LP format is different and not supported.
+         */
+        LP,
+        /**
+         * Mathematical Programming System
+         * <p>
+         * There has been various extensions to the MPS format. When extended to support quadratic programming
+         * (QP) the format is sometimes referred to as QPS. ojAlgo recognise these extensions as part of MPS.
+         * <p>
+         * SIF (Standard Input Format) is a superset of MPS. ojAlgo treats these files the same as MPS.
+         */
+        MPS;
 
-        public static FileFormat from(final String path) {
+        static FileFormat detect(final String fileName) {
 
-            String lowerCasePath = path.toLowerCase();
+            String lowerCasePath = fileName.toLowerCase();
 
-            if (lowerCasePath.endsWith("mps") || lowerCasePath.endsWith("sif")) {
+            if (lowerCasePath.endsWith("mps") || lowerCasePath.endsWith("sif") || lowerCasePath.endsWith("qps")) {
                 return FileFormat.MPS;
             }
 
@@ -293,7 +310,11 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
                 return FileFormat.EBM;
             }
 
-            throw new IllegalArgumentException();
+            if (lowerCasePath.endsWith("lp")) {
+                return FileFormat.LP;
+            }
+
+            return null;
         }
     }
 
@@ -1906,23 +1927,64 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
-     * Save this instance to file. The file format is {@link FileFormat#EBM} and the file name is therefore
-     * recommended to end with ".ebm".
-     *
-     * @param file The path/name of the file to write.
+     * The format is derived from the file name ending. If the format cannot be detected, defaults to EBM and
+     * appends ".ebm" to the file name. Directories are created as needed.
      */
     public void writeTo(final File file) {
-        ToFileWriter.mkdirs(file.getParentFile());
-        try (FileOutputStream output = new FileOutputStream(file)) {
-            FileFormatEBM.write(this, output);
+
+        FileFormat format = FileFormat.detect(file.toString());
+
+        File actual;
+        if (format != null) {
+            actual = file;
+        } else {
+            format = FileFormat.EBM;
+            actual = new File(file.getPath() + ".ebm");
+        }
+
+        ToFileWriter.mkdirs(actual.getParentFile());
+
+        try (OutputStream output = new FileOutputStream(actual)) {
+            this.write(format, output);
         } catch (IOException cause) {
             throw new RuntimeException(cause);
         }
     }
 
+    /**
+     * The format is derived from the file name ending, if present. Otherwise defaults to EBM.
+     */
     public void writeTo(final InMemoryFile file) {
+
+        FileFormat format = file.getName().map(FileFormat::detect).orElse(FileFormat.EBM);
+
         try (OutputStream output = file.newOutputStream()) {
-            FileFormatEBM.write(this, output);
+            this.write(format, output);
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
+        }
+    }
+
+    /**
+     * The format is derived from the file name ending. If the format cannot be detected, defaults to EBM and
+     * appends ".ebm" to the file name. Directories are created as needed.
+     */
+    public void writeTo(final Path path) {
+
+        FileFormat format = FileFormat.detect(path.toString());
+
+        Path actual;
+        if (format != null) {
+            actual = path;
+        } else {
+            format = FileFormat.EBM;
+            actual = path.resolveSibling(path.getFileName() + ".ebm");
+        }
+
+        ToFileWriter.mkdirs(actual.getParent());
+
+        try (OutputStream output = Files.newOutputStream(actual)) {
+            this.write(format, output);
         } catch (IOException cause) {
             throw new RuntimeException(cause);
         }
@@ -2026,7 +2088,6 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private Future<Optimisation.Result> submit(final Optimisation.Sense sense, final Optimisation.ModelSubmitter submitter,
             final Optimisation.ResultPoller poller) {
 
@@ -2065,6 +2126,21 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         thread.start();
 
         return future;
+    }
+
+    private void write(final FileFormat format, final OutputStream output) {
+
+        switch (format) {
+            case MPS:
+                FileFormatMPS.write(this, output);
+                break;
+            case LP:
+                FileFormatLP.write(this, output);
+                break;
+            default:
+                FileFormatEBM.write(this, output);
+                break;
+        }
     }
 
     void addObjectiveConstant(final BigDecimal addition) {

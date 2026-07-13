@@ -24,16 +24,24 @@ package org.ojalgo.optimisation;
 import static org.ojalgo.function.constant.BigMath.*;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Supplier;
 
 import org.ojalgo.netio.ASCII;
+import org.ojalgo.structure.Structure1D.IntIndex;
+import org.ojalgo.structure.Structure2D.IntRowColumn;
 
 /**
  * Mathematical Programming System (MPS) parser
@@ -430,6 +438,248 @@ final class FileFormatMPS {
         }
 
         return retVal.getModel();
+    }
+
+    static void write(final ExpressionsBasedModel model, final OutputStream output) {
+
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output))) {
+
+            List<Variable> variables = model.getVariables();
+            Expression objective = model.objective();
+
+            List<Expression> constraints = new ArrayList<>();
+            for (Expression expr : model.getExpressions()) {
+                if (expr.isConstraint()) {
+                    constraints.add(expr);
+                }
+            }
+
+            String objRow = "obj";
+            String rhsId = "rhs";
+            String bndId = "bnd";
+            String rngId = "rng";
+
+            // NAME
+            writer.write("NAME");
+            writer.newLine();
+
+            // OBJSENSE
+            Optimisation.Sense sense = model.getOptimisationSense();
+            if (sense != null) {
+                writer.write("OBJSENSE");
+                writer.newLine();
+                writer.write("    ");
+                writer.write(sense == Optimisation.Sense.MAX ? MAX : "MIN");
+                writer.newLine();
+            }
+
+            // ROWS
+            writer.write("ROWS");
+            writer.newLine();
+            writeField2(writer, "N", objRow);
+            for (Expression expr : constraints) {
+                String type;
+                switch (expr.getConstraintType()) {
+                    case EQUALITY:
+                        type = "E";
+                        break;
+                    case LOWER:
+                        type = "G";
+                        break;
+                    case RANGE:
+                    case UPPER:
+                        type = "L";
+                        break;
+                    default:
+                        continue;
+                }
+                writeField2(writer, type, expr.getName());
+            }
+
+            // COLUMNS
+            writer.write("COLUMNS");
+            writer.newLine();
+
+            boolean integerBlock = false;
+            int markerCount = 0;
+
+            for (int v = 0; v < variables.size(); v++) {
+                Variable var = variables.get(v);
+
+                if (var.isInteger() && !integerBlock) {
+                    writeMarker(writer, markerCount++, true);
+                    integerBlock = true;
+                } else if (!var.isInteger() && integerBlock) {
+                    writeMarker(writer, markerCount++, false);
+                    integerBlock = false;
+                }
+
+                String varName = var.getName();
+                IntIndex varIndex = new IntIndex(v);
+
+                BigDecimal objCoeff = objective.get(varIndex);
+                if (objCoeff.signum() != 0) {
+                    writeField3(writer, varName, objRow, objCoeff);
+                }
+
+                for (Expression expr : constraints) {
+                    BigDecimal coeff = expr.get(varIndex);
+                    if (coeff.signum() != 0) {
+                        writeField3(writer, varName, expr.getName(), coeff);
+                    }
+                }
+            }
+
+            if (integerBlock) {
+                writeMarker(writer, markerCount, false);
+            }
+
+            // RHS
+            writer.write("RHS");
+            writer.newLine();
+
+            BigDecimal objConstant = model.getObjectiveConstant();
+            if (objConstant != null && objConstant.signum() != 0) {
+                writeField3(writer, rhsId, objRow, objConstant.negate());
+            }
+
+            for (Expression expr : constraints) {
+                BigDecimal rhs;
+                switch (expr.getConstraintType()) {
+                    case EQUALITY:
+                        rhs = expr.getLowerLimit();
+                        break;
+                    case LOWER:
+                        rhs = expr.getLowerLimit();
+                        break;
+                    case RANGE:
+                    case UPPER:
+                        rhs = expr.getUpperLimit();
+                        break;
+                    default:
+                        rhs = null;
+                        break;
+                }
+                if (rhs != null) {
+                    writeField3(writer, rhsId, expr.getName(), rhs);
+                }
+            }
+
+            // RANGES
+            boolean hasRanges = false;
+            for (Expression expr : constraints) {
+                if (expr.getConstraintType() == Optimisation.ConstraintType.RANGE) {
+                    hasRanges = true;
+                    break;
+                }
+            }
+            if (hasRanges) {
+                writer.write("RANGES");
+                writer.newLine();
+                for (Expression expr : constraints) {
+                    if (expr.getConstraintType() == Optimisation.ConstraintType.RANGE) {
+                        BigDecimal range = expr.getUpperLimit().subtract(expr.getLowerLimit());
+                        writeField3(writer, rngId, expr.getName(), range);
+                    }
+                }
+            }
+
+            // BOUNDS
+            writer.write("BOUNDS");
+            writer.newLine();
+
+            for (Variable var : variables) {
+                writeBounds(writer, bndId, var);
+            }
+
+            // QUADOBJ
+            if (objective.isAnyQuadraticFactorNonZero()) {
+                writer.write("QUADOBJ");
+                writer.newLine();
+                for (Entry<IntRowColumn, BigDecimal> entry : objective.getQuadraticEntrySet()) {
+                    int row = entry.getKey().row;
+                    int col = entry.getKey().column;
+                    if (row <= col) {
+                        BigDecimal qValue;
+                        if (row == col) {
+                            qValue = entry.getValue().multiply(TWO);
+                        } else {
+                            BigDecimal transpose = objective.get(new IntRowColumn(col, row));
+                            qValue = entry.getValue().add(transpose);
+                        }
+                        writeField3(writer, variables.get(row).getName(), variables.get(col).getName(), qValue);
+                    }
+                }
+            }
+
+            writer.write("ENDATA");
+            writer.newLine();
+
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
+        }
+    }
+
+    private static void writeBounds(final BufferedWriter writer, final String bndId, final Variable var) throws IOException {
+
+        BigDecimal lower = var.getLowerLimit();
+        BigDecimal upper = var.getUpperLimit();
+        String name = var.getName();
+
+        if (var.isBinary()) {
+            writeBound(writer, "BV", bndId, name, null);
+            return;
+        }
+
+        if (lower != null && upper != null && lower.compareTo(upper) == 0) {
+            writeBound(writer, "FX", bndId, name, lower);
+            return;
+        }
+
+        if (lower == null && upper == null) {
+            writeBound(writer, "FR", bndId, name, null);
+            return;
+        }
+
+        boolean isDefault = lower != null && lower.signum() == 0 && upper == null && !var.isInteger();
+        if (isDefault) {
+            return;
+        }
+
+        if (lower == null) {
+            writeBound(writer, "MI", bndId, name, null);
+        } else if (lower.signum() != 0) {
+            writeBound(writer, "LO", bndId, name, lower);
+        }
+
+        if (upper != null) {
+            writeBound(writer, "UP", bndId, name, upper);
+        }
+    }
+
+    private static void writeBound(final BufferedWriter writer, final String type, final String bndId, final String varName,
+            final BigDecimal value) throws IOException {
+        if (value != null) {
+            writer.write(String.format(" %-2s %-10s%-10s%s", type, bndId, varName, value.toPlainString()));
+        } else {
+            writer.write(String.format(" %-2s %-10s%s", type, bndId, varName));
+        }
+        writer.newLine();
+    }
+
+    private static void writeField2(final BufferedWriter writer, final String f1, final String f2) throws IOException {
+        writer.write(String.format(" %s  %s", f1, f2));
+        writer.newLine();
+    }
+
+    private static void writeField3(final BufferedWriter writer, final String f1, final String f2, final BigDecimal value) throws IOException {
+        writer.write(String.format("    %-10s%-10s%s", f1, f2, value.toPlainString()));
+        writer.newLine();
+    }
+
+    private static void writeMarker(final BufferedWriter writer, final int count, final boolean start) throws IOException {
+        writer.write(String.format("    %-10s  'MARKER'                 '%s'", String.format("M%07d", count), start ? INTORG : INTEND));
+        writer.newLine();
     }
 
     private final Map<String, Row> myRows = new HashMap<>();

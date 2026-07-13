@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
@@ -162,6 +163,14 @@ public interface ToFileWriter<T> extends Closeable {
     static void mkdirs(final File dir) {
         if (!dir.exists() && !dir.mkdirs() && !dir.exists()) {
             throw new RuntimeException("Failed to create " + dir.getAbsolutePath());
+        }
+    }
+
+    static void mkdirs(final Path dir) {
+        try {
+            Files.createDirectories(dir);
+        } catch (IOException cause) {
+            throw new RuntimeException("Failed to create " + dir.toAbsolutePath(), cause);
         }
     }
 

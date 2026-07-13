@@ -239,8 +239,4 @@ abstract class FileFormatEBM {
 
     }
 
-    private FileFormatEBM() {
-        super();
-    }
-
 }

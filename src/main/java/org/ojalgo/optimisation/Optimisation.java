@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -223,29 +225,52 @@ public interface Optimisation {
         }
 
         /**
-         * Apart from the "native" EBM file format, currently only supports the MPS file format, but with some
-         * of the various extensions. In particular it is possible to parse QP models using QUADOBJ or QMATRIX
-         * file sections.
+         * The file format is deduced from the file name ending.
          */
         public ExpressionsBasedModel parse(final File file) {
 
-            FileFormat fileFormat = FileFormat.from(file);
+            FileFormat format = FileFormat.detect(file.toString());
 
-            try (FileInputStream input = new FileInputStream(file)) {
-                return this.parse(input, fileFormat);
+            if (format == null) {
+                throw new IllegalArgumentException();
+            }
+
+            try (InputStream input = new FileInputStream(file)) {
+                return this.parse(input, format);
             } catch (IOException cause) {
                 throw new RuntimeException(cause);
             }
         }
 
         public ExpressionsBasedModel parse(final InputStream input, final FileFormat format) {
+
             switch (format) {
                 case MPS:
                     return FileFormatMPS.read(input, this::newModel);
                 case EBM:
                     return FileFormatEBM.read(input, this::newModel);
+                case LP:
+                    return FileFormatLP.read(input, this::newModel);
                 default:
                     throw new IllegalArgumentException();
+            }
+        }
+
+        /**
+         * The file format is deduced from the file name ending.
+         */
+        public ExpressionsBasedModel parse(final Path path) {
+
+            FileFormat format = FileFormat.detect(path.toString());
+
+            if (format == null) {
+                throw new IllegalArgumentException();
+            }
+
+            try (InputStream input = Files.newInputStream(path)) {
+                return this.parse(input, format);
+            } catch (IOException cause) {
+                throw new RuntimeException(cause);
             }
         }
 

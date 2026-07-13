@@ -113,7 +113,7 @@ public interface ModelFileTest {
 
     static ExpressionsBasedModel makeModel(final String dataset, final String name, final boolean relax) {
 
-        ExpressionsBasedModel.FileFormat format = ExpressionsBasedModel.FileFormat.from(name);
+        ExpressionsBasedModel.FileFormat format = ExpressionsBasedModel.FileFormat.detect(name);
 
         String resource = "optimisation/" + dataset + "/" + name;
 
