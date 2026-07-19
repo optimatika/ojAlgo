@@ -39,7 +39,7 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
 
     private static void doTest(final String modelName, final String expMinValString, final String expMaxValString) {
 
-        ExpressionsBasedModel model = ModelFileTest.makeModel("miplib", modelName, false);
+        ExpressionsBasedModel model = ModelFileTest.makeModel("MIPLIB", modelName, false);
 
         // model.options.debug(Optimisation.Solver.class);
         // model.options.debug(IntegerSolver.class);

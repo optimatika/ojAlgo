@@ -132,7 +132,7 @@ public class SpecificBranchCase extends OptimisationIntegerTests implements Mode
     }
 
     private static ExpressionsBasedModel makeModel(final String modelPath) {
-        return ModelFileTest.makeModel("miplib", modelPath, false);
+        return ModelFileTest.makeModel("MIPLIB", modelPath, false);
     }
 
     /**

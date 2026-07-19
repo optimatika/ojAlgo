@@ -264,6 +264,38 @@ class FileFormatTest extends OptimisationTests {
     }
 
     @Test
+    void testLPReadUpperBoundOnly() {
+
+        String lpContent = "Minimize\n" + "  obj: x + y\n" + "Subject To\n" + "  c1: x + y >= 1\n" + "Bounds\n" + "  x <= 10\n" + "  y <= 10\n" + "End\n";
+
+        ExpressionsBasedModel model = ExpressionsBasedModel.parse(new ByteArrayInputStream(lpContent.getBytes()), FileFormat.LP);
+
+        for (Variable var : model.getVariables()) {
+            TestUtils.assertTrue(var.getName() + " lower should be 0", var.isLowerLimitSet());
+            TestUtils.assertEquals(var.getName() + " lower", 0.0, var.getLowerLimit().doubleValue(), ACCURACY);
+        }
+
+        Result result = model.minimise();
+        TestUtils.assertStateNotLessThanOptimal(result);
+        TestUtils.assertEquals(1.0, result.getValue(), ACCURACY);
+    }
+
+    @Test
+    void testLPReadQuadraticUpperBoundOnly() {
+
+        String lpContent = "Minimize\n" + " obj: 0 x1 + 0 x2 + [ 2 x1 ^2 - 2 x1 * x2 + 2 x2 ^2 ] / 2\n" + "Subject To\n" + " e1: x1 + x2 = 1\n"
+                + "Bounds\n" + " x1 <= 1\n" + " x2 <= 1\n" + "End\n";
+
+        ExpressionsBasedModel model = ExpressionsBasedModel.parse(new ByteArrayInputStream(lpContent.getBytes()), FileFormat.LP);
+
+        TestUtils.assertTrue(model.validate());
+
+        Result result = model.minimise();
+        TestUtils.assertStateNotLessThanOptimal(result);
+        TestUtils.assertEquals(0.25, result.getValue(), ACCURACY);
+    }
+
+    @Test
     void testMinimisation() {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();

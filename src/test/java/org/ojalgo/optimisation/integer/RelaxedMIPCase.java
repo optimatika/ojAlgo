@@ -35,7 +35,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
 
     private static void doTest(final String name, final String expMinValString, final String expMaxValString, final NumberContext accuracy) {
 
-        ExpressionsBasedModel model = ModelFileTest.makeModel("miplib", name, true);
+        ExpressionsBasedModel model = ModelFileTest.makeModel("MIPLIB", name, true);
 
         if (DEBUG) {
             // model.options.debug(Optimisation.Solver.class);

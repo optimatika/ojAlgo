@@ -158,7 +158,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
      */
     static OptimisationCase makeRelaxedGr4x6() {
 
-        ExpressionsBasedModel model = ModelFileTest.makeModel("miplib", "gr4x6.mps", true);
+        ExpressionsBasedModel model = ModelFileTest.makeModel("MIPLIB", "gr4x6.mps", true);
 
         Result result = Optimisation.Result.parse(
                 "OPTIMAL 185.55 @ { 35, 10, 0, 0, 0, 0, 0, 10, 25, 0, 0, 0, 0, 10, 0, 5, 5, 0, 0, 0, 0, 10, 0, 5, 1, 0.3333333333333333, 0, 0, 0, 0, 0, 0.3333333333333333, 1, 0, 0, 0, 0, 0.5, 0, 0.3333333333333333, 1, 0, 0, 0, 0, 0.6666666666666667, 0, 1 }");

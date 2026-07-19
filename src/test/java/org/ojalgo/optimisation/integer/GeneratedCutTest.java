@@ -182,7 +182,7 @@ public class GeneratedCutTest extends OptimisationIntegerTests implements ModelF
         Optimisation.Result minSolution = Optimisation.Result.parse(minStr);
         Optimisation.Result maxSolution = null;
 
-        ExpressionsBasedModel model = ModelFileTest.makeModel("miplib", "gr4x6.mps", false);
+        ExpressionsBasedModel model = ModelFileTest.makeModel("MIPLIB", "gr4x6.mps", false);
 
         GeneratedCutTest.doTest(model, minSolution, maxSolution);
     }

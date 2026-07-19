@@ -78,7 +78,7 @@ public class ExperimentsMIP extends OptimisationIntegerTests implements ModelFil
             for (Entry<String, Comparator<NodeKey>> entry : COMPARATORS.entrySet()) {
                 String comparatorName = entry.getKey();
 
-                ExpressionsBasedModel model = ModelFileTest.makeModel("miplib", modelName, false);
+                ExpressionsBasedModel model = ModelFileTest.makeModel("MIPLIB", modelName, false);
 
                 model.options.time_suffice = 5L;
                 model.options.time_abort = 60L * 1_000L;

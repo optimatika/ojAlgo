@@ -56,6 +56,7 @@ abstract class FileFormatLP {
         Variable var = map.get(name);
         if (var == null) {
             var = model.newVariable(name);
+            var.lower(ZERO); // CPLEX LP default: 0 <= x
             map.put(name, var);
         }
         return var;
@@ -182,9 +183,7 @@ abstract class FileFormatLP {
                         Variable var = FileFormatLP.getOrCreate(varName, model, variableMap);
                         pos[0]++;
 
-                        if (lb != null) {
-                            var.lower(lb);
-                        }
+                        var.lower(lb);
 
                         if (pos[0] < tokens.size() && FileFormatLP.isComparisonOp(tokens.get(pos[0]))) {
                             pos[0]++; // skip <=
@@ -777,13 +776,6 @@ abstract class FileFormatLP {
                 throw new IllegalArgumentException("Unsupported LP file section: " + tokens.get(pos[0]));
             } else {
                 pos[0]++;
-            }
-        }
-
-        // Default bounds: 0 <= x for variables without explicit bounds
-        for (Variable var : model.getVariables()) {
-            if (!var.isLowerLimitSet() && !var.isUpperLimitSet()) {
-                var.lower(ZERO);
             }
         }
 

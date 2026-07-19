@@ -112,7 +112,7 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
         //
         //        return tmpMPS.getExpressionsBasedModel();
 
-        return ModelFileTest.makeModel("miplib", "markshare_5_0.mps", false);
+        return ModelFileTest.makeModel("MIPLIB", "markshare_5_0.mps", false);
     }
 
     @Test

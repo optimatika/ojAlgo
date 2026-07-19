@@ -87,7 +87,7 @@ final class FileFormatMPS {
 
             myVariable = myModel.newVariable(name);
 
-            this.bound(BoundType.PL, null);
+            myVariable.lower(ZERO);
         }
 
         Column bound(final BoundType type, final BigDecimal value) {
@@ -104,10 +104,6 @@ final class FileFormatMPS {
 
                     myVariable.upper(value);
 
-                    if (!myVariable.isLowerLimitSet()) {
-                        myVariable.lower(ZERO);
-                    }
-
                     break;
 
                 case FX:
@@ -118,7 +114,8 @@ final class FileFormatMPS {
 
                 case FR:
 
-                    myVariable.level(null);
+                    myVariable.lower(null);
+                    myVariable.upper(null);
 
                     break;
 
@@ -135,10 +132,6 @@ final class FileFormatMPS {
                 case PL:
 
                     myVariable.upper(null);
-
-                    if (!myVariable.isLowerLimitSet()) {
-                        myVariable.lower(ZERO);
-                    }
 
                     break;
 
@@ -158,10 +151,6 @@ final class FileFormatMPS {
 
                     myVariable.upper(value).integer(true);
 
-                    if (!myVariable.isLowerLimitSet()) {
-                        myVariable.lower(ZERO);
-                    }
-
                     break;
 
                 case SC:
@@ -169,10 +158,6 @@ final class FileFormatMPS {
                     mySemicontinuous = true;
 
                     myVariable.upper(value);
-
-                    if (!myVariable.isLowerLimitSet()) {
-                        myVariable.lower(ONE);
-                    }
 
                     break;
 
@@ -218,12 +203,7 @@ final class FileFormatMPS {
     interface FieldPredicate {
 
         FieldPredicate BOUND_TYPE = (line, start, index, field) -> field != null && field.length() == 2;
-        FieldPredicate COLUMN_NAME = (line, start, index, field) -> {
-            if (field == null || Math.max(field.length(), index - start) < 8) {
-                return false;
-            }
-            return true;
-        };
+        FieldPredicate COLUMN_NAME = (line, start, index, field) -> field != null && field.length() > 0 && Math.max(field.length(), index - start) >= 8;
         FieldPredicate EMPTY = (line, start, index, field) -> {
             if (field == null || field.length() == 0) {
                 return true;
@@ -259,7 +239,8 @@ final class FileFormatMPS {
     }
 
     enum FileSection {
-        BOUNDS, COLUMNS, ENDATA, NAME, OBJNAME, OBJSENSE, QMATRIX, QUADOBJ, RANGES, RHS, ROWS, SOS;
+        BOUNDS, COLUMNS, CSECTION, ENDATA, GENCONS, IMPORTANCES, INDICATORS, LAZYCONS, NAME, OBJNAME, OBJSEN, OBJSENSE, PWLOBJ, QCMATRIX, QMATRIX, QUADOBJ,
+        QSECTION, RANGES, REFROW, RHS, ROWS, SCENARIOS, SOS, USERCUTS;
     }
 
     final class Row {
@@ -413,6 +394,68 @@ final class FileFormatMPS {
     private static final String MAX = "MAX";
     private static final String SPACE = " ";
 
+    private static void writeBound(final BufferedWriter writer, final String type, final String bndId, final String varName, final BigDecimal value)
+            throws IOException {
+        if (value != null) {
+            writer.write(String.format(" %-2s %-10s%-10s%s", type, bndId, varName, value.toPlainString()));
+        } else {
+            writer.write(String.format(" %-2s %-10s%s", type, bndId, varName));
+        }
+        writer.newLine();
+    }
+
+    private static void writeBounds(final BufferedWriter writer, final String bndId, final Variable var) throws IOException {
+
+        BigDecimal lower = var.getLowerLimit();
+        BigDecimal upper = var.getUpperLimit();
+        String name = var.getName();
+
+        if (var.isBinary()) {
+            FileFormatMPS.writeBound(writer, "BV", bndId, name, null);
+            return;
+        }
+
+        if (lower != null && upper != null && lower.compareTo(upper) == 0) {
+            FileFormatMPS.writeBound(writer, "FX", bndId, name, lower);
+            return;
+        }
+
+        if (lower == null && upper == null) {
+            FileFormatMPS.writeBound(writer, "FR", bndId, name, null);
+            return;
+        }
+
+        boolean isDefault = lower != null && lower.signum() == 0 && upper == null && !var.isInteger();
+        if (isDefault) {
+            return;
+        }
+
+        if (lower == null) {
+            FileFormatMPS.writeBound(writer, "MI", bndId, name, null);
+        } else if (lower.signum() != 0) {
+            FileFormatMPS.writeBound(writer, "LO", bndId, name, lower);
+        }
+
+        if (upper != null) {
+            FileFormatMPS.writeBound(writer, "UP", bndId, name, upper);
+        }
+    }
+
+    private static void writeField2(final BufferedWriter writer, final String f1, final String f2) throws IOException {
+        writer.write(String.format(" %s  %s", f1, f2));
+        writer.newLine();
+    }
+
+    private static void writeField3(final BufferedWriter writer, final String f1, final String f2, final BigDecimal value) throws IOException {
+        writer.write(String.format("    %-10s%-10s%s", f1, f2, value.toPlainString()));
+        writer.newLine();
+    }
+
+    private static void writeMarker(final BufferedWriter writer, final int count, final boolean start) throws IOException {
+        writer.write(String.format("    %-10s  'MARKER'                 '%s'", String.format("M%07d", count), start ? INTORG : INTEND));
+        writer.newLine();
+    }
+
     static ExpressionsBasedModel read(final InputStream input, final Supplier<ExpressionsBasedModel> factory) {
 
         FileFormatMPS retVal = new FileFormatMPS(factory);
@@ -430,11 +473,18 @@ final class FileFormatMPS {
                     retVal.parseSectionLine(section, line);
                 } else {
                     section = retVal.identifySection(line);
+                    if (section == FileSection.ENDATA) {
+                        break;
+                    }
                 }
             }
 
         } catch (IOException cause) {
             throw new RuntimeException(cause);
+        }
+
+        if (retVal.myColumns.isEmpty()) {
+            throw new IllegalArgumentException("MPS file produced no variables");
         }
 
         return retVal.getModel();
@@ -476,7 +526,7 @@ final class FileFormatMPS {
             // ROWS
             writer.write("ROWS");
             writer.newLine();
-            writeField2(writer, "N", objRow);
+            FileFormatMPS.writeField2(writer, "N", objRow);
             for (Expression expr : constraints) {
                 String type;
                 switch (expr.getConstraintType()) {
@@ -493,7 +543,7 @@ final class FileFormatMPS {
                     default:
                         continue;
                 }
-                writeField2(writer, type, expr.getName());
+                FileFormatMPS.writeField2(writer, type, expr.getName());
             }
 
             // COLUMNS
@@ -507,10 +557,10 @@ final class FileFormatMPS {
                 Variable var = variables.get(v);
 
                 if (var.isInteger() && !integerBlock) {
-                    writeMarker(writer, markerCount++, true);
+                    FileFormatMPS.writeMarker(writer, markerCount++, true);
                     integerBlock = true;
                 } else if (!var.isInteger() && integerBlock) {
-                    writeMarker(writer, markerCount++, false);
+                    FileFormatMPS.writeMarker(writer, markerCount++, false);
                     integerBlock = false;
                 }
 
@@ -519,19 +569,19 @@ final class FileFormatMPS {
 
                 BigDecimal objCoeff = objective.get(varIndex);
                 if (objCoeff.signum() != 0) {
-                    writeField3(writer, varName, objRow, objCoeff);
+                    FileFormatMPS.writeField3(writer, varName, objRow, objCoeff);
                 }
 
                 for (Expression expr : constraints) {
                     BigDecimal coeff = expr.get(varIndex);
                     if (coeff.signum() != 0) {
-                        writeField3(writer, varName, expr.getName(), coeff);
+                        FileFormatMPS.writeField3(writer, varName, expr.getName(), coeff);
                     }
                 }
             }
 
             if (integerBlock) {
-                writeMarker(writer, markerCount, false);
+                FileFormatMPS.writeMarker(writer, markerCount, false);
             }
 
             // RHS
@@ -540,7 +590,7 @@ final class FileFormatMPS {
 
             BigDecimal objConstant = model.getObjectiveConstant();
             if (objConstant != null && objConstant.signum() != 0) {
-                writeField3(writer, rhsId, objRow, objConstant.negate());
+                FileFormatMPS.writeField3(writer, rhsId, objRow, objConstant.negate());
             }
 
             for (Expression expr : constraints) {
@@ -561,7 +611,7 @@ final class FileFormatMPS {
                         break;
                 }
                 if (rhs != null) {
-                    writeField3(writer, rhsId, expr.getName(), rhs);
+                    FileFormatMPS.writeField3(writer, rhsId, expr.getName(), rhs);
                 }
             }
 
@@ -579,7 +629,7 @@ final class FileFormatMPS {
                 for (Expression expr : constraints) {
                     if (expr.getConstraintType() == Optimisation.ConstraintType.RANGE) {
                         BigDecimal range = expr.getUpperLimit().subtract(expr.getLowerLimit());
-                        writeField3(writer, rngId, expr.getName(), range);
+                        FileFormatMPS.writeField3(writer, rngId, expr.getName(), range);
                     }
                 }
             }
@@ -589,7 +639,7 @@ final class FileFormatMPS {
             writer.newLine();
 
             for (Variable var : variables) {
-                writeBounds(writer, bndId, var);
+                FileFormatMPS.writeBounds(writer, bndId, var);
             }
 
             // QUADOBJ
@@ -607,7 +657,7 @@ final class FileFormatMPS {
                             BigDecimal transpose = objective.get(new IntRowColumn(col, row));
                             qValue = entry.getValue().add(transpose);
                         }
-                        writeField3(writer, variables.get(row).getName(), variables.get(col).getName(), qValue);
+                        FileFormatMPS.writeField3(writer, variables.get(row).getName(), variables.get(col).getName(), qValue);
                     }
                 }
             }
@@ -620,72 +670,28 @@ final class FileFormatMPS {
         }
     }
 
-    private static void writeBounds(final BufferedWriter writer, final String bndId, final Variable var) throws IOException {
-
-        BigDecimal lower = var.getLowerLimit();
-        BigDecimal upper = var.getUpperLimit();
-        String name = var.getName();
-
-        if (var.isBinary()) {
-            writeBound(writer, "BV", bndId, name, null);
-            return;
-        }
-
-        if (lower != null && upper != null && lower.compareTo(upper) == 0) {
-            writeBound(writer, "FX", bndId, name, lower);
-            return;
-        }
-
-        if (lower == null && upper == null) {
-            writeBound(writer, "FR", bndId, name, null);
-            return;
-        }
-
-        boolean isDefault = lower != null && lower.signum() == 0 && upper == null && !var.isInteger();
-        if (isDefault) {
-            return;
-        }
-
-        if (lower == null) {
-            writeBound(writer, "MI", bndId, name, null);
-        } else if (lower.signum() != 0) {
-            writeBound(writer, "LO", bndId, name, lower);
-        }
-
-        if (upper != null) {
-            writeBound(writer, "UP", bndId, name, upper);
-        }
-    }
-
-    private static void writeBound(final BufferedWriter writer, final String type, final String bndId, final String varName,
-            final BigDecimal value) throws IOException {
-        if (value != null) {
-            writer.write(String.format(" %-2s %-10s%-10s%s", type, bndId, varName, value.toPlainString()));
-        } else {
-            writer.write(String.format(" %-2s %-10s%s", type, bndId, varName));
-        }
-        writer.newLine();
-    }
-
-    private static void writeField2(final BufferedWriter writer, final String f1, final String f2) throws IOException {
-        writer.write(String.format(" %s  %s", f1, f2));
-        writer.newLine();
-    }
-
-    private static void writeField3(final BufferedWriter writer, final String f1, final String f2, final BigDecimal value) throws IOException {
-        writer.write(String.format("    %-10s%-10s%s", f1, f2, value.toPlainString()));
-        writer.newLine();
-    }
-
-    private static void writeMarker(final BufferedWriter writer, final int count, final boolean start) throws IOException {
-        writer.write(String.format("    %-10s  'MARKER'                 '%s'", String.format("M%07d", count), start ? INTORG : INTEND));
-        writer.newLine();
-    }
-
     private final Map<String, Row> myRows = new HashMap<>();
     private final Map<String, Column> myColumns = new HashMap<>();
-    private final FieldPredicate myExistingColumn = (line, start, index, field) -> myColumns.containsKey(field);
-    private final FieldPredicate myExistingRow = (line, start, index, field) -> myRows.containsKey(field);
+    private final FieldPredicate myColumnName = (line, start, index, field) -> {
+        if (field == null || field.length() == 0) {
+            return false;
+        }
+        if (Math.max(field.length(), index - start) >= 8) {
+            return true;
+        }
+        for (int i = index + 1; i < line.length(); i++) {
+            if (!ASCII.isSpace(line.charAt(i))) {
+                int end = i;
+                while (end < line.length() && !ASCII.isSpace(line.charAt(end))) {
+                    end++;
+                }
+                return myRows.containsKey(line.substring(i, end).trim());
+            }
+        }
+        return true;
+    };
+    private final FieldPredicate myExistingColumn = (line, start, index, field) -> field != null && myColumns.containsKey(field.trim());
+    private final FieldPredicate myExistingRow = (line, start, index, field) -> field != null && myRows.containsKey(field.trim());
     private final String[] myFields = new String[6];
     private String myIdBOUNDS = null;
     private String myIdRANGES = null;
@@ -744,7 +750,7 @@ final class FileFormatMPS {
         myVerifierROWS = new FieldPredicate[] { FieldPredicate.ROW_TYPE, FieldPredicate.ROW_NAME, FieldPredicate.NOT_USED, FieldPredicate.NOT_USED,
                 FieldPredicate.NOT_USED, FieldPredicate.NOT_USED };
 
-        myVerifierCOLUMNS = new FieldPredicate[] { FieldPredicate.EMPTY, FieldPredicate.COLUMN_NAME, myExistingRow, FieldPredicate.NUMBER, myExistingRow,
+        myVerifierCOLUMNS = new FieldPredicate[] { FieldPredicate.EMPTY, myColumnName, myExistingRow, FieldPredicate.NUMBER, myExistingRow,
                 FieldPredicate.NUMBER };
 
         myVerifierRHS = new FieldPredicate[] { FieldPredicate.EMPTY, myMatchingRHS, myExistingRow, FieldPredicate.NUMBER, myExistingRow,
@@ -824,7 +830,12 @@ final class FileFormatMPS {
             tmpArgument = "";
         }
 
-        FileSection retVal = FileSection.valueOf(tmpSection);
+        FileSection retVal;
+        try {
+            retVal = FileSection.valueOf(tmpSection);
+        } catch (IllegalArgumentException cause) {
+            return null;
+        }
 
         switch (retVal) {
 
@@ -844,6 +855,10 @@ final class FileFormatMPS {
 
     private void parseSectionLine(final FileSection section, final String line) {
 
+        if (section == null) {
+            return;
+        }
+
         Arrays.fill(myFields, null);
 
         switch (section) {
@@ -853,6 +868,7 @@ final class FileFormatMPS {
                 break;
 
             case OBJSENSE:
+            case OBJSEN:
 
                 if (line.contains(MAX)) {
                     myModel.setOptimisationSense(Optimisation.Sense.MAX);
@@ -863,6 +879,11 @@ final class FileFormatMPS {
                 break;
 
             case OBJNAME:
+
+                String tmpObjName = line.trim();
+                if (!tmpObjName.isEmpty()) {
+                    myIdRowN = tmpObjName;
+                }
 
                 break;
 
@@ -876,7 +897,7 @@ final class FileFormatMPS {
                     myIdRowN = rowName;
                 }
 
-                myRows.put(myFields[1], new Row(rowName, rowType, myIdRowN));
+                myRows.put(rowName, new Row(rowName, rowType, myIdRowN));
 
                 break;
 
@@ -894,11 +915,15 @@ final class FileFormatMPS {
 
                     this.extractFields(line, myVerifierCOLUMNS);
 
+                    if (myFields[1] == null || myFields[2] == null || myFields[3] == null) {
+                        throw new IllegalArgumentException("Could not parse COLUMNS line: " + line);
+                    }
+
                     Column tmpColumn = myColumns.computeIfAbsent(myFields[1].trim(), Column::new);
 
-                    tmpColumn.setRowValue(myFields[2], new BigDecimal(myFields[3]));
-                    if (myFields[4] != null) {
-                        tmpColumn.setRowValue(myFields[4], new BigDecimal(myFields[5]));
+                    tmpColumn.setRowValue(myFields[2].trim(), new BigDecimal(myFields[3]));
+                    if (myFields[4] != null && myFields[5] != null) {
+                        tmpColumn.setRowValue(myFields[4].trim(), new BigDecimal(myFields[5]));
                     }
 
                     if (myIntegerMarker) {
@@ -918,10 +943,14 @@ final class FileFormatMPS {
                     break;
                 }
 
-                myRows.get(myFields[2]).rhs(new BigDecimal(myFields[3]));
+                if (myFields[2] == null || myFields[3] == null) {
+                    throw new IllegalArgumentException("Could not parse RHS line: " + line);
+                }
 
-                if (myFields[4] != null) {
-                    myRows.get(myFields[4]).rhs(new BigDecimal(myFields[5]));
+                myRows.get(myFields[2].trim()).rhs(new BigDecimal(myFields[3]));
+
+                if (myFields[4] != null && myFields[5] != null) {
+                    myRows.get(myFields[4].trim()).rhs(new BigDecimal(myFields[5]));
                 }
 
                 break;
@@ -936,10 +965,14 @@ final class FileFormatMPS {
                     break;
                 }
 
-                myRows.get(myFields[2]).range(new BigDecimal(myFields[3]));
+                if (myFields[2] == null || myFields[3] == null) {
+                    throw new IllegalArgumentException("Could not parse RANGES line: " + line);
+                }
 
-                if (myFields[4] != null) {
-                    myRows.get(myFields[4]).range(new BigDecimal(myFields[5]));
+                myRows.get(myFields[2].trim()).range(new BigDecimal(myFields[3]));
+
+                if (myFields[4] != null && myFields[5] != null) {
+                    myRows.get(myFields[4].trim()).range(new BigDecimal(myFields[5]));
                 }
 
                 break;
@@ -954,9 +987,13 @@ final class FileFormatMPS {
                     break;
                 }
 
+                if (myFields[0] == null || myFields[2] == null) {
+                    throw new IllegalArgumentException("Could not parse BOUNDS line: " + line);
+                }
+
                 BoundType boundType = BoundType.valueOf(myFields[0]);
 
-                myColumns.get(myFields[2]).bound(boundType, myFields[3] != null ? new BigDecimal(myFields[3]) : null);
+                myColumns.get(myFields[2].trim()).bound(boundType, myFields[3] != null ? new BigDecimal(myFields[3]) : null);
 
                 break;
 
@@ -968,8 +1005,8 @@ final class FileFormatMPS {
                     myQuadObjExpr = myModel.newExpression(section.name()).weight(HALF);
                 }
 
-                Variable var1 = myColumns.get(myFields[1]).getVariable();
-                Variable var2 = myColumns.get(myFields[2]).getVariable();
+                Variable var1 = myColumns.get(myFields[1].trim()).getVariable();
+                Variable var2 = myColumns.get(myFields[2].trim()).getVariable();
                 BigDecimal param3 = new BigDecimal(myFields[3]);
 
                 myQuadObjExpr.set(var1, var2, param3);
@@ -987,8 +1024,8 @@ final class FileFormatMPS {
                     myQuadObjExpr = myModel.newExpression(section.name()).weight(HALF);
                 }
 
-                Variable varA = myColumns.get(myFields[1]).getVariable();
-                Variable varB = myColumns.get(myFields[2]).getVariable();
+                Variable varA = myColumns.get(myFields[1].trim()).getVariable();
+                Variable varB = myColumns.get(myFields[2].trim()).getVariable();
                 BigDecimal paramC = new BigDecimal(myFields[3]);
 
                 myQuadObjExpr.set(varA, varB, paramC);
@@ -998,6 +1035,24 @@ final class FileFormatMPS {
             case ENDATA:
 
                 break;
+
+            case INDICATORS:
+            case IMPORTANCES:
+            case REFROW:
+            case USERCUTS:
+
+                break;
+
+            case SOS:
+            case LAZYCONS:
+            case QCMATRIX:
+            case PWLOBJ:
+            case GENCONS:
+            case CSECTION:
+            case QSECTION:
+            case SCENARIOS:
+
+                throw new IllegalArgumentException("Unsupported MPS section: " + section);
 
             default:
 
