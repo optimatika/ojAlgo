@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-import se.optimatika.optimisation.service.client.OptClientV01;
+import se.optimatika.optimisation.service.client.OptClientV1;
 
 class RemoteSolverTest extends OptimisationTests {
 
@@ -56,7 +56,7 @@ class RemoteSolverTest extends OptimisationTests {
     @Test
     void testSubmitRemote() throws Exception {
 
-        OptClientV01 client = new OptClientV01(URI.create(HOST));
+        OptClientV1 client = new OptClientV1(URI.create(HOST));
 
         Optimisation.Environment environment = Optimisation.newEnvironment();
         environment.setRemoteSolver(client::putOnQueue, client::pollResult);

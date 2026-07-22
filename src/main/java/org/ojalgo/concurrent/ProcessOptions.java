@@ -50,7 +50,7 @@ public final class ProcessOptions implements Serializable {
     public static final class Builder {
 
         private String myClasspath = System.getProperty("java.class.path");
-        private boolean myEnableNativeAccessAllUnnamed = false;
+        private boolean myEnableNativeAccessAllUnnamed = Runtime.version().feature() >= 16;
         private final Map<String, String> myEnv = new HashMap<>();
         private final List<String> myJvmArgs = new ArrayList<>();
         private final Map<String, String> mySystemProperties = new HashMap<>();
