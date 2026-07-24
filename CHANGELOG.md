@@ -34,7 +34,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 #### org.ojalgo.optimisation
 
-- `ExpressionsBasedModel.parse(File)` and `parse(InputStream, FileFormat)` now delegate to `Optimisation.ENVIRONMENT`, so parsed models use the default environment's configuration.
+- `ExpressionsBasedModel.parse(File)` and `parse(InputStream, FileFormat)` now delegate to the default environment, so parsed models use its configuration.
 - `ExpressionsBasedModel.writeTo(File)` and `writeTo(InMemoryFile)` now auto-detect the output format from the file name ending (previously always wrote EBM). Supported formats: `.ebm`, `.mps`/`.sif`/`.qps`, and `.lp`.
 - `ExpressionsBasedModel.FileFormat` now recognises `.qps` as an alias for MPS.
 
@@ -42,6 +42,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Removed the `org.ojalgo.optimisation.service` package (`OptimisationService`, `ServiceIntegration`, `ServiceSolver`). This functionality has moved to the separate optimisation-service-server project.
 - Removed `exports org.ojalgo.optimisation.service` from `module-info.java`.
+- Removed `Optimisation.ENVIRONMENT` — the default environment is now internal to `ExpressionsBasedModel`. Use the existing static convenience methods or create a separate `Optimisation.Environment`.
+- Removed deprecated `Optimisation.Options.getConfigurator(Class)` and `Options.setConfigurator(Object)` — use the corresponding methods on `ExpressionsBasedModel` or `Optimisation.Environment` instead.
 
 #### org.ojalgo.matrix
 

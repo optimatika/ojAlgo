@@ -155,9 +155,10 @@ public interface Optimisation {
      * Holds configuration for {@link ExpressionsBasedModel} instances: solver integrations, presolvers,
      * variable/expression factories, and 3rd party configurators.
      * <p>
-     * The default instance {@link Optimisation#ENVIRONMENT} is used when constructing models directly. To
-     * isolate configuration for different sets of models, create separate environments via
+     * To isolate configuration for different sets of models, create separate environments via
      * {@link Optimisation#newEnvironment()} and use {@link #newModel()} as the model factory.
+     * <p>
+     * If you don't explicitly create an instance {@link ExpressionsBasedModel} holds a default instance.
      *
      * @see #newModel()
      * @see #newModel(Optimisation.Options)
@@ -173,7 +174,10 @@ public interface Optimisation {
         private Variable.Factory<?> myVariableFactory = Variable::new;
 
         Environment() {
+
             super();
+
+            this.resetPresolvers();
         }
 
         public boolean addIntegration(final ExpressionsBasedModel.Integration<?> integration) {
@@ -634,15 +638,6 @@ public interface Optimisation {
             return this;
         }
 
-        /**
-         * @deprecated Use {@link ExpressionsBasedModel#getConfigurator(Object)} or
-         *             {@link Environment#getConfigurator(Class)} instead.
-         */
-        @Deprecated
-        public <T> Optional<T> getConfigurator(final Class<T> type) {
-            return Optimisation.ENVIRONMENT.getConfigurator(type);
-        }
-
         public IntegerStrategy integer() {
             return myIntegerStrategy;
         }
@@ -679,17 +674,6 @@ public interface Optimisation {
             logger_detailed = false;
             validate = false;
             return this;
-        }
-
-        /**
-         * A configurator for 3rd party solvers. Each such solver may define its own configurator type.
-         *
-         * @deprecated Use {@link ExpressionsBasedModel#setConfigurator(Object)} or
-         *             {@link Environment#setConfigurator(Object)} instead.
-         */
-        @Deprecated
-        public void setConfigurator(final Object configurator) {
-            Optimisation.ENVIRONMENT.setConfigurator(configurator);
         }
 
         /**
@@ -1219,14 +1203,9 @@ public interface Optimisation {
     }
 
     /**
-     * The default optimisation environment.
-     */
-    Environment ENVIRONMENT = new Environment();
-
-    /**
-     * Create a new optimisation environment. You can use the default environment {@link #ENVIRONMENT} or
-     * create separate environments if you need different configurations for different (sets of) models and
-     * solvers.
+     * Create a new optimisation environment. Models created with the no-arg constructor use a default
+     * environment; create separate environments if you need different configurations for different (sets of)
+     * models and solvers.
      */
     static Environment newEnvironment() {
         return new Environment();

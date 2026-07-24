@@ -78,10 +78,9 @@ import org.ojalgo.type.keyvalue.EntryPair;
  * scales parameters for numerical stability.
  * <p>
  * Each model is associated with an {@link Optimisation.Environment} that holds solver integrations,
- * presolvers, and variable/expression factories. The no-arg constructor uses the default
- * {@link Optimisation#ENVIRONMENT}. To isolate configuration (e.g. different solver integrations for
- * different model types) create a separate environment and use {@link Optimisation.Environment#newModel()} as
- * the factory.
+ * presolvers, and variable/expression factories. The no-arg constructor uses a default environment. To
+ * isolate configuration (e.g. different solver integrations for different model types) create a separate
+ * environment and use {@link Optimisation.Environment#newModel()} as the factory.
  *
  * @see Optimisation.Environment
  * @author apete
@@ -878,56 +877,56 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         }
     }
 
+    /**
+     * The default optimisation environment.
+     */
+    private static final Optimisation.Environment ENVIRONMENT = new Optimisation.Environment();
     private static final String NEW_LINE = "\n";
     private static final String OBJ_FUNC_AS_CONSTR_KEY = UUID.randomUUID().toString();
     private static final String START_END = "############################################\n";
     static final String OBJECTIVE = "Generated/Aggregated Objective";
 
-    static {
-        ExpressionsBasedModel.resetPresolvers();
-    }
-
     /**
-     * Register a solver integration with the default {@link Optimisation#ENVIRONMENT}. Models created with
-     * the no-arg constructor will use this integration. For isolated configuration, register integrations on
-     * a separate {@link Optimisation.Environment} instead.
+     * Register a solver integration with the default environment. Models created with the no-arg constructor
+     * will use this integration. For isolated configuration, register integrations on a separate
+     * {@link Optimisation.Environment} instead.
      *
      * @see Optimisation.Environment#addIntegration(Integration)
      */
     public static boolean addIntegration(final Optimisation.Integration<ExpressionsBasedModel, ?> integration) {
         if (integration instanceof ExpressionsBasedModel.Integration<?>) {
-            return Optimisation.ENVIRONMENT.addIntegration((ExpressionsBasedModel.Integration<?>) integration);
+            return ENVIRONMENT.addIntegration((ExpressionsBasedModel.Integration<?>) integration);
         } else {
-            return Optimisation.ENVIRONMENT.addIntegration(new IntegrationWrapper(integration));
+            return ENVIRONMENT.addIntegration(new IntegrationWrapper(integration));
         }
     }
 
     /**
-     * Delegates to {@link Optimisation#ENVIRONMENT}. For isolated configuration use a separate
+     * Delegates to the default environment. For isolated configuration use a separate
      * {@link Optimisation.Environment}.
      *
      * @see Optimisation.Environment#addPresolver(Presolver)
      */
     public static boolean addPresolver(final ExpressionsBasedModel.Simplifier<?, ?> presolver) {
-        return Optimisation.ENVIRONMENT.addPresolver(presolver);
+        return ENVIRONMENT.addPresolver(presolver);
     }
 
     /**
-     * Delegates to {@link Optimisation#ENVIRONMENT}.
+     * Delegates to the default environment.
      *
      * @see Optimisation.Environment#clearIntegrations()
      */
     public static void clearIntegrations() {
-        Optimisation.ENVIRONMENT.clearIntegrations();
+        ENVIRONMENT.clearIntegrations();
     }
 
     /**
-     * Delegates to {@link Optimisation#ENVIRONMENT}.
+     * Delegates to the default environment.
      *
      * @see Optimisation.Environment#clearPresolvers()
      */
     public static void clearPresolvers() {
-        Optimisation.ENVIRONMENT.clearPresolvers();
+        ENVIRONMENT.clearPresolvers();
     }
 
     /**
@@ -958,29 +957,29 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      * sections.
      */
     public static ExpressionsBasedModel parse(final File file) {
-        return Optimisation.ENVIRONMENT.parse(file);
+        return ENVIRONMENT.parse(file);
     }
 
     public static ExpressionsBasedModel parse(final InputStream input, final FileFormat format) {
-        return Optimisation.ENVIRONMENT.parse(input, format);
+        return ENVIRONMENT.parse(input, format);
     }
 
     /**
-     * Delegates to {@link Optimisation#ENVIRONMENT}.
+     * Delegates to the default environment.
      *
      * @see Optimisation.Environment#removeIntegration(Integration)
      */
     public static boolean removeIntegration(final Integration<?> integration) {
-        return Optimisation.ENVIRONMENT.removeIntegration(integration);
+        return ENVIRONMENT.removeIntegration(integration);
     }
 
     /**
-     * Delegates to {@link Optimisation#ENVIRONMENT}.
+     * Delegates to the default environment.
      *
      * @see Optimisation.Environment#removePresolver(Presolver)
      */
     public static boolean removePresolver(final Presolver presolver) {
-        return Optimisation.ENVIRONMENT.removePresolver(presolver);
+        return ENVIRONMENT.removePresolver(presolver);
     }
 
     /**
@@ -988,16 +987,16 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      * presolvers.
      */
     public static void resetPresolvers() {
-        Optimisation.ENVIRONMENT.resetPresolvers();
+        ENVIRONMENT.resetPresolvers();
     }
 
     /**
-     * Delegates to {@link Optimisation#ENVIRONMENT}.
+     * Delegates to the default environment.
      *
      * @see Optimisation.Environment#setConfigurator(Object)
      */
     public static void setConfigurator(final Object configurator) {
-        Optimisation.ENVIRONMENT.setConfigurator(configurator);
+        ENVIRONMENT.setConfigurator(configurator);
     }
 
     public final Optimisation.Options options;
@@ -1033,20 +1032,19 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     private final VariablesCategorisation myVariablesCategorisation = new VariablesCategorisation();
 
     /**
-     * Creates a model using the default {@link Optimisation#ENVIRONMENT} and default
-     * {@link Optimisation.Options}. For isolated configuration use
-     * {@link Optimisation.Environment#newModel()}.
+     * Creates a model using the default environment and default {@link Optimisation.Options}. For isolated
+     * configuration use {@link Optimisation.Environment#newModel()}.
      */
     public ExpressionsBasedModel() {
-        this(Optimisation.ENVIRONMENT, new Optimisation.Options());
+        this(ENVIRONMENT, new Optimisation.Options());
     }
 
     /**
-     * Creates a model using the default {@link Optimisation#ENVIRONMENT} with the supplied options. For
-     * isolated configuration use {@link Optimisation.Environment#newModel(Optimisation.Options)}.
+     * Creates a model using the default environment with the supplied options. For isolated configuration use
+     * {@link Optimisation.Environment#newModel(Optimisation.Options)}.
      */
     public ExpressionsBasedModel(final Optimisation.Options optimisationOptions) {
-        this(Optimisation.ENVIRONMENT, optimisationOptions);
+        this(ENVIRONMENT, optimisationOptions);
     }
 
     ExpressionsBasedModel(final ExpressionsBasedModel modelToCopy, final boolean shallow, final boolean prune) {
