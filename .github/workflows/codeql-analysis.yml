@@ -28,8 +28,14 @@ jobs:
         queries: security-and-quality,./.github/queries/submodules.ql
         config-file: ./.github/codeql/codeql-config.yml
 
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v4
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '25'
+
+    - name: Build
+      run: mvn process-sources compiler:compile -B -ntp
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v4
