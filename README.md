@@ -48,7 +48,7 @@ That is the whole setup — no solver to install, no bindings to compile.
 - **Other** — time series, random numbers, stochastic processes, descriptive
   statistics.
 
-Zero dependencies, MIT licensed, in continuous development since 1997.
+Zero dependencies, MIT licensed, in continuous development since 2003.
 
 ## Pure Java, and what that is worth
 
@@ -76,9 +76,10 @@ not change.
 
 The [Optimatika Optimisation Service](https://optimatika.se/optimisation-service/)
 is the commercial route for that step: a container you deploy in your own
-infrastructure, bundling a suite of best-in-class open-source solvers with the
-building, linking and packaging already handled. Develop locally against pure
-Java; solve remotely when the problem outgrows it.
+infrastructure, configured and tuned to solve linear, quadratic and mixed-integer
+problems at a scale pure Java is not meant for, with the building, packaging and
+operating already handled. Develop locally against pure Java; solve remotely when
+the problem outgrows it.
 
 ## Documentation and support
 
@@ -100,11 +101,11 @@ and work with the source directly. The source is part of the documentation.
 
 ## Who maintains it
 
-ojAlgo is written and maintained by Anders Peterson at
-[Optimatika](https://optimatika.se), and has been in continuous development
-since 1997.
+ojAlgo is developed and maintained by [Optimatika](https://optimatika.se), a
+Swedish company that has been building numerical software since 1997. ojAlgo
+itself has been in continuous development since 2003.
 
-It is MIT licensed, so the code keeps working regardless of what Optimatika
-does — that is a property of the licence, not a promise. What a licence cannot
-give you is a counterparty, and that is what
+It is MIT licensed, so the code you have already shipped keeps working — that is
+a property of the licence, not a promise. What a licence cannot give you is help
+using it well, and that is what
 [ojAlgo Support](https://optimatika.se/ojalgo-support/) exists to provide.
