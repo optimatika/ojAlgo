@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2025 Optimatika
+ * Copyright 1997-2026 Optimatika
  */
 package org.ojalgo.concurrent;
 
