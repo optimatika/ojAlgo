@@ -15,16 +15,6 @@ oj! Algorithms - ojAlgo - is Open Source Java code that has to do with mathemati
 
 General information about ojAlgo is available at the project web site: http://ojalgo.org/
 
-## When the Built-In Solvers Are Not Enough
-
-The built-in solvers are pure Java with zero dependencies, and they handle the great majority of the problems put to them. Some models eventually outgrow them, and there is no pure-Java solver stronger than ojAlgo's own. There are two ways forward, and neither requires changing your model code — the `ExpressionsBasedModel` you have already written stays as it is.
-
-**Third-party solver integrations.** The [ojAlgo-extensions](https://github.com/optimatika/ojAlgo-extensions) repository contains modules that let `ExpressionsBasedModel` solve using Clarabel, CPLEX, Gurobi, MOSEK or OR-Tools. You bring the solver and, where applicable, the licence; the extension connects it. Native libraries then run inside your own application process. The modules are published to Maven Central and anyone may use them; direct repository access and new builds are for ojAlgo sponsors.
-
-**The Optimatika Optimisation Service.** A solver server you deploy in your own cluster, from the AWS, Azure or Google Cloud marketplace. A small pure Java client configures `ExpressionsBasedModel` to solve through it, so no native code enters your application. In capability it sits between the built-in pure Java solvers and the large commercial solvers — for many models that outgrow pure Java it is enough, and it is cheaper and considerably less work than licensing, packaging and operating a commercial solver yourself. Usage-based pricing, billed through the marketplace. See [optimatika.se](https://www.optimatika.se/optimisation-service/).
-
-ojAlgo itself remains Open Source and free to use, and it always will be. These are options for models that need more, not a paywall on anything that works today.
-
 ### Artifacts
 
 ojAlgo is available at [The Central (Maven) Repository](https://mvnrepository.com/artifact/org.ojalgo/ojalgo) to be used with your favourite dependency management tool.
@@ -53,3 +43,13 @@ ojAlgo is Open Source, and you are strongly encouraged to clone or fork this rep
 All example code (from the blog posts) in a multi-file gist: https://gist.github.com/apete/b3278dc2f8c2db6a00369c211ba321db
 
 Commercial support for ojAlgo is available from [Optimatika](https://www.optimatika.se/), the company behind the project.
+
+## When the Built-In Solvers Are Not Enough
+
+The built-in solvers are pure Java with zero dependencies, and they handle the great majority of the problems put to them. Some models do eventually outgrow them, and there are no pure Java solvers stronger than ojAlgo's own. There are two ways forward, and neither requires changing your model code — the `ExpressionsBasedModel` you have already written stays as it is.
+
+**Third-party solver integrations.** ojAlgo has integrations with a number of external solvers, covering both the leading open source alternatives and the major commercial ones — Gurobi, CPLEX and MOSEK among them. You bring the solvers and, where applicable, the licences; the integration connects them to `ExpressionsBasedModel`. The native libraries then run inside your own application process, which is what makes this the more demanding option to deploy and maintain.
+
+**The Optimatika Optimisation Service.** A solver server you deploy in your own cluster, from the AWS, Azure or Google Cloud marketplace. A small pure Java client configures `ExpressionsBasedModel` to solve through it, so no native code enters your application. It is deliberately the middle ground: more capable than the built-in pure Java solvers, less costly and far less work than licensing, packaging and operating the commercial alternatives. What you get is a suite of the strongest open source solvers, built, tuned and tested to work as one, with the right one picked for each problem. Usage-based pricing, billed through the marketplace. See [optimatika.se](https://www.optimatika.se/optimisation-service/).
+
+ojAlgo itself remains Open Source and free to use, and it always will be. These are options for models that need more, not a paywall on anything that works today.
