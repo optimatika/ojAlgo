@@ -40,7 +40,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Removed
 
-- Removed the `org.ojalgo.optimisation.service` package (`OptimisationService`, `ServiceIntegration`, `ServiceSolver`). This functionality has moved to the separate optimisation-service-server project.
+- Removed the `org.ojalgo.optimisation.service` package (`OptimisationService`, `ServiceIntegration`, `ServiceSolver`).
 - Removed `exports org.ojalgo.optimisation.service` from `module-info.java`.
 - Removed `Optimisation.ENVIRONMENT` — the default environment is now internal to `ExpressionsBasedModel`. Use the existing static convenience methods or create a separate `Optimisation.Environment`.
 - Removed deprecated `Optimisation.Options.getConfigurator(Class)` and `Options.setConfigurator(Object)` — use the corresponding methods on `ExpressionsBasedModel` or `Optimisation.Environment` instead.
