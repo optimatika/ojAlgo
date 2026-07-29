@@ -11,6 +11,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [57.1.0] – 2026-07-29
+
 ### Added
 
 #### org.ojalgo.netio
