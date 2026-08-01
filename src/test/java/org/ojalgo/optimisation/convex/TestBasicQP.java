@@ -143,6 +143,83 @@ public class TestBasicQP extends OptimisationConvexTests implements TestBasic {
     }
 
     /**
+     * Maximised concave QP where the optimum sits at a variable bound: maximize -x² + 10x - y² + 2y with x in
+     * [0,3] and y in [0,10], subject to a (slack) constraint x + y <= 100. The unconstrained maximum in x is
+     * at x = 5, so the bound x <= 3 is active. The optimal solution is x = 3, y = 1 with objective value 22.
+     */
+    static OptimisationCase caseMaximiseAtVariableBound() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x = model.addVariable("x").lower(0.0).upper(3.0);
+        Variable y = model.addVariable("y").lower(0.0).upper(10.0);
+
+        Expression objective = model.addExpression("obj");
+        objective.set(x, x, -1.0);
+        objective.set(y, y, -1.0);
+        objective.set(x, 10.0);
+        objective.set(y, 2.0);
+        objective.weight(1.0);
+
+        model.addExpression("c1").set(x, 1.0).set(y, 1.0).upper(100.0);
+
+        Optimisation.Result result = Optimisation.Result.of(22.0, State.OPTIMAL, 3.0, 1.0);
+
+        return OptimisationCase.of(model, Optimisation.Sense.MAX, result).accuracy(NumberContext.of(5));
+    }
+
+    /**
+     * Maximised concave QP with an active inequality constraint: maximize -(x² + y²) + 4x + 6y subject to x +
+     * y <= 4, with x, y in [0,10]. The unconstrained maximum is at (2,3), which violates the constraint, so
+     * it is active. The optimal solution is x = 1.5, y = 2.5 with objective value 12.5.
+     */
+    static OptimisationCase caseMaximiseWithActiveConstraint() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x = model.addVariable("x").lower(0.0).upper(10.0);
+        Variable y = model.addVariable("y").lower(0.0).upper(10.0);
+
+        Expression objective = model.addExpression("obj");
+        objective.set(x, x, -1.0);
+        objective.set(y, y, -1.0);
+        objective.set(x, 4.0);
+        objective.set(y, 6.0);
+        objective.weight(1.0);
+
+        model.addExpression("c1").set(x, 1.0).set(y, 1.0).upper(4.0);
+
+        Optimisation.Result result = Optimisation.Result.of(12.5, State.OPTIMAL, 1.5, 2.5);
+
+        return OptimisationCase.of(model, Optimisation.Sense.MAX, result).accuracy(NumberContext.of(5));
+    }
+
+    /**
+     * Maximised concave QP with an equality constraint: maximize -(x² + y²) + 2x + 2y subject to x + y = 3,
+     * with x, y >= 0. Symmetric, so the optimal solution is x = y = 1.5 with objective value 1.5.
+     */
+    static OptimisationCase caseMaximiseWithEqualityConstraint() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x = model.addVariable("x").lower(0.0);
+        Variable y = model.addVariable("y").lower(0.0);
+
+        Expression objective = model.addExpression("obj");
+        objective.set(x, x, -1.0);
+        objective.set(y, y, -1.0);
+        objective.set(x, 2.0);
+        objective.set(y, 2.0);
+        objective.weight(1.0);
+
+        model.addExpression("c1").set(x, 1.0).set(y, 1.0).level(3.0);
+
+        Optimisation.Result result = Optimisation.Result.of(1.5, State.OPTIMAL, 1.5, 1.5);
+
+        return OptimisationCase.of(model, Optimisation.Sense.MAX, result).accuracy(NumberContext.of(5));
+    }
+
+    /**
      * Minimal constrained QP: minimize 0.5*(x² + y²) subject to x + y >= 1, with x >= 0, y >= 0. The optimal
      * solution is at x = y = 0.5 with objective value 0.25.
      */
@@ -298,6 +375,36 @@ public class TestBasicQP extends OptimisationConvexTests implements TestBasic {
         return OptimisationCase.of(model, Optimisation.Sense.MIN, result).accuracy(NumberContext.of(3));
     }
 
+    /**
+     * The sign-mirrored counterpart of {@link #caseSimpleQP()}: maximize -(x² + y²) + 2x + 4y subject to x +
+     * y <= 5, with x, y in [0,10]. The constraint is slack at the optimum. The optimal solution is x = 1, y =
+     * 2 with objective value 5 - the same point as the minimised variant, with the objective value negated.
+     * An integration that mishandles the sense will typically still pass {@link #caseSimpleQP()}.
+     */
+    static OptimisationCase caseSimpleQPMaximise() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x = model.addVariable("X").lower(0.0).upper(10.0);
+        Variable y = model.addVariable("Y").lower(0.0).upper(10.0);
+
+        Expression objective = model.addExpression("obj");
+        objective.set(x, x, -1.0);
+        objective.set(y, y, -1.0);
+        objective.set(x, 2.0);
+        objective.set(y, 4.0);
+        objective.weight(1.0);
+
+        Expression constraint = model.addExpression("c1");
+        constraint.set(x, 1.0);
+        constraint.set(y, 1.0);
+        constraint.upper(5.0);
+
+        Optimisation.Result result = Optimisation.Result.of(5.0, State.OPTIMAL, 1.0, 2.0);
+
+        return OptimisationCase.of(model, Optimisation.Sense.MAX, result).accuracy(NumberContext.of(3));
+    }
+
     static OptimisationCase caseUnconstrainedQuadraticWithBounds() {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
@@ -350,6 +457,30 @@ public class TestBasicQP extends OptimisationConvexTests implements TestBasic {
     }
 
     @Test
+    public void testMaximiseAtVariableBound() {
+        OptimisationCase testCase = TestBasicQP.caseMaximiseAtVariableBound();
+        for (Integration<?> integration : this.integrations()) {
+            testCase.assertResult(integration);
+        }
+    }
+
+    @Test
+    public void testMaximiseWithActiveConstraint() {
+        OptimisationCase testCase = TestBasicQP.caseMaximiseWithActiveConstraint();
+        for (Integration<?> integration : this.integrations()) {
+            testCase.assertResult(integration);
+        }
+    }
+
+    @Test
+    public void testMaximiseWithEqualityConstraint() {
+        OptimisationCase testCase = TestBasicQP.caseMaximiseWithEqualityConstraint();
+        for (Integration<?> integration : this.integrations()) {
+            testCase.assertResult(integration);
+        }
+    }
+
+    @Test
     public void testMinimalQP() {
         OptimisationCase testCase = TestBasicQP.caseMinimalQP();
         for (Integration<?> integration : this.integrations()) {
@@ -392,6 +523,14 @@ public class TestBasicQP extends OptimisationConvexTests implements TestBasic {
     @Test
     public void testSimpleQP() {
         OptimisationCase testCase = TestBasicQP.caseSimpleQP();
+        for (Integration<?> integration : this.integrations()) {
+            testCase.assertResult(integration);
+        }
+    }
+
+    @Test
+    public void testSimpleQPMaximise() {
+        OptimisationCase testCase = TestBasicQP.caseSimpleQPMaximise();
         for (Integration<?> integration : this.integrations()) {
             testCase.assertResult(integration);
         }
