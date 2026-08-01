@@ -577,7 +577,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
     }
 
     @Test
-    public void testShitingRange() {
+    public void testShiftingRange() {
 
         Random random = new Random();
 
