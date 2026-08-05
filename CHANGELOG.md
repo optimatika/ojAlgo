@@ -11,6 +11,18 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.optimisation
+
+- Added a general parallelism setting in `Optimisation.Options` and then removed the same thing from the `IntegerStrategy` implementations.
+
+### Changed
+
+#### org.ojalgo.optimisation
+
+- The `IntegerStrategy#getWorkerPriorities` now that an int parallelism parameter as input.
+
 ## [57.1.0] – 2026-07-29
 
 ### Added

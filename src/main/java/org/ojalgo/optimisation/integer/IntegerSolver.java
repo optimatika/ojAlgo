@@ -247,7 +247,7 @@ public final class IntegerSolver extends GenericSolver {
 
         Map<Comparator<NodeKey>, MultiviewSet<NodeKey>.PrioritisedView> views = new ConcurrentHashMap<>();
 
-        List<Comparator<NodeKey>> workerPriorities = myStrategy.getWorkerPriorities();
+        List<Comparator<NodeKey>> workerPriorities = myStrategy.getWorkerPriorities(options.getParallelism());
         for (Comparator<NodeKey> workerPriority : workerPriorities) {
             MultiviewSet<NodeKey>.PrioritisedView view = myDeferredNodes.newView(workerPriority);
             views.put(workerPriority, view);

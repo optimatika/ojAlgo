@@ -26,9 +26,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.function.IntSupplier;
 
-import org.ojalgo.concurrent.Parallelism;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -47,15 +45,13 @@ public interface IntegerStrategy {
         private final NumberContext myGapTolerance;
         private final GMICutConfiguration myGMICutConfiguration;
         private final NumberContext myIntegralityTolerance;
-        private final IntSupplier myParallelism;
         private final Comparator<NodeKey>[] myPriorityDefinitions;
 
-        ConfigurableStrategy(final IntSupplier parallelism, final Comparator<NodeKey>[] definitions, final NumberContext integrality, final NumberContext gap,
+        ConfigurableStrategy(final Comparator<NodeKey>[] definitions, final NumberContext integrality, final NumberContext gap,
                 final BiFunction<ExpressionsBasedModel, IntegerStrategy, ModelStrategy> factory, final GMICutConfiguration configuration) {
 
             super();
 
-            myParallelism = parallelism;
             myPriorityDefinitions = definitions;
             myIntegralityTolerance = integrality;
             myGapTolerance = gap;
@@ -79,7 +75,7 @@ public interface IntegerStrategy {
                 totalDefinitions[additionalDefinitions.length + i] = myPriorityDefinitions[i];
             }
 
-            return new ConfigurableStrategy(myParallelism, totalDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myGMICutConfiguration);
+            return new ConfigurableStrategy(totalDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myGMICutConfiguration);
         }
 
         @Override
@@ -103,9 +99,9 @@ public interface IntegerStrategy {
         }
 
         @Override
-        public List<Comparator<NodeKey>> getWorkerPriorities() {
+        public List<Comparator<NodeKey>> getWorkerPriorities(final int parallelism) {
 
-            int nbWorkers = myParallelism.getAsInt();
+            int nbWorkers = Math.max(1, parallelism);
             int nbDefinitions = myPriorityDefinitions.length;
 
             List<Comparator<NodeKey>> retVal = new ArrayList<>(nbWorkers);
@@ -126,32 +122,25 @@ public interface IntegerStrategy {
          * Change the MIP gap
          */
         public ConfigurableStrategy withGapTolerance(final NumberContext newTolerance) {
-            return new ConfigurableStrategy(myParallelism, myPriorityDefinitions, myIntegralityTolerance, newTolerance, myFactory, myGMICutConfiguration);
+            return new ConfigurableStrategy(myPriorityDefinitions, myIntegralityTolerance, newTolerance, myFactory, myGMICutConfiguration);
         }
 
         public ConfigurableStrategy withGMICutConfiguration(final GMICutConfiguration newConfiguration) {
-            return new ConfigurableStrategy(myParallelism, myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, newConfiguration);
+            return new ConfigurableStrategy(myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, newConfiguration);
         }
 
         /**
          * Create a sub-class of {@link ModelStrategy} and provide a factory method for it here.
          */
         public ConfigurableStrategy withModelStrategyFactory(final BiFunction<ExpressionsBasedModel, IntegerStrategy, ModelStrategy> newFactory) {
-            return new ConfigurableStrategy(myParallelism, myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, newFactory, myGMICutConfiguration);
-        }
-
-        /**
-         * How many threads will be used? Perhaps use {@link Parallelism} to obtain a suitable value.
-         */
-        public ConfigurableStrategy withParallelism(final IntSupplier newParallelism) {
-            return new ConfigurableStrategy(newParallelism, myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myGMICutConfiguration);
+            return new ConfigurableStrategy(myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, newFactory, myGMICutConfiguration);
         }
 
         /**
          * Replace the priority definitions with these ones.
          */
         public ConfigurableStrategy withPriorityDefinitions(final Comparator<NodeKey>... newDefinitions) {
-            return new ConfigurableStrategy(myParallelism, newDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myGMICutConfiguration);
+            return new ConfigurableStrategy(newDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myGMICutConfiguration);
         }
 
     }
@@ -210,8 +199,7 @@ public interface IntegerStrategy {
         NumberContext integrality = NumberContext.of(12, 8);
         NumberContext gap = NumberContext.of(5, 7);
 
-        return new ConfigurableStrategy(Parallelism.CORES.require(definitions.length), definitions, integrality, gap, DefaultStrategy::new,
-                new GMICutConfiguration());
+        return new ConfigurableStrategy(definitions, integrality, gap, DefaultStrategy::new, new GMICutConfiguration());
     }
 
     int countUniqueStrategies();
@@ -237,8 +225,10 @@ public interface IntegerStrategy {
     /**
      * There will be 1 worker thread per item in the returned {@link List}. The {@link Comparator} instances
      * need not be unique. Used to prioritise among the nodes waiting to be evaluated.
+     *
+     * @param parallelism The number of worker threads to use
      */
-    List<Comparator<NodeKey>> getWorkerPriorities();
+    List<Comparator<NodeKey>> getWorkerPriorities(int parallelism);
 
     ModelStrategy newModelStrategy(final ExpressionsBasedModel model);
 

@@ -315,7 +315,6 @@ public abstract class ModelStrategy implements IntegerStrategy {
     private final int[] myIndices;
     private final Optimisation.Sense myOptimisationSense;
     private final IntegerStrategy myStrategy;
-    private final List<Comparator<NodeKey>> myWorkerPriorities;
 
     /**
      * Indicates if cut generation is turned on, or not. On by default. Algorithms can turn off when/if no
@@ -337,29 +336,6 @@ public abstract class ModelStrategy implements IntegerStrategy {
         for (int i = 0; i < nbIntegers; i++) {
             int globalIndex = model.indexOf(integerVariables.get(i));
             myIndices[i] = globalIndex;
-        }
-
-        myWorkerPriorities = strategy.getWorkerPriorities();
-
-        boolean didSetObj = false;
-        for (int i = 0; i < myWorkerPriorities.size(); i++) {
-            Comparator<NodeKey> prio = myWorkerPriorities.get(i);
-            if (prio == NodeKey.MIN_OBJECTIVE || prio == NodeKey.MAX_OBJECTIVE) {
-                if (myOptimisationSense == Optimisation.Sense.MIN) {
-                    myWorkerPriorities.set(i, NodeKey.MIN_OBJECTIVE);
-                    didSetObj = true;
-                } else if (myOptimisationSense == Optimisation.Sense.MAX) {
-                    myWorkerPriorities.set(i, NodeKey.MAX_OBJECTIVE);
-                    didSetObj = true;
-                }
-            }
-        }
-        if (!didSetObj) {
-            if (myOptimisationSense == Optimisation.Sense.MIN) {
-                myWorkerPriorities.add(NodeKey.MIN_OBJECTIVE);
-            } else if (myOptimisationSense == Optimisation.Sense.MAX) {
-                myWorkerPriorities.add(NodeKey.MAX_OBJECTIVE);
-            }
         }
     }
 
@@ -384,8 +360,32 @@ public abstract class ModelStrategy implements IntegerStrategy {
     }
 
     @Override
-    public List<Comparator<NodeKey>> getWorkerPriorities() {
-        return myWorkerPriorities;
+    public List<Comparator<NodeKey>> getWorkerPriorities(final int parallelism) {
+
+        List<Comparator<NodeKey>> retVal = myStrategy.getWorkerPriorities(parallelism);
+
+        boolean didSetObj = false;
+        for (int i = 0; i < retVal.size(); i++) {
+            Comparator<NodeKey> prio = retVal.get(i);
+            if (prio == NodeKey.MIN_OBJECTIVE || prio == NodeKey.MAX_OBJECTIVE) {
+                if (myOptimisationSense == Optimisation.Sense.MIN) {
+                    retVal.set(i, NodeKey.MIN_OBJECTIVE);
+                    didSetObj = true;
+                } else if (myOptimisationSense == Optimisation.Sense.MAX) {
+                    retVal.set(i, NodeKey.MAX_OBJECTIVE);
+                    didSetObj = true;
+                }
+            }
+        }
+        if (!didSetObj) {
+            if (myOptimisationSense == Optimisation.Sense.MIN) {
+                retVal.add(NodeKey.MIN_OBJECTIVE);
+            } else if (myOptimisationSense == Optimisation.Sense.MAX) {
+                retVal.add(NodeKey.MAX_OBJECTIVE);
+            }
+        }
+
+        return retVal;
     }
 
     @Override

@@ -37,11 +37,14 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.ArrayR256;
+import org.ojalgo.concurrent.Parallelism;
+import org.ojalgo.concurrent.ParallelismSupplier;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
 import org.ojalgo.optimisation.convex.ConvexSolver;
@@ -597,8 +600,12 @@ public interface Optimisation {
         public boolean validate = false;
 
         private ConvexSolver.Configuration myConvexConfiguration = new ConvexSolver.Configuration();
+
         private IntegerStrategy myIntegerStrategy = IntegerStrategy.DEFAULT;
+
         private LinearSolver.Configuration myLinearConfiguration = new LinearSolver.Configuration();
+
+        private int myParallelism = Parallelism.CORES.getAsInt();
 
         public Options() {
             super();
@@ -638,6 +645,17 @@ public interface Optimisation {
             return this;
         }
 
+        /**
+         * The level of parallelism (number of threads) to use when solving. This is used by ojAlgo's built-in
+         * {@linkplain IntegerSolver} and may also be forwarded to external/3rd-party solvers that support
+         * thread configuration. The default is {@linkplain Parallelism#CORES}.
+         *
+         * @see #setParallelism(ParallelismSupplier)
+         */
+        public int getParallelism() {
+            return myParallelism;
+        }
+
         public IntegerStrategy integer() {
             return myIntegerStrategy;
         }
@@ -663,6 +681,15 @@ public interface Optimisation {
             Objects.requireNonNull(configuration);
             myLinearConfiguration = configuration;
             return this;
+        }
+
+        public Options parallelism(final int parallelism) {
+            myParallelism = parallelism;
+            return this;
+        }
+
+        public Options parallelism(final IntSupplier parallelism) {
+            return this.parallelism(parallelism.getAsInt());
         }
 
         /**
