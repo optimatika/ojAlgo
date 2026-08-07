@@ -19,9 +19,25 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Changed
 
+#### org.ojalgo.netio
+
+- `BasicJson` parsing is now strict — malformed input throws `IllegalArgumentException`.
+
 #### org.ojalgo.optimisation
 
 - The `IntegerStrategy#getWorkerPriorities` now that an int parallelism parameter as input.
+
+### Fixed
+
+#### org.ojalgo.netio
+
+- Various `BasicJson` parsing and writing bugs.
+
+### Removed
+
+#### org.ojalgo.netio
+
+- `BasicJson.toStringList(String)` and `BasicJson.toStringListMap(String)`.
 
 ## [57.1.0] – 2026-07-29
 

@@ -2103,14 +2103,14 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
         Thread thread = new Thread(() -> {
             try {
-                Map<String, Object> response = (Map<String, Object>) BasicJson.parse(submitter.submit(data, "EBM", maximize));
+                Map<String, ?> response = BasicJson.parseObject(submitter.submit(data, "EBM", maximize));
                 String key = (String) response.get("key");
                 String status = (String) response.get("status");
 
                 long counter = 0L;
                 while ("PENDING".equals(status)) {
                     Thread.sleep(Math.min(10_000L, 100L * counter++));
-                    response = (Map<String, Object>) BasicJson.parse(poller.poll(key));
+                    response = BasicJson.parseObject(poller.poll(key));
                     status = (String) response.get("status");
                 }
 
