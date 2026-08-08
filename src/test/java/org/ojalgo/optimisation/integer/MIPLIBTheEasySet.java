@@ -28,22 +28,21 @@ import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * The 794-model pool was assembled by combining 'easy' instances from every published MIPLIB edition — 2.0,
+ * A 794-model pool was assembled by combining 'easy' instances from every published MIPLIB edition — 2.0,
  * 3.0, 2003, 2010 and 2017 — into a single deduplicated collection. Older editions contain smaller, simpler
- * models that were often dropped from later editions for being too easy, making them ideal for testing
- * non-commercial solvers. The test set was then constructed by parsing all 794 models with ojAlgo's MPS
- * reader and filtering down to at most 1 000 variables and 1 000 constraints. A few models were discarded
- * because ojAlgo does not yet support certain MPS sections (e.g. LAZYCONS). The remaining models were
- * benchmarked against three commercial/open-source solvers (CPLEX, HiGHS and OR-Tools) with a 5 min
+ * models that were often dropped from later editions for being too easy, making them better suited for
+ * testing newer non-commercial solvers. The test set was then constructed by parsing all 794 models with
+ * ojAlgo's MPS reader and filtering down to at most 1 000 variables and 1 000 constraints. A few models were
+ * discarded because ojAlgo does not yet support certain MPS sections (e.g. LAZYCONS). The remaining models
+ * were benchmarked against three commercial/open-source solvers (CPLEX, HiGHS and SCIP) with a 5 min
  * per-solver timeout. The 94 models here are those that all three solvers solved within that timeout. They
  * range from 9 to 990 variables.
  * <p>
  * The solver times in each test method's javadoc were measured on a MacBook Air (15-inch, M4, 2025) via the
- * ojAlgo mathematical-programming-benchmark harness using ojAlgo 57.1.1-SNAPSHOT as the MPS parser. They
- * represent median wall-clock time over 20 iterations with a 5 min per-solver timeout.
+ * ojAlgo mathematical-programming-benchmark harness using ojAlgo 57.1.1-SNAPSHOT as the MPS parser.
  * <p>
- * The tag 'slow' means getting a solution takes too long. The tag 'unstable' means the returned solution is
- * not optimal (state OPTIMAL and correct value).
+ * The tag 'slow' means getting a response takes too long (regardless of what the response is). The tag
+ * 'unstable' means there is some problem with the returned solution (possibly that we've never seen one).
  *
  * @author apete
  */
