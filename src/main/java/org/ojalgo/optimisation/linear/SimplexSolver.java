@@ -343,7 +343,18 @@ abstract class SimplexSolver extends LinearSolver {
     private static final boolean ADJUSTED_OBJECTIVE = true;
 
     private static final NumberContext COST = NumberContext.of(7);
-    private static final NumberContext INFEASIBILITY = NumberContext.of(9);
+    /**
+     * Decides whether a basic variable outside its bounds counts as infeasible. Too loose and a marginally
+     * infeasible problem is reported OPTIMAL; too tight and a valid solution's residuals are read as
+     * infeasibility.
+     */
+    private static final NumberContext INFEASIBILITY = NumberContext.of(10);
+    /**
+     * Slack added to the primal ratio-test numerators, bounding how far a basic variable may drift outside
+     * its bounds in a single pivot. Distinct from {@link #INFEASIBILITY}, which decides whether such a drift
+     * counts as infeasible at all.
+     */
+    private static final NumberContext RATIO_RELAX = NumberContext.of(9);
     private static final NumberContext PIVOT = NumberContext.of(6);
 
     static <S extends SimplexStore> S build(final ExpressionsBasedModel model, final Function<LinearStructure, S> factory) {
@@ -1167,7 +1178,7 @@ abstract class SimplexSolver extends LinearSolver {
         Direction enterDirection = enter.direction;
 
         double range = mySimplex.getRange(enter.column());
-        double tolerance = INFEASIBILITY.getAbsoluteError();
+        double tolerance = RATIO_RELAX.getAbsoluteError();
 
         int[] included = mySimplex.included;
 

@@ -33,6 +33,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Various `BasicJson` parsing and writing bugs.
 
+#### org.ojalgo.optimisation
+
+- Reworked Devex pricing and the feasibility/ratio-test tolerances in the dual simplex — the default `LinearSolver` path. Models that previously returned an incorrect `OPTIMAL` now solve correctly, and most solve faster.
+
 ### Removed
 
 #### org.ojalgo.netio

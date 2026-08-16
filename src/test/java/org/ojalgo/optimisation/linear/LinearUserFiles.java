@@ -120,12 +120,12 @@ public class LinearUserFiles extends OptimisationLinearTests implements ModelFil
      * other variables are binary, so the model is poorly scaled.
      * <p>
      * The trigger is the interaction between integrality and parameter scaling: integer entities are not
-     * scaled — both {@code Variable.deriveAdjustmentExponent()} and {@code Expression.deriveAdjustmentExponent()}
-     * return 0 when {@code isInteger()}. Because x_0 (and hence the objective expression) are integer, scaling
-     * is disabled and the poorly-scaled model reaches the simplex unscaled. The phase-1 feasibility verdict
-     * then compared a tiny floating-point residual on a near-zero slack — proportional to the large solution
-     * magnitude — against a fixed absolute tolerance and wrongly declared INFEASIBLE. The verdict now judges
-     * the residual relative to the solution magnitude.
+     * scaled — both {@code Variable.deriveAdjustmentExponent()} and
+     * {@code Expression.deriveAdjustmentExponent()} return 0 when {@code isInteger()}. Because x_0 (and hence
+     * the objective expression) are integer, scaling is disabled and the poorly-scaled model reaches the
+     * simplex unscaled. The phase-1 feasibility verdict then compared a tiny floating-point residual on a
+     * near-zero slack — proportional to the large solution magnitude — against a fixed absolute tolerance and
+     * wrongly declared INFEASIBLE. The verdict now judges the residual relative to the solution magnitude.
      * <p>
      * The model is soft-relaxed ({@code relax(true)}): it uses the LP solver rather than the IntegerSolver,
      * but the variables stay flagged integer, so scaling stays disabled — the exact configuration that

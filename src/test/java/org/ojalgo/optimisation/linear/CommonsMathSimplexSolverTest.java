@@ -38,6 +38,7 @@ import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Primitive1D;
 
 /**
  * Contains the same test cases found in: org.apache.commons.math3.optimization.linear.SimplexSolverTest
@@ -275,8 +276,9 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         }
 
         public double getValue() {
-            Access1D<?> tmpAccess = Access1D.wrap(this.getPoint());
-            return myObjFunc.getObjectiveFunction().invoke(Access1D.asPrimitive1D(tmpAccess)) + myObjFunc.getConstant();
+            Access1D<?> tmpAccess = Primitive1D.of(this.getPoint());
+            final Access1D<?> access = tmpAccess;
+            return myObjFunc.getObjectiveFunction().invoke((Access1D<Double>) Primitive1D.wrap(access)) + myObjFunc.getConstant();
         }
 
         double[] getPoint() {

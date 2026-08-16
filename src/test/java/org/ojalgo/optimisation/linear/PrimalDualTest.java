@@ -24,6 +24,7 @@ package org.ojalgo.optimisation.linear;
 import static org.ojalgo.function.constant.BigMath.*;
 
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -63,8 +64,8 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
 
         TestUtils.assertEquals(primal.getValue(), dual.getValue());
 
-        Access1D<?> primalMultipliers = primal.getMultipliers().get();
-        Access1D<?> dualMultipliers = dual.getMultipliers().get();
+        Access1D<?> primalMultipliers = primal.getDualSolution().map(Supplier::get).get();
+        Access1D<?> dualMultipliers = dual.getDualSolution().map(Supplier::get).get();
 
         for (int i = 0; i < primal.size(); i++) {
             TestUtils.assertEquals(primal.doubleValue(i), dualMultipliers.doubleValue(i));
@@ -122,10 +123,10 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
             BasicLogger.debug("Primal   Store: {}", primStoreResult);
             BasicLogger.debug("Dual     Store: {}", dualStoreResult);
 
-            BasicLogger.debug("Primal Tableau multipliers: {}", primTablResult.getMultipliers().get());
-            BasicLogger.debug("Dual   Tableau multipliers: {}", dualTablResult.getMultipliers().get());
-            BasicLogger.debug("Primal   Store multipliers: {}", primStoreResult.getMultipliers().get());
-            BasicLogger.debug("Dual     Store multipliers: {}", dualStoreResult.getMultipliers().get());
+            BasicLogger.debug("Primal Tableau multipliers: {}", primTablResult.getDualSolution().map(Supplier::get).get());
+            BasicLogger.debug("Dual   Tableau multipliers: {}", dualTablResult.getDualSolution().map(Supplier::get).get());
+            BasicLogger.debug("Primal   Store multipliers: {}", primStoreResult.getDualSolution().map(Supplier::get).get());
+            BasicLogger.debug("Dual     Store multipliers: {}", dualStoreResult.getDualSolution().map(Supplier::get).get());
         }
 
         TestUtils.assertStateAndSolution(modResult, primTablResult);

@@ -746,16 +746,27 @@ final class RevisedStore extends SimplexStore {
         if (Math.abs(pivotElement) > 1e-9) {
 
             double w_p = edgeWeights[p];
+            double largest = ONE;
 
             for (int i = 0; i < included.length; i++) {
 
                 if (i != p) {
                     double ratio = y[i] / pivotElement;
-                    edgeWeights[i] += ratio * ratio * w_p;
+                    double candidate = ratio * ratio * w_p;
+                    if (candidate > edgeWeights[i]) {
+                        edgeWeights[i] = candidate;
+                    }
+                    if (edgeWeights[i] > largest) {
+                        largest = edgeWeights[i];
+                    }
                 }
             }
 
-            edgeWeights[p] = ONE;
+            edgeWeights[p] = Math.max(w_p / (pivotElement * pivotElement), ONE);
+            if (edgeWeights[p] > largest) {
+                largest = edgeWeights[p];
+            }
+            this.resetEdgeWeightsIfDegraded(largest);
         }
     }
 
@@ -769,6 +780,7 @@ final class RevisedStore extends SimplexStore {
         if (Math.abs(pivotElement) > 1e-9) {
 
             double w_p = edgeWeights[p];
+            double largest = ONE;
 
             for (int je = 0; je < excluded.length; je++) {
 
@@ -777,13 +789,23 @@ final class RevisedStore extends SimplexStore {
                     // Skip artificial variables in edge weight updates to match doExclTranspMult optimization
                     if (!this.isArtificial(column)) {
                         double ratio = a[je] / pivotElement;
-                        edgeWeights[je] += ratio * ratio * w_p;
+                        double candidate = ratio * ratio * w_p;
+                        if (candidate > edgeWeights[je]) {
+                            edgeWeights[je] = candidate;
+                        }
+                        if (edgeWeights[je] > largest) {
+                            largest = edgeWeights[je];
+                        }
                     }
                     // Artificial variables keep their current edge weight (typically 1.0)
                 }
             }
 
-            edgeWeights[p] = ONE;
+            edgeWeights[p] = Math.max(w_p / (pivotElement * pivotElement), ONE);
+            if (edgeWeights[p] > largest) {
+                largest = edgeWeights[p];
+            }
+            this.resetEdgeWeightsIfDegraded(largest);
         }
     }
 

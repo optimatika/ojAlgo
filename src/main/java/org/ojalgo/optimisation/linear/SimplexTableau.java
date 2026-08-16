@@ -594,16 +594,27 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
         if (Math.abs(pivotElement) > 1e-9) {
 
             double w_p = edgeWeights[p];
+            double largest = ONE;
 
             for (int i = 0; i < included.length; i++) {
 
                 if (i != p) {
                     double ratio = this.doubleValue(i, j) / pivotElement;
-                    edgeWeights[i] += ratio * ratio * w_p;
+                    double candidate = ratio * ratio * w_p;
+                    if (candidate > edgeWeights[i]) {
+                        edgeWeights[i] = candidate;
+                    }
+                    if (edgeWeights[i] > largest) {
+                        largest = edgeWeights[i];
+                    }
                 }
             }
 
-            edgeWeights[p] = ONE;
+            edgeWeights[p] = Math.max(w_p / (pivotElement * pivotElement), ONE);
+            if (edgeWeights[p] > largest) {
+                largest = edgeWeights[p];
+            }
+            this.resetEdgeWeightsIfDegraded(largest);
         }
     }
 
@@ -618,16 +629,27 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
         if (Math.abs(pivotElement) > 1e-9) {
 
             double w_p = edgeWeights[p];
+            double largest = ONE;
 
             for (int je = 0; je < excluded.length; je++) {
 
                 if (je != p) {
                     double ratio = this.doubleValue(i, excluded[je]) / pivotElement;
-                    edgeWeights[je] += ratio * ratio * w_p;
+                    double candidate = ratio * ratio * w_p;
+                    if (candidate > edgeWeights[je]) {
+                        edgeWeights[je] = candidate;
+                    }
+                    if (edgeWeights[je] > largest) {
+                        largest = edgeWeights[je];
+                    }
                 }
             }
 
-            edgeWeights[p] = ONE;
+            edgeWeights[p] = Math.max(w_p / (pivotElement * pivotElement), ONE);
+            if (edgeWeights[p] > largest) {
+                largest = edgeWeights[p];
+            }
+            this.resetEdgeWeightsIfDegraded(largest);
         }
     }
 

@@ -110,7 +110,7 @@ abstract class SimplexStore {
             } else if (Boolean.FALSE.equals(options.sparse)) {
                 return new DenseTableau(structure);
             } else {
-                if ((size > 2_400_000L && ratio > 3.5) || size >= 25_000_000L || ratio >= 11.0) {
+                if (size > 1_000_000L && ratio > 3.6 || size >= 25_000_000L || ratio >= 11.0) {
                     return new RevisedStore(structure);
                 } else {
                     return new DenseTableau(structure);
@@ -146,6 +146,8 @@ abstract class SimplexStore {
      * Either the primal or dual devex edge weights, depending on the algorithm used. Sized so that it can
      * hold either.
      */
+    private static final double DEVEX_LIMIT = 1E8;
+
     final double[] edgeWeights;
     /**
      * Optional Ruiz-style scaling installed by the concrete store in {@link #doneBuilding()}. When non-null,
@@ -708,6 +710,19 @@ abstract class SimplexStore {
 
     void resetEdgeWeights() {
         Arrays.fill(edgeWeights, ONE);
+    }
+
+    /**
+     * Devex reference weights are approximations that only ever grow between reference framework restarts.
+     * Without a restart they degrade without bound - on QAP8 they reached ~1E304, at which point the
+     * (infeasibility * infeasibility) / weight pricing score underflows to zero for every candidate and the
+     * dual simplex stops selecting any exiting variable. Restarting when the largest weight passes this
+     * limit is the standard remedy.
+     */
+    final void resetEdgeWeightsIfDegraded(final double largest) {
+        if (largest > DEVEX_LIMIT) {
+            this.resetEdgeWeights();
+        }
     }
 
     final void scaleBounds(final double[] scalars) {

@@ -122,9 +122,10 @@ final class SimplexTableauSolver extends LinearSolver {
      */
     private static final boolean ADJUSTED_CONSTRAINTS = true;
     /**
-     * Should the objective's linear coefficients be read in their numerically-adjusted form? Scaling the
-     * cost row keeps reduced-cost magnitudes within the simplex's absolute tolerances. The reported value
-     * and reduced costs are un-scaled at the result boundary via {@code LinearStructure.getObjectiveAdjustmentFactor()}.
+     * Should the objective's linear coefficients be read in their numerically-adjusted form? Scaling the cost
+     * row keeps reduced-cost magnitudes within the simplex's absolute tolerances. The reported value and
+     * reduced costs are un-scaled at the result boundary via
+     * {@code LinearStructure.getObjectiveAdjustmentFactor()}.
      */
     private static final boolean ADJUSTED_OBJECTIVE = true;
 
@@ -256,7 +257,8 @@ final class SimplexTableauSolver extends LinearSolver {
 
         for (IntIndex key : objective.getLinearKeySet()) {
 
-            double tmpFactor = model.getOptimisationSense() == Optimisation.Sense.MAX ? -objective.doubleValue(key, ADJUSTED_OBJECTIVE) : objective.doubleValue(key, ADJUSTED_OBJECTIVE);
+            double tmpFactor = model.getOptimisationSense() == Optimisation.Sense.MAX ? -objective.doubleValue(key, ADJUSTED_OBJECTIVE)
+                    : objective.doubleValue(key, ADJUSTED_OBJECTIVE);
 
             int tmpPosInd = model.indexOfPositiveVariable(key);
             if (tmpPosInd >= 0) {
@@ -512,7 +514,7 @@ final class SimplexTableauSolver extends LinearSolver {
         SimplexTableauSolver solver = new SimplexTableauSolver(tableau, options);
 
         Result result = solver.solve();
-        Access1D<?> multiplierNumbers = result.getMultipliers().get();
+        Access1D<?> multiplierNumbers = result.getDualSolution().map(Supplier::get).get();
 
         State retState = result.getState();
         if (retState == State.UNBOUNDED) {
@@ -622,7 +624,7 @@ final class SimplexTableauSolver extends LinearSolver {
         LinearSolver solver = new SimplexTableauSolver(tableau, options);
 
         Result result = solver.solve();
-        Access1D<?> multiplierNumbers = result.getMultipliers().get();
+        Access1D<?> multiplierNumbers = result.getDualSolution().map(Supplier::get).get();
 
         State retState = result.getState();
 

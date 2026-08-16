@@ -21,7 +21,6 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
@@ -33,18 +32,18 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * The CUTE/netlib collection of linear programming test problems
  * (<a href="http://www.numerical.rl.ac.uk/cute/netlib.html">www.numerical.rl.ac.uk/cute/netlib.html</a>), an
- * industry-standard benchmark suite. Each test corresponds to one SIF file under
- * {@code src/test/resources/optimisation/netlib/}.
+ * industry-standard benchmark suite. Each test corresponds to one SIF file supplied by the
+ * {@code optimisation-models} test dependency, under {@code optimisation/netlib/} on the classpath. Models
+ * that dependency does not ship have no test here.
  * <p>
  * Per-problem expected min/max values were verified with CPLEX or OR-Tools (GLOP). Per-problem javadoc lists
  * the constraint matrix size and non-zero count from the netlib README's PROBLEM SUMMARY TABLE, any
  * variable-bound or constraint-range markers (B/R/BR), the bound types declared in the SIF (UP/LO/FX/FR), and
  * the published optimal value.
  * <ul>
- * <li>{@code @Disabled} — neither CPLEX nor OR-Tools produced a reference solution, so we have nothing to
- * compare against.
  * <li>{@code @Tag("slow")} — solves but takes too long to run as a default unit test.
- * <li>{@code @Tag("unstable")} — solves but the answer differs from CPLEX/OR-Tools.
+ * <li>{@code @Tag("unstable")} — either doesn't solve at all or solves but the answer differs from
+ * CPLEX/OR-Tools.
  * </ul>
  *
  * @author apete
@@ -292,16 +291,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
         CuteNetlibCase.doTest("CRE-A.SIF", "2.3595407060971607E7", "4.000288201473081E7", ACCURACY);
     }
 
-    /**
-     * CRE-B.<br>
-     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
-     */
-    @Test
-    @Tag("slow")
-    @Tag("unstable")
-    public void testCRE_B() {
-        CuteNetlibCase.doTest("CRE-B.SIF", "2.3129639886832364E7", "7.634368362305094E7", ACCURACY);
-    }
 
     /**
      * CRE-C — 3069 rows × 3678 columns.<br>
@@ -312,16 +301,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
         CuteNetlibCase.doTest("CRE-C.SIF", "2.5275116140880212E7", "3.762512696726111E7", ACCURACY);
     }
 
-    /**
-     * CRE-D.<br>
-     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
-     */
-    @Test
-    @Tag("slow")
-    @Tag("unstable")
-    public void testCRE_D() {
-        CuteNetlibCase.doTest("CRE-D.SIF", "2.4454969764549244E7", "7.373382453297935E7", ACCURACY);
-    }
 
     /**
      * CYCLE — 1904 rows × 2857 columns, 21322 non-zeros.<br>
@@ -349,7 +328,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * Optimal value: 1.2278423615E+05.<br>
      */
     @Test
-    @Tag("unstable")
+    @Tag("slow")
     public void testD2Q06C() {
         CuteNetlibCase.doTest("D2Q06C.SIF", "122784.21081418857", null, ACCURACY);
     }
@@ -382,17 +361,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
         CuteNetlibCase.doTest("DEGEN3.SIF", "-987.2940000000001", "-876.2800000000008", ACCURACY);
     }
 
-    /**
-     * DFL001 — 6072 rows × 12230 columns, 41873 non-zeros.<br>
-     * Has variable bounds (UP).<br>
-     * Estimated optimal value: 1.12664E+07.<br>
-     */
-    @Test
-    @Tag("slow")
-    @Tag("unstable")
-    public void testDFL001() {
-        CuteNetlibCase.doTest("DFL001.SIF", "1.126639604667184E7", null, ACCURACY);
-    }
 
     /**
      * E226 — 224 rows × 282 columns, 2767 non-zeros.<br>
@@ -452,28 +420,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
         CuteNetlibCase.doTest("FIT1P.SIF", "9146.378092420955", null, ACCURACY);
     }
 
-    /**
-     * FIT2D — 26 rows × 10500 columns, 138018 non-zeros.<br>
-     * Has variable bounds (UP).<br>
-     * Optimal value: -6.8464293294E+04.<br>
-     */
-    @Test
-    @Tag("slow")
-    public void testFIT2D() {
-        CuteNetlibCase.doTest("FIT2D.SIF", "-68464.29329383196", "393548.6499999999", ACCURACY);
-    }
 
-    /**
-     * FIT2P — 3001 rows × 13525 columns, 60784 non-zeros.<br>
-     * Has variable bounds (UP).<br>
-     * Optimal value: 6.8464293232E+04.<br>
-     */
-    @Test
-    @Tag("slow")
-    @Tag("unstable")
-    public void testFIT2P() {
-        CuteNetlibCase.doTest("FIT2P.SIF", "68464.29329383207", null, ACCURACY);
-    }
 
     /**
      * FORPLAN — 162 rows × 421 columns, 4916 non-zeros.<br>
@@ -524,7 +471,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * RHS section is empty in the original SIF.<br>
      */
     @Test
-    @Tag("unstable")
     public void testGREENBEB() {
         CuteNetlibCase.doTest("GREENBEB.SIF", "-4302260.261206587", null, ACCURACY);
     }
@@ -588,36 +534,8 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
         CuteNetlibCase.doTest("KEN-07.SIF", "-6.795204433816869E8", "-1.61949281194431E8", ACCURACY);
     }
 
-    /**
-     * KEN-11.<br>
-     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
-     */
-    @Test
-    @Tag("slow")
-    public void testKEN_11() {
-        CuteNetlibCase.doTest("KEN-11.SIF", "-6.972382262519971E9", "-1.287957080545934E9", ACCURACY);
-    }
 
-    /**
-     * KEN-13.<br>
-     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
-     */
-    @Test
-    @Tag("slow")
-    @Tag("unstable")
-    public void testKEN_13() {
-        CuteNetlibCase.doTest("KEN-13.SIF", "-1.0257394789482431E10", "-2.241281190609764E9", ACCURACY);
-    }
 
-    /**
-     * KEN-18.<br>
-     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
-     */
-    @Test
-    @Disabled
-    public void testKEN_18() {
-        CuteNetlibCase.doTest("KEN-18.SIF", "1234567890", "1234567890", ACCURACY);
-    }
 
     /**
      * LOTFI — 154 rows × 308 columns, 1086 non-zeros.<br>
@@ -643,7 +561,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * Optimal value: 1.4971851665E+06.<br>
      */
     @Test
-    @Tag("slow")
     public void testMAROS_R7() {
         CuteNetlibCase.doTest("MAROS-R7.SIF", "1497185.1664800502", null, ACCURACY);
     }
@@ -668,46 +585,9 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
         CuteNetlibCase.doTest("NESM.SIF", "1.4076036487562722E7", "3.6088214327411644E7", ACCURACY);
     }
 
-    /**
-     * OSA-07.<br>
-     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
-     */
-    @Test
-    @Tag("slow")
-    public void testOSA_07() {
-        CuteNetlibCase.doTest("OSA-07.SIF", "535722.517299352", "4332086.205299969", ACCURACY);
-    }
 
-    /**
-     * OSA-14.<br>
-     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
-     */
-    @Test
-    @Tag("slow")
-    public void testOSA_14() {
-        CuteNetlibCase.doTest("OSA-14.SIF", "1106462.8447362552", "9377699.405100001", ACCURACY);
-    }
 
-    /**
-     * OSA-30.<br>
-     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
-     */
-    @Test
-    @Tag("slow")
-    public void testOSA_30() {
-        CuteNetlibCase.doTest("OSA-30.SIF", "2142139.873209757", "1.78441602883E7", ACCURACY);
-    }
 
-    /**
-     * OSA-60.<br>
-     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
-     */
-    @Test
-    @Tag("slow")
-    @Tag("unstable")
-    public void testOSA_60() {
-        CuteNetlibCase.doTest("OSA-60.SIF", "4044072.503163047", "4.25114540365E7", ACCURACY);
-    }
 
     /**
      * PDS-02 — 2954 rows × 7535 columns.<br>
@@ -718,38 +598,8 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
         CuteNetlibCase.doTest("PDS-02.SIF", "2.885786201E10", "2.931365171E10", ACCURACY);
     }
 
-    /**
-     * PDS-06.<br>
-     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
-     */
-    @Test
-    @Tag("slow")
-    @Tag("unstable")
-    public void testPDS_06() {
-        CuteNetlibCase.doTest("PDS-06.SIF", "2.77610376E10", "2.931366991E10", ACCURACY);
-    }
 
-    /**
-     * PDS-10.<br>
-     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
-     */
-    @Test
-    @Tag("slow")
-    @Tag("unstable")
-    public void testPDS_10() {
-        CuteNetlibCase.doTest("PDS-10.SIF", "2.6727094976E10", "2.931368811E10", ACCURACY);
-    }
 
-    /**
-     * PDS-20.<br>
-     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
-     */
-    @Test
-    @Tag("slow")
-    @Tag("unstable")
-    public void testPDS_20() {
-        CuteNetlibCase.doTest("PDS-20.SIF", "2.382165864E10", "2.931372451E10", ACCURACY);
-    }
 
     /**
      * PEROLD — 626 rows × 1376 columns, 6026 non-zeros.<br>
@@ -768,7 +618,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      */
     @Test
     @Tag("slow")
-    @Tag("unstable")
     public void testPILOT() {
         CuteNetlibCase.doTest("PILOT.SIF", "-557.4897292730852", "-422.4724550733185", ACCURACY);
     }
@@ -813,7 +662,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      */
     @Test
     @Tag("slow")
-    @Tag("unstable")
     public void testPILOT87() {
         CuteNetlibCase.doTest("PILOT87.SIF", "301.7103473330999", null, ACCURACY);
     }
@@ -824,7 +672,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * Optimal value: -4.4972761882E+03.<br>
      */
     @Test
-    @Tag("unstable")
     public void testPILOTNOV() {
         CuteNetlibCase.doTest("PILOTNOV.SIF", "-4497.27618821887", "-957.3524818279784", ACCURACY);
     }
@@ -840,17 +687,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
         CuteNetlibCase.doTest("QAP12.SIF", "522.8943505591718", "1104.1482908677572", ACCURACY);
     }
 
-    /**
-     * QAP15 — 6331 rows × 22275 columns, 110700 non-zeros.<br>
-     * Optimal value: 1.0409940410E+03.<br>
-     * Non-zero count not reported in the netlib summary table.<br>
-     */
-    @Test
-    @Tag("slow")
-    @Tag("unstable")
-    public void testQAP15() {
-        CuteNetlibCase.doTest("QAP15.SIF", "1040.9940409587314", "2109.777554651187", ACCURACY);
-    }
 
     /**
      * QAP8 — 913 rows × 1632 columns, 8304 non-zeros.<br>
@@ -858,7 +694,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * Non-zero count not reported in the netlib summary table.<br>
      */
     @Test
-    @Tag("unstable")
     public void testQAP8() {
         CuteNetlibCase.doTest("QAP8.SIF", "2.0350000000E+02", null, ACCURACY);
     }
@@ -1183,17 +1018,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
         CuteNetlibCase.doTest("STOCFOR2.SIF", "-39024.4085378819", null, ACCURACY);
     }
 
-    /**
-     * STOCFOR3 — 16676 rows × 15695 columns, 74004 non-zeros.<br>
-     * Optimal value: -3.9976661576E+04.<br>
-     * Non-zero count not reported in the netlib summary table.<br>
-     */
-    @Test
-    @Tag("slow")
-    @Tag("unstable")
-    public void testSTOCFOR3() {
-        CuteNetlibCase.doTest("STOCFOR3.SIF", "-39976.78394364959", null, ACCURACY);
-    }
 
     /**
      * TRUSS — 1001 rows × 8806 columns, 36642 non-zeros.<br>
@@ -1201,7 +1025,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * Non-zero count not reported in the netlib summary table.<br>
      */
     @Test
-    @Tag("unstable")
     public void testTRUSS() {
         CuteNetlibCase.doTest("TRUSS.SIF", "458815.84718561685", null, ACCURACY);
     }
