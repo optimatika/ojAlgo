@@ -63,6 +63,29 @@ public class TestBasicMIP extends OptimisationIntegerTests implements TestBasic 
     }
 
     /**
+     * GitHub issue #682: A feasible binary model incorrectly reported as INFEASIBLE when GMI root cuts are
+     * active. Four binary variables, three constraints. Known optimal maximisation solution is
+     * {alternative=0, first=1, second=1, active=1} with objective 10.
+     */
+    static OptimisationCase caseGitHub682() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable alternative = model.newVariable("alternative").binary().weight(7);
+        Variable first = model.newVariable("first").binary().weight(3);
+        Variable second = model.newVariable("second").binary().weight(7);
+        Variable active = model.newVariable("active").binary();
+
+        model.addExpression("group-min").lower(0).set(first, 1).set(second, 1).set(active, -2);
+        model.addExpression("group-max").upper(0).set(first, 1).set(second, 1).set(active, -10);
+        model.addExpression("choose-one").level(1).set(alternative, 1).set(first, 1);
+
+        Result result = Result.of(10.0, State.OPTIMAL, 0.0, 1.0, 1.0, 1.0);
+
+        return OptimisationCase.of(model, Optimisation.Sense.MAX, result);
+    }
+
+    /**
      * Simple MIP: minimize x + 2y subject to x + y >= 1, x, y binary. The optimal solution is x = 1, y = 0
      * with objective value 1.
      */
@@ -83,6 +106,14 @@ public class TestBasicMIP extends OptimisationIntegerTests implements TestBasic 
     @Test
     public void testBranchAndBoundSubSolverTest() {
         OptimisationCase testCase = TestBasicMIP.caseBranchAndBoundSubSolverTest();
+        for (Integration<?> integration : this.integrations()) {
+            testCase.assertResult(integration);
+        }
+    }
+
+    @Test
+    public void testGitHub682() {
+        OptimisationCase testCase = TestBasicMIP.caseGitHub682();
         for (Integration<?> integration : this.integrations()) {
             testCase.assertResult(integration);
         }

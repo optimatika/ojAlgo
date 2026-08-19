@@ -153,6 +153,36 @@ public class GeneratedCutTest extends OptimisationIntegerTests implements ModelF
     }
 
     /**
+     * GitHub issue #682: A feasible binary model is incorrectly reported as INFEASIBLE when GMI root cuts are
+     * active. The model has four binary variables and three constraints. The known optimal solution for
+     * maximisation is {alternative=0, first=1, second=1, active=1} with objective 10.
+     * <p>
+     * The LP relaxation optimum is at a vertex where the only fractional integer variable generates a GMI cut
+     * that incorrectly eliminates the feasible region. Disabling GMI cuts produces the correct result.
+     */
+    @Test
+    public void testGitHub682() {
+
+        OptimisationCase testCase = TestBasicMIP.caseGitHub682();
+
+        GeneratedCutTest.doTest(testCase.model, null, testCase.result);
+    }
+
+    /**
+     * Same model as {@link #testGitHub682()} but with GMI cuts disabled. This verifies that the solver
+     * produces the correct result through branching alone (equivalent to v57.0.0 behaviour).
+     */
+    @Test
+    public void testGitHub682NoCuts() {
+
+        OptimisationCase testCase = TestBasicMIP.caseGitHub682();
+
+        testCase.model.options.integer(IntegerStrategy.DEFAULT.withGMICutConfiguration(null));
+
+        GeneratedCutTest.doTest(testCase.model, null, testCase.result);
+    }
+
+    /**
      * Verify cut generation with a model that has variables with non-zero lower bounds. The GomorySolver
      * always uses cuts rather than branching, so it reliably exercises the cut generation path. Combined with
      * non-zero lower bounds this verifies that shift handling in cut generation is correct.

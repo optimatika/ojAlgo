@@ -1174,7 +1174,7 @@ public class Expression extends ModelEntity<Expression> {
             this.setInfeasible();
         }
 
-        myInteger = Boolean.TRUE;
+        myInteger = Boolean.valueOf(maxScale <= 0);
     }
 
     final Expression doMixedIntegerRounding() {

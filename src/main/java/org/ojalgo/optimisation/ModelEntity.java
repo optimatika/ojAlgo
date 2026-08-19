@@ -570,10 +570,11 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     abstract int deriveAdjustmentExponent();
 
     /**
-     * If necessary this method should first determine if this {@link ModelEntity} is "integer" or not.
-     * <P>
-     * If it is, then verify if all variable factors are integers or if there exists a simple scalar that will
-     * make it so. If so, the lower/upper limits are "integer rounded".
+     * If all referenced variables are integer, attempt to tighten the lower/upper limits by rounding them to
+     * the nearest multiple of the coefficients' GCD. The entity is marked "integer" only when all
+     * coefficients are themselves integers (the expression is guaranteed to evaluate to an integer for any
+     * integer variable assignment). When the coefficients share a non-integer GCD the bounds are still
+     * tightened but the entity is not marked integer.
      */
     abstract void doIntegerRounding();
 
