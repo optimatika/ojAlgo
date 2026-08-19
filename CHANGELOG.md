@@ -11,6 +11,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [57.1.1] – 2026-08-19
+
 ### Added
 
 #### org.ojalgo.optimisation
@@ -25,7 +27,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 #### org.ojalgo.optimisation
 
-- The `IntegerStrategy#getWorkerPriorities` now that an int parallelism parameter as input.
+- The `IntegerStrategy#getWorkerPriorities` now takes an int parallelism parameter as input.
 
 ### Fixed
 
