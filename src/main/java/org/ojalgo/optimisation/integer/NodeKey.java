@@ -117,7 +117,6 @@ public final class NodeKey implements Comparable<NodeKey> {
     private final int[] myLowerBounds;
     private final boolean mySignChanged;
     private final int[] myUpperBounds;
-    // Indicates whether this node was created by branching UP (true) or DOWN (false)
     private final boolean myUpperBranch;
 
     private NodeKey(final int[] lowerBounds, final int[] upperBounds, final long parentSequenceNumber, final int parentDepth, final int integerIndexBranchedOn,
@@ -141,6 +140,27 @@ public final class NodeKey implements Comparable<NodeKey> {
         myUpperBranch = upperBranch;
 
         myIntArrayPool = pool;
+    }
+
+    private NodeKey(final NodeKey source, final int[] lowerBounds, final int[] upperBounds) {
+
+        super();
+
+        sequence = source.sequence;
+
+        myLowerBounds = lowerBounds;
+        myUpperBounds = upperBounds;
+
+        parent = source.parent;
+        depth = source.depth;
+        index = source.index;
+        displacement = source.displacement;
+        objective = source.objective;
+
+        mySignChanged = source.mySignChanged;
+        myUpperBranch = source.myUpperBranch;
+
+        myIntArrayPool = source.myIntArrayPool;
     }
 
     NodeKey(final ExpressionsBasedModel integerModel) {
@@ -182,7 +202,7 @@ public final class NodeKey implements Comparable<NodeKey> {
         objective = NaN;
 
         mySignChanged = false;
-        myUpperBranch = false; // Root node: no direction
+        myUpperBranch = false;
     }
 
     @Override
@@ -469,25 +489,24 @@ public final class NodeKey implements Comparable<NodeKey> {
         }
     }
 
-    /**
-     * Raise the lower bound on integer variable {@code idx} to {@code newLower} if that is strictly tighter;
-     * never loosens. NodeKeys are otherwise treated as immutable (children get new instances) - this mutator
-     * is intended for the root-phase probing pass before any worker can see the NodeKey.
-     */
-    void tightenLower(final int idx, final int newLower) {
-        if (newLower > myLowerBounds[idx]) {
-            myLowerBounds[idx] = newLower;
+    NodeKey withTightenedLower(final int idx, final int newLower) {
+        if (newLower <= myLowerBounds[idx]) {
+            return this;
         }
+        int[] lbs = this.copyLowerBounds();
+        int[] ubs = this.copyUpperBounds();
+        lbs[idx] = newLower;
+        return new NodeKey(this, lbs, ubs);
     }
 
-    /**
-     * Lower the upper bound on integer variable {@code idx} to {@code newUpper} if that is strictly tighter;
-     * never loosens. See {@link #tightenLower}.
-     */
-    void tightenUpper(final int idx, final int newUpper) {
-        if (newUpper < myUpperBounds[idx]) {
-            myUpperBounds[idx] = newUpper;
+    NodeKey withTightenedUpper(final int idx, final int newUpper) {
+        if (newUpper >= myUpperBounds[idx]) {
+            return this;
         }
+        int[] lbs = this.copyLowerBounds();
+        int[] ubs = this.copyUpperBounds();
+        ubs[idx] = newUpper;
+        return new NodeKey(this, lbs, ubs);
     }
 
 }

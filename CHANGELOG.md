@@ -11,6 +11,19 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Changed
+
+#### org.ojalgo.optimisation
+
+- `NodeKey` is now (completely) immutable. The `tightenLower`/`tightenUpper` mutators have been replaced with `withTightenedLower`/`withTightenedUpper` factory methods that return new instances.
+
+### Fixed
+
+#### org.ojalgo.optimisation
+
+- Fixed integer rounding of constraints whose coefficients share a non-integer GCD. The expression is now marked "integer" only when all coefficients are themselves integers; non-integer GCD cases still tighten bounds but no longer incorrectly flag the expression as integer. (Issue [#682](https://github.com/optimatika/ojAlgo/issues/682))
+- Fixed model-solver desync in the B&B solver. Permanent bound tightenings from reduced-cost fixing and root probing now update both the model and the solver via `enforceBounds`, preventing "obviously infeasible value" warnings after solver regeneration.
+
 ## [57.1.1] – 2026-08-19
 
 ### Added
