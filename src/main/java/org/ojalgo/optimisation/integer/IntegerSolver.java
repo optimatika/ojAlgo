@@ -537,10 +537,10 @@ public final class IntegerSolver extends GenericSolver {
                     // root LP region.
                     if (!downOK) {
                         rootNode.tightenLower(ii, (int) ceilVal);
-                        rootSolver.update(gi, ceilVal, origUpper);
+                        rootNode.enforceBounds(rootSolver, ii, myStrategy);
                     } else if (!upOK) {
                         rootNode.tightenUpper(ii, (int) floorVal);
-                        rootSolver.update(gi, origLower, floorVal);
+                        rootNode.enforceBounds(rootSolver, ii, myStrategy);
                     }
                 }
 
@@ -887,14 +887,14 @@ public final class IntegerSolver extends GenericSolver {
                     int newUpper = lower + maxSteps;
                     if (newUpper < upper) {
                         nodeKey.tightenUpper(i, newUpper);
-                        nodeSolver.update(globalIndex, lower, newUpper);
+                        nodeKey.enforceBounds(nodeSolver, i, strategy);
                     }
                 } else if (Math.abs(value - upper) < 0.5) {
                     int maxSteps = (int) Math.floor(gap / absRC);
                     int newLower = upper - maxSteps;
                     if (newLower > lower) {
                         nodeKey.tightenLower(i, newLower);
-                        nodeSolver.update(globalIndex, newLower, upper);
+                        nodeKey.enforceBounds(nodeSolver, i, strategy);
                     }
                 }
             }

@@ -261,6 +261,26 @@ public final class NodeKey implements Comparable<NodeKey> {
         builder.append(myUpperBounds[idx]);
     }
 
+    private void enforceBounds(final Variable variable, final NodeSolver nodeSolver, final int idx, final boolean signChanged) {
+
+        int lb = myLowerBounds[idx];
+        int ub = myUpperBounds[idx];
+
+        variable.lower(lb != Integer.MIN_VALUE ? BigDecimal.valueOf(lb) : null);
+        variable.upper(ub != Integer.MAX_VALUE ? BigDecimal.valueOf(ub) : null);
+
+        BigDecimal value = variable.getValue();
+        if (value != null) {
+            variable.setValue(value);
+        }
+
+        if (signChanged || !nodeSolver.isInPlaceBoundUpdateSafe()) {
+            nodeSolver.reset();
+        } else {
+            nodeSolver.update(variable);
+        }
+    }
+
     private double feasible(final int idx, final double value, final boolean validate) {
 
         double feasibilityAdjusted = Math.min(Math.max(myLowerBounds[idx], value), myUpperBounds[idx]);
@@ -349,46 +369,21 @@ public final class NodeKey implements Comparable<NodeKey> {
         myIntArrayPool.giveBack(myUpperBounds);
     }
 
-    void enforceBounds(final ExpressionsBasedModel model, final int idx, final ModelStrategy strategy) {
+    void enforceBounds(final NodeSolver nodeSolver, final int idx, final ModelStrategy strategy) {
 
-        BigDecimal lowerBound = this.getLower(idx);
-        BigDecimal upperBound = this.getUpper(idx);
+        Variable variable = nodeSolver.getVariable(strategy.getIndex(idx));
 
-        Variable variable = model.getVariable(strategy.getIndex(idx));
-        variable.lower(lowerBound);
-        variable.upper(upperBound);
+        BigDecimal oldLower = variable.getLowerLimit();
+        BigDecimal oldUpper = variable.getUpperLimit();
+        boolean wasNegated = oldUpper != null && oldUpper.signum() <= 0 && oldLower != null && oldLower.signum() < 0;
+        boolean isNegated = myUpperBounds[idx] <= 0 && myLowerBounds[idx] < 0;
 
-        BigDecimal value = variable.getValue();
-        if (value != null) {
-            // Re-setting will ensure the new bounds are not violated
-            variable.setValue(value);
-        }
+        this.enforceBounds(variable, nodeSolver, idx, wasNegated != isNegated);
     }
 
     void enforceBounds(final NodeSolver nodeSolver, final ModelStrategy strategy) {
-
-        BigDecimal lowerBound = this.getLower(index);
-        BigDecimal upperBound = this.getUpper(index);
-
         Variable variable = nodeSolver.getVariable(strategy.getIndex(index));
-        variable.lower(lowerBound);
-        variable.upper(upperBound);
-
-        BigDecimal value = variable.getValue();
-        if (value != null) {
-            // Re-setting will ensure the new bounds are not violated
-            variable.setValue(value);
-        }
-
-        // A genuine negated-class flip needs a full rebuild. So does every branch of a relaxation that
-        // can't absorb a bound change in place (quadratic / convex): those must rebuild fresh per node —
-        // the historical, numerically-stable behaviour the old over-broad sign-change condition gave
-        // them for free. Only the linear/simplex relaxation takes the in-place update path.
-        if (this.isSignChanged() || !nodeSolver.isInPlaceBoundUpdateSafe()) {
-            nodeSolver.reset();
-        } else {
-            nodeSolver.update(variable);
-        }
+        this.enforceBounds(variable, nodeSolver, index, this.isSignChanged());
     }
 
     boolean equals(final int[] lowerBounds, final int[] upperBounds) {
@@ -456,8 +451,21 @@ public final class NodeKey implements Comparable<NodeKey> {
     }
 
     void setNodeState(final ExpressionsBasedModel model, final ModelStrategy strategy) {
-        for (int i = 0; i < strategy.countIntegerVariables(); i++) {
-            this.enforceBounds(model, i, strategy);
+
+        for (int idx = 0; idx < strategy.countIntegerVariables(); idx++) {
+
+            BigDecimal lowerBound = this.getLower(idx);
+            BigDecimal upperBound = this.getUpper(idx);
+
+            Variable variable = model.getVariable(strategy.getIndex(idx));
+            variable.lower(lowerBound);
+            variable.upper(upperBound);
+
+            BigDecimal value = variable.getValue();
+            if (value != null) {
+                // Re-setting will ensure the new bounds are not violated
+                variable.setValue(value);
+            }
         }
     }
 
