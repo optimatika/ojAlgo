@@ -698,7 +698,7 @@ public final class IntegerSolver extends GenericSolver {
             return myNodeStatistics.abandoned();
         }
 
-        if (this.isLogDebug()) {
+        if (nodePrinter != null && this.isLogDebug()) {
             nodePrinter.println();
             nodePrinter.println("Branch&Bound Node");
             nodePrinter.println(nodeKey.toString());
@@ -714,12 +714,12 @@ public final class IntegerSolver extends GenericSolver {
 
         this.incrementIterationsCount();
 
-        if (this.isLogDebug()) {
+        if (nodePrinter != null && this.isLogDebug()) {
             nodePrinter.println("Node Result: {}", nodeResult);
         }
 
         if (!nodeResult.getState().isOptimal()) {
-            if (this.isLogDebug()) {
+            if (nodePrinter != null && this.isLogDebug()) {
                 nodePrinter.println("Failed to solve node problem - stop this branch!");
                 IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
             }
@@ -735,7 +735,7 @@ public final class IntegerSolver extends GenericSolver {
             return myNodeStatistics.infeasible();
         }
 
-        if (this.isLogDebug()) {
+        if (nodePrinter != null && this.isLogDebug()) {
             nodePrinter.println("Node solved to optimality!");
         }
 
@@ -778,12 +778,12 @@ public final class IntegerSolver extends GenericSolver {
         int branchIntegerIndex = this.identifyNonIntegerVariable(nodeResult, nodeKey, strategy);
 
         if (branchIntegerIndex == -1) {
-            if (this.isLogDebug()) {
+            if (nodePrinter != null && this.isLogDebug()) {
                 nodePrinter.println("Integer solution! Store it among the others, and stop this branch!");
             }
 
             if (!myIntegerModel.validate(nodeResult)) {
-                if (this.isLogDebug()) {
+                if (nodePrinter != null && this.isLogDebug()) {
                     nodePrinter.println("Candidate integer solution is infeasible for the original model. Discarding.");
                     IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
                 }
@@ -797,7 +797,7 @@ public final class IntegerSolver extends GenericSolver {
 
             this.markInteger(nodeKey, tmpIntegerSolutionResult, strategy);
 
-            if (this.isLogDebug()) {
+            if (nodePrinter != null && this.isLogDebug()) {
                 nodePrinter.println(this.getBestResultSoFar().toString());
                 BasicLogger.debug();
                 BasicLogger.debug(this.toString());
@@ -809,14 +809,14 @@ public final class IntegerSolver extends GenericSolver {
             return myNodeStatistics.integer();
 
         }
-        if (this.isLogDebug()) {
+        if (nodePrinter != null && this.isLogDebug()) {
             nodePrinter.println("Not an Integer Solution: " + nodeValue);
         }
 
         double variableValue = nodeResult.doubleValue(strategy.getIndex(branchIntegerIndex));
 
         if (!strategy.isGoodEnough(myBestResultSoFar, nodeValue)) {
-            if (this.isLogDebug()) {
+            if (nodePrinter != null && this.isLogDebug()) {
                 nodePrinter.println("Can't find better integer solutions - stop this branch!");
                 IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
             }
@@ -825,7 +825,7 @@ public final class IntegerSolver extends GenericSolver {
             // return true;
             return myNodeStatistics.exhausted();
         }
-        if (this.isLogDebug()) {
+        if (nodePrinter != null && this.isLogDebug()) {
             nodePrinter.println("Still hope, branching on {} @ {} >>> {}", branchIntegerIndex, variableValue,
                     nodeSolver.getVariable(strategy.getIndex(branchIntegerIndex)));
             IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
