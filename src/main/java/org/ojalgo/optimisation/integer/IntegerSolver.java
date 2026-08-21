@@ -235,6 +235,8 @@ public final class IntegerSolver extends GenericSolver {
 
         this.resetIterationsCount();
 
+        this.generateRootCuts();
+
         NodeKey rootNode = new NodeKey(myIntegerModel);
         ExpressionsBasedModel rootModel = myIntegerModel.snapshot();
         rootNode.setNodeState(rootModel, myStrategy);
@@ -243,6 +245,7 @@ public final class IntegerSolver extends GenericSolver {
 
         NodeSolver rootSolver = rootModel.prepare(mySense, NodeSolver::new);
         AtomicBoolean solverNormalExit = new AtomicBoolean(this.processRoot(rootNode, rootSolver, rootPrinter));
+
         rootNode.dispose();
 
         Map<Comparator<NodeKey>, MultiviewSet<NodeKey>.PrioritisedView> views = new ConcurrentHashMap<>();
@@ -341,43 +344,17 @@ public final class IntegerSolver extends GenericSolver {
         this.markInteger(rootNode, integerResult, myStrategy);
     }
 
-    /**
-     * Dedicated root cut loop — runs GMI cut generation multiple times before branching begins. Bypasses the
-     * full compute() path (pseudo-cost updates, reduced-cost fixing, variable selection) that is unnecessary
-     * at this stage. Stops on: no cuts generated, LP infeasibility, or tailing-off.
-     */
-    private void generateRootCuts(final NodeSolver rootSolver, Optimisation.Result rootResult) {
+    private void generateRootCuts() {
 
-        if (rootResult == null || !rootResult.getState().isOptimal()) {
-            return;
+        ExpressionsBasedModel cutModel = myIntegerModel.snapshot();
+        NodeSolver cutSolver = cutModel.prepare(mySense, NodeSolver::new);
+        Optimisation.Result cutResult = cutSolver.solve(this.getBestEstimate());
+
+        if (cutResult != null && cutResult.getState().isOptimal()) {
+            cutSolver.generateRootCuts(myIntegerModel, 10);
         }
 
-        if (myStrategy.getGMICutConfiguration() == null) {
-            return;
-        }
-
-        int maxRounds = 10;
-        double previousObjective = rootResult.getValue();
-
-        for (int round = 0; round < maxRounds; round++) {
-
-            if (!rootSolver.generateCuts(myStrategy)) {
-                break;
-            }
-
-            rootResult = rootSolver.solve(this.getBestEstimate());
-
-            if (rootResult == null || !rootResult.getState().isOptimal()) {
-                break;
-            }
-
-            double currentObjective = rootResult.getValue();
-            double improvement = Math.abs(currentObjective - previousObjective);
-            if (improvement < 1E-6 * (ONE + Math.abs(currentObjective))) {
-                break;
-            }
-            previousObjective = currentObjective;
-        }
+        cutSolver.dispose();
     }
 
     /**
@@ -426,14 +403,7 @@ public final class IntegerSolver extends GenericSolver {
 
     /**
      * Process the root node before workers start. Solves the root LP, runs the strong-branching probe pass to
-     * seed pseudo-costs, then delegates to {@link #compute} which owns the rest of the per-node flow
-     * (validate, {@link ModelStrategy#onNodeSolved}, {@link #identifyNonIntegerVariable},
-     * {@link ModelStrategy#isGoodEnough}, root cut generation via {@code depth == 0}, and the branching
-     * plunge that keeps {@code rootSolver} warm).
-     * <p>
-     * Costs one extra warm LP solve at the root (the upcoming {@code compute} re-solves), in exchange for
-     * keeping {@code compute} the single owner of the B&B flow. The probe pass uses the LP result solved
-     * here; the {@code rootSolver}'s basis is restored to the root LP before handing off.
+     * seed pseudo-costs, then delegates to {@link #compute} for the normal B&B flow.
      */
     private boolean processRoot(final NodeKey originalRootNode, final NodeSolver rootSolver, final RingLogger rootPrinter) {
 
@@ -552,8 +522,6 @@ public final class IntegerSolver extends GenericSolver {
                     rootResult = rootSolver.solve(null);
                 }
             }
-
-            this.generateRootCuts(rootSolver, rootResult);
 
             return this.compute(rootNode, rootSolver, rootPrinter, myStrategy);
 
@@ -844,7 +812,7 @@ public final class IntegerSolver extends GenericSolver {
                 IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
             }
 
-            if (strategy.isCutRatherThanBranch(nodeKey, branchIntegerIndex, variableValue, nodeValue, myBestResultSoFar)) {
+            if (!nodeSolver.isCutRoundDone() && strategy.isCutRatherThanBranch(nodeKey, branchIntegerIndex, variableValue, nodeValue, myBestResultSoFar)) {
                 if (nodeSolver.generateCuts(strategy, nodeKey)) {
                     strategy.onCutSuccess(nodeKey);
                     return this.compute(nodeKey, nodeSolver, nodePrinter, strategy);

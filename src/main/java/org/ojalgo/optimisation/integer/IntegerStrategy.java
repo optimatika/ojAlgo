@@ -152,39 +152,104 @@ public interface IntegerStrategy {
      */
     public static final class GMICutConfiguration {
 
+        public final NumberContext dynanism;
+
+        /**
+         * Minimum cut violation at the current LP solution. A cut that violates the LP point by less than
+         * this amount is too weak to be useful and is discarded. Both SCIP (1e-4) and HiGHS (1e-5) enforce a
+         * similar threshold.
+         */
+        public final NumberContext efficacy;
         /**
          * The minimum fractionality of the integer variable used to generate the cut. Less than this, and the
          * (potential) cut is never generated.
          */
         public final double fractionality;
         /**
-         * After the cut is generated it is transformed to be expresssed in the original model variables. In
+         * After the cut is generated it is transformed to be expressed in the original model variables. In
          * this process the RHS of the cut inequality changes. This parameter controls how much the RHS is
          * allowed to grow in magnitude. If it grows/expands to much the cut is discarded.
          * <p>
          * The cut/constraint violation is always exactly 1 (due to how the cut is generated). That means the
-         * magnitude of the RHS becomes a meassure of the relative cut violation. Allowing large RHS values is
+         * magnitude of the RHS becomes a measure of the relative cut violation. Allowing large RHS values is
          * equivalent to accepting small relative cut violations. The number you specify here is the inverse
          * of the relative cut violation (the absolute value of the max RHS allowed).
          */
         public final BigDecimal violation;
 
+        private final int myMaxCutsCeiling;
+        private final int myMaxCutsDivisor;
+        private final int myMaxCutsFloor;
+        private final int myMaxElementsCeiling;
+        private final int myMaxElementsDivisor;
+        private final int myMaxElementsFloor;
+
         public GMICutConfiguration() {
-            this(PrimitiveMath.ELEVENTH, BigMath.TWELVE);
+            this(NumberContext.of(7), NumberContext.of(6), PrimitiveMath.ELEVENTH, BigMath.TWELVE, 10, 3, 100, 10, 10, 100);
         }
 
-        private GMICutConfiguration(final double newAway, final BigDecimal newExpansion) {
+        private GMICutConfiguration(final NumberContext newDynanism, final NumberContext newEfficacy, final double newAway, final BigDecimal newExpansion,
+                final int newMaxCutsFloor, final int newMaxCutsDivisor, final int newMaxCutsCeiling, final int newMaxElementsFloor,
+                final int newMaxElementsDivisor, final int newMaxElementsCeiling) {
             super();
+            dynanism = newDynanism;
+            efficacy = newEfficacy;
             fractionality = newAway;
             violation = newExpansion;
+            myMaxCutsFloor = newMaxCutsFloor;
+            myMaxCutsDivisor = newMaxCutsDivisor;
+            myMaxCutsCeiling = newMaxCutsCeiling;
+            myMaxElementsFloor = newMaxElementsFloor;
+            myMaxElementsDivisor = newMaxElementsDivisor;
+            myMaxElementsCeiling = newMaxElementsCeiling;
+        }
+
+        public int getMaxCuts(final int nbVariables) {
+            return Math.max(myMaxCutsFloor, Math.min(nbVariables / myMaxCutsDivisor, myMaxCutsCeiling));
+        }
+
+        public int getMaxElements(final int nbVariables) {
+            return Math.max(myMaxElementsFloor, Math.min(nbVariables / myMaxElementsDivisor, myMaxElementsCeiling));
+        }
+
+        public GMICutConfiguration withDynanism(final NumberContext newDynanism) {
+            return new GMICutConfiguration(newDynanism, efficacy, fractionality, violation, myMaxCutsFloor, myMaxCutsDivisor, myMaxCutsCeiling,
+                    myMaxElementsFloor, myMaxElementsDivisor, myMaxElementsCeiling);
+        }
+
+        public GMICutConfiguration withEfficacy(final NumberContext newEfficacy) {
+            return new GMICutConfiguration(dynanism, newEfficacy, fractionality, violation, myMaxCutsFloor, myMaxCutsDivisor, myMaxCutsCeiling,
+                    myMaxElementsFloor, myMaxElementsDivisor, myMaxElementsCeiling);
         }
 
         public GMICutConfiguration withFractionality(final double newFractionality) {
-            return new GMICutConfiguration(Math.min(Math.abs(newFractionality), 0.5), violation);
+            return new GMICutConfiguration(dynanism, efficacy, Math.min(Math.abs(newFractionality), 0.5), violation, myMaxCutsFloor, myMaxCutsDivisor,
+                    myMaxCutsCeiling, myMaxElementsFloor, myMaxElementsDivisor, myMaxElementsCeiling);
+        }
+
+        /**
+         * @param floor   minimum number of cuts accepted regardless of problem size
+         * @param divisor accepted cuts scale as {@code nbVariables / divisor}
+         * @param ceiling absolute maximum number of cuts accepted
+         */
+        public GMICutConfiguration withMaxCuts(final int floor, final int divisor, final int ceiling) {
+            return new GMICutConfiguration(dynanism, efficacy, fractionality, violation, Math.max(1, floor), Math.max(1, divisor), Math.max(1, ceiling),
+                    myMaxElementsFloor, myMaxElementsDivisor, myMaxElementsCeiling);
+        }
+
+        /**
+         * @param floor   minimum number of non-zero coefficients allowed regardless of problem size
+         * @param divisor density limit scales as {@code nbVariables / divisor}
+         * @param ceiling absolute maximum number of non-zero coefficients allowed
+         */
+        public GMICutConfiguration withMaxElements(final int floor, final int divisor, final int ceiling) {
+            return new GMICutConfiguration(dynanism, efficacy, fractionality, violation, myMaxCutsFloor, myMaxCutsDivisor, myMaxCutsCeiling, Math.max(1, floor),
+                    Math.max(1, divisor), Math.max(1, ceiling));
         }
 
         public GMICutConfiguration withViolation(final BigDecimal newViolation) {
-            return new GMICutConfiguration(fractionality, newViolation.abs());
+            return new GMICutConfiguration(dynanism, efficacy, fractionality, newViolation.abs(), myMaxCutsFloor, myMaxCutsDivisor, myMaxCutsCeiling,
+                    myMaxElementsFloor, myMaxElementsDivisor, myMaxElementsCeiling);
         }
 
     }

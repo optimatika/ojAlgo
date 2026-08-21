@@ -11,11 +11,21 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [57.2.0] – 2026-08-31
+
+### Added
+
+#### org.ojalgo.optimisation
+
+- Flow cover cut separator for models with variable upper bound (VUB) structure. Detects `x <= M*y` constraints paired with flow-conservation equalities and generates tightened cuts that replace big-M capacities with local demands. Runs automatically at the root node before branching begins.
+- GMI cut quality filters: efficacy, dynamism, density, and violation thresholds control which Gomory cuts are accepted. Cuts are ranked by efficacy and capped proportionally to problem size. Configurable via `GMICutConfiguration`.
+
 ### Changed
 
 #### org.ojalgo.optimisation
 
 - `NodeKey` is now (completely) immutable. The `tightenLower`/`tightenUpper` mutators have been replaced with `withTightenedLower`/`withTightenedUpper` factory methods that return new instances.
+- `GMICutConfiguration` now exposes `dynanism` and `efficacy` as `NumberContext` fields, with builder methods `withDynanism()`/`withEfficacy()`. Cut count and density limits scale with problem size via `getMaxCuts(int)` and `getMaxElements(int)`, configurable through `withMaxCuts(floor, divisor, ceiling)` and `withMaxElements(floor, divisor, ceiling)`.
 
 ### Fixed
 

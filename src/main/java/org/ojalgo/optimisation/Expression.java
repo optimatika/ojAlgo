@@ -224,21 +224,21 @@ public class Expression extends ModelEntity<Expression> {
      * Will add the value to this variable's factor.
      */
     public final Expression add(final Variable variable, final Comparable<?> value) {
-        return this.doAdd(this.toIntIndex(variable), ModelEntity.toBigDecimal(value));
+        return this.doAdd(variable.getIndex(), ModelEntity.toBigDecimal(value));
     }
 
     /**
      * @see #add(Variable, Comparable)
      */
     public final Expression add(final Variable variable, final double value) {
-        return this.doAdd(this.toIntIndex(variable), BigDecimal.valueOf(value));
+        return this.doAdd(variable.getIndex(), BigDecimal.valueOf(value));
     }
 
     /**
      * @see #add(Variable, Comparable)
      */
     public final Expression add(final Variable variable, final long value) {
-        return this.doAdd(this.toIntIndex(variable), BigDecimal.valueOf(value));
+        return this.doAdd(variable.getIndex(), BigDecimal.valueOf(value));
     }
 
     /**
@@ -332,9 +332,8 @@ public class Expression extends ModelEntity<Expression> {
 
             Variable tmpRowVariable = model.getVariable(tmpKey.row);
             Variable tmpColVariable = model.getVariable(tmpKey.column);
-
-            IntIndex tmpRowKey = this.toIntIndex(tmpRowVariable);
-            IntIndex tmpColKey = this.toIntIndex(tmpColVariable);
+            IntIndex tmpRowKey = tmpRowVariable.getIndex();
+            IntIndex tmpColKey = tmpColVariable.getIndex();
 
             if (fixedVariables.contains(tmpRowKey)) {
 
@@ -500,7 +499,7 @@ public class Expression extends ModelEntity<Expression> {
     }
 
     public final BigDecimal get(final Variable variable) {
-        IntIndex index = this.toIntIndex(variable);
+        IntIndex index = variable.getIndex();
         if (index != null) {
             return this.get(index);
         } else {
@@ -687,21 +686,21 @@ public class Expression extends ModelEntity<Expression> {
      * Will set (replace) the variable's factor to this value
      */
     public final Expression set(final Variable variable, final Comparable<?> value) {
-        return this.doSet(this.toIntIndex(variable), ModelEntity.toBigDecimal(value));
+        return this.doSet(variable.getIndex(), ModelEntity.toBigDecimal(value));
     }
 
     /**
      * @see #set(Variable, Comparable)
      */
     public final Expression set(final Variable variable, final double value) {
-        return this.doSet(this.toIntIndex(variable), BigDecimal.valueOf(value));
+        return this.doSet(variable.getIndex(), BigDecimal.valueOf(value));
     }
 
     /**
      * @see #set(Variable, Comparable)
      */
     public final Expression set(final Variable variable, final long value) {
-        return this.doSet(this.toIntIndex(variable), BigDecimal.valueOf(value));
+        return this.doSet(variable.getIndex(), BigDecimal.valueOf(value));
     }
 
     /**
@@ -938,16 +937,12 @@ public class Expression extends ModelEntity<Expression> {
         return myModel.toIntIndex(index);
     }
 
-    private IntIndex toIntIndex(final Variable variable) {
-        return variable.getIndex();
-    }
-
     private IntRowColumn toIntRowColumn(final int row, final int column) {
         return myModel.toIntRowColumn(row, column);
     }
 
     private IntRowColumn toIntRowColumn(final Variable variable1, final Variable variable2) {
-        return new IntRowColumn(this.toIntIndex(variable1), this.toIntIndex(variable2));
+        return new IntRowColumn(variable1.getIndex(), variable2.getIndex());
     }
 
     private BigDecimal toPositiveFraction(final BigDecimal noninteger) {
@@ -1276,7 +1271,7 @@ public class Expression extends ModelEntity<Expression> {
     }
 
     final boolean includes(final Variable variable) {
-        IntIndex tmpVarInd = this.toIntIndex(variable);
+        IntIndex tmpVarInd = variable.getIndex();
         return myLinear.containsKey(tmpVarInd)
                 || myQuadratic.size() > 0 && myQuadratic.keySet().stream().anyMatch(k -> (k.row == tmpVarInd.index || k.column == tmpVarInd.index));
     }

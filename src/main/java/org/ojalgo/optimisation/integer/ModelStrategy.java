@@ -80,14 +80,6 @@ public abstract class ModelStrategy implements IntegerStrategy {
          * Adaptive cut generation state
          */
         private volatile int myCutFailedStreak = 0;
-        /**
-         * Adaptive cut generation state
-         */
-        private volatile int myCutLastDepth = -1;
-        /**
-         * Adaptive cut generation state
-         */
-        private volatile long myCutNodesSinceLastSuccess = 0L;
         private final int[] myLowerCount;
         /**
          * Pseudo-costs when down
@@ -184,38 +176,11 @@ public abstract class ModelStrategy implements IntegerStrategy {
 
             if (!cutting) {
                 return false;
+            } else if (nodeKey.depth == 0) {
+                return true;
             }
 
-            // Count each branching decision considered for cutting
-            myCutNodesSinceLastSuccess++;
-
-            // Root handled separately
-            if (nodeKey.depth == 0) {
-                return false;
-            }
-
-            if (bestResultSoFar == null) {
-                return false;
-            }
-
-            // Spacing: depth and number of nodes since last successful cut
-            if (myCutLastDepth >= 0 && nodeKey.depth - myCutLastDepth < 5) {
-                return false;
-            }
-            if (myCutNodesSinceLastSuccess < 100) {
-                return false;
-            }
-
-            if (THIRD > nodeKey.getMinimumDisplacement(branchIntegerIndex, variableValue)) {
-                return false;
-            }
-
-            // Back off after repeated failed attempts
-            if (myCutFailedStreak >= 3) {
-                return false;
-            }
-
-            return true;
+            return 0.4 < nodeKey.getMinimumDisplacement(branchIntegerIndex, variableValue);
         }
 
         /**
@@ -257,7 +222,7 @@ public abstract class ModelStrategy implements IntegerStrategy {
         @Override
         protected void onCutFailure() {
             myCutFailedStreak++;
-            if (myCutFailedStreak >= 5) {
+            if (myCutFailedStreak >= 3) {
                 cutting = false; // Permanently disable after several failures
             }
         }
@@ -265,8 +230,6 @@ public abstract class ModelStrategy implements IntegerStrategy {
         /** Called after a successful cut generation attempt. */
         @Override
         protected void onCutSuccess(final NodeKey nodeKey) {
-            myCutNodesSinceLastSuccess = 0L;
-            myCutLastDepth = nodeKey.depth;
             myCutFailedStreak = 0;
         }
 

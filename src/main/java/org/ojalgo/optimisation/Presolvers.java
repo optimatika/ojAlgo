@@ -584,15 +584,6 @@ public abstract class Presolvers {
             upperNew = upperCand;
         }
 
-        if (lowerNew != null && upperNew != null) {
-            BigDecimal level = precision.common(lowerNew, upperNew);
-            if (level != null) {
-                lowerNew = level;
-                upperNew = level;
-                variable.setFixed(level);
-            }
-        }
-
         if (lowerNew != null && variable.isInteger()) {
             lowerNew = lowerNew.setScale(0, RoundingMode.CEILING);
         }
@@ -607,9 +598,10 @@ public abstract class Presolvers {
                 if (level != null) {
                     variable.setFixed(level);
                     return true;
+                } else {
+                    expression.setInfeasible();
+                    return false;
                 }
-                expression.setInfeasible();
-                return false;
             }
 
             BigDecimal level = precision.common(lowerNew, upperNew);

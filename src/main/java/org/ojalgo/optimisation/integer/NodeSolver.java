@@ -23,8 +23,11 @@ package org.ojalgo.optimisation.integer;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -38,10 +41,12 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.IntermediateSolver;
 import org.ojalgo.optimisation.ModelEntity;
 import org.ojalgo.optimisation.UpdatableSolver;
+import org.ojalgo.optimisation.integer.IntegerStrategy.GMICutConfiguration;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.keyvalue.EntryPair;
+import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 
 public final class NodeSolver extends IntermediateSolver {
 
@@ -49,7 +54,6 @@ public final class NodeSolver extends IntermediateSolver {
     private static final NumberContext COEFFICIENT = PRECISION.withMode(RoundingMode.CEILING);
     private static final AtomicInteger COUNTER = new AtomicInteger();
     private static final boolean DEBUG = false;
-    private static final NumberContext DYNANISM = NumberContext.of(8);
     private static final NumberContext LIMIT = PRECISION.withMode(RoundingMode.FLOOR);
     private static final NumberContext PARAMETERS = NumberContext.of(12);
     private static final NumberContext SCALE = NumberContext.of(14);
@@ -62,13 +66,33 @@ public final class NodeSolver extends IntermediateSolver {
      */
     private boolean[] myCachedIntegers = null;
     private ExpressionsBasedModel.EntityMap myCachedIntegersFor = null;
+    private FlowCoverSeparator myFlowCoverSeparator = null;
+    private boolean myCutRoundDone = false;
     private Boolean myInPlaceBoundUpdateSafe = null;
 
     NodeSolver(final ExpressionsBasedModel model) {
         super(model);
     }
 
-    private boolean doGenerateCuts(final ModelStrategy strategy, final NodeKey nodeKey, final ExpressionsBasedModel target) {
+    private boolean doGenerateFlowCoverCuts(final ExpressionsBasedModel target) {
+
+        if (!this.isSolved()) {
+            return false;
+        }
+
+        Result result = this.getResult();
+
+        long nbConstr = target.constraints().count();
+
+        if (myFlowCoverSeparator == null) {
+            myFlowCoverSeparator = new FlowCoverSeparator(this.getModel());
+        }
+        myFlowCoverSeparator.generateCuts(result, target);
+
+        return nbConstr != target.constraints().count();
+    }
+
+    private boolean doGenerateGMICuts(final IntegerStrategy.GMICutConfiguration configuration, final ExpressionsBasedModel target) {
 
         if (!this.isSolved()) {
             return false;
@@ -92,11 +116,8 @@ public final class NodeSolver extends IntermediateSolver {
             if (entityMap != null) {
 
                 int nbProblVars = entityMap.countModelVariables();
-
                 int nbSlackVars = entityMap.countSlackVariables();
 
-                // entityMap.integers(model) walks every model variable + every slack expression; cache it
-                // by entityMap identity. The flags only change when the underlying solver is regenerated.
                 boolean[] integers;
                 if (myCachedIntegersFor == entityMap && myCachedIntegers != null) {
                     integers = myCachedIntegers;
@@ -106,7 +127,12 @@ public final class NodeSolver extends IntermediateSolver {
                     myCachedIntegersFor = entityMap;
                 }
 
-                Collection<Equation> potentialCuts = updatable.generateCutCandidates(strategy.getGMICutConfiguration().fractionality, integers);
+                Collection<Equation> potentialCuts = updatable.generateCutCandidates(configuration.fractionality, integers);
+
+                int maxCuts = configuration.getMaxCuts(nbProblVars);
+                int maxElements = configuration.getMaxElements(nbProblVars);
+
+                List<KeyedPrimitive<String>> acceptedEfficacies = new ArrayList<>();
 
                 for (Equation equation : potentialCuts) {
 
@@ -182,11 +208,7 @@ public final class NodeSolver extends IntermediateSolver {
 
                     BigDecimal cRHS = cut.getLowerLimit();
 
-                    // The cut violation is always 1.0
-                    // The relative violation is 1.0 relative to the RHS
-                    // We only need to check that the RHS is not too large
-                    // The violation configuration property is the largest allowed RHS
-                    BigDecimal violation = strategy.getGMICutConfiguration().violation;
+                    BigDecimal violation = configuration.violation;
                     if (cRHS.abs().compareTo(violation) > 0) {
                         target.removeExpression(name);
                         if (DEBUG) {
@@ -218,27 +240,49 @@ public final class NodeSolver extends IntermediateSolver {
                     cRHS = LIMIT.enforce(cRHS);
                     cut.lower(cRHS);
 
+                    BigDecimal cEvaluated = cut.evaluate(result);
+                    BigDecimal cDiff = cRHS.subtract(cEvaluated);
+
                     if (DEBUG) {
                         BigDecimal cRatio = MissingMath.divide(cLargest, cSmallest);
-                        BigDecimal cEvaluated = cut.evaluate(result);
-                        BasicLogger.debug(1, "Largest={}, Smallest={}, Ratio={}: {} < {}", cLargest, cSmallest, cRatio, cRHS, cEvaluated);
+                        BigDecimal cEfficacy = MissingMath.divide(cDiff, cLargest);
+                        BasicLogger.debug(1, "Largest={}, Smallest={}, Ratio={}, RHS={}, Evaluated={},  Difference={}", cLargest, cSmallest, cRatio, cRHS,
+                                cEvaluated, cDiff);
                     }
 
-                    if (DYNANISM.isSmall(cLargest, cSmallest)) {
+                    if (cDiff.signum() <= 0 || configuration.efficacy.isSmall(cLargest, cDiff)) {
+                        target.removeExpression(name);
+                        if (DEBUG) {
+                            BasicLogger.debug(1, "Efficacy small! {} << {}", cDiff, cLargest);
+                        }
+
+                    } else if (configuration.dynanism.isSmall(cLargest, cSmallest)) {
                         target.removeExpression(name);
                         if (DEBUG) {
                             BasicLogger.debug(1, "Dynanism large! {} >> {}", cLargest, cSmallest);
                         }
+
+                    } else if (cut.getLinearEntrySet().size() > maxElements) {
+                        target.removeExpression(name);
+                        if (DEBUG) {
+                            BasicLogger.debug(1, "Too dense! {} > {}", cut.getLinearEntrySet().size(), maxElements);
+                        }
+
                     } else if (target.checkSimilarity(cut)) {
                         target.removeExpression(name);
                         if (DEBUG) {
                             BasicLogger.debug(1, "Cut similar to current constraint!");
                         }
+
                     } else {
 
-                        // Accept this cut!
                         cut.enforce(PARAMETERS);
                         cut.tighten();
+
+                        double normalizedEfficacy = cDiff.doubleValue() / cLargest.doubleValue();
+
+                        acceptedEfficacies.add(EntryPair.of(name, normalizedEfficacy));
+
                         if (DEBUG) {
                             BasicLogger.debug(1, "{}", cut);
                             BasicLogger.debug(1, "{} < {}", cut.getLowerLimit(), cut.getLinearEntrySet());
@@ -247,37 +291,56 @@ public final class NodeSolver extends IntermediateSolver {
                         if (target.options.logger_detailed && target.options.logger_appender != null) {
                             target.options.logger_appender.println("{}: {} < {}", name, cut.getLowerLimit(), cut.getLinearEntrySet());
                         }
+                    }
+                }
 
-                        if (target.options.validate && target.validate(result)) {
-                            BasicLogger.error("Result still valid, was NOT cut off!");
-                        }
+                if (acceptedEfficacies.size() > maxCuts) {
+
+                    acceptedEfficacies.sort(Comparator.comparingDouble(KeyedPrimitive::doubleValue));
+                    for (int i = 0, limit = acceptedEfficacies.size() - maxCuts; i < limit; i++) {
+                        target.removeExpression(acceptedEfficacies.get(i).getKey());
                     }
                 }
             }
-
         }
 
         return nbConstr != target.constraints().count();
     }
 
     boolean generateCuts(final ModelStrategy strategy) {
-        boolean retVal = this.doGenerateCuts(strategy, null, this.getModel());
-        if (retVal) {
-            this.reset();
-        }
-        return retVal;
-    }
 
-    boolean generateCuts(final ModelStrategy strategy, final ExpressionsBasedModel target) {
-        return this.doGenerateCuts(strategy, null, target);
+        GMICutConfiguration configuration = strategy.getGMICutConfiguration();
+
+        if (configuration != null && this.doGenerateGMICuts(configuration, this.getModel())) {
+            this.reset();
+            myCutRoundDone = true;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     boolean generateCuts(final ModelStrategy strategy, final NodeKey nodeKey) {
-        boolean retVal = this.doGenerateCuts(strategy, nodeKey, this.getModel());
-        if (retVal) {
-            this.reset();
+        return this.generateCuts(strategy);
+    }
+
+    void generateRootCuts(final ExpressionsBasedModel target, final int maxRounds) {
+
+        for (int round = 0; round < maxRounds; round++) {
+
+            if (!this.doGenerateFlowCoverCuts(target)) {
+                break;
+            }
+
+            if (round + 1 < maxRounds) {
+                this.doGenerateFlowCoverCuts(this.getModel());
+                this.reset();
+                Result result = this.solve(null);
+                if (result == null || !result.getState().isOptimal()) {
+                    break;
+                }
+            }
         }
-        return retVal;
     }
 
     double getReducedGradient(final int globalModelIndex) {
@@ -288,6 +351,10 @@ public final class NodeSolver extends IntermediateSolver {
             }
         }
         return 0.0;
+    }
+
+    boolean isCutRoundDone() {
+        return myCutRoundDone;
     }
 
     /**

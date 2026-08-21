@@ -21,6 +21,7 @@
  */
 package org.ojalgo.optimisation.integer;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.netio.BasicLogger;
@@ -153,6 +154,116 @@ public class GeneratedCutTest extends OptimisationIntegerTests implements ModelF
     }
 
     /**
+     * pp08a is a capacitated lot-sizing model with 64 VUB constraints linking production to setup variables.
+     * The flow cover separator should detect all 64 VUB nodes and generate violated cuts from the LP
+     * relaxation that tighten the formulation.
+     */
+    /**
+     * Verifies that the flow cover separator reproduces exactly the 110 cuts in pp08aCUTS. After two
+     * separation rounds the LP relaxation tightens from ~2748 to ~5481 — the same bound as pp08aCUTS.
+     */
+    @Test
+    public void testFlowCoverDetection() {
+
+        ExpressionsBasedModel model = ModelFileTest.makeModel("MIPLIB", "pp08a.mps", false);
+        FlowCoverSeparator separator = new FlowCoverSeparator(model);
+        TestUtils.assertTrue("Should detect VUB nodes", separator.countVUBNodes() > 0);
+
+        // Iterative separation: generate cuts, re-solve LP, repeat
+        ExpressionsBasedModel lpModel = ModelFileTest.makeModel("MIPLIB", "pp08a.mps", true);
+        Optimisation.Result lpResult = lpModel.minimise();
+        TestUtils.assertTrue("LP should be optimal", lpResult.getState().isOptimal());
+
+        int totalCuts = 0;
+        for (int round = 0; round < 10; round++) {
+            separator.generateCuts(lpResult, model);
+            long count = model.getExpressions().stream().filter(e -> e.getName().startsWith("CUT_FC_")).count();
+            if (count == totalCuts) {
+                break;
+            }
+            totalCuts = (int) count;
+            ExpressionsBasedModel cutLP = model.copy();
+            cutLP.relax(true);
+            lpResult = cutLP.minimise();
+        }
+
+        // Must reproduce exactly the 110 cuts from pp08aCUTS
+        TestUtils.assertEquals(110, totalCuts);
+
+        // LP with our cuts must match pp08aCUTS LP
+        ExpressionsBasedModel cutsLP = ModelFileTest.makeModel("MIPLIB", "pp08aCUTS.mps", true);
+        Optimisation.Result cutsLPResult = cutsLP.minimise();
+        TestUtils.assertEquals(cutsLPResult.getValue(), lpResult.getValue(), ACCURACY);
+    }
+
+    @Test
+    public void testFlowCoverGapClosure() {
+
+        String[] models = { "set1al", "set1ch", "set1cl", "exp-1-500-5-5", "fixnet3" };
+        double[] optimals = { 15869.75, 54537.75, 11586.0, 65887.0, 51973.0 };
+
+        for (int i = 0; i < models.length; i++) {
+            String name = models[i];
+            double optimal = optimals[i];
+
+            ExpressionsBasedModel model = ModelFileTest.makeModel("MIPLIB", name + ".mps", false);
+            FlowCoverSeparator sep = new FlowCoverSeparator(model);
+
+            ExpressionsBasedModel lpModel = ModelFileTest.makeModel("MIPLIB", name + ".mps", true);
+            Optimisation.Result lpResult = lpModel.minimise();
+            double lpValue = lpResult.getValue();
+
+            int totalCuts = 0;
+            for (int round = 0; round < 10; round++) {
+                sep.generateCuts(lpResult, model);
+                long count = model.getExpressions().stream().filter(e -> e.getName().startsWith("CUT_FC_")).count();
+                if (count == totalCuts) {
+                    break;
+                }
+                totalCuts = (int) count;
+                ExpressionsBasedModel cutLP = model.copy();
+                cutLP.relax(true);
+                lpResult = cutLP.minimise();
+            }
+
+            TestUtils.assertTrue(name + ": should generate cuts", totalCuts > 0);
+
+            double cutLP = lpResult.getValue();
+            TestUtils.assertTrue(name + ": cuts should tighten LP bound", cutLP > lpValue);
+        }
+    }
+
+    @Test
+    public void testFlowCoverMisc05() {
+
+        ExpressionsBasedModel model = ModelFileTest.makeModel("MIPLIB", "misc05.mps", false);
+        FlowCoverSeparator sep = new FlowCoverSeparator(model);
+
+        TestUtils.assertEquals(28, sep.countVUBNodes());
+    }
+
+    /**
+     * Full MIP solve of pp08a — previously timed out, should now solve with flow cover cuts.
+     */
+    @Tag("slow")
+    @Test
+    public void testFlowCoverPp08a() {
+
+        ExpressionsBasedModel model = ModelFileTest.makeModel("MIPLIB", "pp08a.mps", false);
+
+        model.options.time_suffice = 120_000L;
+        model.options.time_abort = 300_000L;
+
+        Result result = model.minimise();
+
+        TestUtils.assertTrue("pp08a should reach a feasible solution", result.getState().isFeasible());
+
+        if (result.getState().isOptimal()) {
+            TestUtils.assertEquals(7350.0, result.getValue(), ACCURACY);
+        }
+    }
+
+    /**
      * GitHub issue #682: A feasible binary model is incorrectly reported as INFEASIBLE when GMI root cuts are
      * active. The model has four binary variables and three constraints. The known optimal solution for
      * maximisation is {alternative=0, first=1, second=1, active=1} with objective 10.
@@ -255,6 +366,36 @@ public class GeneratedCutTest extends OptimisationIntegerTests implements ModelF
         OptimisationCase testCase = KnapsackTest.makeCase4();
 
         GeneratedCutTest.doTest(testCase.model, null, testCase.result);
+    }
+
+    /**
+     * Presolver must not falsely declare infeasibility when fractional-coefficient constraints produce
+     * near-integer bounds during bound propagation on integer variables.
+     */
+    @Test
+    public void testPresolverWithFractionalConstraints() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x1 = model.newVariable("x1").integer(true).lower(1).weight(-6);
+        Variable x2 = model.newVariable("x2").integer(true).lower(1).weight(-5);
+
+        model.addExpression().upper(11).set(x1, 3).set(x2, 1);
+        model.addExpression().upper(5).set(x1, -1).set(x2, 2);
+
+        ExpressionsBasedModel simplified = model.simplify();
+
+        simplified.newExpression("CUT_GMI_1_1").set(1, -1.4).lower(-4.2);
+        simplified.newExpression("CUT_GMI_0_2").set(0, -1.75).set(1, -1.16666666666).lower(-7.58333333334);
+
+        ExpressionsBasedModel snapshot = simplified.snapshot();
+        snapshot.getVariable(0).lower(3).upper(3);
+        snapshot.options.linear().dual();
+
+        NodeSolver nodeSolver = snapshot.prepare(Optimisation.Sense.MIN, NodeSolver::new);
+        Result result = nodeSolver.solve(null);
+
+        TestUtils.assertStateNotLessThanFeasible(result);
     }
 
 }

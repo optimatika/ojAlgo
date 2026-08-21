@@ -72,6 +72,14 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     private static final MathContext DEFAULT_MATH = MathContext.DECIMAL64;
     private static final int DEFAULT_SCALE = Integer.MIN_VALUE;
     private static final NumberStyle DEFAULT_STYLE = NumberStyle.GENERAL;
+    private static final NumberContext[] INSTANCES = new NumberContext[16];
+
+    static {
+        for (int i = 0; i < INSTANCES.length; i++) {
+            int precisionAndScale = 1 + i;
+            INSTANCES[i] = NumberContext.make(precisionAndScale, precisionAndScale);
+        }
+    }
 
     /**
      * Variation of {@link Double#compare(double, double)} that returns 0 if arg1 == arg2.
@@ -128,15 +136,21 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     }
 
     public static NumberContext of(final int precisionAndScale) {
-        NumberFormat format = NumberStyle.GENERAL.getFormat();
-        MathContext math = new MathContext(precisionAndScale, DEFAULT_MATH.getRoundingMode());
-        return new NumberContext(format, math, precisionAndScale);
+
+        if (1 <= precisionAndScale && precisionAndScale <= 16) {
+            return INSTANCES[precisionAndScale - 1];
+        }
+
+        return NumberContext.make(precisionAndScale, precisionAndScale);
     }
 
     public static NumberContext of(final int precision, final int scale) {
-        NumberFormat format = NumberStyle.GENERAL.getFormat();
-        MathContext math = new MathContext(precision, DEFAULT_MATH.getRoundingMode());
-        return new NumberContext(format, math, scale);
+
+        if (precision == scale && 1 <= precision && precision <= 16) {
+            return INSTANCES[precision - 1];
+        }
+
+        return NumberContext.make(precision, scale);
     }
 
     public static NumberContext ofMath(final MathContext math) {
@@ -161,6 +175,12 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
 
     private static boolean isZero(final double value, final double tolerance) {
         return value == 0D || Math.abs(value) < tolerance;
+    }
+
+    static NumberContext make(final int precision, final int scale) {
+        NumberFormat format = NumberStyle.GENERAL.getFormat();
+        MathContext math = new MathContext(precision, DEFAULT_MATH.getRoundingMode());
+        return new NumberContext(format, math, scale);
     }
 
     private final double myAbsoluteError;
@@ -430,9 +450,9 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
 
         if (value.signum() == 0) {
             return true;
+        } else {
+            return this.enforce(value).signum() == 0;
         }
-
-        return this.enforce(value).signum() == 0;
     }
 
     public boolean isZero(final double value) {
