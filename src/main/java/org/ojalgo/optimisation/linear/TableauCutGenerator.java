@@ -27,7 +27,6 @@ import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 import java.util.Arrays;
 
 import org.ojalgo.equation.Equation;
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Primitive1D;
 import org.ojalgo.type.context.NumberContext;
@@ -47,6 +46,40 @@ abstract class TableauCutGenerator {
         } else {
             return away < fraction && fraction < ONE - away;
         }
+    }
+
+    /**
+     * Applies shift back-conversion to a GMI cut equation produced by
+     * {@link #doGomoryMixedInteger(Primitive1D, int, double, double, int[], boolean[], double[], double[], boolean[], boolean)}.
+     * Used by {@link SimplexTableau} which shifts variables so the current bound = 0.
+     */
+    static void applyShiftBackConversion(final Equation eq, final int[] excluded, final double[] lowers, final double[] uppers, final double[] shifts,
+            final boolean[] atUpper) {
+
+        int nbVariables = lowers.length;
+        double limit = eq.getRHS();
+
+        for (int je = 0; je < excluded.length; je++) {
+            int j = excluded[je];
+
+            if (j < nbVariables) {
+                double range = uppers[j] - lowers[j];
+                double shift = shifts[j];
+                if (Double.isFinite(range) && !ACCURACY.isZero(shift)) {
+
+                    double tmpVal = eq.doubleValue(j);
+
+                    if (atUpper[j]) {
+                        limit -= tmpVal * shift;
+                        eq.set(j, -tmpVal);
+                    } else {
+                        limit += tmpVal * shift;
+                    }
+                }
+            }
+        }
+
+        eq.setRHS(limit);
     }
 
     /**
@@ -144,7 +177,7 @@ abstract class TableauCutGenerator {
     }
 
     static Equation doGomoryMixedInteger(final Primitive1D body, final int index, final double rhs, final double fractionality, final int[] excluded,
-            final boolean[] integer) {
+            final boolean[] integer, final boolean mirRelaxation) {
 
         int nbVariables = integer.length; // Excluding artificial variables
         if (body.size() < nbVariables) {
@@ -189,7 +222,7 @@ abstract class TableauCutGenerator {
                             }
                         }
 
-                    } else if (aj > ZERO) {
+                    } else if (!mirRelaxation && aj > ZERO) {
                         cut[j] = aj / f0;
                     } else if (aj < ZERO) {
                         cut[j] = -aj / cf0;
@@ -208,14 +241,13 @@ abstract class TableauCutGenerator {
     }
 
     /**
-     * No-shift variant for stores that do not shift variables (e.g. {@link RevisedStore}). Equivalent to
-     * calling the shift-aware overload with an all-zero shifts array, but avoids allocating it.
-     * <p>
-     * Variables at their lower bound are non-negative; variables at their upper bound are non-positive
-     * (negated). The cut limit is always {@link PrimitiveMath#ONE ONE} since there is no shift adjustment.
+     * No-shift variant for stores that do not shift variables (e.g. {@link RevisedStore}). Coefficients are
+     * returned in surplus/slack space (same as the shift-aware overload with zero shifts).
+     *
+     * @param atUpper Which non-basic variables are at their upper bound in the current simplex basis.
      */
     static Equation doGomoryMixedInteger(final Primitive1D body, final int index, final double rhs, final double fractionality, final int[] excluded,
-            final boolean[] integers, final double[] lowers, final double[] uppers) {
+            final boolean[] integers, final double[] lowers, final double[] uppers, final boolean[] atUpper, final boolean mirRelaxation) {
 
         int nbVariables = integers.length;
         if (body.size() < nbVariables || lowers.length < nbVariables || uppers.length < nbVariables) {
@@ -237,7 +269,7 @@ abstract class TableauCutGenerator {
 
             if (j < nbVariables) {
 
-                boolean negVar = uppers[j] <= ZERO;
+                boolean negVar = atUpper[j];
 
                 double aj = body.doubleValue(j);
                 if (negRHS ^ negVar) {
@@ -261,7 +293,7 @@ abstract class TableauCutGenerator {
                             }
                         }
 
-                    } else if (aj > ZERO) {
+                    } else if (!mirRelaxation && aj > ZERO) {
                         cut[j] = aj / f0;
                     } else if (aj < ZERO) {
                         cut[j] = -aj / cf0;
@@ -277,126 +309,6 @@ abstract class TableauCutGenerator {
         }
 
         return Equation.of(ONE, index, cut);
-    }
-
-    /**
-     * Calculates a Gomory Mixed Integer (GMI) cut.
-     *
-     * @param body          The equation body (simplex tableau row). The tableau is assumed to be in an
-     *                      optimal (phase 2) state. Any reference to artificial variables will be ignored.
-     * @param index         Index (tableau column) of the variable to be cut. A basic variable that should be
-     *                      integer, but is not. The body value at this index must be integer (not 0) and if
-     *                      this actually is from a tableau row it should be (will be) 1.
-     * @param rhs           The equation right hand side value – the value that should be an integer.
-     * @param fractionality The fractionality threshold.
-     * @param excluded      Indices of the non-basic variables (excluded from the basis).
-     * @param integers      Which variables are integer? There must be one element for each variable - the
-     *                      length of this array defines the number of variables.
-     * @param lowers        Variables' lower bounds.
-     * @param uppers        Variables' upper bounds.
-     * @param shifts        The variable bounds may be shifted from their original values.
-     * @return A GMI cut equation, or null if no cut was generated.
-     */
-    static Equation doGomoryMixedInteger(final Primitive1D body, final int index, final double rhs, final double fractionality, final int[] excluded,
-            final boolean[] integers, final double[] lowers, final double[] uppers, final double[] shifts) {
-
-        int nbVariables = integers.length; // Excluding artificial variables
-        if (body.size() < nbVariables || lowers.length < nbVariables || uppers.length < nbVariables || shifts.length < nbVariables) {
-            throw new IllegalArgumentException();
-        }
-
-        if (DEBUG) {
-            BasicLogger.debug(1, "{} {} = {}", index, rhs, body);
-            BasicLogger.debug(1, "Integer:{}", Arrays.toString(integers));
-            BasicLogger.debug(1, "Lower:  {}", Arrays.toString(lowers));
-            BasicLogger.debug(1, "Upper:  {}", Arrays.toString(uppers));
-            BasicLogger.debug(1, "Shift:  {}", Arrays.toString(shifts));
-        }
-
-        boolean negRHS = rhs < ZERO;
-
-        double f0 = TableauCutGenerator.fraction(negRHS ? -rhs : rhs);
-        if (!TableauCutGenerator.isFractionalEnough(rhs, f0, fractionality)) {
-            return null;
-        }
-        double cf0 = ONE - f0;
-
-        double limit = ONE;
-        double[] cut = new double[nbVariables];
-
-        for (int je = 0; je < excluded.length; je++) {
-            int j = excluded[je];
-
-            if (j < nbVariables) {
-
-                boolean negVar = uppers[j] <= ZERO;
-
-                double aj = body.doubleValue(j);
-                if (negRHS ^ negVar) {
-                    aj = -aj;
-                }
-
-                if (!ACCURACY.isZero(aj)) {
-
-                    if (integers[j]) {
-
-                        double fj = TableauCutGenerator.fraction(aj);
-
-                        if (fj <= f0) {
-                            if (!ACCURACY.isZero(fj)) {
-                                cut[j] = fj / f0;
-                            }
-                        } else {
-                            double cfj = ONE - fj;
-                            if (!ACCURACY.isZero(cfj)) {
-                                cut[j] = cfj / cf0;
-                            }
-                        }
-
-                    } else if (aj > ZERO) {
-                        cut[j] = aj / f0;
-                    } else if (aj < ZERO) {
-                        cut[j] = -aj / cf0;
-                    }
-                }
-
-                double range = uppers[j] - lowers[j];
-                double shift = shifts[j];
-                /*
-                 * Attempt to handle implied bound slack variables. The idea is that a finite variable range
-                 * implies a constraint, as well as a slack variable, expressing the upper bound. We would
-                 * have a constraint saying that the sum of the actual variable and the slack variable is
-                 * equal to the (upper) bound. So, here we assume the actual variable to be basic and at a
-                 * value corresponding to the shift. Then the slack variable is non-basic and at a value
-                 * corresponding to the range.
-                 */
-                if (Double.isFinite(range) && !ACCURACY.isZero(shift)) {
-
-                    double tmpVal = cut[j];
-
-                    if (negVar) {
-                        // Uppger bound
-
-                        limit -= tmpVal * shift;
-
-                        cut[j] = -tmpVal;
-
-                    } else {
-                        // Lower bound
-
-                        limit += tmpVal * shift;
-                    }
-                }
-
-            } else {
-
-                if (DEBUG) {
-                    BasicLogger.debug("Artificial variable: {} {}", j, body.doubleValue(j));
-                }
-            }
-        }
-
-        return Equation.of(limit, index, cut);
     }
 
 }

@@ -42,6 +42,7 @@ import org.ojalgo.optimisation.ModelEntity;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.ConstraintType;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.optimisation.integer.IntegerStrategy;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.keyvalue.EntryPair;
 
@@ -206,7 +207,7 @@ public class UsageMIP extends OptimisationLinearTests {
             }
 
             boolean[] refIntegers = referenceMap.integers(model);
-            Collection<Equation> referenceCutCandidates = referenceSolver.generateCutCandidates(PrimitiveMath.ELEVENTH, refIntegers);
+            Collection<Equation> referenceCutCandidates = referenceSolver.generateCutCandidates(refIntegers, options.integer().getGMICutConfiguration());
 
             if (DEBUG) {
                 BasicLogger.debug();
@@ -229,7 +230,9 @@ public class UsageMIP extends OptimisationLinearTests {
                 Optimisation.Result result = solver.solve();
 
                 boolean[] integers = map.integers(model);
-                Collection<Equation> cutCandidates = solver.generateCutCandidates(PrimitiveMath.ELEVENTH, integers);
+                final boolean[] integer1 = integers;
+                Collection<Equation> cutCandidates = solver.generateCutCandidates(integer1,
+                        IntegerStrategy.DEFAULT.getGMICutConfiguration().withFractionality(PrimitiveMath.ELEVENTH));
 
                 if (DEBUG) {
                     BasicLogger.debug();
@@ -251,7 +254,9 @@ public class UsageMIP extends OptimisationLinearTests {
                 Optimisation.Result result = solver.solve();
 
                 boolean[] integers = map.integers(model);
-                Collection<Equation> cutCandidates = solver.generateCutCandidates(PrimitiveMath.ELEVENTH, integers);
+                final boolean[] integer1 = integers;
+                Collection<Equation> cutCandidates = solver.generateCutCandidates(integer1,
+                        IntegerStrategy.DEFAULT.getGMICutConfiguration().withFractionality(PrimitiveMath.ELEVENTH));
 
                 if (DEBUG) {
                     BasicLogger.debug();

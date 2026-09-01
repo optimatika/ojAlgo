@@ -43,6 +43,10 @@ import org.ojalgo.type.context.NumberContext;
  * <p>
  * The tag 'slow' means getting a response takes too long (regardless of what the response is). The tag
  * 'unstable' means there is some problem with the returned solution (possibly that we've never seen one).
+ * <p>
+ * The purpose of this test class is to make as many as possible of the MIPLIB (easy set) models pass with the
+ * default settings. There are cases where a known small configuration change makes the test pass – that's not
+ * relevant here.
  *
  * @author apete
  */
@@ -65,6 +69,15 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
 
         ModelFileTest.assertValues(model, expMinValString, expMaxValString, ACCURACY);
     }
+
+    /**
+     * For models where the expected value is asserted to more digits than the default MIP gap tolerance
+     * guarantees: the default (5 significant digits) lets the solver stop at any solution within that band,
+     * so the result would depend on search order.
+     *
+     * @deprecated Should not be necessary to use this!
+     */
+    @Deprecated
 
     /**
      * https://miplib.zib.de/instance_details_22433.html
@@ -189,10 +202,18 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 3s
      * <li>2026-08-21: 0.3s (objective only correct to 5 digits)
+     * <li>2026-09-04: 2-7s with an 8-digit gap tolerance (the default 5 digits stops within ~1e-4 of the
+     * optimum, which is what made this test unstable)
+     * <li>2026-09-07: default configuration again (this class mirrors the benchmark, where every solver runs
+     * with its defaults). With the default gap the search legitimately stops on an incumbent within 0.007% of
+     * the optimum (a +-1 shift on two general integers away from it) in about half the runs, and reaching the
+     * exact optimum costs about one more second of search whichever mechanism looks for it (a local branching
+     * polish and a within-gap continuation were measured and rejected, see TODO.md). Tagged unstable for that
+     * reason: the value asserted here needs the exact optimum.
      * </ul>
      */
-    @Tag("unstable")
     @Test
+    @Tag("unstable")
     public void testBell3b() {
         MIPLIBTheEasySet.doTest("bell3b.mps", "11786160.62", null);
     }
@@ -266,6 +287,11 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 3s
      * <li>2026-08-21: 2s
+     * <li>2026-09-05: wrong answer (7.692983) about once in 100 solves, only under CPU load: a warm node LP
+     * ended primal feasible but marginally not dual feasible, was reported FEASIBLE, and the node holding the
+     * optimum was pruned as infeasible. The warm path now finishes with primal iterations, and a node that is
+     * neither optimal nor infeasible aborts the search instead of being pruned. Reproduced by looping the
+     * model with a dozen busy threads in the same JVM.
      * </ul>
      */
     @Test
@@ -338,9 +364,13 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 3s
      * <li>2026-08-21: 1s
+     * <li>2026-09-06: 188188.9 seen once in a suite run, 188183.5 once in 30 solves. The objective has
+     * continuous variables, so every incumbent within the default relative gap (18.8 here) is a legitimate
+     * stop, and which one comes first depends on thread timing. Tagged unstable for that reason.
      * </ul>
      */
     @Test
+    @Tag("unstable")
     public void testDcmulti() {
         MIPLIBTheEasySet.doTest("dcmulti.mps", "188182", null);
     }
@@ -376,7 +406,6 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 0.1s
      * </ul>
      */
-    @Tag("unstable")
     @Test
     public void testEnigma() {
         MIPLIBTheEasySet.doTest("enigma.mps", "0.0", null);
@@ -528,6 +557,9 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 0.2s
      * <li>2026-08-21: 0.02s
+     * <li>2026-09-05: wrong answer (1202100) about once in 500 solves: node bounds overwrote a variable that
+     * presolve had fixed from an equality row already marked redundant, so the node LP lacked that row and
+     * its "optimal" point was discarded by validation. Node bounds now only ever tighten (NodeKey).
      * </ul>
      */
     @Test
@@ -548,7 +580,6 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 7s
      * </ul>
      */
-    @Tag("unstable")
     @Test
     public void testGen() {
         MIPLIBTheEasySet.doTest("gen.mps", "112313.362718", null);
@@ -567,7 +598,6 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 0.01s
      * </ul>
      */
-    @Tag("unstable")
     @Test
     public void testGr4x6() {
         MIPLIBTheEasySet.doTest("gr4x6.mps", "202.35", null);
@@ -1270,7 +1300,6 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 0.03s
      * </ul>
      */
-    @Tag("unstable")
     @Test
     public void testP0291() {
         MIPLIBTheEasySet.doTest("p0291.mps", "5223.7490", null);

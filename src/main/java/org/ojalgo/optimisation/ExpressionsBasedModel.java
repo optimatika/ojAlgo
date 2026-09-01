@@ -53,6 +53,7 @@ import org.ojalgo.netio.ToFileWriter;
 import org.ojalgo.optimisation.Optimisation.Integration;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.integer.IntegerSolver;
+import org.ojalgo.optimisation.integer.IntegerStrategy;
 import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure1D.IntIndex;
@@ -170,6 +171,10 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      */
     public interface EntityMap extends ProblemStructure {
 
+        static boolean isIntegerValued(final BigDecimal limit) {
+            return limit == null || limit.stripTrailingZeros().scale() <= 0;
+        }
+
         /**
          * The number of variables, in the solver, that directly correspond to a model variable. (Not slack or
          * artificial variables.)
@@ -214,9 +219,9 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
          * Given an {@link ExpressionsBasedModel} and this {@link EntityMap}, this method inspects the model's
          * variables and the slack entities to determine which internal variables are subject to integrality
          * restrictions. The result is typically passed to
-         * {@link UpdatableSolver#generateCutCandidates(double, boolean[])} and used by integer algorithms
-         * (for example {@link IntegerSolver} and {@link org.ojalgo.optimisation.integer.NodeSolver}) to
-         * interpret the solver state.
+         * {@link UpdatableSolver#generateCutCandidates(boolean[], IntegerStrategy.GMICutConfiguration)} and
+         * used by integer algorithms (for example {@link IntegerSolver} and
+         * {@link org.ojalgo.optimisation.integer.NodeSolver}) to interpret the solver state.
          *
          * @param model the model that this solver instance is (or will be) solving
          * @return a boolean array where {@code true} marks an internal variable that must take integer
@@ -241,7 +246,9 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             for (int i = 0; i < nbSlackVars; i++) {
                 EntryPair<ModelEntity<?>, ConstraintType> slack = this.getSlack(i);
                 ModelEntity<?> entity = slack.getKey();
-                if (entity.isInteger()) {
+                // The slack of an integer row (integer coefficients on integer variables) is integer valued
+                // only if the limit it measures the distance to is integer as well
+                if (entity.isInteger() && EntityMap.isIntegerValued(entity.getLowerLimit()) && EntityMap.isIntegerValued(entity.getUpperLimit())) {
                     integers[nbProblVars + i] = true;
                 }
             }

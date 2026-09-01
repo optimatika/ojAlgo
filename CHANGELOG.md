@@ -11,6 +11,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Changed
+
+#### org.ojalgo.optimisation
+
+- `GMICutConfiguration` now exposes a `mirRelaxation` flag (with `withMirRelaxation()` builder method). When enabled, positive continuous variable coefficients are dropped from GMI cuts (Mixed-Integer Rounding relaxation), producing weaker but numerically more stable cuts.
+
 ## [57.2.0] – 2026-08-31
 
 ### Added

@@ -241,10 +241,7 @@ public abstract class Presolvers {
                     return Presolvers.doCase1(expression, remaining, lower, upper, precision);
                 case 2:
                     return Presolvers.doCase2(expression, remaining, lower, upper, precision);
-                //            case 3:
-                //            case 4:
-                //            case 5:
-                //                return Presolvers.doCase3(expression, remaining, lower, upper, precision);
+                // doCase3 (bound propagation) disabled — see doBoundPropagation javadoc
                 default:
                     return Presolvers.doCaseN(expression, remaining, lower, upper, precision);
             }
@@ -282,7 +279,20 @@ public abstract class Presolvers {
 
                         for (IntIndex index : currentLinearKeySet) {
 
-                            tmpVal = expression.get(index).divide(potential.get(index), SIMILARITY);
+                            BigDecimal currentValue = expression.get(index);
+                            BigDecimal potentialValue = potential.get(index);
+
+                            if (potentialValue.signum() == 0 || currentValue.signum() == 0) {
+                                // A zero coefficient (an entry set to zero through the entry set view) is
+                                // consistent only with a zero on the other side
+                                if (potentialValue.signum() == 0 && currentValue.signum() == 0) {
+                                    continue;
+                                }
+                                fctVal = null;
+                                break;
+                            }
+
+                            tmpVal = currentValue.divide(potentialValue, SIMILARITY);
 
                             if (fctVal == null) {
                                 fctVal = tmpVal;
@@ -356,8 +366,11 @@ public abstract class Presolvers {
      * all free variables, then for each variable subtracts its own contribution to derive implied bounds from
      * the remaining variables. Generalises the logic in doCase2 to any number of variables.
      * <p>
-     * Although it seems correct, applying this pre-solver caused numerical issues in the solvers. Will have
-     * to wait
+     * Disabled: enabling this for constraints with 3+ variables caused LP test failures and made
+     * MIPLIBTheEasySet 2-3x slower (tested 2026-09). The tightened variable bounds also did not help
+     * fixed-charge network models (fixnet3, vpm1) because the LP relaxation quality is driven by VUB
+     * constraint coefficients, not variable bounds — coefficient strengthening on the VUB expression
+     * itself would be needed instead.
      */
     static boolean doBoundPropagation(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
             final NumberContext precision) {
@@ -453,16 +466,8 @@ public abstract class Presolvers {
                 }
             }
 
-            if (lowerNew != null && upperNew != null) {
-                BigDecimal level = precision.common(lowerNew, upperNew);
-                if (level != null) {
-                    lowerNew = level;
-                    upperNew = level;
-                    variables[i].setFixed(level);
-                    didFix = true;
-                }
-            }
-
+            // Integer bounds must be rounded before any fixing: the quotients above are rounded (FLOOR/CEILING)
+            // and an integer variable fixed at e.g. 0.999...975 rather than 1 corrupts every later deduction
             if (variables[i].isInteger()) {
                 if (lowerNew != null) {
                     lowerNew = lowerNew.setScale(0, RoundingMode.CEILING);
@@ -748,24 +753,8 @@ public abstract class Presolvers {
             }
         }
 
-        if (lowerNewA != null && upperNewA != null) {
-            BigDecimal level = precision.common(lowerNewA, upperNewA);
-            if (level != null) {
-                lowerNewA = level;
-                upperNewA = level;
-                variableA.setFixed(level);
-            }
-        }
-
-        if (lowerNewB != null && upperNewB != null) {
-            BigDecimal level = precision.common(lowerNewB, upperNewB);
-            if (level != null) {
-                lowerNewB = level;
-                upperNewB = level;
-                variableB.setFixed(level);
-            }
-        }
-
+        // Integer bounds must be rounded before any fixing: the quotients above are rounded (FLOOR/CEILING) and
+        // an integer variable fixed at e.g. 0.999...975 rather than 1 corrupts every later deduction
         if (variableA.isInteger()) {
             if (lowerNewA != null) {
                 lowerNewA = lowerNewA.setScale(0, RoundingMode.CEILING);
