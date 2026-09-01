@@ -59,6 +59,15 @@ All source lives under `org.ojalgo` with these key packages:
 - Use `TestUtils` (not JUnit `Assertions`) for test assertions.
 - Prefer deterministic tests. For numerics, use tolerances via `TestUtils` and avoid brittle equality checks.
 - Keep tests fast and focused.
+- `MIPLIBTheEasySet` mirrors the MIPLIB benchmark, where every solver runs with its default settings: no per-model configuration there. A test that the defaults do not solve reliably is tagged `slow` or `unstable` (both excluded from the default run). Tests on user-supplied models (`IntegerUserFiles`) use whatever configuration solves the model best.
+
+### Diagnosing flaky solver tests
+
+- Loop the model many times in one JVM. Results depend on static counters (cut names, hash orders), so a failing run index is stable across repetitions of the same loop.
+- Failures that only appear in the full suite usually need CPU contention: start a dozen max-priority busy threads in the same JVM.
+- For a hang, a daemon watchdog thread that dumps all `org.ojalgo` stack traces to a file and halts the JVM once a solve exceeds a limit gives a usable stack; a thread dump of a halted surefire fork is lost.
+- To find where an optimum is lost, record a known optimal solution from a good run and log every event (polled, solved, pruned, discarded by validation, branched) at the nodes whose bounds contain it; also evaluate every cut of the node model at that point.
+- Timing comparisons need a same-session baseline and the best of several runs; the noise on the MIPLIB easy set is about 10%, and some instances vary 10x between runs of the same code. A change that lands inside that noise is reverted, not kept.
 
 ## Logging and Diagnostics
 

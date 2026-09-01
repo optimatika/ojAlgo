@@ -108,7 +108,7 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
         Arrays.fill(integer, true);
 
         Equation base = TableauCutGenerator.doGomoryMixedInteger(body, basis, rhs, integer);
-        Equation tableau = TableauCutGenerator.doGomoryMixedInteger(body, basis, rhs, PrimitiveMath.ELEVENTH, excluded, integer);
+        Equation tableau = TableauCutGenerator.doGomoryMixedInteger(body, basis, rhs, PrimitiveMath.ELEVENTH, excluded, integer, false);
 
         double[] lower = new double[factors.length];
         Arrays.fill(lower, PrimitiveMath.ZERO);
@@ -116,30 +116,23 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
         double[] upper = new double[factors.length];
         Arrays.fill(upper, PrimitiveMath.POSITIVE_INFINITY);
 
-        double[] shift = new double[factors.length];
-        Arrays.fill(shift, PrimitiveMath.ZERO);
+        boolean[] atUpper = new boolean[factors.length];
 
-        Equation revised = TableauCutGenerator.doGomoryMixedInteger(body, basis, rhs, PrimitiveMath.ELEVENTH, excluded, integer, lower, upper, shift);
-
-        Equation noShift = TableauCutGenerator.doGomoryMixedInteger(body, basis, rhs, PrimitiveMath.ELEVENTH, excluded, integer, lower, upper);
+        Equation unified = TableauCutGenerator.doGomoryMixedInteger(body, basis, rhs, PrimitiveMath.ELEVENTH, excluded, integer, lower, upper, atUpper, false);
 
         TestUtils.assertEquals(base.index, tableau.index);
-        TestUtils.assertEquals(base.index, revised.index);
-        TestUtils.assertEquals(base.index, noShift.index);
+        TestUtils.assertEquals(base.index, unified.index);
 
         TestUtils.assertEquals(base.getPivot(), tableau.getPivot());
-        TestUtils.assertEquals(base.getPivot(), revised.getPivot());
-        TestUtils.assertEquals(base.getPivot(), noShift.getPivot());
+        TestUtils.assertEquals(base.getPivot(), unified.getPivot());
 
         TestUtils.assertEquals(base.getRHS(), tableau.getRHS());
-        TestUtils.assertEquals(base.getRHS(), revised.getRHS());
-        TestUtils.assertEquals(base.getRHS(), noShift.getRHS());
+        TestUtils.assertEquals(base.getRHS(), unified.getRHS());
 
         TestUtils.assertEquals(base.getBody(), tableau.getBody());
-        TestUtils.assertEquals(base.getBody(), revised.getBody());
-        TestUtils.assertEquals(base.getBody(), noShift.getBody());
+        TestUtils.assertEquals(base.getBody(), unified.getBody());
 
-        return revised;
+        return unified;
     }
 
     /**
@@ -162,10 +155,9 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
         double[] upper = new double[integer.length];
         Arrays.fill(upper, PrimitiveMath.POSITIVE_INFINITY);
 
-        double[] shift = new double[integer.length];
-        Arrays.fill(shift, PrimitiveMath.ZERO);
+        boolean[] atUpper = new boolean[integer.length];
 
-        Equation gomoryMixedCut = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lower, upper, lower);
+        Equation gomoryMixedCut = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lower, upper, atUpper, false);
 
         double f0 = rhs - Math.floor(rhs);
         double cf0 = 1 - f0;
@@ -333,9 +325,39 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
     }
 
     /**
+     * Verify that the GMI formula produces the same cut regardless of finite vs infinite upper bounds, as
+     * long as the variable is not at its upper bound.
+     */
+    @Test
+    public void testFiniteVsInfiniteUpperBound() {
+
+        Primitive1D body = Primitive1D.of(1.0, 1.5, -0.5);
+        int index = 0;
+        double rhs = 2.3;
+        double fractionality = PrimitiveMath.ELEVENTH;
+        int[] excluded = { 1, 2 };
+        boolean[] integer = { true, true, false };
+
+        double[] lower = { 0, 0, 0 };
+        boolean[] atUpper = { false, false, false };
+
+        double[] upperInf = { Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY };
+        Equation infRange = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lower, upperInf, atUpper, false);
+
+        double[] upperFin = { Double.POSITIVE_INFINITY, 10, Double.POSITIVE_INFINITY };
+        Equation finRange = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lower, upperFin, atUpper, false);
+
+        TestUtils.assertEquals(infRange.getRHS(), finRange.getRHS());
+
+        for (int j = 0; j < integer.length; j++) {
+            TestUtils.assertEquals(infRange.doubleValue(j), finRange.doubleValue(j));
+        }
+    }
+
+    /**
      * Verify that non-zero shifts correctly adjust the cut RHS (lower-bound case). A shifted variable with
      * finite range triggers the {@code limit += tmpVal * shift} path in
-     * {@link TableauCutGenerator#doGomoryMixedInteger}.
+     * {@link TableauCutGenerator#applyShiftBackConversion}.
      */
     @Test
     public void testNonZeroShiftLowerBound() {
@@ -348,20 +370,18 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
         int[] excluded = { 1, 2 };
         boolean[] integer = { true, true, false };
 
-        // First: compute the baseline cut with no shift
         double[] lower0 = { 0, 0, 0 };
         double[] upper0 = { Double.POSITIVE_INFINITY, 10, Double.POSITIVE_INFINITY };
-        double[] shift0 = { 0, 0, 0 };
+        boolean[] atUpper = { false, false, false };
 
-        Equation baseline = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lower0, upper0, shift0);
+        Equation baseline = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lower0, upper0, atUpper, false);
 
-        // Now apply a shift of 3.0 to x1 (the shifted integer variable with finite range)
+        // Apply shift back-conversion with shift of 3.0 on x1
+        Equation shifted = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lower0, upper0, atUpper, false);
         double[] shift1 = { 0, 3.0, 0 };
+        TableauCutGenerator.applyShiftBackConversion(shifted, excluded, lower0, upper0, shift1, atUpper);
 
-        Equation shifted = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lower0, upper0, shift1);
-
-        // Coefficients should be the same for both (only RHS changes)
-        TestUtils.assertEquals(baseline.doubleValue(0), shifted.doubleValue(0));
+        // x2 has infinite range, so shift has no effect on it
         TestUtils.assertEquals(baseline.doubleValue(2), shifted.doubleValue(2));
 
         // The RHS should differ: shifted limit = baseline limit + cut[1] * shift
@@ -370,13 +390,14 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
     }
 
     /**
-     * Verify that non-zero shifts correctly adjust the cut when the variable is negated (upper-bound case
-     * where upper <= 0). This triggers the {@code limit -= tmpVal * shift; cut[j] = -tmpVal} path.
+     * Verify that non-zero shifts correctly adjust the cut when the variable is at its upper bound. This
+     * triggers the {@code limit -= tmpVal * shift; eq.set(j, -tmpVal)} path in
+     * {@link TableauCutGenerator#applyShiftBackConversion}.
      */
     @Test
     public void testNonZeroShiftNegatedVariable() {
 
-        // 3 variables: x0 (integer, basic), x1 (integer, non-basic, negated: upper<=0), x2 (continuous)
+        // 3 variables: x0 (integer, basic), x1 (integer, non-basic, at upper bound), x2 (continuous)
         Primitive1D body = Primitive1D.of(1.0, 1.5, -0.5);
         int index = 0;
         double rhs = 2.3;
@@ -384,20 +405,18 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
         int[] excluded = { 1, 2 };
         boolean[] integer = { true, true, false };
 
-        // x1 is negated: lower=-10, upper=0
         double[] lower = { 0, -10, 0 };
         double[] upper = { Double.POSITIVE_INFINITY, 0, Double.POSITIVE_INFINITY };
+        boolean[] atUpper = { false, true, false };
 
-        // No shift first
-        double[] shift0 = { 0, 0, 0 };
-        Equation baseline = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lower, upper, shift0);
+        Equation baseline = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lower, upper, atUpper, false);
 
-        // Now shift x1 by -2.0
+        // Apply shift back-conversion with shift of -2.0 on x1
+        Equation shifted = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lower, upper, atUpper, false);
         double[] shift1 = { 0, -2.0, 0 };
-        Equation shifted = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lower, upper, shift1);
+        TableauCutGenerator.applyShiftBackConversion(shifted, excluded, lower, upper, shift1, atUpper);
 
-        // For a negated variable: limit -= tmpVal * shift, and cut[j] = -tmpVal
-        // So shifted RHS = baseline.RHS - baseline.cut[1] * shift
+        // For an at-upper variable: limit -= tmpVal * shift, and coeff = -tmpVal
         double expectedRHS = baseline.getRHS() - baseline.doubleValue(1) * (-2.0);
         TestUtils.assertEquals(expectedRHS, shifted.getRHS());
 
@@ -406,29 +425,53 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
     }
 
     /**
-     * Verify that the no-shift overload produces the same result as the shift-aware overload when shifts are
-     * all zero. Uses mixed integer/continuous variables and includes a negated variable.
+     * Verify that the no-shift variant correctly handles a variable at its upper bound when UB > 0 (e.g. a
+     * binary variable at value 1). Before the fix, this code path used {@code uppers[j] <= 0} for negVar
+     * determination, which is wrong for unshifted variables — a binary at UB=1 has uppers[j]=1.0 so negVar
+     * would be false when it should be true. The fix uses {@code atUpper[j]} from the simplex basis state.
      */
     @Test
-    public void testNoShiftMatchesZeroShift() {
+    public void testNoShiftUpperBoundPositive() {
 
-        Primitive1D body = Primitive1D.of(1.0, 1.5, -0.5, 2.3);
+        // x0: integer, basic, fractional (source row for GMI cut)
+        // x1: integer, non-basic, AT UPPER BOUND (UB=1, binary)
+        // x2: continuous, non-basic, at lower bound
+        Primitive1D body = Primitive1D.of(1.0, 0.7, -0.3);
         int index = 0;
         double rhs = 2.3;
         double fractionality = PrimitiveMath.ELEVENTH;
-        int[] excluded = { 1, 2, 3 };
-        boolean[] integer = { true, true, false, true };
+        int[] excluded = { 1, 2 };
+        boolean[] integer = { true, true, false };
 
-        double[] lower = { 0, 0, 0, -5 };
-        double[] upper = { Double.POSITIVE_INFINITY, 10, Double.POSITIVE_INFINITY, 0 };
-        double[] shift = { 0, 0, 0, 0 };
+        double[] lower = { 0, 0, 0 };
+        double[] upper = { Double.POSITIVE_INFINITY, 1, Double.POSITIVE_INFINITY };
 
-        Equation withShift = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lower, upper, shift);
-        Equation noShift = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lower, upper);
+        // x1 IS at its upper bound — atUpper[1] = true
+        boolean[] atUpper = { false, true, false };
 
-        TestUtils.assertEquals(withShift.index, noShift.index);
-        TestUtils.assertEquals(withShift.getRHS(), noShift.getRHS());
-        TestUtils.assertEquals(withShift.getBody(), noShift.getBody());
+        Equation correct = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lower, upper, atUpper, false);
+
+        // x1 NOT at its upper bound — atUpper[1] = false
+        boolean[] atLower = { false, false, false };
+
+        Equation wrongNegVar = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lower, upper, atLower, false);
+
+        // The two must differ: negVar changes the sign of aj before computing the GMI coefficient
+        Assertions.assertNotEquals(correct.doubleValue(1), wrongNegVar.doubleValue(1), "Cut coefficient must differ when negVar is correct vs incorrect");
+
+        // Verify the correct cut manually:
+        // negRHS = false (rhs > 0), negVar = true for x1
+        // aj = body[1] = 0.7, negRHS ^ negVar = true, so aj = -0.7
+        // For integer variable: fraction(-0.7) = -0.7 - floor(-0.7) = -0.7 - (-1) = 0.3
+        // f0 = fraction(2.3) = 0.3, cf0 = 0.7
+        // fj=0.3 <= f0=0.3, so cut[1] = 0.3/0.3 = 1.0
+
+        double f0 = 0.3;
+        TestUtils.assertEquals(1.0, correct.doubleValue(1));
+
+        // With wrong negVar (false): aj = 0.7, no negation
+        // fraction(0.7) = 0.7, fj=0.7 > f0=0.3, so cut[1] = (1-0.7)/(1-0.3) = 0.3/0.7
+        TestUtils.assertEquals(0.3 / 0.7, wrongNegVar.doubleValue(1));
     }
 
     /**
@@ -481,34 +524,31 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
     }
 
     /**
-     * Verify that zero shift with finite range does not alter the cut relative to infinite range.
+     * Verify that applying shift back-conversion with zero shifts produces the same result as no
+     * back-conversion. Uses mixed integer/continuous variables and includes a variable at its upper bound.
      */
     @Test
-    public void testZeroShiftFiniteRangeNoEffect() {
+    public void testZeroShiftBackConversionIsNoOp() {
 
-        Primitive1D body = Primitive1D.of(1.0, 1.5, -0.5);
+        Primitive1D body = Primitive1D.of(1.0, 1.5, -0.5, 2.3);
         int index = 0;
         double rhs = 2.3;
         double fractionality = PrimitiveMath.ELEVENTH;
-        int[] excluded = { 1, 2 };
-        boolean[] integer = { true, true, false };
+        int[] excluded = { 1, 2, 3 };
+        boolean[] integer = { true, true, false, true };
 
-        // Infinite range, zero shift
-        double[] lowerInf = { 0, 0, 0 };
-        double[] upperInf = { Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY };
-        double[] shift = { 0, 0, 0 };
+        double[] lower = { 0, 0, 0, -5 };
+        double[] upper = { Double.POSITIVE_INFINITY, 10, Double.POSITIVE_INFINITY, 0 };
+        boolean[] atUpper = { false, false, false, true };
 
-        Equation infRange = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lowerInf, upperInf, shift);
+        Equation plain = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lower, upper, atUpper, false);
 
-        // Finite range but zero shift — should produce the same cut
-        double[] upperFin = { Double.POSITIVE_INFINITY, 10, Double.POSITIVE_INFINITY };
+        Equation withZeroShift = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lower, upper, atUpper, false);
+        double[] shift = { 0, 0, 0, 0 };
+        TableauCutGenerator.applyShiftBackConversion(withZeroShift, excluded, lower, upper, shift, atUpper);
 
-        Equation finRange = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lowerInf, upperFin, shift);
-
-        TestUtils.assertEquals(infRange.getRHS(), finRange.getRHS());
-
-        for (int j = 0; j < integer.length; j++) {
-            TestUtils.assertEquals(infRange.doubleValue(j), finRange.doubleValue(j));
-        }
+        TestUtils.assertEquals(plain.index, withZeroShift.index);
+        TestUtils.assertEquals(plain.getRHS(), withZeroShift.getRHS());
+        TestUtils.assertEquals(plain.getBody(), withZeroShift.getBody());
     }
 }

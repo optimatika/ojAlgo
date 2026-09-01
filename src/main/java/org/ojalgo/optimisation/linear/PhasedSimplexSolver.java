@@ -46,6 +46,10 @@ final class PhasedSimplexSolver extends SimplexSolver {
     @Override
     public Result solve(final Result kickStarter) {
 
+        if (this.isInfeasibleByCrossedBounds()) {
+            return this.extractResult();
+        }
+
         if (state == State.APPROXIMATE) {
             // Warm start after variable range update
 
@@ -53,8 +57,14 @@ final class PhasedSimplexSolver extends SimplexSolver {
 
             this.doDualIterations(iteration, false);
 
-            if (state.isFeasible() && this.isDualFeasible()) {
-                state = State.OPTIMAL;
+            if (state.isFeasible()) {
+                if (this.isDualFeasible()) {
+                    state = State.OPTIMAL;
+                } else {
+                    // Primal feasible but (marginally) not dual feasible - finish with primal iterations
+                    // rather than reporting a merely FEASIBLE point
+                    this.doPrimalIterations(iteration, true);
+                }
             }
 
             return this.extractResult();

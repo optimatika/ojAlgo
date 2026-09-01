@@ -29,14 +29,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.optimisation.integer.IntegerStrategy.CutType;
+import org.ojalgo.optimisation.integer.NodeSolver.CutRound;
 import org.ojalgo.structure.Structure1D.IntIndex;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * Generates single-node flow cover cuts for models with variable upper bound (VUB) structure.
@@ -45,7 +45,7 @@ import org.ojalgo.type.context.NumberContext;
  * flow-conservation equality containing x, and generates tightened inequalities that replace the big-M
  * capacity with the local demand.
  */
-final class FlowCoverSeparator {
+final class FlowCoverSeparator extends NodeSolver.Separator {
 
     static final class FlowArc {
 
@@ -81,33 +81,34 @@ final class FlowCoverSeparator {
         }
     }
 
-    private static final AtomicInteger COUNTER = new AtomicInteger();
-    private static final NumberContext TOLERANCE = NumberContext.of(4);
+    private List<VUBNode> myNodes = null;
+    /**
+     * The model {@link #myNodes} was detected for
+     */
+    private ExpressionsBasedModel myStructureModel = null;
 
-    private final ExpressionsBasedModel myModel;
-    private List<VUBNode> myNodes;
-
-    FlowCoverSeparator(final ExpressionsBasedModel model) {
-        myModel = model;
+    FlowCoverSeparator() {
+        super();
     }
 
     /**
      * Detect VUB + flow-balance structure. Called once per model; the result is cached.
      */
-    private void detectStructure() {
+    private void detectStructure(final ExpressionsBasedModel model) {
 
-        if (myNodes != null) {
+        if (myNodes != null && myStructureModel == model) {
             return;
         } else {
             myNodes = new ArrayList<>();
+            myStructureModel = model;
         }
 
-        List<Variable> variables = myModel.getVariables();
+        List<Variable> variables = model.getVariables();
 
         Map<IntIndex, List<Expression>> equalitiesByVar = new HashMap<>();
         List<Expression> candidates = new ArrayList<>();
 
-        for (Expression expr : myModel.getExpressions()) {
+        for (Expression expr : model.getExpressions()) {
             if (!expr.isConstraint() || expr.isAnyQuadraticFactorNonZero()) {
                 continue;
             }
@@ -267,23 +268,26 @@ final class FlowCoverSeparator {
         }
     }
 
-    int countVUBNodes() {
-        this.detectStructure();
+    int countVUBNodes(final ExpressionsBasedModel model) {
+        this.detectStructure(model);
         return myNodes.size();
     }
 
     /**
-     * Generate violated flow cover cuts for the current LP solution. Returns true if any cuts were added.
+     * Generate violated flow cover cuts for the current LP solution.
      */
-    boolean generateCuts(final Optimisation.Result solution, final ExpressionsBasedModel target) {
+    @Override
+    int generateCuts(final CutRound round) {
 
-        this.detectStructure();
+        this.beginRound(round);
+
+        Optimisation.Result solution = round.solution;
+
+        this.detectStructure(round.model);
 
         if (myNodes.isEmpty()) {
-            return false;
+            return 0;
         }
-
-        boolean added = false;
 
         for (VUBNode node : myNodes) {
 
@@ -297,9 +301,8 @@ final class FlowCoverSeparator {
                 typeB_lhs -= arc.coefficient.abs().doubleValue() * solution.doubleValue(arc.variable.index);
             }
 
-            if (typeB_lhs > 0 && !TOLERANCE.isZero(typeB_lhs)) {
-                String name = "CUT_FC_B_" + COUNTER.incrementAndGet();
-                Expression cut = target.newExpression(name);
+            if (typeB_lhs > 0) {
+                Expression cut = this.newCut(round);
 
                 cut.add(node.xIndex.index, BigDecimal.ONE);
                 cut.add(node.yIndex.index, node.demand.negate());
@@ -308,11 +311,7 @@ final class FlowCoverSeparator {
                 }
                 cut.upper(BigDecimal.ZERO);
 
-                if (!target.checkSimilarity(cut)) {
-                    added = true;
-                } else {
-                    target.removeExpression(name);
-                }
+                this.accept(round, cut);
             }
 
             // Cut Type A (demand coverage): sum(inflow) >= demand * (1 - y)
@@ -321,9 +320,8 @@ final class FlowCoverSeparator {
                 typeA_lhs -= arc.coefficient.abs().doubleValue() * solution.doubleValue(arc.variable.index);
             }
 
-            if (typeA_lhs > 0 && !TOLERANCE.isZero(typeA_lhs)) {
-                String name = "CUT_FC_A_" + COUNTER.incrementAndGet();
-                Expression cut = target.newExpression(name);
+            if (typeA_lhs > 0) {
+                Expression cut = this.newCut(round);
 
                 for (FlowArc arc : node.inflows) {
                     cut.add(arc.variable.index, arc.coefficient.abs());
@@ -331,15 +329,19 @@ final class FlowCoverSeparator {
                 cut.add(node.yIndex.index, node.demand);
                 cut.lower(node.demand);
 
-                if (!target.checkSimilarity(cut)) {
-                    added = true;
-                } else {
-                    target.removeExpression(name);
-                }
+                this.accept(round, cut);
             }
         }
 
-        return added;
+        return this.endRound(round);
+    }
+
+    /**
+     * Flow Cover
+     */
+    @Override
+    CutType type() {
+        return CutType.FLOW_COVER;
     }
 
 }

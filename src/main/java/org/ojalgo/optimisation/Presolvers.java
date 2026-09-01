@@ -35,6 +35,7 @@ import java.util.Set;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.type.keyvalue.EntryPair;
 
 public abstract class Presolvers {
 
@@ -241,10 +242,7 @@ public abstract class Presolvers {
                     return Presolvers.doCase1(expression, remaining, lower, upper, precision);
                 case 2:
                     return Presolvers.doCase2(expression, remaining, lower, upper, precision);
-                //            case 3:
-                //            case 4:
-                //            case 5:
-                //                return Presolvers.doCase3(expression, remaining, lower, upper, precision);
+                // doCase3 (bound propagation) disabled — see doBoundPropagation javadoc
                 default:
                     return Presolvers.doCaseN(expression, remaining, lower, upper, precision);
             }
@@ -257,90 +255,101 @@ public abstract class Presolvers {
     private static final MathContext UPPER = NumberContext.ofMath(MathContext.DECIMAL128).withMode(RoundingMode.CEILING).getMathContext();
 
     /**
-     * Checks if the potential {@link Expression} is similar to any in the current collection. Only works for
-     * linear expressions. If the potential expression to check has any quadratic term, nothing more is
-     * checked, and false is returned.
+     * Checks if the potential {@link Expression} is similar to any in the current collection, see
+     * {@link #findSimilar(Collection, Expression)}. If it is, the limits of that similar expression are
+     * tightened with those of the potential expression (scaled to match), and the potential expression is
+     * marked as redundant.
      *
      * @return true, if the potential {@link Expression} is found to be similar and marked as redundant by
      *         this method.
      */
     public static boolean checkSimilarity(final Collection<Expression> current, final Expression potential) {
 
-        if (potential.isConstraint() && !potential.isRedundant() && !potential.isAnyQuadraticFactorNonZero()) {
+        EntryPair<Expression, BigDecimal> similar = Presolvers.findSimilar(current, potential);
 
-            Set<IntIndex> potentialLinearKeySet = potential.getLinearKeySet();
+        if (similar == null) {
+            return false;
+        }
 
-            for (Expression expression : current) {
+        Expression expression = similar.getKey();
+        BigDecimal fctVal = similar.getValue();
 
-                if (expression.isConstraint() && !expression.isRedundant()) {
-                    Set<IntIndex> currentLinearKeySet = expression.getLinearKeySet();
+        boolean pos = fctVal.signum() == 1;
 
-                    if (!expression.getName().equals(potential.getName()) && currentLinearKeySet.equals(potentialLinearKeySet)) {
+        BigDecimal refLo = expression.getLowerLimit();
+        BigDecimal refUp = expression.getUpperLimit();
 
-                        BigDecimal fctVal = null;
-                        BigDecimal tmpVal = null;
+        BigDecimal subLo = pos ? potential.getLowerLimit() : potential.getUpperLimit();
+        BigDecimal subUp = pos ? potential.getUpperLimit() : potential.getLowerLimit();
 
-                        for (IntIndex index : currentLinearKeySet) {
-
-                            tmpVal = expression.get(index).divide(potential.get(index), SIMILARITY);
-
-                            if (fctVal == null) {
-                                fctVal = tmpVal;
-                            } else if (tmpVal.compareTo(fctVal) != 0) {
-                                fctVal = null;
-                                break;
-                            }
-                        }
-
-                        if (fctVal != null) {
-
-                            // BasicLogger.debug("Match! {}", fctVal);
-                            // BasicLogger.debug("Ref: {}", refExpression);
-                            // BasicLogger.debug("Sub: {}", subExpression);
-
-                            boolean pos = fctVal.signum() == 1;
-
-                            BigDecimal refLo = expression.getLowerLimit();
-                            BigDecimal refUp = expression.getUpperLimit();
-
-                            BigDecimal subLo = pos ? potential.getLowerLimit() : potential.getUpperLimit();
-                            BigDecimal subUp = pos ? potential.getUpperLimit() : potential.getLowerLimit();
-
-                            if (fctVal.compareTo(ONE) != 0) {
-                                if (subLo != null) {
-                                    subLo = subLo.multiply(fctVal);
-                                }
-                                if (subUp != null) {
-                                    subUp = subUp.multiply(fctVal);
-                                }
-                            }
-
-                            if (subLo != null) {
-                                if (refLo != null) {
-                                    expression.lower(subLo.max(refLo));
-                                } else {
-                                    expression.lower(subLo);
-                                }
-                            }
-
-                            if (subUp != null) {
-                                if (refUp != null) {
-                                    expression.upper(subUp.min(refUp));
-                                } else {
-                                    expression.upper(subUp);
-                                }
-                            }
-
-                            // BasicLogger.debug("Redundant: {} <<= {}", subExpression, refExpression);
-                            potential.setRedundant();
-                            return true;
-                        }
-                    }
-                }
+        if (fctVal.compareTo(ONE) != 0) {
+            if (subLo != null) {
+                subLo = subLo.multiply(fctVal);
+            }
+            if (subUp != null) {
+                subUp = subUp.multiply(fctVal);
             }
         }
 
-        return false;
+        if (subLo != null) {
+            if (refLo != null) {
+                expression.lower(subLo.max(refLo));
+            } else {
+                expression.lower(subLo);
+            }
+        }
+
+        if (subUp != null) {
+            if (refUp != null) {
+                expression.upper(subUp.min(refUp));
+            } else {
+                expression.upper(subUp);
+            }
+        }
+
+        potential.setRedundant();
+
+        return true;
+    }
+
+    /**
+     * Finds a constraint in the current collection that is similar to the potential expression: the same
+     * variables, and every coefficient of the current constraint is the same factor times the corresponding
+     * coefficient of the potential expression. Only linear constraints are considered; if the potential
+     * expression is not a constraint, is already redundant, or has any quadratic term, nothing is searched.
+     * Nothing is modified.
+     *
+     * @return The first similar constraint (other than the potential expression itself) together with the
+     *         factor {@code current = factor * potential}, or null if there is none.
+     */
+    public static EntryPair<Expression, BigDecimal> findSimilar(final Collection<Expression> current, final Expression potential) {
+
+        if (!potential.isConstraint() || potential.isRedundant() || potential.isAnyQuadraticFactorNonZero()) {
+            return null;
+        }
+
+        Set<IntIndex> potentialLinearKeySet = potential.getLinearKeySet();
+
+        for (Expression expression : current) {
+
+            if (!expression.isConstraint() || expression.isRedundant() || expression.getName().equals(potential.getName())) {
+                continue;
+            }
+
+            Set<IntIndex> currentLinearKeySet = expression.getLinearKeySet();
+
+            if (!currentLinearKeySet.equals(potentialLinearKeySet)) {
+                continue;
+            }
+
+            BigDecimal factor = Presolvers.commonFactor(expression, potential, currentLinearKeySet);
+
+            if (factor != null) {
+                return EntryPair.of(expression, factor);
+            }
+        }
+
+        return null;
     }
 
     public static boolean reduce(final Collection<Expression> expressions) {
@@ -352,12 +361,68 @@ public abstract class Presolvers {
     }
 
     /**
+     * Round a derived lower bound of an integer variable up to an integer, tolerantly: the value is first
+     * rounded to the feasibility precision, so that a bound within tolerance of an integer is not pushed past
+     * it. Derived bounds are computed from constraint coefficients and limits that may carry rounding noise
+     * (cut rows generated by the integer solver, an objective cutoff), and an exact ceiling would amplify
+     * that noise into a unit-sized error.
+     */
+    private static BigDecimal ceiling(final BigDecimal lower, final NumberContext precision) {
+        return precision.enforce(lower).setScale(0, RoundingMode.CEILING);
+    }
+
+    /**
+     * The factor such that {@code current = factor * potential} for every coefficient of the given keys, or
+     * null if there is no single such factor.
+     */
+    private static BigDecimal commonFactor(final Expression current, final Expression potential, final Set<IntIndex> keys) {
+
+        BigDecimal factor = null;
+
+        for (IntIndex index : keys) {
+
+            BigDecimal currentValue = current.get(index);
+            BigDecimal potentialValue = potential.get(index);
+
+            if (potentialValue.signum() == 0 || currentValue.signum() == 0) {
+                // A zero coefficient (an entry set to zero through the entry set view) is consistent only
+                // with a zero on the other side
+                if (potentialValue.signum() == 0 && currentValue.signum() == 0) {
+                    continue;
+                }
+                return null;
+            }
+
+            BigDecimal quotient = currentValue.divide(potentialValue, SIMILARITY);
+
+            if (factor == null) {
+                factor = quotient;
+            } else if (quotient.compareTo(factor) != 0) {
+                return null;
+            }
+        }
+
+        return factor;
+    }
+
+    /**
+     * Round a derived upper bound of an integer variable down to an integer, tolerantly. See
+     * {@link #ceiling(BigDecimal, NumberContext)}.
+     */
+    private static BigDecimal floor(final BigDecimal upper, final NumberContext precision) {
+        return precision.enforce(upper).setScale(0, RoundingMode.FLOOR);
+    }
+
+    /**
      * General activity-based bound propagation. Computes the total contribution range (sumMin/sumMax) over
      * all free variables, then for each variable subtracts its own contribution to derive implied bounds from
      * the remaining variables. Generalises the logic in doCase2 to any number of variables.
      * <p>
-     * Although it seems correct, applying this pre-solver caused numerical issues in the solvers. Will have
-     * to wait
+     * Disabled: enabling this for constraints with 3+ variables caused LP test failures and made
+     * MIPLIBTheEasySet 2-3x slower (tested 2026-09). The tightened variable bounds also did not help
+     * fixed-charge network models (fixnet3, vpm1) because the LP relaxation quality is driven by VUB
+     * constraint coefficients, not variable bounds — coefficient strengthening on the VUB expression itself
+     * would be needed instead.
      */
     static boolean doBoundPropagation(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
             final NumberContext precision) {
@@ -453,22 +518,14 @@ public abstract class Presolvers {
                 }
             }
 
-            if (lowerNew != null && upperNew != null) {
-                BigDecimal level = precision.common(lowerNew, upperNew);
-                if (level != null) {
-                    lowerNew = level;
-                    upperNew = level;
-                    variables[i].setFixed(level);
-                    didFix = true;
-                }
-            }
-
+            // Integer bounds must be rounded before any fixing: the quotients above are rounded (FLOOR/CEILING)
+            // and an integer variable fixed at e.g. 0.999...975 rather than 1 corrupts every later deduction
             if (variables[i].isInteger()) {
                 if (lowerNew != null) {
-                    lowerNew = lowerNew.setScale(0, RoundingMode.CEILING);
+                    lowerNew = Presolvers.ceiling(lowerNew, precision);
                 }
                 if (upperNew != null) {
-                    upperNew = upperNew.setScale(0, RoundingMode.FLOOR);
+                    upperNew = Presolvers.floor(upperNew, precision);
                 }
             }
 
@@ -585,10 +642,10 @@ public abstract class Presolvers {
         }
 
         if (lowerNew != null && variable.isInteger()) {
-            lowerNew = lowerNew.setScale(0, RoundingMode.CEILING);
+            lowerNew = Presolvers.ceiling(lowerNew, precision);
         }
         if (upperNew != null && variable.isInteger()) {
-            upperNew = upperNew.setScale(0, RoundingMode.FLOOR);
+            upperNew = Presolvers.floor(upperNew, precision);
         }
 
         if (lowerNew != null && upperNew != null) {
@@ -748,39 +805,23 @@ public abstract class Presolvers {
             }
         }
 
-        if (lowerNewA != null && upperNewA != null) {
-            BigDecimal level = precision.common(lowerNewA, upperNewA);
-            if (level != null) {
-                lowerNewA = level;
-                upperNewA = level;
-                variableA.setFixed(level);
-            }
-        }
-
-        if (lowerNewB != null && upperNewB != null) {
-            BigDecimal level = precision.common(lowerNewB, upperNewB);
-            if (level != null) {
-                lowerNewB = level;
-                upperNewB = level;
-                variableB.setFixed(level);
-            }
-        }
-
+        // Integer bounds must be rounded before any fixing: the quotients above are rounded (FLOOR/CEILING) and
+        // an integer variable fixed at e.g. 0.999...975 rather than 1 corrupts every later deduction
         if (variableA.isInteger()) {
             if (lowerNewA != null) {
-                lowerNewA = lowerNewA.setScale(0, RoundingMode.CEILING);
+                lowerNewA = Presolvers.ceiling(lowerNewA, precision);
             }
             if (upperNewA != null) {
-                upperNewA = upperNewA.setScale(0, RoundingMode.FLOOR);
+                upperNewA = Presolvers.floor(upperNewA, precision);
             }
         }
 
         if (variableB.isInteger()) {
             if (lowerNewB != null) {
-                lowerNewB = lowerNewB.setScale(0, RoundingMode.CEILING);
+                lowerNewB = Presolvers.ceiling(lowerNewB, precision);
             }
             if (upperNewB != null) {
-                upperNewB = upperNewB.setScale(0, RoundingMode.FLOOR);
+                upperNewB = Presolvers.floor(upperNewB, precision);
             }
         }
 

@@ -194,7 +194,7 @@ public class P20140819 extends OptimisationIntegerTests {
         Result resLP1 = node.solve();
         TestUtils.assertTrue(relaxed.validate(resLP1));
 
-        node.generateCuts(strategy);
+        node.generateCuts(strategy, new CutStatistics(relaxed.getOptimisationSense()), true);
 
         Result resLP2 = node.solve();
 

@@ -26,7 +26,8 @@ import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
-import org.ojalgo.optimisation.integer.IntegerStrategy.GMICutConfiguration;
+import org.ojalgo.optimisation.integer.IntegerStrategy.CutConfiguration;
+import org.ojalgo.optimisation.integer.IntegerStrategy.CutType;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Primitive1D;
 
@@ -60,7 +61,8 @@ public final class GomorySolver extends GenericSolver {
 
     public static final ExpressionsBasedModel.Integration<GomorySolver> INTEGRATION = new GomorySolver.ModelIntegration();
 
-    private static final GMICutConfiguration GMI_CUT_CONFIGURATION = new GMICutConfiguration().withFractionality(0.01).withViolation(BigMath.HUNDRED);
+    private static final CutConfiguration GMI_CUT_CONFIGURATION = new CutConfiguration().withTypes(CutType.GOMORY_MIXED_INTEGER).withRelaxation(false)
+            .withFractionality(0.01).withViolation(BigMath.HUNDRED).withIterations(10);
 
     public static GomorySolver newSolver(final ExpressionsBasedModel model) {
         return INTEGRATION.build(model);
@@ -80,7 +82,8 @@ public final class GomorySolver extends GenericSolver {
     @Override
     public Result solve(final Result kickStarter) {
 
-        ModelStrategy strategy = IntegerStrategy.DEFAULT.withGMICutConfiguration(GMI_CUT_CONFIGURATION).newModelStrategy(myIntegerModel);
+        ModelStrategy strategy = IntegerStrategy.DEFAULT.withCutConfiguration(GMI_CUT_CONFIGURATION).newModelStrategy(myIntegerModel);
+        CutStatistics statistics = new CutStatistics(myIntegerModel.getOptimisationSense());
 
         ExpressionsBasedModel iteratorModel = myIntegerModel.snapshot();
         NodeSolver iterativeSolver = iteratorModel.prepare(NodeSolver::new);
@@ -92,7 +95,7 @@ public final class GomorySolver extends GenericSolver {
             this.log("Iteration {}: {}", this.countIterations(), retVal);
         }
         while (retVal.getState().isFeasible() && !myIntegerModel.validate(retVal)) {
-            iterativeSolver.generateCuts(strategy);
+            iterativeSolver.generateCuts(strategy, statistics, true);
             retVal = iterativeSolver.solve();
             this.incrementIterationsCount();
             if (this.isLogProgress()) {

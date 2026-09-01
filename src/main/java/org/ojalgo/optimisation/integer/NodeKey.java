@@ -281,18 +281,34 @@ public final class NodeKey implements Comparable<NodeKey> {
         builder.append(myUpperBounds[idx]);
     }
 
-    private void enforceBounds(final Variable variable, final NodeSolver nodeSolver, final int idx, final boolean signChanged) {
+    /**
+     * Apply this node's bounds to a model variable, but only ever tightening: the node model may already
+     * carry tighter bounds derived by presolve (together with rows marked redundant and variables fixed on
+     * the strength of those bounds). Overwriting them with the node's looser bounds would leave the model
+     * inconsistent, and the LP built from it would be missing constraints.
+     */
+    private static void tightenBounds(final Variable variable, final BigDecimal lower, final BigDecimal upper) {
 
-        int lb = myLowerBounds[idx];
-        int ub = myUpperBounds[idx];
+        BigDecimal currentLower = variable.getLowerLimit();
+        BigDecimal currentUpper = variable.getUpperLimit();
 
-        variable.lower(lb != Integer.MIN_VALUE ? BigDecimal.valueOf(lb) : null);
-        variable.upper(ub != Integer.MAX_VALUE ? BigDecimal.valueOf(ub) : null);
+        if (lower != null && (currentLower == null || lower.compareTo(currentLower) > 0)) {
+            variable.lower(lower);
+        }
+        if (upper != null && (currentUpper == null || upper.compareTo(currentUpper) < 0)) {
+            variable.upper(upper);
+        }
 
         BigDecimal value = variable.getValue();
         if (value != null) {
+            // Re-setting will ensure the new bounds are not violated
             variable.setValue(value);
         }
+    }
+
+    private void enforceBounds(final Variable variable, final NodeSolver nodeSolver, final int idx, final boolean signChanged) {
+
+        NodeKey.tightenBounds(variable, this.getLower(idx), this.getUpper(idx));
 
         if (signChanged || !nodeSolver.isInPlaceBoundUpdateSafe()) {
             nodeSolver.reset();
@@ -477,15 +493,7 @@ public final class NodeKey implements Comparable<NodeKey> {
             BigDecimal lowerBound = this.getLower(idx);
             BigDecimal upperBound = this.getUpper(idx);
 
-            Variable variable = model.getVariable(strategy.getIndex(idx));
-            variable.lower(lowerBound);
-            variable.upper(upperBound);
-
-            BigDecimal value = variable.getValue();
-            if (value != null) {
-                // Re-setting will ensure the new bounds are not violated
-                variable.setValue(value);
-            }
+            NodeKey.tightenBounds(model.getVariable(strategy.getIndex(idx)), lowerBound, upperBound);
         }
     }
 

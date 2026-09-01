@@ -22,6 +22,8 @@
 package org.ojalgo.optimisation;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;
@@ -42,6 +44,12 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
     private final ExpressionsBasedModel myModel;
     private transient Optimisation.Result myResult = null;
     private transient Optimisation.Solver mySolver = null;
+    /**
+     * Bounds pushed to the solver only (not the model) via {@link #update(int, double, double)}, keyed by
+     * global variable index. Kept so that they can be re-applied when the solver is regenerated for reasons
+     * other than {@link #reset()}.
+     */
+    private final Map<Integer, double[]> mySolverOnlyBounds = new HashMap<>();
 
     protected IntermediateSolver(final ExpressionsBasedModel model) {
         super();
@@ -69,6 +77,7 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
     public void reset() {
 
         myResult = null;
+        mySolverOnlyBounds.clear();
 
         if (mySolver != null) {
             mySolver.dispose();
@@ -155,6 +164,9 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
      */
     public void update(final int globalIndex, final double lowerBound, final double upperBound) {
 
+        // Remembered so that the bounds survive a solver rebuild (until reset() is called)
+        mySolverOnlyBounds.put(Integer.valueOf(globalIndex), new double[] { lowerBound, upperBound });
+
         if (myInPlaceUpdatesOK && mySolver instanceof UpdatableSolver) {
             UpdatableSolver updatableSolver = (UpdatableSolver) mySolver;
 
@@ -164,10 +176,16 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
                 return;
             }
 
-            myInPlaceUpdatesOK = false;
+            if (indexInSolver >= 0 && myResult != null && myResult.getState().isFailure()) {
+                // The solver refused because it cannot warm start from a failed (INFEASIBLE/UNBOUNDED...)
+                // run. That is a property of the current state, not of the solver: rebuild this time, and
+                // keep updating in place later.
+            } else {
+                myInPlaceUpdatesOK = false;
+            }
         }
 
-        // Solver will be re-generated
+        // Solver will be re-generated (the remembered solver-only bounds are re-applied then)
         mySolver = null;
     }
 
@@ -177,6 +195,9 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
      * solver.
      */
     public void update(final Variable variable) {
+
+        // The model now carries the bounds, any solver-only override is obsolete
+        mySolverOnlyBounds.remove(Integer.valueOf(myModel.indexOf(variable)));
 
         if (myInPlaceUpdatesOK && mySolver instanceof UpdatableSolver) {
             UpdatableSolver updatableSolver = (UpdatableSolver) mySolver;
@@ -202,6 +223,13 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
                         return;
                     }
                 }
+
+                if (myResult != null && myResult.getState().isFailure()) {
+                    // Refused only because the solver cannot warm start from a failed run; rebuild this
+                    // time and keep updating in place later.
+                    mySolver = null;
+                    return;
+                }
             }
 
             myInPlaceUpdatesOK = false;
@@ -217,6 +245,28 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
      */
     public boolean validate(final Access1D<BigDecimal> solution, final BasicLogger appender) {
         return myModel.validate(solution, appender);
+    }
+
+    /**
+     * Re-apply the bounds set via {@link #update(int, double, double)} to a freshly generated solver. Bounds
+     * of variables that are not present in the solver (eliminated by presolve) cannot be applied and are
+     * dropped.
+     */
+    private void applySolverOnlyBounds() {
+
+        if (mySolverOnlyBounds.isEmpty() || !(mySolver instanceof UpdatableSolver)) {
+            return;
+        }
+
+        UpdatableSolver updatableSolver = (UpdatableSolver) mySolver;
+
+        for (Map.Entry<Integer, double[]> entry : mySolverOnlyBounds.entrySet()) {
+            int indexInSolver = this.getIndexInSolver(entry.getKey().intValue());
+            if (indexInSolver >= 0) {
+                double[] bounds = entry.getValue();
+                updatableSolver.updateRange(indexInSolver, bounds[0], bounds[1]);
+            }
+        }
     }
 
     protected Optimisation.Solver generateSolver(final ExpressionsBasedModel model) {
@@ -249,6 +299,7 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
     protected final Optimisation.Solver getSolver() {
         if (mySolver == null) {
             mySolver = this.generateSolver(myModel);
+            this.applySolverOnlyBounds();
         }
         return mySolver;
     }

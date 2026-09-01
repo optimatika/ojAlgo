@@ -519,7 +519,7 @@ public interface Optimisation {
         public NumberContext feasibility = NumberContext.of(12, 8);
 
         /**
-         * The maximmum number of iterations allowed for the solve() command.
+         * The maximum number of iterations allowed for the solve() command.
          */
         public int iterations_abort = Integer.MAX_VALUE;
 
@@ -579,7 +579,7 @@ public interface Optimisation {
         public Boolean sparse = null;
 
         /**
-         * The maximmum number of millis allowed for the solve() command. Executions will be aborted
+         * The maximum number of millis allowed for the solve() command. Executions will be aborted
          * regardless of if a solution has been found or not.
          */
         public long time_abort = CalendarDateUnit.DAY.toDurationInMillis();

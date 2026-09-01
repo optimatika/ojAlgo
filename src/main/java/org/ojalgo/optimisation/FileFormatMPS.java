@@ -404,11 +404,42 @@ final class FileFormatMPS {
         writer.newLine();
     }
 
-    private static void writeBounds(final BufferedWriter writer, final String bndId, final Variable var) throws IOException {
+    /**
+     * MPS names are limited to 8 characters (the fixed-format fields are 8 wide, and longer names run into the
+     * following field). Names that fit are used as they are; longer (or duplicate/empty) ones are replaced by a
+     * deterministic 8-character alias: the prefix ('V' for variables, 'E' for expressions) followed by 7
+     * base-36 digits derived from the original name's hash. A hash collision is resolved by re-hashing, so the
+     * result is still deterministic for a given model.
+     */
+    private static String mpsName(final String original, final char prefix, final Map<String, String> aliases, final java.util.Set<String> used) {
+
+        String existing = aliases.get(original);
+        if (existing != null) {
+            return existing;
+        }
+
+        String name = original;
+        if (name == null || name.length() == 0 || name.length() > 8 || !used.add(name)) {
+            int hash = original == null ? 0 : original.hashCode();
+            do {
+                String digits = Long.toString(hash & 0xFFFFFFFFL, 36).toUpperCase();
+                StringBuilder builder = new StringBuilder(8).append(prefix);
+                for (int i = digits.length(); i < 7; i++) {
+                    builder.append('0');
+                }
+                name = builder.append(digits).toString();
+                hash = 31 * hash + 17;
+            } while (!used.add(name));
+        }
+
+        aliases.put(original, name);
+        return name;
+    }
+
+    private static void writeBounds(final BufferedWriter writer, final String bndId, final Variable var, final String name) throws IOException {
 
         BigDecimal lower = var.getLowerLimit();
         BigDecimal upper = var.getUpperLimit();
-        String name = var.getName();
 
         if (var.isBinary()) {
             FileFormatMPS.writeBound(writer, "BV", bndId, name, null);
@@ -509,6 +540,16 @@ final class FileFormatMPS {
             String bndId = "bnd";
             String rngId = "rng";
 
+            java.util.Set<String> usedNames = new java.util.HashSet<>(Arrays.asList(objRow, rhsId, bndId, rngId));
+            Map<String, String> rowNames = new HashMap<>();
+            Map<String, String> columnNames = new HashMap<>();
+            for (Expression expr : constraints) {
+                FileFormatMPS.mpsName(expr.getName(), 'E', rowNames, usedNames);
+            }
+            for (Variable var : variables) {
+                FileFormatMPS.mpsName(var.getName(), 'V', columnNames, usedNames);
+            }
+
             // NAME
             writer.write("NAME");
             writer.newLine();
@@ -543,7 +584,7 @@ final class FileFormatMPS {
                     default:
                         continue;
                 }
-                FileFormatMPS.writeField2(writer, type, expr.getName());
+                FileFormatMPS.writeField2(writer, type, rowNames.get(expr.getName()));
             }
 
             // COLUMNS
@@ -564,7 +605,7 @@ final class FileFormatMPS {
                     integerBlock = false;
                 }
 
-                String varName = var.getName();
+                String varName = columnNames.get(var.getName());
                 IntIndex varIndex = new IntIndex(v);
 
                 BigDecimal objCoeff = objective.get(varIndex);
@@ -575,7 +616,7 @@ final class FileFormatMPS {
                 for (Expression expr : constraints) {
                     BigDecimal coeff = expr.get(varIndex);
                     if (coeff.signum() != 0) {
-                        FileFormatMPS.writeField3(writer, varName, expr.getName(), coeff);
+                        FileFormatMPS.writeField3(writer, varName, rowNames.get(expr.getName()), coeff);
                     }
                 }
             }
@@ -611,7 +652,7 @@ final class FileFormatMPS {
                         break;
                 }
                 if (rhs != null) {
-                    FileFormatMPS.writeField3(writer, rhsId, expr.getName(), rhs);
+                    FileFormatMPS.writeField3(writer, rhsId, rowNames.get(expr.getName()), rhs);
                 }
             }
 
@@ -629,7 +670,7 @@ final class FileFormatMPS {
                 for (Expression expr : constraints) {
                     if (expr.getConstraintType() == Optimisation.ConstraintType.RANGE) {
                         BigDecimal range = expr.getUpperLimit().subtract(expr.getLowerLimit());
-                        FileFormatMPS.writeField3(writer, rngId, expr.getName(), range);
+                        FileFormatMPS.writeField3(writer, rngId, rowNames.get(expr.getName()), range);
                     }
                 }
             }
@@ -639,7 +680,7 @@ final class FileFormatMPS {
             writer.newLine();
 
             for (Variable var : variables) {
-                FileFormatMPS.writeBounds(writer, bndId, var);
+                FileFormatMPS.writeBounds(writer, bndId, var, columnNames.get(var.getName()));
             }
 
             // QUADOBJ
@@ -657,7 +698,7 @@ final class FileFormatMPS {
                             BigDecimal transpose = objective.get(new IntRowColumn(col, row));
                             qValue = entry.getValue().add(transpose);
                         }
-                        FileFormatMPS.writeField3(writer, variables.get(row).getName(), variables.get(col).getName(), qValue);
+                        FileFormatMPS.writeField3(writer, columnNames.get(variables.get(row).getName()), columnNames.get(variables.get(col).getName()), qValue);
                     }
                 }
             }

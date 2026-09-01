@@ -157,6 +157,14 @@ public final class IntegerSolver extends GenericSolver {
 
     public static final ModelIntegration INTEGRATION = new ModelIntegration();
 
+    /**
+     * Tolerance for accepting a node LP solution as an integer solution, see
+     * {@link #validIntegerCandidate(Optimisation.Result, ModelStrategy)}: 8 significant digits, absolute
+     * 0.5e-8 near zero, roughly the accuracy of the LP solutions. The default feasibility context (12 digits)
+     * is tighter than that, so a returned solution can carry noise it would not accept; an LP polish of the
+     * continuous part would remove it.
+     */
+    private static final NumberContext CANDIDATE_FEASIBILITY = NumberContext.of(8);
     private static final int STRONG_BRANCH_CANDIDATES = 16;
     private static final double STRONG_BRANCH_INFEASIBLE_PENALTY = 10.0;
 
@@ -192,12 +200,19 @@ public final class IntegerSolver extends GenericSolver {
      * Set during solve() for logProgress to read; null otherwise.
      */
     private MultiviewSet<NodeKey>.PrioritisedView myBoundView = null;
+    /**
+     * Relaxation bound of the node each worker currently has checked out of {@link #myDeferredNodes} (or a
+     * pessimistic placeholder while it is polling). Together with the deferred frontier this is the set of
+     * open subtrees the global dual bound must cover.
+     */
+    private final ConcurrentHashMap<Thread, Double> myCheckedOutBounds = new ConcurrentHashMap<>();
     private final MultiviewSet<NodeKey> myDeferredNodes = new MultiviewSet<>();
     /**
      * Gap tolerance cached during solve() for logProgress; null otherwise.
      */
     private final NumberContext myGapTolerance;
     private final ExpressionsBasedModel myIntegerModel;
+    private final CutStatistics myCutStatistics;
     private final NodeStatistics myNodeStatistics = new NodeStatistics();
     private volatile boolean myOptimalityProven = false;
     private final Optimisation.Sense mySense;
@@ -209,6 +224,7 @@ public final class IntegerSolver extends GenericSolver {
 
         myIntegerModel = model.simplify();
         mySense = myIntegerModel.getOptimisationSense();
+        myCutStatistics = new CutStatistics(mySense);
         myStrategy = options.integer().newModelStrategy(myIntegerModel);
         myGapTolerance = myStrategy.getGapTolerance();
     }
@@ -234,8 +250,6 @@ public final class IntegerSolver extends GenericSolver {
         }
 
         this.resetIterationsCount();
-
-        this.generateRootCuts();
 
         NodeKey rootNode = new NodeKey(myIntegerModel);
         ExpressionsBasedModel rootModel = myIntegerModel.snapshot();
@@ -269,29 +283,45 @@ public final class IntegerSolver extends GenericSolver {
 
             RingLogger nodePrinter = this.newPrinter();
 
-            NodeKey node = null;
-            while (workerNormalExit && solverNormalExit.get() && !myOptimalityProven && !myDeferredNodes.isEmpty()) {
-                if ((node = view.poll()) != null) {
+            Thread worker = Thread.currentThread();
+            Double pessimistic = Double.valueOf(mySense == Optimisation.Sense.MIN ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY);
 
-                    if (!this.isIterationAllowed()) {
-                        workerNormalExit = false;
-                    } else if (this.isOptimalityProven()) {
-                        myOptimalityProven = true;
-                    } else if (!myStrategy.isGoodEnough(myBestResultSoFar, node.objective)) {
-                        workerNormalExit = myNodeStatistics.abandoned();
-                    } else {
-                        ExpressionsBasedModel nodeModel = myIntegerModel.snapshot();
-                        node.setNodeState(nodeModel, myStrategy);
-                        NodeSolver nodeSolver = nodeModel.prepare(mySense, NodeSolver::new);
-                        workerNormalExit &= this.compute(node, nodeSolver, nodePrinter, myStrategy);
+            NodeKey node = null;
+            try {
+                while (workerNormalExit && solverNormalExit.get() && !myOptimalityProven && !myDeferredNodes.isEmpty()) {
+
+                    // Registered as pessimistic before polling, so that no other worker can prove optimality
+                    // in the window between this node leaving the queue and its bound being recorded.
+                    myCheckedOutBounds.put(worker, pessimistic);
+
+                    if ((node = view.poll()) != null) {
+
+                        myCheckedOutBounds.put(worker, Double.valueOf(node.objective));
+
+                        if (!this.isIterationAllowed()) {
+                            workerNormalExit = false;
+                        } else if (this.isOptimalityProven()) {
+                            myOptimalityProven = true;
+                        } else if (!myStrategy.isGoodEnough(myBestResultSoFar, node.objective)) {
+                            workerNormalExit = myNodeStatistics.abandoned();
+                        } else {
+                            ExpressionsBasedModel nodeModel = myIntegerModel.snapshot();
+                            node.setNodeState(nodeModel, myStrategy);
+                            NodeSolver nodeSolver = nodeModel.prepare(mySense, NodeSolver::new);
+                            workerNormalExit &= this.compute(node, nodeSolver, nodePrinter, myStrategy);
+                        }
+
+                        node.dispose();
                     }
 
-                    node.dispose();
-                }
+                    myCheckedOutBounds.remove(worker);
 
-                if (!workerNormalExit) {
-                    solverNormalExit.set(workerNormalExit);
+                    if (!workerNormalExit) {
+                        solverNormalExit.set(workerNormalExit);
+                    }
                 }
+            } finally {
+                myCheckedOutBounds.remove(worker);
             }
         });
 
@@ -337,24 +367,12 @@ public final class IntegerSolver extends GenericSolver {
         if (this.identifyNonIntegerVariable(probeResult, rootNode, myStrategy) != -1) {
             return;
         }
-        if (!myIntegerModel.validate(probeResult)) {
+        Optimisation.Result candidate = this.validIntegerCandidate(probeResult, myStrategy);
+        if (candidate == null) {
             return;
         }
-        Optimisation.Result integerResult = new Optimisation.Result(Optimisation.State.FEASIBLE, probeValue, probeResult);
+        Optimisation.Result integerResult = new Optimisation.Result(Optimisation.State.FEASIBLE, probeValue, candidate);
         this.markInteger(rootNode, integerResult, myStrategy);
-    }
-
-    private void generateRootCuts() {
-
-        ExpressionsBasedModel cutModel = myIntegerModel.snapshot();
-        NodeSolver cutSolver = cutModel.prepare(mySense, NodeSolver::new);
-        Optimisation.Result cutResult = cutSolver.solve(this.getBestEstimate());
-
-        if (cutResult != null && cutResult.getState().isOptimal()) {
-            cutSolver.generateRootCuts(myIntegerModel, 10);
-        }
-
-        cutSolver.dispose();
     }
 
     /**
@@ -376,6 +394,14 @@ public final class IntegerSolver extends GenericSolver {
             bound = mySense == Optimisation.Sense.MIN ? Math.min(bound, head.objective) : Math.max(bound, head.objective);
         }
 
+        for (Double checkedOut : myCheckedOutBounds.values()) {
+            double value = checkedOut.doubleValue();
+            if (!Double.isFinite(value)) {
+                return pessimistic;
+            }
+            bound = mySense == Optimisation.Sense.MIN ? Math.min(bound, value) : Math.max(bound, value);
+        }
+
         return bound;
     }
 
@@ -392,6 +418,17 @@ public final class IntegerSolver extends GenericSolver {
         }
 
         double incumbentValue = incumbent.getValue();
+
+        if (myStrategy.isObjectiveIntegral()) {
+            // With an integral objective the bound can be rounded to the next attainable value, and
+            // optimality is proven as soon as no attainable value lies strictly between bound and incumbent
+            if (myStrategy.isLatticeGapClosed(incumbentValue, bound)) {
+                return true;
+            }
+            bound = myStrategy.toLatticeBound(bound);
+            incumbentValue = myStrategy.toLatticeValue(incumbentValue);
+        }
+
         double gap = Math.max(ZERO, mySense == Optimisation.Sense.MIN ? incumbentValue - bound : bound - incumbentValue);
 
         return gap <= myGapTolerance.error(incumbentValue);
@@ -412,6 +449,10 @@ public final class IntegerSolver extends GenericSolver {
         try {
 
             Optimisation.Result rootResult = rootSolver.solve(this.getBestEstimate());
+
+            if (rootSolver.generateCuts(myStrategy, myCutStatistics, true)) {
+                rootResult = rootSolver.solve(rootResult);
+            }
 
             if (rootResult.getState().isOptimal() && rootSolver.isInPlaceBoundUpdateSafe()) {
 
@@ -532,6 +573,51 @@ public final class IntegerSolver extends GenericSolver {
         }
     }
 
+    private Optimisation.Result snapIntegers(final Optimisation.Result relaxed, final ModelStrategy strategy) {
+
+        int nbVars = relaxed.size();
+        BigDecimal[] snapped = new BigDecimal[nbVars];
+
+        for (int i = 0, limit = strategy.countIntegerVariables(); i < limit; i++) {
+            int globalIndex = strategy.getIndex(i);
+            snapped[globalIndex] = BigDecimal.valueOf(Math.rint(relaxed.doubleValue(globalIndex)));
+        }
+
+        for (int j = 0; j < nbVars; j++) {
+            if (snapped[j] == null) {
+                snapped[j] = BigDecimal.valueOf(relaxed.doubleValue(j));
+            }
+        }
+
+        return relaxed.withSolution(Access1D.wrap(snapped));
+    }
+
+    /**
+     * A relaxation solution that passed the integrality test still carries LP-level noise (integer variables
+     * at {@code 1.0000000000107}, row activities off their limits by 1e-11). The model's own feasibility
+     * context ({@code options.feasibility}, 12 significant digits) is a relative 1e-11 test near a limit and
+     * would discard genuine integer solutions for that noise, which turns the node into an infeasible leaf
+     * and loses its subtree (22433, p0291). Candidates are therefore validated with
+     * {@link #CANDIDATE_FEASIBILITY}, consistent with what the LP delivers. If the point with its integer
+     * variables snapped to integers validates as well, that cleaner point is the one kept.
+     *
+     * @return The validated candidate, or null if the relaxation solution is not feasible
+     */
+    private Optimisation.Result validIntegerCandidate(final Optimisation.Result relaxed, final ModelStrategy strategy) {
+
+        if (!myIntegerModel.validate(relaxed, CANDIDATE_FEASIBILITY, BasicLogger.NULL)) {
+            return null;
+        }
+
+        Optimisation.Result snapped = this.snapIntegers(relaxed, strategy);
+
+        if (myIntegerModel.validate(snapped, CANDIDATE_FEASIBILITY, BasicLogger.NULL)) {
+            return snapped;
+        }
+
+        return relaxed;
+    }
+
     protected Optimisation.Result getBestEstimate() {
         return new Optimisation.Result(Optimisation.State.APPROXIMATE, this.getBestResultSoFar());
     }
@@ -564,6 +650,7 @@ public final class IntegerSolver extends GenericSolver {
     protected void logProgress(final int iterationsDone, final String classSimpleName, final CalendarDateDuration duration) {
 
         this.log("Done {} {} iterations in {} with {}", iterationsDone, classSimpleName, duration, myNodeStatistics);
+        this.log("Cuts {}", myCutStatistics);
 
         if (myBoundView != null) {
             double bound = this.globalDualBound(myBoundView);
@@ -577,6 +664,10 @@ public final class IntegerSolver extends GenericSolver {
                         Double.isFinite(bound) ? bound : "n/a");
             }
         }
+    }
+
+    CutStatistics getCutStatistics() {
+        return myCutStatistics;
     }
 
     protected synchronized void markInteger(final NodeKey key, final Optimisation.Result result, final ModelStrategy strategy) {
@@ -629,6 +720,14 @@ public final class IntegerSolver extends GenericSolver {
         // strict-improvement-via-LP-infeasibility. (No-op for QP MIPs - limitObjective doesn't
         // install constraints for quadratic objectives.)
         double nudge = Math.max(Math.ulp(bestValue), 1.0e-12);
+
+        if (strategy.isObjectiveIntegral()) {
+            // The next attainable objective value is a whole lattice unit away. (The row is an integer
+            // expression, so limitObjective's tightening rounds the limit to the lattice anyway; the slack
+            // keeps that rounding from landing on the wrong side because of noise in bestValue.)
+            bestValue = strategy.toLatticeValue(bestValue);
+            nudge = strategy.getObjectiveLatticeUnit() * (ONE - 1.0E-6);
+        }
 
         if (mySense != Optimisation.Sense.MAX) {
             myIntegerModel.limitObjective(null, BigDecimal.valueOf(bestValue - nudge));
@@ -707,11 +806,12 @@ public final class IntegerSolver extends GenericSolver {
                 }
 
                 nodeSolver.dispose();
-                if (nodeKey.sequence == 0 && (nodeResult.getState().isUnexplored() || !nodeResult.getState().isValid())) {
-                    // return false;
+                if (!nodeResult.getState().isFailure() || nodeKey.sequence == 0 && !nodeResult.getState().isValid()) {
+                    // Neither optimal nor infeasible (FEASIBLE, APPROXIMATE...): the LP stopped short of
+                    // optimality, so the node can neither be bounded nor pruned and the search cannot claim
+                    // optimality. Abort (the result is reported as FEASIBLE, not OPTIMAL).
                     return myNodeStatistics.failed();
                 }
-                // return true;
                 double incumbentValue = myBestResultSoFar != null ? myBestResultSoFar.getValue() : Double.NaN;
                 strategy.markInfeasible(nodeKey, myBestResultSoFar != null, incumbentValue);
                 return myNodeStatistics.infeasible();
@@ -764,7 +864,9 @@ public final class IntegerSolver extends GenericSolver {
                     nodePrinter.println("Integer solution! Store it among the others, and stop this branch!");
                 }
 
-                if (!myIntegerModel.validate(nodeResult)) {
+                Optimisation.Result integerCandidate = this.validIntegerCandidate(nodeResult, strategy);
+
+                if (integerCandidate == null) {
                     if (nodePrinter != null && this.isLogDebug()) {
                         nodePrinter.println("Candidate integer solution is infeasible for the original model. Discarding.");
                         IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
@@ -775,7 +877,7 @@ public final class IntegerSolver extends GenericSolver {
                     return myNodeStatistics.infeasible();
                 }
 
-                Optimisation.Result tmpIntegerSolutionResult = new Optimisation.Result(Optimisation.State.FEASIBLE, nodeValue, nodeResult);
+                Optimisation.Result tmpIntegerSolutionResult = new Optimisation.Result(Optimisation.State.FEASIBLE, nodeValue, integerCandidate);
 
                 this.markInteger(nodeKey, tmpIntegerSolutionResult, strategy);
 
@@ -813,7 +915,7 @@ public final class IntegerSolver extends GenericSolver {
             }
 
             if (!nodeSolver.isCutRoundDone() && strategy.isCutRatherThanBranch(nodeKey, branchIntegerIndex, variableValue, nodeValue, myBestResultSoFar)) {
-                if (nodeSolver.generateCuts(strategy, nodeKey)) {
+                if (nodeSolver.generateCuts(strategy, myCutStatistics, nodeKey.depth == 0)) {
                     strategy.onCutSuccess(nodeKey);
                     return this.compute(nodeKey, nodeSolver, nodePrinter, strategy);
                 } else {
@@ -872,9 +974,10 @@ public final class IntegerSolver extends GenericSolver {
 
             if (absRC > ZERO) {
                 if (Math.abs(value - lower) < 0.5) {
-                    int maxSteps = (int) Math.floor(gap / absRC);
-                    int newUpper = lower + maxSteps;
-                    if (newUpper < upper) {
+                    // gap / absRC can exceed the int range - compare before converting
+                    double maxSteps = Math.floor(gap / absRC);
+                    if (maxSteps < upper - (double) lower) {
+                        int newUpper = lower + (int) maxSteps;
                         NodeKey prev = nodeKey;
                         nodeKey = nodeKey.withTightenedUpper(i, newUpper);
                         if (prev != original && prev != nodeKey) {
@@ -883,9 +986,9 @@ public final class IntegerSolver extends GenericSolver {
                         nodeKey.enforceBounds(nodeSolver, i, strategy);
                     }
                 } else if (Math.abs(value - upper) < 0.5) {
-                    int maxSteps = (int) Math.floor(gap / absRC);
-                    int newLower = upper - maxSteps;
-                    if (newLower > lower) {
+                    double maxSteps = Math.floor(gap / absRC);
+                    if (maxSteps < upper - (double) lower) {
+                        int newLower = upper - (int) maxSteps;
                         NodeKey prev = nodeKey;
                         nodeKey = nodeKey.withTightenedLower(i, newLower);
                         if (prev != original && prev != nodeKey) {
