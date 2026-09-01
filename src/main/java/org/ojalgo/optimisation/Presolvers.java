@@ -241,10 +241,7 @@ public abstract class Presolvers {
                     return Presolvers.doCase1(expression, remaining, lower, upper, precision);
                 case 2:
                     return Presolvers.doCase2(expression, remaining, lower, upper, precision);
-                //            case 3:
-                //            case 4:
-                //            case 5:
-                //                return Presolvers.doCase3(expression, remaining, lower, upper, precision);
+                // doCase3 (bound propagation) disabled — see doBoundPropagation javadoc
                 default:
                     return Presolvers.doCaseN(expression, remaining, lower, upper, precision);
             }
@@ -356,8 +353,11 @@ public abstract class Presolvers {
      * all free variables, then for each variable subtracts its own contribution to derive implied bounds from
      * the remaining variables. Generalises the logic in doCase2 to any number of variables.
      * <p>
-     * Although it seems correct, applying this pre-solver caused numerical issues in the solvers. Will have
-     * to wait
+     * Disabled: enabling this for constraints with 3+ variables caused LP test failures and made
+     * MIPLIBTheEasySet 2-3x slower (tested 2026-09). The tightened variable bounds also did not help
+     * fixed-charge network models (fixnet3, vpm1) because the LP relaxation quality is driven by VUB
+     * constraint coefficients, not variable bounds — coefficient strengthening on the VUB expression
+     * itself would be needed instead.
      */
     static boolean doBoundPropagation(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
             final NumberContext precision) {

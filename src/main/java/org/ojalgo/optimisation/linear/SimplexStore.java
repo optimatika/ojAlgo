@@ -98,6 +98,12 @@ abstract class SimplexStore {
         }
     }
 
+    /**
+     * Either the primal or dual devex edge weights, depending on the algorithm used. Sized so that it can
+     * hold either.
+     */
+    private static final double DEVEX_LIMIT = 1E8;
+
     static Function<LinearStructure, SimplexStore> newStoreFactory(final Options options) {
 
         return structure -> {
@@ -142,11 +148,6 @@ abstract class SimplexStore {
     private int myRemainingArtificials;
     private final List<String> myToStringList = new ArrayList<>();
     private final double[] myUpperBounds;
-    /**
-     * Either the primal or dual devex edge weights, depending on the algorithm used. Sized so that it can
-     * hold either.
-     */
-    private static final double DEVEX_LIMIT = 1E8;
 
     final double[] edgeWeights;
     /**
@@ -404,16 +405,40 @@ abstract class SimplexStore {
 
     abstract double extractValue();
 
-    Equation generateCut(final Primitive1D body, final int index, final double rhs, final double fractionality, final int[] excluded, final boolean[] integers,
-            final double[] lowers, final double[] uppers) {
-        return TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integers, lowers, uppers);
+    Equation generateCut(final Primitive1D body, final int index, final double rhs, final double fractionality, final boolean[] integers, final double[] lowers,
+            final double[] uppers, final boolean[] atUpper, final boolean mirRelaxation) {
+
+        Equation retVal = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integers, lowers, uppers, atUpper, mirRelaxation);
+
+        if (retVal != null) {
+            int nbModelVars = structure.countModelVariables();
+            double limit = retVal.getRHS();
+            for (int je = 0; je < excluded.length; je++) {
+                int j = excluded[je];
+                if (j < nbModelVars) {
+                    double cj = retVal.doubleValue(j);
+                    if (cj != ZERO) {
+                        if (atUpper[j]) {
+                            limit -= cj * uppers[j];
+                            retVal.set(j, -cj);
+                        } else if (lowers[j] != ZERO) {
+                            limit += cj * lowers[j];
+                        }
+                    }
+                }
+            }
+            retVal.setRHS(limit);
+        }
+
+        return retVal;
     }
 
     /**
      * When {@link SimplexSolver} is used as node solver for {@link IntegerSolver} this method generates cut
      * candidates.
      */
-    final Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality) {
+    final Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality,
+            final boolean mirRelaxation) {
 
         if (myRemainingArtificials > 0) {
             return Collections.emptyList();
@@ -464,6 +489,14 @@ abstract class SimplexStore {
             origUpperBounds = myCachedOriginalUpperBounds;
         }
 
+        boolean[] atUpper = new boolean[nbVars];
+        for (int je = 0; je < excluded.length; je++) {
+            int ej = excluded[je];
+            if (ej < nbVars) {
+                atUpper[ej] = this.getColumnState(ej) == ColumnState.UPPER;
+            }
+        }
+
         List<Equation> retVal = new ArrayList<>();
 
         for (int i = 0; i < m; i++) {
@@ -475,9 +508,6 @@ abstract class SimplexStore {
 
             double rhs = this.getCurrentRHS(i);
             if (scaled) {
-                // Basic variable can be a model variable (j < nbModelVars) or a slack/artificial whose
-                // constraint expression itself is flagged integer (then integer[j] is true and we still
-                // generate a cut from it). The unscaling factor C_p[j] differs by column type.
                 if (j < nbModelVars) {
                     rhs *= primalScale[j];
                 } else {
@@ -495,7 +525,7 @@ abstract class SimplexStore {
                     body = this.unscaleBodyRow(body, j);
                 }
 
-                Equation maybe = this.generateCut(body, j, rhs, fractionality, excluded, integer, origLowerBounds, origUpperBounds);
+                Equation maybe = this.generateCut(body, j, rhs, fractionality, integer, origLowerBounds, origUpperBounds, atUpper, mirRelaxation);
 
                 if (maybe != null) {
                     retVal.add(maybe);
@@ -679,8 +709,8 @@ abstract class SimplexStore {
     abstract <T extends Mutate1D & Access1D<Double>> T phase1();
 
     /**
-     * Prepare the store for an iteration sequence. {@code warm == false} (cold solve) does the full prepare
-     * — recompute duals &amp; reduced costs and refresh the basic solution. {@code warm == true} (retained
+     * Prepare the store for an iteration sequence. {@code warm == false} (cold solve) does the full prepare —
+     * recompute duals &amp; reduced costs and refresh the basic solution. {@code warm == true} (retained
      * optimal basis after a bound-only change) does the lean prepare — duals/reduced costs are unchanged so
      * they are kept; only the basic solution is refreshed.
      */
@@ -716,8 +746,8 @@ abstract class SimplexStore {
      * Devex reference weights are approximations that only ever grow between reference framework restarts.
      * Without a restart they degrade without bound - on QAP8 they reached ~1E304, at which point the
      * (infeasibility * infeasibility) / weight pricing score underflows to zero for every candidate and the
-     * dual simplex stops selecting any exiting variable. Restarting when the largest weight passes this
-     * limit is the standard remedy.
+     * dual simplex stops selecting any exiting variable. Restarting when the largest weight passes this limit
+     * is the standard remedy.
      */
     final void resetEdgeWeightsIfDegraded(final double largest) {
         if (largest > DEVEX_LIMIT) {

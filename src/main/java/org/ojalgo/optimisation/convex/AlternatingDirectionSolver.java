@@ -23,7 +23,6 @@ package org.ojalgo.optimisation.convex;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -36,7 +35,6 @@ import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.DOT;
 import org.ojalgo.array.operation.MULTIPLY;
 import org.ojalgo.array.operation.NRMINF;
-import org.ojalgo.equation.Equation;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
@@ -834,11 +832,6 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
     @Override
     public boolean fixVariable(final int index, final double value) {
         return this.updateRange(index, value, value);
-    }
-
-    @Override
-    public Collection<Equation> generateCutCandidates(final double fractionality, final boolean[] integer) {
-        return Set.of();
     }
 
     @Override

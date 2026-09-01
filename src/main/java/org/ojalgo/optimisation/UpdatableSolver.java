@@ -28,6 +28,8 @@ import java.util.Optional;
 import org.ojalgo.equation.Equation;
 import org.ojalgo.optimisation.ExpressionsBasedModel.EntityMap;
 import org.ojalgo.optimisation.convex.ConvexSolver;
+import org.ojalgo.optimisation.integer.IntegerStrategy;
+import org.ojalgo.optimisation.integer.IntegerStrategy.GMICutConfiguration;
 import org.ojalgo.optimisation.linear.LinearSolver;
 
 /**
@@ -51,6 +53,19 @@ public interface UpdatableSolver extends Optimisation.Solver {
     }
 
     /**
+     * Generate candidate GMI cutting planes that separate the current fractional solution from the
+     * integer-feasible region.
+     *
+     * @param integer       mask aligned with solver-internal indices; {@code true} for integer-constrained
+     *                      variables
+     * @param configuration various tunable parameters for the algorithm
+     * @return valid inequalities to add, or an empty collection if none are generated
+     */
+    default Collection<Equation> generateCutCandidates(final boolean[] integer, final GMICutConfiguration configuration) {
+        return Collections.emptySet();
+    }
+
+    /**
      * Generate candidate cutting planes that separate the current fractional solution from the
      * integer-feasible region.
      *
@@ -59,9 +74,11 @@ public interface UpdatableSolver extends Optimisation.Solver {
      * @param integer       mask aligned with solver-internal indices; {@code true} for integer-constrained
      *                      variables
      * @return valid inequalities to add, or an empty collection if none are generated
+     * @deprecated v58 Use {@link #generateCutCandidates(boolean[], GMICutConfiguration)} instead
      */
+    @Deprecated
     default Collection<Equation> generateCutCandidates(final double fractionality, final boolean[] integer) {
-        return Collections.emptySet();
+        return this.generateCutCandidates(integer, IntegerStrategy.DEFAULT.getGMICutConfiguration().withFractionality(fractionality));
     }
 
     /**

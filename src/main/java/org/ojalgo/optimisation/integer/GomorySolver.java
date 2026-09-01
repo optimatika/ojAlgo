@@ -60,7 +60,8 @@ public final class GomorySolver extends GenericSolver {
 
     public static final ExpressionsBasedModel.Integration<GomorySolver> INTEGRATION = new GomorySolver.ModelIntegration();
 
-    private static final GMICutConfiguration GMI_CUT_CONFIGURATION = new GMICutConfiguration().withFractionality(0.01).withViolation(BigMath.HUNDRED);
+    private static final GMICutConfiguration GMI_CUT_CONFIGURATION = new GMICutConfiguration().withMirRelaxation(false).withFractionality(0.01)
+            .withViolation(BigMath.HUNDRED);
 
     public static GomorySolver newSolver(final ExpressionsBasedModel model) {
         return INTEGRATION.build(model);

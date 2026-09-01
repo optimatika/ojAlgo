@@ -50,12 +50,12 @@ import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 
 public final class NodeSolver extends IntermediateSolver {
 
-    private static final NumberContext PRECISION = NumberContext.of(12);
-    private static final NumberContext COEFFICIENT = PRECISION.withMode(RoundingMode.CEILING);
+    private static final NumberContext COEFFICIENT = NumberContext.of(12).withMode(RoundingMode.CEILING);
     private static final AtomicInteger COUNTER = new AtomicInteger();
     private static final boolean DEBUG = false;
-    private static final NumberContext LIMIT = PRECISION.withMode(RoundingMode.FLOOR);
+    private static final NumberContext LIMIT = NumberContext.of(12).withMode(RoundingMode.FLOOR);
     private static final NumberContext PARAMETERS = NumberContext.of(12);
+    private static final NumberContext PRECISION = NumberContext.of(12);
     private static final NumberContext SCALE = NumberContext.of(14);
 
     /**
@@ -66,8 +66,8 @@ public final class NodeSolver extends IntermediateSolver {
      */
     private boolean[] myCachedIntegers = null;
     private ExpressionsBasedModel.EntityMap myCachedIntegersFor = null;
-    private FlowCoverSeparator myFlowCoverSeparator = null;
     private boolean myCutRoundDone = false;
+    private FlowCoverSeparator myFlowCoverSeparator = null;
     private Boolean myInPlaceBoundUpdateSafe = null;
 
     NodeSolver(final ExpressionsBasedModel model) {
@@ -127,7 +127,7 @@ public final class NodeSolver extends IntermediateSolver {
                     myCachedIntegersFor = entityMap;
                 }
 
-                Collection<Equation> potentialCuts = updatable.generateCutCandidates(configuration.fractionality, integers);
+                Collection<Equation> potentialCuts = updatable.generateCutCandidates(integers, configuration);
 
                 int maxCuts = configuration.getMaxCuts(nbProblVars);
                 int maxElements = configuration.getMaxElements(nbProblVars);
@@ -324,16 +324,25 @@ public final class NodeSolver extends IntermediateSolver {
         return this.generateCuts(strategy);
     }
 
-    void generateRootCuts(final ExpressionsBasedModel target, final int maxRounds) {
+    void generateRootCuts(final ExpressionsBasedModel target, final int maxRounds, final GMICutConfiguration gmiConfig) {
 
         for (int round = 0; round < maxRounds; round++) {
 
-            if (!this.doGenerateFlowCoverCuts(target)) {
+            boolean added = this.doGenerateFlowCoverCuts(target);
+
+            if (gmiConfig != null) {
+                added |= this.doGenerateGMICuts(gmiConfig, target);
+            }
+
+            if (!added) {
                 break;
             }
 
             if (round + 1 < maxRounds) {
                 this.doGenerateFlowCoverCuts(this.getModel());
+                if (gmiConfig != null) {
+                    this.doGenerateGMICuts(gmiConfig, this.getModel());
+                }
                 this.reset();
                 Result result = this.solve(null);
                 if (result == null || !result.getState().isOptimal()) {

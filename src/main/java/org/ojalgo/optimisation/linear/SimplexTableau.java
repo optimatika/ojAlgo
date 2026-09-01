@@ -259,32 +259,35 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
     abstract boolean fixVariable(int index, double value);
 
     @Override
-    Equation generateCut(final Primitive1D body, final int index, final double rhs, final double fractionality, final int[] excluded, final boolean[] integers,
-            final double[] lowers, final double[] uppers) {
-        // SimplexStore.generateCutCandidates passes body/rhs/bounds already converted to original (unscaled)
-        // space when scaling is active. mySolutionShift is in scaled-internal space, so it must be unscaled
-        // to match. For a model variable j: shift_orig = shift_scaled * primal.values[j]. The transformed
-        // array is cached in myCachedScaledShifts and invalidated whenever mySolutionShift is mutated.
-        double[] shifts = mySolutionShift;
-        if (equilibrator != null) {
-            if (!myCachedScaledShiftsValid) {
-                if (myCachedScaledShifts == null || myCachedScaledShifts.length != mySolutionShift.length) {
-                    myCachedScaledShifts = new double[mySolutionShift.length];
+    Equation generateCut(final Primitive1D body, final int index, final double rhs, final double fractionality, final boolean[] integers, final double[] lowers,
+            final double[] uppers, final boolean[] atUpper, final boolean mirRelaxation) {
+
+        Equation eq = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integers, lowers, uppers, atUpper, mirRelaxation);
+
+        if (eq != null) {
+            double[] shifts = mySolutionShift;
+            if (equilibrator != null) {
+                if (!myCachedScaledShiftsValid) {
+                    if (myCachedScaledShifts == null || myCachedScaledShifts.length != mySolutionShift.length) {
+                        myCachedScaledShifts = new double[mySolutionShift.length];
+                    }
+                    double[] primalScale = equilibrator.primal.values;
+                    int nbModelVars = primalScale.length;
+                    int limModel = Math.min(myCachedScaledShifts.length, nbModelVars);
+                    for (int j = 0; j < limModel; j++) {
+                        myCachedScaledShifts[j] = mySolutionShift[j] * primalScale[j];
+                    }
+                    if (limModel < myCachedScaledShifts.length) {
+                        System.arraycopy(mySolutionShift, limModel, myCachedScaledShifts, limModel, myCachedScaledShifts.length - limModel);
+                    }
+                    myCachedScaledShiftsValid = true;
                 }
-                double[] primalScale = equilibrator.primal.values;
-                int nbModelVars = primalScale.length;
-                int limModel = Math.min(myCachedScaledShifts.length, nbModelVars);
-                for (int j = 0; j < limModel; j++) {
-                    myCachedScaledShifts[j] = mySolutionShift[j] * primalScale[j];
-                }
-                if (limModel < myCachedScaledShifts.length) {
-                    System.arraycopy(mySolutionShift, limModel, myCachedScaledShifts, limModel, myCachedScaledShifts.length - limModel);
-                }
-                myCachedScaledShiftsValid = true;
+                shifts = myCachedScaledShifts;
             }
-            shifts = myCachedScaledShifts;
+            TableauCutGenerator.applyShiftBackConversion(eq, excluded, lowers, uppers, shifts, atUpper);
         }
-        return TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integers, lowers, uppers, shifts);
+
+        return eq;
     }
 
     /**
@@ -292,7 +295,8 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
      * specific use with {@link SimplexTableauSolver}. {@link SimplexSolver} and {@link SimplexTableauSolver}
      * can both use {@link SimplexTableau}, but they use them differently.
      */
-    final Collection<Equation> generateSimpleCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality) {
+    final Collection<Equation> generateSimpleCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality,
+            final boolean mirRelaxation) {
 
         if (this.countRemainingArtificials() > 0) {
             return Collections.emptyList();
@@ -313,7 +317,7 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
 
             if (j >= 0 && j < nbVars && integer[j] && !accuracy.isInteger(rhs)) {
 
-                Equation maybe = TableauCutGenerator.doGomoryMixedInteger(this.sliceBodyRow(i), j, rhs, fractionality, excluded, integer);
+                Equation maybe = TableauCutGenerator.doGomoryMixedInteger(this.sliceBodyRow(i), j, rhs, fractionality, excluded, integer, mirRelaxation);
 
                 if (maybe != null) {
                     retVal.add(maybe);

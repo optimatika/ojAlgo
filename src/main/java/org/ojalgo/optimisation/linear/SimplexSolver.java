@@ -41,6 +41,7 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexData;
+import org.ojalgo.optimisation.integer.IntegerStrategy.GMICutConfiguration;
 import org.ojalgo.optimisation.linear.SimplexStore.ColumnState;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
@@ -727,11 +728,11 @@ abstract class SimplexSolver extends LinearSolver {
     }
 
     @Override
-    public final Collection<Equation> generateCutCandidates(final double fractionality, final boolean[] integer) {
+    public final Collection<Equation> generateCutCandidates(final boolean[] integer, final GMICutConfiguration configuration) {
 
         NumberContext integralityTolerance = options.integer().getIntegralityTolerance();
 
-        return mySimplex.generateCutCandidates(integer, integralityTolerance, fractionality);
+        return mySimplex.generateCutCandidates(integer, integralityTolerance, configuration.fractionality, configuration.mirRelaxation);
     }
 
     @Override

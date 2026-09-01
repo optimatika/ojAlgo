@@ -166,6 +166,12 @@ public interface IntegerStrategy {
          */
         public final double fractionality;
         /**
+         * When true, positive continuous variable coefficients are dropped from the cut (set to zero). This
+         * is the Mixed-Integer Rounding (MIR) relaxation. It produces weaker but numerically more stable
+         * cuts, which allows using a lower fractionality threshold.
+         */
+        public final boolean mirRelaxation;
+        /**
          * After the cut is generated it is transformed to be expressed in the original model variables. In
          * this process the RHS of the cut inequality changes. This parameter controls how much the RHS is
          * allowed to grow in magnitude. If it grows/expands to much the cut is discarded.
@@ -185,16 +191,17 @@ public interface IntegerStrategy {
         private final int myMaxElementsFloor;
 
         public GMICutConfiguration() {
-            this(NumberContext.of(7), NumberContext.of(6), PrimitiveMath.ELEVENTH, BigMath.TWELVE, 10, 3, 100, 10, 10, 100);
+            this(NumberContext.of(7), NumberContext.of(6), PrimitiveMath.ELEVENTH, false, BigMath.TWELVE, 10, 3, 100, 10, 10, 100);
         }
 
-        private GMICutConfiguration(final NumberContext newDynanism, final NumberContext newEfficacy, final double newAway, final BigDecimal newExpansion,
-                final int newMaxCutsFloor, final int newMaxCutsDivisor, final int newMaxCutsCeiling, final int newMaxElementsFloor,
-                final int newMaxElementsDivisor, final int newMaxElementsCeiling) {
+        private GMICutConfiguration(final NumberContext newDynanism, final NumberContext newEfficacy, final double newAway, final boolean newMirRelaxation,
+                final BigDecimal newExpansion, final int newMaxCutsFloor, final int newMaxCutsDivisor, final int newMaxCutsCeiling,
+                final int newMaxElementsFloor, final int newMaxElementsDivisor, final int newMaxElementsCeiling) {
             super();
             dynanism = newDynanism;
             efficacy = newEfficacy;
             fractionality = newAway;
+            mirRelaxation = newMirRelaxation;
             violation = newExpansion;
             myMaxCutsFloor = newMaxCutsFloor;
             myMaxCutsDivisor = newMaxCutsDivisor;
@@ -213,18 +220,18 @@ public interface IntegerStrategy {
         }
 
         public GMICutConfiguration withDynanism(final NumberContext newDynanism) {
-            return new GMICutConfiguration(newDynanism, efficacy, fractionality, violation, myMaxCutsFloor, myMaxCutsDivisor, myMaxCutsCeiling,
+            return new GMICutConfiguration(newDynanism, efficacy, fractionality, mirRelaxation, violation, myMaxCutsFloor, myMaxCutsDivisor, myMaxCutsCeiling,
                     myMaxElementsFloor, myMaxElementsDivisor, myMaxElementsCeiling);
         }
 
         public GMICutConfiguration withEfficacy(final NumberContext newEfficacy) {
-            return new GMICutConfiguration(dynanism, newEfficacy, fractionality, violation, myMaxCutsFloor, myMaxCutsDivisor, myMaxCutsCeiling,
+            return new GMICutConfiguration(dynanism, newEfficacy, fractionality, mirRelaxation, violation, myMaxCutsFloor, myMaxCutsDivisor, myMaxCutsCeiling,
                     myMaxElementsFloor, myMaxElementsDivisor, myMaxElementsCeiling);
         }
 
         public GMICutConfiguration withFractionality(final double newFractionality) {
-            return new GMICutConfiguration(dynanism, efficacy, Math.min(Math.abs(newFractionality), 0.5), violation, myMaxCutsFloor, myMaxCutsDivisor,
-                    myMaxCutsCeiling, myMaxElementsFloor, myMaxElementsDivisor, myMaxElementsCeiling);
+            return new GMICutConfiguration(dynanism, efficacy, Math.min(Math.abs(newFractionality), 0.5), mirRelaxation, violation, myMaxCutsFloor,
+                    myMaxCutsDivisor, myMaxCutsCeiling, myMaxElementsFloor, myMaxElementsDivisor, myMaxElementsCeiling);
         }
 
         /**
@@ -233,8 +240,8 @@ public interface IntegerStrategy {
          * @param ceiling absolute maximum number of cuts accepted
          */
         public GMICutConfiguration withMaxCuts(final int floor, final int divisor, final int ceiling) {
-            return new GMICutConfiguration(dynanism, efficacy, fractionality, violation, Math.max(1, floor), Math.max(1, divisor), Math.max(1, ceiling),
-                    myMaxElementsFloor, myMaxElementsDivisor, myMaxElementsCeiling);
+            return new GMICutConfiguration(dynanism, efficacy, fractionality, mirRelaxation, violation, Math.max(1, floor), Math.max(1, divisor),
+                    Math.max(1, ceiling), myMaxElementsFloor, myMaxElementsDivisor, myMaxElementsCeiling);
         }
 
         /**
@@ -243,13 +250,18 @@ public interface IntegerStrategy {
          * @param ceiling absolute maximum number of non-zero coefficients allowed
          */
         public GMICutConfiguration withMaxElements(final int floor, final int divisor, final int ceiling) {
-            return new GMICutConfiguration(dynanism, efficacy, fractionality, violation, myMaxCutsFloor, myMaxCutsDivisor, myMaxCutsCeiling, Math.max(1, floor),
-                    Math.max(1, divisor), Math.max(1, ceiling));
+            return new GMICutConfiguration(dynanism, efficacy, fractionality, mirRelaxation, violation, myMaxCutsFloor, myMaxCutsDivisor, myMaxCutsCeiling,
+                    Math.max(1, floor), Math.max(1, divisor), Math.max(1, ceiling));
+        }
+
+        public GMICutConfiguration withMirRelaxation(final boolean newMirRelaxation) {
+            return new GMICutConfiguration(dynanism, efficacy, fractionality, newMirRelaxation, violation, myMaxCutsFloor, myMaxCutsDivisor, myMaxCutsCeiling,
+                    myMaxElementsFloor, myMaxElementsDivisor, myMaxElementsCeiling);
         }
 
         public GMICutConfiguration withViolation(final BigDecimal newViolation) {
-            return new GMICutConfiguration(dynanism, efficacy, fractionality, newViolation.abs(), myMaxCutsFloor, myMaxCutsDivisor, myMaxCutsCeiling,
-                    myMaxElementsFloor, myMaxElementsDivisor, myMaxElementsCeiling);
+            return new GMICutConfiguration(dynanism, efficacy, fractionality, mirRelaxation, newViolation.abs(), myMaxCutsFloor, myMaxCutsDivisor,
+                    myMaxCutsCeiling, myMaxElementsFloor, myMaxElementsDivisor, myMaxElementsCeiling);
         }
 
     }

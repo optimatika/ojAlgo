@@ -351,7 +351,7 @@ public final class IntegerSolver extends GenericSolver {
         Optimisation.Result cutResult = cutSolver.solve(this.getBestEstimate());
 
         if (cutResult != null && cutResult.getState().isOptimal()) {
-            cutSolver.generateRootCuts(myIntegerModel, 10);
+            cutSolver.generateRootCuts(myIntegerModel, 10, null);
         }
 
         cutSolver.dispose();
