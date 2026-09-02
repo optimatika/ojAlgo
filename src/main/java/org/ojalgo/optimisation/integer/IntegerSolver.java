@@ -235,8 +235,6 @@ public final class IntegerSolver extends GenericSolver {
 
         this.resetIterationsCount();
 
-        this.generateRootCuts();
-
         NodeKey rootNode = new NodeKey(myIntegerModel);
         ExpressionsBasedModel rootModel = myIntegerModel.snapshot();
         rootNode.setNodeState(rootModel, myStrategy);
@@ -344,19 +342,6 @@ public final class IntegerSolver extends GenericSolver {
         this.markInteger(rootNode, integerResult, myStrategy);
     }
 
-    private void generateRootCuts() {
-
-        ExpressionsBasedModel cutModel = myIntegerModel.snapshot();
-        NodeSolver cutSolver = cutModel.prepare(mySense, NodeSolver::new);
-        Optimisation.Result cutResult = cutSolver.solve(this.getBestEstimate());
-
-        if (cutResult != null && cutResult.getState().isOptimal()) {
-            cutSolver.generateRootCuts(myIntegerModel, 10, null);
-        }
-
-        cutSolver.dispose();
-    }
-
     /**
      * Valid bound on the optimal integer objective: best relaxation bound over all open subtrees (deferred
      * frontier head + nodes currently checked out by workers). A non-finite contribution could hide an
@@ -412,6 +397,10 @@ public final class IntegerSolver extends GenericSolver {
         try {
 
             Optimisation.Result rootResult = rootSolver.solve(this.getBestEstimate());
+
+            if (rootSolver.generateCuts(myStrategy)) {
+                rootResult = rootSolver.solve(rootResult);
+            }
 
             if (rootResult.getState().isOptimal() && rootSolver.isInPlaceBoundUpdateSafe()) {
 
@@ -813,7 +802,7 @@ public final class IntegerSolver extends GenericSolver {
             }
 
             if (!nodeSolver.isCutRoundDone() && strategy.isCutRatherThanBranch(nodeKey, branchIntegerIndex, variableValue, nodeValue, myBestResultSoFar)) {
-                if (nodeSolver.generateCuts(strategy, nodeKey)) {
+                if (nodeSolver.generateCuts(strategy)) {
                     strategy.onCutSuccess(nodeKey);
                     return this.compute(nodeKey, nodeSolver, nodePrinter, strategy);
                 } else {

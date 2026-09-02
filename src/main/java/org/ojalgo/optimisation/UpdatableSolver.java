@@ -29,7 +29,7 @@ import org.ojalgo.equation.Equation;
 import org.ojalgo.optimisation.ExpressionsBasedModel.EntityMap;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.integer.IntegerStrategy;
-import org.ojalgo.optimisation.integer.IntegerStrategy.GMICutConfiguration;
+import org.ojalgo.optimisation.integer.IntegerStrategy.CutConfiguration;
 import org.ojalgo.optimisation.linear.LinearSolver;
 
 /**
@@ -61,7 +61,7 @@ public interface UpdatableSolver extends Optimisation.Solver {
      * @param configuration various tunable parameters for the algorithm
      * @return valid inequalities to add, or an empty collection if none are generated
      */
-    default Collection<Equation> generateCutCandidates(final boolean[] integer, final GMICutConfiguration configuration) {
+    default Collection<Equation> generateCutCandidates(final boolean[] integer, final CutConfiguration configuration) {
         return Collections.emptySet();
     }
 
@@ -74,7 +74,7 @@ public interface UpdatableSolver extends Optimisation.Solver {
      * @param integer       mask aligned with solver-internal indices; {@code true} for integer-constrained
      *                      variables
      * @return valid inequalities to add, or an empty collection if none are generated
-     * @deprecated v58 Use {@link #generateCutCandidates(boolean[], GMICutConfiguration)} instead
+     * @deprecated v58 Use {@link #generateCutCandidates(boolean[], CutConfiguration)} instead
      */
     @Deprecated
     default Collection<Equation> generateCutCandidates(final double fractionality, final boolean[] integer) {

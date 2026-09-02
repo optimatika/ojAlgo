@@ -42,13 +42,16 @@ public interface IntegerStrategy {
     final class ConfigurableStrategy implements IntegerStrategy {
 
         private final BiFunction<ExpressionsBasedModel, IntegerStrategy, ModelStrategy> myFactory;
+        private final CutConfiguration myFCCutConfiguration;
         private final NumberContext myGapTolerance;
-        private final GMICutConfiguration myGMICutConfiguration;
+        private final CutConfiguration myGMICutConfiguration;
         private final NumberContext myIntegralityTolerance;
+        private final CutConfiguration myMIRCutConfiguration;
         private final Comparator<NodeKey>[] myPriorityDefinitions;
 
         ConfigurableStrategy(final Comparator<NodeKey>[] definitions, final NumberContext integrality, final NumberContext gap,
-                final BiFunction<ExpressionsBasedModel, IntegerStrategy, ModelStrategy> factory, final GMICutConfiguration configuration) {
+                final BiFunction<ExpressionsBasedModel, IntegerStrategy, ModelStrategy> factory, final CutConfiguration fcConfiguration,
+                final CutConfiguration gmiConfiguration, final CutConfiguration mirConfiguration) {
 
             super();
 
@@ -56,7 +59,9 @@ public interface IntegerStrategy {
             myIntegralityTolerance = integrality;
             myGapTolerance = gap;
             myFactory = factory;
-            myGMICutConfiguration = configuration;
+            myFCCutConfiguration = fcConfiguration;
+            myGMICutConfiguration = gmiConfiguration;
+            myMIRCutConfiguration = mirConfiguration;
         }
 
         /**
@@ -75,7 +80,8 @@ public interface IntegerStrategy {
                 totalDefinitions[additionalDefinitions.length + i] = myPriorityDefinitions[i];
             }
 
-            return new ConfigurableStrategy(totalDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myGMICutConfiguration);
+            return new ConfigurableStrategy(totalDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myFCCutConfiguration, myGMICutConfiguration,
+                    myMIRCutConfiguration);
         }
 
         @Override
@@ -84,18 +90,28 @@ public interface IntegerStrategy {
         }
 
         @Override
+        public CutConfiguration getFCCutConfiguration() {
+            return myFCCutConfiguration;
+        }
+
+        @Override
         public NumberContext getGapTolerance() {
             return myGapTolerance;
         }
 
         @Override
-        public GMICutConfiguration getGMICutConfiguration() {
+        public CutConfiguration getGMICutConfiguration() {
             return myGMICutConfiguration;
         }
 
         @Override
         public NumberContext getIntegralityTolerance() {
             return myIntegralityTolerance;
+        }
+
+        @Override
+        public CutConfiguration getMIRCutConfiguration() {
+            return myMIRCutConfiguration;
         }
 
         @Override
@@ -118,39 +134,53 @@ public interface IntegerStrategy {
             return myFactory.apply(model, this);
         }
 
+        public ConfigurableStrategy withFCCutConfiguration(final CutConfiguration newConfiguration) {
+            return new ConfigurableStrategy(myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, newConfiguration, myGMICutConfiguration,
+                    myMIRCutConfiguration);
+        }
+
         /**
          * Change the MIP gap
          */
         public ConfigurableStrategy withGapTolerance(final NumberContext newTolerance) {
-            return new ConfigurableStrategy(myPriorityDefinitions, myIntegralityTolerance, newTolerance, myFactory, myGMICutConfiguration);
+            return new ConfigurableStrategy(myPriorityDefinitions, myIntegralityTolerance, newTolerance, myFactory, myFCCutConfiguration, myGMICutConfiguration,
+                    myMIRCutConfiguration);
         }
 
-        public ConfigurableStrategy withGMICutConfiguration(final GMICutConfiguration newConfiguration) {
-            return new ConfigurableStrategy(myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, newConfiguration);
+        public ConfigurableStrategy withGMICutConfiguration(final CutConfiguration newConfiguration) {
+            return new ConfigurableStrategy(myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myFCCutConfiguration, newConfiguration,
+                    myMIRCutConfiguration);
+        }
+
+        public ConfigurableStrategy withMIRCutConfiguration(final CutConfiguration newConfiguration) {
+            return new ConfigurableStrategy(myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myFCCutConfiguration,
+                    myGMICutConfiguration, newConfiguration);
         }
 
         /**
          * Create a sub-class of {@link ModelStrategy} and provide a factory method for it here.
          */
         public ConfigurableStrategy withModelStrategyFactory(final BiFunction<ExpressionsBasedModel, IntegerStrategy, ModelStrategy> newFactory) {
-            return new ConfigurableStrategy(myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, newFactory, myGMICutConfiguration);
+            return new ConfigurableStrategy(myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, newFactory, myFCCutConfiguration,
+                    myGMICutConfiguration, myMIRCutConfiguration);
         }
 
         /**
          * Replace the priority definitions with these ones.
          */
         public ConfigurableStrategy withPriorityDefinitions(final Comparator<NodeKey>... newDefinitions) {
-            return new ConfigurableStrategy(newDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myGMICutConfiguration);
+            return new ConfigurableStrategy(newDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myFCCutConfiguration, myGMICutConfiguration,
+                    myMIRCutConfiguration);
         }
 
     }
 
     /**
-     * Gomory Mixed Integer Cut Configuration
-     *
-     * @author apete
+     * Cut Configuration (initially/primarily designed for MIR and GMI cuts, but used for any/all types).
      */
-    public static final class GMICutConfiguration {
+    public static final class CutConfiguration {
+
+        public final int iterations;
 
         public final NumberContext dynanism;
 
@@ -190,22 +220,27 @@ public interface IntegerStrategy {
         private final int myMaxElementsDivisor;
         private final int myMaxElementsFloor;
 
-        public GMICutConfiguration() {
-            this(NumberContext.of(7), NumberContext.of(6), PrimitiveMath.ELEVENTH, false, BigMath.TWELVE, 10, 3, 100, 10, 10, 100);
+        public CutConfiguration() {
+            this(NumberContext.of(7), NumberContext.of(6), PrimitiveMath.ELEVENTH, false, BigMath.TWELVE, 10, 3, 100, 10, 10, 100, 1);
         }
 
-        private GMICutConfiguration(final NumberContext newDynanism, final NumberContext newEfficacy, final double newAway, final boolean newMirRelaxation,
+        private CutConfiguration(final NumberContext newDynanism, final NumberContext newEfficacy, final double newAway, final boolean newMirRelaxation,
                 final BigDecimal newExpansion, final int newMaxCutsFloor, final int newMaxCutsDivisor, final int newMaxCutsCeiling,
-                final int newMaxElementsFloor, final int newMaxElementsDivisor, final int newMaxElementsCeiling) {
+                final int newMaxElementsFloor, final int newMaxElementsDivisor, final int newMaxElementsCeiling, final int newIterations) {
+
             super();
+
             dynanism = newDynanism;
             efficacy = newEfficacy;
             fractionality = newAway;
             mirRelaxation = newMirRelaxation;
             violation = newExpansion;
+            iterations = newIterations;
+
             myMaxCutsFloor = newMaxCutsFloor;
             myMaxCutsDivisor = newMaxCutsDivisor;
             myMaxCutsCeiling = newMaxCutsCeiling;
+
             myMaxElementsFloor = newMaxElementsFloor;
             myMaxElementsDivisor = newMaxElementsDivisor;
             myMaxElementsCeiling = newMaxElementsCeiling;
@@ -219,19 +254,24 @@ public interface IntegerStrategy {
             return Math.max(myMaxElementsFloor, Math.min(nbVariables / myMaxElementsDivisor, myMaxElementsCeiling));
         }
 
-        public GMICutConfiguration withDynanism(final NumberContext newDynanism) {
-            return new GMICutConfiguration(newDynanism, efficacy, fractionality, mirRelaxation, violation, myMaxCutsFloor, myMaxCutsDivisor, myMaxCutsCeiling,
-                    myMaxElementsFloor, myMaxElementsDivisor, myMaxElementsCeiling);
+        public CutConfiguration withDynanism(final NumberContext newDynanism) {
+            return new CutConfiguration(newDynanism, efficacy, fractionality, mirRelaxation, violation, myMaxCutsFloor, myMaxCutsDivisor, myMaxCutsCeiling,
+                    myMaxElementsFloor, myMaxElementsDivisor, myMaxElementsCeiling, iterations);
         }
 
-        public GMICutConfiguration withEfficacy(final NumberContext newEfficacy) {
-            return new GMICutConfiguration(dynanism, newEfficacy, fractionality, mirRelaxation, violation, myMaxCutsFloor, myMaxCutsDivisor, myMaxCutsCeiling,
-                    myMaxElementsFloor, myMaxElementsDivisor, myMaxElementsCeiling);
+        public CutConfiguration withEfficacy(final NumberContext newEfficacy) {
+            return new CutConfiguration(dynanism, newEfficacy, fractionality, mirRelaxation, violation, myMaxCutsFloor, myMaxCutsDivisor, myMaxCutsCeiling,
+                    myMaxElementsFloor, myMaxElementsDivisor, myMaxElementsCeiling, iterations);
         }
 
-        public GMICutConfiguration withFractionality(final double newFractionality) {
-            return new GMICutConfiguration(dynanism, efficacy, Math.min(Math.abs(newFractionality), 0.5), mirRelaxation, violation, myMaxCutsFloor,
-                    myMaxCutsDivisor, myMaxCutsCeiling, myMaxElementsFloor, myMaxElementsDivisor, myMaxElementsCeiling);
+        public CutConfiguration withFractionality(final double newFractionality) {
+            return new CutConfiguration(dynanism, efficacy, Math.min(Math.abs(newFractionality), 0.5), mirRelaxation, violation, myMaxCutsFloor,
+                    myMaxCutsDivisor, myMaxCutsCeiling, myMaxElementsFloor, myMaxElementsDivisor, myMaxElementsCeiling, iterations);
+        }
+
+        public CutConfiguration withIterations(final int newIterations) {
+            return new CutConfiguration(dynanism, efficacy, fractionality, mirRelaxation, violation, myMaxCutsFloor, myMaxCutsDivisor, myMaxCutsCeiling,
+                    myMaxElementsFloor, myMaxElementsDivisor, myMaxElementsCeiling, newIterations);
         }
 
         /**
@@ -239,9 +279,9 @@ public interface IntegerStrategy {
          * @param divisor accepted cuts scale as {@code nbVariables / divisor}
          * @param ceiling absolute maximum number of cuts accepted
          */
-        public GMICutConfiguration withMaxCuts(final int floor, final int divisor, final int ceiling) {
-            return new GMICutConfiguration(dynanism, efficacy, fractionality, mirRelaxation, violation, Math.max(1, floor), Math.max(1, divisor),
-                    Math.max(1, ceiling), myMaxElementsFloor, myMaxElementsDivisor, myMaxElementsCeiling);
+        public CutConfiguration withMaxCuts(final int floor, final int divisor, final int ceiling) {
+            return new CutConfiguration(dynanism, efficacy, fractionality, mirRelaxation, violation, Math.max(1, floor), Math.max(1, divisor),
+                    Math.max(1, ceiling), myMaxElementsFloor, myMaxElementsDivisor, myMaxElementsCeiling, iterations);
         }
 
         /**
@@ -249,19 +289,19 @@ public interface IntegerStrategy {
          * @param divisor density limit scales as {@code nbVariables / divisor}
          * @param ceiling absolute maximum number of non-zero coefficients allowed
          */
-        public GMICutConfiguration withMaxElements(final int floor, final int divisor, final int ceiling) {
-            return new GMICutConfiguration(dynanism, efficacy, fractionality, mirRelaxation, violation, myMaxCutsFloor, myMaxCutsDivisor, myMaxCutsCeiling,
-                    Math.max(1, floor), Math.max(1, divisor), Math.max(1, ceiling));
+        public CutConfiguration withMaxElements(final int floor, final int divisor, final int ceiling) {
+            return new CutConfiguration(dynanism, efficacy, fractionality, mirRelaxation, violation, myMaxCutsFloor, myMaxCutsDivisor, myMaxCutsCeiling,
+                    Math.max(1, floor), Math.max(1, divisor), Math.max(1, ceiling), iterations);
         }
 
-        public GMICutConfiguration withMirRelaxation(final boolean newMirRelaxation) {
-            return new GMICutConfiguration(dynanism, efficacy, fractionality, newMirRelaxation, violation, myMaxCutsFloor, myMaxCutsDivisor, myMaxCutsCeiling,
-                    myMaxElementsFloor, myMaxElementsDivisor, myMaxElementsCeiling);
+        public CutConfiguration withMirRelaxation(final boolean newMirRelaxation) {
+            return new CutConfiguration(dynanism, efficacy, fractionality, newMirRelaxation, violation, myMaxCutsFloor, myMaxCutsDivisor, myMaxCutsCeiling,
+                    myMaxElementsFloor, myMaxElementsDivisor, myMaxElementsCeiling, iterations);
         }
 
-        public GMICutConfiguration withViolation(final BigDecimal newViolation) {
-            return new GMICutConfiguration(dynanism, efficacy, fractionality, mirRelaxation, newViolation.abs(), myMaxCutsFloor, myMaxCutsDivisor,
-                    myMaxCutsCeiling, myMaxElementsFloor, myMaxElementsDivisor, myMaxElementsCeiling);
+        public CutConfiguration withViolation(final BigDecimal newViolation) {
+            return new CutConfiguration(dynanism, efficacy, fractionality, mirRelaxation, newViolation.abs(), myMaxCutsFloor, myMaxCutsDivisor,
+                    myMaxCutsCeiling, myMaxElementsFloor, myMaxElementsDivisor, myMaxElementsCeiling, iterations);
         }
 
     }
@@ -276,10 +316,16 @@ public interface IntegerStrategy {
         NumberContext integrality = NumberContext.of(12, 8);
         NumberContext gap = NumberContext.of(5, 7);
 
-        return new ConfigurableStrategy(definitions, integrality, gap, DefaultStrategy::new, new GMICutConfiguration());
+        return new ConfigurableStrategy(definitions, integrality, gap, DefaultStrategy::new, FlowCoverSeparator.CONFIGURATION, GMISeparator.CONFIGURATION,
+                MIRSeparator.CONFIGURATION);
     }
 
     int countUniqueStrategies();
+
+    /**
+     * Flow Cover cut configuration
+     */
+    CutConfiguration getFCCutConfiguration();
 
     /**
      * The MIP gap is the difference between the best integer solution found so far and a node's relaxed
@@ -292,12 +338,20 @@ public interface IntegerStrategy {
      */
     NumberContext getGapTolerance();
 
-    GMICutConfiguration getGMICutConfiguration();
+    /**
+     * Gomory Mixed Integer cut configuration
+     */
+    CutConfiguration getGMICutConfiguration();
 
     /**
      * Used to determine if a variable value is integer or not
      */
     NumberContext getIntegralityTolerance();
+
+    /**
+     * Mixed Integer Rounding cut configuration
+     */
+    CutConfiguration getMIRCutConfiguration();
 
     /**
      * There will be 1 worker thread per item in the returned {@link List}. The {@link Comparator} instances

@@ -21,7 +21,6 @@
  */
 package org.ojalgo.optimisation.integer;
 
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ModelFileTest;
@@ -66,10 +65,9 @@ public class IntegerUserFiles extends OptimisationIntegerTests implements ModelF
      * MIP gap larger than NumberContext.of(7) misses the optimal solution.
      */
     @Test
-    @Tag("slow")
     public void testBigBinary() {
 
-        ConfigurableStrategy strategy = IntegerStrategy.DEFAULT.withGapTolerance(NumberContext.of(7));
+        ConfigurableStrategy strategy = IntegerStrategy.DEFAULT.withGapTolerance(NumberContext.of(6));
 
         IntegerUserFiles.doTest("BigBinary.ebm", null, "139.4070725458", strategy);
     }

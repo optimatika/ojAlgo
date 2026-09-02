@@ -41,7 +41,8 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.IntermediateSolver;
 import org.ojalgo.optimisation.ModelEntity;
 import org.ojalgo.optimisation.UpdatableSolver;
-import org.ojalgo.optimisation.integer.IntegerStrategy.GMICutConfiguration;
+import org.ojalgo.optimisation.Variable;
+import org.ojalgo.optimisation.integer.IntegerStrategy.CutConfiguration;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -50,9 +51,15 @@ import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 
 public final class NodeSolver extends IntermediateSolver {
 
+    abstract static class Separator {
+
+    }
+
     private static final NumberContext COEFFICIENT = NumberContext.of(12).withMode(RoundingMode.CEILING);
     private static final AtomicInteger COUNTER = new AtomicInteger();
     private static final boolean DEBUG = false;
+    private static final BigDecimal EPS_RELAX_ABS = new BigDecimal("1E-11");
+    private static final BigDecimal EPS_RELAX_REL = new BigDecimal("1E-13");
     private static final NumberContext LIMIT = NumberContext.of(12).withMode(RoundingMode.FLOOR);
     private static final NumberContext PARAMETERS = NumberContext.of(12);
     private static final NumberContext PRECISION = NumberContext.of(12);
@@ -69,12 +76,13 @@ public final class NodeSolver extends IntermediateSolver {
     private boolean myCutRoundDone = false;
     private FlowCoverSeparator myFlowCoverSeparator = null;
     private Boolean myInPlaceBoundUpdateSafe = null;
+    private MIRSeparator myMIRSeparator = null;
 
     NodeSolver(final ExpressionsBasedModel model) {
         super(model);
     }
 
-    private boolean doGenerateFlowCoverCuts(final ExpressionsBasedModel target) {
+    private boolean doGenerateFlowCoverCuts(final IntegerStrategy.CutConfiguration configuration, final ExpressionsBasedModel target) {
 
         if (!this.isSolved()) {
             return false;
@@ -92,7 +100,7 @@ public final class NodeSolver extends IntermediateSolver {
         return nbConstr != target.constraints().count();
     }
 
-    private boolean doGenerateGMICuts(final IntegerStrategy.GMICutConfiguration configuration, final ExpressionsBasedModel target) {
+    private boolean doGenerateGMICuts(final IntegerStrategy.CutConfiguration configuration, final ExpressionsBasedModel target) {
 
         if (!this.isSolved()) {
             return false;
@@ -222,6 +230,7 @@ public final class NodeSolver extends IntermediateSolver {
                         cLargest = cLargest.max(entry.getValue().abs());
                     }
 
+                    boolean discardCut = false;
                     BigDecimal cSmallest = BigMath.VERY_POSITIVE;
                     for (Iterator<Entry<IntIndex, BigDecimal>> iterator = cut.getLinearEntrySet().iterator(); iterator.hasNext();) {
                         Entry<IntIndex, BigDecimal> entry = iterator.next();
@@ -232,12 +241,24 @@ public final class NodeSolver extends IntermediateSolver {
                             cSmallest = cSmallest.min(cValue.abs());
                             entry.setValue(COEFFICIENT.enforce(cValue));
                         } else {
-                            cRHS = cRHS.subtract(cValue.multiply(result.get(entry.getKey().index)));
+                            Variable var = model.getVariable(entry.getKey().index);
+                            BigDecimal bound = cValue.signum() > 0 ? var.getUpperLimit() : var.getLowerLimit();
+                            if (bound == null) {
+                                discardCut = true;
+                                break;
+                            }
+                            cRHS = cRHS.subtract(cValue.multiply(bound));
                             iterator.remove();
                         }
                     }
 
+                    if (discardCut) {
+                        target.removeExpression(name);
+                        continue;
+                    }
+
                     cRHS = LIMIT.enforce(cRHS);
+                    cRHS = cRHS.subtract(cRHS.abs().multiply(EPS_RELAX_REL).add(EPS_RELAX_ABS));
                     cut.lower(cRHS);
 
                     BigDecimal cEvaluated = cut.evaluate(result);
@@ -307,48 +328,76 @@ public final class NodeSolver extends IntermediateSolver {
         return nbConstr != target.constraints().count();
     }
 
+    private boolean doGenerateMIRCuts(final IntegerStrategy.CutConfiguration configuration, final ExpressionsBasedModel target) {
+
+        if (!this.isSolved()) {
+            return false;
+        }
+
+        Result result = this.getResult();
+
+        if (myMIRSeparator == null) {
+            myMIRSeparator = new MIRSeparator(this.getModel());
+        }
+
+        return myMIRSeparator.generateCuts(result, target, configuration);
+    }
+
+    private boolean generateCuts(final ExpressionsBasedModel target, final CutConfiguration configGMI, final CutConfiguration configMIR,
+            final CutConfiguration configFC) {
+
+        int roundsFC = configFC != null ? configFC.iterations : 0;
+        int roundsMIR = configMIR != null ? configMIR.iterations : 0;
+        int roundsGMI = configGMI != null ? configGMI.iterations : 0;
+
+        int maxRounds = MissingMath.max(roundsFC, roundsMIR, roundsGMI);
+
+        boolean retVal = false;
+
+        for (int round = 0; round < maxRounds; round++) {
+
+            boolean added = false;
+
+            if (round < roundsFC) {
+                added |= this.doGenerateFlowCoverCuts(configFC, target);
+            }
+
+            if (round < roundsMIR) {
+                added |= this.doGenerateMIRCuts(configMIR, target);
+            }
+
+            if (round < roundsGMI) {
+                added |= this.doGenerateGMICuts(configGMI, target);
+            }
+
+            if (added) {
+
+                retVal |= added;
+
+                this.reset();
+                Result result = this.getResult();
+
+                if (result == null || !result.getState().isOptimal()) {
+                    break;
+                }
+
+            } else {
+
+                break;
+            }
+        }
+
+        return retVal;
+    }
+
     boolean generateCuts(final ModelStrategy strategy) {
 
-        GMICutConfiguration configuration = strategy.getGMICutConfiguration();
-
-        if (configuration != null && this.doGenerateGMICuts(configuration, this.getModel())) {
+        if (this.generateCuts(this.getModel(), strategy.getGMICutConfiguration(), strategy.getMIRCutConfiguration(), strategy.getFCCutConfiguration())) {
             this.reset();
             myCutRoundDone = true;
             return true;
         } else {
             return false;
-        }
-    }
-
-    boolean generateCuts(final ModelStrategy strategy, final NodeKey nodeKey) {
-        return this.generateCuts(strategy);
-    }
-
-    void generateRootCuts(final ExpressionsBasedModel target, final int maxRounds, final GMICutConfiguration gmiConfig) {
-
-        for (int round = 0; round < maxRounds; round++) {
-
-            boolean added = this.doGenerateFlowCoverCuts(target);
-
-            if (gmiConfig != null) {
-                added |= this.doGenerateGMICuts(gmiConfig, target);
-            }
-
-            if (!added) {
-                break;
-            }
-
-            if (round + 1 < maxRounds) {
-                this.doGenerateFlowCoverCuts(this.getModel());
-                if (gmiConfig != null) {
-                    this.doGenerateGMICuts(gmiConfig, this.getModel());
-                }
-                this.reset();
-                Result result = this.solve(null);
-                if (result == null || !result.getState().isOptimal()) {
-                    break;
-                }
-            }
         }
     }
 

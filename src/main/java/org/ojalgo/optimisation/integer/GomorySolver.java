@@ -26,7 +26,7 @@ import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
-import org.ojalgo.optimisation.integer.IntegerStrategy.GMICutConfiguration;
+import org.ojalgo.optimisation.integer.IntegerStrategy.CutConfiguration;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Primitive1D;
 
@@ -60,8 +60,8 @@ public final class GomorySolver extends GenericSolver {
 
     public static final ExpressionsBasedModel.Integration<GomorySolver> INTEGRATION = new GomorySolver.ModelIntegration();
 
-    private static final GMICutConfiguration GMI_CUT_CONFIGURATION = new GMICutConfiguration().withMirRelaxation(false).withFractionality(0.01)
-            .withViolation(BigMath.HUNDRED);
+    private static final CutConfiguration GMI_CUT_CONFIGURATION = new CutConfiguration().withMirRelaxation(false).withFractionality(0.01)
+            .withViolation(BigMath.HUNDRED).withIterations(10);
 
     public static GomorySolver newSolver(final ExpressionsBasedModel model) {
         return INTEGRATION.build(model);

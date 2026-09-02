@@ -45,7 +45,7 @@ import org.ojalgo.type.context.NumberContext;
  * flow-conservation equality containing x, and generates tightened inequalities that replace the big-M
  * capacity with the local demand.
  */
-final class FlowCoverSeparator {
+final class FlowCoverSeparator extends NodeSolver.Separator {
 
     static final class FlowArc {
 
@@ -83,6 +83,8 @@ final class FlowCoverSeparator {
 
     private static final AtomicInteger COUNTER = new AtomicInteger();
     private static final NumberContext TOLERANCE = NumberContext.of(4);
+
+    static final IntegerStrategy.CutConfiguration CONFIGURATION = new IntegerStrategy.CutConfiguration();
 
     private final ExpressionsBasedModel myModel;
     private List<VUBNode> myNodes;

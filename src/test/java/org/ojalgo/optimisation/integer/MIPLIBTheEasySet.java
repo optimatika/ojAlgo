@@ -376,7 +376,6 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 0.1s
      * </ul>
      */
-    @Tag("unstable")
     @Test
     public void testEnigma() {
         MIPLIBTheEasySet.doTest("enigma.mps", "0.0", null);
@@ -567,7 +566,6 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 0.01s
      * </ul>
      */
-    @Tag("unstable")
     @Test
     public void testGr4x6() {
         MIPLIBTheEasySet.doTest("gr4x6.mps", "202.35", null);

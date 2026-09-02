@@ -945,11 +945,6 @@ public class Expression extends ModelEntity<Expression> {
         return new IntRowColumn(variable1.getIndex(), variable2.getIndex());
     }
 
-    private BigDecimal toPositiveFraction(final BigDecimal noninteger) {
-        BigDecimal intPart = noninteger.setScale(0, RoundingMode.FLOOR);
-        return noninteger.subtract(intPart);
-    }
-
     protected final void appendMiddlePart(final StringBuilder builder, final Access1D<BigDecimal> solution, final NumberContext display) {
 
         builder.append(this.getName());
@@ -1170,51 +1165,6 @@ public class Expression extends ModelEntity<Expression> {
         }
 
         myInteger = Boolean.valueOf(maxScale <= 0);
-    }
-
-    final Expression doMixedIntegerRounding() {
-
-        if (!this.isEqualityConstraint()) {
-            return null;
-        }
-
-        BigDecimal posFracLevel = this.toPositiveFraction(this.getLowerLimit());
-        if (posFracLevel.signum() <= 0) {
-            return null;
-        }
-        BigDecimal cmpFracLevel = BigMath.ONE.subtract(posFracLevel);
-
-        Expression retVal = myModel.newExpression(this.getName() + "(MIR)");
-
-        for (Entry<IntIndex, BigDecimal> entry : myLinear.entrySet()) {
-            Variable variable = this.resolve(entry.getKey());
-
-            if (!variable.isLowerLimitSet() || variable.getLowerLimit().compareTo(BigMath.ZERO) < 0) {
-                return null;
-            }
-
-            BigDecimal coeff = entry.getValue();
-
-            if (variable.isInteger()) {
-
-                BigDecimal posFracCoeff = this.toPositiveFraction(coeff);
-
-                if (posFracCoeff.compareTo(posFracLevel) <= 0) {
-                    retVal.set(variable, BigMath.DIVIDE.invoke(posFracCoeff, posFracLevel));
-                } else {
-                    BigDecimal cmpFracCoeff = BigMath.ONE.subtract(posFracCoeff);
-                    retVal.set(variable, BigMath.DIVIDE.invoke(cmpFracCoeff, cmpFracLevel));
-                }
-
-            } else if (coeff.signum() == 1) {
-                retVal.set(variable, BigMath.DIVIDE.invoke(coeff, posFracLevel));
-            } else if (coeff.signum() == -1) {
-                BigDecimal negCoeff = coeff.negate();
-                retVal.set(variable, BigMath.DIVIDE.invoke(negCoeff, cmpFracLevel));
-            }
-        }
-
-        return retVal.lower(BigMath.ONE);
     }
 
     final Expression doSet(final IntIndex key, final BigDecimal value) {

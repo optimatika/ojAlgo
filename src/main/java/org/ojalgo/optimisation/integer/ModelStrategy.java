@@ -308,18 +308,28 @@ public abstract class ModelStrategy implements IntegerStrategy {
     }
 
     @Override
+    public CutConfiguration getFCCutConfiguration() {
+        return myStrategy.getFCCutConfiguration();
+    }
+
+    @Override
     public NumberContext getGapTolerance() {
         return myStrategy.getGapTolerance();
     }
 
     @Override
-    public GMICutConfiguration getGMICutConfiguration() {
+    public CutConfiguration getGMICutConfiguration() {
         return myStrategy.getGMICutConfiguration();
     }
 
     @Override
     public NumberContext getIntegralityTolerance() {
         return myStrategy.getIntegralityTolerance();
+    }
+
+    @Override
+    public CutConfiguration getMIRCutConfiguration() {
+        return myStrategy.getMIRCutConfiguration();
     }
 
     @Override
