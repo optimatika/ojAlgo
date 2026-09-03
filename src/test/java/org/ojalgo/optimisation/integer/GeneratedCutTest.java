@@ -176,7 +176,7 @@ public class GeneratedCutTest extends OptimisationIntegerTests implements ModelF
 
         int totalCuts = 0;
         for (int round = 0; round < 10; round++) {
-            separator.generateCuts(lpResult, model);
+            separator.generateCuts(lpResult, FlowCoverSeparator.CONFIGURATION);
             long count = model.getExpressions().stream().filter(e -> e.getName().startsWith("CUT_FC_")).count();
             if (count == totalCuts) {
                 break;
@@ -215,7 +215,7 @@ public class GeneratedCutTest extends OptimisationIntegerTests implements ModelF
 
             int totalCuts = 0;
             for (int round = 0; round < 10; round++) {
-                sep.generateCuts(lpResult, model);
+                sep.generateCuts(lpResult, FlowCoverSeparator.CONFIGURATION);
                 long count = model.getExpressions().stream().filter(e -> e.getName().startsWith("CUT_FC_")).count();
                 if (count == totalCuts) {
                     break;

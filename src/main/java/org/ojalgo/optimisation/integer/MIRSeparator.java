@@ -53,10 +53,8 @@ final class MIRSeparator extends NodeSolver.Separator {
 
     private static final NumberContext ACCURACY = NumberContext.of(8);
     private static final AtomicInteger COUNTER = new AtomicInteger();
-    private static final BigDecimal EPS_RELAX_ABS = new BigDecimal("1E-11");
-    private static final BigDecimal EPS_RELAX_REL = new BigDecimal("1E-13");
 
-    static final IntegerStrategy.CutConfiguration CONFIGURATION = new IntegerStrategy.CutConfiguration().withIterations(1);
+    static final IntegerStrategy.CutConfiguration CONFIGURATION = new IntegerStrategy.CutConfiguration().withIterations(3);
 
     private static boolean acceptCut(final Expression cut, final String name, final BigDecimal diff, final BigDecimal largestCoeff,
             final ExpressionsBasedModel target, final CutConfiguration configuration) {
@@ -152,10 +150,8 @@ final class MIRSeparator extends NodeSolver.Separator {
         return false;
     }
 
-    private final ExpressionsBasedModel myModel;
-
-    MIRSeparator(final ExpressionsBasedModel model) {
-        myModel = model;
+    MIRSeparator(final ExpressionsBasedModel ebm) {
+        super(ebm);
     }
 
     /**
@@ -174,7 +170,7 @@ final class MIRSeparator extends NodeSolver.Separator {
                 continue;
             }
 
-            Variable var = myModel.getVariable(entry.getKey().index);
+            Variable var = model.getVariable(entry.getKey().index);
 
             BigDecimal bound;
             if (isGEQ) {
@@ -189,13 +185,6 @@ final class MIRSeparator extends NodeSolver.Separator {
 
             cutRHS = cutRHS.subtract(coeff.multiply(bound));
             it.remove();
-        }
-
-        BigDecimal relaxation = cutRHS.abs().multiply(EPS_RELAX_REL).add(EPS_RELAX_ABS);
-        if (isGEQ) {
-            cutRHS = cutRHS.subtract(relaxation);
-        } else {
-            cutRHS = cutRHS.add(relaxation);
         }
 
         return cutRHS;
@@ -217,7 +206,7 @@ final class MIRSeparator extends NodeSolver.Separator {
 
         for (Entry<IntIndex, BigDecimal> entry : constraint.getLinearEntrySet()) {
             int idx = entry.getKey().index;
-            Variable variable = myModel.getVariable(idx);
+            Variable variable = model.getVariable(idx);
             BigDecimal coeff = entry.getValue();
 
             if (!variable.isLowerLimitSet()) {
@@ -247,7 +236,7 @@ final class MIRSeparator extends NodeSolver.Separator {
 
         for (Entry<IntIndex, BigDecimal> entry : constraint.getLinearEntrySet()) {
             int idx = entry.getKey().index;
-            Variable variable = myModel.getVariable(idx);
+            Variable variable = model.getVariable(idx);
             BigDecimal origCoeff = entry.getValue();
             BigDecimal value = solution.get(idx);
             BigDecimal lower = variable.getLowerLimit();
@@ -334,7 +323,7 @@ final class MIRSeparator extends NodeSolver.Separator {
 
         for (Entry<IntIndex, BigDecimal> entry : constraint.getLinearEntrySet()) {
             int idx = entry.getKey().index;
-            Variable variable = myModel.getVariable(idx);
+            Variable variable = model.getVariable(idx);
             BigDecimal coeff = negate ? entry.getValue().negate() : entry.getValue();
             BigDecimal value = solution.get(idx);
 
@@ -365,7 +354,7 @@ final class MIRSeparator extends NodeSolver.Separator {
 
         for (Entry<IntIndex, BigDecimal> entry : constraint.getLinearEntrySet()) {
             int idx = entry.getKey().index;
-            Variable variable = myModel.getVariable(idx);
+            Variable variable = model.getVariable(idx);
             BigDecimal origCoeff = negate ? entry.getValue().negate() : entry.getValue();
             BigDecimal value = solution.get(idx);
             BigDecimal lower = variable.getLowerLimit();
@@ -435,14 +424,16 @@ final class MIRSeparator extends NodeSolver.Separator {
         return MIRSeparator.acceptCut(cut, name, diff, largestCoeff, target, configuration);
     }
 
-    boolean generateCuts(final Optimisation.Result solution, final ExpressionsBasedModel target, final CutConfiguration configuration) {
+    int generateCuts(final Optimisation.Result solution, final CutConfiguration configuration) {
+
+        int nbBefore = model.countExpressions();
 
         boolean added = false;
 
-        int maxCuts = configuration.getMaxCuts(target.countVariables());
+        int maxCuts = configuration.getMaxCuts(model.countVariables());
         int nbAdded = 0;
 
-        List<Expression> expressions = new ArrayList<>(myModel.getExpressions());
+        List<Expression> expressions = new ArrayList<>(model.getExpressions());
 
         for (Expression constraint : expressions) {
 
@@ -454,28 +445,28 @@ final class MIRSeparator extends NodeSolver.Separator {
                 continue;
             }
 
-            if (!MIRSeparator.hasFractionalData(constraint, myModel)) {
+            if (!MIRSeparator.hasFractionalData(constraint, model)) {
                 continue;
             }
 
             if (constraint.isEqualityConstraint()) {
-                if (this.tryEquality(constraint, solution, target, configuration)) {
+                if (this.tryEquality(constraint, solution, model, configuration)) {
                     added = true;
                     nbAdded++;
                 }
             } else {
-                if (constraint.isUpperLimitSet() && this.tryInequality(constraint, true, solution, target, configuration)) {
+                if (constraint.isUpperLimitSet() && this.tryInequality(constraint, true, solution, model, configuration)) {
                     added = true;
                     nbAdded++;
                 }
-                if ((nbAdded < maxCuts && constraint.isLowerLimitSet()) && this.tryInequality(constraint, false, solution, target, configuration)) {
+                if ((nbAdded < maxCuts && constraint.isLowerLimitSet()) && this.tryInequality(constraint, false, solution, model, configuration)) {
                     added = true;
                     nbAdded++;
                 }
             }
         }
 
-        return added;
+        return model.countExpressions() - nbBefore;
     }
 
 }

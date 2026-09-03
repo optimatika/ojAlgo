@@ -35,6 +35,7 @@ import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.optimisation.integer.IntegerStrategy.CutConfiguration;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
 
@@ -84,13 +85,12 @@ final class FlowCoverSeparator extends NodeSolver.Separator {
     private static final AtomicInteger COUNTER = new AtomicInteger();
     private static final NumberContext TOLERANCE = NumberContext.of(4);
 
-    static final IntegerStrategy.CutConfiguration CONFIGURATION = new IntegerStrategy.CutConfiguration();
+    static final IntegerStrategy.CutConfiguration CONFIGURATION = new IntegerStrategy.CutConfiguration().withIterations(3);
 
-    private final ExpressionsBasedModel myModel;
     private List<VUBNode> myNodes;
 
-    FlowCoverSeparator(final ExpressionsBasedModel model) {
-        myModel = model;
+    FlowCoverSeparator(final ExpressionsBasedModel ebm) {
+        super(ebm);
     }
 
     /**
@@ -104,12 +104,12 @@ final class FlowCoverSeparator extends NodeSolver.Separator {
             myNodes = new ArrayList<>();
         }
 
-        List<Variable> variables = myModel.getVariables();
+        List<Variable> variables = model.getVariables();
 
         Map<IntIndex, List<Expression>> equalitiesByVar = new HashMap<>();
         List<Expression> candidates = new ArrayList<>();
 
-        for (Expression expr : myModel.getExpressions()) {
+        for (Expression expr : model.getExpressions()) {
             if (!expr.isConstraint() || expr.isAnyQuadraticFactorNonZero()) {
                 continue;
             }
@@ -276,13 +276,17 @@ final class FlowCoverSeparator extends NodeSolver.Separator {
 
     /**
      * Generate violated flow cover cuts for the current LP solution. Returns true if any cuts were added.
+     *
+     * @param configuration TODO
      */
-    boolean generateCuts(final Optimisation.Result solution, final ExpressionsBasedModel target) {
+    int generateCuts(final Optimisation.Result solution, final CutConfiguration configuration) {
+
+        int nbBefore = model.countExpressions();
 
         this.detectStructure();
 
         if (myNodes.isEmpty()) {
-            return false;
+            return 0;
         }
 
         boolean added = false;
@@ -301,7 +305,7 @@ final class FlowCoverSeparator extends NodeSolver.Separator {
 
             if (typeB_lhs > 0 && !TOLERANCE.isZero(typeB_lhs)) {
                 String name = "CUT_FC_B_" + COUNTER.incrementAndGet();
-                Expression cut = target.newExpression(name);
+                Expression cut = model.newExpression(name);
 
                 cut.add(node.xIndex.index, BigDecimal.ONE);
                 cut.add(node.yIndex.index, node.demand.negate());
@@ -310,10 +314,10 @@ final class FlowCoverSeparator extends NodeSolver.Separator {
                 }
                 cut.upper(BigDecimal.ZERO);
 
-                if (!target.checkSimilarity(cut)) {
+                if (!model.checkSimilarity(cut)) {
                     added = true;
                 } else {
-                    target.removeExpression(name);
+                    model.removeExpression(name);
                 }
             }
 
@@ -325,7 +329,7 @@ final class FlowCoverSeparator extends NodeSolver.Separator {
 
             if (typeA_lhs > 0 && !TOLERANCE.isZero(typeA_lhs)) {
                 String name = "CUT_FC_A_" + COUNTER.incrementAndGet();
-                Expression cut = target.newExpression(name);
+                Expression cut = model.newExpression(name);
 
                 for (FlowArc arc : node.inflows) {
                     cut.add(arc.variable.index, arc.coefficient.abs());
@@ -333,15 +337,15 @@ final class FlowCoverSeparator extends NodeSolver.Separator {
                 cut.add(node.yIndex.index, node.demand);
                 cut.lower(node.demand);
 
-                if (!target.checkSimilarity(cut)) {
+                if (!model.checkSimilarity(cut)) {
                     added = true;
                 } else {
-                    target.removeExpression(name);
+                    model.removeExpression(name);
                 }
             }
         }
 
-        return added;
+        return model.countExpressions() - nbBefore;
     }
 
 }
