@@ -46,12 +46,13 @@ public interface IntegerStrategy {
         private final NumberContext myGapTolerance;
         private final CutConfiguration myGMICutConfiguration;
         private final NumberContext myIntegralityTolerance;
+        private final CutConfiguration myKCCutConfiguration;
         private final CutConfiguration myMIRCutConfiguration;
         private final Comparator<NodeKey>[] myPriorityDefinitions;
 
         ConfigurableStrategy(final Comparator<NodeKey>[] definitions, final NumberContext integrality, final NumberContext gap,
                 final BiFunction<ExpressionsBasedModel, IntegerStrategy, ModelStrategy> factory, final CutConfiguration fcConfiguration,
-                final CutConfiguration gmiConfiguration, final CutConfiguration mirConfiguration) {
+                final CutConfiguration gmiConfiguration, final CutConfiguration kcConfiguration, final CutConfiguration mirConfiguration) {
 
             super();
 
@@ -61,6 +62,7 @@ public interface IntegerStrategy {
             myFactory = factory;
             myFCCutConfiguration = fcConfiguration;
             myGMICutConfiguration = gmiConfiguration;
+            myKCCutConfiguration = kcConfiguration;
             myMIRCutConfiguration = mirConfiguration;
         }
 
@@ -81,7 +83,7 @@ public interface IntegerStrategy {
             }
 
             return new ConfigurableStrategy(totalDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myFCCutConfiguration, myGMICutConfiguration,
-                    myMIRCutConfiguration);
+                    myKCCutConfiguration, myMIRCutConfiguration);
         }
 
         @Override
@@ -107,6 +109,11 @@ public interface IntegerStrategy {
         @Override
         public NumberContext getIntegralityTolerance() {
             return myIntegralityTolerance;
+        }
+
+        @Override
+        public CutConfiguration getKCCutConfiguration() {
+            return myKCCutConfiguration;
         }
 
         @Override
@@ -136,7 +143,7 @@ public interface IntegerStrategy {
 
         public ConfigurableStrategy withFCCutConfiguration(final CutConfiguration newConfiguration) {
             return new ConfigurableStrategy(myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, newConfiguration, myGMICutConfiguration,
-                    myMIRCutConfiguration);
+                    myKCCutConfiguration, myMIRCutConfiguration);
         }
 
         /**
@@ -144,17 +151,22 @@ public interface IntegerStrategy {
          */
         public ConfigurableStrategy withGapTolerance(final NumberContext newTolerance) {
             return new ConfigurableStrategy(myPriorityDefinitions, myIntegralityTolerance, newTolerance, myFactory, myFCCutConfiguration, myGMICutConfiguration,
-                    myMIRCutConfiguration);
+                    myKCCutConfiguration, myMIRCutConfiguration);
         }
 
         public ConfigurableStrategy withGMICutConfiguration(final CutConfiguration newConfiguration) {
             return new ConfigurableStrategy(myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myFCCutConfiguration, newConfiguration,
-                    myMIRCutConfiguration);
+                    myKCCutConfiguration, myMIRCutConfiguration);
+        }
+
+        public ConfigurableStrategy withKCCutConfiguration(final CutConfiguration newConfiguration) {
+            return new ConfigurableStrategy(myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myFCCutConfiguration,
+                    myGMICutConfiguration, newConfiguration, myMIRCutConfiguration);
         }
 
         public ConfigurableStrategy withMIRCutConfiguration(final CutConfiguration newConfiguration) {
             return new ConfigurableStrategy(myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myFCCutConfiguration,
-                    myGMICutConfiguration, newConfiguration);
+                    myGMICutConfiguration, myKCCutConfiguration, newConfiguration);
         }
 
         /**
@@ -162,7 +174,7 @@ public interface IntegerStrategy {
          */
         public ConfigurableStrategy withModelStrategyFactory(final BiFunction<ExpressionsBasedModel, IntegerStrategy, ModelStrategy> newFactory) {
             return new ConfigurableStrategy(myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, newFactory, myFCCutConfiguration,
-                    myGMICutConfiguration, myMIRCutConfiguration);
+                    myGMICutConfiguration, myKCCutConfiguration, myMIRCutConfiguration);
         }
 
         /**
@@ -170,7 +182,7 @@ public interface IntegerStrategy {
          */
         public ConfigurableStrategy withPriorityDefinitions(final Comparator<NodeKey>... newDefinitions) {
             return new ConfigurableStrategy(newDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myFCCutConfiguration, myGMICutConfiguration,
-                    myMIRCutConfiguration);
+                    myKCCutConfiguration, myMIRCutConfiguration);
         }
 
     }
@@ -317,7 +329,7 @@ public interface IntegerStrategy {
         NumberContext gap = NumberContext.of(5, 7);
 
         return new ConfigurableStrategy(definitions, integrality, gap, DefaultStrategy::new, FlowCoverSeparator.CONFIGURATION, GMISeparator.CONFIGURATION,
-                MIRSeparator.CONFIGURATION);
+                KnapsackCoverSeparator.CONFIGURATION, MIRSeparator.CONFIGURATION);
     }
 
     int countUniqueStrategies();
@@ -347,6 +359,11 @@ public interface IntegerStrategy {
      * Used to determine if a variable value is integer or not
      */
     NumberContext getIntegralityTolerance();
+
+    /**
+     * Knapsack Cover cut configuration
+     */
+    CutConfiguration getKCCutConfiguration();
 
     /**
      * Mixed Integer Rounding cut configuration

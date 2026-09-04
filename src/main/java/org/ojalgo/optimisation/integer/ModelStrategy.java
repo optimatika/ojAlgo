@@ -328,6 +328,11 @@ public abstract class ModelStrategy implements IntegerStrategy {
     }
 
     @Override
+    public CutConfiguration getKCCutConfiguration() {
+        return myStrategy.getKCCutConfiguration();
+    }
+
+    @Override
     public CutConfiguration getMIRCutConfiguration() {
         return myStrategy.getMIRCutConfiguration();
     }

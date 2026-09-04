@@ -43,19 +43,21 @@ public final class NodeSolver extends IntermediateSolver {
 
     }
 
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     private boolean myCutRoundDone = false;
     private transient FlowCoverSeparator myFlowCoverSeparator = null;
     private transient GMISeparator myGMISeparator = null;
     private Boolean myInPlaceBoundUpdateSafe = null;
+    private transient KnapsackCoverSeparator myKnapsackCoverSeparator = null;
     private transient MIRSeparator myMIRSeparator = null;
 
     NodeSolver(final ExpressionsBasedModel model) {
         super(model);
     }
 
-    private boolean generateCuts(final CutConfiguration configGMI, final CutConfiguration configMIR, final CutConfiguration configFC) {
+    private boolean generateCuts(final CutConfiguration configGMI, final CutConfiguration configMIR, final CutConfiguration configFC,
+            final CutConfiguration configKC) {
 
         ExpressionsBasedModel model = this.getModel();
         Result result = this.getResult();
@@ -63,12 +65,14 @@ public final class NodeSolver extends IntermediateSolver {
         int roundsFC = configFC != null ? configFC.iterations : 0;
         int roundsMIR = configMIR != null ? configMIR.iterations : 0;
         int roundsGMI = configGMI != null ? configGMI.iterations : 0;
+        int roundsKC = configKC != null ? configKC.iterations : 0;
 
         int countFC = 0;
         int countMIR = 0;
         int countGMI = 0;
+        int countKC = 0;
 
-        int maxRounds = MissingMath.max(roundsFC, roundsMIR, roundsGMI);
+        int maxRounds = MissingMath.max(roundsFC, roundsMIR, roundsGMI, roundsKC);
 
         boolean retVal = false;
 
@@ -77,6 +81,7 @@ public final class NodeSolver extends IntermediateSolver {
             countFC = 0;
             countMIR = 0;
             countGMI = 0;
+            countKC = 0;
 
             if (!this.isSolved()) {
                 break;
@@ -112,7 +117,17 @@ public final class NodeSolver extends IntermediateSolver {
                 }
             }
 
-            if ((countFC + countMIR + countGMI) > 0) {
+            if (round < roundsKC) {
+                if (myKnapsackCoverSeparator == null) {
+                    myKnapsackCoverSeparator = new KnapsackCoverSeparator(model);
+                }
+                countKC = myKnapsackCoverSeparator.generateCuts(result, configKC);
+                if (DEBUG) {
+                    BasicLogger.debug("{} new KC cuts, iteration {}", countKC, 1 + round);
+                }
+            }
+
+            if ((countFC + countMIR + countGMI + countKC) > 0) {
 
                 retVal = true;
 
@@ -137,8 +152,9 @@ public final class NodeSolver extends IntermediateSolver {
         CutConfiguration gmi = strategy.getGMICutConfiguration();
         CutConfiguration mir = strategy.getMIRCutConfiguration();
         CutConfiguration fc = strategy.getFCCutConfiguration();
+        CutConfiguration kc = strategy.getKCCutConfiguration();
 
-        if (this.generateCuts(gmi, mir, fc)) {
+        if (this.generateCuts(gmi, mir, fc, kc)) {
             this.reset();
             myCutRoundDone = true;
             return true;
