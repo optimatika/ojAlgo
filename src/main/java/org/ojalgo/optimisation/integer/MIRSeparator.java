@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.special.MissingMath;
@@ -52,7 +51,6 @@ import org.ojalgo.type.context.NumberContext;
 final class MIRSeparator extends NodeSolver.Separator {
 
     private static final NumberContext ACCURACY = NumberContext.of(8);
-    private static final AtomicInteger COUNTER = new AtomicInteger();
 
     static final IntegerStrategy.CutConfiguration CONFIGURATION = new IntegerStrategy.CutConfiguration().withIterations(3);
 
@@ -467,6 +465,14 @@ final class MIRSeparator extends NodeSolver.Separator {
         }
 
         return model.countExpressions() - nbBefore;
+    }
+
+    /**
+     * Mixed integer Rounding
+     */
+    @Override
+    String type() {
+        return "MR";
     }
 
 }

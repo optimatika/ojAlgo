@@ -45,7 +45,9 @@ public class IntegerUserFiles extends OptimisationIntegerTests implements ModelF
         // model.options.progress(IntegerSolver.class);
         // model.options.validate = false;
 
-        model.options.integer(strategy);
+        if (strategy != null) {
+            model.options.integer(strategy);
+        }
 
         ModelFileTest.assertValues(model, expMinValString, expMaxValString, ACCURACY);
 
@@ -85,9 +87,7 @@ public class IntegerUserFiles extends OptimisationIntegerTests implements ModelF
     @Test
     public void testEnergyApp() {
 
-        ConfigurableStrategy strategy = IntegerStrategy.DEFAULT.withGapTolerance(NumberContext.of(4));
-
-        IntegerUserFiles.doTest("EnergyApp.ebm", "2316538.192374359", null, strategy);
+        IntegerUserFiles.doTest("EnergyApp.ebm", "2316538.192374359", null, null);
     }
 
 }

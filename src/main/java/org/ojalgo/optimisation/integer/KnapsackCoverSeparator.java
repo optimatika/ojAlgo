@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -37,19 +36,25 @@ import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * Generates knapsack cover cuts for constraints involving binary variables.
+ * Generates lifted knapsack cover cuts for constraints involving binary variables.
  * <p>
  * For a constraint {@code sum(a_j * x_j) <= b} with binary variables, a cover C is a subset where
- * {@code sum_{C}(a_j) > b}. The cover inequality {@code sum_{C}(x_j) <= |C| - 1} is valid for any
- * integer-feasible solution.
+ * {@code sum_{C}(a_j) > b}. The basic cover inequality {@code sum_{C}(x_j) <= |C| - 1} is strengthened via a
+ * superadditive lifting function that assigns non-zero coefficients to non-cover variables and potentially
+ * larger coefficients to cover variables with large original coefficients.
  * <p>
- * Non-binary variables are handled by subtracting their minimum contribution (using bounds) from the RHS.
- * Negative binary coefficients are complemented ({@code x' = 1 - x}) to make all coefficients positive before
- * cover finding.
+ * The lifting function is sequence-independent (superadditive), so all variables are lifted in a single pass
+ * without solving knapsack subproblems, and the cover does not need to be minimal.
  */
 final class KnapsackCoverSeparator extends NodeSolver.Separator {
 
-    private static final AtomicInteger COUNTER = new AtomicInteger();
+    /**
+     * Feasibility tolerance used when classifying coefficients against the lifting function's breakpoints,
+     * and (scaled) as the minimum excess a cover must have over the right-hand side. A cover that exceeds the
+     * capacity by less than this is treated as not being a cover at all, so that sub-tolerance noise in the
+     * right-hand side (of cut rows, or an objective cutoff) is never amplified into a unit-sized error.
+     */
+    private static final double FEASTOL = 1e-6;
     private static final NumberContext TOLERANCE = NumberContext.of(4);
 
     static final IntegerStrategy.CutConfiguration CONFIGURATION = new IntegerStrategy.CutConfiguration().withIterations(3);
@@ -68,9 +73,9 @@ final class KnapsackCoverSeparator extends NodeSolver.Separator {
         boolean negate = !useUpper;
         BigDecimal effectiveRHS = negate ? rhs.negate() : rhs;
 
-        List<Integer> binaryVarIndices = new ArrayList<>();
-        List<BigDecimal> binaryCoeffs = new ArrayList<>();
-        List<Boolean> isComplemented = new ArrayList<>();
+        List<Integer> binVarIdx = new ArrayList<>();
+        List<BigDecimal> binCoeffs = new ArrayList<>();
+        List<Boolean> compled = new ArrayList<>();
 
         boolean valid = true;
 
@@ -81,14 +86,14 @@ final class KnapsackCoverSeparator extends NodeSolver.Separator {
 
             if (var.isBinary()) {
                 if (coeff.signum() < 0) {
-                    binaryVarIndices.add(idx);
-                    binaryCoeffs.add(coeff.negate());
-                    isComplemented.add(Boolean.TRUE);
+                    binVarIdx.add(idx);
+                    binCoeffs.add(coeff.negate());
+                    compled.add(Boolean.TRUE);
                     effectiveRHS = effectiveRHS.subtract(coeff);
                 } else if (coeff.signum() > 0) {
-                    binaryVarIndices.add(idx);
-                    binaryCoeffs.add(coeff);
-                    isComplemented.add(Boolean.FALSE);
+                    binVarIdx.add(idx);
+                    binCoeffs.add(coeff);
+                    compled.add(Boolean.FALSE);
                 }
             } else {
                 BigDecimal minContrib;
@@ -113,7 +118,7 @@ final class KnapsackCoverSeparator extends NodeSolver.Separator {
             }
         }
 
-        if (!valid || binaryVarIndices.size() < 2) {
+        if (!valid || binVarIdx.size() < 2) {
             return 0;
         }
 
@@ -121,80 +126,140 @@ final class KnapsackCoverSeparator extends NodeSolver.Separator {
             return 0;
         }
 
-        BigDecimal totalSum = BigDecimal.ZERO;
-        for (BigDecimal c : binaryCoeffs) {
-            totalSum = totalSum.add(c);
+        int n = binVarIdx.size();
+        double rhsD = effectiveRHS.doubleValue();
+        double minLambda = Math.max(10.0 * FEASTOL, FEASTOL * rhsD);
+
+        double[] coeffsD = new double[n];
+        double[] lpVals = new double[n];
+        for (int i = 0; i < n; i++) {
+            coeffsD[i] = binCoeffs.get(i).doubleValue();
+            double val = solution.doubleValue(binVarIdx.get(i));
+            lpVals[i] = compled.get(i) ? 1.0 - val : val;
         }
-        if (totalSum.compareTo(effectiveRHS) <= 0) {
+
+        double totalSum = 0;
+        for (int i = 0; i < n; i++) {
+            totalSum += coeffsD[i];
+        }
+        if (totalSum - rhsD <= minLambda) {
             return 0;
         }
 
-        int n = binaryVarIndices.size();
-        double[] lpValues = new double[n];
-        for (int i = 0; i < n; i++) {
-            double val = solution.doubleValue(binaryVarIndices.get(i));
-            lpValues[i] = isComplemented.get(i) ? 1.0 - val : val;
-        }
-
+        // Greedy cover: sort by LP contribution (lpValue * coefficient) descending
         Integer[] order = new Integer[n];
         for (int i = 0; i < n; i++) {
             order[i] = i;
         }
-        Arrays.sort(order, (a, b) -> Double.compare(lpValues[b], lpValues[a]));
+        Arrays.sort(order, (a, b) -> Double.compare(lpVals[b] * coeffsD[b], lpVals[a] * coeffsD[a]));
 
-        BigDecimal coverSum = BigDecimal.ZERO;
-        List<Integer> coverList = new ArrayList<>();
+        List<Integer> coverIdx = new ArrayList<>();
+        double coverSumD = 0;
         for (int i = 0; i < n; i++) {
             int k = order[i];
-            coverList.add(k);
-            coverSum = coverSum.add(binaryCoeffs.get(k));
-            if (coverSum.compareTo(effectiveRHS) > 0) {
+            coverIdx.add(k);
+            coverSumD += coeffsD[k];
+            if (coverSumD - rhsD > minLambda) {
                 break;
             }
         }
 
-        if (coverSum.compareTo(effectiveRHS) <= 0) {
+        double lambda = coverSumD - rhsD;
+        if (lambda <= minLambda) {
             return 0;
         }
 
-        for (int i = coverList.size() - 1; i >= 0; i--) {
-            int k = coverList.get(i);
-            BigDecimal without = coverSum.subtract(binaryCoeffs.get(k));
-            if (without.compareTo(effectiveRHS) > 0) {
-                coverSum = without;
-                coverList.remove(i);
-            }
-        }
-
-        int coverSize = coverList.size();
+        int coverSize = coverIdx.size();
         if (coverSize < 2) {
             return 0;
         }
 
-        double violation = -(coverSize - 1);
-        for (int k : coverList) {
-            violation += lpValues[k];
+        // Sort cover by decreasing coefficient for the lifting function
+        coverIdx.sort((a, b) -> Double.compare(coeffsD[b], coeffsD[a]));
+
+        // Compute abar: threshold such that sum_{cover} min(abar, a_j) = rhs
+        double abar = coeffsD[coverIdx.get(0)];
+        double sigma = lambda;
+        for (int i = 1; i < coverSize; i++) {
+            double ai = coeffsD[coverIdx.get(i)];
+            double delta = abar - ai;
+            double kdelta = i * delta;
+            if (kdelta < sigma) {
+                abar = ai;
+                sigma -= kdelta;
+            } else {
+                abar -= sigma / i;
+                sigma = 0;
+                break;
+            }
+        }
+        if (sigma > 0) {
+            abar = rhsD / coverSize;
         }
 
+        // Build partial sums S[h] = sum_{k=0..h} min(abar, a_cover[k])
+        double[] partialSums = new double[coverSize];
+        partialSums[0] = Math.min(abar, coeffsD[coverIdx.get(0)]);
+        for (int i = 1; i < coverSize; i++) {
+            partialSums[i] = partialSums[i - 1] + Math.min(abar, coeffsD[coverIdx.get(i)]);
+        }
+
+        // Mark C- variables (cover variables with coefficient <= abar)
+        boolean[] isCMinus = new boolean[n];
+        for (int i = 0; i < coverSize; i++) {
+            int k = coverIdx.get(i);
+            if (coeffsD[k] <= abar + FEASTOL) {
+                isCMinus[k] = true;
+            }
+        }
+
+        // Compute lifted coefficients and check violation
+        int[] lifted = new int[n];
+        double lhsValue = 0;
+
+        for (int i = 0; i < n; i++) {
+            if (isCMinus[i]) {
+                lifted[i] = 1;
+            } else {
+                // Staircase lifting function: g(z) = max{h+1 : z > S[h]}
+                double z = coeffsD[i];
+                int g = 0;
+                for (int h = 0; h < coverSize; h++) {
+                    if (z > partialSums[h] + FEASTOL) {
+                        g = h + 1;
+                    } else {
+                        break;
+                    }
+                }
+                lifted[i] = g;
+            }
+            lhsValue += lifted[i] * lpVals[i];
+        }
+
+        double violation = lhsValue - (coverSize - 1);
         if (violation <= 0 || TOLERANCE.isZero(violation)) {
             return 0;
         }
 
+        // Build the cut in original model variables
         String name = "CUT_KC_" + COUNTER.incrementAndGet();
         Expression cut = model.newExpression(name);
 
-        int nbComp = 0;
-        for (int k : coverList) {
-            int idx = binaryVarIndices.get(k);
-            if (isComplemented.get(k)) {
-                cut.add(idx, BigDecimal.ONE.negate());
-                nbComp++;
+        long cutRHS = coverSize - 1;
+        for (int i = 0; i < n; i++) {
+            if (lifted[i] == 0) {
+                continue;
+            }
+            int idx = binVarIdx.get(i);
+            if (compled.get(i)) {
+                cut.add(idx, BigDecimal.valueOf(-lifted[i]));
+                cutRHS -= lifted[i];
             } else {
-                cut.add(idx, BigDecimal.ONE);
+                cut.add(idx, BigDecimal.valueOf(lifted[i]));
             }
         }
 
-        cut.upper(BigDecimal.valueOf(coverSize - 1 - nbComp));
+        cut.upper(BigDecimal.valueOf(cutRHS));
 
         if (model.checkSimilarity(cut)) {
             model.removeExpression(name);
@@ -219,7 +284,7 @@ final class KnapsackCoverSeparator extends NodeSolver.Separator {
                 break;
             }
 
-            if (!constraint.isInteger()) {
+            if (constraint.isObjective() || !constraint.isInteger()) {
                 continue;
             }
 
@@ -236,6 +301,14 @@ final class KnapsackCoverSeparator extends NodeSolver.Separator {
         }
 
         return model.countExpressions() - nbBefore;
+    }
+
+    /**
+     * Knapsack Cover
+     */
+    @Override
+    String type() {
+        return "KC";
     }
 
 }

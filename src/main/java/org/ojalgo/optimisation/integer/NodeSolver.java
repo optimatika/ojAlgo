@@ -21,6 +21,8 @@
  */
 package org.ojalgo.optimisation.integer;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -33,6 +35,7 @@ public final class NodeSolver extends IntermediateSolver {
     abstract static class Separator {
 
         static final boolean DEBUG = false;
+        static final AtomicInteger COUNTER = new AtomicInteger();
 
         final ExpressionsBasedModel model;
 
@@ -41,13 +44,20 @@ public final class NodeSolver extends IntermediateSolver {
             model = ebm;
         }
 
+        /**
+         * 2-character cut type identifier
+         */
+        abstract String type();
+
     }
 
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
+    private transient CliqueSeparator myCliqueSeparator = null;
     private boolean myCutRoundDone = false;
     private transient FlowCoverSeparator myFlowCoverSeparator = null;
     private transient GMISeparator myGMISeparator = null;
+    private transient ImpliedBoundsSeparator myImpliedBoundsSeparator = null;
     private Boolean myInPlaceBoundUpdateSafe = null;
     private transient KnapsackCoverSeparator myKnapsackCoverSeparator = null;
     private transient MIRSeparator myMIRSeparator = null;
@@ -57,7 +67,7 @@ public final class NodeSolver extends IntermediateSolver {
     }
 
     private boolean generateCuts(final CutConfiguration configGMI, final CutConfiguration configMIR, final CutConfiguration configFC,
-            final CutConfiguration configKC) {
+            final CutConfiguration configKC, final CutConfiguration configCL, final CutConfiguration configIB) {
 
         ExpressionsBasedModel model = this.getModel();
         Result result = this.getResult();
@@ -66,13 +76,17 @@ public final class NodeSolver extends IntermediateSolver {
         int roundsMIR = configMIR != null ? configMIR.iterations : 0;
         int roundsGMI = configGMI != null ? configGMI.iterations : 0;
         int roundsKC = configKC != null ? configKC.iterations : 0;
+        int roundsCL = configCL != null ? configCL.iterations : 0;
+        int roundsIB = configIB != null ? configIB.iterations : 0;
 
         int countFC = 0;
         int countMIR = 0;
         int countGMI = 0;
         int countKC = 0;
+        int countCL = 0;
+        int countIB = 0;
 
-        int maxRounds = MissingMath.max(roundsFC, roundsMIR, roundsGMI, roundsKC);
+        int maxRounds = MissingMath.max(roundsFC, roundsMIR, roundsGMI, roundsKC, roundsCL, roundsIB);
 
         boolean retVal = false;
 
@@ -82,6 +96,8 @@ public final class NodeSolver extends IntermediateSolver {
             countMIR = 0;
             countGMI = 0;
             countKC = 0;
+            countCL = 0;
+            countIB = 0;
 
             if (!this.isSolved()) {
                 break;
@@ -127,7 +143,27 @@ public final class NodeSolver extends IntermediateSolver {
                 }
             }
 
-            if ((countFC + countMIR + countGMI + countKC) > 0) {
+            if (round < roundsCL) {
+                if (myCliqueSeparator == null) {
+                    myCliqueSeparator = new CliqueSeparator(model);
+                }
+                countCL = myCliqueSeparator.generateCuts(result, configCL);
+                if (DEBUG) {
+                    BasicLogger.debug("{} new CL cuts, iteration {}", countCL, 1 + round);
+                }
+            }
+
+            if (round < roundsIB) {
+                if (myImpliedBoundsSeparator == null) {
+                    myImpliedBoundsSeparator = new ImpliedBoundsSeparator(model);
+                }
+                countIB = myImpliedBoundsSeparator.generateCuts(result, configIB);
+                if (DEBUG) {
+                    BasicLogger.debug("{} new IB cuts, iteration {}", countIB, 1 + round);
+                }
+            }
+
+            if ((countFC + countMIR + countGMI + countKC + countCL + countIB) > 0) {
 
                 retVal = true;
 
@@ -153,8 +189,10 @@ public final class NodeSolver extends IntermediateSolver {
         CutConfiguration mir = strategy.getMIRCutConfiguration();
         CutConfiguration fc = strategy.getFCCutConfiguration();
         CutConfiguration kc = strategy.getKCCutConfiguration();
+        CutConfiguration cl = strategy.getCLCutConfiguration();
+        CutConfiguration ib = strategy.getIBCutConfiguration();
 
-        if (this.generateCuts(gmi, mir, fc, kc)) {
+        if (this.generateCuts(gmi, mir, fc, kc, cl, ib)) {
             this.reset();
             myCutRoundDone = true;
             return true;

@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -82,7 +81,6 @@ final class FlowCoverSeparator extends NodeSolver.Separator {
         }
     }
 
-    private static final AtomicInteger COUNTER = new AtomicInteger();
     private static final NumberContext TOLERANCE = NumberContext.of(4);
 
     static final IntegerStrategy.CutConfiguration CONFIGURATION = new IntegerStrategy.CutConfiguration().withIterations(3);
@@ -346,6 +344,14 @@ final class FlowCoverSeparator extends NodeSolver.Separator {
         }
 
         return model.countExpressions() - nbBefore;
+    }
+
+    /**
+     * Flow Cover
+     */
+    @Override
+    String type() {
+        return "FC";
     }
 
 }

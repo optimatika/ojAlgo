@@ -453,16 +453,8 @@ public abstract class Presolvers {
                 }
             }
 
-            if (lowerNew != null && upperNew != null) {
-                BigDecimal level = precision.common(lowerNew, upperNew);
-                if (level != null) {
-                    lowerNew = level;
-                    upperNew = level;
-                    variables[i].setFixed(level);
-                    didFix = true;
-                }
-            }
-
+            // Integer bounds must be rounded before any fixing: the quotients above are rounded (FLOOR/CEILING)
+            // and an integer variable fixed at e.g. 0.999...975 rather than 1 corrupts every later deduction
             if (variables[i].isInteger()) {
                 if (lowerNew != null) {
                     lowerNew = lowerNew.setScale(0, RoundingMode.CEILING);
@@ -748,24 +740,8 @@ public abstract class Presolvers {
             }
         }
 
-        if (lowerNewA != null && upperNewA != null) {
-            BigDecimal level = precision.common(lowerNewA, upperNewA);
-            if (level != null) {
-                lowerNewA = level;
-                upperNewA = level;
-                variableA.setFixed(level);
-            }
-        }
-
-        if (lowerNewB != null && upperNewB != null) {
-            BigDecimal level = precision.common(lowerNewB, upperNewB);
-            if (level != null) {
-                lowerNewB = level;
-                upperNewB = level;
-                variableB.setFixed(level);
-            }
-        }
-
+        // Integer bounds must be rounded before any fixing: the quotients above are rounded (FLOOR/CEILING) and
+        // an integer variable fixed at e.g. 0.999...975 rather than 1 corrupts every later deduction
         if (variableA.isInteger()) {
             if (lowerNewA != null) {
                 lowerNewA = lowerNewA.setScale(0, RoundingMode.CEILING);

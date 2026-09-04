@@ -29,7 +29,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.equation.Equation;
 import org.ojalgo.function.constant.BigMath;
@@ -53,7 +52,6 @@ final class GMISeparator extends NodeSolver.Separator {
 
     private static final NumberContext COEFFICIENT = NumberContext.of(12).withMode(RoundingMode.CEILING);
 
-    private static final AtomicInteger COUNTER = new AtomicInteger();
     private static final NumberContext LIMIT = NumberContext.of(12).withMode(RoundingMode.FLOOR);
     private static final NumberContext PARAMETERS = NumberContext.of(12);
     private static final NumberContext PRECISION = NumberContext.of(12);
@@ -278,6 +276,14 @@ final class GMISeparator extends NodeSolver.Separator {
         }
 
         return model.countExpressions() - nbBefore;
+    }
+
+    /**
+     * Gomory Mixed integer
+     */
+    @Override
+    String type() {
+        return "GM";
     }
 
 }

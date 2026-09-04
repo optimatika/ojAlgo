@@ -192,6 +192,12 @@ public final class IntegerSolver extends GenericSolver {
      * Set during solve() for logProgress to read; null otherwise.
      */
     private MultiviewSet<NodeKey>.PrioritisedView myBoundView = null;
+    /**
+     * Relaxation bound of the node each worker currently has checked out of {@link #myDeferredNodes} (or a
+     * pessimistic placeholder while it is polling). Together with the deferred frontier this is the set of
+     * open subtrees the global dual bound must cover.
+     */
+    private final ConcurrentHashMap<Thread, Double> myCheckedOutBounds = new ConcurrentHashMap<>();
     private final MultiviewSet<NodeKey> myDeferredNodes = new MultiviewSet<>();
     /**
      * Gap tolerance cached during solve() for logProgress; null otherwise.
@@ -267,29 +273,45 @@ public final class IntegerSolver extends GenericSolver {
 
             RingLogger nodePrinter = this.newPrinter();
 
-            NodeKey node = null;
-            while (workerNormalExit && solverNormalExit.get() && !myOptimalityProven && !myDeferredNodes.isEmpty()) {
-                if ((node = view.poll()) != null) {
+            Thread worker = Thread.currentThread();
+            Double pessimistic = Double.valueOf(mySense == Optimisation.Sense.MIN ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY);
 
-                    if (!this.isIterationAllowed()) {
-                        workerNormalExit = false;
-                    } else if (this.isOptimalityProven()) {
-                        myOptimalityProven = true;
-                    } else if (!myStrategy.isGoodEnough(myBestResultSoFar, node.objective)) {
-                        workerNormalExit = myNodeStatistics.abandoned();
-                    } else {
-                        ExpressionsBasedModel nodeModel = myIntegerModel.snapshot();
-                        node.setNodeState(nodeModel, myStrategy);
-                        NodeSolver nodeSolver = nodeModel.prepare(mySense, NodeSolver::new);
-                        workerNormalExit &= this.compute(node, nodeSolver, nodePrinter, myStrategy);
+            NodeKey node = null;
+            try {
+                while (workerNormalExit && solverNormalExit.get() && !myOptimalityProven && !myDeferredNodes.isEmpty()) {
+
+                    // Registered as pessimistic before polling, so that no other worker can prove optimality
+                    // in the window between this node leaving the queue and its bound being recorded.
+                    myCheckedOutBounds.put(worker, pessimistic);
+
+                    if ((node = view.poll()) != null) {
+
+                        myCheckedOutBounds.put(worker, Double.valueOf(node.objective));
+
+                        if (!this.isIterationAllowed()) {
+                            workerNormalExit = false;
+                        } else if (this.isOptimalityProven()) {
+                            myOptimalityProven = true;
+                        } else if (!myStrategy.isGoodEnough(myBestResultSoFar, node.objective)) {
+                            workerNormalExit = myNodeStatistics.abandoned();
+                        } else {
+                            ExpressionsBasedModel nodeModel = myIntegerModel.snapshot();
+                            node.setNodeState(nodeModel, myStrategy);
+                            NodeSolver nodeSolver = nodeModel.prepare(mySense, NodeSolver::new);
+                            workerNormalExit &= this.compute(node, nodeSolver, nodePrinter, myStrategy);
+                        }
+
+                        node.dispose();
                     }
 
-                    node.dispose();
-                }
+                    myCheckedOutBounds.remove(worker);
 
-                if (!workerNormalExit) {
-                    solverNormalExit.set(workerNormalExit);
+                    if (!workerNormalExit) {
+                        solverNormalExit.set(workerNormalExit);
+                    }
                 }
+            } finally {
+                myCheckedOutBounds.remove(worker);
             }
         });
 
@@ -359,6 +381,14 @@ public final class IntegerSolver extends GenericSolver {
                 return pessimistic;
             }
             bound = mySense == Optimisation.Sense.MIN ? Math.min(bound, head.objective) : Math.max(bound, head.objective);
+        }
+
+        for (Double checkedOut : myCheckedOutBounds.values()) {
+            double value = checkedOut.doubleValue();
+            if (!Double.isFinite(value)) {
+                return pessimistic;
+            }
+            bound = mySense == Optimisation.Sense.MIN ? Math.min(bound, value) : Math.max(bound, value);
         }
 
         return bound;

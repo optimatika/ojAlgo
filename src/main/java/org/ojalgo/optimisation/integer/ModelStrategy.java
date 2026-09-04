@@ -308,6 +308,11 @@ public abstract class ModelStrategy implements IntegerStrategy {
     }
 
     @Override
+    public CutConfiguration getCLCutConfiguration() {
+        return myStrategy.getCLCutConfiguration();
+    }
+
+    @Override
     public CutConfiguration getFCCutConfiguration() {
         return myStrategy.getFCCutConfiguration();
     }
@@ -320,6 +325,11 @@ public abstract class ModelStrategy implements IntegerStrategy {
     @Override
     public CutConfiguration getGMICutConfiguration() {
         return myStrategy.getGMICutConfiguration();
+    }
+
+    @Override
+    public CutConfiguration getIBCutConfiguration() {
+        return myStrategy.getIBCutConfiguration();
     }
 
     @Override
