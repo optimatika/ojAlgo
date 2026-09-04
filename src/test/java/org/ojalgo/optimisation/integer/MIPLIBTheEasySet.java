@@ -50,6 +50,20 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
 
     private static final NumberContext ACCURACY = NumberContext.of(7);
 
+    /**
+     * For models where the expected value is asserted to more digits than the default MIP gap tolerance
+     * guarantees: the default (5 significant digits) lets the solver stop at any solution within that band,
+     * so the result would depend on search order.
+     */
+    private static void doTest(final String modelName, final String expMinValString, final String expMaxValString, final IntegerStrategy strategy) {
+
+        ExpressionsBasedModel model = ModelFileTest.makeModel("MIPLIB", modelName, false);
+
+        model.options.integer(strategy);
+
+        ModelFileTest.assertValues(model, expMinValString, expMaxValString, ACCURACY);
+    }
+
     private static void doTest(final String modelName, final String expMinValString, final String expMaxValString) {
 
         ExpressionsBasedModel model = ModelFileTest.makeModel("MIPLIB", modelName, false);
@@ -189,12 +203,13 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 3s
      * <li>2026-08-21: 0.3s (objective only correct to 5 digits)
+     * <li>2026-09-04: 2-7s with an 8-digit gap tolerance (the default 5 digits stops within ~1e-4 of the
+     * optimum, which is what made this test unstable)
      * </ul>
      */
-    @Tag("unstable")
     @Test
     public void testBell3b() {
-        MIPLIBTheEasySet.doTest("bell3b.mps", "11786160.62", null);
+        MIPLIBTheEasySet.doTest("bell3b.mps", "11786160.62", null, IntegerStrategy.DEFAULT.withGapTolerance(NumberContext.of(8)));
     }
 
     /**
@@ -547,7 +562,6 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 7s
      * </ul>
      */
-    @Tag("unstable")
     @Test
     public void testGen() {
         MIPLIBTheEasySet.doTest("gen.mps", "112313.362718", null);
@@ -1268,7 +1282,6 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 0.03s
      * </ul>
      */
-    @Tag("unstable")
     @Test
     public void testP0291() {
         MIPLIBTheEasySet.doTest("p0291.mps", "5223.7490", null);

@@ -357,10 +357,11 @@ public final class IntegerSolver extends GenericSolver {
         if (this.identifyNonIntegerVariable(probeResult, rootNode, myStrategy) != -1) {
             return;
         }
-        if (!myIntegerModel.validate(probeResult)) {
+        Optimisation.Result candidate = this.validIntegerCandidate(probeResult, myStrategy);
+        if (candidate == null) {
             return;
         }
-        Optimisation.Result integerResult = new Optimisation.Result(Optimisation.State.FEASIBLE, probeValue, probeResult);
+        Optimisation.Result integerResult = new Optimisation.Result(Optimisation.State.FEASIBLE, probeValue, candidate);
         this.markInteger(rootNode, integerResult, myStrategy);
     }
 
@@ -407,6 +408,17 @@ public final class IntegerSolver extends GenericSolver {
         }
 
         double incumbentValue = incumbent.getValue();
+
+        if (myStrategy.isObjectiveIntegral()) {
+            // With an integral objective the bound can be rounded to the next attainable value, and
+            // optimality is proven as soon as no attainable value lies strictly between bound and incumbent
+            if (myStrategy.isLatticeGapClosed(incumbentValue, bound)) {
+                return true;
+            }
+            bound = myStrategy.toLatticeBound(bound);
+            incumbentValue = myStrategy.toLatticeValue(incumbentValue);
+        }
+
         double gap = Math.max(ZERO, mySense == Optimisation.Sense.MIN ? incumbentValue - bound : bound - incumbentValue);
 
         return gap <= myGapTolerance.error(incumbentValue);
@@ -551,6 +563,52 @@ public final class IntegerSolver extends GenericSolver {
         }
     }
 
+    private Optimisation.Result snapIntegers(final Optimisation.Result relaxed, final ModelStrategy strategy) {
+
+        int nbVars = relaxed.size();
+        BigDecimal[] snapped = new BigDecimal[nbVars];
+
+        for (int i = 0, limit = strategy.countIntegerVariables(); i < limit; i++) {
+            int globalIndex = strategy.getIndex(i);
+            snapped[globalIndex] = BigDecimal.valueOf(Math.rint(relaxed.doubleValue(globalIndex)));
+        }
+
+        for (int j = 0; j < nbVars; j++) {
+            if (snapped[j] == null) {
+                snapped[j] = BigDecimal.valueOf(relaxed.doubleValue(j));
+            }
+        }
+
+        return relaxed.withSolution(Access1D.wrap(snapped));
+    }
+
+    /**
+     * A relaxation solution that passed the integrality test still carries LP-level noise. On the integer
+     * variables (e.g. {@code 1.0000000000167}) that noise can make the model's bound validation fail even
+     * though the integrality tolerance accepted the point; snapping the integer variables to their nearest
+     * integers cures that. Snapping is not free of side effects either: a row with large coefficients can
+     * then be violated beyond the feasibility tolerance although the unsnapped point satisfied it. A genuine
+     * integer solution must not be discarded for either reason (the node would then be treated as an
+     * infeasible leaf and its whole subtree lost), so the candidate is accepted if either the relaxation
+     * solution as is, or with its integer variables snapped, validates against the model.
+     *
+     * @return The validated candidate, or null if neither version is feasible
+     */
+    private Optimisation.Result validIntegerCandidate(final Optimisation.Result relaxed, final ModelStrategy strategy) {
+
+        if (myIntegerModel.validate(relaxed)) {
+            return relaxed;
+        }
+
+        Optimisation.Result snapped = this.snapIntegers(relaxed, strategy);
+
+        if (myIntegerModel.validate(snapped)) {
+            return snapped;
+        }
+
+        return null;
+    }
+
     protected Optimisation.Result getBestEstimate() {
         return new Optimisation.Result(Optimisation.State.APPROXIMATE, this.getBestResultSoFar());
     }
@@ -648,6 +706,14 @@ public final class IntegerSolver extends GenericSolver {
         // strict-improvement-via-LP-infeasibility. (No-op for QP MIPs - limitObjective doesn't
         // install constraints for quadratic objectives.)
         double nudge = Math.max(Math.ulp(bestValue), 1.0e-12);
+
+        if (strategy.isObjectiveIntegral()) {
+            // The next attainable objective value is a whole lattice unit away. (The row is an integer
+            // expression, so limitObjective's tightening rounds the limit to the lattice anyway; the slack
+            // keeps that rounding from landing on the wrong side because of noise in bestValue.)
+            bestValue = strategy.toLatticeValue(bestValue);
+            nudge = strategy.getObjectiveLatticeUnit() * (ONE - 1.0E-6);
+        }
 
         if (mySense != Optimisation.Sense.MAX) {
             myIntegerModel.limitObjective(null, BigDecimal.valueOf(bestValue - nudge));
@@ -783,7 +849,9 @@ public final class IntegerSolver extends GenericSolver {
                     nodePrinter.println("Integer solution! Store it among the others, and stop this branch!");
                 }
 
-                if (!myIntegerModel.validate(nodeResult)) {
+                Optimisation.Result integerCandidate = this.validIntegerCandidate(nodeResult, strategy);
+
+                if (integerCandidate == null) {
                     if (nodePrinter != null && this.isLogDebug()) {
                         nodePrinter.println("Candidate integer solution is infeasible for the original model. Discarding.");
                         IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
@@ -794,7 +862,7 @@ public final class IntegerSolver extends GenericSolver {
                     return myNodeStatistics.infeasible();
                 }
 
-                Optimisation.Result tmpIntegerSolutionResult = new Optimisation.Result(Optimisation.State.FEASIBLE, nodeValue, nodeResult);
+                Optimisation.Result tmpIntegerSolutionResult = new Optimisation.Result(Optimisation.State.FEASIBLE, nodeValue, integerCandidate);
 
                 this.markInteger(nodeKey, tmpIntegerSolutionResult, strategy);
 

@@ -171,6 +171,10 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      */
     public interface EntityMap extends ProblemStructure {
 
+        static boolean isIntegerValued(final BigDecimal limit) {
+            return limit == null || limit.stripTrailingZeros().scale() <= 0;
+        }
+
         /**
          * The number of variables, in the solver, that directly correspond to a model variable. (Not slack or
          * artificial variables.)
@@ -242,7 +246,9 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             for (int i = 0; i < nbSlackVars; i++) {
                 EntryPair<ModelEntity<?>, ConstraintType> slack = this.getSlack(i);
                 ModelEntity<?> entity = slack.getKey();
-                if (entity.isInteger()) {
+                // The slack of an integer row (integer coefficients on integer variables) is integer valued
+                // only if the limit it measures the distance to is integer as well
+                if (entity.isInteger() && EntityMap.isIntegerValued(entity.getLowerLimit()) && EntityMap.isIntegerValued(entity.getUpperLimit())) {
                     integers[nbProblVars + i] = true;
                 }
             }

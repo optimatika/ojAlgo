@@ -28,11 +28,13 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.Sense;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -273,9 +275,29 @@ public abstract class ModelStrategy implements IntegerStrategy {
     }
 
     /**
+     * Absolute tolerance, as a fraction of the lattice unit, when rounding objective values to the lattice.
+     */
+    private static final double LATTICE_EPS = 1.0E-6;
+    /**
+     * Absolute tolerance for LP noise in objective values, independent of the lattice unit.
+     */
+    private static final double LATTICE_NOISE_ABS = 1.0E-7;
+    /**
+     * Relative (to the objective value) tolerance for LP noise in objective values.
+     */
+    private static final double LATTICE_NOISE_REL = 1.0E-9;
+
+    /**
      * One entry per integer variable, the entry is the global index of that integer variable
      */
     private final int[] myIndices;
+    /**
+     * The objective value of any integer solution is {@code myObjectiveOffset + k * myObjectiveUnit} for some
+     * integer {@code k}; {@code myObjectiveUnit == 0} means the objective is not integral. Derived from
+     * {@link Expression#getIntegerStep()} of the model's objective.
+     */
+    private final double myObjectiveOffset;
+    private final double myObjectiveUnit;
     private final Optimisation.Sense myOptimisationSense;
     private final IntegerStrategy myStrategy;
 
@@ -299,6 +321,18 @@ public abstract class ModelStrategy implements IntegerStrategy {
         for (int i = 0; i < nbIntegers; i++) {
             int globalIndex = model.indexOf(integerVariables.get(i));
             myIndices[i] = globalIndex;
+        }
+
+        Expression objective = model.objective();
+        BigDecimal step = objective.getIntegerStep();
+        if (step != null) {
+            myObjectiveUnit = step.doubleValue();
+            BigDecimal[] origin = new BigDecimal[model.countVariables()];
+            Arrays.fill(origin, BigDecimal.ZERO);
+            myObjectiveOffset = objective.evaluate(Access1D.wrap(origin)).doubleValue();
+        } else {
+            myObjectiveUnit = ZERO;
+            myObjectiveOffset = ZERO;
         }
     }
 
@@ -386,6 +420,14 @@ public abstract class ModelStrategy implements IntegerStrategy {
         return Arrays.toString(myIndices);
     }
 
+    /**
+     * Absolute tolerance used when comparing an objective value to the lattice. Larger tolerances only make
+     * the lattice rules more conservative (less pruning), never invalid.
+     */
+    private double latticeTolerance(final double value) {
+        return Math.max(LATTICE_EPS * myObjectiveUnit, Math.max(LATTICE_NOISE_ABS, LATTICE_NOISE_REL * Math.abs(value)));
+    }
+
     protected int countIntegerVariables() {
         return myIndices.length;
     }
@@ -419,6 +461,16 @@ public abstract class ModelStrategy implements IntegerStrategy {
         }
 
         double bestIntegerValue = bestResultSoFar.getValue();
+
+        if (myObjectiveUnit > ZERO) {
+            // No integer solution in this subtree can be strictly better than the incumbent
+            double bound = this.toLatticeBound(relaxedNodeValue);
+            double incumbent = this.toLatticeValue(bestIntegerValue);
+            double tolerance = this.latticeTolerance(bestIntegerValue);
+            if (myOptimisationSense == Sense.MAX ? bound <= incumbent + tolerance : bound >= incumbent - tolerance) {
+                return false;
+            }
+        }
 
         if (!myStrategy.getGapTolerance().isDifferent(bestIntegerValue, relaxedNodeValue)) {
             return false;
@@ -463,8 +515,75 @@ public abstract class ModelStrategy implements IntegerStrategy {
 
     protected abstract double scoreBranch(int idx, double distanceDown, double distanceUp, boolean found);
 
+    /**
+     * The spacing between attainable objective values when {@link #isObjectiveIntegral()}, otherwise 0.
+     */
+    double getObjectiveLatticeUnit() {
+        return myObjectiveUnit;
+    }
+
+    /**
+     * With an integral objective: true if no attainable objective value lies strictly between the dual bound
+     * and the incumbent, so that the incumbent is proven optimal. Always false otherwise.
+     */
+    boolean isLatticeGapClosed(final double incumbentValue, final double dualBound) {
+
+        if (myObjectiveUnit <= ZERO || !Double.isFinite(dualBound) || !Double.isFinite(incumbentValue)) {
+            return false;
+        }
+
+        double bound = this.toLatticeBound(dualBound);
+        double incumbent = this.toLatticeValue(incumbentValue);
+        double gap = myOptimisationSense == Sense.MAX ? bound - incumbent : incumbent - bound;
+
+        return gap < myObjectiveUnit - this.latticeTolerance(incumbentValue);
+    }
+
     boolean isMinimisation() {
         return myOptimisationSense == Optimisation.Sense.MIN;
+    }
+
+    /**
+     * @return true if the objective value of every integer solution lies on a known lattice: the objective is
+     *         linear in integer variables only, see {@link Expression#getIntegerStep()}
+     */
+    boolean isObjectiveIntegral() {
+        return myObjectiveUnit > ZERO;
+    }
+
+    /**
+     * The best objective value an integer solution can attain given a relaxation bound: the relaxation value
+     * rounded to the lattice, away from the incumbent's side (up when minimising, down when maximising).
+     * Returns the input unchanged when the objective is not integral or the value is not finite.
+     */
+    double toLatticeBound(final double relaxedValue) {
+
+        if (myObjectiveUnit <= ZERO || !Double.isFinite(relaxedValue)) {
+            return relaxedValue;
+        }
+
+        double tolerance = this.latticeTolerance(relaxedValue);
+        double rounded;
+        if (myOptimisationSense == Sense.MAX) {
+            rounded = Math.floor((relaxedValue + tolerance - myObjectiveOffset) / myObjectiveUnit);
+        } else {
+            rounded = Math.ceil((relaxedValue - tolerance - myObjectiveOffset) / myObjectiveUnit);
+        }
+
+        return rounded * myObjectiveUnit + myObjectiveOffset;
+    }
+
+    /**
+     * An (incumbent) objective value, which carries LP noise, snapped to the nearest lattice point. Returns
+     * the input unchanged when the objective is not integral or the value is not finite.
+     */
+    double toLatticeValue(final double value) {
+
+        if (myObjectiveUnit <= ZERO || !Double.isFinite(value)) {
+            return value;
+        }
+
+        return Math.rint((value - myObjectiveOffset) / myObjectiveUnit) * myObjectiveUnit + myObjectiveOffset;
     }
 
 }

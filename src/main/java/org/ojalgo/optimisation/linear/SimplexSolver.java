@@ -350,13 +350,13 @@ abstract class SimplexSolver extends LinearSolver {
      * infeasibility.
      */
     private static final NumberContext INFEASIBILITY = NumberContext.of(10);
+    private static final NumberContext PIVOT = NumberContext.of(6);
     /**
      * Slack added to the primal ratio-test numerators, bounding how far a basic variable may drift outside
      * its bounds in a single pivot. Distinct from {@link #INFEASIBILITY}, which decides whether such a drift
      * counts as infeasible at all.
      */
     private static final NumberContext RATIO_RELAX = NumberContext.of(9);
-    private static final NumberContext PIVOT = NumberContext.of(6);
 
     static <S extends SimplexStore> S build(final ExpressionsBasedModel model, final Function<LinearStructure, S> factory) {
 
@@ -740,8 +740,21 @@ abstract class SimplexSolver extends LinearSolver {
         return mySimplex.structure.isEntityMap() ? Optional.of(mySimplex.structure) : Optional.empty();
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Refused (returns {@code false}, nothing is modified) after a failed run: the basis where an INFEASIBLE
+     * (dual unbounded) or otherwise failed run stopped is no starting point for a warm re-solve. The dual
+     * simplex has moved along a ray, the basic values are huge and the tableau/factorisation is poorly
+     * conditioned, and a re-solve from there typically ends with a spurious INFEASIBLE or garbage. The caller
+     * should rebuild the solver instead.
+     */
     @Override
     public boolean updateRange(final int index, final double lower, final double upper) {
+
+        if (state.isFailure()) {
+            return false;
+        }
 
         boolean changed = mySimplex.updateRange(index, lower, upper);
 

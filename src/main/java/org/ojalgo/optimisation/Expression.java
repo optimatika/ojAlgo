@@ -88,6 +88,7 @@ public class Expression extends ModelEntity<Expression> {
     private BigDecimal myConstant = null;
     private transient boolean myInfeasible = false;
     private transient Boolean myInteger = null;
+    private transient BigDecimal myIntegerStep = null;
     private final Map<IntIndex, BigDecimal> myLinear;
     private final ExpressionsBasedModel myModel;
     private final Map<IntRowColumn, BigDecimal> myQuadratic;
@@ -547,6 +548,25 @@ public class Expression extends ModelEntity<Expression> {
         return retVal;
     }
 
+    /**
+     * If this is a linear expression in integer variables only, its value at any integer point is an integer
+     * multiple of the returned step: the greatest common divisor of the coefficients, {@code 1} when the
+     * coefficients are integers with no common factor. When {@link #isInteger()} the step is a whole number.
+     * The step is {@code null} when the expression is not integer, has quadratic factors, or the coefficients
+     * have too many decimals for the step to be of any use.
+     */
+    public final BigDecimal getIntegerStep() {
+
+        if (myIntegerStep == null) {
+            Set<IntIndex> keys = this.getLinearKeySet();
+            if (keys.size() > 0 && myQuadratic.size() == 0 && myModel.isInteger(keys)) {
+                myIntegerStep = this.computeIntegerStep(keys);
+            }
+        }
+
+        return myIntegerStep;
+    }
+
     public final Set<Entry<IntIndex, BigDecimal>> getLinearEntrySet() {
         return myLinear.entrySet();
     }
@@ -799,7 +819,7 @@ public class Expression extends ModelEntity<Expression> {
      */
     public final void tighten() {
         if (this.isConstraint()) {
-            this.isInteger();
+            this.doIntegerRounding();
         }
     }
 
@@ -818,6 +838,35 @@ public class Expression extends ModelEntity<Expression> {
         }
 
         return this.makeConstantFunction();
+    }
+
+    /**
+     * The greatest common divisor of the coefficients of the given (integer) variables, as a decimal, or
+     * {@code null} if the coefficients have more than 8 decimals or share no factor beyond a decimal scale.
+     */
+    private BigDecimal computeIntegerStep(final Set<IntIndex> variables) {
+
+        int maxScale = Integer.MIN_VALUE;
+
+        for (IntIndex index : variables) {
+            maxScale = Math.max(maxScale, myLinear.get(index).stripTrailingZeros().scale());
+            if (maxScale > 8) {
+                return null;
+            }
+        }
+
+        BigInteger gcd = null;
+
+        for (IntIndex index : variables) {
+            // All coefficients expressed as integers at the common (max) scale
+            BigInteger unscaled = myLinear.get(index).abs().setScale(maxScale, RoundingMode.UNNECESSARY).unscaledValue();
+            gcd = gcd != null ? gcd.gcd(unscaled) : unscaled;
+            if (gcd.equals(BigInteger.ONE) && maxScale > 0) {
+                return null;
+            }
+        }
+
+        return new BigDecimal(gcd, maxScale);
     }
 
     private BigDecimal convert(final BigDecimal value, final boolean adjusted) {
@@ -1112,35 +1161,34 @@ public class Expression extends ModelEntity<Expression> {
 
     final void doIntegerRounding(final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper) {
 
+        boolean full = myLinear.size() == remaining.size();
+
+        BigDecimal divisor;
+
         if (myInteger != null) {
-            return;
-        }
-
-        if (remaining.size() == 0 || !myModel.isInteger(remaining) || myQuadratic.size() > 0) {
-            myInteger = Boolean.FALSE;
-            return;
-        }
-
-        BigInteger gcd = null;
-        int maxScale = Integer.MIN_VALUE;
-        for (IntIndex index : remaining) {
-            BigDecimal coeff = myLinear.get(index);
-            BigDecimal abs = coeff.stripTrailingZeros().abs();
-            maxScale = Math.max(maxScale, abs.scale());
-            if (gcd != null) {
-                gcd = gcd.gcd(abs.unscaledValue());
-            } else {
-                gcd = abs.unscaledValue();
+            // Already analysed. The limits may have changed since (e.g. an objective cutoff row), so an
+            // integer expression still gets its (current) limits rounded.
+            if (!full || !myInteger.booleanValue()) {
+                return;
             }
-            if (maxScale > 8 || gcd.equals(BigInteger.ONE) && maxScale > 0) {
+            divisor = this.getIntegerStep();
+            if (divisor == null) {
+                return;
+            }
+        } else {
+
+            if (remaining.size() == 0 || !myModel.isInteger(remaining) || myQuadratic.size() > 0) {
+                myInteger = Boolean.FALSE;
+                return;
+            }
+
+            divisor = this.computeIntegerStep(remaining);
+
+            if (divisor == null) {
                 myInteger = Boolean.FALSE;
                 return;
             }
         }
-
-        BigDecimal divisor = new BigDecimal(gcd, maxScale);
-
-        boolean full = myLinear.size() == remaining.size();
 
         BigDecimal newLower = null, newUpper = null;
 
@@ -1164,7 +1212,11 @@ public class Expression extends ModelEntity<Expression> {
             this.setInfeasible();
         }
 
-        myInteger = Boolean.valueOf(maxScale <= 0);
+        if (full) {
+            myIntegerStep = divisor;
+        }
+
+        myInteger = Boolean.valueOf(divisor.scale() <= 0);
     }
 
     final Expression doSet(final IntIndex key, final BigDecimal value) {
