@@ -792,11 +792,12 @@ public final class IntegerSolver extends GenericSolver {
                 }
 
                 nodeSolver.dispose();
-                if (nodeKey.sequence == 0 && (nodeResult.getState().isUnexplored() || !nodeResult.getState().isValid())) {
-                    // return false;
+                if (!nodeResult.getState().isFailure() || nodeKey.sequence == 0 && !nodeResult.getState().isValid()) {
+                    // Neither optimal nor infeasible (FEASIBLE, APPROXIMATE...): the LP stopped short of
+                    // optimality, so the node can neither be bounded nor pruned and the search cannot claim
+                    // optimality. Abort (the result is reported as FEASIBLE, not OPTIMAL).
                     return myNodeStatistics.failed();
                 }
-                // return true;
                 double incumbentValue = myBestResultSoFar != null ? myBestResultSoFar.getValue() : Double.NaN;
                 strategy.markInfeasible(nodeKey, myBestResultSoFar != null, incumbentValue);
                 return myNodeStatistics.infeasible();
@@ -959,9 +960,10 @@ public final class IntegerSolver extends GenericSolver {
 
             if (absRC > ZERO) {
                 if (Math.abs(value - lower) < 0.5) {
-                    int maxSteps = (int) Math.floor(gap / absRC);
-                    int newUpper = lower + maxSteps;
-                    if (newUpper < upper) {
+                    // gap / absRC can exceed the int range - compare before converting
+                    double maxSteps = Math.floor(gap / absRC);
+                    if (maxSteps < upper - (double) lower) {
+                        int newUpper = lower + (int) maxSteps;
                         NodeKey prev = nodeKey;
                         nodeKey = nodeKey.withTightenedUpper(i, newUpper);
                         if (prev != original && prev != nodeKey) {
@@ -970,9 +972,9 @@ public final class IntegerSolver extends GenericSolver {
                         nodeKey.enforceBounds(nodeSolver, i, strategy);
                     }
                 } else if (Math.abs(value - upper) < 0.5) {
-                    int maxSteps = (int) Math.floor(gap / absRC);
-                    int newLower = upper - maxSteps;
-                    if (newLower > lower) {
+                    double maxSteps = Math.floor(gap / absRC);
+                    if (maxSteps < upper - (double) lower) {
+                        int newLower = upper - (int) maxSteps;
                         NodeKey prev = nodeKey;
                         nodeKey = nodeKey.withTightenedLower(i, newLower);
                         if (prev != original && prev != nodeKey) {

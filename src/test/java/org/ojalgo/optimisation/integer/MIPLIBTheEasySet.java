@@ -50,20 +50,6 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
 
     private static final NumberContext ACCURACY = NumberContext.of(7);
 
-    /**
-     * For models where the expected value is asserted to more digits than the default MIP gap tolerance
-     * guarantees: the default (5 significant digits) lets the solver stop at any solution within that band,
-     * so the result would depend on search order.
-     */
-    private static void doTest(final String modelName, final String expMinValString, final String expMaxValString, final IntegerStrategy strategy) {
-
-        ExpressionsBasedModel model = ModelFileTest.makeModel("MIPLIB", modelName, false);
-
-        model.options.integer(strategy);
-
-        ModelFileTest.assertValues(model, expMinValString, expMaxValString, ACCURACY);
-    }
-
     private static void doTest(final String modelName, final String expMinValString, final String expMaxValString) {
 
         ExpressionsBasedModel model = ModelFileTest.makeModel("MIPLIB", modelName, false);
@@ -76,6 +62,23 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
         // model.options.integer(IntegerStrategy.DEFAULT.withGapTolerance(NumberContext.of(3)));
         // model.options.integer(SIMPLE_FIFO_STRATEGY);
         // model.options.iterations_abort = 10;
+
+        ModelFileTest.assertValues(model, expMinValString, expMaxValString, ACCURACY);
+    }
+
+    /**
+     * For models where the expected value is asserted to more digits than the default MIP gap tolerance
+     * guarantees: the default (5 significant digits) lets the solver stop at any solution within that band,
+     * so the result would depend on search order.
+     *
+     * @deprecated Should not be necessary to use this!
+     */
+    @Deprecated
+    private static void doTest(final String modelName, final String expMinValString, final String expMaxValString, final IntegerStrategy strategy) {
+
+        ExpressionsBasedModel model = ModelFileTest.makeModel("MIPLIB", modelName, false);
+
+        model.options.integer(strategy);
 
         ModelFileTest.assertValues(model, expMinValString, expMaxValString, ACCURACY);
     }

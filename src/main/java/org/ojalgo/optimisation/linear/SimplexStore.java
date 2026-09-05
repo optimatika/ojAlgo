@@ -577,6 +577,19 @@ abstract class SimplexStore {
 
     abstract double getInfeasibility(int i);
 
+    /**
+     * @return true if some variable has its lower bound above its upper bound (an infeasible problem, and a
+     *         state the iterations cannot resolve)
+     */
+    final boolean isAnyBoundCrossed() {
+        for (int j = 0; j < n; j++) {
+            if (myLowerBounds[j] > myUpperBounds[j]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     final double getLowerBound(final int index) {
         return myLowerBounds[index];
     }

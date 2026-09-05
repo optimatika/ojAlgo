@@ -1415,6 +1415,19 @@ abstract class SimplexSolver extends LinearSolver {
         return retVal;
     }
 
+    /**
+     * Bounds that cross (lower above upper) make the problem infeasible, and neither the primal nor the dual
+     * iterations can ever resolve that: a basic variable with crossed bounds stays infeasible whatever the
+     * pivots, so the dual simplex would cycle. Checked before iterating.
+     */
+    final boolean isInfeasibleByCrossedBounds() {
+        if (mySimplex.isAnyBoundCrossed()) {
+            state = State.INFEASIBLE;
+            return true;
+        }
+        return false;
+    }
+
     final SimplexSolver basis(final int[] basis) {
         mySimplex.resetBasis(basis);
         state = State.UNEXPLORED;

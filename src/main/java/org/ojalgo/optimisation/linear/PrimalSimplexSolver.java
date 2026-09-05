@@ -41,6 +41,10 @@ final class PrimalSimplexSolver extends SimplexSolver {
     @Override
     public Result solve(final Result kickStarter) {
 
+        if (this.isInfeasibleByCrossedBounds()) {
+            return this.extractResult();
+        }
+
         IterDescr iteration = this.prepareToIterate(true);
 
         this.doPrimalIterations(iteration, true);

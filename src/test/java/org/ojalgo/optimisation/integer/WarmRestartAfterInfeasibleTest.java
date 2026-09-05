@@ -83,4 +83,54 @@ public class WarmRestartAfterInfeasibleTest extends OptimisationIntegerTests {
         solver.dispose();
     }
 
+    /**
+     * A solver-only bound update that leaves a variable with lower above upper (which happens when a node's
+     * bound contradicts a bound presolve derived) must come back INFEASIBLE at once, not iterate forever.
+     */
+    @Test
+    public void testCrossedBounds() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x = model.newVariable("X").integer().lower(0).upper(2).weight(1);
+        Variable y = model.newVariable("Y").integer().lower(0).upper(2).weight(2);
+
+        model.newExpression("C1").set(x, 1).set(y, 1).lower(3);
+
+        model.relax(true);
+
+        NodeSolver solver = model.prepare(Optimisation.Sense.MIN, NodeSolver::new);
+
+        TestUtils.assertTrue(solver.solve(null).getState().isOptimal());
+
+        solver.update(0, 2.0, 1.0);
+        Optimisation.Result crossed = solver.solve(null);
+        TestUtils.assertEquals(Optimisation.State.INFEASIBLE, crossed.getState());
+
+        solver.update(0, 0.0, 2.0);
+        Optimisation.Result restored = solver.solve(null);
+        TestUtils.assertTrue(restored.getState().isOptimal());
+        TestUtils.assertEquals(4.0, restored.getValue(), 1E-9);
+
+        solver.dispose();
+    }
+
+    /**
+     * Crossed bounds on a model variable: the model is infeasible.
+     */
+    @Test
+    public void testCrossedBoundsInModel() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x = model.newVariable("X").integer().lower(2).upper(1).weight(1);
+        Variable y = model.newVariable("Y").integer().lower(0).upper(2).weight(2);
+
+        model.newExpression("C1").set(x, 1).set(y, 1).lower(1);
+
+        Optimisation.Result result = model.minimise();
+
+        TestUtils.assertFalse(result.getState().isFeasible());
+    }
+
 }

@@ -29,14 +29,73 @@ Investigated with the bm23 (binding cutoff) and f2gap40400 (root probes) reprodu
 Regression tests: `WarmRestartAfterInfeasibleTest`, `ObjectiveIntegralityTest`; the bm23 and f2gap loops
 ran 0/100 wrong afterwards.
 
-## `SimplexTableau.resetBasis` / cold restart from a non-initial basis
+## `SimplexTableau.resetBasis` - fix written, NOT applied (2026-09-05)
 
-`SimplexSolver.basis(int[])` and `SimplexStore.resetBasis` are supposed to restart from a given basis, but
-for the tableau stores the row-by-row `doPivot` re-pivoting yields NaN even when the given basis is the
-current one (experiment: reset to `included.clone()` before every re-solve on f2gap40400 gives NaN
-solutions labelled OPTIMAL). `RevisedStore.resetBasis` refactorises and is fine. Not used by the B&B today
-(the refusal above rebuilds instead), but it blocks the cheaper alternative of restarting from the parent's
-optimal basis after a failed probe.
+The tableau stores re-pivot row by row in the order of the given basis (`doPivot(i, newBasis[i])`), which
+divides by zero as soon as the wanted column is basic in another row (the same basis with the rows permuted
+is enough), and `SimplexStore.resetBasis` resets every non-basic column to LOWER without undoing the
+upper-bound shifts in the tableau. A rewrite (partial-pivoting entry of the missing columns, row permutation,
+shift-consistent bound placement, artificial recount, `TableauResetBasisTest` for all store types, verified
+on f2gap40400 by resetting to the current basis before every re-solve) exists as a patch outside the repo;
+it was taken out of the working tree to keep the change set focused on the failing tests. Not used by the
+B&B today (the warm-restart refusal rebuilds instead), so nothing depends on it.
+
+## Node LP ending FEASIBLE (not OPTIMAL) was treated as infeasible - FIXED (2026-09-05)
+
+blend2 returned 7.692983 instead of 7.598985 about once per 50-150 solves when the machine was loaded
+(reproduced with 12 busy threads in the same JVM, never without load). Tracking the known optimum through
+the tree showed the node holding it warm-solved to state FEASIBLE at the correct optimal value: the warm
+path in `PhasedSimplexSolver.solve` only runs dual iterations, and if the basis ends primal feasible but
+marginally not dual feasible (`COST` tolerance) it returned FEASIBLE. `IntegerSolver.compute` treated every
+non-OPTIMAL state as infeasible and dropped the subtree. Node order (hence which incumbent exists, which
+cuts are added, and the warm-start history) depends on thread timing, which is why it only showed under
+contention. Two fixes: the warm path now continues with primal iterations when the point is primal feasible
+but not dual feasible (150 loaded solves afterwards: no FEASIBLE node result at all), and `compute` aborts
+the search (`failed()`, result state FEASIBLE) on a non-optimal, non-failed LP result instead of pruning the
+node. (A cold retry before aborting was tried and dropped again: it never triggered.) The
+`DualSimplexSolver` still returns FEASIBLE in that situation; it is not used as node solver.
+
+## Node bounds overwrote presolve-tightened bounds in the node model - FIXED (2026-09-05)
+
+flugpl returned 1202100 or 1201800 instead of 1201500 in roughly 1 of 500 solves, without any load.
+Tracking the optimum showed the node holding it solved (cold, right after a cut round) to an "OPTIMAL" LP
+point that violates plain model equalities (ANZ4: 0.9 STM3 + ANM3 - STM4 = 0 off by 7) and is then
+discarded by `validIntegerCandidate`, closing the node. The node model itself was inconsistent: presolve at
+the first cold solve had fixed ANM3 from that row (STM3 and STM4 fixed) and marked the row redundant; then
+`NodeKey.enforceBounds` / `setNodeState` wrote the node's own, looser bounds for ANM3 back into the
+variable (`variable.lower(lb).upper(ub)`), so the rebuilt LP had the variable free and the row gone.
+Fixed: node bounds are now applied tighten-only (`NodeKey.tightenBounds`), never loosening a bound the node
+model already has. Afterwards 6000 flugpl solves: 0 wrong, no loss events. This very likely also explains
+part of the "integer candidate discarded by validate()" history behind the snapping hack (TODO item on the
+LP polish): a node LP built from an inconsistent node model can produce such points.
+
+## Reduced-cost fixing int overflow, crossed bounds cycling the dual simplex - FIXED (2026-09-05)
+
+Surfaced by the tighten-only change above: blend2 then hung (one worker at 100% CPU pivoting forever in
+the warm dual iterations). `IntegerSolver.fixByReducedCost` computed `lower + (int) floor(gap / |rc|)`;
+with a tiny reduced cost the step is `Integer.MAX_VALUE` and the sum overflows to `Integer.MIN_VALUE`, so the
+node got bounds like [1, -2147483648] (seen ~3 times per blend2 solve). Before tighten-only the next
+`enforceBounds` happened to overwrite such a bound; now it stays, and a basic variable whose bounds cross
+can never become feasible, so the dual loop pivots until `time_abort` (15 min in the tests). Fixed: the step
+is compared in double before converting, and all three `SimplexSolver.solve` variants return INFEASIBLE at
+once when any variable has lower > upper (`SimplexStore.isAnyBoundCrossed`), which is also what a node whose
+bound contradicts a presolve-derived one should get. Tests: `WarmRestartAfterInfeasibleTest.testCrossedBounds`
+and `testCrossedBoundsInModel`.
+
+## Dual simplex stalling on degenerate LPs - OPEN
+
+Seen on blend2 under load after the fixes above: a node LP (150 rows, 417 columns, DenseTableau) took
+20000+ dual iterations, leaving row 142 nine times in a row with different entering columns and 59 basics
+still infeasible, in one case only ending at a 20 s time limit; with the 15 min limits of the tests that
+looks like a hang. No crossed bounds involved: plain degenerate cycling, with only Devex pricing and the
+Harris ratio test as safeguards. A first attempt (count consecutive degenerate steps, switch to Bland's
+rule after max(50, m) of them) was reverted the same day: the primal "no progress" test (objective
+unchanged to 7 digits) fires all the time in the late iterations of large LPs, so netlib cases such as
+MODSZK1 locked into Bland's rule and crawled. The proper remedy is cost/bound perturbation with a clean-up
+phase, which needs the original costs to be restorable (the tableau stores only keep the reduced row); a
+cheaper interim option is an iteration cap for the warm path only, falling back to a cold rebuild through
+the existing "retry non-optimal LP" logic in `IntegerSolver.compute`. Reproduction: loop blend2 under CPU
+load (12 busy threads) with a temporary log when `countIterations()` passes 20000.
 
 ## `IntermediateSolver.update(int, lower, upper)` - FIXED (2026-09-05)
 
@@ -57,24 +116,35 @@ Better: fix the integer variables at their rounded values, re-solve the LP for t
 that LP is infeasible the candidate is genuinely infeasible and the node can be closed. `tryRounding` could
 share the same routine.
 
-## MIP gap tolerance vs test expectations: tests should pass with standard configuration
+## PRIORITY (next after the cut work): primal heuristics and search order
 
-**Decision (2026-09-04): do not tune the gap per test. Implement objective integrality (next item, done
-2026-09-05) so the integer-objective instances are exact by construction with the default 1e-4 gap.
-Instances with non-integral objectives that still miss the exact optimum (bell3b, EnergyApp, BigBinary: all
-non-integral) are a primal-heuristics matter; their `withGapTolerance` workarounds remain for now.**
+Goal: the MIPLIB tests pass with the default configuration, and the per-test gap workarounds go away
+(`testBell3b` and `IntegerUserFiles.testEnergyApp`/`testBigBinary` use `withGapTolerance`; the
+`doTest(..., strategy)` overload in `MIPLIBTheEasySet` exists only for this).
 
-The default gap tolerance `NumberContext.of(5, 7)` is a relative gap of 1e-4 (`10^(1-5)`; absolute
-0.5e-7), applied consistently by `ModelStrategy.isGoodEnough` (node pruning) and
-`IntegerSolver.isOptimalityProven` (early stop). That is the same default as CPLEX/Gurobi, so the
-implementation itself is fine. The problem is that the tests assert the exact optimum to 6-7 digits while
-the solver is configured to accept anything within 1e-4: tests pass only when the first solution found
-happens to be the exact optimum, and `testBell3b` (3e-5 off) / `IntegerUserFiles.testEnergyApp` (1.5e-4 off
-with its 1e-3 gap) currently work around it with `withGapTolerance(NumberContext.of(8))`.
+Why: the default gap is 1e-4 relative, the same as CPLEX/Gurobi/HiGHS, and it is applied correctly. The
+tests assert the optimum to 6-7 digits, so with a non-integral objective a run passes only when the exact
+optimum is the first incumbent within the gap. bell3b with defaults (20 runs, 2026-09-05): the optimum
+11786160.618 twice, 11786515.398 five times, 11786925.366 five times, eight other values, all within 0.007%
+of the optimum and therefore legitimate stops. The other solvers hit the exact optimum with the same gap
+because their primal heuristics find it before the bound closes; ojAlgo only has `tryRounding`.
 
-Alternatives considered and rejected: asserting within the configured gap (hides real regressions),
-tightening the default gap (slower everywhere), a shared tight test strategy (still not the standard
-configuration).
+What to build (in rough order of payoff):
+
+- Diving heuristics at the root and periodically (fractional, guided by the incumbent, pseudo-cost diving):
+  cheap, and where most exact optima are found on these instances.
+- RINS / local branching sub-MIPs once an incumbent exists (fix variables that agree between the incumbent
+  and the LP solution, solve the rest with a node limit).
+- Feasibility pump for instances where no incumbent is found early.
+- Search order: best-bound vs depth-first mix, and node selection that revisits the best-estimate nodes
+  (the current worker priorities are a start).
+- Objective integrality (done) keeps applying on top: for integral objectives the optimum is exact by
+  construction once found.
+
+Then: remove the `withGapTolerance` workarounds and the strategy overload, and re-tag any instance that
+still needs it as a heuristics gap rather than a solver bug. Alternatives considered and rejected for the
+tests: asserting within the configured gap (hides regressions), tightening the default gap (slower
+everywhere; bell3b would need 1e-6), per-test gaps (the current workaround).
 
 ## Objective integrality - DONE (2026-09-05)
 
