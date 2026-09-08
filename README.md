@@ -38,6 +38,10 @@ All example code (from the blog posts) in a multi-file gist: https://gist.github
 
 Where to ask questions and report bugs is covered in [SUPPORT.md](SUPPORT.md). If you'd like to contribute, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
+### Commercial Support
+
+The [Optimatika subscription](https://www.optimatika.se/subscription/) gives you priority support and third-party solver integrations for ojAlgo.
+
 ## Building from Source
 
 ojAlgo requires Java 11+ and uses the Maven Wrapper, so no separate Maven install is needed.
