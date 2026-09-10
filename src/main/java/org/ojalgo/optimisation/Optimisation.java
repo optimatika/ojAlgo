@@ -579,8 +579,8 @@ public interface Optimisation {
         public Boolean sparse = null;
 
         /**
-         * The maximum number of millis allowed for the solve() command. Executions will be aborted
-         * regardless of if a solution has been found or not.
+         * The maximum number of millis allowed for the solve() command. Executions will be aborted regardless
+         * of if a solution has been found or not.
          */
         public long time_abort = CalendarDateUnit.DAY.toDurationInMillis();
 
