@@ -11,6 +11,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [57.3.0] – 2026-09-11
+
 ### Added
 
 #### org.ojalgo.optimisation
@@ -19,12 +21,22 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - Integral-objective pruning: when all objective coefficients are integers the solver computes the GCD lattice step and uses it to widen the incumbent cutoff, pruning nodes that cannot improve by a full lattice unit.
 - `ExpressionsBasedModel.findSimilar(Expression)` and `Presolvers.findSimilar(Collection, Expression)`: the similarity test behind `checkSimilarity`, without its side effects. Returns the similar constraint and the factor between the coefficients, or null.
 
+#### org.ojalgo.concurrent
+
+- `InterruptForwarder`: forwards `Thread.interrupt()` of the calling thread as a repeated invocation of a stop action. Useful when the calling thread is blocked inside code that cannot observe Java's interrupt flag on its own. Use it in a try-with-resources block around the blocking call.
+
 ### Changed
 
 #### org.ojalgo.optimisation
 
 - `IntegerStrategy.GMICutConfiguration` is replaced by `IntegerStrategy.CutConfiguration`, a single configuration shared by all cut types: the quality filters (efficacy, dynamism, density, count) and the number of separation rounds (`withIterations()`) apply to every separator, while `fractionality`, `violation` and the new `mirRelaxation` flag only affect the GMI and MIR cuts. `withTypes(CutType...)` selects which cut types to use and the order in which they are attempted within a round; with no arguments cut generation is turned off. The default order is implied bounds, clique, knapsack cover, flow cover, MIR, GMI. `IntegerStrategy` has the single accessor `getCutConfiguration()` and `ConfigurableStrategy` the single `withCutConfiguration()`.
 - `UpdatableSolver.generateCutCandidates(boolean[], CutConfiguration)` replaces the `GMICutConfiguration` overload.
+
+### Deprecated
+
+#### org.ojalgo.optimisation
+
+- `UpdatableSolver.generateCutCandidates(double, boolean[])`: use `generateCutCandidates(boolean[], CutConfiguration)` instead.
 
 ### Fixed
 

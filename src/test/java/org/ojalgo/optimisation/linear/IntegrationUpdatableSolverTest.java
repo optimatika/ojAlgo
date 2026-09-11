@@ -29,12 +29,15 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ExpressionsBasedModel.EntityMap;
 import org.ojalgo.optimisation.ExpressionsBasedModel.Integration;
+import org.ojalgo.optimisation.ModelEntity;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.Optimisation.ConstraintType;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.type.keyvalue.EntryPair;
 
 /**
  * Tests {@link UpdatableSolver} methods ({@code fixVariable}, {@code updateRange}, {@code getDualMultiplier},
@@ -130,6 +133,30 @@ public class IntegrationUpdatableSolverTest extends OptimisationLinearTests {
 
         model.newExpression("c0").set(x, 1).set(y, 1).set(z, 1).upper(4);
         model.newExpression("c1").set(x, 1).set(y, 3).set(z, 1).upper(6);
+
+        return model;
+    }
+
+    /**
+     * <pre>
+     * min  -x - 2y
+     * s.t.  1 <= x + y <= 3    (ranged: both lower and upper, not equality)
+     *            x + 3y <= 6   (upper only)
+     *       x, y in [0, 10]
+     * </pre>
+     *
+     * Optimal: x=1.5, y=1.5, obj=-4.5. The ranged constraint binds at its upper bound (x+y=3) and the
+     * upper-only constraint also binds (x+3y=6). The lower bound of the ranged constraint does not bind.
+     */
+    private static ExpressionsBasedModel newRangedConstraintModel() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x = model.newVariable("x").lower(0).upper(10).weight(-1);
+        Variable y = model.newVariable("y").lower(0).upper(10).weight(-2);
+
+        model.newExpression("range").set(x, 1).set(y, 1).lower(1).upper(3);
+        model.newExpression("ub").set(x, 1).set(y, 3).upper(6);
 
         return model;
     }
@@ -337,6 +364,117 @@ public class IntegrationUpdatableSolverTest extends OptimisationLinearTests {
             String tag = integration.toString();
 
             TestUtils.assertTrue(tag + " x <= 1", result.doubleValue(0) <= 1.0 + 1E-8);
+        }
+    }
+
+    /**
+     * Verifies that a model with a ranged expression (both lower and upper bounds, not equality) solves
+     * correctly, and that the {@link EntityMap} properly accounts for the ranged constraint(s).
+     * <p>
+     * Solvers that split a ranged expression into two rows (one {@code >=}, one {@code <=}) will report more
+     * constraints than solvers that use a native range row. The test accepts both representations.
+     */
+    @Test
+    public void testRangedExpression() {
+
+        for (Integration<?> integration : this.integrations()) {
+
+            ExpressionsBasedModel model = IntegrationUpdatableSolverTest.newRangedConstraintModel();
+            UpdatableSolver solver = IntegrationUpdatableSolverTest.buildUpdatableSolver(integration, model);
+
+            Result result = solver.solve(null);
+            TestUtils.assertStateNotLessThanOptimal(result);
+
+            String tag = integration.toString();
+
+            TestUtils.assertEquals(tag + " x", 1.5, result.doubleValue(0), ACCURACY);
+            TestUtils.assertEquals(tag + " y", 1.5, result.doubleValue(1), ACCURACY);
+            TestUtils.assertEquals(tag + " obj", -4.5, result.getValue(), ACCURACY);
+
+            Optional<EntityMap> optMap = solver.getEntityMap();
+            TestUtils.assertTrue(tag + " EntityMap present", optMap.isPresent());
+
+            EntityMap map = optMap.get();
+
+            TestUtils.assertTrue(tag + " variables > 0", map.countVariables() > 0);
+            TestUtils.assertTrue(tag + " modelVariables > 0", map.countModelVariables() > 0);
+
+            int totalConstraints = map.countConstraints();
+            TestUtils.assertTrue(tag + " constraints >= 2", totalConstraints >= 2);
+            TestUtils.assertEquals(tag + " eq + ineq = total", totalConstraints,
+                    map.countEqualityConstraints() + map.countInequalityConstraints());
+            TestUtils.assertEquals(tag + " no equality constraints", 0, map.countEqualityConstraints());
+
+            for (int c = 0; c < totalConstraints; c++) {
+                EntryPair<ModelEntity<?>, ConstraintType> entry = map.getConstraint(c);
+                TestUtils.assertNotNull(entry);
+                String name = entry.getKey().getName();
+                TestUtils.assertTrue(tag + " constraint " + c + " maps to known expression (" + name + ")",
+                        "range".equals(name) || "ub".equals(name));
+            }
+        }
+    }
+
+    /**
+     * Verifies that duals are correctly retrieved for a model with a ranged expression. At the optimum, the
+     * upper side of the range and the upper-only constraint both bind, so their duals must be non-zero.
+     */
+    @Test
+    public void testRangedExpressionDuals() {
+
+        for (Integration<?> integration : this.integrations()) {
+
+            ExpressionsBasedModel model = IntegrationUpdatableSolverTest.newRangedConstraintModel();
+            UpdatableSolver solver = IntegrationUpdatableSolverTest.buildUpdatableSolver(integration, model);
+
+            Result result = solver.solve(null);
+            TestUtils.assertStateNotLessThanOptimal(result);
+
+            String tag = integration.toString();
+
+            EntityMap map = solver.getEntityMap().get();
+            int totalConstraints = map.countConstraints();
+
+            int nonZeroDuals = 0;
+            for (int c = 0; c < totalConstraints; c++) {
+                double dual = solver.getDualMultiplier(c);
+                if (Math.abs(dual) > 1E-8) {
+                    nonZeroDuals++;
+                }
+            }
+
+            TestUtils.assertTrue(tag + " at least 2 non-zero duals (2 binding constraints)", nonZeroDuals >= 2);
+        }
+    }
+
+    /**
+     * Verifies that {@code fixVariable} and re-solve work correctly in the presence of a ranged expression.
+     */
+    @Test
+    public void testRangedExpressionFixVariable() {
+
+        for (Integration<?> integration : this.integrations()) {
+
+            ExpressionsBasedModel model = IntegrationUpdatableSolverTest.newRangedConstraintModel();
+            UpdatableSolver solver = IntegrationUpdatableSolverTest.buildUpdatableSolver(integration, model);
+
+            solver.solve(null);
+
+            boolean fixed = solver.fixVariable(0, 0.0);
+            TestUtils.assertTrue(integration + " fixVariable should succeed", fixed);
+
+            Result result = solver.solve(null);
+            TestUtils.assertStateNotLessThanOptimal(result);
+
+            String tag = integration.toString();
+
+            TestUtils.assertEquals(tag + " fixed x=0", 0.0, result.doubleValue(0), ACCURACY);
+
+            double y = result.doubleValue(1);
+            TestUtils.assertTrue(tag + " y in ranged [1,3]", y >= 1.0 - 1E-8 && y <= 3.0 + 1E-8);
+            TestUtils.assertTrue(tag + " x+3y <= 6", 0.0 + 3.0 * y <= 6.0 + 1E-8);
+
+            TestUtils.assertEquals(tag + " obj after fix", -4.0, result.getValue(), ACCURACY);
         }
     }
 
