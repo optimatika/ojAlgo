@@ -28,21 +28,16 @@ import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * A 794-model pool was assembled by combining 'easy' instances from every published MIPLIB edition — 2.0,
- * 3.0, 2003, 2010 and 2017 — into a single deduplicated collection. Older editions contain smaller, simpler
- * models that were often dropped from later editions for being too easy, making them better suited for
- * testing newer non-commercial solvers. The test set was then constructed by parsing all 794 models with
- * ojAlgo's MPS reader and filtering down to at most 1 000 variables and 1 000 constraints. A few models were
- * discarded because ojAlgo does not yet support certain MPS sections (e.g. LAZYCONS). The remaining models
- * were benchmarked against three commercial/open-source solvers (CPLEX, HiGHS and SCIP) with a 5 min
- * per-solver timeout. The 94 models here are those that all three solvers solved within that timeout. They
- * range from 9 to 990 variables.
+ * A set of models from MIPLIB (including older releases of that test suite). The models included here have no
+ * more than 1k variables or constraints. In addition it is limited to the set of models that SCIP, HiGHS and
+ * the top commercial solvers ALL can solve. Something for ojAlgo to aim for...
  * <p>
- * The solver times in each test method's javadoc were measured on a MacBook Air (15-inch, M4, 2025) via the
- * ojAlgo mathematical-programming-benchmark harness using ojAlgo 57.1.1-SNAPSHOT as the MPS parser.
+ * The definition of which models to include is not entirely deterministic. Any update to either of the
+ * solvers or the benchmark code may change the outcome. Currently there are 103 models in this set.
  * <p>
  * The tag 'slow' means getting a response takes too long (regardless of what the response is). The tag
- * 'unstable' means there is some problem with the returned solution (possibly that we've never seen one).
+ * 'unstable' means there is (sometimes) a problem with the returned solution (possibly that we've never seen
+ * one).
  * <p>
  * The purpose of this test class is to make as many as possible of the MIPLIB (easy set) models pass with the
  * default settings. There are cases where a known small configuration change makes the test pass – that's not
@@ -75,7 +70,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 429 variables, 199 expressions, density 0.0023
      * <p>
-     * CPLEX 112ms, HiGHS 2.0s, OR-Tools (SCIP) 769ms
+     * HiGHS 2.0s, SCIP 769ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -93,7 +88,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 368 variables, 138 expressions, density 0.0027
      * <p>
-     * CPLEX 55ms, HiGHS 4.1s, OR-Tools (SCIP) 1.5s
+     * HiGHS 4.1s, SCIP 1.5s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -111,7 +106,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 842 variables, 480 expressions, density 0.50
      * <p>
-     * CPLEX 877ms, HiGHS 5.5s, OR-Tools (SCIP) 14.9s
+     * HiGHS 5.5s, SCIP 14.9s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -131,7 +126,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 771 variables, 24 expressions, density 1.0
      * <p>
-     * CPLEX 136ms, HiGHS 53ms, OR-Tools (SCIP) 37ms
+     * HiGHS 53ms, SCIP 37ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -149,7 +144,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 390 variables, 373 expressions, density 0.88
      * <p>
-     * CPLEX 64ms, HiGHS 70ms, OR-Tools (SCIP) 241ms
+     * HiGHS 70ms, SCIP 241ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -169,7 +164,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 133 variables, 124 expressions, density 0.71
      * <p>
-     * CPLEX 141ms, HiGHS 227ms, OR-Tools (SCIP) 588ms
+     * HiGHS 227ms, SCIP 588ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -187,7 +182,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 133 variables, 124 expressions, density 0.71
      * <p>
-     * CPLEX 490ms, HiGHS 314ms, OR-Tools (SCIP) 1.7s
+     * HiGHS 314ms, SCIP 1.7s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -211,7 +206,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 117 variables, 106 expressions, density 0.71
      * <p>
-     * CPLEX 470ms, HiGHS 858ms, OR-Tools (SCIP) 393ms
+     * HiGHS 858ms, SCIP 393ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -231,7 +226,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 104 variables, 92 expressions, density 0.71
      * <p>
-     * CPLEX 1.8s, HiGHS 674ms, OR-Tools (SCIP) 143ms
+     * HiGHS 674ms, SCIP 143ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -250,7 +245,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 505 variables, 577 expressions, density 0.0020
      * <p>
-     * CPLEX 1.3s, HiGHS 17.6s, OR-Tools (SCIP) 78.4s
+     * HiGHS 17.6s, SCIP 78.4s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -265,11 +260,25 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
     }
 
     /**
+     * https://miplib.zib.de/instance_details_bienst2.html
+     * <p>
+     * 505 variables, 577 expressions, density 0.0020
+     * <p>
+     * HiGHS 281s, SCIP 142s
+     */
+    @Tag("unstable")
+    @Tag("slow")
+    @Test
+    public void testBienst2() {
+        MIPLIBTheEasySet.doTest("bienst2.mps", "54.6", null);
+    }
+
+    /**
      * https://miplib.zib.de/instance_details_blend2.html
      * <p>
      * 353 variables, 275 expressions, density 0.25
      * <p>
-     * CPLEX 2.2s, HiGHS 1.7s, OR-Tools (SCIP) 689ms
+     * HiGHS 1.7s, SCIP 689ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -292,7 +301,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 27 variables, 21 expressions, density 1.0
      * <p>
-     * CPLEX 113ms, HiGHS 61ms, OR-Tools (SCIP) 150ms
+     * HiGHS 61ms, SCIP 150ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -310,7 +319,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 232 variables, 60 expressions, density 0.0086
      * <p>
-     * CPLEX 12.6s, HiGHS 157ms, OR-Tools (SCIP) 154ms
+     * HiGHS 157ms, SCIP 154ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -328,7 +337,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 572 variables, 144 expressions, density 1.0
      * <p>
-     * CPLEX 16ms, HiGHS 29ms, OR-Tools (SCIP) 69ms
+     * HiGHS 29ms, SCIP 69ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -346,7 +355,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 548 variables, 291 expressions, density 0.95
      * <p>
-     * CPLEX 43ms, HiGHS 3.1s, OR-Tools (SCIP) 850ms
+     * HiGHS 3.1s, SCIP 850ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -364,11 +373,25 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
     }
 
     /**
+     * https://miplib.zib.de/instance_details_dfn-gwin-UUM.html
+     * <p>
+     * 938 variables, 159 expressions, density 0.10
+     * <p>
+     * HiGHS 144s, SCIP 36.4s
+     */
+    @Tag("unstable")
+    @Tag("slow")
+    @Test
+    public void testDfn_gwin_UUM() {
+        MIPLIBTheEasySet.doTest("dfn-gwin-UUM.mps", "38752", null);
+    }
+
+    /**
      * https://miplib.zib.de/instance_details_egout.html
      * <p>
      * 141 variables, 99 expressions, density 0.78
      * <p>
-     * CPLEX 153ms, HiGHS 11ms, OR-Tools (SCIP) 2.8ms
+     * HiGHS 11ms, SCIP 2.8ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -386,7 +409,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 100 variables, 22 expressions, density 0.090
      * <p>
-     * CPLEX 113ms, HiGHS 118ms, OR-Tools (SCIP) 116ms
+     * HiGHS 118ms, SCIP 116ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -404,7 +427,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 200 variables, 101 expressions, density 0.50
      * <p>
-     * CPLEX 2.4ms, HiGHS 3.8s, OR-Tools (SCIP) 2.0ms
+     * HiGHS 3.8s, SCIP 2.0ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -419,11 +442,25 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
     }
 
     /**
+     * https://miplib.zib.de/instance_details_enlight13.html
+     * <p>
+     * 338 variables, 170 expressions, density 0.50
+     * <p>
+     * HiGHS 127s, SCIP 5ms
+     */
+    @Tag("unstable")
+    @Tag("slow")
+    @Test
+    public void testEnlight13() {
+        MIPLIBTheEasySet.doTest("enlight13.mps", "71", null);
+    }
+
+    /**
      * https://miplib.zib.de/instance_details_enlight8.html
      * <p>
      * 128 variables, 65 expressions, density 0.50
      * <p>
-     * CPLEX 2.6ms, HiGHS 1.0s, OR-Tools (SCIP) 2.2ms
+     * HiGHS 1.0s, SCIP 2.2ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -441,7 +478,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 990 variables, 551 expressions, density 1.0
      * <p>
-     * CPLEX 958ms, HiGHS 1.7s, OR-Tools (SCIP) 1.0s
+     * HiGHS 1.7s, SCIP 1.0s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -461,7 +498,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 400 variables, 41 expressions, density 0.99
      * <p>
-     * CPLEX 823ms, HiGHS 6.8ms, OR-Tools (SCIP) 26ms
+     * HiGHS 6.8ms, SCIP 26ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -479,7 +516,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 878 variables, 479 expressions, density 1.00
      * <p>
-     * CPLEX 637ms, HiGHS 47ms, OR-Tools (SCIP) 18ms
+     * HiGHS 47ms, SCIP 18ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -499,7 +536,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 878 variables, 479 expressions, density 0.99
      * <p>
-     * CPLEX 188ms, HiGHS 182ms, OR-Tools (SCIP) 749ms
+     * HiGHS 182ms, SCIP 749ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -519,7 +556,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 878 variables, 479 expressions, density 0.90
      * <p>
-     * CPLEX 181ms, HiGHS 1.5s, OR-Tools (SCIP) 5.7s
+     * HiGHS 1.5s, SCIP 5.7s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -539,7 +576,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 18 variables, 19 expressions, density 1.0
      * <p>
-     * CPLEX 6.3ms, HiGHS 42ms, OR-Tools (SCIP) 77ms
+     * HiGHS 42ms, SCIP 77ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -560,7 +597,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 870 variables, 781 expressions, density 0.67
      * <p>
-     * CPLEX 78ms, HiGHS 12ms, OR-Tools (SCIP) 11ms
+     * HiGHS 12ms, SCIP 11ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -574,11 +611,39 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
     }
 
     /**
+     * https://miplib.zib.de/instance_details_gen-ip021.html
+     * <p>
+     * 35 variables, 29 expressions, density 1.0
+     * <p>
+     * HiGHS 263s, SCIP 158s
+     */
+    @Tag("unstable")
+    @Tag("slow")
+    @Test
+    public void testGen_ip021() {
+        MIPLIBTheEasySet.doTest("gen-ip021.mps", "2361.4541951916", null);
+    }
+
+    /**
+     * https://miplib.zib.de/instance_details_gen-ip036.html
+     * <p>
+     * 29 variables, 47 expressions, density 1.0
+     * <p>
+     * HiGHS 281s, SCIP 145s
+     */
+    @Tag("unstable")
+    @Tag("slow")
+    @Test
+    public void testGen_ip036() {
+        MIPLIBTheEasySet.doTest("gen-ip036.mps", "-4606.6796098376", null);
+    }
+
+    /**
      * https://miplib.zib.de/instance_details_gr4x6.html
      * <p>
      * 48 variables, 35 expressions, density 1.0
      * <p>
-     * CPLEX 2.4s, HiGHS 7.2ms, OR-Tools (SCIP) 3.1ms
+     * HiGHS 7.2ms, SCIP 3.1ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -596,7 +661,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 166 variables, 475 expressions, density 0.23
      * <p>
-     * CPLEX 7.8s, HiGHS 163s, OR-Tools (SCIP) 188s
+     * HiGHS 163s, SCIP 188s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -612,31 +677,11 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
     }
 
     /**
-     * https://miplib.zib.de/instance_details_gsvm2rl3.html
-     * <p>
-     * 241 variables, 181 expressions, density 0.75
-     * <p>
-     * CPLEX 24.5s, HiGHS 4.6s, OR-Tools (SCIP) 5.0s
-     * <p>
-     * MacBook Pro (2026) M5 Pro, 48GB
-     * <ul>
-     * <li>2026-07-17: 602s
-     * <li>2026-08-21: 10min
-     * </ul>
-     */
-    @Tag("unstable")
-    @Tag("slow")
-    @Test
-    public void testGsvm2rl3() {
-        MIPLIBTheEasySet.doTest("gsvm2rl3.mps", "0.33652753", null);
-    }
-
-    /**
      * https://miplib.zib.de/instance_details_gt2.html
      * <p>
      * 188 variables, 30 expressions, density 0.49
      * <p>
-     * CPLEX 141ms, HiGHS 28ms, OR-Tools (SCIP) 19ms
+     * HiGHS 28ms, SCIP 19ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -654,7 +699,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 703 variables, 320 expressions, density 0.28
      * <p>
-     * CPLEX 7.9s, HiGHS 13.2s, OR-Tools (SCIP) 8.1s
+     * HiGHS 13.2s, SCIP 8.1s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -674,7 +719,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 89 variables, 29 expressions, density 0.96
      * <p>
-     * CPLEX 98ms, HiGHS 163ms, OR-Tools (SCIP) 417ms
+     * HiGHS 163ms, SCIP 417ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -688,11 +733,25 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
     }
 
     /**
+     * https://miplib.zib.de/instance_details_markshare_4_0.html
+     * <p>
+     * 34 variables, 5 expressions, density 0.12
+     * <p>
+     * HiGHS 80s, SCIP 42.2s
+     */
+    @Tag("unstable")
+    @Tag("slow")
+    @Test
+    public void testMarkshare_4_0() {
+        MIPLIBTheEasySet.doTest("markshare_4_0.mps", "1", null);
+    }
+
+    /**
      * https://miplib.zib.de/instance_details_mas76.html
      * <p>
      * 151 variables, 13 expressions, density 1.0
      * <p>
-     * CPLEX 27.1s, HiGHS 225s, OR-Tools (SCIP) 64.9s
+     * HiGHS 225s, SCIP 64.9s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -710,7 +769,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 251 variables, 152 expressions, density 1.0
      * <p>
-     * CPLEX 1.2s, HiGHS 6.5s, OR-Tools (SCIP) 45.9s
+     * HiGHS 6.5s, SCIP 45.9s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -730,7 +789,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 270 variables, 196 expressions, density 1.0
      * <p>
-     * CPLEX 17.4s, HiGHS 3.0s, OR-Tools (SCIP) 3.1s
+     * HiGHS 3.0s, SCIP 3.1s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -750,7 +809,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 270 variables, 196 expressions, density 1.0
      * <p>
-     * CPLEX 35.0s, HiGHS 3.2s, OR-Tools (SCIP) 3.3s
+     * HiGHS 3.2s, SCIP 3.3s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -770,7 +829,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 270 variables, 196 expressions, density 1.0
      * <p>
-     * CPLEX 5.4s, HiGHS 5.1s, OR-Tools (SCIP) 7.3s
+     * HiGHS 5.1s, SCIP 7.3s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -790,7 +849,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 270 variables, 196 expressions, density 1.0
      * <p>
-     * CPLEX 23.2s, HiGHS 27.5s, OR-Tools (SCIP) 8.3s
+     * HiGHS 27.5s, SCIP 8.3s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -810,7 +869,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 270 variables, 196 expressions, density 1.0
      * <p>
-     * CPLEX 1.7s, HiGHS 2.1s, OR-Tools (SCIP) 2.2s
+     * HiGHS 2.1s, SCIP 2.2s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -830,7 +889,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 83 variables, 55 expressions, density 0.012
      * <p>
-     * CPLEX 10.8s, HiGHS 118ms, OR-Tools (SCIP) 271ms
+     * HiGHS 118ms, SCIP 271ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -848,7 +907,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 59 variables, 40 expressions, density 0.017
      * <p>
-     * CPLEX 375ms, HiGHS 32ms, OR-Tools (SCIP) 115ms
+     * HiGHS 32ms, SCIP 115ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -866,7 +925,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 160 variables, 97 expressions, density 0.0063
      * <p>
-     * CPLEX 112ms, HiGHS 389ms, OR-Tools (SCIP) 705ms
+     * HiGHS 389ms, SCIP 705ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -884,7 +943,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 136 variables, 301 expressions, density 0.0074
      * <p>
-     * CPLEX 48ms, HiGHS 438ms, OR-Tools (SCIP) 968ms
+     * HiGHS 438ms, SCIP 968ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -902,7 +961,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 260 variables, 213 expressions, density 0.0038
      * <p>
-     * CPLEX 724ms, HiGHS 23.3s, OR-Tools (SCIP) 75.7s
+     * HiGHS 23.3s, SCIP 75.7s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -920,7 +979,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 319 variables, 7 expressions, density 1.0
      * <p>
-     * CPLEX 120s, HiGHS 1.3s, OR-Tools (SCIP) 539ms
+     * HiGHS 1.3s, SCIP 539ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -938,7 +997,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 96 variables, 63 expressions, density 1.0
      * <p>
-     * CPLEX 145ms, HiGHS 420ms, OR-Tools (SCIP) 492ms
+     * HiGHS 420ms, SCIP 492ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -956,7 +1015,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 422 variables, 292 expressions, density 1.0
      * <p>
-     * CPLEX 17.2s, HiGHS 404ms, OR-Tools (SCIP) 118ms
+     * HiGHS 404ms, SCIP 118ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -976,7 +1035,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 105 variables, 90 expressions, density 0.74
      * <p>
-     * CPLEX 36ms, HiGHS 73ms, OR-Tools (SCIP) 2.9ms
+     * HiGHS 73ms, SCIP 2.9ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -990,11 +1049,24 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
     }
 
     /**
+     * https://miplib.zib.de/instance_details_neos-1430701.html
+     * <p>
+     * 312 variables, 669 expressions, density 0.50
+     * <p>
+     * HiGHS 5.1s, SCIP 2.0s
+     */
+    @Tag("slow")
+    @Test
+    public void testNeos_1430701() {
+        MIPLIBTheEasySet.doTest("neos-1430701.mps", "-77", null);
+    }
+
+    /**
      * https://miplib.zib.de/instance_details_neos-2624317-amur.html
      * <p>
      * 524 variables, 343 expressions, density 0.061
      * <p>
-     * CPLEX 155ms, HiGHS 7.4s, OR-Tools (SCIP) 58.6s
+     * HiGHS 7.4s, SCIP 58.6s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1014,7 +1086,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 430 variables, 336 expressions, density 0.0023
      * <p>
-     * CPLEX 36ms, HiGHS 801ms, OR-Tools (SCIP) 1.0s
+     * HiGHS 801ms, SCIP 1.0s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1033,7 +1105,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 805 variables, 710 expressions, density 0.0012
      * <p>
-     * CPLEX 73ms, HiGHS 4.6s, OR-Tools (SCIP) 722ms
+     * HiGHS 4.6s, SCIP 722ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1053,7 +1125,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 844 variables, 748 expressions, density 0.0012
      * <p>
-     * CPLEX 22.6s, HiGHS 1.7s, OR-Tools (SCIP) 458ms
+     * HiGHS 1.7s, SCIP 458ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1072,7 +1144,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 472 variables, 378 expressions, density 0.0021
      * <p>
-     * CPLEX 201ms, HiGHS 840ms, OR-Tools (SCIP) 1.2s
+     * HiGHS 840ms, SCIP 1.2s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1091,7 +1163,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 421 variables, 324 expressions, density 0.0024
      * <p>
-     * CPLEX 1.0s, HiGHS 1.2s, OR-Tools (SCIP) 725ms
+     * HiGHS 1.2s, SCIP 725ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1110,7 +1182,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 180 variables, 58 expressions, density 1.0
      * <p>
-     * CPLEX 7.5ms, HiGHS 25ms, OR-Tools (SCIP) 7.5ms
+     * HiGHS 25ms, SCIP 7.5ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1124,11 +1196,37 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
     }
 
     /**
+     * https://miplib.zib.de/instance_details_neos-911880.html
+     * <p>
+     * 888 variables, 84 expressions, density 0.054
+     * <p>
+     * HiGHS 8.8s, SCIP 11.2s
+     */
+    @Tag("slow")
+    @Test
+    public void testNeos_911880() {
+        MIPLIBTheEasySet.doTest("neos-911880.mps", "54.76", null);
+    }
+
+    /**
+     * https://miplib.zib.de/instance_details_neos-911970.html
+     * <p>
+     * 888 variables, 108 expressions, density 0.054
+     * <p>
+     * HiGHS 3.9s, SCIP 16.0s
+     */
+    @Tag("slow")
+    @Test
+    public void testNeos_911970() {
+        MIPLIBTheEasySet.doTest("neos-911970.mps", "54.76", null);
+    }
+
+    /**
      * https://miplib.zib.de/instance_details_neos17.html
      * <p>
      * 535 variables, 487 expressions, density 0.91
      * <p>
-     * CPLEX 623ms, HiGHS 3.7s, OR-Tools (SCIP) 5.7s
+     * HiGHS 3.7s, SCIP 5.7s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1144,11 +1242,25 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
     }
 
     /**
+     * https://miplib.zib.de/instance_details_neos5.html
+     * <p>
+     * 63 variables, 64 expressions, density 1.0
+     * <p>
+     * HiGHS 59.0s, SCIP 154s
+     */
+    @Tag("unstable")
+    @Tag("slow")
+    @Test
+    public void testNeos5() {
+        MIPLIBTheEasySet.doTest("neos5.mps", "15", null);
+    }
+
+    /**
      * https://miplib.zib.de/instance_details_nexp-50-20-1-1.html
      * <p>
      * 490 variables, 541 expressions, density 0.50
      * <p>
-     * CPLEX 102ms, HiGHS 27ms, OR-Tools (SCIP) 132ms
+     * HiGHS 27ms, SCIP 132ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1168,7 +1280,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 128 variables, 183 expressions, density 0.20
      * <p>
-     * CPLEX 1.4s, HiGHS 39.7s, OR-Tools (SCIP) 73.6s
+     * HiGHS 39.7s, SCIP 73.6s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1188,7 +1300,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 769 variables, 65 expressions, density 0.0013
      * <p>
-     * CPLEX 161ms, HiGHS 75ms, OR-Tools (SCIP) 167ms
+     * HiGHS 75ms, SCIP 167ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1208,7 +1320,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 33 variables, 17 expressions, density 1.0
      * <p>
-     * CPLEX 7.7s, HiGHS 6.3ms, OR-Tools (SCIP) 6.1ms
+     * HiGHS 6.3ms, SCIP 6.1ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1226,7 +1338,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 40 variables, 24 expressions, density 1.0
      * <p>
-     * CPLEX 1.6ms, HiGHS 2.8ms, OR-Tools (SCIP) 1.3ms
+     * HiGHS 2.8ms, SCIP 1.3ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1244,7 +1356,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 201 variables, 134 expressions, density 1.0
      * <p>
-     * CPLEX 109ms, HiGHS 494ms, OR-Tools (SCIP) 416ms
+     * HiGHS 494ms, SCIP 416ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1262,7 +1374,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 282 variables, 242 expressions, density 1.0
      * <p>
-     * CPLEX 127ms, HiGHS 82ms, OR-Tools (SCIP) 160ms
+     * HiGHS 82ms, SCIP 160ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1280,7 +1392,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 291 variables, 253 expressions, density 1.00
      * <p>
-     * CPLEX 173ms, HiGHS 14ms, OR-Tools (SCIP) 7.2ms
+     * HiGHS 14ms, SCIP 7.2ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1298,7 +1410,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 548 variables, 177 expressions, density 0.76
      * <p>
-     * CPLEX 20.0s, HiGHS 42ms, OR-Tools (SCIP) 54ms
+     * HiGHS 42ms, SCIP 54ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1318,7 +1430,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 344 variables, 602 expressions, density 0.023
      * <p>
-     * CPLEX 1.7s, HiGHS 3.1s, OR-Tools (SCIP) 16.7s
+     * HiGHS 3.1s, SCIP 16.7s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1337,7 +1449,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 48 variables, 26 expressions, density 1.0
      * <p>
-     * CPLEX 153ms, HiGHS 64ms, OR-Tools (SCIP) 47ms
+     * HiGHS 64ms, SCIP 47ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1355,7 +1467,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 86 variables, 46 expressions, density 0.012
      * <p>
-     * CPLEX 4.1s, HiGHS 137s, OR-Tools (SCIP) 156s
+     * HiGHS 137s, SCIP 156s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1373,7 +1485,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 240 variables, 137 expressions, density 0.73
      * <p>
-     * CPLEX 8.4s, HiGHS 696ms, OR-Tools (SCIP) 786ms
+     * HiGHS 696ms, SCIP 786ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1393,7 +1505,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 240 variables, 247 expressions, density 0.73
      * <p>
-     * CPLEX 109ms, HiGHS 853ms, OR-Tools (SCIP) 1.8s
+     * HiGHS 853ms, SCIP 1.8s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1412,7 +1524,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 250 variables, 209 expressions, density 0.0040
      * <p>
-     * CPLEX 2.6s, HiGHS 39.9s, OR-Tools (SCIP) 10.0s
+     * HiGHS 39.9s, SCIP 10.0s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1432,7 +1544,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 301 variables, 212 expressions, density 0.0033
      * <p>
-     * CPLEX 7.9s, HiGHS 95.8s, OR-Tools (SCIP) 88.4s
+     * HiGHS 95.8s, SCIP 88.4s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1452,7 +1564,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 720 variables, 411 expressions, density 1.0
      * <p>
-     * CPLEX 4.1s, HiGHS 26.4s, OR-Tools (SCIP) 52.6s
+     * HiGHS 26.4s, SCIP 52.6s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1472,7 +1584,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 504 variables, 286 expressions, density 1.0
      * <p>
-     * CPLEX 2.2s, HiGHS 10.9s, OR-Tools (SCIP) 23.4s
+     * HiGHS 10.9s, SCIP 23.4s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1492,7 +1604,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 338 variables, 196 expressions, density 1.0
      * <p>
-     * CPLEX 23.4s, HiGHS 13.2s, OR-Tools (SCIP) 20.3s
+     * HiGHS 13.2s, SCIP 20.3s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1511,7 +1623,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 512 variables, 289 expressions, density 1.0
      * <p>
-     * CPLEX 4.8s, HiGHS 50.5s, OR-Tools (SCIP) 64.3s
+     * HiGHS 50.5s, SCIP 64.3s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1531,7 +1643,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 180 variables, 25 expressions, density 0.44
      * <p>
-     * CPLEX 18.2s, HiGHS 126ms, OR-Tools (SCIP) 104ms
+     * HiGHS 126ms, SCIP 104ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1549,7 +1661,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 556 variables, 292 expressions, density 0.0018
      * <p>
-     * CPLEX 5.3s, HiGHS 63.8s, OR-Tools (SCIP) 21.6s
+     * HiGHS 63.8s, SCIP 21.6s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1569,7 +1681,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 67 variables, 46 expressions, density 0.49
      * <p>
-     * CPLEX 161ms, HiGHS 13ms, OR-Tools (SCIP) 2.1ms
+     * HiGHS 13ms, SCIP 2.1ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1587,7 +1699,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 60 variables, 31 expressions, density 1.0
      * <p>
-     * CPLEX 962ms, HiGHS 125ms, OR-Tools (SCIP) 213ms
+     * HiGHS 125ms, SCIP 213ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1605,7 +1717,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 712 variables, 493 expressions, density 0.66
      * <p>
-     * CPLEX 25.2s, HiGHS 39ms, OR-Tools (SCIP) 58ms
+     * HiGHS 39ms, SCIP 58ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1624,7 +1736,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 712 variables, 493 expressions, density 0.66
      * <p>
-     * CPLEX 23.1s, HiGHS 666ms, OR-Tools (SCIP) 210ms
+     * HiGHS 666ms, SCIP 210ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1644,7 +1756,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 712 variables, 493 expressions, density 0.66
      * <p>
-     * CPLEX 2.9s, HiGHS 43ms, OR-Tools (SCIP) 10ms
+     * HiGHS 43ms, SCIP 10ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1663,7 +1775,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 600 variables, 451 expressions, density 0.50
      * <p>
-     * CPLEX 152ms, HiGHS 60ms, OR-Tools (SCIP) 898ms
+     * HiGHS 60ms, SCIP 898ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1683,7 +1795,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 15 variables, 37 expressions, density 1.0
      * <p>
-     * CPLEX 312ms, HiGHS 23ms, OR-Tools (SCIP) 21ms
+     * HiGHS 23ms, SCIP 21ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1701,7 +1813,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 27 variables, 119 expressions, density 1.0
      * <p>
-     * CPLEX 553ms, HiGHS 835ms, OR-Tools (SCIP) 567ms
+     * HiGHS 835ms, SCIP 567ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1719,7 +1831,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 45 variables, 332 expressions, density 1.0
      * <p>
-     * CPLEX 752ms, HiGHS 13.1s, OR-Tools (SCIP) 7.3s
+     * HiGHS 13.1s, SCIP 7.3s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1738,7 +1850,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 9 variables, 14 expressions, density 1.0
      * <p>
-     * CPLEX 96ms, HiGHS 11ms, OR-Tools (SCIP) 4.6ms
+     * HiGHS 11ms, SCIP 4.6ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1756,7 +1868,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 304 variables, 235 expressions, density 0.98
      * <p>
-     * CPLEX 1.8s, HiGHS 51ms, OR-Tools (SCIP) 51ms
+     * HiGHS 51ms, SCIP 51ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1774,7 +1886,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 319 variables, 131 expressions, density 0.98
      * <p>
-     * CPLEX 1.7s, HiGHS 44ms, OR-Tools (SCIP) 80ms
+     * HiGHS 44ms, SCIP 80ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1792,7 +1904,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 397 variables, 172 expressions, density 0.32
      * <p>
-     * CPLEX 19.2s, HiGHS 42.6s, OR-Tools (SCIP) 44.1s
+     * HiGHS 42.6s, SCIP 44.1s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1812,7 +1924,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 397 variables, 372 expressions, density 0.32
      * <p>
-     * CPLEX 26.9s, HiGHS 77.1s, OR-Tools (SCIP) 55.0s
+     * HiGHS 77.1s, SCIP 55.0s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1832,7 +1944,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 378 variables, 235 expressions, density 0.44
      * <p>
-     * CPLEX 166ms, HiGHS 11ms, OR-Tools (SCIP) 9.6ms
+     * HiGHS 11ms, SCIP 9.6ms
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
@@ -1852,7 +1964,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * 378 variables, 235 expressions, density 0.44
      * <p>
-     * CPLEX 1.5s, HiGHS 2.3s, OR-Tools (SCIP) 2.0s
+     * HiGHS 2.3s, SCIP 2.0s
      * <p>
      * MacBook Pro (2026) M5 Pro, 48GB
      * <ul>
