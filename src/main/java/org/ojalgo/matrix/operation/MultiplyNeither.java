@@ -172,6 +172,78 @@ public class MultiplyNeither implements MatrixOperation {
         }
     }
 
+    /**
+     * Not running code. Copies used as a starting point when coding various variants
+     */
+    private static void baseExp4c(final double[] product, final double[] left, final int complexity, final double[] right) {
+
+        int nbRows = left.length / complexity;
+        int nbCols = right.length / complexity;
+
+        for (int i = 0; i < nbRows; i++) {
+            for (int c = 0; c < complexity; c += 4) {
+                int c0 = c + 0;
+                int c1 = c + 1;
+                int c2 = c + 2;
+                int c3 = c + 3;
+                for (int j = 0; j < nbCols; j++) {
+                    product[i + j * nbRows] += left[i + c0 * nbRows] * right[c0 + j * complexity];
+                    product[i + j * nbRows] += left[i + c1 * nbRows] * right[c1 + j * complexity];
+                    product[i + j * nbRows] += left[i + c2 * nbRows] * right[c2 + j * complexity];
+                    product[i + j * nbRows] += left[i + c3 * nbRows] * right[c3 + j * complexity];
+                }
+            }
+        }
+    }
+
+    /**
+     * Not running code. Copies used as a starting point when coding various variants
+     */
+    private static void baseExp4i(final double[] product, final double[] left, final int complexity, final double[] right) {
+
+        int nbRows = left.length / complexity;
+        int nbCols = right.length / complexity;
+
+        for (int j = 0; j < nbCols; j++) {
+            for (int i = 0; i < nbRows; i += 4) {
+                int i0 = i + 0;
+                int i1 = i + 1;
+                int i2 = i + 2;
+                int i3 = i + 3;
+                for (int c = 0; c < complexity; c++) {
+                    product[i0 + j * nbRows] += left[i0 + c * nbRows] * right[c + j * complexity];
+                    product[i1 + j * nbRows] += left[i1 + c * nbRows] * right[c + j * complexity];
+                    product[i2 + j * nbRows] += left[i2 + c * nbRows] * right[c + j * complexity];
+                    product[i3 + j * nbRows] += left[i3 + c * nbRows] * right[c + j * complexity];
+                }
+            }
+        }
+    }
+
+    /**
+     * Not running code. Copies used as a starting point when coding various variants
+     */
+    private static void baseExp4j(final double[] product, final double[] left, final int complexity, final double[] right) {
+
+        int nbRows = left.length / complexity;
+        int nbCols = right.length / complexity;
+
+        for (int j = 0; j < nbCols; j += 4) {
+            int j0 = j + 0;
+            int j1 = j + 1;
+            int j2 = j + 2;
+            int j3 = j + 3;
+            for (int i = 0; i < nbRows; i++) {
+                for (int c = 0; c < complexity; c++) {
+                    product[i + j0 * nbRows] += left[i + c * nbRows] * right[c + j0 * complexity];
+                    product[i + j1 * nbRows] += left[i + c * nbRows] * right[c + j1 * complexity];
+                    product[i + j2 * nbRows] += left[i + c * nbRows] * right[c + j2 * complexity];
+                    product[i + j3 * nbRows] += left[i + c * nbRows] * right[c + j3 * complexity];
+                }
+            }
+        }
+    }
+
     private static void doOneRow(final double[] prodRow, final double[] leftRow, final double[][] right) {
 
         for (int c = 0, complexity = leftRow.length; c < complexity; c++) {
