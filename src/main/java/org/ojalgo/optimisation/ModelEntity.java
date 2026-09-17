@@ -85,6 +85,19 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         return candidate;
     }
 
+    static BigDecimal toBigDecimal(final double number) {
+
+        if (Double.isFinite(number)) {
+            return BigDecimal.valueOf(number);
+        } else {
+            return null;
+        }
+    }
+
+    static BigDecimal toBigDecimal(final long number) {
+        return BigDecimal.valueOf(number);
+    }
+
     private transient int myAdjustmentExponent = Integer.MIN_VALUE;
     private BigDecimal myContributionWeight = null;
     private BigDecimal myLowerLimit = null;
@@ -298,11 +311,11 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     public final ME level(final double level) {
-        return this.level(BigDecimal.valueOf(level));
+        return this.level(ModelEntity.toBigDecimal(level));
     }
 
     public final ME level(final long level) {
-        return this.level(BigDecimal.valueOf(level));
+        return this.level(ModelEntity.toBigDecimal(level));
     }
 
     /**
@@ -317,11 +330,11 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     public final ME lower(final double lower) {
-        return this.lower(BigDecimal.valueOf(lower));
+        return this.lower(ModelEntity.toBigDecimal(lower));
     }
 
     public final ME lower(final long lower) {
-        return this.lower(BigDecimal.valueOf(lower));
+        return this.lower(ModelEntity.toBigDecimal(lower));
     }
 
     /**
@@ -417,11 +430,11 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     public final ME upper(final double upper) {
-        return this.upper(BigDecimal.valueOf(upper));
+        return this.upper(ModelEntity.toBigDecimal(upper));
     }
 
     public final ME upper(final long upper) {
-        return this.upper(BigDecimal.valueOf(upper));
+        return this.upper(ModelEntity.toBigDecimal(upper));
     }
 
     /**
@@ -437,11 +450,11 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     public final ME weight(final double weight) {
-        return this.weight(BigDecimal.valueOf(weight));
+        return this.weight(ModelEntity.toBigDecimal(weight));
     }
 
     public final ME weight(final long weight) {
-        return this.weight(BigDecimal.valueOf(weight));
+        return this.weight(ModelEntity.toBigDecimal(weight));
     }
 
     private BigDecimal getLower(final boolean adjusted) {

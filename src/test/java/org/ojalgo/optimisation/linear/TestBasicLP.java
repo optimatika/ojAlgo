@@ -20,6 +20,24 @@ import org.ojalgo.type.keyvalue.KeyValue;
 public class TestBasicLP extends OptimisationLinearTests implements TestBasic {
 
     /**
+     * LP with fractional optimal objective: minimize 0.5x + y subject to x + y >= 1, x >= 0, y >= 0. The
+     * optimal solution is at x = 1, y = 0 with objective value 0.5.
+     */
+    static OptimisationCase caseFractionalObjectiveLP() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x = model.addVariable("x").lower(0.0).weight(0.5);
+        Variable y = model.addVariable("y").lower(0.0).weight(1.0);
+
+        model.addExpression("c1").set(x, 1.0).set(y, 1.0).lower(1.0);
+
+        Optimisation.Result result = Optimisation.Result.of(0.5, State.OPTIMAL, 1.0, 0.0);
+
+        return OptimisationCase.of(model, Optimisation.Sense.MIN, result);
+    }
+
+    /**
      * Infeasible LP: x + y >= 10 and x + y <= 5 (contradictory)
      */
     static OptimisationCase caseInfeasibleLP() {
@@ -123,6 +141,14 @@ public class TestBasicLP extends OptimisationLinearTests implements TestBasic {
         Optimisation.Result result = Optimisation.Result.of(State.UNBOUNDED, 0.0);
 
         return OptimisationCase.of(model, Optimisation.Sense.MIN, result);
+    }
+
+    @Test
+    public void testFractionalObjectiveLP() {
+        OptimisationCase testCase = TestBasicLP.caseFractionalObjectiveLP();
+        for (Integration<?> integration : this.integrations()) {
+            testCase.assertResult(integration);
+        }
     }
 
     @Test

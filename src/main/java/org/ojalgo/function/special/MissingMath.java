@@ -113,6 +113,18 @@ public abstract class MissingMath {
         return MissingMath.doInternalCos(arg.remainder(BigMath.TWO_PI, MC256));
     }
 
+    /**
+     * The number of decimal places required to describe this number without loss. Will be >=0.
+     */
+    public static int decimalsOf(final BigDecimal value) {
+
+        if (value == null || value.signum() == 0) {
+            return 0;
+        } else {
+            return Math.max(value.stripTrailingZeros().scale(), 0);
+        }
+    }
+
     public static BigDecimal divide(final BigDecimal numerator, final BigDecimal denominator) {
         return numerator.divide(denominator, MC256);
     }
@@ -330,9 +342,31 @@ public abstract class MissingMath {
      * <li>Works for negative numbers as the sign is disregarded.
      * <li>Works for fractional numbers 0.1, 0.0456, 1.2 or whatever.
      * </ul>
+     *
+     * @deprecated v58 Use {@link #magnitudeOf(BigDecimal)} instead that handles null and 0.0 differently.
      */
+    @Deprecated
     public static int magnitude(final BigDecimal arg) {
         return arg.signum() == 0 ? 0 : arg.precision() - arg.scale() - 1;
+    }
+
+    /**
+     * Write any nonzero number in scientific notation: N = a × 10^b where 1 ≤ a < 10. The exponent b is the
+     * order of magnitude.
+     * <p>
+     * For 0.0 this implementation returns {@link Integer#MIN_VALUE}
+     * <p>
+     * For null this implementation returns 0
+     */
+    public static int magnitudeOf(final BigDecimal value) {
+
+        if (value == null) {
+            return 0;
+        } else if (value.signum() == 0) {
+            return Integer.MIN_VALUE;
+        } else {
+            return value.precision() - value.scale() - 1;
+        }
     }
 
     public static double max(final double... values) {

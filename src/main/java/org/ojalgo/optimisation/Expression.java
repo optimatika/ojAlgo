@@ -169,7 +169,7 @@ public class Expression extends ModelEntity<Expression> {
      * @see #add(Comparable, Expression)
      */
     public final Expression add(final double scale, final Expression values) {
-        return this.doAdd(BigDecimal.valueOf(scale), values);
+        return this.doAdd(ModelEntity.toBigDecimal(scale), values);
     }
 
     /**
@@ -183,7 +183,7 @@ public class Expression extends ModelEntity<Expression> {
      * @see #add(Variable, Comparable)
      */
     public final Expression add(final int index, final double value) {
-        return this.doAdd(this.toIntIndex(index), BigDecimal.valueOf(value));
+        return this.doAdd(this.toIntIndex(index), ModelEntity.toBigDecimal(value));
     }
 
     /**
@@ -197,28 +197,28 @@ public class Expression extends ModelEntity<Expression> {
      * @see #add(Variable, Comparable)
      */
     public final Expression add(final int row, final int column, final double value) {
-        return this.doAdd(this.toIntRowColumn(row, column), BigDecimal.valueOf(value));
+        return this.doAdd(this.toIntRowColumn(row, column), ModelEntity.toBigDecimal(value));
     }
 
     /**
      * @see #add(Variable, Comparable)
      */
     public final Expression add(final int row, final int column, final long value) {
-        return this.doAdd(this.toIntRowColumn(row, column), BigDecimal.valueOf(value));
+        return this.doAdd(this.toIntRowColumn(row, column), ModelEntity.toBigDecimal(value));
     }
 
     /**
      * @see #add(Variable, Comparable)
      */
     public final Expression add(final int index, final long value) {
-        return this.doAdd(this.toIntIndex(index), BigDecimal.valueOf(value));
+        return this.doAdd(this.toIntIndex(index), ModelEntity.toBigDecimal(value));
     }
 
     /**
      * @see #add(Comparable, Expression)
      */
     public final Expression add(final long scale, final Expression values) {
-        return this.doAdd(BigDecimal.valueOf(scale), values);
+        return this.doAdd(ModelEntity.toBigDecimal(scale), values);
     }
 
     /**
@@ -232,14 +232,14 @@ public class Expression extends ModelEntity<Expression> {
      * @see #add(Variable, Comparable)
      */
     public final Expression add(final Variable variable, final double value) {
-        return this.doAdd(variable.getIndex(), BigDecimal.valueOf(value));
+        return this.doAdd(variable.getIndex(), ModelEntity.toBigDecimal(value));
     }
 
     /**
      * @see #add(Variable, Comparable)
      */
     public final Expression add(final Variable variable, final long value) {
-        return this.doAdd(variable.getIndex(), BigDecimal.valueOf(value));
+        return this.doAdd(variable.getIndex(), ModelEntity.toBigDecimal(value));
     }
 
     /**
@@ -253,14 +253,14 @@ public class Expression extends ModelEntity<Expression> {
      * @see #add(Variable, Comparable)
      */
     public final Expression add(final Variable variable1, final Variable variable2, final double value) {
-        return this.doAdd(this.toIntRowColumn(variable1, variable2), BigDecimal.valueOf(value));
+        return this.doAdd(this.toIntRowColumn(variable1, variable2), ModelEntity.toBigDecimal(value));
     }
 
     /**
      * @see #add(Variable, Comparable)
      */
     public final Expression add(final Variable variable1, final Variable variable2, final long value) {
-        return this.doAdd(this.toIntRowColumn(variable1, variable2), BigDecimal.valueOf(value));
+        return this.doAdd(this.toIntRowColumn(variable1, variable2), ModelEntity.toBigDecimal(value));
     }
 
     @Override
@@ -671,7 +671,7 @@ public class Expression extends ModelEntity<Expression> {
      * @see #set(Variable, Comparable)
      */
     public final Expression set(final int index, final double value) {
-        return this.doSet(this.toIntIndex(index), BigDecimal.valueOf(value));
+        return this.doSet(this.toIntIndex(index), ModelEntity.toBigDecimal(value));
     }
 
     /**
@@ -685,21 +685,21 @@ public class Expression extends ModelEntity<Expression> {
      * @see #set(Variable, Comparable)
      */
     public final Expression set(final int row, final int column, final double value) {
-        return this.doSet(this.toIntRowColumn(row, column), BigDecimal.valueOf(value));
+        return this.doSet(this.toIntRowColumn(row, column), ModelEntity.toBigDecimal(value));
     }
 
     /**
      * @see #set(Variable, Comparable)
      */
     public final Expression set(final int row, final int column, final long value) {
-        return this.doSet(this.toIntRowColumn(row, column), BigDecimal.valueOf(value));
+        return this.doSet(this.toIntRowColumn(row, column), ModelEntity.toBigDecimal(value));
     }
 
     /**
      * @see #set(Variable, Comparable)
      */
     public final Expression set(final int index, final long value) {
-        return this.doSet(this.toIntIndex(index), BigDecimal.valueOf(value));
+        return this.doSet(this.toIntIndex(index), ModelEntity.toBigDecimal(value));
     }
 
     /**
@@ -713,14 +713,14 @@ public class Expression extends ModelEntity<Expression> {
      * @see #set(Variable, Comparable)
      */
     public final Expression set(final Variable variable, final double value) {
-        return this.doSet(variable.getIndex(), BigDecimal.valueOf(value));
+        return this.doSet(variable.getIndex(), ModelEntity.toBigDecimal(value));
     }
 
     /**
      * @see #set(Variable, Comparable)
      */
     public final Expression set(final Variable variable, final long value) {
-        return this.doSet(variable.getIndex(), BigDecimal.valueOf(value));
+        return this.doSet(variable.getIndex(), ModelEntity.toBigDecimal(value));
     }
 
     /**
@@ -734,14 +734,14 @@ public class Expression extends ModelEntity<Expression> {
      * @see #set(Variable, Comparable)
      */
     public final Expression set(final Variable variable1, final Variable variable2, final double value) {
-        return this.doSet(this.toIntRowColumn(variable1, variable2), BigDecimal.valueOf(value));
+        return this.doSet(this.toIntRowColumn(variable1, variable2), ModelEntity.toBigDecimal(value));
     }
 
     /**
      * @see #set(Variable, Comparable)
      */
     public final Expression set(final Variable variable1, final Variable variable2, final long value) {
-        return this.doSet(this.toIntRowColumn(variable1, variable2), BigDecimal.valueOf(value));
+        return this.doSet(this.toIntRowColumn(variable1, variable2), ModelEntity.toBigDecimal(value));
     }
 
     /**
@@ -1358,11 +1358,11 @@ public class Expression extends ModelEntity<Expression> {
     }
 
     final void setConstant(final double value) {
-        myConstant = BigDecimal.valueOf(value);
+        myConstant = ModelEntity.toBigDecimal(value);
     }
 
     final void setConstant(final long value) {
-        myConstant = BigDecimal.valueOf(value);
+        myConstant = ModelEntity.toBigDecimal(value);
     }
 
     final void setInfeasible() {
