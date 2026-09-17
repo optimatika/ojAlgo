@@ -180,13 +180,16 @@ public class MultiplyNeither implements MatrixOperation {
         int nbRows = left.length / complexity;
         int nbCols = right.length / complexity;
 
-        for (int i = 0; i < nbRows; i++) {
+        for (int j = 0; j < nbCols; j++) {
+
             for (int c = 0; c < complexity; c += 4) {
                 int c0 = c + 0;
                 int c1 = c + 1;
                 int c2 = c + 2;
                 int c3 = c + 3;
-                for (int j = 0; j < nbCols; j++) {
+
+                for (int i = 0; i < nbRows; i++) {
+
                     product[i + j * nbRows] += left[i + c0 * nbRows] * right[c0 + j * complexity];
                     product[i + j * nbRows] += left[i + c1 * nbRows] * right[c1 + j * complexity];
                     product[i + j * nbRows] += left[i + c2 * nbRows] * right[c2 + j * complexity];
@@ -205,12 +208,15 @@ public class MultiplyNeither implements MatrixOperation {
         int nbCols = right.length / complexity;
 
         for (int j = 0; j < nbCols; j++) {
-            for (int i = 0; i < nbRows; i += 4) {
-                int i0 = i + 0;
-                int i1 = i + 1;
-                int i2 = i + 2;
-                int i3 = i + 3;
-                for (int c = 0; c < complexity; c++) {
+
+            for (int c = 0; c < complexity; c++) {
+
+                for (int i = 0; i < nbRows; i += 4) {
+                    int i0 = i + 0;
+                    int i1 = i + 1;
+                    int i2 = i + 2;
+                    int i3 = i + 3;
+
                     product[i0 + j * nbRows] += left[i0 + c * nbRows] * right[c + j * complexity];
                     product[i1 + j * nbRows] += left[i1 + c * nbRows] * right[c + j * complexity];
                     product[i2 + j * nbRows] += left[i2 + c * nbRows] * right[c + j * complexity];
@@ -233,8 +239,11 @@ public class MultiplyNeither implements MatrixOperation {
             int j1 = j + 1;
             int j2 = j + 2;
             int j3 = j + 3;
+
             for (int i = 0; i < nbRows; i++) {
+
                 for (int c = 0; c < complexity; c++) {
+
                     product[i + j0 * nbRows] += left[i + c * nbRows] * right[c + j0 * complexity];
                     product[i + j1 * nbRows] += left[i + c * nbRows] * right[c + j1 * complexity];
                     product[i + j2 * nbRows] += left[i + c * nbRows] * right[c + j2 * complexity];
