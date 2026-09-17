@@ -113,6 +113,18 @@ public abstract class MissingMath {
         return MissingMath.doInternalCos(arg.remainder(BigMath.TWO_PI, MC256));
     }
 
+    /**
+     * The number of decimal places required to describe this number without loss. Will be >=0.
+     */
+    public static int decimalsOf(final BigDecimal value) {
+
+        if (value == null || value.signum() == 0) {
+            return 0;
+        } else {
+            return Math.max(value.stripTrailingZeros().scale(), 0);
+        }
+    }
+
     public static BigDecimal divide(final BigDecimal numerator, final BigDecimal denominator) {
         return numerator.divide(denominator, MC256);
     }

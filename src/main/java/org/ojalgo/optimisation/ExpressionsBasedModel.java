@@ -33,6 +33,7 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
@@ -46,6 +47,7 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.netio.BasicJson;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.InMemoryFile;
@@ -335,6 +337,23 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      */
     public static abstract class Integration<S extends Optimisation.Solver> implements Optimisation.Integration<ExpressionsBasedModel, S> {
 
+        private static void updateDecimals(final Expression expression, final List<Variable> variables, final int[] decimals) {
+
+            int exprDecimals = Math.max(MissingMath.decimalsOf(expression.getLowerLimit()), MissingMath.decimalsOf(expression.getUpperLimit()));
+
+            for (Entry<IntIndex, BigDecimal> entry : expression.getLinearEntrySet()) {
+                exprDecimals = Math.max(exprDecimals, MissingMath.decimalsOf(entry.getValue()));
+            }
+
+            for (Entry<IntIndex, BigDecimal> entry : expression.getLinearEntrySet()) {
+                int index = entry.getKey().index;
+
+                if (!variables.get(index).isInteger()) {
+                    decimals[index] = Math.max(decimals[index], exprDecimals);
+                }
+            }
+        }
+
         /**
          * Reconstructs a model-level reduced cost from first principles: {@code rc_v = c_v - Σ a_iv · λ_i},
          * using the variable's objective coefficient and the constraint multipliers reported on
@@ -360,6 +379,69 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             }
 
             return rc;
+        }
+
+        /**
+         * Computes the scaling exponent for this particular {@link Expression} taking in to account how the
+         * variables are already scaled.
+         */
+        protected static int deduceExpressionScale(final Expression expression, final int[] variableScales) {
+
+            int lowerScale = MissingMath.decimalsOf(expression.getLowerLimit());
+            int upperScale = MissingMath.decimalsOf(expression.getUpperLimit());
+            int retVal = Math.max(lowerScale, upperScale);
+
+            for (Entry<IntIndex, BigDecimal> entry : expression.getLinearEntrySet()) {
+                IntIndex key = entry.getKey();
+                BigDecimal value = entry.getValue();
+                int index = key.index;
+                int scale = variableScales[index];
+
+                if (scale > 0) {
+                    value = value.movePointLeft(scale);
+                }
+
+                retVal = Math.max(retVal, MissingMath.decimalsOf(value));
+            }
+
+            return retVal;
+        }
+
+        /**
+         * Computes per-variable scaling exponents for representing continuous variables as scaled integers.
+         * The logic looks at variable bounds as well as the variables' coefficients in the expressions
+         * (constraints and objective). The returned array matches the total number of variables in the model,
+         * but integer variables always have scale 0.
+         */
+        protected static int[] deduceVariableScales(final ExpressionsBasedModel model) {
+
+            List<Variable> variables = model.getVariables();
+
+            int nbVars = variables.size();
+            int[] scales = new int[nbVars];
+
+            boolean mixed = false;
+
+            for (int i = 0; i < nbVars; i++) {
+                Variable variable = variables.get(i);
+                if (!variable.isInteger()) {
+                    int lowerScale = MissingMath.decimalsOf(variable.getLowerLimit());
+                    int upperScale = MissingMath.decimalsOf(variable.getUpperLimit());
+                    scales[i] = Math.max(lowerScale, upperScale);
+                    mixed = true;
+                }
+            }
+
+            if (mixed) {
+
+                model.constraints().forEach(constraint -> {
+                    ExpressionsBasedModel.Integration.updateDecimals(constraint, variables, scales);
+                });
+
+                ExpressionsBasedModel.Integration.updateDecimals(model.objective(), variables, scales);
+            }
+
+            return scales;
         }
 
         protected static Result expandFreeToFull(final Result solverState, final ExpressionsBasedModel model, final DenseArray.Factory<?, ?> factory) {

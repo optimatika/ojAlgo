@@ -86,6 +86,31 @@ public class TestBasicMIP extends OptimisationIntegerTests implements TestBasic 
     }
 
     /**
+     * MIP with integer and continuous variables where the objective references only integer variables with
+     * fractional coefficients. {@code getIntegerStep()} on the objective returns 0.5 (GCD of 1.5 and 0.5).
+     * <p>
+     * minimize 1.5*x1 + 0.5*x2 subject to x1 + x2 >= 3, x1 + y1 = 4, x2 + y2 = 5, all >= 0, x1 and x2
+     * integer. Optimal: x1=0, x2=3, y1=4, y2=2 with objective value 1.5.
+     */
+    static OptimisationCase caseMixedIntegerContinuous() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x1 = model.addVariable("x1").lower(0.0).integer().weight(1.5);
+        Variable x2 = model.addVariable("x2").lower(0.0).integer().weight(0.5);
+        Variable y1 = model.addVariable("y1").lower(0.0);
+        Variable y2 = model.addVariable("y2").lower(0.0);
+
+        model.addExpression("intReq").set(x1, 1.0).set(x2, 1.0).lower(3.0);
+        model.addExpression("link1").set(x1, 1.0).set(y1, 1.0).level(4.0);
+        model.addExpression("link2").set(x2, 1.0).set(y2, 1.0).level(5.0);
+
+        Result result = Result.of(1.5, State.OPTIMAL, 0.0, 3.0, 4.0, 2.0);
+
+        return OptimisationCase.of(model, Optimisation.Sense.MIN, result);
+    }
+
+    /**
      * Simple MIP: minimize x + 2y subject to x + y >= 1, x, y binary. The optimal solution is x = 1, y = 0
      * with objective value 1.
      */
@@ -114,6 +139,15 @@ public class TestBasicMIP extends OptimisationIntegerTests implements TestBasic 
     @Test
     public void testGitHub682() {
         OptimisationCase testCase = TestBasicMIP.caseGitHub682();
+        for (Integration<?> integration : this.integrations()) {
+            testCase.assertResult(integration);
+        }
+    }
+
+    @Test
+    public void testMixedIntegerContinuous() {
+
+        OptimisationCase testCase = TestBasicMIP.caseMixedIntegerContinuous();
         for (Integration<?> integration : this.integrations()) {
             testCase.assertResult(integration);
         }

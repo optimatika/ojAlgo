@@ -134,6 +134,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 0.02s
      * </ul>
      */
+    @Tag("pure-integer")
     @Test
     public void testAir01() {
         MIPLIBTheEasySet.doTest("air01.mps", "6796", null);
@@ -309,6 +310,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 0.01s
      * </ul>
      */
+    @Tag("pure-integer")
     @Test
     public void testBm23() {
         MIPLIBTheEasySet.doTest("bm23.mps", "34", null);
@@ -345,6 +347,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 0.1s
      * </ul>
      */
+    @Tag("pure-integer")
     @Test
     public void testCracpb1() {
         MIPLIBTheEasySet.doTest("cracpb1.mps", "22199", null);
@@ -417,6 +420,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 0.1s
      * </ul>
      */
+    @Tag("pure-integer")
     @Test
     public void testEnigma() {
         MIPLIBTheEasySet.doTest("enigma.mps", "0.0", null);
@@ -436,6 +440,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * </ul>
      */
     @Tag("slow")
+    @Tag("pure-integer")
     @Test
     public void testEnlight_hard() {
         MIPLIBTheEasySet.doTest("enlight_hard.mps", "37", null);
@@ -450,6 +455,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      */
     @Tag("unstable")
     @Tag("slow")
+    @Tag("pure-integer")
     @Test
     public void testEnlight13() {
         MIPLIBTheEasySet.doTest("enlight13.mps", "71", null);
@@ -468,6 +474,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 0.5s
      * </ul>
      */
+    @Tag("pure-integer")
     @Test
     public void testEnlight8() {
         MIPLIBTheEasySet.doTest("enlight8.mps", "27", null);
@@ -506,6 +513,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 0.1s
      * </ul>
      */
+    @Tag("pure-integer")
     @Test
     public void testF2gap40400() {
         MIPLIBTheEasySet.doTest("f2gap40400.mps", "20772", null);
@@ -619,6 +627,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      */
     @Tag("unstable")
     @Tag("slow")
+    @Tag("pure-integer")
     @Test
     public void testGen_ip021() {
         MIPLIBTheEasySet.doTest("gen-ip021.mps", "2361.4541951916", null);
@@ -633,6 +642,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      */
     @Tag("unstable")
     @Tag("slow")
+    @Tag("pure-integer")
     @Test
     public void testGen_ip036() {
         MIPLIBTheEasySet.doTest("gen-ip036.mps", "-4606.6796098376", null);
@@ -689,6 +699,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 0.1s
      * </ul>
      */
+    @Tag("pure-integer")
     @Test
     public void testGt2() {
         MIPLIBTheEasySet.doTest("gt2.mps", "21166", null);
@@ -727,6 +738,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 0.1s
      * </ul>
      */
+    @Tag("pure-integer")
     @Test
     public void testLseu() {
         MIPLIBTheEasySet.doTest("lseu.mps", "1120", null);
@@ -987,6 +999,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 0.1s
      * </ul>
      */
+    @Tag("pure-integer")
     @Test
     public void testMod008() {
         MIPLIBTheEasySet.doTest("mod008.mps", "307", null);
@@ -1076,6 +1089,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      */
     @Tag("unstable")
     @Tag("slow")
+    @Tag("pure-integer")
     @Test
     public void testNeos_2624317_amur() {
         MIPLIBTheEasySet.doTest("neos-2624317-amur.mps", "3.5223968", null);
@@ -1328,6 +1342,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 0.01s
      * </ul>
      */
+    @Tag("pure-integer")
     @Test
     public void testP0033() {
         MIPLIBTheEasySet.doTest("p0033.mps", "3089", null);
@@ -1346,6 +1361,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 0.01s
      * </ul>
      */
+    @Tag("pure-integer")
     @Test
     public void testP0040() {
         MIPLIBTheEasySet.doTest("p0040.mps", "62027", null);
@@ -1364,6 +1380,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 0.1s
      * </ul>
      */
+    @Tag("pure-integer")
     @Test
     public void testP0201() {
         MIPLIBTheEasySet.doTest("p0201.mps", "7615", null);
@@ -1382,6 +1399,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 0.1s
      * </ul>
      */
+    @Tag("pure-integer")
     @Test
     public void testP0282() {
         MIPLIBTheEasySet.doTest("p0282.mps", "258411", null);
@@ -1400,6 +1418,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 0.03s
      * </ul>
      */
+    @Tag("pure-integer")
     @Test
     public void testP0291() {
         MIPLIBTheEasySet.doTest("p0291.mps", "5223.7490", null);
@@ -1420,6 +1439,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      */
     @Tag("unstable")
     @Tag("slow")
+    @Tag("pure-integer")
     @Test
     public void testP0548() {
         MIPLIBTheEasySet.doTest("p0548.mps", "8691", null);
@@ -1457,6 +1477,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 0.02s
      * </ul>
      */
+    @Tag("pure-integer")
     @Test
     public void testPipex() {
         MIPLIBTheEasySet.doTest("pipex.mps", "788.263", null);
@@ -1707,6 +1728,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 0.01s
      * </ul>
      */
+    @Tag("pure-integer")
     @Test
     public void testSentoy() {
         MIPLIBTheEasySet.doTest("sentoy.mps", "-7772", null);
@@ -1803,6 +1825,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 0.01s
      * </ul>
      */
+    @Tag("pure-integer")
     @Test
     public void testStein15() {
         MIPLIBTheEasySet.doTest("stein15.mps", "9", null);
@@ -1821,6 +1844,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 0.2s
      * </ul>
      */
+    @Tag("pure-integer")
     @Test
     public void testStein27() {
         MIPLIBTheEasySet.doTest("stein27.mps", "18", null);
@@ -1840,6 +1864,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * </ul>
      */
     @Tag("slow")
+    @Tag("pure-integer")
     @Test
     public void testStein45() {
         MIPLIBTheEasySet.doTest("stein45.mps", "30", null);
@@ -1858,6 +1883,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 0.01s
      * </ul>
      */
+    @Tag("pure-integer")
     @Test
     public void testStein9() {
         MIPLIBTheEasySet.doTest("stein9.mps", "5", null);
@@ -1876,6 +1902,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 0.1s
      * </ul>
      */
+    @Tag("pure-integer")
     @Test
     public void testSupportcase14() {
         MIPLIBTheEasySet.doTest("supportcase14.mps", "288", null);
@@ -1894,6 +1921,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-08-21: 0.1s
      * </ul>
      */
+    @Tag("pure-integer")
     @Test
     public void testSupportcase16() {
         MIPLIBTheEasySet.doTest("supportcase16.mps", "288", null);
