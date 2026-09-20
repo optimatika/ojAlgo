@@ -11,6 +11,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Fixed
+
+#### org.ojalgo.optimisation
+
+- `Optimisation.Result.parse(String)` handles empty solution vectors without throwing.
+
 ## [57.3.0] – 2026-09-11
 
 ### Added

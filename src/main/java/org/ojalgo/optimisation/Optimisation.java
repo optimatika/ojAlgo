@@ -758,10 +758,18 @@ public interface Optimisation {
 
             String strState = result.substring(0, indexOfFirstSpace);
             String strValue = result.substring(indexOfFirstSpace + 1, indexOfAtMark);
-            String[] strSolution = result.substring(indexOfAtMark + 5, result.length() - 2).split(", ");
 
             State state = Optimisation.State.valueOf(strState);
             double value = Double.parseDouble(strValue);
+
+            int solutionBegin = indexOfAtMark + 5;
+            int solutionEnd = result.length() - 2;
+
+            if (solutionBegin > solutionEnd) {
+                return new Result(state, value, ArrayR256.make(0));
+            }
+
+            String[] strSolution = result.substring(solutionBegin, solutionEnd).split(", ");
             ArrayR256 solution = ArrayR256.make(strSolution.length);
             for (int i = 0; i < strSolution.length; i++) {
                 solution.set(i, new BigDecimal(strSolution[i]));

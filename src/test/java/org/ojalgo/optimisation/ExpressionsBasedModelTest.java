@@ -357,6 +357,46 @@ class ExpressionsBasedModelTest extends OptimisationTests {
 
     }
 
+    @Test
+    void testResultParseEmptySolution() {
+
+        Optimisation.Result original = Optimisation.Result.of(0.0, Optimisation.State.FAILED);
+        String str = original.toString();
+        Optimisation.Result parsed = Optimisation.Result.parse(str);
+
+        TestUtils.assertEquals(Optimisation.State.FAILED, parsed.getState());
+        TestUtils.assertEquals(0.0, parsed.getValue());
+        TestUtils.assertEquals(0, parsed.size());
+    }
+
+    @Test
+    void testResultParseRoundTrip() {
+
+        Optimisation.Result original = Optimisation.Result.of(42.5, Optimisation.State.OPTIMAL, 1.0, 2.0, 3.0);
+        String str = original.toString();
+        Optimisation.Result parsed = Optimisation.Result.parse(str);
+
+        TestUtils.assertEquals(Optimisation.State.OPTIMAL, parsed.getState());
+        TestUtils.assertEquals(42.5, parsed.getValue());
+        TestUtils.assertEquals(3, parsed.size());
+        TestUtils.assertEquals(1.0, parsed.doubleValue(0));
+        TestUtils.assertEquals(2.0, parsed.doubleValue(1));
+        TestUtils.assertEquals(3.0, parsed.doubleValue(2));
+    }
+
+    @Test
+    void testResultParseSingleElement() {
+
+        Optimisation.Result original = Optimisation.Result.of(7.0, Optimisation.State.OPTIMAL, 7.0);
+        String str = original.toString();
+        Optimisation.Result parsed = Optimisation.Result.parse(str);
+
+        TestUtils.assertEquals(Optimisation.State.OPTIMAL, parsed.getState());
+        TestUtils.assertEquals(7.0, parsed.getValue());
+        TestUtils.assertEquals(1, parsed.size());
+        TestUtils.assertEquals(7.0, parsed.doubleValue(0));
+    }
+
     /**
      * https://github.com/optimatika/ojAlgo/issues/415
      */
