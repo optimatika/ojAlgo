@@ -347,7 +347,7 @@ public abstract class MissingMath {
      */
     @Deprecated
     public static int magnitude(final BigDecimal arg) {
-        return arg.signum() == 0 ? 0 : arg.precision() - arg.scale() - 1;
+        return arg.signum() == 0 ? 0 : MissingMath.magnitudeOf(arg);
     }
 
     /**

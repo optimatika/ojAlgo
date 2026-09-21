@@ -78,7 +78,7 @@ public class MissingMathTest {
     }
 
     @Test
-    public void testMagnitude() {
+    public void testMagnitudeOf() {
 
         for (int exp = -32; exp <= 32; exp++) {
 
@@ -86,34 +86,33 @@ public class MissingMathTest {
 
             TestUtils.assertEquals(exp, Math.toIntExact(Math.round(Math.log10(number.doubleValue()))));
 
-            TestUtils.assertEquals(exp, MissingMath.magnitude(number));
+            TestUtils.assertEquals(exp, MissingMath.magnitudeOf(number));
         }
 
         for (int exp = -32; exp <= 32; exp++) {
-            TestUtils.assertEquals(0, MissingMath.magnitude(BigDecimal.valueOf(0L, -exp)));
+            TestUtils.assertEquals(Integer.MIN_VALUE, MissingMath.magnitudeOf(BigDecimal.valueOf(0L, -exp)));
         }
 
         for (int exp = -32; exp <= 32; exp++) {
             for (long base = 1L; base <= 9L; base++) {
-                TestUtils.assertEquals(exp, MissingMath.magnitude(BigDecimal.valueOf(base, -exp)));
+                TestUtils.assertEquals(exp, MissingMath.magnitudeOf(BigDecimal.valueOf(base, -exp)));
             }
         }
 
-        TestUtils.assertEquals(6, MissingMath.magnitude(BigDecimal.valueOf(1_000_000)));
-        TestUtils.assertEquals(3, MissingMath.magnitude(BigDecimal.valueOf(1_000)));
-        TestUtils.assertEquals(2, MissingMath.magnitude(BigDecimal.valueOf(100)));
-        TestUtils.assertEquals(1, MissingMath.magnitude(BigDecimal.valueOf(10)));
-        TestUtils.assertEquals(0, MissingMath.magnitude(BigDecimal.valueOf(1)));
-        TestUtils.assertEquals(0, MissingMath.magnitude(BigDecimal.valueOf(0)));
-        TestUtils.assertEquals(-1, MissingMath.magnitude(BigDecimal.valueOf(0.1)));
-        TestUtils.assertEquals(-2, MissingMath.magnitude(BigDecimal.valueOf(0.01)));
-        TestUtils.assertEquals(-3, MissingMath.magnitude(BigDecimal.valueOf(0.001)));
-        TestUtils.assertEquals(-6, MissingMath.magnitude(BigDecimal.valueOf(0.000001)));
+        TestUtils.assertEquals(6, MissingMath.magnitudeOf(BigDecimal.valueOf(1_000_000)));
+        TestUtils.assertEquals(3, MissingMath.magnitudeOf(BigDecimal.valueOf(1_000)));
+        TestUtils.assertEquals(2, MissingMath.magnitudeOf(BigDecimal.valueOf(100)));
+        TestUtils.assertEquals(1, MissingMath.magnitudeOf(BigDecimal.valueOf(10)));
+        TestUtils.assertEquals(0, MissingMath.magnitudeOf(BigDecimal.valueOf(1)));
+        TestUtils.assertEquals(-1, MissingMath.magnitudeOf(BigDecimal.valueOf(0.1)));
+        TestUtils.assertEquals(-2, MissingMath.magnitudeOf(BigDecimal.valueOf(0.01)));
+        TestUtils.assertEquals(-3, MissingMath.magnitudeOf(BigDecimal.valueOf(0.001)));
+        TestUtils.assertEquals(-6, MissingMath.magnitudeOf(BigDecimal.valueOf(0.000001)));
 
-        TestUtils.assertEquals(2, MissingMath.magnitude(BigDecimal.valueOf(999)));
-        TestUtils.assertEquals(2, MissingMath.magnitude(BigDecimal.valueOf(-100)));
-        TestUtils.assertEquals(-2, MissingMath.magnitude(BigDecimal.valueOf(0.09)));
-        TestUtils.assertEquals(-2, MissingMath.magnitude(BigDecimal.valueOf(-0.01)));
+        TestUtils.assertEquals(2, MissingMath.magnitudeOf(BigDecimal.valueOf(999)));
+        TestUtils.assertEquals(2, MissingMath.magnitudeOf(BigDecimal.valueOf(-100)));
+        TestUtils.assertEquals(-2, MissingMath.magnitudeOf(BigDecimal.valueOf(0.09)));
+        TestUtils.assertEquals(-2, MissingMath.magnitudeOf(BigDecimal.valueOf(-0.01)));
 
         for (int exp = -32; exp <= 32; exp++) {
 
@@ -122,7 +121,7 @@ public class MissingMathTest {
             BigDecimal number = BigDecimal.valueOf(value);
 
             int expected = exp - 1;
-            int actual = MissingMath.magnitude(number);
+            int actual = MissingMath.magnitudeOf(number);
 
             TestUtils.assertEquals(expected, actual);
         }
