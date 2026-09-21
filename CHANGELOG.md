@@ -11,6 +11,31 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.optimisation
+
+- Degenerate coefficient detection in presolving. A new `DEGENERATE` analyser scans expression coefficients for near-zero values and filters them from presolver logic, preventing false infeasibility from floating-point noise. Controlled by `Options.degeneracy`. (Discussion [#691](https://github.com/optimatika/ojAlgo/discussions/691))
+
+### Changed
+
+#### org.ojalgo.optimisation
+
+- `Expression` now allocates the quadratic coefficient map lazily — only when quadratic terms are actually added. Models with only linear expressions use less memory.
+
+#### org.ojalgo.type.context
+
+- `NumberContext.isLessThan(BigDecimal, BigDecimal)` and `isMoreThan(BigDecimal, BigDecimal)` now use full `BigDecimal` tolerance comparison instead of converting to `double`. Added corresponding `double` overloads.
+- `NumberContext.isDifferent(BigDecimal, BigDecimal)` added: tolerance-aware comparison that picks the larger operand as the reference magnitude and avoids `abs()` on the inputs.
+- Minor performance: `NumberContext` caches its `MathContext.getPrecision()` value and uses multiplication instead of division in the `double` version of `isSmall`.
+
+### Fixed
+
+#### org.ojalgo.optimisation
+
+- Presolver infeasibility checks (`REDUNDANT_CONSTRAINT`) now use tolerance-aware `isMoreThan`/`isLessThan` instead of raw `compareTo`, consistent with the model's feasibility context. (Discussion [#691](https://github.com/optimatika/ojAlgo/discussions/691))
+- `SpecialOrderedSet` loop always read `mySequence[1]` instead of `mySequence[i]` — the loop variable was never used as the array index.
+
 ## [57.3.1] – 2026-09-21
 
 ### Fixed

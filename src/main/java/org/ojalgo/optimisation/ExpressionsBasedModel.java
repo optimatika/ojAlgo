@@ -722,7 +722,32 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     public static abstract class Simplifier<ME extends ModelEntity<?>, S extends Simplifier<?, ?>> implements Comparable<S> {
 
+        protected static final void fix(final Variable variable, final BigDecimal value) {
+            variable.setFixed(value);
+        }
+
+        protected static final void markDegenerate(final Expression expression) {
+            expression.setDegenerate();
+        }
+
+        protected static final void markInfeasible(final Expression expression) {
+            expression.setInfeasible();
+        }
+
+        protected static final void markRedundant(final Expression expression) {
+            expression.setRedundant();
+        }
+
+        protected static final Variable resolve(final Expression expression, final IntIndex index) {
+            return expression.resolve(index);
+        }
+
+        protected static final boolean validate(final Variable variable, final BigDecimal value, final NumberContext context) {
+            return variable.validate(value, context, null);
+        }
+
         private final int myExecutionOrder;
+
         private final UUID myUUID = UUID.randomUUID();
 
         Simplifier(final int executionOrder) {
@@ -2152,7 +2177,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
                 Presolver presolver = (Presolver) simplifier;
 
                 for (Expression tmpExpr : myExpressions.values()) {
-                    if (presolver.isApplicable(tmpExpr)) {
+                    if (tmpExpr.isSafeToPresolve() && presolver.isApplicable(tmpExpr)) {
 
                         BigDecimal setValue = tmpExpr.calculateSetValue(fixedVariables);
 
@@ -2162,8 +2187,11 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
                         myTemporary.clear();
                         myTemporary.addAll(tmpExpr.getLinearKeySet());
                         myTemporary.removeAll(fixedVariables);
+                        if (tmpExpr.isDegenerate()) {
+                            myTemporary.removeIf(index -> options.degeneracy.isZero(tmpExpr.get(index)));
+                        }
 
-                        ((Presolver) simplifier).simplify(tmpExpr, myTemporary, lower, upper, options.feasibility);
+                        presolver.simplify(tmpExpr, myTemporary, lower, upper, options.feasibility);
 
                         myTemporary.clear();
                     }
@@ -2373,33 +2401,39 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     void presolve() {
 
-        boolean needToRepeat = false;
+        if (myEnvironment.containsPresolver(Presolvers.ZERO_ONE_TWO)) {
 
-        BigDecimal compensatedLowerLimit;
-        BigDecimal compensatedUpperLimit;
+            boolean needToRepeat = false;
 
-        do {
+            BigDecimal compensatedLowerLimit;
+            BigDecimal compensatedUpperLimit;
 
-            Set<IntIndex> fixedVariables = this.getFixedVariables();
-            needToRepeat = false;
+            do {
 
-            for (Expression expr : this.getExpressions()) {
+                Set<IntIndex> fixedVariables = this.getFixedVariables();
+                needToRepeat = false;
 
-                if (!needToRepeat && expr.isConstraint() && !expr.isInfeasible() && !expr.isRedundant() && expr.countQuadraticFactors() == 0) {
+                for (Expression expr : this.getExpressions()) {
 
-                    BigDecimal calculateSetValue = expr.calculateSetValue(fixedVariables);
+                    if (!needToRepeat && expr.isConstraint() && expr.isSafeToPresolve() && expr.countQuadraticFactors() == 0) {
 
-                    compensatedLowerLimit = expr.getCompensatedLowerLimit(calculateSetValue);
-                    compensatedUpperLimit = expr.getCompensatedUpperLimit(calculateSetValue);
+                        BigDecimal calculateSetValue = expr.calculateSetValue(fixedVariables);
 
-                    myTemporary.clear();
-                    myTemporary.addAll(expr.getLinearKeySet());
-                    myTemporary.removeAll(fixedVariables);
+                        compensatedLowerLimit = expr.getCompensatedLowerLimit(calculateSetValue);
+                        compensatedUpperLimit = expr.getCompensatedUpperLimit(calculateSetValue);
 
-                    needToRepeat |= Presolvers.ZERO_ONE_TWO.simplify(expr, myTemporary, compensatedLowerLimit, compensatedUpperLimit, options.feasibility);
+                        myTemporary.clear();
+                        myTemporary.addAll(expr.getLinearKeySet());
+                        myTemporary.removeAll(fixedVariables);
+                        if (expr.isDegenerate()) {
+                            myTemporary.removeIf(index -> options.degeneracy.isZero(expr.get(index)));
+                        }
+
+                        needToRepeat |= Presolvers.ZERO_ONE_TWO.simplify(expr, myTemporary, compensatedLowerLimit, compensatedUpperLimit, options.feasibility);
+                    }
                 }
-            }
-        } while (needToRepeat);
+            } while (needToRepeat);
+        }
 
         // Used to be additional code here to specifically check that constraints that have been determined redundant
         // are not infeasible - as that would hide the infeasibility.  Believe this is now handled elsewhere.

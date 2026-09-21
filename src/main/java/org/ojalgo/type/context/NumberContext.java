@@ -185,6 +185,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
 
     private final double myAbsoluteError;
     private final MathContext myMathContext;
+    private final int myPrecision;
     private final double myRelativeError;
     private final double myRoundingFactor;
     private final int myScale;
@@ -198,9 +199,10 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         super(format);
 
         myMathContext = math;
+        myPrecision = math.getPrecision();
 
-        if (math.getPrecision() > 0) {
-            myRelativeError = Math.pow(PrimitiveMath.TEN, 1 - math.getPrecision());
+        if (myPrecision > 0) {
+            myRelativeError = Math.pow(PrimitiveMath.TEN, 1 - myPrecision);
         } else {
             myRelativeError = PrimitiveMath.MACHINE_EPSILON;
         }
@@ -244,8 +246,8 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
 
         BigDecimal tmpDecimal = number;
 
-        if (myMathContext.getPrecision() > 0) {
-            tmpDecimal = tmpDecimal.plus(this.getMathContext());
+        if (myPrecision > 0) {
+            tmpDecimal = tmpDecimal.plus(myMathContext);
         }
 
         return this.scale(tmpDecimal);
@@ -271,7 +273,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
      * {@linkplain Math#rint(double)} (regardless of what rounding mode is specified).
      */
     public double enforce(final double number) {
-        if (myMathContext.getPrecision() > 0) {
+        if (myPrecision > 0) {
             return this.enforce(BigDecimal.valueOf(number)).doubleValue();
         }
         if (myScale > Integer.MIN_VALUE) {
@@ -368,7 +370,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     }
 
     public int getPrecision() {
-        return myMathContext.getPrecision();
+        return myPrecision;
     }
 
     /**
@@ -398,6 +400,19 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         return prime * result + myScale;
     }
 
+    public boolean isDifferent(final BigDecimal expected, final BigDecimal actual) {
+        if (expected.compareTo(actual) == 0) {
+            return false;
+        }
+        int magE = MissingMath.magnitudeOf(expected);
+        int magA = MissingMath.magnitudeOf(actual);
+        BigDecimal reference = magE >= magA ? expected : actual;
+        if (reference.signum() < 0) {
+            reference = reference.negate();
+        }
+        return !this.isSmall(reference, actual.subtract(expected));
+    }
+
     public boolean isDifferent(final double expected, final double actual) {
         if (expected == actual) {
             return false;
@@ -411,7 +426,11 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     }
 
     public boolean isLessThan(final BigDecimal reference, final BigDecimal value) {
-        return value.compareTo(reference) < 0 && this.isDifferent(reference.doubleValue(), value.doubleValue());
+        return value.compareTo(reference) < 0 && this.isDifferent(reference, value);
+    }
+
+    public boolean isLessThan(final double reference, final double value) {
+        return value < reference && this.isDifferent(reference, value);
     }
 
     /**
@@ -425,24 +444,39 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     }
 
     public boolean isMoreThan(final BigDecimal reference, final BigDecimal value) {
-        return value.compareTo(reference) > 0 && this.isDifferent(reference.doubleValue(), value.doubleValue());
+        return value.compareTo(reference) > 0 && this.isDifferent(reference, value);
+    }
+
+    public boolean isMoreThan(final double reference, final double value) {
+        return value > reference && this.isDifferent(reference, value);
     }
 
     public boolean isSmall(final BigDecimal comparedTo, final BigDecimal value) {
         if (this.isZero(comparedTo)) {
             return this.isZero(value);
-        } else {
-            BigDecimal reference = this.enforce(comparedTo);
-            return this.enforce(reference.add(value)).compareTo(reference) == 0;
         }
+        if (myPrecision > 0) {
+            int magRef = MissingMath.magnitudeOf(comparedTo);
+            int magVal = MissingMath.magnitudeOf(value);
+            if (magVal != Integer.MIN_VALUE && magRef != Integer.MIN_VALUE) {
+                int magDiff = magRef - magVal;
+                if (magDiff > myPrecision + 1) {
+                    return true;
+                }
+                if (magDiff < 0) {
+                    return false;
+                }
+            }
+        }
+        BigDecimal reference = this.enforceForComparison(comparedTo);
+        return this.enforceForComparison(reference.add(value)).compareTo(reference) == 0;
     }
 
     public boolean isSmall(final double comparedTo, final double value) {
         if (NumberContext.isZero(comparedTo, myAbsoluteError)) {
             return NumberContext.isZero(value, myAbsoluteError);
         } else {
-            double relative = value / comparedTo;
-            return NumberContext.isZero(relative, myRelativeError);
+            return Math.abs(value) < Math.abs(comparedTo) * myRelativeError;
         }
     }
 
@@ -450,9 +484,18 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
 
         if (value.signum() == 0) {
             return true;
-        } else {
-            return this.enforce(value).signum() == 0;
         }
+        if (myScale <= DEFAULT_SCALE) {
+            return false;
+        }
+        int mag = MissingMath.magnitudeOf(value);
+        if (mag >= 0) {
+            return false;
+        }
+        if (mag < -(myScale + 1)) {
+            return true;
+        }
+        return this.enforceForComparison(value).signum() == 0;
     }
 
     public boolean isZero(final double value) {
@@ -464,7 +507,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
      */
     public BigDecimal toBigDecimal(final double number) {
 
-        BigDecimal decimal = myMathContext.getPrecision() > 0 ? new BigDecimal(number, myMathContext) : new BigDecimal(number);
+        BigDecimal decimal = myPrecision > 0 ? new BigDecimal(number, myMathContext) : new BigDecimal(number);
 
         return this.scale(decimal);
     }
@@ -505,7 +548,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + " " + myMathContext.getPrecision() + ":" + myScale + " " + myMathContext.getRoundingMode().toString();
+        return this.getClass().getSimpleName() + " " + myPrecision + ":" + myScale + " " + myMathContext.getRoundingMode().toString();
     }
 
     public NumberContext withDecrementedPrecision() {
@@ -513,7 +556,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     }
 
     public NumberContext withDecrementedPrecision(final int subtrahend) {
-        return this.withPrecision(myMathContext.getPrecision() - subtrahend);
+        return this.withPrecision(myPrecision - subtrahend);
     }
 
     public NumberContext withDecrementedScale() {
@@ -525,7 +568,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     }
 
     public NumberContext withDoubledPrecision() {
-        return this.withPrecision(myMathContext.getPrecision() * 2);
+        return this.withPrecision(myPrecision * 2);
     }
 
     public NumberContext withDoubledScale() {
@@ -538,7 +581,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     }
 
     public NumberContext withHalvedPrecision() {
-        return this.withPrecision(myMathContext.getPrecision() / 2);
+        return this.withPrecision(myPrecision / 2);
     }
 
     public NumberContext withHalvedScale() {
@@ -550,7 +593,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     }
 
     public NumberContext withIncrementedPrecision(final int addend) {
-        return this.withPrecision(myMathContext.getPrecision() + addend);
+        return this.withPrecision(myPrecision + addend);
     }
 
     public NumberContext withIncrementedScale() {
@@ -568,7 +611,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
 
     public NumberContext withMode(final RoundingMode mode) {
         NumberFormat format = (NumberFormat) this.format();
-        MathContext math = new MathContext(myMathContext.getPrecision(), mode);
+        MathContext math = new MathContext(myPrecision, mode);
         return new NumberContext(format, math, myScale);
     }
 
@@ -592,6 +635,17 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     public NumberContext withScale(final int scale) {
         NumberFormat format = (NumberFormat) this.format();
         return new NumberContext(format, myMathContext, scale);
+    }
+
+    private BigDecimal enforceForComparison(final BigDecimal number) {
+        BigDecimal retVal = number;
+        if (myPrecision > 0) {
+            retVal = retVal.plus(myMathContext);
+        }
+        if (myScale > DEFAULT_SCALE) {
+            retVal = retVal.setScale(myScale, myMathContext.getRoundingMode());
+        }
+        return retVal;
     }
 
     private BigDecimal scale(final BigDecimal number) {

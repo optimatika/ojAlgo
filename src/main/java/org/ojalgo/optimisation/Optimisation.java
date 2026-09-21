@@ -297,6 +297,7 @@ public interface Optimisation {
 
             this.clearPresolvers();
 
+            this.addPresolver(Presolvers.DEGENERATE); // -10
             this.addPresolver(Presolvers.LINEAR_OBJECTIVE); // 10
             this.addPresolver(Presolvers.UNREFERENCED); // 30
             this.addPresolver(Presolvers.ZERO_ONE_TWO); // 50
@@ -331,6 +332,10 @@ public interface Optimisation {
             ExpressionsBasedModel model = this.parse(new ByteArrayInputStream(data), FileFormat.valueOf(format));
             Optimisation.Result result = maximize ? model.maximise() : model.minimise();
             return "{\"key\":\"local\",\"status\":\"DONE\",\"result\":\"" + result + "\"}";
+        }
+
+        boolean containsPresolver(final ExpressionsBasedModel.Simplifier<?, ?> presolver) {
+            return myPresolvers.contains(presolver);
         }
 
         int countIntegrations() {
@@ -504,98 +509,92 @@ public interface Optimisation {
     public static final class Options implements Optimisation {
 
         /**
-         * This may turn on various experimental features. If you do not know exactly what you want to turn
-         * on, for the specific version you're using, then always leave this 'false'.
+         * Tolerance for detecting degenerate (near-zero) expression coefficients during presolving.
+         * Coefficients within this tolerance are treated as zero, and the corresponding variables are
+         * excluded from presolve logic. This prevents false infeasibility from floating-point noise in model
+         * parameters.
+         */
+        public NumberContext degeneracy = NumberContext.of(14);
+
+        /**
+         * Enables experimental features. Unless you know exactly what this turns on for the specific version
+         * you're using, leave it {@code false}.
          */
         public boolean experimental = false;
 
         /**
-         * Used to determine/validate feasibility. Are the variables within their bounds or not, are the
-         * constraints violated or not? are the variable values integer or not?
-         * <p>
-         * Primarily used in {@link ExpressionsBasedModel}. Not used (should not be) as part of solver logic,
-         * but outside the solvers to validate their results.
+         * Tolerance for feasibility checks: are variables within bounds, are constraints satisfied, are
+         * variable values integer? Used by presolvers and by {@link ExpressionsBasedModel} to validate solver
+         * results. Not used as part of internal solver logic.
          */
         public NumberContext feasibility = NumberContext.of(12, 8);
 
         /**
-         * The maximum number of iterations allowed for the solve() command.
+         * Hard iteration limit. The solver aborts after this many iterations regardless of solution state.
          */
         public int iterations_abort = Integer.MAX_VALUE;
 
         /**
-         * Calculations will be terminated after this number of iterations if a feasible solution has been
-         * found. If no feasible solution has been found calculations will continue until one is found or
-         * {@linkplain #iterations_abort} is reached. This option is, probably, only of interest with the
-         * {@linkplain IntegerSolver}.
+         * Soft iteration limit. If a feasible solution has been found, the solver may stop after this many
+         * iterations. If no feasible solution exists yet, iterations continue until
+         * {@link #iterations_abort}. Primarily useful with {@link IntegerSolver}.
          */
         public int iterations_suffice = Integer.MAX_VALUE;
 
         /**
-         * If this is null nothing is printed, if it is not null then progress/debug messages are printed to
-         * that {@linkplain org.ojalgo.netio.BasicLogger}.
+         * Log output destination. Null (the default) disables all solver logging. Set this together with
+         * {@link #logger_solver} to enable logging for a specific solver.
          */
         public BasicLogger logger_appender = null;
 
         /**
-         * Detailed (debug) logging or not.
+         * If true, emit detailed/debug-level log messages. If false, only progress-level messages are logged.
          */
         public boolean logger_detailed = true;
 
         /**
-         * Which {@linkplain Solver} to debug. Null means NO solvers. This setting is only relevant if
-         * {@link #logger_appender} has been set.
+         * Restricts logging to a specific solver class (matched via {@code isAssignableFrom}). Null means no
+         * solver logs. Only effective when {@link #logger_appender} is set.
          */
         public Class<? extends Optimisation.Solver> logger_solver = null;
 
         /**
-         * For display only! {@link #toString()} and log message formatting.
+         * Formatting context for display only — used in {@link #toString()} and log message formatting.
          */
         public NumberContext print = ModelEntity.PRINT;
 
         /**
-         * Describes the (required/sufficient) accuracy of the solution. It is used when copying the solver's
-         * solution back to the model (converting from double to BigDecimal). Specific solvers may also use
-         * this as a stopping criteria or similar. The default essentially copies the numbers as is –
-         * corresponding to full double precision – but with no more than 14 decimals.
+         * Accuracy used when converting the solver's double-precision solution back to BigDecimal in the
+         * model. Also used by some solvers as a convergence threshold.
          */
         public NumberContext solution = NumberContext.ofScale(14).withMode(RoundingMode.HALF_DOWN);
 
         /**
-         * Controls if sparse/iterative solvers should be favoured over dense/direct alternatives.
-         * Sparse/iterative alternatives are usually preferable with larger models, but there are also
-         * algorithmical differences that could make one alternative better than the other for a (your)
-         * specific case. There are 3 different possibilities for this option:
-         * <ol>
-         * <li><b>TRUE</b> Will use the sparse linear solver and the iterative convex solver.</li>
-         * <li><b>FALSE</b> Will use the dense linear solver and the direct convex solver.</li>
-         * <li><b>NULL</b> ojAlgo will use some logic to choose for you. This is the default. Currently, the
-         * dense LinearSolver and the iterative ConvexSolver will be used. In the vast majority of cases these
-         * are the best alternatives.</li>
-         * </ol>
-         * In most cases you do not need to worry about this configuration option - leave this choice to
-         * ojAlgo.
+         * Controls sparse/iterative vs dense/direct solver selection:
+         * <ul>
+         * <li>{@code TRUE} — sparse linear solver and iterative convex solver</li>
+         * <li>{@code FALSE} — dense linear solver and direct convex solver</li>
+         * <li>{@code null} (default) — ojAlgo chooses automatically</li>
+         * </ul>
          */
         public Boolean sparse = null;
 
         /**
-         * The maximum number of millis allowed for the solve() command. Executions will be aborted regardless
-         * of if a solution has been found or not.
+         * Hard time limit in milliseconds. The solver aborts after this duration regardless of solution
+         * state.
          */
         public long time_abort = CalendarDateUnit.DAY.toDurationInMillis();
 
         /**
-         * Calculations will be terminated after this amount of time if a feasible solution has been found. If
-         * no feasible solution has been found calculations will continue until one is found or
-         * {@linkplain #time_abort} is reached. This option is , probably, only of interest with the
-         * {@linkplain IntegerSolver}.
+         * Soft time limit in milliseconds. If a feasible solution has been found, the solver may stop after
+         * this duration. If no feasible solution exists yet, execution continues until {@link #time_abort}.
+         * Primarily useful with {@link IntegerSolver}.
          */
         public long time_suffice = CalendarDateUnit.HOUR.toDurationInMillis();
 
         /**
-         * If true models and solvers will validate data at various points. Validation is turned off by
-         * default. Turning it on will significantly slow down execution - even very expensive validation may
-         * be performed.
+         * Enables internal consistency checks in solvers (tableau state, matrix properties, node solutions).
+         * Off by default. Turning it on significantly slows execution.
          */
         public boolean validate = false;
 

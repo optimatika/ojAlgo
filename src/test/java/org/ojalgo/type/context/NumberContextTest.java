@@ -116,12 +116,180 @@ public class NumberContextTest {
     }
 
     @Test
+    public void testIsDifferentBigDecimalAvoidAbs() {
+
+        NumberContext nc = NumberContext.of(7);
+
+        BigDecimal a = new BigDecimal("500.00001");
+        BigDecimal b = new BigDecimal("500.00002");
+        BigDecimal c = new BigDecimal("200.0");
+
+        TestUtils.assertFalse(nc.isDifferent(a, b));
+        TestUtils.assertTrue(nc.isDifferent(a, c));
+
+        TestUtils.assertFalse(nc.isDifferent(a.negate(), b.negate()));
+        TestUtils.assertTrue(nc.isDifferent(a.negate(), c.negate()));
+
+        TestUtils.assertTrue(nc.isDifferent(a, a.negate()));
+    }
+
+    @Test
+    public void testIsDifferentBigDecimalDoubleConsistency() {
+
+        NumberContext nc = NumberContext.of(10);
+
+        double[] values = { 1.0, 100.0, 0.001, -50.0, 1E10 };
+
+        for (double v : values) {
+            BigDecimal bv = BigDecimal.valueOf(v);
+            double nudge = v * 1E-11;
+            BigDecimal bn = BigDecimal.valueOf(v + nudge);
+
+            boolean bigResult = nc.isDifferent(bv, bn);
+            boolean dblResult = nc.isDifferent(v, v + nudge);
+            TestUtils.assertEquals("consistency at " + v, bigResult, dblResult);
+        }
+    }
+
+    @Test
+    public void testIsLessThanIsMoreThanBigDecimal() {
+
+        NumberContext nc = NumberContext.of(7);
+
+        BigDecimal a = new BigDecimal("100.0000001");
+        BigDecimal b = new BigDecimal("100.0000002");
+        BigDecimal c = new BigDecimal("101.0");
+
+        TestUtils.assertFalse(nc.isLessThan(a, b));
+        TestUtils.assertFalse(nc.isMoreThan(a, b));
+
+        TestUtils.assertTrue(nc.isLessThan(c, a));
+        TestUtils.assertTrue(nc.isMoreThan(a, c));
+    }
+
+    @Test
+    public void testIsLessThanIsMoreThanConsistency() {
+
+        NumberContext nc = NumberContext.of(10);
+
+        double ref = 1000.0;
+        double close = 1000.0 + 1E-8;
+        double far = 1001.0;
+
+        TestUtils.assertEquals(nc.isLessThan(BigDecimal.valueOf(ref), BigDecimal.valueOf(close)), nc.isLessThan(ref, close));
+        TestUtils.assertEquals(nc.isMoreThan(BigDecimal.valueOf(ref), BigDecimal.valueOf(far)), nc.isMoreThan(ref, far));
+    }
+
+    @Test
+    public void testIsLessThanIsMoreThanDouble() {
+
+        NumberContext nc = NumberContext.of(7);
+
+        TestUtils.assertFalse(nc.isLessThan(100.0, 100.0 - 1E-10));
+        TestUtils.assertFalse(nc.isMoreThan(100.0, 100.0 + 1E-10));
+
+        TestUtils.assertTrue(nc.isLessThan(100.0, 99.0));
+        TestUtils.assertTrue(nc.isMoreThan(100.0, 101.0));
+
+        TestUtils.assertFalse(nc.isLessThan(100.0, 100.0));
+        TestUtils.assertFalse(nc.isMoreThan(100.0, 100.0));
+    }
+
+    @Test
     public void testIsSmall() {
 
         BigDecimal compareTo = BigDecimal.valueOf(2.03007518794);
         BigDecimal small = BigDecimal.valueOf(1E-12);
 
         TestUtils.assertTrue(NumberContext.of(12).isSmall(compareTo, small));
+    }
+
+    @Test
+    public void testIsSmallBigDecimalDoubleConsistency() {
+
+        NumberContext nc = NumberContext.of(7);
+
+        double[] refs = { 1.0, 100.0, 1E6 };
+        double[] vals = { 1E-10, 1E-5, 0.5 };
+
+        for (double r : refs) {
+            for (double v : vals) {
+                boolean bigResult = nc.isSmall(BigDecimal.valueOf(r), BigDecimal.valueOf(v));
+                boolean dblResult = nc.isSmall(r, v);
+                TestUtils.assertEquals("ref=" + r + " val=" + v, bigResult, dblResult);
+            }
+        }
+    }
+
+    @Test
+    public void testIsSmallBigDecimalFastPaths() {
+
+        NumberContext nc = NumberContext.of(7);
+
+        BigDecimal large = new BigDecimal("1000");
+        BigDecimal tiny = new BigDecimal("1E-20");
+        BigDecimal comparable = new BigDecimal("500");
+
+        TestUtils.assertTrue(nc.isSmall(large, tiny));
+        TestUtils.assertFalse(nc.isSmall(large, comparable));
+        TestUtils.assertFalse(nc.isSmall(tiny, large));
+    }
+
+    @Test
+    public void testIsSmallDoubleMultiplication() {
+
+        NumberContext nc = NumberContext.of(7);
+
+        TestUtils.assertTrue(nc.isSmall(1000.0, 1E-20));
+        TestUtils.assertFalse(nc.isSmall(1000.0, 500.0));
+        TestUtils.assertTrue(nc.isSmall(1.0, 1E-8));
+        TestUtils.assertFalse(nc.isSmall(1.0, 1E-6));
+
+        TestUtils.assertTrue(nc.isSmall(-1000.0, 1E-20));
+        TestUtils.assertTrue(nc.isSmall(1000.0, -1E-20));
+        TestUtils.assertFalse(nc.isSmall(-1000.0, 500.0));
+    }
+
+    @Test
+    public void testIsZeroBigDecimalConsistency() {
+
+        for (int ps = 1; ps <= 16; ps++) {
+            NumberContext nc = NumberContext.of(ps);
+
+            BigDecimal belowThreshold = BigDecimal.ONE.movePointLeft(ps + 2);
+            BigDecimal atThreshold = new BigDecimal("5").movePointLeft(ps + 1);
+            BigDecimal aboveThreshold = BigDecimal.ONE.movePointLeft(ps - 1);
+
+            TestUtils.assertTrue(ps + ": below", nc.isZero(belowThreshold));
+            TestUtils.assertFalse(ps + ": above", nc.isZero(aboveThreshold));
+            TestUtils.assertEquals(ps + ": consistency", nc.isZero(belowThreshold), nc.isZero(belowThreshold.doubleValue()));
+            TestUtils.assertEquals(ps + ": consistency", nc.isZero(aboveThreshold), nc.isZero(aboveThreshold.doubleValue()));
+        }
+    }
+
+    @Test
+    public void testIsZeroMagnitudeFastPaths() {
+
+        NumberContext nc = NumberContext.of(7);
+
+        TestUtils.assertFalse(nc.isZero(BigDecimal.ONE));
+        TestUtils.assertFalse(nc.isZero(BigDecimal.TEN));
+        TestUtils.assertFalse(nc.isZero(new BigDecimal("1000000")));
+
+        TestUtils.assertTrue(nc.isZero(new BigDecimal("1E-9")));
+        TestUtils.assertTrue(nc.isZero(new BigDecimal("1E-20")));
+
+        TestUtils.assertFalse(nc.isZero(new BigDecimal("1E-7")));
+    }
+
+    @Test
+    public void testIsZeroNoScale() {
+
+        NumberContext nc = NumberContext.ofPrecision(7);
+
+        TestUtils.assertTrue(nc.isZero(BigDecimal.ZERO));
+        TestUtils.assertFalse(nc.isZero(new BigDecimal("1E-100")));
+        TestUtils.assertFalse(nc.isZero(new BigDecimal("0.001")));
     }
 
     @Test

@@ -24,6 +24,7 @@ package org.ojalgo.optimisation;
 import java.math.BigDecimal;
 import java.util.Set;
 
+import org.ojalgo.optimisation.ExpressionsBasedModel.Simplifier;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
 
@@ -46,8 +47,7 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
      * The program logic here does not assume variables to be binary or even integer
      */
     @Override
-    public boolean simplify(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
-            final NumberContext precision) {
+    public boolean simplify(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper, final NumberContext precision) {
 
         if (!expression.equals(myExpression)) {
             return false;
@@ -59,8 +59,8 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
 
         int first = -1, limit = -1;
         for (int i = 0; i < mySequence.length; i++) {
-            final IntIndex index = mySequence[1];
-            if (!remaining.contains(index) && (expression.resolve(index).getValue().signum() != 0)) {
+            IntIndex index = mySequence[i];
+            if (!remaining.contains(index) && (Simplifier.resolve(expression, index).getValue().signum() != 0)) {
                 if (first == -1) {
                     first = i;
                 }
@@ -68,52 +68,52 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
             }
         }
 
-        final int count = limit - first;
+        int count = limit - first;
         if (count > myType) {
-            expression.setInfeasible();
+            Simplifier.markInfeasible(expression);
             return false;
         }
 
         boolean didFixVariable = false;
 
         for (int i = first + 1; i < limit; i++) {
-            final IntIndex index = mySequence[i];
-            final Variable variable = expression.resolve(index);
+            IntIndex index = mySequence[i];
+            Variable variable = Simplifier.resolve(expression, index);
             if (!remaining.contains(index)) {
                 if (variable.getValue().signum() == 0) {
-                    expression.setInfeasible();
+                    Simplifier.markInfeasible(expression);
                 }
             } else {
                 if (variable.isInteger()) {
-                    variable.setFixed(BigDecimal.ONE);
+                    Simplifier.fix(variable, BigDecimal.ONE);
                     didFixVariable = true;
                 }
             }
         }
 
-        final int remainingCount = myType - count;
+        int remainingCount = myType - count;
         if ((count > 0) && (remainingCount > 0)) {
             for (int i = 0, lim = first - remainingCount; i < lim; i++) {
-                final IntIndex index = mySequence[i];
-                final Variable variable = expression.resolve(index);
+                IntIndex index = mySequence[i];
+                Variable variable = Simplifier.resolve(expression, index);
                 if (!remaining.contains(index)) {
                     if (variable.getValue().signum() != 0) {
-                        expression.setInfeasible();
+                        Simplifier.markInfeasible(expression);
                     }
                 } else {
-                    variable.setFixed(BigDecimal.ZERO);
+                    Simplifier.fix(variable, BigDecimal.ZERO);
                     didFixVariable = true;
                 }
             }
             for (int i = limit + remainingCount, lim = mySequence.length; i < lim; i++) {
-                final IntIndex index = mySequence[i];
-                final Variable variable = expression.resolve(index);
+                IntIndex index = mySequence[i];
+                Variable variable = Simplifier.resolve(expression, index);
                 if (!remaining.contains(index)) {
                     if (variable.getValue().signum() != 0) {
-                        expression.setInfeasible();
+                        Simplifier.markInfeasible(expression);
                     }
                 } else {
-                    variable.setFixed(BigDecimal.ZERO);
+                    Simplifier.fix(variable, BigDecimal.ZERO);
                     didFixVariable = true;
                 }
             }
