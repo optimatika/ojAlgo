@@ -352,6 +352,16 @@ abstract class SimplexSolver extends LinearSolver {
     private static final NumberContext INFEASIBILITY = NumberContext.of(10);
     private static final NumberContext PIVOT = NumberContext.of(6);
     /**
+     * A pivot must also be large relative to the largest element of the pivot row (dual simplex) or column
+     * (primal simplex), 1e-9 relative, no absolute tolerance. Smaller elements neither limit the step nor
+     * become pivots. If this rejects all the dual candidates, the basis is refactorised (if it has been
+     * updated) and the iteration repeated before infeasibility is concluded (see
+     * {@link SimplexStore#refactorise()}). If it rejects all the primal rows that bound the step, the basis
+     * is refactorised the same way, and if it had not been updated those rows are accepted after all: this
+     * limit never turns a bounded step into an unbounded one.
+     */
+    private static final NumberContext PIVOT_GROWTH = NumberContext.ofPrecision(10);
+    /**
      * Slack added to the primal ratio-test numerators, bounding how far a basic variable may drift outside
      * its bounds in a single pivot. Distinct from {@link #INFEASIBILITY}, which decides whether such a drift
      * counts as infeasible at all.
@@ -501,6 +511,10 @@ abstract class SimplexSolver extends LinearSolver {
             rowAI.nonzeros().forEach(nz -> constrBody.set(nz.index(), nbCvxEqus + rowAI.row(), nz.doubleValue()));
         }
 
+        for (int i = 0; i < nbCvxVars; i++) {
+            constrBody.set(i, nbCvxEqus + nbCvxInes + i, ONE);
+        }
+
         LinearSolver solver = store.newPhasedSimplexSolver(options);
 
         Result result = solver.solve();
@@ -610,6 +624,10 @@ abstract class SimplexSolver extends LinearSolver {
             constrRHS.set(nbCvxInes + rowAE.row(), cvxBE.doubleValue(rowAE.row()));
         }
 
+        for (int j = 0; j < nbCvxEqus; j++) {
+            constrBody.set(nbCvxInes + j, nbCvxVars + nbCvxInes + j, ONE);
+        }
+
         LinearSolver solver = store.newPhasedSimplexSolver(options);
 
         Result result = solver.solve();
@@ -691,6 +709,12 @@ abstract class SimplexSolver extends LinearSolver {
     }
 
     /**
+     * Set by {@link #testDualEnterRatio}: there were candidates, but {@link #PIVOT_GROWTH} rejected them all.
+     * Set by {@link #testPrimalExitRatio}: the step is unbounded only because {@link #PIVOT_GROWTH} rejected
+     * the rows that bound it.
+     */
+    private boolean myGrowthLimited = false;
+    /**
      * Reused across solves. {@link IterDescr} only captures the (stable, lifetime-fixed) {@code excluded}
      * /{@code included} arrays of the store, so a single instance can be {@code reset()} and reused every
      * {@link #prepareToIterate(boolean)} instead of allocating one per solve — cuts per-B&amp;B-node GC
@@ -699,8 +723,9 @@ abstract class SimplexSolver extends LinearSolver {
     private IterDescr myIteration = null;
     /**
      * Scratch storage shared between the two passes of the Harris ratio tests. Pass 1 fills these arrays for
-     * every valid candidate; pass 2 reads them sequentially. Sized to fit either {@code excluded.length}
-     * (dual enter test) or {@code included.length} (primal exit test). Allocated lazily on first use.
+     * every valid candidate; pass 2 reads them sequentially. {@code myRatioCacheRelaxed} is used to apply the
+     * growth limit after pass 1. Sized to fit either {@code excluded.length} (dual enter test) or
+     * {@code included.length} (primal exit test). Allocated lazily on first use.
      * <p>
      * {@code myRatioCacheExitDirection[k]} encodes the (direction, destination) pair for the cached row in
      * {@link #testPrimalExitRatio}: {@code true} = exit variable INCREASEs to its UPPER bound, {@code false}
@@ -708,6 +733,7 @@ abstract class SimplexSolver extends LinearSolver {
      */
     private boolean[] myRatioCacheExitDirection;
     private int[] myRatioCacheIdx;
+    private double[] myRatioCacheRelaxed;
     private double[] myRatioCacheScale;
     private ColumnState[] myRatioCacheState;
     private double[] myRatioCacheTrueRatio;
@@ -779,6 +805,7 @@ abstract class SimplexSolver extends LinearSolver {
     private void ensureRatioCacheCapacity(final int needed) {
         if (myRatioCacheIdx == null || myRatioCacheIdx.length < needed) {
             myRatioCacheIdx = new int[needed];
+            myRatioCacheRelaxed = new double[needed];
             myRatioCacheScale = new double[needed];
             myRatioCacheTrueRatio = new double[needed];
             myRatioCacheState = new ColumnState[needed];
@@ -1071,27 +1098,30 @@ abstract class SimplexSolver extends LinearSolver {
 
         int n = mySimplex.structure.countVariables();
         int[] excluded = mySimplex.excluded;
+        int[] candidates = mySimplex.getDualDirectionIndices();
+        int nbCandidates = mySimplex.countDualDirection();
 
         this.ensureRatioCacheCapacity(excluded.length);
 
-        // Pass 1: compute the relaxed minimum theta_max = min over valid candidates of
-        // (gap + tolerance) / |denom|, while caching per-candidate (idx, scale, trueRatio, state)
-        // for sequential reuse in pass 2.
-        double thetaMax = MACHINE_LARGEST;
+        // Pass 1: find the largest element of the row, and cache the valid candidates (idx, scale, relaxed
+        // ratio, trueRatio, state), where the relaxed ratio is (gap + tolerance) / |denom|.
         int cachedCount = 0;
+        double largest = ZERO;
 
-        for (int je = 0; je < excluded.length; je++) {
+        for (int k = 0; k < nbCandidates; k++) {
+            int je = candidates != null ? candidates[k] : k;
             int j = excluded[je];
             if (j >= n) {
                 continue;
             }
 
             double denom = mySimplex.getCurrentElement(exit, je);
+            double scale = Math.abs(denom);
+            largest = Math.max(largest, scale);
             if (PIVOT.isZero(denom)) {
                 continue;
             }
 
-            double scale = Math.abs(denom);
             ColumnState columnState = mySimplex.getColumnState(j);
             double relaxed;
             double trueRatio;
@@ -1134,16 +1164,35 @@ abstract class SimplexSolver extends LinearSolver {
                 this.log(1, "{}({}) relaxed = {}", j, je, relaxed);
             }
 
-            if (relaxed < thetaMax) {
-                thetaMax = relaxed;
-            }
-
             myRatioCacheIdx[cachedCount] = je;
+            myRatioCacheRelaxed[cachedCount] = relaxed;
             myRatioCacheScale[cachedCount] = scale;
             myRatioCacheTrueRatio[cachedCount] = trueRatio;
             myRatioCacheState[cachedCount] = columnState;
             cachedCount++;
         }
+
+        // Keep the cached candidates that pass the growth limit (relative to the largest element of the row),
+        // and compute the relaxed minimum theta_max over them.
+        double thetaMax = MACHINE_LARGEST;
+        int nbKept = 0;
+
+        for (int k = 0; k < cachedCount; k++) {
+            if (PIVOT_GROWTH.isSmall(largest, myRatioCacheScale[k])) {
+                continue;
+            }
+            double relaxed = myRatioCacheRelaxed[k];
+            if (relaxed < thetaMax) {
+                thetaMax = relaxed;
+            }
+            myRatioCacheIdx[nbKept] = myRatioCacheIdx[k];
+            myRatioCacheScale[nbKept] = myRatioCacheScale[k];
+            myRatioCacheTrueRatio[nbKept] = myRatioCacheTrueRatio[k];
+            myRatioCacheState[nbKept] = myRatioCacheState[k];
+            nbKept++;
+        }
+        myGrowthLimited = cachedCount > 0 && nbKept == 0;
+        cachedCount = nbKept;
 
         if (cachedCount == 0) {
             // No valid candidate found
@@ -1178,7 +1227,10 @@ abstract class SimplexSolver extends LinearSolver {
         return enter.index >= 0;
     }
 
-    private boolean testPrimalExitRatio(final IterDescr iteration) {
+    /**
+     * @param limitGrowth Whether to apply {@link #PIVOT_GROWTH}
+     */
+    private boolean testPrimalExitRatio(final IterDescr iteration, final boolean limitGrowth) {
 
         if (this.isLogDebug()) {
             this.log();
@@ -1195,21 +1247,25 @@ abstract class SimplexSolver extends LinearSolver {
         double tolerance = RATIO_RELAX.getAbsoluteError();
 
         int[] included = mySimplex.included;
+        int[] candidates = mySimplex.getPrimalDirectionIndices();
+        int nbCandidates = mySimplex.countPrimalDirection();
 
         this.ensureRatioCacheCapacity(included.length);
 
-        // Pass 1: relaxed minimum, capped at the entering variable's range. While iterating, cache per-row
-        // (idx, scale, trueRatio, exit-to-upper) so pass 2 can iterate the cache sequentially.
-        double thetaMax = range;
+        // Pass 1: find the largest element of the column, and cache the candidates (idx, scale, relaxed ratio,
+        // trueRatio, exit-to-upper), where the relaxed ratio is (gap + tolerance) / |denom|.
         int cachedCount = 0;
+        double largest = ZERO;
 
-        for (int ji = included.length - 1; ji >= 0; ji--) {
+        for (int k = nbCandidates - 1; k >= 0; k--) {
+            int ji = candidates != null ? candidates[k] : k;
             double denom = mySimplex.getCurrentElement(ji, enter);
+            double scale = Math.abs(denom);
+            largest = Math.max(largest, scale);
             if (PIVOT.isZero(denom)) {
                 continue;
             }
 
-            double scale = Math.abs(denom);
             double numer;
             boolean exitDirection;
 
@@ -1240,16 +1296,36 @@ abstract class SimplexSolver extends LinearSolver {
                 this.log(1, "{}({}) relaxed = {}", included[ji], ji, relaxed);
             }
 
-            if (relaxed < thetaMax) {
-                thetaMax = relaxed;
-            }
-
             myRatioCacheIdx[cachedCount] = ji;
+            myRatioCacheRelaxed[cachedCount] = relaxed;
             myRatioCacheScale[cachedCount] = scale;
             myRatioCacheTrueRatio[cachedCount] = trueRatio;
             myRatioCacheExitDirection[cachedCount] = exitDirection;
             cachedCount++;
         }
+
+        // Keep the cached candidates that pass the growth limit (relative to the largest element of the
+        // column), and compute the relaxed minimum theta_max over them, capped at the entering variable's range.
+        double thetaMax = range;
+        int nbKept = 0;
+        boolean rejectedBounding = false;
+
+        for (int k = 0; k < cachedCount; k++) {
+            double relaxed = myRatioCacheRelaxed[k];
+            if (limitGrowth && PIVOT_GROWTH.isSmall(largest, myRatioCacheScale[k])) {
+                rejectedBounding |= Double.isFinite(relaxed);
+                continue;
+            }
+            if (relaxed < thetaMax) {
+                thetaMax = relaxed;
+            }
+            myRatioCacheIdx[nbKept] = myRatioCacheIdx[k];
+            myRatioCacheScale[nbKept] = myRatioCacheScale[k];
+            myRatioCacheTrueRatio[nbKept] = myRatioCacheTrueRatio[k];
+            myRatioCacheExitDirection[nbKept] = myRatioCacheExitDirection[k];
+            nbKept++;
+        }
+        myGrowthLimited = rejectedBounding && !Double.isFinite(thetaMax);
 
         if (thetaMax >= range) {
 
@@ -1271,10 +1347,10 @@ abstract class SimplexSolver extends LinearSolver {
             return iteration.isBoundFlip();
         }
 
-        // Pass 2: among cached rows with true ratio <= thetaMax, pick the largest |denom|.
+        // Pass 2: among kept rows with true ratio <= thetaMax, pick the largest |denom|.
         double bestScale = -ONE;
 
-        for (int k = 0; k < cachedCount; k++) {
+        for (int k = 0; k < nbKept; k++) {
             double scale = myRatioCacheScale[k];
             if (myRatioCacheTrueRatio[k] <= thetaMax && scale > bestScale) {
                 bestScale = scale;
@@ -1391,30 +1467,6 @@ abstract class SimplexSolver extends LinearSolver {
         return retVal;
     }
 
-    private boolean verifyPrimalFeasibility() {
-
-        boolean retVal = true;
-
-        double epsilon = options.feasibility.epsilon();
-
-        for (int i = 0, limit = mySimplex.included.length; i < limit; i++) {
-            int j = mySimplex.included[i];
-
-            double value = mySimplex.getCurrentRHS(i);
-
-            double lb = mySimplex.getLowerBound(j);
-            double ub = mySimplex.getUpperBound(j);
-
-            // Check if the value lies within the bounds
-            if (value < lb - epsilon || value > ub + epsilon) {
-                this.log("!PF {}({}) {}, but [{},{}]", j, i, value, lb, ub);
-                retVal = false;
-            }
-        }
-
-        return retVal;
-    }
-
     final SimplexSolver basis(final int[] basis) {
         mySimplex.resetBasis(basis);
         state = State.UNEXPLORED;
@@ -1436,7 +1488,11 @@ abstract class SimplexSolver extends LinearSolver {
 
             iteration.reset();
 
-            if (this.getDualExitCandidate(iteration)) {
+            if (mySimplex.isBasisSingular()) {
+
+                state = State.FAILED;
+
+            } else if (this.getDualExitCandidate(iteration)) {
 
                 mySimplex.calculateDualDirection(iteration.exit);
 
@@ -1451,7 +1507,7 @@ abstract class SimplexSolver extends LinearSolver {
 
                     this.incrementIterationsCount();
 
-                } else {
+                } else if (!myGrowthLimited || !mySimplex.refactorise()) {
 
                     double infeasibility = Math.abs(mySimplex.getInfeasibility(iteration.exit.index));
                     // Judge the residual relative to the magnitude of the basic solution rather than against
@@ -1506,11 +1562,20 @@ abstract class SimplexSolver extends LinearSolver {
 
             iteration.reset();
 
-            if (this.getPrimalEnterCandidate(iteration)) {
+            if (mySimplex.isBasisSingular()) {
+
+                state = State.FAILED;
+
+            } else if (this.getPrimalEnterCandidate(iteration)) {
 
                 mySimplex.calculatePrimalDirection(iteration.enter);
 
-                if (this.testPrimalExitRatio(iteration)) {
+                boolean bounded = this.testPrimalExitRatio(iteration, true);
+                if (!bounded && myGrowthLimited && !mySimplex.refactorise()) {
+                    bounded = this.testPrimalExitRatio(iteration, false);
+                }
+
+                if (bounded) {
 
                     if (iteration.isBasisUpdate()) {
                         mySimplex.calculateDualDirection(iteration.exit);
@@ -1521,7 +1586,7 @@ abstract class SimplexSolver extends LinearSolver {
 
                     this.incrementIterationsCount();
 
-                } else {
+                } else if (!myGrowthLimited) {
 
                     state = State.UNBOUNDED;
                 }
@@ -1662,6 +1727,34 @@ abstract class SimplexSolver extends LinearSolver {
 
     void switchToPhase2() {
         mySimplex.removePhase1();
+    }
+
+    /**
+     * Are all basic variables within their bounds, by {@link Optimisation.Options#feasibility}? Violations
+     * are logged.
+     */
+    final boolean verifyPrimalFeasibility() {
+
+        boolean retVal = true;
+
+        double epsilon = options.feasibility.epsilon();
+
+        for (int i = 0, limit = mySimplex.included.length; i < limit; i++) {
+            int j = mySimplex.included[i];
+
+            double value = mySimplex.getCurrentRHS(i);
+
+            double lb = mySimplex.getLowerBound(j);
+            double ub = mySimplex.getUpperBound(j);
+
+            // Check if the value lies within the bounds
+            if (value < lb - epsilon || value > ub + epsilon) {
+                this.log("!PF {}({}) {}, but [{},{}]", j, i, value, lb, ub);
+                retVal = false;
+            }
+        }
+
+        return retVal;
     }
 
 }

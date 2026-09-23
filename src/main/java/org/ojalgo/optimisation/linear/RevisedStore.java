@@ -26,12 +26,14 @@ import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import java.util.Arrays;
 
+import org.ojalgo.array.DensityTrackingArray;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.INV;
 import org.ojalgo.array.operation.SQRT;
 import org.ojalgo.matrix.store.R064CSC;
+import org.ojalgo.matrix.store.R064CSR;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.optimisation.Equilibrator;
@@ -64,7 +66,7 @@ final class RevisedStore extends SimplexStore {
      * unit-vector basis structure is preserved.
      * <p>
      * Operates on the build-time {@link #myConstraintsBody} ({@link RowsSupplier}). Must run before the
-     * matrix is frozen to {@link #myConstraintsCSC} in {@link #doneBuilding()}.
+     * matrix is frozen to {@link #myConstraintsCSC} in {@link #doneBuilding(LinearSolver.Configuration)}.
      */
     static final class Scaling extends Equilibrator<RevisedStore> {
 
@@ -172,6 +174,13 @@ final class RevisedStore extends SimplexStore {
 
     }
 
+    /**
+     * The pivot element is computed twice each iteration: from the pivot row (BTRAN + PRICE) and from the
+     * entering column (FTRAN). A relative difference larger than this indicates that the updated basis
+     * representation has lost accuracy, and it is refactorised instead of updated.
+     */
+    private static final NumberContext BASIS_REPRESENTATION_ACCURACY = NumberContext.ofPrecision(8);
+
     private static R064Store newColumn(final int nbRows) {
         return R064Store.FACTORY.make(nbRows, 1);
     }
@@ -187,12 +196,6 @@ final class RevisedStore extends SimplexStore {
     }
 
     /**
-     * Pivot row for dual simplex. Contains coefficients of non-basic variables in the tableau row for the
-     * exiting basic variable. Updated incrementally with each dual simplex iteration.
-     */
-    private final double[] a;
-
-    /**
      * Reduced costs for non-basic variables. Shows objective change per unit increase in a non-basic
      * variable. Updated incrementally with each iteration and pivot.
      */
@@ -205,23 +208,37 @@ final class RevisedStore extends SimplexStore {
     private final double[] l;
 
     /**
-     * Set after the basic solution has been fully computed (via {@link #refreshBasicSolution()}). Cleared on
-     * {@link #resetBasis} so that {@link #setToLower}/{@link #setToUpper} skip redundant ftran calls during
-     * the subsequent setup phase — {@link #prepareToIterate()} will recompute x from scratch anyway.
+     * Set after the basic solution has been fully computed (via {@link #refreshBasicSolution()}), cleared by
+     * {@link #resetBasis}. Only while it is set do {@link #setToLower}, {@link #setToUpper} and bound changes
+     * update the basic solution incrementally.
      */
     private boolean myBasicSolutionReady = false;
 
     /**
-     * Complete constraint matrix A (all variables). Mutable during build; frozen to {@link #myConstraintsCSC}
-     * before iteration.
+     * Direction vector for the entering variable in primal simplex: the FTRAN of the entering column (by
+     * basis position), with the index list of its nonzeros. Shows how the basic variables change when the
+     * entering variable increases.
      */
-    private final RowsSupplier<Double> myConstraintsBody;
+    private final DensityTrackingArray myColumnDirection;
+
+    /**
+     * Complete constraint matrix A (all variables). Mutable during build; frozen to {@link #myConstraintsCSC}
+     * and {@link #myConstraintsCSR}, and released, in {@link #doneBuilding(LinearSolver.Configuration)}.
+     */
+    private RowsSupplier<Double> myConstraintsBody;
 
     /**
      * Frozen compressed-sparse-column form of the constraint matrix. Created from {@link #myConstraintsBody}
-     * in {@link #doneBuilding()} and used for all column-access operations during the solve loop.
+     * in {@link #doneBuilding(LinearSolver.Configuration)} and used for all column-access operations during
+     * the solve loop.
      */
     private R064CSC myConstraintsCSC;
+
+    /**
+     * Row-wise copy of the constraint matrix, for the row-wise PRICE. Created in
+     * {@link #doneBuilding(LinearSolver.Configuration)}.
+     */
+    private R064CSR myConstraintsCSR;
 
     /**
      * Right-hand side vector b of Ax = b. Updated when bounds are shifted. Used to compute the current basic
@@ -231,19 +248,23 @@ final class RevisedStore extends SimplexStore {
 
     /**
      * Inverse of the current basis matrix B^(-1). Maintained and updated using factorization techniques.
-     * Updated when the basis changes or is reset. Initialised in {@link #doneBuilding()} once the constraint
-     * matrix density is known.
+     * Updated when the basis changes or is reset. Created in
+     * {@link #doneBuilding(LinearSolver.Configuration)}.
      */
     private BasisRepresentation myInvBasis;
 
     /**
-     * True when {@link #myInvBasis} does not reflect the current {@link #included} basis and must be rebuilt
-     * via {@link BasisRepresentation#reset} before reuse. Set initially (no factorization yet) and on
-     * external basis swaps via {@link #resetBasis(int[])}; cleared once {@link #prepareToIterate()} has
-     * rebuilt the factorisation. Pivots performed during iteration keep the inverse in sync via
-     * {@link BasisRepresentation#update} and leave this flag {@code false}.
+     * True until {@link #myInvBasis} has been factorised the first time, by
+     * {@link #prepareToIterate(boolean)} or {@link #resetBasis(int[])}. After that pivots keep it in sync via
+     * {@link BasisRepresentation#update}.
      */
     private boolean myInvBasisStale = true;
+
+    /**
+     * The BTRAN of the unit vector for the leaving basis position (by row), with the index list of its
+     * nonzeros.
+     */
+    private final DensityTrackingArray myInverseRow;
 
     /**
      * Objective function coefficients c for all variables. Static during solve. Used to compute duals and
@@ -258,6 +279,11 @@ final class RevisedStore extends SimplexStore {
     private R064Store myPhase1Objective = null;
 
     /**
+     * The row-wise PRICE (by column, length {@code n}), with the index list of the columns touched.
+     */
+    private final DensityTrackingArray myPriceAccumulator;
+
+    /**
      * Set when the basis representation was fully refactored (rather than incrementally updated). Both the
      * basic solution x and reduced costs d are recomputed from scratch after refactorisation, since the fresh
      * factors make the recompute accurate. Between refactorisations, x and d are maintained incrementally.
@@ -265,36 +291,21 @@ final class RevisedStore extends SimplexStore {
     private boolean myRefactored = false;
 
     /**
-     * Per-instance scratch for {@link #sliceBodyRow(int)}: holds the non-basic part of the current tableau
-     * row produced by {@link #doBodyRow(int, double[])}. Reused across calls — the returned
-     * {@link Primitive1D} view is consumed synchronously by the caller (see
-     * {@link SimplexStore#generateCutCandidates(boolean[], NumberContext, double)}) before the next
-     * {@code sliceBodyRow} call, so reuse is safe.
+     * Pivot row for dual simplex: the coefficients of the non-basic variables in the tableau row of the
+     * exiting basic variable (by non-basic position), with the index list of its nonzeros.
      */
-    private final double[] mySliceBodyRowScratch;
+    private final DensityTrackingArray myRowDirection;
 
     /**
-     * Scratch buffer for row-scatter transpose-multiply. Length {@code n}, reused across iterations.
+     * Scratch for FTRAN of columns that do not enter the basis (bound flips and bound changes).
      */
-    private final double[] w;
+    private final double[] myScratchColumn;
 
     /**
      * Current basic solution x_B. Values of basic variables in the current iteration. Updated incrementally
      * with each iteration and pivot.
      */
     private final double[] x;
-
-    /**
-     * Direction vector for entering variable in primal simplex. Shows how basic variables change when
-     * entering variable increases. Updated incrementally with each iteration.
-     */
-    private final double[] y;
-
-    /**
-     * Temporary storage vector for various computations, especially rows of the inverse basis matrix. Reused
-     * to avoid memory allocation. Updated as needed for intermediate calculations.
-     */
-    private final double[] z;
 
     RevisedStore(final int mm, final int nn) {
         this(new LinearStructure(mm, nn));
@@ -308,38 +319,16 @@ final class RevisedStore extends SimplexStore {
         myConstraintsBody = RevisedStore.newMatrix(m, n);
         myConstraintsRHS = RevisedStore.newColumn(m);
 
+        myColumnDirection = new DensityTrackingArray(m);
+        myInverseRow = new DensityTrackingArray(m);
+        myPriceAccumulator = new DensityTrackingArray(n);
+        myRowDirection = new DensityTrackingArray(n - m);
+        myScratchColumn = new double[m];
+
         x = new double[m];
-        y = new double[m];
-        z = new double[m];
         l = new double[m];
-        w = new double[n];
 
         d = new double[n - m];
-        a = new double[n - m];
-        mySliceBodyRowScratch = new double[n - m];
-    }
-
-    private void doBodyRow(final int row, final double[] destination) {
-
-        Arrays.fill(z, ZERO);
-        z[row] = ONE;
-        myInvBasis.btran(z); // i:th row of inv B
-
-        Arrays.fill(w, ZERO);
-
-        for (int i = 0; i < m; i++) {
-            double li = z[i];
-            if (li != ZERO) {
-                myConstraintsBody.getRow(i).axpy(li, w);
-            }
-        }
-
-        for (int je = 0, lim = excluded.length; je < lim; je++) {
-            int col = excluded[je];
-            if (!this.isArtificial(col)) {
-                destination[je] = w[col];
-            }
-        }
     }
 
     private double nonBasicValue(final int col, final ColumnState state) {
@@ -350,6 +339,52 @@ final class RevisedStore extends SimplexStore {
         } else {
             return ZERO;
         }
+    }
+
+    /**
+     * The pivot row (tableau row) for a basis position, into {@link #myRowDirection}: BTRAN of the unit
+     * vector, a row-wise PRICE that only visits the rows of the constraint matrix where that BTRAN result is
+     * nonzero, and then a gather of the non-basic (non-artificial) columns. When the BTRAN result is sparse
+     * the gather only visits the columns the PRICE touched, otherwise all non-basic columns (in order).
+     */
+    private void priceRow(final int row) {
+
+        myInvBasis.btranUnit(row, myInverseRow);
+
+        myConstraintsCSR.premultiply(myInverseRow, myPriceAccumulator);
+
+        myRowDirection.reset();
+        int[] packed = myRowDirection.indices();
+        int nbPacked = 0;
+
+        if (myInverseRow.isSparse()) {
+
+            int[] reverse = this.getExcludedReverseMap();
+            int[] touched = myPriceAccumulator.indices();
+
+            for (int k = 0, limit = myPriceAccumulator.countNonzeros(); k < limit; k++) {
+                int col = touched[k];
+                double value = myPriceAccumulator.values[col];
+                int je = reverse[col];
+                if (je >= 0 && value != ZERO && !this.isArtificial(col)) {
+                    myRowDirection.values[je] = value;
+                    packed[nbPacked++] = je;
+                }
+            }
+
+        } else {
+
+            for (int je = 0, limit = excluded.length; je < limit; je++) {
+                int col = excluded[je];
+                double value = myPriceAccumulator.values[col];
+                if (value != ZERO && !this.isArtificial(col)) {
+                    myRowDirection.values[je] = value;
+                    packed[nbPacked++] = je;
+                }
+            }
+        }
+
+        myRowDirection.setNonzeroCount(nbPacked);
     }
 
     /**
@@ -369,6 +404,16 @@ final class RevisedStore extends SimplexStore {
 
         myInvBasis.ftran(x);
         myBasicSolutionReady = true;
+    }
+
+    /**
+     * The basic solution after a non-basic variable moves by delta: x = x - delta
+     * B<sup>-1</sup>A<sub>col</sub>.
+     */
+    private void updateBasicSolution(final int col, final double delta) {
+        myConstraintsCSC.supplyTo(col, myScratchColumn);
+        myInvBasis.ftran(myScratchColumn);
+        AXPY.invoke(x, -delta, myScratchColumn);
     }
 
     private void updateDualsAndReducedCosts() {
@@ -391,22 +436,37 @@ final class RevisedStore extends SimplexStore {
         }
     }
 
+    /**
+     * Update the basis representation, or refactorise it. The representation refactorises by itself when its
+     * own limits are reached (see {@link BasisRepresentation#update(R064CSC, int[], int, int)}). This store
+     * forces a refactorisation when the pivot element differs when computed from the row and from the column,
+     * which only it can see.
+     */
     @Override
     protected void pivot(final IterDescr iteration) {
 
         int iterExitInd = iteration.exit.index;
         int iterEnterCol = iteration.enter.column();
 
+        int nbUpdates = myInvBasis.countUpdates();
+
+        double alphaFromColumn = Math.abs(myColumnDirection.values[iterExitInd]);
+        double alphaFromRow = Math.abs(myRowDirection.values[iteration.enter.index]);
+        boolean refactor = nbUpdates > 0 && BASIS_REPRESENTATION_ACCURACY.isDifferent(alphaFromColumn, alphaFromRow);
+
         super.pivot(iteration);
 
-        if (myInvBasis.update(myConstraintsCSC, included, iterExitInd, iterEnterCol)) {
+        if (refactor) {
+            myInvBasis.reset(myConstraintsCSC, included);
+            myRefactored = true;
+        } else if (myInvBasis.update(myConstraintsCSC, included, iterExitInd, iterEnterCol)) {
             myRefactored = true;
         }
     }
 
     @Override
     void calculateDualDirection(final ExitInfo exit) {
-        this.doBodyRow(exit.index, a);
+        this.priceRow(exit.index);
     }
 
     @Override
@@ -420,8 +480,8 @@ final class RevisedStore extends SimplexStore {
             if (myRefactored) {
                 this.updateDualsAndReducedCosts();
             } else {
-                double stepD = d[enter] / a[enter];
-                AXPY.invoke(d, -stepD, a);
+                double stepD = d[enter] / myRowDirection.values[enter];
+                myRowDirection.axpy(-stepD, d);
                 d[enter] = -stepD;
             }
         }
@@ -437,20 +497,25 @@ final class RevisedStore extends SimplexStore {
             double enterValue = this.nonBasicValue(enterCol, iteration.enter.from);
             double exitBound = this.nonBasicValue(exitCol, iteration.exit.to);
 
-            double theta = (x[exit] - exitBound) / y[exit];
-            AXPY.invoke(x, -theta, y);
+            double theta = (x[exit] - exitBound) / myColumnDirection.values[exit];
+            myColumnDirection.axpy(-theta, x);
             x[exit] = enterValue + theta;
         }
     }
 
     @Override
     void calculatePrimalDirection(final EnterInfo enter) {
-        myConstraintsCSC.supplyTo(enter.column(), y);
-        myInvBasis.ftran(y);
+        myInvBasis.ftranColumn(myConstraintsCSC, enter.column(), myColumnDirection);
     }
 
+    /**
+     * @throws IllegalStateException When building is done, and the body has been released
+     */
     @Override
     Mutate2D constraintsBody() {
+        if (myConstraintsBody == null) {
+            throw new IllegalStateException("The constraints body is released when building is done!");
+        }
         return myConstraintsBody;
     }
 
@@ -468,11 +533,23 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
+    int countDualDirection() {
+        return myRowDirection.countNonzeros();
+    }
+
+    @Override
+    int countPrimalDirection() {
+        return myColumnDirection.countNonzeros();
+    }
+
+    @Override
     void doneBuilding(final LinearSolver.Configuration configuration) {
 
         super.doneBuilding(configuration);
 
         myConstraintsCSC = myConstraintsBody.toCSC();
+        myConstraintsCSR = myConstraintsBody.toCSR();
+        myConstraintsBody = null;
         myInvBasis = BasisRepresentation.newInstance(myConstraintsCSC);
     }
 
@@ -528,17 +605,22 @@ final class RevisedStore extends SimplexStore {
 
     @Override
     double getCurrentElement(final ExitInfo exit, final int je) {
-        return a[je];
+        return myRowDirection.values[je];
     }
 
     @Override
     double getCurrentElement(final int i, final EnterInfo enter) {
-        return y[i];
+        return myColumnDirection.values[i];
     }
 
     @Override
     double getCurrentRHS(final int i) {
         return x[i];
+    }
+
+    @Override
+    int[] getDualDirectionIndices() {
+        return myRowDirection.indices();
     }
 
     @Override
@@ -562,8 +644,18 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
+    int[] getPrimalDirectionIndices() {
+        return myColumnDirection.indices();
+    }
+
+    @Override
     double getReducedCost(final int je) {
         return d[je];
+    }
+
+    @Override
+    boolean isBasisSingular() {
+        return myInvBasis.isSingular();
     }
 
     @Override
@@ -606,6 +698,21 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
+    boolean refactorise() {
+
+        if (myInvBasis.countUpdates() <= 0) {
+            return false;
+        }
+
+        myInvBasis.reset(myConstraintsCSC, included);
+
+        this.updateDualsAndReducedCosts();
+        this.refreshBasicSolution();
+
+        return true;
+    }
+
+    @Override
     void removePhase1() {
 
         if (myPhase1Objective != null) {
@@ -631,9 +738,7 @@ final class RevisedStore extends SimplexStore {
         if (myBasicSolutionReady) {
             double delta = this.getLowerBound(col) - this.nonBasicValue(col, prevState);
             if (delta != ZERO) {
-                myConstraintsCSC.supplyTo(col, y);
-                myInvBasis.ftran(y);
-                AXPY.invoke(x, -delta, y);
+                this.updateBasicSolution(col, delta);
             }
         }
     }
@@ -645,9 +750,7 @@ final class RevisedStore extends SimplexStore {
         if (myBasicSolutionReady) {
             double delta = this.getUpperBound(col) - this.nonBasicValue(col, prevState);
             if (delta != ZERO) {
-                myConstraintsCSC.supplyTo(col, y);
-                myInvBasis.ftran(y);
-                AXPY.invoke(x, -delta, y);
+                this.updateBasicSolution(col, delta);
             }
         }
     }
@@ -674,28 +777,31 @@ final class RevisedStore extends SimplexStore {
         }
     }
 
+    /**
+     * A view of the pivot row {@link #myRowDirection} (the non-basic part of the tableau row), valid until the next
+     * {@link #priceRow(int)}. The caller,
+     * {@link SimplexStore#generateCutCandidates(boolean[], NumberContext, double)}, consumes it before asking
+     * for the next row.
+     */
     @Override
     Primitive1D sliceBodyRow(final int i) {
 
-        // Reuse a per-instance scratch for the non-basic part to avoid a fresh allocation per cut row.
-        final double[] exclPart = mySliceBodyRowScratch;
-        this.doBodyRow(i, exclPart);
+        this.priceRow(i);
 
-        // Return a view backed by exclPart and the cached excluded-reverse-map for O(1) doubleValue(k):
+        // Return a view backed by the pivot row and the cached excluded-reverse-map for O(1) doubleValue(k):
         // - basic columns (reverse[k] == -1) → ZERO (the tableau row of a basic var has 0 at other basic cols)
-        // - non-basic columns → exclPart[reverse[k]]
+        // - non-basic columns → the pivot row at reverse[k] (zero at the non-basic columns not in the row)
         // This avoids allocating a full-size Primitive1D and copying n-m entries on every cut row.
         final int[] reverse = this.getExcludedReverseMap();
-        final int nLocal = n;
         return new Primitive1D() {
 
             @Override
             public double doubleValue(final int k) {
-                if (k < 0 || k >= nLocal) {
+                if (k < 0 || k >= n) {
                     return ZERO;
                 }
                 int je = reverse[k];
-                return je >= 0 ? exclPart[je] : ZERO;
+                return je >= 0 ? myRowDirection.values[je] : ZERO;
             }
 
             @Override
@@ -705,7 +811,7 @@ final class RevisedStore extends SimplexStore {
 
             @Override
             public int size() {
-                return nLocal;
+                return n;
             }
         };
     }
@@ -741,17 +847,18 @@ final class RevisedStore extends SimplexStore {
         int p = iteration.exit.index;
         int je = iteration.enter.index;
 
-        double pivotElement = a[je];
+        double pivotElement = myRowDirection.values[je];
 
-        if (Math.abs(pivotElement) > 1e-9) {
+        if (!DEVEX_PIVOT.isZero(pivotElement)) {
 
             double w_p = edgeWeights[p];
             double largest = ONE;
 
-            for (int i = 0; i < included.length; i++) {
-
+            int[] indices = myColumnDirection.indices();
+            for (int k = 0, limit = myColumnDirection.countNonzeros(); k < limit; k++) {
+                int i = indices[k];
                 if (i != p) {
-                    double ratio = y[i] / pivotElement;
+                    double ratio = myColumnDirection.values[i] / pivotElement;
                     double candidate = ratio * ratio * w_p;
                     if (candidate > edgeWeights[i]) {
                         edgeWeights[i] = candidate;
@@ -775,29 +882,25 @@ final class RevisedStore extends SimplexStore {
 
         int p = iteration.enter.index;
 
-        double pivotElement = a[p];
+        double pivotElement = myRowDirection.values[p];
 
-        if (Math.abs(pivotElement) > 1e-9) {
+        if (!DEVEX_PIVOT.isZero(pivotElement)) {
 
             double w_p = edgeWeights[p];
             double largest = ONE;
 
-            for (int je = 0; je < excluded.length; je++) {
-
+            int[] indices = myRowDirection.indices();
+            for (int k = 0, limit = myRowDirection.countNonzeros(); k < limit; k++) {
+                int je = indices[k];
                 if (je != p) {
-                    int column = excluded[je];
-                    // Skip artificial variables in edge weight updates to match doExclTranspMult optimization
-                    if (!this.isArtificial(column)) {
-                        double ratio = a[je] / pivotElement;
-                        double candidate = ratio * ratio * w_p;
-                        if (candidate > edgeWeights[je]) {
-                            edgeWeights[je] = candidate;
-                        }
-                        if (edgeWeights[je] > largest) {
-                            largest = edgeWeights[je];
-                        }
+                    double ratio = myRowDirection.values[je] / pivotElement;
+                    double candidate = ratio * ratio * w_p;
+                    if (candidate > edgeWeights[je]) {
+                        edgeWeights[je] = candidate;
                     }
-                    // Artificial variables keep their current edge weight (typically 1.0)
+                    if (edgeWeights[je] > largest) {
+                        largest = edgeWeights[je];
+                    }
                 }
             }
 
@@ -828,9 +931,7 @@ final class RevisedStore extends SimplexStore {
                 delta = scaledUpper - oldUpper;
             }
             if (delta != ZERO && Double.isFinite(delta)) {
-                myConstraintsCSC.supplyTo(index, y);
-                myInvBasis.ftran(y);
-                AXPY.invoke(x, -delta, y);
+                this.updateBasicSolution(index, delta);
             }
         }
         this.setBounds(index, scaledLower, scaledUpper);

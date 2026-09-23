@@ -4,6 +4,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import java.util.Arrays;
 
+import org.ojalgo.array.DensityTrackingArray;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Factory2D;
@@ -128,6 +129,32 @@ abstract class CompressedSparseR064 extends FactoryStore<Double> implements Spar
     @Override
     public final Double get(final int row, final int col) {
         return Double.valueOf(this.doubleValue(row, col));
+    }
+
+    /**
+     * Copies the nonzeros of the specified row/col into a target array, resetting it first, and sets its
+     * index.
+     *
+     * @param index  The row/col index
+     * @param target The target array will be reset then populated
+     */
+    public final void supplyTo(final int index, final DensityTrackingArray target) {
+
+        target.reset();
+
+        int[] targetIndices = target.indices();
+        int count = 0;
+
+        for (int k = pointers[index], limit = pointers[index + 1]; k < limit; k++) {
+            double value = values[k];
+            if (value != ZERO) {
+                int i = indices[k];
+                target.values[i] = value;
+                targetIndices[count++] = i;
+            }
+        }
+
+        target.setNonzeroCount(count);
     }
 
     /**

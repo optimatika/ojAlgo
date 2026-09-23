@@ -165,8 +165,7 @@ public interface IntegerStrategy {
         public final NumberContext dynamism;
         /**
          * Minimum cut violation at the current LP solution. A cut that violates the LP point by less than
-         * this amount is too weak to be useful and is discarded. Both SCIP (1e-4) and HiGHS (1e-5) enforce a
-         * similar threshold.
+         * this amount is too weak to be useful and is discarded.
          */
         public final NumberContext efficacy;
         /**

@@ -57,9 +57,10 @@ import org.ojalgo.type.context.NumberContext;
  * Two concrete families extend this class:
  * <ul>
  * <li>{@link SimplexTableau} — stores the full (or sparse) simplex tableau explicitly. Used by
- * {@link SimplexTableauSolver}.
+ * {@link SimplexTableauSolver}, and ({@link DenseTableau}) by {@link SimplexSolver} for small problems.
  * <li>{@link RevisedStore} — maintains the basis inverse in factored form via a {@link BasisRepresentation},
- * computing tableau elements on demand. Used by {@link SimplexSolver} and its subclasses.
+ * computing tableau elements on demand. Used by {@link SimplexSolver} and its subclasses (see
+ * {@link #newStoreFactory(Options)}).
  * </ul>
  * Non-basic variables are partitioned into {@link ColumnState#LOWER}, {@link ColumnState#UPPER}, or
  * {@link ColumnState#UNBOUNDED}; basic variables are {@link ColumnState#BASIS}. The partition is updated on
@@ -99,28 +100,39 @@ abstract class SimplexStore {
     }
 
     /**
-     * Either the primal or dual devex edge weights, depending on the algorithm used. Sized so that it can
-     * hold either.
+     * Restart the devex reference framework when the largest weight exceeds this, see
+     * {@link #resetEdgeWeightsIfDegraded(double)}.
      */
     private static final double DEVEX_LIMIT = 1E8;
+    /**
+     * The devex weights are not updated when the pivot element is zero by this tolerance.
+     */
+    static final NumberContext DEVEX_PIVOT = NumberContext.ofScale(9);
 
+    /**
+     * Unless {@link Options#sparse} says otherwise, chooses between the revised simplex
+     * ({@link RevisedStore}) and the dense tableau ({@link DenseTableau}) based on the problem size (m*n) and
+     * ratio (n/m), where m is the number of constraints and n the total number of variables (including slacks
+     * and artificials). The revised store is used when the size is at least 150_000, the ratio at least 5, or
+     * the size at least 40_000 with a ratio of at least 3.
+     */
     static Function<LinearStructure, SimplexStore> newStoreFactory(final Options options) {
 
         return structure -> {
-
-            long size = structure.getProblemSize();
-            double ratio = structure.getProblemRatio();
 
             if (Boolean.TRUE.equals(options.sparse)) {
                 return new RevisedStore(structure);
             } else if (Boolean.FALSE.equals(options.sparse)) {
                 return new DenseTableau(structure);
+            }
+
+            long size = structure.getProblemSize();
+            double ratio = structure.getProblemRatio();
+
+            if (size >= 150_000L || ratio >= 5.0 || size >= 40_000L && ratio >= 3.0) {
+                return new RevisedStore(structure);
             } else {
-                if (size > 1_000_000L && ratio > 3.6 || size >= 25_000_000L || ratio >= 11.0) {
-                    return new RevisedStore(structure);
-                } else {
-                    return new DenseTableau(structure);
-                }
+                return new DenseTableau(structure);
             }
         };
     }
@@ -136,10 +148,10 @@ abstract class SimplexStore {
     /**
      * Reverse map of {@link #excluded}: for column index {@code k}, holds the position in {@code excluded[]}
      * where {@code k} appears, or {@code -1} if {@code k} is currently in the basis. Used by
-     * {@link RevisedStore#sliceBodyRow(int)} to provide O(1) {@code doubleValue(k)} on the returned view
-     * without materialising a full-size {@link Primitive1D}. Built lazily by
-     * {@link #getExcludedReverseMap()}; invalidated by {@link #invalidateExcludedReverseMap()} after every
-     * pivot ({@link #update}, {@link #updateBasis}, {@link #resetBasis}).
+     * {@link RevisedStore#sliceBodyRow(int)} to provide O(1) {@code doubleValue(k)} on the returned view, and
+     * by the row-wise PRICE. Built lazily by {@link #getExcludedReverseMap()}, patched by
+     * {@link #updateBasis} and invalidated by {@link #invalidateExcludedReverseMap()} when the partition is
+     * rebuilt ({@link #update}, {@link #resetBasis}).
      */
     private transient int[] myExcludedReverseMap = null;
     private transient boolean myExcludedReverseMapValid = false;
@@ -149,11 +161,15 @@ abstract class SimplexStore {
     private final List<String> myToStringList = new ArrayList<>();
     private final double[] myUpperBounds;
 
+    /**
+     * Either the primal or dual devex edge weights, depending on the algorithm used. Sized so that it can
+     * hold either.
+     */
     final double[] edgeWeights;
     /**
-     * Optional Ruiz-style scaling installed by the concrete store in {@link #doneBuilding()}. When non-null,
-     * the LP data has been scaled and {@link #unscaleSolution(double[])} / {@link #unscaleDuals(double[])}
-     * map back to the original space.
+     * Optional Ruiz-style scaling installed by the concrete store in
+     * {@link #doneBuilding(LinearSolver.Configuration)}. When non-null, the LP data has been scaled and
+     * {@link #unscaleSolution(double[])} / {@link #unscaleDuals(double[])} map back to the original space.
      */
     Equilibrator<?> equilibrator = null;
     /**
@@ -223,7 +239,8 @@ abstract class SimplexStore {
     }
 
     /**
-     * Invalidate {@link #myExcludedReverseMap}. Called from every code path that mutates {@link #excluded}.
+     * Invalidate {@link #myExcludedReverseMap}. Called when the partition is rebuilt ({@link #update},
+     * {@link #resetBasis}); {@link #updateBasis} patches the map instead.
      */
     private void invalidateExcludedReverseMap() {
         myExcludedReverseMapValid = false;
@@ -342,6 +359,8 @@ abstract class SimplexStore {
 
     /**
      * The simplex' constraints body (including the parts corresponding to slack and artificial variables).
+     * Only for building: a store may release it in {@link #doneBuilding(LinearSolver.Configuration)}, and
+     * then throws {@link IllegalStateException} ({@link RevisedStore} does).
      */
     abstract Mutate2D constraintsBody();
 
@@ -351,6 +370,22 @@ abstract class SimplexStore {
     abstract Mutate1D constraintsRHS();
 
     abstract void copyBasicSolution(double[] solution);
+
+    /**
+     * The number of elements of the current dual direction (pivot row) to consider, see
+     * {@link #getDualDirectionIndices()}.
+     */
+    int countDualDirection() {
+        return excluded.length;
+    }
+
+    /**
+     * The number of elements of the current primal direction (entering column) to consider, see
+     * {@link #getPrimalDirectionIndices()}.
+     */
+    int countPrimalDirection() {
+        return included.length;
+    }
 
     /**
      * The number of artificial variables in the basis.
@@ -558,8 +593,16 @@ abstract class SimplexStore {
     abstract double getCurrentRHS(int i);
 
     /**
+     * The (excluded) indices of the possibly nonzero elements of the current dual direction (pivot row), the
+     * first {@link #countDualDirection()} are valid. Null means all indices, in order.
+     */
+    int[] getDualDirectionIndices() {
+        return null;
+    }
+
+    /**
      * Lazy accessor for {@link #myExcludedReverseMap}. Builds the reverse map on first call and after each
-     * invalidation. Subsequent calls within the same B&B node (no pivots) return the cached map.
+     * invalidation. Pivots patch it, so it is usually rebuilt only when the partition is.
      */
     final int[] getExcludedReverseMap() {
         if (!myExcludedReverseMapValid) {
@@ -576,19 +619,6 @@ abstract class SimplexStore {
     }
 
     abstract double getInfeasibility(int i);
-
-    /**
-     * @return true if some variable has its lower bound above its upper bound (an infeasible problem, and a
-     *         state the iterations cannot resolve)
-     */
-    final boolean isAnyBoundCrossed() {
-        for (int j = 0; j < n; j++) {
-            if (myLowerBounds[j] > myUpperBounds[j]) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     final double getLowerBound(final int index) {
         return myLowerBounds[index];
@@ -628,6 +658,14 @@ abstract class SimplexStore {
     }
 
     /**
+     * The (included) indices of the possibly nonzero elements of the current primal direction (entering
+     * column), the first {@link #countPrimalDirection()} are valid. Null means all indices, in order.
+     */
+    int[] getPrimalDirectionIndices() {
+        return null;
+    }
+
+    /**
      * {@link #getUpperBound(int)} minus {@link #getLowerBound(int)}
      */
     final double getRange(final int index) {
@@ -659,8 +697,29 @@ abstract class SimplexStore {
         }
     }
 
+    /**
+     * @return true if some variable has its lower bound above its upper bound (an infeasible problem, and a
+     *         state the iterations cannot resolve)
+     */
+    final boolean isAnyBoundCrossed() {
+        for (int j = 0; j < n; j++) {
+            if (myLowerBounds[j] > myUpperBounds[j]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     final boolean isArtificial(final int col) {
         return structure.isArtificialVariable(col);
+    }
+
+    /**
+     * Is the basis (numerically) singular? Then solves with it are meaningless, and the iterations can not
+     * continue. The default is false: a tableau is not factorised.
+     */
+    boolean isBasisSingular() {
+        return false;
     }
 
     final boolean isExcluded(final int index) {
@@ -728,6 +787,17 @@ abstract class SimplexStore {
      * they are kept; only the basic solution is refreshed.
      */
     abstract void prepareToIterate(boolean cold);
+
+    /**
+     * Refactorise the basis, if it has been updated since it was last factorised, and recompute the basic
+     * solution, the duals and the reduced costs from scratch. The default does nothing: a tableau is not
+     * factorised.
+     *
+     * @return true if the basis was refactorised (and a failed test may be worth repeating)
+     */
+    boolean refactorise() {
+        return false;
+    }
 
     abstract void removePhase1();
 
@@ -908,7 +978,10 @@ abstract class SimplexStore {
 
         included[exit] = exclEnter;
         excluded[enter] = inclExit;
-        this.invalidateExcludedReverseMap();
+        if (myExcludedReverseMapValid) {
+            myExcludedReverseMap[exclEnter] = -1;
+            myExcludedReverseMap[inclExit] = enter;
+        }
     }
 
     /**

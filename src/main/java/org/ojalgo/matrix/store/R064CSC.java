@@ -28,6 +28,7 @@ import java.util.NoSuchElementException;
 
 import org.ojalgo.array.operation.COPY;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ElementView2D;
 import org.ojalgo.structure.Structure2D;
 
@@ -367,6 +368,41 @@ public final class R064CSC extends CompressedSparseR064 {
     }
 
     /**
+     * The matrix in CSC format, by the cheapest route. A {@link SparseStructure2D} converts itself (an
+     * {@link R064CSC} is returned as is), any other {@link Access2D} is scanned column by column, and
+     * anything else first supplies itself to a {@link SparseStore}. The dimensions are always those of the
+     * matrix, also when its last rows or columns are empty.
+     */
+    public static R064CSC of(final Access2D.Collectable<Double, ? super TransformableRegion<Double>> matrix) {
+
+        if (matrix instanceof SparseStructure2D) {
+            return ((SparseStructure2D) matrix).toCSC();
+        } else if (matrix instanceof Access2D) {
+            return R064CSC.scan((Access2D<?>) matrix, null);
+        } else {
+            return matrix.collect(SparseStore.R064).toCSC();
+        }
+    }
+
+    /**
+     * As {@link #of(Access2D.Collectable)}, but only with the nonzero elements whose (row, column) position
+     * the filter accepts. The CSC form of a sparse structure is filtered column by column (an
+     * {@link R064CSC} without an intermediate copy). A null filter accepts everything.
+     */
+    public static R064CSC of(final Access2D.Collectable<Double, ? super TransformableRegion<Double>> matrix, final Structure2D.IntRowColPredicate filter) {
+
+        if (filter == null) {
+            return R064CSC.of(matrix);
+        } else if (matrix instanceof SparseStructure2D) {
+            return R064CSC.gather(((SparseStructure2D) matrix).toCSC(), filter);
+        } else if (matrix instanceof Access2D) {
+            return R064CSC.scan((Access2D<?>) matrix, filter);
+        } else {
+            return R064CSC.gather(matrix.collect(SparseStore.R064).toCSC(), filter);
+        }
+    }
+
+    /**
      * Scales all non-zero entries of a sparse matrix by a scalar.
      */
     public static void scale(final R064CSC matrix, final double scalar) {
@@ -397,6 +433,77 @@ public final class R064CSC extends CompressedSparseR064 {
     }
 
     /**
+     * Copy the nonzeros the filter accepts: count per column, then fill. Within each column the rows keep
+     * their order.
+     */
+    private static R064CSC gather(final R064CSC matrix, final Structure2D.IntRowColPredicate filter) {
+
+        int nbRows = matrix.getRowDim();
+        int nbCols = matrix.getColDim();
+
+        int[] pointers = new int[nbCols + 1];
+        for (int j = 0; j < nbCols; j++) {
+            int count = 0;
+            for (int p = matrix.pointers[j], limit = matrix.pointers[j + 1]; p < limit; p++) {
+                if (matrix.values[p] != ZERO && filter.test(matrix.indices[p], j)) {
+                    count++;
+                }
+            }
+            pointers[j + 1] = pointers[j] + count;
+        }
+
+        int[] indices = new int[pointers[nbCols]];
+        double[] values = new double[indices.length];
+        for (int j = 0, k = 0; j < nbCols; j++) {
+            for (int p = matrix.pointers[j], limit = matrix.pointers[j + 1]; p < limit; p++) {
+                int i = matrix.indices[p];
+                double value = matrix.values[p];
+                if (value != ZERO && filter.test(i, j)) {
+                    indices[k] = i;
+                    values[k] = value;
+                    k++;
+                }
+            }
+        }
+
+        return new R064CSC(nbRows, nbCols, values, indices, pointers);
+    }
+
+    /**
+     * Build by scanning all elements, column by column, keeping the nonzeros the filter (if not null)
+     * accepts.
+     */
+    private static R064CSC scan(final Access2D<?> matrix, final Structure2D.IntRowColPredicate filter) {
+
+        int nbRows = matrix.getRowDim();
+        int nbCols = matrix.getColDim();
+
+        int[] pointers = new int[nbCols + 1];
+        int[] indices = new int[Math.max(16, nbCols)];
+        double[] values = new double[indices.length];
+        int count = 0;
+
+        for (int j = 0; j < nbCols; j++) {
+            pointers[j] = count;
+            for (int i = 0; i < nbRows; i++) {
+                if (filter == null || filter.test(i, j)) {
+                    double value = matrix.doubleValue(i, j);
+                    if (value != ZERO) {
+                        indices = COPY.grow(indices, count + 1);
+                        values = COPY.grow(values, count + 1);
+                        indices[count] = i;
+                        values[count] = value;
+                        count++;
+                    }
+                }
+            }
+        }
+        pointers[nbCols] = count;
+
+        return new R064CSC(nbRows, nbCols, Arrays.copyOf(values, count), Arrays.copyOf(indices, count), pointers);
+    }
+
+    /**
      * Creates a new CSC matrix store.
      *
      * @param rows           The number of rows in the matrix
@@ -410,9 +517,12 @@ public final class R064CSC extends CompressedSparseR064 {
     }
 
     /**
+     * The arrays are allocated, to be filled by the caller. They have to be filled completely: the number of
+     * non-zero elements is taken to be the length of the arrays (see {@link #countNonzeros()}).
+     *
      * @param nbRows   The number of rows
      * @param nbCols   The number of columns
-     * @param capacity The maximum number of non-zero elements
+     * @param capacity The number of non-zero elements
      */
     public R064CSC(final int nbRows, final int nbCols, final int capacity) {
         super(nbRows, nbCols, new double[capacity], new int[capacity], new int[nbCols + 1]);

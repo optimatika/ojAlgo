@@ -22,6 +22,7 @@
 package org.ojalgo.array.operation;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.List;
 
 import org.ojalgo.structure.Access1D;
@@ -74,6 +75,22 @@ public abstract class COPY implements ArrayOperation {
         T[] retVal = (T[]) Array.newInstance(original.getClass().getComponentType(), tmpLength);
         System.arraycopy(original, 0, retVal, 0, tmpLength);
         return retVal;
+    }
+
+    /**
+     * The array itself if it has room for the needed number of elements, otherwise a copy with (at least)
+     * twice the length.
+     */
+    public static double[] grow(final double[] array, final int needed) {
+        return needed <= array.length ? array : Arrays.copyOf(array, Math.max(needed, 2 * array.length));
+    }
+
+    /**
+     * The array itself if it has room for the needed number of elements, otherwise a copy with (at least)
+     * twice the length.
+     */
+    public static int[] grow(final int[] array, final int needed) {
+        return needed <= array.length ? array : Arrays.copyOf(array, Math.max(needed, 2 * array.length));
     }
 
     public static void invoke(final Access1D<?> source, final double[] destination) {

@@ -1,178 +1,139 @@
 package org.ojalgo.optimisation.linear;
 
-import java.util.concurrent.atomic.AtomicLong;
-
-import org.ojalgo.array.ArrayR064;
+import org.ojalgo.array.DensityTrackingArray;
 import org.ojalgo.matrix.decomposition.SparseLU;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064CSC;
-import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.matrix.transformation.InvertibleFactor;
 
 /**
- * Maintains a {@link SparseLU} decomposition of the basis matrix for efficient solving of linear systems in
- * the revised simplex method. Supports incremental updates using the Forrest-Tomlin algorithm when columns
- * change, with periodic refactorization to maintain numerical stability.
+ * The basis factorisation of the revised simplex: a {@link SparseLU} (factorised with
+ * {@link SparseLU#factor(R064CSC, int[])}) with Forrest-Tomlin updates. This class refactorises instead of
+ * updating when the updates have added too many nonzeros, after too many updates, or when a pivot is too
+ * small, and it decides when the basis is to be considered singular. The store may force further
+ * refactorisations for reasons of its own (see {@link RevisedStore#pivot(SimplexSolver.IterDescr)}).
  * <p>
- * Refactorisation is triggered dynamically when the accumulated eta-chain fill-in exceeds a configurable
- * ratio of the original L+U nonzero count, or when a dimension-scaled update ceiling is reached.
+ * The sparse solves ({@link #ftranColumn(R064CSC, int, DensityTrackingArray)} and
+ * {@link #btranUnit(int, DensityTrackingArray)}) retain partial results that the following
+ * {@link #update(R064CSC, int[], int, int)} reuses, so an update does no solves of its own.
  */
 final class SparseDecomposition implements BasisRepresentation {
 
     /**
-     * Refactor when {@code ETA_MULTIPLIER * etaNonzeros > factorNonzeros}. Lower values refactor more often
-     * (shorter eta chains, fresher numerics, more refactor cost); higher values let the eta chain grow.
-     * Package-private and non-final to permit benchmark-time tuning from tests.
+     * Refactorise when the nonzeros added by updates (R-etas plus replacement columns of U) exceed this
+     * multiple of the nonzeros in the factorisation.
      */
-    static int ETA_MULTIPLIER = 3;
+    private static final double GROWTH_LIMIT = 2.0;
     /**
-     * Hard ceiling on updates between refactorisations (a backstop in case the other gates stay silent).
-     * Package-private and non-final to permit benchmark-time tuning from tests.
+     * Maximum number of updates between refactorisations.
      */
-    static int MAX_UPDATES = 250;
+    private static final int MAX_UPDATES = 100;
     /**
-     * Gate on diagonal-spread degradation since the last factorisation. Refactorisation fires when the
-     * current spread {@code max/min} has grown by more than the gate's tolerance relative to the spread
-     * snapshotted at factorisation time. Measuring degradation (not absolute spread) avoids refactor-loops
-     * on bases that are already ill-conditioned, where refactoring won't help — only updates that have
-     * worsened things should trigger. Package-private and non-final to permit benchmark-time tuning.
+     * A pivot (from the factorisation or an update) smaller than this means the basis is (numerically)
+     * singular.
      */
-    static NumberContext PIVOT_DEGRADATION_GATE = NumberContext.of(5);
+    private static final double PIVOT_TOLERANCE = 1E-11;
 
-    /**
-     * Diagnostic counters for which trigger caused refactorisation. Process-wide; call
-     * {@link #resetCounters()} before a measured run and {@link #logCounters(String)} after.
-     */
-    static final AtomicLong COUNT_UPDATES = new AtomicLong();
-    static final AtomicLong COUNT_TRIGGER_MAX = new AtomicLong();
-    static final AtomicLong COUNT_TRIGGER_PIVOT = new AtomicLong();
-    static final AtomicLong COUNT_TRIGGER_ETA = new AtomicLong();
-    static final AtomicLong COUNT_TRIGGER_FAIL = new AtomicLong();
-
-    static void resetCounters() {
-        COUNT_UPDATES.set(0);
-        COUNT_TRIGGER_MAX.set(0);
-        COUNT_TRIGGER_PIVOT.set(0);
-        COUNT_TRIGGER_ETA.set(0);
-        COUNT_TRIGGER_FAIL.set(0);
-    }
-
-    static void logCounters(final String tag) {
-        long upd = COUNT_UPDATES.get();
-        long max = COUNT_TRIGGER_MAX.get();
-        long piv = COUNT_TRIGGER_PIVOT.get();
-        long eta = COUNT_TRIGGER_ETA.get();
-        long fail = COUNT_TRIGGER_FAIL.get();
-        long total = max + piv + eta + fail;
-        BasicLogger.debug("{}: updates={} refactors={} (max={}, pivot={}, eta={}, failed={})", tag, upd, total, max, piv, eta, fail);
-    }
-
-    private final SparseLU mySparse = new SparseLU();
-    private int myUpdateCounter = 0;
-    private final int myUpperLimit;
+    private final int myDim;
+    private final SparseLU myLU = new SparseLU();
+    private boolean mySingular = false;
+    private int myUpdateCount = 0;
 
     SparseDecomposition(final int dim) {
         super();
-        myUpperLimit = Math.min(dim, MAX_UPDATES);
+        myDim = dim;
     }
 
     @Override
     public void btran(final double[] arg) {
-        if (mySparse.isComputed()) {
-            mySparse.btran(arg);
+        if (myLU.isComputed()) {
+            myLU.btran(arg);
         }
     }
 
     @Override
     public void btran(final PhysicalStore<Double> arg) {
-        if (mySparse.isComputed()) {
-            if (arg instanceof ArrayR064) {
-                mySparse.btran(((ArrayR064) arg).data);
-            } else {
-                mySparse.btran(arg);
-            }
+        InvertibleFactor.doPrimitive(arg, this);
+    }
+
+    @Override
+    public void btranUnit(final int position, final DensityTrackingArray result) {
+        if (myLU.isComputed()) {
+            myLU.btranUnit(position, result);
+        } else {
+            BasisRepresentation.super.btranUnit(position, result);
         }
     }
 
     @Override
+    public int countUpdates() {
+        return myUpdateCount;
+    }
+
+    @Override
     public void ftran(final double[] arg) {
-        if (mySparse.isComputed()) {
-            mySparse.ftran(arg);
+        if (myLU.isComputed()) {
+            myLU.ftran(arg);
         }
     }
 
     @Override
     public void ftran(final PhysicalStore<Double> arg) {
-        if (mySparse.isComputed()) {
-            if (arg instanceof ArrayR064) {
-                mySparse.ftran(((ArrayR064) arg).data);
-            } else {
-                mySparse.ftran(arg);
-            }
+        InvertibleFactor.doPrimitive(this, arg);
+    }
+
+    @Override
+    public void ftranColumn(final R064CSC matrix, final int column, final DensityTrackingArray result) {
+        if (myLU.isComputed()) {
+            myLU.ftranColumn(matrix, column, result);
+        } else {
+            BasisRepresentation.super.ftranColumn(matrix, column, result);
         }
     }
 
     @Override
     public int getColDim() {
-        return mySparse.getColDim();
+        return myDim;
     }
 
     @Override
     public int getRowDim() {
-        return mySparse.getRowDim();
+        return myDim;
+    }
+
+    /**
+     * A factorisation with a pivot smaller than {@link #PIVOT_TOLERANCE} is singular.
+     */
+    @Override
+    public boolean isSingular() {
+        return mySingular;
     }
 
     @Override
     public void reset(final R064CSC matrix, final int[] included) {
-        mySparse.factor(matrix, included);
-        myUpdateCounter = 0;
+        myLU.factor(matrix, included);
+        mySingular = myLU.getMinPivotMagnitude() < PIVOT_TOLERANCE;
+        myUpdateCount = 0;
     }
 
     /**
-     * Updates the decomposition to reflect a change in the basis matrix. Uses the Forrest-Tomlin update
-     * algorithm to efficiently modify the LU factors. Falls back to a complete refactorization when:
-     * <ul>
-     * <li>The eta-chain fill-in exceeds {@link #ETA_FILL_RATIO} times the original factor nonzeros
-     * <li>The dimension-scaled update ceiling is reached
-     * <li>The decomposition is not computed
-     * <li>The update itself fails (e.g. singular pivot)
-     * </ul>
+     * Forrest-Tomlin update, or a refactorisation when: the basis is singular, the update limits are reached,
+     * or the new pivot is too small.
      */
     @Override
     public boolean update(final R064CSC matrix, final int[] included, final int exitIndex, final int enterColumn) {
-        COUNT_UPDATES.incrementAndGet();
-        if (!mySparse.isComputed() || this.shouldRefactor()) {
-            this.reset(matrix, included);
-            return true;
-        }
-        if (!mySparse.updateColumn(exitIndex, matrix, enterColumn)) {
-            COUNT_TRIGGER_FAIL.incrementAndGet();
-            this.reset(matrix, included);
-            return true;
-        }
-        ++myUpdateCounter;
-        return false;
-    }
 
-    private boolean shouldRefactor() {
-        if (myUpdateCounter >= myUpperLimit) {
-            COUNT_TRIGGER_MAX.incrementAndGet();
+        if (!myLU.isComputed() || mySingular || myUpdateCount >= MAX_UPDATES || myLU.countEtaNonzeros() > GROWTH_LIMIT * myLU.countFactorNonzeros()) {
+            this.reset(matrix, included);
             return true;
         }
-        // Fire when current spread exceeds factor-time spread by more than the gate's tolerance.
-        // Equivalently: (factorMax/factorMin) / (currentMax/currentMin) < epsilon.
-        double currentMax = mySparse.getMaxPivotMagnitude();
-        double currentMin = mySparse.getMinPivotMagnitude();
-        double factorMax = mySparse.getFactorMaxPivotMagnitude();
-        double factorMin = mySparse.getFactorMinPivotMagnitude();
-        if (PIVOT_DEGRADATION_GATE.isSmall(currentMax * factorMin, currentMin * factorMax)) {
-            COUNT_TRIGGER_PIVOT.incrementAndGet();
+
+        if (!myLU.updateColumn(exitIndex, matrix, enterColumn) || myLU.getMinPivotMagnitude() < PIVOT_TOLERANCE) {
+            this.reset(matrix, included);
             return true;
         }
-        if (ETA_MULTIPLIER * mySparse.countEtaNonzeros() > mySparse.countFactorNonzeros()) {
-            COUNT_TRIGGER_ETA.incrementAndGet();
-            return true;
-        }
+
+        myUpdateCount++;
         return false;
     }
 

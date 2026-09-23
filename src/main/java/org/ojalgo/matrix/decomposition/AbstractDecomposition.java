@@ -23,7 +23,9 @@ package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.function.constant.PrimitiveMath.MACHINE_EPSILON;
 
+import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.BasicArray;
+import org.ojalgo.array.operation.COPY;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.matrix.store.DiagonalStore;
@@ -35,6 +37,7 @@ import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Access2D.ColumnView;
 import org.ojalgo.structure.Structure2D;
 
 /**
@@ -264,6 +267,24 @@ abstract class AbstractDecomposition<N extends Comparable<N>, M extends Physical
 
     }
 
+    /**
+     * Solve for several right hand sides, the columns of the argument, one at a time with the primitive
+     * (single column) {@link InvertibleFactor#ftran(double[])}. For implementations of
+     * {@link MatrixDecomposition.Solver#getSolution(Access2D.Collectable, PhysicalStore)}.
+     */
+    static void ftranColumns(final InvertibleFactor<Double> factor, final PhysicalStore<Double> arg) {
+        if (arg.getColDim() == 1 && arg instanceof ArrayR064) {
+            factor.ftran(((ArrayR064) arg).data);
+        } else {
+            double[] column = new double[arg.getRowDim()];
+            for (ColumnView<Double> view : arg.columns()) {
+                COPY.invoke(view, column);
+                factor.ftran(column);
+                COPY.invoke(column, view);
+            }
+        }
+    }
+
     private boolean myComputed = false;
     private final PhysicalStore.Factory<N, ? extends M> myFactory;
     private Boolean mySolvable = null;
@@ -335,7 +356,12 @@ abstract class AbstractDecomposition<N extends Comparable<N>, M extends Physical
         return source.collect(myFactory);
     }
 
+    /**
+     * The decomposition has been (re)computed, or updated. Whether it is solvable is checked again when next
+     * asked.
+     */
     final boolean computed(final boolean computed) {
+        mySolvable = null;
         return myComputed = computed;
     }
 

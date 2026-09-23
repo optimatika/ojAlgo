@@ -13,15 +13,46 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Added
 
+#### org.ojalgo.array
+
+- `DensityTrackingArray` has `supplyTo(DensityTrackingArray)`, `axpy(double, double[])`, `dot(double[])`, `tighten(double)`, `reindex()`, `invalidateIndex()` and `setNonzeroCount(int)`, for code that works directly with the values and the index of nonzeros.
+
+#### org.ojalgo.matrix.decomposition
+
+- `SparseLU.ftranColumn(R064CSC, int, DensityTrackingArray)` and `btranUnit(int, DensityTrackingArray)`: sparse solves for a column of a sparse matrix and for a unit vector. They keep partial results that a following `updateColumn(int, R064CSC, int)` reuses.
+
+#### org.ojalgo.matrix.store
+
+- `R064CSC.of(...)` and `R064CSR.of(...)` convert any matrix to compressed sparse form by the cheapest route, optionally keeping only the elements whose position a `Structure2D.IntRowColPredicate` accepts.
+- `R064CSR.premultiply(DensityTrackingArray, DensityTrackingArray)`: a sparse vector times the matrix, visiting only the rows where the vector is nonzero.
+- `R064CSC.supplyTo(int, DensityTrackingArray)` and `R064CSR.supplyTo(int, DensityTrackingArray)` copy one column or row into a `DensityTrackingArray`.
+
 #### org.ojalgo.optimisation
 
 - Degenerate coefficient detection in presolving. A new `DEGENERATE` analyser scans expression coefficients for near-zero values and filters them from presolver logic, preventing false infeasibility from floating-point noise. Controlled by `Options.degeneracy`. (Discussion [#691](https://github.com/optimatika/ojAlgo/discussions/691))
 
+#### org.ojalgo.structure
+
+- `Structure2D.IntRowColPredicate`, a predicate on (row, column) positions.
+
 ### Changed
+
+#### org.ojalgo.array
+
+- `DensityTrackingArray.countNonzeros()` and `density()` count the listed positions, which may include values that have become zero (set to zero, or cancelled when adding), until the next `reset()`, `reindex()` or `tighten(double)`. Previously setting a value to zero made the next call rescan, so the count was exact.
+
+#### org.ojalgo.matrix.decomposition
+
+- `SparseLU` is rewritten. Simplex bases are factorised with a triangular (singleton) pass followed by Markowitz pivoting, the sparse solves are hyper-sparse when the right hand side and the result are sparse enough, and Forrest-Tomlin updates reuse the partial results of the preceding solves.
+- `MinimumDegree` computes the same ordering as before, by a counting sort on the degrees, in linear instead of quadratic time.
 
 #### org.ojalgo.optimisation
 
 - `Expression` now allocates the quadratic coefficient map lazily — only when quadratic terms are actually added. Models with only linear expressions use less memory.
+
+#### org.ojalgo.optimisation.linear
+
+- The revised (sparse) dual simplex is considerably faster, using the new `SparseLU`, and is used much more often. Unless `Options.sparse` says otherwise, the dual simplex (MIP node solves, or when asked for) uses it when m·n is at least 150 000, n/m at least 5, or m·n at least 40 000 with n/m at least 3, and the dense tableau otherwise (m constraints, n variables including slacks). Previously the revised simplex was only used for very large problems, or ones with at least 11 times as many variables as constraints.
 
 #### org.ojalgo.type.context
 
@@ -29,13 +60,33 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - `NumberContext.isDifferent(BigDecimal, BigDecimal)` added: tolerance-aware comparison that picks the larger operand as the reference magnitude and avoids `abs()` on the inputs.
 - Minor performance: `NumberContext` caches its `MathContext.getPrecision()` value and uses multiplication instead of division in the `double` version of `isSmall`.
 
+### Deprecated
+
+#### org.ojalgo.matrix.decomposition
+
+- `SparseLU.getMaxPivotMagnitude()`, `getFactorMaxPivotMagnitude()` and `getFactorMinPivotMagnitude()` are no longer used internally. `getMinPivotMagnitude()` remains.
+
 ### Fixed
+
+#### org.ojalgo.matrix.decomposition
+
+- `SparseQDLDL.getSolution(...)` for a 1x1 matrix solved only the first of several right hand sides.
 
 #### org.ojalgo.optimisation
 
 - Presolver infeasibility checks (`REDUNDANT_CONSTRAINT`) now use tolerance-aware `isMoreThan`/`isLessThan` instead of raw `compareTo`, consistent with the model's feasibility context. (Discussion [#691](https://github.com/optimatika/ojAlgo/discussions/691))
 - `SpecialOrderedSet` loop always read `mySequence[1]` instead of `mySequence[i]` — the loop variable was never used as the array index.
 - Integrations with interface-based configurators could not find the registered configurator. Added `ExpressionsBasedModel.getConfigurator(Class)` to look up by declared type. (Issue [#692](https://github.com/optimatika/ojAlgo/issues/692))
+
+#### org.ojalgo.optimisation.integer
+
+- A node LP that failed (`FAILED`, such as on a singular basis) was treated as infeasible, and its branch pruned. Now the search stops without claiming optimality. Strong branching no longer takes a probe that fails, or stops short of optimality, as proof that the branch direction is infeasible.
+
+#### org.ojalgo.optimisation.linear
+
+- The LP solver could report an optimal solution that violated a constraint (netlib PILOT-JA). If the primal simplex iterations leave basic variables outside their bounds, by more than `Options.feasibility` allows, dual simplex iterations now restore feasibility.
+- The primal ratio test no longer pivots on elements that are tiny relative to the rest of the entering column, unless nothing else limits the step. Such pivots could make the basis nearly singular, and the solve wrongly end as unbounded.
+- A numerically singular basis in the revised simplex ends the solve as `FAILED`, rather than continuing with meaningless solves.
 
 ## [57.3.1] – 2026-09-21
 

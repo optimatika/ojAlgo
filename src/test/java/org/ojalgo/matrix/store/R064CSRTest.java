@@ -1,12 +1,16 @@
 package org.ojalgo.matrix.store;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.array.DensityTrackingArray;
+import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ElementView2D;
+import org.ojalgo.structure.Structure2D;
 
 public class R064CSRTest extends MatrixStoreTests {
 
@@ -290,6 +294,185 @@ public class R064CSRTest extends MatrixStoreTests {
         TestUtils.assertArrayEquals(new double[] { 1.0, 2.0, 3.0 }, collectedValues.stream().mapToDouble(Double::doubleValue).toArray());
         TestUtils.assertArrayEquals(new long[] { 0, 0, 2 }, collectedRows.stream().mapToLong(Long::longValue).toArray());
         TestUtils.assertArrayEquals(new long[] { 0, 1, 2 }, collectedCols.stream().mapToLong(Long::longValue).toArray());
+    }
+
+    /**
+     * Each route of {@link R064CSR#of(Access2D.Collectable)} gives the same matrix, with its dimensions also
+     * when the last row and column are empty, and an {@link R064CSR} is returned as is.
+     */
+    @Test
+    public void testOf() {
+
+        R064Store dense = R064Store.FACTORY.make(4, 3);
+        dense.set(0, 0, 1.0);
+        dense.set(2, 0, -2.0);
+        dense.set(0, 1, 4.0);
+        dense.set(1, 1, 3.0);
+
+        R064CSR fromDense = R064CSR.of(dense);
+        TestUtils.assertEquals(4, fromDense.getRowDim());
+        TestUtils.assertEquals(3, fromDense.getColDim());
+        TestUtils.assertEquals(4, fromDense.countNonzeros());
+        TestUtils.assertEquals(dense, fromDense);
+
+        SparseStore<Double> sparse = SparseStore.R064.make(4, 3);
+        dense.supplyTo(sparse);
+        TestUtils.assertEquals(dense, R064CSR.of(sparse));
+
+        Access2D.Collectable<Double, TransformableRegion<Double>> collectable = new Access2D.Collectable<>() {
+
+            @Override
+            public int getColDim() {
+                return 3;
+            }
+
+            @Override
+            public int getRowDim() {
+                return 4;
+            }
+
+            @Override
+            public void supplyTo(final TransformableRegion<Double> receiver) {
+                dense.supplyTo(receiver);
+            }
+        };
+        TestUtils.assertEquals(dense, R064CSR.of(collectable));
+
+        TestUtils.assertTrue(R064CSR.of(fromDense) == fromDense);
+    }
+
+    /**
+     * Each route of {@link R064CSR#of(Access2D.Collectable, Structure2D.IntRowColPredicate)} keeps only the
+     * elements the filter accepts, and the dimensions of the matrix.
+     */
+    @Test
+    public void testOfFiltered() {
+
+        R064Store dense = R064Store.FACTORY.make(4, 3);
+        dense.set(0, 0, 1.0);
+        dense.set(2, 0, -2.0);
+        dense.set(0, 1, 4.0);
+        dense.set(1, 1, 3.0);
+        dense.set(3, 1, 5.0);
+
+        R064Store upper = dense.copy();
+        upper.set(2, 0, 0.0);
+        upper.set(3, 1, 0.0);
+
+        Structure2D.IntRowColPredicate filter = (row, col) -> row <= col;
+
+        R064CSR fromDense = R064CSR.of(dense, filter);
+        TestUtils.assertEquals(4, fromDense.getRowDim());
+        TestUtils.assertEquals(3, fromDense.getColDim());
+        TestUtils.assertEquals(3, fromDense.countNonzeros());
+        TestUtils.assertEquals(upper, fromDense);
+
+        SparseStore<Double> sparse = SparseStore.R064.make(4, 3);
+        dense.supplyTo(sparse);
+        TestUtils.assertEquals(upper, R064CSR.of(sparse, filter));
+        TestUtils.assertEquals(upper, R064CSR.of(R064CSR.of(dense), filter));
+        TestUtils.assertEquals(upper, R064CSR.of(R064CSC.of(dense), filter));
+
+        Access2D.Collectable<Double, TransformableRegion<Double>> collectable = new Access2D.Collectable<>() {
+
+            @Override
+            public int getColDim() {
+                return 3;
+            }
+
+            @Override
+            public int getRowDim() {
+                return 4;
+            }
+
+            @Override
+            public void supplyTo(final TransformableRegion<Double> receiver) {
+                dense.supplyTo(receiver);
+            }
+        };
+        TestUtils.assertEquals(upper, R064CSR.of(collectable, filter));
+    }
+
+    /**
+     * A dense row vector (the left vector's density is at least 0.1) times the matrix: accumulated without
+     * tracking, and the index of the result built (with a scan) when needed. The sparse, tracking, branch is
+     * tested by {@link #testPremultiplyTracksTouchedColumns()}.
+     */
+    @Test
+    public void testPremultiplyDense() {
+        // Test matrix: [1 0 2]
+        // [0 3 0]
+        // [4 0 5]
+        double[] values = { 1.0, 2.0, 3.0, 4.0, 5.0 };
+        int[] columnIndices = { 0, 2, 1, 0, 2 };
+        int[] rowPointers = { 0, 2, 3, 5 };
+        R064CSR matrix = new R064CSR(3, 3, values, columnIndices, rowPointers);
+
+        DensityTrackingArray left = new DensityTrackingArray(3);
+        left.set(0, 2.0);
+        left.set(2, -1.0);
+
+        DensityTrackingArray target = new DensityTrackingArray(3);
+        target.set(1, 99.0);
+
+        matrix.premultiply(left, target);
+
+        // [2 0 -1] * A = [2*1 - 4, 0, 2*2 - 5] = [-2, 0, -1]
+        TestUtils.assertEquals(-2.0, target.doubleValue(0));
+        TestUtils.assertEquals(0.0, target.doubleValue(1));
+        TestUtils.assertEquals(-1.0, target.doubleValue(2));
+        TestUtils.assertEquals(2, target.countNonzeros());
+
+        left.reset();
+        left.set(1, 1.0);
+
+        matrix.premultiply(left, target);
+
+        TestUtils.assertEquals(0.0, target.doubleValue(0));
+        TestUtils.assertEquals(3.0, target.doubleValue(1));
+        TestUtils.assertEquals(0.0, target.doubleValue(2));
+        TestUtils.assertEquals(1, target.countNonzeros());
+    }
+
+    /**
+     * With a sparse left vector the touched columns are tracked. A column that cancels to exactly zero may be
+     * listed, but no column is listed twice.
+     */
+    @Test
+    public void testPremultiplyTracksTouchedColumns() {
+
+        // Row 3: 1.0 at column 5, 2.0 at column 7
+        // Row 11: -1.0 at column 5, 4.0 at column 9
+        double[] values = { 1.0, 2.0, -1.0, 4.0 };
+        int[] columnIndices = { 5, 7, 5, 9 };
+        int[] rowPointers = new int[31];
+        for (int i = 4; i <= 11; i++) {
+            rowPointers[i] = 2;
+        }
+        for (int i = 12; i <= 30; i++) {
+            rowPointers[i] = 4;
+        }
+        R064CSR matrix = new R064CSR(30, 30, values, columnIndices, rowPointers);
+
+        DensityTrackingArray left = new DensityTrackingArray(30);
+        left.set(3, 1.0);
+        left.set(11, 1.0);
+        TestUtils.assertTrue(left.isSparse());
+
+        DensityTrackingArray target = new DensityTrackingArray(30);
+
+        matrix.premultiply(left, target);
+
+        TestUtils.assertEquals(0.0, target.doubleValue(5));
+        TestUtils.assertEquals(2.0, target.doubleValue(7));
+        TestUtils.assertEquals(4.0, target.doubleValue(9));
+
+        target.add(5, 3.0);
+
+        int[] listed = Arrays.copyOf(target.indices(), target.countNonzeros());
+        Arrays.sort(listed);
+        TestUtils.assertEquals(new int[] { 5, 7, 9 }, listed);
+        TestUtils.assertEquals(3.0, target.doubleValue(5));
     }
 
 }

@@ -24,27 +24,22 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.matrix.store.R064CSC;
 
 /**
- * Approximate Minimum Degree (AMD) style ordering for pre-ordering a symmetric sparse matrix prior to
- * numerical factorisation (Cholesky or LDL). This is NOT the full/correct AMD-algorithm as described by
- * Amestoy, Davis, and Duff, but rather something simpler that aims to accomplish similar results. It is
- * clearly not as fast as a highly tuned proper AMD implementation, but compared to not doing any ordering at
- * all it is found to provide up to 90% of the potential speedup in overall use cases.
+ * A fill-reducing ordering of a symmetric sparse matrix, prior to numerical factorisation (Cholesky or LDL):
+ * the rows/columns in order of increasing degree (the number of off-diagonal nonzeros in the symmetric
+ * pattern), ties in index order. The degrees are those of the original matrix. They are not updated as the
+ * elimination proceeds, as they are in a (true or approximate) minimum degree algorithm such as AMD.
  * <p>
- * This implementation:
- * <ul>
- * <li>Assumes the input {@link R064CSC} represents a symmetric pattern with only the upper triangle stored.
- * <li>Treats the matrix as an adjacency graph and computes a fill-reducing column ordering.
- * <li>Does not modify the input matrix; it only returns a permutation vector.
- * </ul>
+ * The input {@link R064CSC} is assumed to represent a symmetric pattern with only the upper triangle stored.
+ * It is not modified.
  */
 public final class MinimumDegree {
 
     private final Pivot myPermutation = new Pivot();
 
     /**
-     * Approximates a minimum degree ordering for a symmetric {@link R064CSC} matrix. The result is stored
-     * internally. To permute vectors or matrices according to the computed ordering, use the
-     * {@link #permute(double[], double[])} or {@link #permute(R064CSC, int[])}} methods.
+     * Computes the ordering of a symmetric {@link R064CSC} matrix. The result is stored internally. To
+     * permute vectors or matrices according to the computed ordering, use the
+     * {@link #permute(double[], double[])} or {@link #permute(R064CSC, int[])} methods.
      * <p>
      * The input is assumed to store only the upper/right triangle of the symmetric pattern; lower-triangular
      * entries (if present) are ignored.
@@ -56,109 +51,38 @@ public final class MinimumDegree {
             return;
         }
 
-        int[] colPtr = matrix.pointers;
-        int[] rowIdx = matrix.indices;
-
-        // Build a simple symmetric adjacency structure from the (assumed upper-triangular) pattern.
-        // neighbours[v] is the list of neighbours of v in the undirected graph defined by the pattern.
-        int[][] neighbours = new int[dimension][];
         int[] degree = new int[dimension];
 
-        // First pass: count undirected neighbours per vertex
         for (int col = 0; col < dimension; col++) {
-            for (int p = colPtr[col]; p < colPtr[col + 1]; p++) {
-                int row = rowIdx[p];
-                if (row > col) {
-                    continue; // assume upper triangle only
+            for (int p = matrix.pointers[col]; p < matrix.pointers[col + 1]; p++) {
+                int row = matrix.indices[p];
+                if (row < col) {
+                    degree[row]++;
+                    degree[col]++;
                 }
-                if (row == col) {
-                    continue; // skip diagonal
-                }
-                degree[row]++;
-                degree[col]++;
             }
         }
 
-        // Allocate neighbour arrays
+        int maxDegree = 0;
         for (int v = 0; v < dimension; v++) {
-            neighbours[v] = new int[degree[v]];
-            degree[v] = 0; // reuse as write index
+            maxDegree = Math.max(maxDegree, degree[v]);
         }
 
-        // Second pass: fill neighbour lists symmetrically
-        for (int col = 0; col < dimension; col++) {
-            for (int p = colPtr[col]; p < colPtr[col + 1]; p++) {
-                int row = rowIdx[p];
-                if (row > col) {
-                    continue;
-                }
-                if (row == col) {
-                    continue;
-                }
-                neighbours[row][degree[row]++] = col;
-                neighbours[col][degree[col]++] = row;
-            }
+        // Counting sort: the vertices with degree d start at start[d]
+        int[] start = new int[maxDegree + 2];
+        for (int v = 0; v < dimension; v++) {
+            start[degree[v] + 1]++;
+        }
+        for (int d = 0; d <= maxDegree; d++) {
+            start[d + 1] += start[d];
         }
 
-        // Reset pivot and degrees for the actual ordering loop
         myPermutation.reset(dimension);
         int[] order = myPermutation.getOrder();
-        boolean[] eliminated = new boolean[dimension];
-
-        // Recompute degrees as neighbour counts
         for (int v = 0; v < dimension; v++) {
-            degree[v] = neighbours[v].length;
+            order[start[degree[v]]++] = v;
         }
-
-        // Greedy minimum-degree-like selection
-        for (int k = 0; k < dimension; k++) {
-
-            int best = -1;
-            int bestDegree = Integer.MAX_VALUE;
-
-            for (int v = 0; v < dimension; v++) {
-                if (!eliminated[v] && degree[v] < bestDegree) {
-                    bestDegree = degree[v];
-                    best = v;
-                }
-            }
-
-            if (best < 0) {
-                break;
-            }
-
-            // Move 'best' into position k in the Pivots order
-            int posBest = -1;
-            for (int pos = k; pos < dimension; pos++) {
-                if (order[pos] == best) {
-                    posBest = pos;
-                    break;
-                }
-            }
-            if (posBest >= 0 && posBest != k) {
-                myPermutation.change(k, posBest);
-            }
-
-            eliminated[best] = true;
-
-            // Degree update: for each neighbour of best, bump its degree to reflect potential fill among
-            // its remaining neighbours. This is a lightweight approximation of AMDs external degree
-            // update and uses only the local adjacency information.
-            int[] nbBest = neighbours[best];
-            for (int u : nbBest) {
-                if (eliminated[u]) {
-                    continue;
-                }
-                // Count remaining neighbours of u that are not yet eliminated; use that as a fresh degree.
-                int newDeg = 0;
-                for (int w : neighbours[u]) {
-                    if (!eliminated[w] && w != u) {
-                        newDeg++;
-                    }
-                }
-                degree[u] = Math.max(degree[u], newDeg);
-            }
-        }
+        myPermutation.setModified(true);
     }
 
     /**

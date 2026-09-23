@@ -6,7 +6,10 @@ import java.util.NoSuchElementException;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.array.DensityTrackingArray;
+import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ElementView2D;
+import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
 public class R064CSCTest extends MatrixStoreTests {
@@ -326,6 +329,139 @@ public class R064CSCTest extends MatrixStoreTests {
         TestUtils.assertArrayEquals(new double[] { 1.0, 2.0, 3.0 }, collectedValues.stream().mapToDouble(Double::doubleValue).toArray());
         TestUtils.assertArrayEquals(new long[] { 0, 1, 2 }, collectedRows.stream().mapToLong(Long::longValue).toArray());
         TestUtils.assertArrayEquals(new long[] { 0, 0, 2 }, collectedCols.stream().mapToLong(Long::longValue).toArray());
+    }
+
+    /**
+     * Each route of {@link R064CSC#of(Access2D.Collectable)} gives the same matrix, with its dimensions also
+     * when the last row and column are empty, and an {@link R064CSC} is returned as is.
+     */
+    @Test
+    public void testOf() {
+
+        R064Store dense = R064Store.FACTORY.make(4, 3);
+        dense.set(0, 0, 1.0);
+        dense.set(2, 0, -2.0);
+        dense.set(0, 1, 4.0);
+        dense.set(1, 1, 3.0);
+
+        R064CSC fromDense = R064CSC.of(dense);
+        TestUtils.assertEquals(4, fromDense.getRowDim());
+        TestUtils.assertEquals(3, fromDense.getColDim());
+        TestUtils.assertEquals(4, fromDense.countNonzeros());
+        TestUtils.assertEquals(dense, fromDense);
+
+        SparseStore<Double> sparse = SparseStore.R064.make(4, 3);
+        dense.supplyTo(sparse);
+        TestUtils.assertEquals(dense, R064CSC.of(sparse));
+
+        Access2D.Collectable<Double, TransformableRegion<Double>> collectable = new Access2D.Collectable<>() {
+
+            @Override
+            public int getColDim() {
+                return 3;
+            }
+
+            @Override
+            public int getRowDim() {
+                return 4;
+            }
+
+            @Override
+            public void supplyTo(final TransformableRegion<Double> receiver) {
+                dense.supplyTo(receiver);
+            }
+        };
+        TestUtils.assertEquals(dense, R064CSC.of(collectable));
+
+        TestUtils.assertTrue(R064CSC.of(fromDense) == fromDense);
+    }
+
+    /**
+     * Each route of {@link R064CSC#of(Access2D.Collectable, Structure2D.IntRowColPredicate)} keeps only the
+     * elements the filter accepts, and the dimensions of the matrix.
+     */
+    @Test
+    public void testOfFiltered() {
+
+        R064Store dense = R064Store.FACTORY.make(4, 3);
+        dense.set(0, 0, 1.0);
+        dense.set(2, 0, -2.0);
+        dense.set(0, 1, 4.0);
+        dense.set(1, 1, 3.0);
+        dense.set(3, 1, 5.0);
+
+        R064Store upper = dense.copy();
+        upper.set(2, 0, 0.0);
+        upper.set(3, 1, 0.0);
+
+        Structure2D.IntRowColPredicate filter = (row, col) -> row <= col;
+
+        R064CSC fromDense = R064CSC.of(dense, filter);
+        TestUtils.assertEquals(4, fromDense.getRowDim());
+        TestUtils.assertEquals(3, fromDense.getColDim());
+        TestUtils.assertEquals(3, fromDense.countNonzeros());
+        TestUtils.assertEquals(upper, fromDense);
+
+        SparseStore<Double> sparse = SparseStore.R064.make(4, 3);
+        dense.supplyTo(sparse);
+        TestUtils.assertEquals(upper, R064CSC.of(sparse, filter));
+        TestUtils.assertEquals(upper, R064CSC.of(R064CSR.of(dense), filter));
+        TestUtils.assertEquals(upper, R064CSC.of(R064CSC.of(dense), filter));
+
+        RowsSupplier<Double> rows = R064Store.FACTORY.makeRowsSupplier(3);
+        rows.addRows(4);
+        dense.supplyTo(rows);
+        R064CSC fromRows = R064CSC.of(rows, filter);
+        TestUtils.assertEquals(3, fromRows.countNonzeros());
+        TestUtils.assertEquals(upper, fromRows);
+
+        ColumnsSupplier<Double> columns = R064Store.FACTORY.makeColumnsSupplier(4);
+        columns.addColumns(3);
+        dense.supplyTo(columns);
+        R064CSC fromColumns = R064CSC.of(columns, filter);
+        TestUtils.assertEquals(3, fromColumns.countNonzeros());
+        TestUtils.assertEquals(upper, fromColumns);
+
+        Access2D.Collectable<Double, TransformableRegion<Double>> collectable = new Access2D.Collectable<>() {
+
+            @Override
+            public int getColDim() {
+                return 3;
+            }
+
+            @Override
+            public int getRowDim() {
+                return 4;
+            }
+
+            @Override
+            public void supplyTo(final TransformableRegion<Double> receiver) {
+                dense.supplyTo(receiver);
+            }
+        };
+        TestUtils.assertEquals(upper, R064CSC.of(collectable, filter));
+    }
+
+    /**
+     * Loading a column into a {@link DensityTrackingArray} resets it first, and lists exactly the column's
+     * nonzeros.
+     */
+    @Test
+    public void testSupplyToDensityTrackingArray() {
+
+        R064Store dense = R064Store.FACTORY.make(4, 2);
+        dense.set(0, 1, 3.0);
+        dense.set(2, 1, -1.0);
+        dense.set(3, 0, 5.0);
+        R064CSC csc = R064CSC.of(dense);
+
+        DensityTrackingArray target = new DensityTrackingArray(4);
+        target.set(1, 9.0);
+
+        csc.supplyTo(1, target);
+
+        TestUtils.assertEquals(2, target.countNonzeros());
+        TestUtils.assertEquals(new double[] { 3.0, 0.0, -1.0, 0.0 }, target.values);
     }
 
 }

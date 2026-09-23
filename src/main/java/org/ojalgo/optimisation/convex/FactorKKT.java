@@ -234,7 +234,7 @@ final class FactorKKT implements InvertibleFactor<Double> {
     }
 
     /**
-     * Permute the KKT matrix using an approximate minimum degree ordering and update the index mappings
+     * Permute the KKT matrix using the {@link MinimumDegree} ordering and update the index mappings
      * accordingly so that subsequent in-place updates remain valid.
      */
     private static R064CSC permuteKKT(final R064CSC original, final MinimumDegree md, final int[] mapP, final int[] mapA, final int[] mapDualDiag) {

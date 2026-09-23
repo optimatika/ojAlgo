@@ -161,7 +161,8 @@ public interface InvertibleFactor<N extends Comparable<N>> extends Structure2D {
      * Backwards-transformation
      * <p>
      * Solve [x]<sup>T</sup>[A] = [b]<sup>T</sup> (equivalent to [A]<sup>T</sup>[x] = [b]) by transforming [b]
-     * into [x] in-place.
+     * into [x] in-place. [b] is a single column (a vector). To solve for several right hand sides, see
+     * {@link org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver}.
      *
      * @param arg [b] transformed into [x]
      */
@@ -175,7 +176,8 @@ public interface InvertibleFactor<N extends Comparable<N>> extends Structure2D {
     /**
      * Forward-transformation
      * <p>
-     * Solve [A][x] = [b] by transforming [b] into [x] in-place.
+     * Solve [A][x] = [b] by transforming [b] into [x] in-place. [b] is a single column (a vector). To solve
+     * for several right hand sides, see {@link org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver}.
      *
      * @param arg [b] transformed into [x]
      */

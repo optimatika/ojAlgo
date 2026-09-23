@@ -30,6 +30,17 @@ import org.ojalgo.function.aggregator.Aggregator;
  */
 public interface Structure2D extends Structure1D {
 
+    /**
+     * A predicate on (row, column) positions, for example {@code (row, col) -> row <= col} for the upper
+     * triangle.
+     */
+    @FunctionalInterface
+    public interface IntRowColPredicate {
+
+        boolean test(int row, int col);
+
+    }
+
     public final class IntRowColumn implements Comparable<IntRowColumn> {
 
         public final int column;

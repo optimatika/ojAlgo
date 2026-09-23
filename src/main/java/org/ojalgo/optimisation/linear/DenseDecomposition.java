@@ -4,6 +4,7 @@ import org.ojalgo.array.ArrayR064;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064CSC;
+import org.ojalgo.matrix.transformation.InvertibleFactor;
 
 /**
  * Dense LU based {@link BasisRepresentation}. Uses {@link LU#R064} for the factorisation. Useful as a
@@ -32,13 +33,12 @@ final class DenseDecomposition implements BasisRepresentation {
 
     @Override
     public void btran(final PhysicalStore<Double> arg) {
-        if (myDense.isComputed()) {
-            if (arg instanceof ArrayR064) {
-                myDense.btran(((ArrayR064) arg).data);
-            } else {
-                myDense.btran(arg);
-            }
-        }
+        InvertibleFactor.doPrimitive(arg, this);
+    }
+
+    @Override
+    public int countUpdates() {
+        return myUpdateCounter;
     }
 
     @Override
@@ -50,13 +50,7 @@ final class DenseDecomposition implements BasisRepresentation {
 
     @Override
     public void ftran(final PhysicalStore<Double> arg) {
-        if (myDense.isComputed()) {
-            if (arg instanceof ArrayR064) {
-                myDense.ftran(((ArrayR064) arg).data);
-            } else {
-                myDense.ftran(arg);
-            }
-        }
+        InvertibleFactor.doPrimitive(this, arg);
     }
 
     @Override

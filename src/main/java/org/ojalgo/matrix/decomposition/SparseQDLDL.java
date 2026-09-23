@@ -27,21 +27,16 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.ojalgo.RecoverableCondition;
-import org.ojalgo.array.operation.COPY;
 import org.ojalgo.array.operation.NRMINF;
 import org.ojalgo.matrix.store.DiagonalStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064CSC;
-import org.ojalgo.matrix.store.R064CSC.Builder;
 import org.ojalgo.matrix.store.R064Store;
-import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.matrix.transformation.InvertibleFactor;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
-import org.ojalgo.structure.Access2D.ColumnView;
-import org.ojalgo.structure.ElementView2D;
 import org.ojalgo.structure.Structure1D;
 import org.ojalgo.type.ReciprocalPair;
 
@@ -362,22 +357,12 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
         return significant;
     }
 
+    /**
+     * Only the upper triangle (including the diagonal) of the matrix is used.
+     */
     @Override
     public boolean decompose(final Collectable<Double, ? super TransformableRegion<Double>> matrix) {
-
-        Access2D<Double> access;
-        if (matrix instanceof Access2D) {
-            access = (Access2D<Double>) matrix;
-        } else {
-            access = matrix.collect(SparseStore.R064);
-        }
-        Builder builder = R064CSC.newBuilder();
-        for (ElementView2D<Double, ?> nz : access.nonzeros()) {
-            if (nz.row() <= nz.column()) {
-                builder.set(nz.row(), nz.column(), nz.doubleValue());
-            }
-        }
-        return this.factor(builder.build());
+        return this.factor(R064CSC.of(matrix, (row, col) -> row <= col));
     }
 
     /**
@@ -526,26 +511,8 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
 
         rhs.supplyTo(preallocated);
 
-        int n = this.getColDim();
-        if (n <= 0) {
-            return preallocated;
-        }
-
-        double[] x = new double[n];
-
-        if (n == 1) {
-
-            COPY.invoke(preallocated, x);
-            this.ftran(x);
-            COPY.invoke(x, preallocated);
-
-        } else {
-
-            for (ColumnView<Double> column : preallocated.columns()) {
-                COPY.invoke(column, x);
-                this.ftran(x);
-                COPY.invoke(x, column);
-            }
+        if (this.getColDim() > 0) {
+            AbstractDecomposition.ftranColumns(this, preallocated);
         }
 
         return preallocated;

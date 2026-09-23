@@ -25,7 +25,6 @@ import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.DOT;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
-import org.ojalgo.matrix.store.R064CSR;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access2D;
 
@@ -199,52 +198,6 @@ public abstract class SubstituteBackwards implements MatrixOperation {
 
                 data[i + colBaseIndex] = tmpVal;
             }
-        }
-    }
-
-    /**
-     * Single-RHS backward substitution with a unit-diagonal lower triangular CSR body, solving L<sup>T</sup>x
-     * = b. Iterates rows bottom-up, scattering updates from each solved element to preceding elements.
-     * <p>
-     * Matches SparseLU's L factor btran: L<sup>T</sup> is upper triangular, with the off-diagonal part stored
-     * as the rows of L and a unit diagonal (not stored).
-     *
-     * @param arg  RHS overwritten with the solution
-     * @param body CSR representation of the strictly lower triangular entries
-     */
-    public static void invoke(final double[] arg, final R064CSR body) {
-        int[] rowPointers = body.pointers;
-        int[] colIndices = body.indices;
-        double[] values = body.values;
-        for (int i = body.getMinDim() - 1; i > 0; i--) {
-            double solved = arg[i];
-            for (int k = rowPointers[i], limit = rowPointers[i + 1]; k < limit; k++) {
-                arg[colIndices[k]] -= solved * values[k];
-            }
-        }
-    }
-
-    /**
-     * Single-RHS backward substitution with a non-unit-diagonal upper triangular CSR body + separate
-     * diagonal. Iterates rows bottom-up, subtracting the sparse dot product of each row with the current
-     * solution and dividing by the diagonal.
-     * <p>
-     * Matches SparseLU's U factor ftran.
-     *
-     * @param arg      RHS overwritten with the solution
-     * @param body     CSR representation of the strictly upper triangular entries
-     * @param diagonal Diagonal elements
-     */
-    public static void invoke(final double[] arg, final R064CSR body, final double[] diagonal) {
-        int[] rowPointers = body.pointers;
-        int[] colIndices = body.indices;
-        double[] values = body.values;
-        for (int i = body.getMinDim() - 1; i >= 0; i--) {
-            double sum = arg[i];
-            for (int k = rowPointers[i], limit = rowPointers[i + 1]; k < limit; k++) {
-                sum -= values[k] * arg[colIndices[k]];
-            }
-            arg[i] = sum / diagonal[i];
         }
     }
 

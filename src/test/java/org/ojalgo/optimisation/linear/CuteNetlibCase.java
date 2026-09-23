@@ -459,7 +459,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * RHS section is empty in the original SIF.<br>
      */
     @Test
-    @Tag("unstable")
     public void testGREENBEA() {
         CuteNetlibCase.doTest("GREENBEA.SIF", "-7.255524812984598E7", null, ACCURACY);
     }
@@ -628,7 +627,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * Optimal value: -6.1131344111E+03.<br>
      */
     @Test
-    @Tag("unstable")
     public void testPILOT_JA() {
         CuteNetlibCase.doTest("PILOT-JA.SIF", "-6113.1364655813495", "-3095.1845377674813", ACCURACY);
     }

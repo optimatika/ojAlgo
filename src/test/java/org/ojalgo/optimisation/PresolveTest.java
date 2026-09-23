@@ -2,6 +2,7 @@ package org.ojalgo.optimisation;
 
 import java.math.BigDecimal;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.optimisation.Optimisation.Result;
@@ -69,6 +70,34 @@ public class PresolveTest extends OptimisationTests {
         Result result = model.minimise();
 
         TestUtils.assertStateNotLessThanFeasible(result);
+    }
+
+    /**
+     * Presolve writes its conclusions (infeasibility and redundancy flags, tightened variable limits) into the
+     * model, and nothing undoes them when the model is changed and solved again. A known, long-standing,
+     * problem. Here the first solve is infeasible, and the second, after the limits have been relaxed, still
+     * reports infeasible. This is what {@code RevisedSimplexSolverTest.testShiftingRange} used to run into
+     * with some random data. Tagged unstable (it fails) until that is fixed.
+     */
+    @Test
+    @Tag("unstable")
+    void testResolveAfterInfeasible() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x = model.newVariable("x").lower(2).upper(3).weight(1);
+        Variable y = model.newVariable("y").lower(0).weight(1);
+
+        model.newExpression("LIMIT").set(x, 1).set(y, 1).upper(1);
+
+        TestUtils.assertStateInfeasible(model.minimise());
+
+        x.lower(0).upper(1);
+
+        Result result = model.minimise();
+
+        TestUtils.assertStateNotLessThanOptimal(result);
+        TestUtils.assertEquals(0.0, result.getValue());
     }
 
 }

@@ -24,9 +24,13 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.function.constant.PrimitiveMath.ONE;
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
+import java.util.Random;
+
 import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
+import org.ojalgo.array.DensityTrackingArray;
+import org.ojalgo.array.DensityTrackingArrayTest;
 import org.ojalgo.matrix.decomposition.DecompositionUpdateTest.UpdateCase;
 import org.ojalgo.matrix.decomposition.DecompositionUpdateTest.UpdateSequence;
 import org.ojalgo.matrix.store.ColumnsSupplier;
@@ -90,6 +94,39 @@ public class SparseLUTest extends MatrixDecompositionTests {
         MatrixStore<Double> modifiedMatrix = updateCase.getModifiedMatrix();
 
         DecompositionUpdateTest.doTestTran(modifiedMatrix, sparse, updateCase.rhs());
+    }
+
+    /**
+     * dim x 3dim: [D1 D2 I] where the columns of D1 and D2 are strictly diagonally dominant, the diagonal of
+     * column j of either at row j. Any selection with one column per diagonal position is non-singular. The
+     * first column of D2 is dense, the others have at most 4 nonzeros.
+     */
+    static SparseStore<Double> makeDiagonallyDominant(final int dim, final Random random) {
+
+        SparseStore<Double> retVal = SparseStore.R064.make(dim, 3 * dim);
+
+        for (int block = 0; block < 2; block++) {
+            for (int j = 0; j < dim; j++) {
+                int column = block * dim + j;
+                retVal.set(j, column, 4.0 + random.nextDouble());
+                for (int k = 0; k < 3; k++) {
+                    int i = random.nextInt(dim);
+                    if (i != j) {
+                        retVal.set(i, column, random.nextDouble() - 0.5);
+                    }
+                }
+            }
+        }
+
+        for (int i = 1; i < dim; i++) {
+            retVal.set(i, dim, (random.nextDouble() - 0.5) / dim);
+        }
+
+        for (int j = 0; j < dim; j++) {
+            retVal.set(j, 2 * dim + j, ONE);
+        }
+
+        return retVal;
     }
 
     @Test
@@ -246,6 +283,44 @@ public class SparseLUTest extends MatrixDecompositionTests {
         SparseLUTest.doTestUpdate(updateCase, sparse);
     }
 
+    /**
+     * A column without nonzero pivot candidates does not use up a pivot row. The rank is revealed and [U] is
+     * upper triangular (row echelon form).
+     */
+    @Test
+    public void testDeferredZeroColumn() {
+
+        R064Store square = R064Store.FACTORY.make(4, 4);
+        square.set(0, 0, 1.0);
+        square.set(0, 2, 2.0);
+        square.set(1, 2, 1.0);
+        square.set(1, 3, 3.0);
+        square.set(2, 0, 2.0);
+        square.set(2, 2, 5.0);
+        square.set(2, 3, 1.0);
+        square.set(3, 0, 1.0);
+        square.set(3, 3, 4.0);
+
+        SparseLU decomposition = SparseLUTest.doTestDecomposition(square);
+
+        TestUtils.assertEquals(3, decomposition.getRank());
+        TestUtils.assertFalse(decomposition.isSolvable());
+        TestUtils.assertEquals(ZERO, decomposition.getDeterminant().doubleValue());
+
+        MatrixStore<Double> mtrxU = decomposition.getU();
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < i; j++) {
+                TestUtils.assertEquals(ZERO, mtrxU.doubleValue(i, j));
+            }
+        }
+
+        R064Store wide = R064Store.FACTORY.make(2, 3);
+        wide.set(0, 1, 1.0);
+        wide.set(1, 2, 1.0);
+
+        TestUtils.assertEquals(2, SparseLUTest.doTestDecomposition(wide).getRank());
+    }
+
     @Test
     public void testEmptyMatrixConversions() {
         // Test LSR to CSC/CSR
@@ -317,7 +392,62 @@ public class SparseLUTest extends MatrixDecompositionTests {
         SparseLUTest.doTestUpdate(updateCase, sparse);
     }
 
+    /**
+     * Factorise a selection of columns, and then repeatedly: solve for an entering column and for a unit
+     * vector with the sparse solves, and replace a column reusing their partial results. Every solve is
+     * verified against the explicitly formed matrix.
+     */
+    @Test
+    public void testFactorWithSparseSolvesAndUpdates() {
 
+        int dim = 200;
+        Random random = new Random(1234L);
+
+        SparseStore<Double> matrix = SparseLUTest.makeDiagonallyDominant(dim, random);
+        R064CSC csc = matrix.toCSC();
+
+        int[] selection = new int[dim];
+        R064Store body = R064Store.FACTORY.make(dim, dim);
+        for (int j = 0; j < dim; j++) {
+            selection[j] = j;
+            body.fillColumn(j, matrix.sliceColumn(j));
+        }
+
+        SparseLU decomposition = new SparseLU();
+        TestUtils.assertTrue(decomposition.factor(csc, selection));
+        TestUtils.assertEquals(body, decomposition, ACCURACY);
+
+        DensityTrackingArray column = new DensityTrackingArray(dim);
+        DensityTrackingArray row = new DensityTrackingArray(dim);
+        MatrixStore<Double> rhs = DecompositionUpdateTest.rhs(dim);
+
+        for (int iteration = 0; iteration < 60; iteration++) {
+
+            int position = iteration == 7 ? 0 : random.nextInt(dim);
+            int entering = iteration == 7 ? dim : (1 + random.nextInt(2)) * dim + position;
+
+            decomposition.ftranColumn(csc, entering, column);
+            DensityTrackingArrayTest.assertIndexComplete(column);
+            TestUtils.assertEquals(matrix.sliceColumn(entering), body.multiply(R064Store.FACTORY.column(column.values)), ACCURACY);
+
+            decomposition.btranUnit(position, row);
+            DensityTrackingArrayTest.assertIndexComplete(row);
+            MatrixStore<Double> unit = body.transpose().multiply(R064Store.FACTORY.column(row.values));
+            for (int i = 0; i < dim; i++) {
+                TestUtils.assertEquals(i == position ? ONE : ZERO, unit.doubleValue(i), ACCURACY);
+            }
+
+            TestUtils.assertTrue(decomposition.updateColumn(position, csc, entering));
+
+            selection[position] = entering;
+            body.fillColumn(position, matrix.sliceColumn(entering));
+
+            DecompositionUpdateTest.doTestTran(body, decomposition, rhs);
+        }
+
+        LU<Double> reference = LU.R064.decompose(body);
+        TestUtils.assertEquals(reference.getDeterminant(), decomposition.getDeterminant(), ACCURACY);
+    }
 
     @Test
     public void testFtranBtranAfterUpdate() {
@@ -435,6 +565,21 @@ public class SparseLUTest extends MatrixDecompositionTests {
         expected.fillColumn(2, newCol2);
 
         DecompositionUpdateTest.doTestTran(expected, decomp, DecompositionUpdateTest.rhs(4));
+    }
+
+    /**
+     * A non-finite pivot (from non-finite input) counts as zero, so the factorisation does not look well
+     * conditioned.
+     */
+    @Test
+    public void testNonFinitePivotCountsAsZero() {
+
+        R064CSC matrix = R064CSC.of(R064Store.FACTORY.rows(new double[][] { { Double.NaN, 0.0 }, { 0.0, 1.0 } }));
+
+        SparseLU decomp = new SparseLU();
+        decomp.factor(matrix, new int[] { 0, 1 });
+
+        TestUtils.assertEquals(0.0, decomp.getMinPivotMagnitude());
     }
 
     @Test
@@ -709,6 +854,67 @@ public class SparseLUTest extends MatrixDecompositionTests {
         SparseLU decomp = SparseLUTest.doTestDecomposition(matrix);
     }
 
+    /**
+     * Tall and wide matrices: [L] is unit lower triangular (rows x rank) and [U] upper triangular (rank x
+     * columns).
+     */
+    @Test
+    public void testRectangular() {
+
+        Random random = new Random(42L);
+
+        for (int[] shape : new int[][] { { 7, 4 }, { 4, 7 } }) {
+
+            R064Store matrix = R064Store.FACTORY.make(shape[0], shape[1]);
+            for (int i = 0; i < shape[0]; i++) {
+                for (int j = 0; j < shape[1]; j++) {
+                    if (random.nextDouble() < 0.6) {
+                        matrix.set(i, j, random.nextDouble() - 0.5);
+                    }
+                }
+            }
+
+            SparseLU decomposition = SparseLUTest.doTestDecomposition(matrix);
+
+            MatrixStore<Double> mtrxL = decomposition.getL();
+            MatrixStore<Double> mtrxU = decomposition.getU();
+            TestUtils.assertEquals(4, mtrxL.getColDim());
+            TestUtils.assertEquals(4, mtrxU.getRowDim());
+            for (int i = 0; i < mtrxL.getRowDim(); i++) {
+                for (int j = i; j < mtrxL.getColDim(); j++) {
+                    TestUtils.assertEquals(i == j ? ONE : ZERO, mtrxL.doubleValue(i, j));
+                }
+            }
+            for (int i = 0; i < mtrxU.getRowDim(); i++) {
+                for (int j = 0; j < i; j++) {
+                    TestUtils.assertEquals(ZERO, mtrxU.doubleValue(i, j));
+                }
+            }
+
+            LU<Double> reference = LU.R064.decompose(matrix);
+            TestUtils.assertEquals(reference.getRank(), decomposition.getRank());
+        }
+    }
+
+    /**
+     * Several right hand sides are solved column by column, also for a 1x1 matrix (where a 1 x k right hand
+     * side is not a row vector).
+     */
+    @Test
+    public void testSeveralRightHandSides() {
+
+        SparseLU decomp = new SparseLU();
+
+        decomp.decompose(R064Store.FACTORY.rows(new double[][] { { 2.0 } }));
+        MatrixStore<Double> solution = decomp.getSolution(R064Store.FACTORY.rows(new double[][] { { 4.0, 6.0 } }));
+        TestUtils.assertEquals(R064Store.FACTORY.rows(new double[][] { { 2.0, 3.0 } }), solution);
+
+        R064Store body = R064Store.FACTORY.rows(new double[][] { { 4.0, 1.0, 0.0 }, { 1.0, 3.0, 1.0 }, { 0.0, 1.0, 2.0 } });
+        R064Store rhs = R064Store.FACTORY.rows(new double[][] { { 1.0, 0.0 }, { 2.0, 1.0 }, { 3.0, -1.0 } });
+        decomp.decompose(body);
+        TestUtils.assertEquals(rhs, body.multiply(decomp.getSolution(rhs)), ACCURACY);
+    }
+
     @Test
     public void testSimple2x2() throws RecoverableCondition {
 
@@ -946,6 +1152,23 @@ public class SparseLUTest extends MatrixDecompositionTests {
 
             DecompositionUpdateTest.doTestTran(matrix, decomposition, rhs);
         }
+    }
+
+    /**
+     * An update can not repair a rank deficient factorisation. Here the update itself succeeds (the new pivot
+     * is significant), but the matrix is still singular, so updateColumn returns false, as specified by
+     * {@link MatrixDecomposition.Updatable}.
+     */
+    @Test
+    public void testUpdateRankDeficient() {
+
+        SparseLU decomp = new SparseLU();
+        decomp.decompose(R064Store.FACTORY.rows(new double[][] { { 0.0, 1.0, 2.0 }, { 0.0, 3.0, 1.0 }, { 0.0, 1.0, 1.0 } }));
+        TestUtils.assertFalse(decomp.isSolvable());
+
+        TestUtils.assertFalse(decomp.updateColumn(1, R064Store.FACTORY.rows(new double[][] { { 1.0 }, { 0.0 }, { 2.0 } })));
+        TestUtils.assertFalse(decomp.isSolvable());
+        TestUtils.assertEquals(2, decomp.getRank());
     }
 
 }

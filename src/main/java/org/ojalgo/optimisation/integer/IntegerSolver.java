@@ -511,12 +511,13 @@ public final class IntegerSolver extends GenericSolver {
                         rootSolver.update(gi, origLower, floorVal);
                         Optimisation.Result downResult = rootSolver.solve(null);
                         boolean downOK = downResult.getState().isOptimal();
+                        boolean downInfeasible = downResult.getState().isFailure() && downResult.getState() != State.FAILED;
                         if (downOK) {
                             double downLP = downResult.getValue();
                             double deg = Math.max(ZERO, mySense == Optimisation.Sense.MIN ? downLP - rootValue : rootValue - downLP);
                             myStrategy.observeBranch(ii, false, Math.max(deg, NodeKey.MINIMUM_DISPLACEMENT) / downDisp);
                             this.acceptIfIntegerFeasible(downResult, downLP, rootNode);
-                        } else {
+                        } else if (downInfeasible) {
                             myStrategy.observeBranch(ii, false, STRONG_BRANCH_INFEASIBLE_PENALTY / downDisp);
                         }
 
@@ -525,31 +526,33 @@ public final class IntegerSolver extends GenericSolver {
                         rootSolver.update(gi, ceilVal, origUpper);
                         Optimisation.Result upResult = rootSolver.solve(null);
                         boolean upOK = upResult.getState().isOptimal();
+                        boolean upInfeasible = upResult.getState().isFailure() && upResult.getState() != State.FAILED;
                         if (upOK) {
                             double upLP = upResult.getValue();
                             double deg = Math.max(ZERO, mySense == Optimisation.Sense.MIN ? upLP - rootValue : rootValue - upLP);
                             myStrategy.observeBranch(ii, true, Math.max(deg, NodeKey.MINIMUM_DISPLACEMENT) / upDisp);
                             this.acceptIfIntegerFeasible(upResult, upLP, rootNode);
-                        } else {
+                        } else if (upInfeasible) {
                             myStrategy.observeBranch(ii, true, STRONG_BRANCH_INFEASIBLE_PENALTY / upDisp);
                         }
 
                         // Restore root bounds in the solver
                         rootSolver.update(gi, origLower, origUpper);
 
-                        if (!downOK && !upOK) {
+                        // A probe that is neither optimal nor infeasible (FAILED, APPROXIMATE...) proves nothing
+                        if (downInfeasible && upInfeasible) {
                             rootSolver.dispose();
                             return myNodeStatistics.infeasible();
                         }
 
-                        if (!downOK) {
+                        if (downInfeasible) {
                             NodeKey prev = rootNode;
                             rootNode = rootNode.withTightenedLower(ii, (int) ceilVal);
                             if (prev != originalRootNode && prev != rootNode) {
                                 prev.dispose();
                             }
                             rootNode.enforceBounds(rootSolver, ii, myStrategy);
-                        } else if (!upOK) {
+                        } else if (upInfeasible) {
                             NodeKey prev = rootNode;
                             rootNode = rootNode.withTightenedUpper(ii, (int) floorVal);
                             if (prev != originalRootNode && prev != rootNode) {
@@ -806,9 +809,10 @@ public final class IntegerSolver extends GenericSolver {
                 }
 
                 nodeSolver.dispose();
-                if (!nodeResult.getState().isFailure() || nodeKey.sequence == 0 && !nodeResult.getState().isValid()) {
-                    // Neither optimal nor infeasible (FEASIBLE, APPROXIMATE...): the LP stopped short of
-                    // optimality, so the node can neither be bounded nor pruned and the search cannot claim
+                State nodeState = nodeResult.getState();
+                if (!nodeState.isFailure() || nodeState == State.FAILED || nodeKey.sequence == 0 && !nodeState.isValid()) {
+                    // Neither optimal nor infeasible (FEASIBLE, APPROXIMATE...), or the LP failed (FAILED, such as
+                    // on a singular basis): the node can neither be bounded nor pruned and the search cannot claim
                     // optimality. Abort (the result is reported as FEASIBLE, not OPTIMAL).
                     return myNodeStatistics.failed();
                 }

@@ -88,11 +88,17 @@ public class IntegerUserFiles extends OptimisationIntegerTests implements ModelF
      * <li>v56.0.0-SNAPSHOT (Improved LP) ≈ [gap 6 => 2.0s, gap 5 => 1.2s, gap 4 => 0.4s, gap 3 => 0.4s]
      * <li>v57.1.0-SNAPSHOT: ≈0.5s
      * </ul>
+     * The gap has to match the accuracy of the assertion: with the default gap (1e-4 relative) the search may
+     * legitimately stop on an incumbent 3.6e-5 above the optimum (2316621.90), which depends on which of the
+     * alternative optimal LP bases the node solves happen to return (2026-09-23, revised simplex with the new
+     * basis factorisation).
      */
     @Test
     public void testEnergyApp() {
 
-        IntegerUserFiles.doTest("EnergyApp.ebm", "2316538.192374359", null, null);
+        ConfigurableStrategy strategy = IntegerStrategy.DEFAULT.withGapTolerance(NumberContext.of(6));
+
+        IntegerUserFiles.doTest("EnergyApp.ebm", "2316538.192374359", null, strategy);
     }
 
 }

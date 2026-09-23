@@ -26,8 +26,10 @@ import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 
+import org.ojalgo.array.DensityTrackingArray;
 import org.ojalgo.array.operation.COPY;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ElementView2D;
 import org.ojalgo.structure.Structure2D;
 
@@ -211,6 +213,30 @@ public final class R064CSR extends CompressedSparseR064 {
     }
 
     /**
+     * The matrix in CSR format, by the cheapest route. A {@link SparseStructure2D} converts itself (an
+     * {@link R064CSR} is returned as is), anything else via {@link R064CSC#of(Access2D.Collectable)}. The
+     * dimensions are always those of the matrix, also when its last rows or columns are empty.
+     */
+    public static R064CSR of(final Access2D.Collectable<Double, ? super TransformableRegion<Double>> matrix) {
+
+        if (matrix instanceof SparseStructure2D) {
+            return ((SparseStructure2D) matrix).toCSR();
+        } else if (matrix instanceof Access2D) {
+            return R064CSC.of(matrix).toCSR();
+        } else {
+            return matrix.collect(SparseStore.R064).toCSR();
+        }
+    }
+
+    /**
+     * As {@link #of(Access2D.Collectable)}, but only with the elements whose (row, column) position the
+     * filter accepts (via {@link R064CSC#of(Access2D.Collectable, Structure2D.IntRowColPredicate)}).
+     */
+    public static R064CSR of(final Access2D.Collectable<Double, ? super TransformableRegion<Double>> matrix, final Structure2D.IntRowColPredicate filter) {
+        return R064CSC.of(matrix, filter).toCSR();
+    }
+
+    /**
      * Creates a new CSR matrix store.
      *
      * @param nbRows        The number of rows in the matrix
@@ -224,9 +250,12 @@ public final class R064CSR extends CompressedSparseR064 {
     }
 
     /**
+     * The arrays are allocated, to be filled by the caller. They have to be filled completely: the number of
+     * non-zero elements is taken to be the length of the arrays (see {@link #countNonzeros()}).
+     *
      * @param nbRows   The number of rows
      * @param nbCols   The number of columns
-     * @param capacity The maximum capacity (number of non-zero elements)
+     * @param capacity The number of non-zero elements
      */
     public R064CSR(final int nbRows, final int nbCols, final int capacity) {
         super(nbRows, nbCols, new double[capacity], new int[capacity], new int[nbRows + 1]);
@@ -347,6 +376,49 @@ public final class R064CSR extends CompressedSparseR064 {
     @Override
     public NonZeroView nonzeros() {
         return new NonZeroView(this);
+    }
+
+    /**
+     * Sparse vector times sparse matrix, row-wise: target = [left]<sup>T</sup>[this]. Only the rows where
+     * left is nonzero are visited. When left is sparse the index of the target tracks the columns that were
+     * touched, so the cost depends on the sparsity of left rather than on the matrix size. Otherwise the
+     * result is expected to be dense; it is accumulated without tracking, and its index is built (with a
+     * scan) only if and when it is needed.
+     *
+     * @param left   The vector to premultiply with (its index is used)
+     * @param target Reset and then set to the result, with its index
+     */
+    public void premultiply(final DensityTrackingArray left, final DensityTrackingArray target) {
+
+        target.reset();
+
+        int[] rows = left.indices();
+        int nbRows = left.countNonzeros();
+
+        if (left.isSparse()) {
+
+            for (int k = 0; k < nbRows; k++) {
+                int i = rows[k];
+                double factor = left.values[i];
+                if (factor != ZERO) {
+                    for (int p = pointers[i], end = pointers[i + 1]; p < end; p++) {
+                        target.add(indices[p], factor * values[p]);
+                    }
+                }
+            }
+
+        } else {
+
+            for (int k = 0; k < nbRows; k++) {
+                int i = rows[k];
+                double factor = left.values[i];
+                if (factor != ZERO) {
+                    this.axpy(i, factor, target.values);
+                }
+            }
+
+            target.invalidateIndex();
+        }
     }
 
     @Override

@@ -28,7 +28,8 @@ import org.ojalgo.structure.Mutate1D;
 /**
  * Two-phase revised simplex. Phase 1 constructs a modified objective that makes the starting point dual
  * feasible and then runs dual simplex iterations to achieve primal feasibility. Phase 2 restores the original
- * objective and runs primal simplex iterations (maintaining primal feasibility) to reach optimality.
+ * objective and runs primal simplex iterations (maintaining primal feasibility) to reach optimality. If those
+ * leave some basic variables outside their bounds, dual simplex iterations restore primal feasibility.
  * <p>
  * This is the most general {@link SimplexSolver} subclass and the one normally instantiated by
  * {@link LinearSolver.Builder} and the {@link LinearSolver.ModelIntegration}. It handles explicit finite
@@ -50,29 +51,19 @@ final class PhasedSimplexSolver extends SimplexSolver {
             return this.extractResult();
         }
 
+        IterDescr iteration;
+        boolean resetEdgeWeights;
+
         if (state == State.APPROXIMATE) {
             // Warm start after variable range update
 
-            IterDescr iteration = this.prepareToIterate(false);
-
-            this.doDualIterations(iteration, false);
-
-            if (state.isFeasible()) {
-                if (this.isDualFeasible()) {
-                    state = State.OPTIMAL;
-                } else {
-                    // Primal feasible but (marginally) not dual feasible - finish with primal iterations
-                    // rather than reporting a merely FEASIBLE point
-                    this.doPrimalIterations(iteration, true);
-                }
-            }
-
-            return this.extractResult();
+            iteration = this.prepareToIterate(false);
+            resetEdgeWeights = false;
 
         } else {
             // Normal cold start optimisation
 
-            IterDescr iteration = this.prepareToIterate(true);
+            iteration = this.prepareToIterate(true);
 
             this.doDualIterations(iteration, true);
 
@@ -80,8 +71,29 @@ final class PhasedSimplexSolver extends SimplexSolver {
 
             this.doPrimalIterations(iteration, true);
 
-            return this.extractResult();
+            if (!state.isOptimal() || this.verifyPrimalFeasibility()) {
+                return this.extractResult();
+            }
+
+            // Optimal, but the primal iterations left some basic variables outside their bounds. The basis is
+            // dual feasible, so continue as after a warm start.
+            state = State.APPROXIMATE;
+            resetEdgeWeights = true;
         }
+
+        this.doDualIterations(iteration, resetEdgeWeights);
+
+        if (state.isFeasible()) {
+            if (this.isDualFeasible()) {
+                state = State.OPTIMAL;
+            } else {
+                // Primal feasible but (marginally) not dual feasible - finish with primal iterations
+                // rather than reporting a merely FEASIBLE point
+                this.doPrimalIterations(iteration, true);
+            }
+        }
+
+        return this.extractResult();
     }
 
     @Override

@@ -214,6 +214,11 @@ final class ProductFormInverse implements BasisRepresentation {
     }
 
     @Override
+    public int countUpdates() {
+        return myFactors.size();
+    }
+
+    @Override
     public void ftran(final double[] arg) {
 
         if (myRoot.isComputed()) {
@@ -246,7 +251,7 @@ final class ProductFormInverse implements BasisRepresentation {
     }
 
     /**
-     * Update the product form inverse to reflect a replaced column.
+     * Factorise the basis anew, discarding the eta factors.
      */
     @Override
     public void reset(final R064CSC matrix, final int[] included) {

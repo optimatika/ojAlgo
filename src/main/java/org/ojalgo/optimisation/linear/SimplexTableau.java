@@ -59,6 +59,12 @@ import org.ojalgo.type.context.NumberContext;
 abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, Mutate2D {
 
     /**
+     * When fixing a variable, the pivot column is chosen among the negative elements of the auxiliary row
+     * that are not zero by this tolerance. The same absolute tolerance as the pivot test in
+     * {@link SimplexTableauSolver}.
+     */
+    private static final NumberContext FIX_VARIABLE_PIVOT = NumberContext.ofScale(8);
+    /**
      * Used when pivoting to identify rows with elements that are already very close to zero (to avoid
      * updating those rows).
      */
@@ -243,7 +249,7 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
                 break;
             }
             final double denominator = nz.doubleValue();
-            if (denominator < -1E-8) {
+            if (denominator < ZERO && !FIX_VARIABLE_PIVOT.isZero(denominator)) {
                 double numerator = objectiveRow.doubleValue(i);
                 double quotient = Math.abs(numerator / denominator);
                 if (quotient < minQuotient) {
@@ -429,10 +435,8 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
     }
 
     /**
-     * Known to be unsound and unused: rows are re-pivoted in the order of the given basis, which divides by
-     * zero as soon as the wanted column is basic in another row (the current basis with two rows swapped is
-     * enough), and the partition reset loses the upper-bound shifts. A basis change is done by rebuilding
-     * the solver instead.
+     * Unused, and unsound: re-pivots the rows in the order of the given basis, which fails when a wanted
+     * column is basic in another row, and loses the upper-bound shifts.
      */
     @Override
     final void resetBasis(final int[] newBasis) {
@@ -601,7 +605,7 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
 
         double pivotElement = this.doubleValue(p, j);
 
-        if (Math.abs(pivotElement) > 1e-9) {
+        if (!DEVEX_PIVOT.isZero(pivotElement)) {
 
             double w_p = edgeWeights[p];
             double largest = ONE;
@@ -636,7 +640,7 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
 
         double pivotElement = this.doubleValue(i, excluded[p]);
 
-        if (Math.abs(pivotElement) > 1e-9) {
+        if (!DEVEX_PIVOT.isZero(pivotElement)) {
 
             double w_p = edgeWeights[p];
             double largest = ONE;

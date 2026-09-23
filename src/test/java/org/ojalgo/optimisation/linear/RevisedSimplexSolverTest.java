@@ -576,43 +576,53 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
         RevisedSimplexSolverTest.doTestPhasedVariants(builder, expected);
     }
 
+    /**
+     * Solves the same model repeatedly while the range of X shifts. The data is random, but seeded, and every
+     * shift is feasible: with |a1 - a2| &lt; 2 and |x| &le; 3, (a1 - a2) x &lt; 6 &le; b1 - b2, so some y
+     * satisfies both constraints for every x. (With unrestricted b1 and b2 some shifts were infeasible, and
+     * presolve's conclusions from an infeasible solve then made later, feasible, re-solves of the same model
+     * report infeasible too.)
+     */
     @Test
     public void testShiftingRange() {
 
-        Random random = new Random();
+        for (long seed = 0L; seed < 10L; seed++) {
 
-        ExpressionsBasedModel model = new ExpressionsBasedModel();
+            Random random = new Random(seed);
 
-        Variable x = model.addVariable("X");
-        Variable y = model.addVariable("Y");
+            ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        double b1 = 10.0 * random.nextDouble();
-        double b2 = -10.0 * random.nextDouble();
+            Variable x = model.addVariable("X");
+            Variable y = model.addVariable("Y");
 
-        double a1 = 2.0 * random.nextDouble() - 1.0;
-        double a2 = 2.0 * random.nextDouble() - 1.0;
+            double b1 = 3.0 + 7.0 * random.nextDouble();
+            double b2 = -3.0 - 7.0 * random.nextDouble();
 
-        model.addExpression().add(x, a1).add(y, 1.0).upper(b1);
-        model.addExpression().add(x, a2).add(y, 1.0).lower(b2);
+            double a1 = 2.0 * random.nextDouble() - 1.0;
+            double a2 = 2.0 * random.nextDouble() - 1.0;
 
-        for (int i = -2; i <= 2; i++) {
+            model.addExpression().add(x, a1).add(y, 1.0).upper(b1);
+            model.addExpression().add(x, a2).add(y, 1.0).lower(b2);
 
-            x.weight(2.0 * (random.nextDouble() - 0.5));
-            x.lower(i - 1).upper(i + 1);
+            for (int i = -2; i <= 2; i++) {
 
-            y.weight(2.0 * (random.nextDouble() - 0.5));
-            y.lower(null).upper(null);
+                x.weight(2.0 * (random.nextDouble() - 0.5));
+                x.lower(i - 1).upper(i + 1);
 
-            Result min = model.minimise();
-            Result max = model.maximise();
+                y.weight(2.0 * (random.nextDouble() - 0.5));
+                y.lower(null).upper(null);
 
-            TestUtils.assertStateNotLessThanFeasible(min);
-            TestUtils.assertStateNotLessThanFeasible(max);
+                Result min = model.minimise();
+                Result max = model.maximise();
 
-            TestUtils.assertSolutionFeasible(model, min);
-            TestUtils.assertSolutionFeasible(model, max);
+                TestUtils.assertStateNotLessThanFeasible(min);
+                TestUtils.assertStateNotLessThanFeasible(max);
 
-            TestUtils.assertTrue(max.getValue() > min.getValue());
+                TestUtils.assertSolutionFeasible(model, min);
+                TestUtils.assertSolutionFeasible(model, max);
+
+                TestUtils.assertTrue(max.getValue() > min.getValue());
+            }
         }
     }
 
