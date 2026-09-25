@@ -398,7 +398,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
                 int scale = variableScales[index];
 
                 if (scale > 0) {
-                    value = value.movePointLeft(scale);
+                    value = value.scaleByPowerOfTen(-scale);
                 }
 
                 retVal = Math.max(retVal, MissingMath.decimalsOf(value));
@@ -2142,7 +2142,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             for (int i = 0, limit = myVariables.size(); i < limit; i++) {
                 Variable tmpVariable = myVariables.get(i);
                 if (!tmpVariable.isFixed()) {
-                    tmpVariable.setValue(options.solution.enforce(result.get(i)));
+                    tmpVariable.setValue(options.solution.enforce(result.get(i)).stripTrailingZeros());
                 }
             }
         }

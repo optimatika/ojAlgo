@@ -116,24 +116,6 @@ public class NumberContextTest {
     }
 
     @Test
-    public void testIsDifferentBigDecimalAvoidAbs() {
-
-        NumberContext nc = NumberContext.of(7);
-
-        BigDecimal a = new BigDecimal("500.00001");
-        BigDecimal b = new BigDecimal("500.00002");
-        BigDecimal c = new BigDecimal("200.0");
-
-        TestUtils.assertFalse(nc.isDifferent(a, b));
-        TestUtils.assertTrue(nc.isDifferent(a, c));
-
-        TestUtils.assertFalse(nc.isDifferent(a.negate(), b.negate()));
-        TestUtils.assertTrue(nc.isDifferent(a.negate(), c.negate()));
-
-        TestUtils.assertTrue(nc.isDifferent(a, a.negate()));
-    }
-
-    @Test
     public void testIsDifferentBigDecimalDoubleConsistency() {
 
         NumberContext nc = NumberContext.of(10);
@@ -149,6 +131,24 @@ public class NumberContextTest {
             boolean dblResult = nc.isDifferent(v, v + nudge);
             TestUtils.assertEquals("consistency at " + v, bigResult, dblResult);
         }
+    }
+
+    @Test
+    public void testIsDifferentBigDecimalSigns() {
+
+        NumberContext nc = NumberContext.of(7);
+
+        BigDecimal a = new BigDecimal("500.00001");
+        BigDecimal b = new BigDecimal("500.00002");
+        BigDecimal c = new BigDecimal("200.0");
+
+        TestUtils.assertFalse(nc.isDifferent(a, b));
+        TestUtils.assertTrue(nc.isDifferent(a, c));
+
+        TestUtils.assertFalse(nc.isDifferent(a.negate(), b.negate()));
+        TestUtils.assertTrue(nc.isDifferent(a.negate(), c.negate()));
+
+        TestUtils.assertTrue(nc.isDifferent(a, a.negate()));
     }
 
     @Test

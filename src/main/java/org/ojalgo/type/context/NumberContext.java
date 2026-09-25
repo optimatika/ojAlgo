@@ -45,10 +45,11 @@ import org.ojalgo.type.format.NumberStyle;
  * scale is desirable.
  * </p>
  * <p>
- * The enforce methods first enforce the precision and then set the scale. It is possible that this will
- * create a number with trailing zeros and more digits than the precision allows. It is also possible to
- * define a context with a scale that is larger than the precision. This is NOT how precision and scale is
- * used with numeric types in databases.
+ * The enforce methods first enforce the precision and then, if the number has more decimals than the scale
+ * allows, round to the scale. Trailing zeros are neither added nor removed; the result may have trailing
+ * zeros, and it may have fewer decimals than the scale. It is also possible to define a context with a scale
+ * that is larger than the precision. This is NOT how precision and scale is used with numeric types in
+ * databases.
  * </p>
  *
  * @author apete
@@ -239,8 +240,9 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     }
 
     /**
-     * Will first enforce the precision, and then the scale. Both operations will comply with the rounding
-     * mode.
+     * Will first enforce the precision, and then the scale, rounding only if the number has more decimals
+     * than the scale allows. Both operations will comply with the rounding mode. Trailing zeros are neither
+     * added nor removed.
      */
     public BigDecimal enforce(final BigDecimal number) {
 
@@ -404,13 +406,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         if (expected.compareTo(actual) == 0) {
             return false;
         }
-        int magE = MissingMath.magnitudeOf(expected);
-        int magA = MissingMath.magnitudeOf(actual);
-        BigDecimal reference = magE >= magA ? expected : actual;
-        if (reference.signum() < 0) {
-            reference = reference.negate();
-        }
-        return !this.isSmall(reference, actual.subtract(expected));
+        return !this.isSmall(expected.abs().max(actual.abs()), actual.subtract(expected));
     }
 
     public boolean isDifferent(final double expected, final double actual) {
@@ -454,22 +450,11 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     public boolean isSmall(final BigDecimal comparedTo, final BigDecimal value) {
         if (this.isZero(comparedTo)) {
             return this.isZero(value);
+        } else if (myPrecision > 0) {
+            return value.abs().compareTo(comparedTo.abs().scaleByPowerOfTen(1 - myPrecision)) < 0;
+        } else {
+            return Math.abs(value.doubleValue()) < Math.abs(comparedTo.doubleValue()) * myRelativeError;
         }
-        if (myPrecision > 0) {
-            int magRef = MissingMath.magnitudeOf(comparedTo);
-            int magVal = MissingMath.magnitudeOf(value);
-            if (magVal != Integer.MIN_VALUE && magRef != Integer.MIN_VALUE) {
-                int magDiff = magRef - magVal;
-                if (magDiff > myPrecision + 1) {
-                    return true;
-                }
-                if (magDiff < 0) {
-                    return false;
-                }
-            }
-        }
-        BigDecimal reference = this.enforceForComparison(comparedTo);
-        return this.enforceForComparison(reference.add(value)).compareTo(reference) == 0;
     }
 
     public boolean isSmall(final double comparedTo, final double value) {
@@ -488,14 +473,10 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         if (myScale <= DEFAULT_SCALE) {
             return false;
         }
-        int mag = MissingMath.magnitudeOf(value);
-        if (mag >= 0) {
+        if (MissingMath.magnitudeOf(value) >= -myScale) {
             return false;
         }
-        if (mag < -(myScale + 1)) {
-            return true;
-        }
-        return this.enforceForComparison(value).signum() == 0;
+        return value.setScale(myScale, myMathContext.getRoundingMode()).signum() == 0;
     }
 
     public boolean isZero(final double value) {
@@ -637,27 +618,13 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         return new NumberContext(format, myMathContext, scale);
     }
 
-    private BigDecimal enforceForComparison(final BigDecimal number) {
-        BigDecimal retVal = number;
-        if (myPrecision > 0) {
-            retVal = retVal.plus(myMathContext);
-        }
-        if (myScale > DEFAULT_SCALE) {
-            retVal = retVal.setScale(myScale, myMathContext.getRoundingMode());
-        }
-        return retVal;
-    }
-
     private BigDecimal scale(final BigDecimal number) {
 
-        BigDecimal retVal = number;
-
-        if (myScale > DEFAULT_SCALE) {
-            retVal = retVal.setScale(myScale, myMathContext.getRoundingMode());
-            retVal = retVal.stripTrailingZeros();
+        if (myScale > DEFAULT_SCALE && number.scale() > myScale) {
+            return number.setScale(myScale, myMathContext.getRoundingMode());
+        } else {
+            return number;
         }
-
-        return retVal;
     }
 
     @Override

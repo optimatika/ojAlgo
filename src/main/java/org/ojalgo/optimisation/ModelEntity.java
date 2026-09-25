@@ -141,7 +141,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     public abstract void addTo(Expression target, BigDecimal scale);
 
     public final BigDecimal adjust(final BigDecimal factor) {
-        return factor.movePointRight(this.getAdjustmentExponent());
+        return factor.scaleByPowerOfTen(this.getAdjustmentExponent());
     }
 
     @Override
@@ -161,7 +161,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
      * @return The scaling factor (10^exponent) used to adjust model parameters for numerical stability
      */
     public final double getAdjustmentFactor() {
-        return BigDecimal.ONE.movePointRight(this.getAdjustmentExponent()).doubleValue(); // 10^exponent
+        return BigDecimal.ONE.scaleByPowerOfTen(this.getAdjustmentExponent()).doubleValue(); // 10^exponent
     }
 
     @Override
@@ -342,11 +342,13 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
      */
     public final BigDecimal reverseAdjustment(final BigDecimal adjusted) {
 
-        if (myAdjustmentExponent != 0) {
-            return adjusted.movePointLeft(myAdjustmentExponent);
-        }
+        int adjustmentExponent = this.getAdjustmentExponent();
 
-        return adjusted;
+        if (adjustmentExponent != 0) {
+            return adjusted.scaleByPowerOfTen(-adjustmentExponent);
+        } else {
+            return adjusted;
+        }
     }
 
     /**
@@ -378,11 +380,12 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
             return PrimitiveMath.ZERO;
         }
 
-        if (myAdjustmentExponent == 0) {
+        int adjustmentExponent = this.getAdjustmentExponent();
+        if (adjustmentExponent == 0) {
             return unadjusted.doubleValue();
+        } else {
+            return unadjusted.scaleByPowerOfTen(adjustmentExponent).doubleValue();
         }
-
-        return unadjusted.movePointRight(myAdjustmentExponent).doubleValue();
     }
 
     @Override
@@ -462,7 +465,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         if (adjusted && myLowerLimit != null) {
             int adjustmentExponent = this.getAdjustmentExponent();
             if (adjustmentExponent != 0) {
-                limit = myLowerLimit.movePointRight(adjustmentExponent);
+                limit = myLowerLimit.scaleByPowerOfTen(adjustmentExponent);
             } else {
                 limit = myLowerLimit;
             }
@@ -477,7 +480,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         if (adjusted && myUpperLimit != null) {
             int adjustmentExponent = this.getAdjustmentExponent();
             if (adjustmentExponent != 0) {
-                limit = myUpperLimit.movePointRight(adjustmentExponent);
+                limit = myUpperLimit.scaleByPowerOfTen(adjustmentExponent);
             } else {
                 limit = myUpperLimit;
             }

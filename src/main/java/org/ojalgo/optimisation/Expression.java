@@ -884,7 +884,7 @@ public class Expression extends ModelEntity<Expression> {
 
         int tmpAdjExp = this.getAdjustmentExponent();
         if (tmpAdjExp != 0) {
-            return value.movePointRight(tmpAdjExp);
+            return value.scaleByPowerOfTen(tmpAdjExp);
         }
 
         return value;

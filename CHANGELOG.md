@@ -49,6 +49,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.optimisation
 
 - `Expression` now allocates the quadratic coefficient map lazily — only when quadratic terms are actually added. Models with only linear expressions use less memory.
+- Model parameters are scaled by the adjustment exponent using `BigDecimal.scaleByPowerOfTen` instead of `movePointLeft`/`movePointRight`, so no digits are expanded when the scale becomes negative. `ModelEntity.adjust(BigDecimal)`, `reverseAdjustment(BigDecimal)`, `getLowerLimit(boolean, BigDecimal)`, `getUpperLimit(boolean, BigDecimal)` and `Expression.get(..., boolean)` may therefore return numbers with a negative scale (the values are the same).
 
 #### org.ojalgo.optimisation.linear
 
@@ -57,7 +58,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.type.context
 
 - `NumberContext.isLessThan(BigDecimal, BigDecimal)` and `isMoreThan(BigDecimal, BigDecimal)` now use full `BigDecimal` tolerance comparison instead of converting to `double`. Added corresponding `double` overloads.
-- `NumberContext.isDifferent(BigDecimal, BigDecimal)` added: tolerance-aware comparison that picks the larger operand as the reference magnitude and avoids `abs()` on the inputs.
+- `NumberContext.isDifferent(BigDecimal, BigDecimal)` added: tolerance-aware comparison that uses the larger absolute value of the two as the reference, as the `double` version does.
+- The `BigDecimal` versions of `NumberContext.isSmall`, `isDifferent`, `isLessThan` and `isMoreThan` now use the same relative tolerance as the `double` versions, `|value| < |reference| · relative error`, so with the default rounding mode the two agree. Previously they checked whether rounding to the context changed the reference, which depended on where the reference was between two rounding steps, and also applied the scale to non-zero references. Comparisons with a reference that is zero (to the context's scale) are still decided by rounding.
+- `NumberContext.isZero(BigDecimal)` rounds to the scale only, using the context's rounding mode. It no longer rounds to the precision first, which could make a number slightly larger than half a unit in the last decimal count as zero.
+- `NumberContext.enforce(BigDecimal)` and `toBigDecimal(double)` no longer strip trailing zeros, and only round to the scale when the number has more decimals than the scale allows. Trailing zeros are neither added nor removed, as the class documentation describes (for example, 3.0 stays 3.0 rather than becoming 3). `enforce(double)` returns the same values as before, faster.
 - Minor performance: `NumberContext` caches its `MathContext.getPrecision()` value and uses multiplication instead of division in the `double` version of `isSmall`.
 
 ### Deprecated
@@ -77,6 +81,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - Presolver infeasibility checks (`REDUNDANT_CONSTRAINT`) now use tolerance-aware `isMoreThan`/`isLessThan` instead of raw `compareTo`, consistent with the model's feasibility context. (Discussion [#691](https://github.com/optimatika/ojAlgo/discussions/691))
 - `SpecialOrderedSet` loop always read `mySequence[1]` instead of `mySequence[i]` — the loop variable was never used as the array index.
 - Integrations with interface-based configurators could not find the registered configurator. Added `ExpressionsBasedModel.getConfigurator(Class)` to look up by declared type. (Issue [#692](https://github.com/optimatika/ojAlgo/issues/692))
+- `ModelEntity.toAdjusted(BigDecimal)` and `reverseAdjustment(BigDecimal)` used the adjustment exponent without making sure it had been derived.
 
 #### org.ojalgo.optimisation.integer
 
@@ -87,6 +92,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - The LP solver could report an optimal solution that violated a constraint (netlib PILOT-JA). If the primal simplex iterations leave basic variables outside their bounds, by more than `Options.feasibility` allows, dual simplex iterations now restore feasibility.
 - The primal ratio test no longer pivots on elements that are tiny relative to the rest of the entering column, unless nothing else limits the step. Such pivots could make the basis nearly singular, and the solve wrongly end as unbounded.
 - A numerically singular basis in the revised simplex ends the solve as `FAILED`, rather than continuing with meaningless solves.
+
+#### org.ojalgo.type.context
+
+- `NumberContext.isZero(BigDecimal)` treated any number smaller than a tenth of the last decimal as zero, although with the rounding modes `UP`, `CEILING` and `FLOOR` it may round to a non-zero value. With a negative scale, numbers that round to zero (such as 49 with scale -2) were reported as non-zero.
 
 ## [57.3.1] – 2026-09-21
 
