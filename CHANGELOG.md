@@ -35,6 +35,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Presolver infeasibility checks (`REDUNDANT_CONSTRAINT`) now use tolerance-aware `isMoreThan`/`isLessThan` instead of raw `compareTo`, consistent with the model's feasibility context. (Discussion [#691](https://github.com/optimatika/ojAlgo/discussions/691))
 - `SpecialOrderedSet` loop always read `mySequence[1]` instead of `mySequence[i]` — the loop variable was never used as the array index.
+- Integrations with interface-based configurators could not find the registered configurator. Added `ExpressionsBasedModel.getConfigurator(Class)` to look up by declared type. (Issue [#692](https://github.com/optimatika/ojAlgo/issues/692))
 
 ## [57.3.1] – 2026-09-21
 

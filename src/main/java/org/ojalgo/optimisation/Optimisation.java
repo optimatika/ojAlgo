@@ -346,12 +346,6 @@ public interface Optimisation {
             return myPresolvers.size();
         }
 
-        <T> T getConfigurator(final T defaultValue) {
-            ProgrammingError.throwIfNull(defaultValue);
-            Class<T> type = (Class<T>) defaultValue.getClass();
-            return this.getConfigurator(type).orElse(defaultValue);
-        }
-
         Expression.Factory<?> getExpressionFactory() {
             return myExpressionFactory;
         }

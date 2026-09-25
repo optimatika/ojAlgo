@@ -1417,11 +1417,28 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
+     * Returns a configurator, registered with this model's {@link Optimisation.Environment}, that is an
+     * instance of {@code type} – the type itself, a subclass or an implementation of an interface. Intended
+     * for {@link Integration}s to look up their (3rd party solver specific) configurator.
+     *
+     * @see Optimisation.Environment#setConfigurator(Object)
+     */
+    public <T> Optional<T> getConfigurator(final Class<T> type) {
+        return myEnvironment.getConfigurator(type);
+    }
+
+    /**
      * Returns a configurator that is of the same type as {@code defaultValue} or a subclass thereof. If no
      * such configurator exists, returns {@code defaultValue}.
+     * <p>
+     * The lookup type is the runtime class of {@code defaultValue}. If that is not the intended type – the
+     * configurator type is an interface, or the default is an anonymous subclass or lambda – use
+     * {@link #getConfigurator(Class)} instead.
      */
     public <T> T getConfigurator(final T defaultValue) {
-        return myEnvironment.getConfigurator(defaultValue);
+        ProgrammingError.throwIfNull(defaultValue);
+        Class<T> type = (Class<T>) defaultValue.getClass();
+        return this.getConfigurator(type).orElse(defaultValue);
     }
 
     public Expression getExpression(final String name) {
