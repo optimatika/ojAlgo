@@ -148,12 +148,7 @@ final class LinearStructure implements ExpressionsBasedModel.EntityMap {
 
     @Override
     public EntryPair<ModelEntity<?>, ConstraintType> getSlack(final int ids) {
-
-        if (ids < nbSlck) {
-            return this.getConstraint(nbIdty + ids);
-        } else {
-            return this.getConstraint(ids - nbSlck);
-        }
+        return this.getConstraint(this.indexOfSlackConstraint(ids));
     }
 
     @Override
@@ -213,17 +208,21 @@ final class LinearStructure implements ExpressionsBasedModel.EntityMap {
         return false;
     }
 
+    @Override
+    public boolean isSlackAdjusted(final int ids) {
+        return constraints.isAdjusted(this.indexOfSlackConstraint(ids));
+    }
+
     public boolean negated(final int i, final boolean negated) {
         return constraints.negated(i, negated);
     }
 
-    public void setConstraintMap(final int i, final ModelEntity<?> entity, final ConstraintType type) {
-        constraints.setEntry(i, entity, type);
-    }
-
-    public void setConstraintMap(final int i, final ModelEntity<?> entity, final ConstraintType type, final boolean negated) {
-        constraints.setEntry(i, entity, type);
-        constraints.setNegated(i, negated);
+    /**
+     * @param adjusted Whether the row was built from the entity's adjusted (scaled) parameters, see
+     *                 {@link ConstraintsMetaData#setEntry(int, ModelEntity, ConstraintType, boolean, boolean)}
+     */
+    public void setConstraintMap(final int i, final ModelEntity<?> entity, final ConstraintType type, final boolean negated, final boolean adjusted) {
+        constraints.setEntry(i, entity, type, negated, adjusted);
     }
 
     public void setConstraintNegated(final int i, final boolean negated) {
@@ -233,6 +232,13 @@ final class LinearStructure implements ExpressionsBasedModel.EntityMap {
     @Override
     public String toString() {
         return this.countConstraints() + " x " + this.countVariables();
+    }
+
+    /**
+     * The constraint (row) index of slack variable ids.
+     */
+    private int indexOfSlackConstraint(final int ids) {
+        return ids < nbSlck ? nbIdty + ids : ids - nbSlck;
     }
 
     /**

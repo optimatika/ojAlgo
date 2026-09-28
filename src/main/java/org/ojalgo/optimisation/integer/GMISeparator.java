@@ -160,7 +160,7 @@ final class GMISeparator extends NodeSolver.Separator {
                     ModelEntity<?> entity = pair.getKey();
                     ConstraintType type = pair.getValue();
                     BigDecimal coefficient = TypeUtils.toBigDecimal(aj, SCALE);
-                    BigDecimal adjusted = entity.adjust(coefficient);
+                    BigDecimal adjusted = entityMap.isSlackAdjusted(j) ? entity.adjust(coefficient) : coefficient;
 
                     if (ConstraintType.LOWER.equals(type)) {
 

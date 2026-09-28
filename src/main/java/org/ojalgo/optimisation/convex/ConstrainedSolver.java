@@ -104,15 +104,7 @@ abstract class ConstrainedSolver extends BasePrimitiveSolver {
     @Override
     double[] computeReducedGradient() {
         double[] gradient = super.computeReducedGradient();
-        MatrixStore<Double> iterA = this.getIterationA();
-        int nbRows = iterA.getRowDim();
-        int nbCols = gradient.length;
-        for (int i = 0; i < nbRows; i++) {
-            double lambda = mySolutionL.doubleValue(i);
-            for (int j = 0; j < nbCols; j++) {
-                gradient[j] += iterA.doubleValue(i, j) * lambda;
-            }
-        }
+        this.getConvexData().addMultiplierTerms(gradient, mySolutionL);
         return gradient;
     }
 

@@ -88,6 +88,20 @@ public class ReducedCostsTest extends OptimisationLinearTests {
         }
     }
 
+    private static void assertFixedInConstraint(final String id, final Optimisation.Result result, final Expression constraint, final int fixedIndex,
+            final double value, final double dual, final double fixedRc) {
+
+        TestUtils.assertStateNotLessThanOptimal(result);
+        TestUtils.assertEquals(id + " value", value, result.getValue(), ACCURACY);
+
+        double actualDual = result.getDualValues().stream().filter(kp -> kp.getKey().left() == constraint).mapToDouble(kp -> kp.doubleValue()).findFirst()
+                .orElseThrow();
+        TestUtils.assertEquals(id + " dual", dual, actualDual, ACCURACY);
+
+        double[] rc = ReducedCostsTest.extractRc(result, fixedIndex + 1, id);
+        TestUtils.assertEquals(id + " rc of fixed", fixedRc, rc[fixedIndex], ACCURACY);
+    }
+
     private static double[] extractRc(final Optimisation.Result result, final int nbVars, final String id) {
 
         Optional<Supplier<Access1D<?>>> rg = result.getReducedGradient();
@@ -158,6 +172,57 @@ public class ReducedCostsTest extends OptimisationLinearTests {
         };
 
         this.doVerifyConsistency("fixedByPresolve", factory, Sense.MIN, 15.0, new double[] { 0.0, 5.0 });
+    }
+
+    /**
+     * A fixed variable, z = 0.5, that is part of a constraint. The fixed z is removed from the constraint
+     * before it reaches the solver, so its rc is reconstructed from the constraint's multiplier (see
+     * {@link Optimisation.Result#getDualValues()} for the sign convention). The dual must be reported with
+     * the model's own constraint instance. Each case has a non-degenerate optimum, where no nonbasic variable
+     * is at a bound that presolve would use to imply a bound on the basic one.
+     *
+     * <pre>
+     * min  x + 2y + 3z        s.t. x + y + z >= 2.5       x, y in [0, 10]
+     *      x=2, y=0, value=3.5, lambda=1, rc_z = 3 - lambda = 2
+     * max  x + 2y + 3z        s.t. x + y + z <= 2.5       x in [0, 10], y in [0, 1]
+     *      x=1, y=1, value=4.5, lambda=1, rc_z = 3 - lambda = 2
+     * min  x - y + 3w + 3z    s.t. x + y + w + z = 2.5    x in [0, 10], y, w in [0, 1]
+     *      x=1, y=1, w=0, value=1.5, lambda=-1, rc_z = 3 + lambda = 2
+     * </pre>
+     */
+    @Test
+    public void testFixedInConstraint() {
+
+        for (KeyValue<String, ExpressionsBasedModel.Integration<LinearSolver>> entry : this.getAllIntegrations()) {
+
+            ExpressionsBasedModel lowerModel = new ExpressionsBasedModel();
+            Variable lowerX = lowerModel.newVariable("x").lower(0).upper(10).weight(1);
+            Variable lowerY = lowerModel.newVariable("y").lower(0).upper(10).weight(2);
+            Variable lowerZ = lowerModel.newVariable("z").level(0.5).weight(3);
+            Expression lower = lowerModel.newExpression("c").set(lowerX, 1).set(lowerY, 1).set(lowerZ, 1).lower(2.5);
+
+            ReducedCostsTest.assertFixedInConstraint("fixedInConstraint/LOWER/" + entry.getKey(), lowerModel.minimise(entry.getValue()), lower, 2, 3.5, 1.0,
+                    2.0);
+
+            ExpressionsBasedModel upperModel = new ExpressionsBasedModel();
+            Variable upperX = upperModel.newVariable("x").lower(0).upper(10).weight(1);
+            Variable upperY = upperModel.newVariable("y").lower(0).upper(1).weight(2);
+            Variable upperZ = upperModel.newVariable("z").level(0.5).weight(3);
+            Expression upper = upperModel.newExpression("c").set(upperX, 1).set(upperY, 1).set(upperZ, 1).upper(2.5);
+
+            ReducedCostsTest.assertFixedInConstraint("fixedInConstraint/UPPER/" + entry.getKey(), upperModel.maximise(entry.getValue()), upper, 2, 4.5, 1.0,
+                    2.0);
+
+            ExpressionsBasedModel equalityModel = new ExpressionsBasedModel();
+            Variable equalityX = equalityModel.newVariable("x").lower(0).upper(10).weight(1);
+            Variable equalityY = equalityModel.newVariable("y").lower(0).upper(1).weight(-1);
+            Variable equalityW = equalityModel.newVariable("w").lower(0).upper(1).weight(3);
+            Variable equalityZ = equalityModel.newVariable("z").level(0.5).weight(3);
+            Expression equality = equalityModel.newExpression("c").set(equalityX, 1).set(equalityY, 1).set(equalityW, 1).set(equalityZ, 1).level(2.5);
+
+            ReducedCostsTest.assertFixedInConstraint("fixedInConstraint/EQUALITY/" + entry.getKey(), equalityModel.minimise(entry.getValue()), equality, 3,
+                    1.5, -1.0, 2.0);
+        }
     }
 
     /**

@@ -23,6 +23,7 @@ package org.ojalgo.optimisation.convex;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.store.ElementsSupplier;
@@ -170,8 +171,10 @@ class NullSpaceProjection {
 
         // Recover multipliers using stationarity: Qx - C + AE^T λE + AI^T λI = 0
         // Build rhsStation = C - Qx - AI^T λI in a few dense/sparse ops for clarity
+        MatrixStore<Double> orgQx = orgQ.multiply(x);
         PhysicalStore<Double> rhsStation = R064Store.FACTORY.make(nbOrgVars, 1);
-        orgC.onMatching(orgQ.multiply(x), SUBTRACT).supplyTo(rhsStation);
+        rhsStation.fillMatching(orgC);
+        rhsStation.modifyMatching(SUBTRACT, orgQx);
 
         PhysicalStore<Double> lambdaI = null;
         if (nbOrgInes > 0 && reducedlState.getMultipliers().isPresent()) {
@@ -183,7 +186,7 @@ class NullSpaceProjection {
             }
             // Subtract AI^T * lambdaI
             MatrixStore<Double> aitLambda = myOriginal.getAI().transpose().multiply(lambdaI);
-            rhsStation.onMatching(aitLambda, SUBTRACT).supplyTo(rhsStation);
+            rhsStation.modifyMatching(SUBTRACT, aitLambda);
         }
 
         // Solve AE^T * lambdaE = rhsStation using the same QR(AE^T)
@@ -198,8 +201,22 @@ class NullSpaceProjection {
             multipliers.regionByOffsets(nbOrgEqus, 0).fillMatching(lambdaI);
         }
 
-        Optimisation.Result retVal = new Optimisation.Result(reducedlState.getState(), NaN, x);
-        return retVal.withDualValues(myOriginal.getConstraintsMetaData(), () -> multipliers);
+        double objectiveScale = myOriginal.getObjectiveAdjustmentFactor();
+
+        double value = (x.dot(orgQx) / TWO - x.dot(orgC)) / objectiveScale;
+
+        double[] reducedGradient = new double[nbOrgVars];
+        for (int j = 0; j < nbOrgVars; j++) {
+            reducedGradient[j] = orgQx.doubleValue(j) - orgC.doubleValue(j);
+        }
+        myOriginal.addMultiplierTerms(reducedGradient, multipliers);
+        for (int j = 0; j < nbOrgVars; j++) {
+            reducedGradient[j] /= objectiveScale;
+        }
+
+        Optimisation.Result retVal = new Optimisation.Result(reducedlState.getState(), value, x);
+        return retVal.withDualValues(myOriginal.getConstraintsMetaData(), () -> multipliers)
+                .withReducedGradient(() -> ArrayR064.wrap(reducedGradient));
     }
 
     /**

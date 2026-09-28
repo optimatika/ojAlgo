@@ -419,9 +419,11 @@ public interface Optimisation {
         }
 
         /**
-         * Convert solver state to model state. Transforming the solution (set of variable values) is the main
-         * concern. Adjusting the objective function value (if needed) is best handled elsewhere, and is not
-         * required here.
+         * Convert solver state to model state. The returned result is in model terms: the solution indexed as
+         * the model's variables, and the objective function value, the dual values and the reduced gradient
+         * in model units (any scaling of the objective or the constraints undone) and in the model's
+         * optimisation sense. The objective function value includes any objective constant. See
+         * {@link Result#getDualValues()} and {@link Result#getReducedGradient()}.
          * <p>
          * The required behaviour here depends on how {@link #build(Optimisation.Model)} is implemented, and
          * is the reverse mapping of {@link #toSolverState(Optimisation.Result, Optimisation.Model)}.
@@ -502,6 +504,8 @@ public interface Optimisation {
 
     public static final class Options implements Optimisation {
 
+        private static final NumberContext DEFAULT_FEASIBILITY = NumberContext.of(12, 8);
+
         /**
          * Tolerance for detecting degenerate (near-zero) expression coefficients during presolving.
          * Coefficients within this tolerance are treated as zero, and the corresponding variables are
@@ -521,7 +525,7 @@ public interface Optimisation {
          * variable values integer? Used by presolvers and by {@link ExpressionsBasedModel} to validate solver
          * results. Not used as part of internal solver logic.
          */
-        public NumberContext feasibility = NumberContext.of(12, 8);
+        public NumberContext feasibility = DEFAULT_FEASIBILITY;
 
         /**
          * Hard iteration limit. The solver aborts after this many iterations regardless of solution state.
@@ -636,6 +640,35 @@ public interface Optimisation {
             logger_detailed = solver != null;
             validate = solver != null;
             return this;
+        }
+
+        /**
+         * The {@link #feasibility} tolerance, but only if it is different from the default.
+         * External/3rd-party solvers are passed it only then, as a requirement to achieve - not as internal
+         * algorithm thresholds - and otherwise keep their own defaults.
+         */
+        public Optional<NumberContext> getConfiguredFeasibilityTolerance() {
+            if (DEFAULT_FEASIBILITY.equals(feasibility)) {
+                return Optional.empty();
+            } else {
+                return Optional.of(feasibility);
+            }
+        }
+
+        /**
+         * The MIP gap tolerance of the {@link #integer()} strategy, but only if it is different from that of
+         * {@link IntegerStrategy#DEFAULT}. External/3rd-party solvers are passed it only then, and otherwise
+         * keep their own defaults. Its relative and absolute errors are the relative and absolute gaps – the
+         * search may stop when the gap is no larger than either.
+         */
+        public Optional<NumberContext> getConfiguredGapTolerance() {
+            NumberContext gap = myIntegerStrategy.getGapTolerance();
+            NumberContext defaultGap = IntegerStrategy.DEFAULT.getGapTolerance();
+            if (gap.equals(defaultGap)) {
+                return Optional.empty();
+            } else {
+                return Optional.of(gap);
+            }
         }
 
         /**
@@ -853,6 +886,13 @@ public interface Optimisation {
         /**
          * The dual variable values or Lagrange multipliers, matched to their respective constraints (model
          * entity and constraint type pairs).
+         * <p>
+         * The multipliers are those of the minimisation form of the problem (the objective is negated for
+         * MAX), with the Lagrangian {@code L = f(x) + Σ λ (a'x - u) + Σ λ (l - a'x) + Σ λ (a'x - b)} summing
+         * over the UPPER, LOWER and EQUALITY constraints respectively. For inequality constraints they are
+         * non-negative. When minimising, the optimal value changes by {@code -λ} per unit increase of an
+         * UPPER or EQUALITY limit, and by {@code +λ} per unit increase of a LOWER limit; when maximising the
+         * signs are reversed.
          */
         public List<KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>>> getDualValues() {
 
@@ -889,6 +929,12 @@ public interface Optimisation {
         /**
          * The reduced gradient of the solution. This is the rate of change of the objective if a variable
          * were to move from its current bound, accounting for the dual variables.
+         * <p>
+         * It is the gradient of the objective function plus the multiplier terms of the constraints (not the
+         * variable bounds), in the model's optimisation sense: at an optimum it is non-zero only for
+         * variables at an active bound. When minimising it is positive at a lower bound and negative at an
+         * upper bound; when maximising the reverse. Solvers that model the variable bounds as constraint rows
+         * also report those multipliers as dual values, with the variables, see {@link #getDualValues()}.
          * <p>
          * If the {@link Optional} is empty the underlying {@link Solver} or {@link Integration} does not
          * provide the reduced gradient.

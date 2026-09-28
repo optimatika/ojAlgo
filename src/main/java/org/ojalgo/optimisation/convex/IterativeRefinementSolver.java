@@ -21,8 +21,10 @@
  */
 package org.ojalgo.optimisation.convex;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
+import org.ojalgo.array.ArrayR064;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.QuadrupleMath;
 import org.ojalgo.matrix.store.GenericStore;
@@ -30,6 +32,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.scalar.Quadruple;
+import org.ojalgo.structure.Access1D;
 
 /**
  * Algorithm from: Solving quadratic programs to high precision using scaled iterative refinement <br>
@@ -288,7 +291,36 @@ final class IterativeRefinementSolver extends ConvexSolver {
         MatrixStore<Quadruple> mtrxAI = myData.getAI();
         MatrixStore<Quadruple> mtrxBI = myData.getBI();
 
-        return IterativeRefinementSolver.doSolve(mtrxQ, mtrxC, mtrxAE, mtrxBE, mtrxAI, mtrxBI, options);
+        Result result = IterativeRefinementSolver.doSolve(mtrxQ, mtrxC, mtrxAE, mtrxBE, mtrxAI, mtrxBI, options);
+
+        double objectiveScale = myData.getObjectiveAdjustmentFactor();
+
+        Result retVal = result.withValue(result.getValue() / objectiveScale);
+
+        Optional<Supplier<Access1D<?>>> dualSolution = result.getDualSolution();
+        if (result.getState().isFeasible() && dualSolution.isPresent()) {
+
+            Access1D<?> multipliers = dualSolution.get().get();
+
+            int nbVars = myData.countVariables();
+            MatrixStore<Quadruple> mtrxQx = mtrxQ.multiply(GenericStore.R128.column(result));
+            double[] reducedGradient = new double[nbVars];
+            for (int j = 0; j < nbVars; j++) {
+                reducedGradient[j] = mtrxQx.doubleValue(j) - mtrxC.doubleValue(j);
+            }
+            myData.addMultiplierTerms(reducedGradient, multipliers);
+            for (int j = 0; j < nbVars; j++) {
+                reducedGradient[j] /= objectiveScale;
+            }
+
+            retVal = retVal.withReducedGradient(() -> ArrayR064.wrap(reducedGradient));
+
+            if (myData.isEntityMap()) {
+                retVal = retVal.withDualValues(myData.getConstraintsMetaData(), () -> multipliers);
+            }
+        }
+
+        return retVal;
     }
 
 }

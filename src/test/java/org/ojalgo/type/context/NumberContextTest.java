@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.type.format.NumberStyle;
 
 /**
  * NumberContextTest
@@ -113,6 +114,31 @@ public class NumberContextTest {
                 TestUtils.assertFalse(preciContext.isSmall(value, trigger));
             }
         }
+    }
+
+    /**
+     * Equal precision, rounding mode and scale make equal contexts – whether or not they are the same instance,
+     * and whatever their formats.
+     */
+    @Test
+    public void testEqualsAndHashCode() {
+
+        NumberContext context = NumberContext.of(5, 7);
+        NumberContext same = NumberContext.of(5, 7);
+
+        TestUtils.assertTrue(context.equals(same));
+        TestUtils.assertEquals(context.hashCode(), same.hashCode());
+
+        NumberContext formatted = context.withFormat(NumberStyle.PERCENT, Locale.US);
+        TestUtils.assertTrue(context.equals(formatted));
+        TestUtils.assertEquals(context.hashCode(), formatted.hashCode());
+
+        context.format(1.5);
+        TestUtils.assertEquals(same.hashCode(), context.hashCode());
+
+        TestUtils.assertFalse(context.equals(NumberContext.of(5, 8)));
+        TestUtils.assertFalse(context.equals(NumberContext.of(6, 7)));
+        TestUtils.assertFalse(context.equals(context.withMode(RoundingMode.DOWN)));
     }
 
     @Test

@@ -85,6 +85,10 @@ public class Expression extends ModelEntity<Expression> {
     private transient BigDecimal myIntegerStep = null;
     private final Map<IntIndex, BigDecimal> myLinear;
     private final ExpressionsBasedModel myModel;
+    /**
+     * Set on a compensated copy, see {@link #compensate(Set)}: the model expression it was derived from.
+     */
+    private Expression myOrigin = null;
     private Map<IntRowColumn, BigDecimal> myQuadratic;
     private transient boolean myRedundant = false;
     /**
@@ -296,6 +300,7 @@ public class Expression extends ModelEntity<Expression> {
         ExpressionsBasedModel model = this.getModel();
 
         Expression retVal = new Expression(this.getName(), model);
+        retVal.myOrigin = this.getOrigin();
 
         BigDecimal fixedValue = BigMath.ZERO;
 
@@ -1286,6 +1291,11 @@ public class Expression extends ModelEntity<Expression> {
 
     final ExpressionsBasedModel getModel() {
         return myModel;
+    }
+
+    @Override
+    final Expression getOrigin() {
+        return myOrigin != null ? myOrigin : this;
     }
 
     final Optional<Map<IntRowColumn, BigDecimal>> getQuadratic() {

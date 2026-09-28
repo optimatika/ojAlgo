@@ -96,9 +96,11 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
 
             if (model.options.convex().isExtendedPrecision()) {
-                return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR256.FACTORY, solverState.getReducedGradient());
+                return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR256.FACTORY, solverState.getReducedGradient(),
+                        this.getSolverSense());
             } else {
-                return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR064.FACTORY, solverState.getReducedGradient());
+                return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR064.FACTORY, solverState.getReducedGradient(),
+                        this.getSolverSense());
             }
         }
 
@@ -229,7 +231,7 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
     @Override
     public double getReducedGradient(final int index) {
         if (myCachedReducedGradient == null) {
-            myCachedReducedGradient = this.computeReducedGradient();
+            myCachedReducedGradient = this.extractReducedGradient();
         }
         return myCachedReducedGradient[index];
     }
@@ -261,12 +263,27 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
         return myMatrices.toString();
     }
 
+    /**
+     * The reduced gradient in model space. {@link #computeReducedGradient()} works with the solver's data,
+     * where the objective is scaled by {@link ConvexData#getObjectiveAdjustmentFactor()}.
+     */
+    private double[] extractReducedGradient() {
+        double[] gradient = this.computeReducedGradient();
+        double objectiveScale = myMatrices.getObjectiveAdjustmentFactor();
+        if (objectiveScale != ONE) {
+            for (int j = 0; j < gradient.length; j++) {
+                gradient[j] /= objectiveScale;
+            }
+        }
+        return gradient;
+    }
+
     protected Optimisation.Result buildResult() {
 
         Access1D<?> solution = this.extractSolution();
-        double value = this.evaluateFunction(solution);
+        double value = this.evaluateFunction(solution) / myMatrices.getObjectiveAdjustmentFactor();
 
-        Supplier<Access1D<?>> reducedGradient = () -> ArrayR064.wrap(this.computeReducedGradient());
+        Supplier<Access1D<?>> reducedGradient = () -> ArrayR064.wrap(this.extractReducedGradient());
 
         return new Optimisation.Result(state, value, solution).withReducedGradient(reducedGradient);
     }
@@ -526,6 +543,10 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
 
     ConstraintsMetaData getConstraintsMetaData() {
         return myMatrices.getConstraintsMetaData();
+    }
+
+    ConvexData<Double> getConvexData() {
+        return myMatrices;
     }
 
     boolean isPatchedQ() {

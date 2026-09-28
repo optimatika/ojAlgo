@@ -151,10 +151,11 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
             return myU;
         }
 
-        void setConstraint(final int index, final BigDecimal lower, final ModelEntity<?> entity, final BigDecimal upper, final ConstraintType type) {
+        void setConstraint(final int index, final BigDecimal lower, final ModelEntity<?> entity, final BigDecimal upper, final ConstraintType type,
+                final boolean adjusted) {
             myL.set(index, lower);
             myU.set(index, upper);
-            myStructure.setConstraintEntry(index, entity, type);
+            myStructure.setConstraintEntry(index, entity, type, adjusted);
         }
 
         void setInA(final int row, final int col, final BigDecimal value) {
@@ -194,7 +195,7 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
         /**
          * Absolute iteration ceiling independent of problem size.
          */
-        private static final int MAX_ITERATIONS = 8_000;
+        private static final int MAX_ITERATIONS = 20_000;
 
         /**
          * How often (in iterations) to check termination and consider adapting rho. Higher values reduce
@@ -214,8 +215,6 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
          * factorisation is triggered. Increasing this reduces refactorisations but may slow adaptation.
          */
         static final double ADAPTIVE_RHO_TOLERANCE = 5.0;
-
-        static final boolean ADJUSTED = true;
 
         /**
          * ADMM relaxation parameter α; must lie in (0, 2). Over-relaxation (α > 1) often improves
@@ -266,8 +265,7 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
         static final double SMALL = 1e-10;
 
         /**
-         * @return A size-dependent iteration limit. For small problems, a minimum of 400 iterations is
-         *         allowed. For larger problems, 1000 × √(m + n) iterations, capped by the user's
+         * @return A size-dependent iteration limit: 400 × √(m + n) iterations, capped by the user's
          *         {@link Options#iterations_abort} and the absolute ceiling {@link #MAX_ITERATIONS}.
          */
         static int maxIterations(final int m, final int n, final Optimisation.Options options) {
@@ -277,7 +275,7 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
                 max = MAX_ITERATIONS;
             }
 
-            int candidate = (int) (300.0 * Math.sqrt(m + n));
+            int candidate = (int) (400.0 * Math.sqrt(m + n));
             return Math.min(candidate, max);
         }
 
@@ -311,13 +309,27 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
             return !model.isAnyVariableInteger() && model.isAnyObjectiveQuadratic() && !model.isAnyConstraintQuadratic();
         }
 
+        /**
+         * An approximate solution - not converged, but the relaxed tolerances are met - is accepted as optimal
+         * if it validates against the model.
+         */
         @Override
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
+
+            Result modelState;
             if (model.options.convex().isExtendedPrecision()) {
-                return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR256.FACTORY, solverState.getReducedGradient());
+                modelState = ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR256.FACTORY, solverState.getReducedGradient(),
+                        this.getSolverSense());
             } else {
-                return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR064.FACTORY, solverState.getReducedGradient());
+                modelState = ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR064.FACTORY, solverState.getReducedGradient(),
+                        this.getSolverSense());
             }
+
+            if (modelState.getState() == State.APPROXIMATE && model.validate(modelState)) {
+                modelState = modelState.withState(State.OPTIMAL);
+            }
+
+            return modelState;
         }
 
         @Override
@@ -437,11 +449,15 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
             this(dimensions.getRowDim(), dimensions.getColDim());
         }
 
-        Optimisation.Result compose(final double value, final Optimisation.State state) {
+        /**
+         * @param approximate Not converged, but the relaxed tolerances are met - the dual variables are kept,
+         *                    as well as the primal.
+         */
+        Optimisation.Result compose(final double value, final Optimisation.State state, final boolean approximate) {
 
             Optimisation.Result result = Optimisation.Result.of(value, state, x);
 
-            if (state.isFeasible() && y != null && y.length > 0) {
+            if ((state.isFeasible() || approximate) && y != null && y.length > 0) {
                 result = result.withDualSolution(() -> ArrayR064.wrap(y));
             }
 
@@ -455,7 +471,19 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
      */
     static final class Structure implements EntityMap {
 
-        private final ConstraintsMetaData myConstraintsMetaData;
+        /**
+         * For each solver variable, the row of its bound constraint, or -1 if it has none.
+         */
+        private final int[] myBoundRows;
+        /**
+         * For each solver variable with a bound row, the coefficient of that row: the variable's adjustment
+         * factor if the bounds are adjusted, or else 1.
+         */
+        private final double[] myBoundScales;
+        /**
+         * Replaced, not modified, when a bound row's type changes – results already returned refer to it.
+         */
+        private ConstraintsMetaData myConstraintsMetaData;
         private final int[] myModelIndices;
         /**
          * Number of constraints.
@@ -473,7 +501,11 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
 
             this.m = m;
             this.n = n;
+            myBoundRows = new int[n];
+            Arrays.fill(myBoundRows, -1);
+            myBoundScales = new double[n];
             myConstraintsMetaData = ConstraintsMetaData.newInstance(m, mapped);
+            myConstraintsMetaData.setSignedRows(true);
             myModelIndices = new int[n];
         }
 
@@ -531,12 +563,49 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
             return false;
         }
 
-        void setConstraintEntry(final int i, final ModelEntity<?> entity, final ConstraintType type) {
-            myConstraintsMetaData.setEntry(i, entity, type);
+        int getBoundRow(final int j) {
+            return myBoundRows[j];
+        }
+
+        double getBoundScale(final int j) {
+            return myBoundScales[j];
+        }
+
+        ConstraintsMetaData getConstraintsMetaData() {
+            return myConstraintsMetaData;
+        }
+
+        /**
+         * The objective's adjustment factor (10^exponent), the scaling applied to the objective when the
+         * problem was built from a model. 1.0 means no scaling.
+         */
+        double getObjectiveAdjustmentFactor() {
+            return myConstraintsMetaData.getMultiplierScale();
+        }
+
+        boolean isEntityMap() {
+            return myConstraintsMetaData.isEntityMap();
+        }
+
+        void setBoundRow(final int j, final int row, final double scale) {
+            myBoundRows[j] = row;
+            myBoundScales[j] = scale;
+        }
+
+        void setConstraintEntry(final int i, final ModelEntity<?> entity, final ConstraintType type, final boolean adjusted) {
+            myConstraintsMetaData.setEntry(i, entity, type, false, adjusted);
+        }
+
+        void setObjectiveAdjustmentFactor(final double factor) {
+            myConstraintsMetaData.setMultiplierScale(factor);
         }
 
         void setVariableEntry(final int j, final int index) {
             myModelIndices[j] = index;
+        }
+
+        void updateBoundLimits(final int j, final double lower, final double upper) {
+            myConstraintsMetaData = myConstraintsMetaData.withLimits(myBoundRows[j], lower, upper);
         }
 
     }
@@ -697,6 +766,20 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
         }
     }
 
+    /**
+     * Should variable lower/upper bounds be read in their numerically-adjusted form? Bounds are modelled as
+     * rows in {@code A} with a single coefficient, the variable's adjustment factor if adjusted or else 1,
+     * and the bounds as {@code l} and {@code u}. Unit rows keep the bounds in model units.
+     */
+    private static final boolean ADJUSTED_BOUNDS = false;
+    /**
+     * Should constraint coefficients and limits be read in their numerically-adjusted form?
+     */
+    private static final boolean ADJUSTED_CONSTRAINTS = true;
+    /**
+     * Should the objective's linear and quadratic coefficients be read in their numerically-adjusted form?
+     */
+    private static final boolean ADJUSTED_OBJECTIVE = true;
     private static final double SCALED_INFINITY = Configuration.INFINITY * Equilibrator.MIN;
 
     static final Integration INTEGRATION = new Integration();
@@ -724,10 +807,12 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
 
         boolean max = model.getOptimisationSense() == Optimisation.Sense.MAX;
 
+        retVal.getStructure().setObjectiveAdjustmentFactor(ADJUSTED_OBJECTIVE ? objective.getAdjustmentFactor() : PrimitiveMath.ONE);
+
         for (IntIndex key : objective.getLinearKeySet()) {
             int index = model.indexOfFreeVariable(key.index);
             if (index >= 0 && index < n) {
-                BigDecimal val = objective.get(key, Configuration.ADJUSTED);
+                BigDecimal val = objective.get(key, ADJUSTED_OBJECTIVE);
                 // q[index] = max ? -val : val;
                 retVal.setInQ(index, max ? val.negate() : val);
             }
@@ -737,7 +822,7 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
             int row = model.indexOfFreeVariable(key.row);
             int col = model.indexOfFreeVariable(key.column);
             if (row >= 0 && row < n && col >= 0 && col < n) {
-                BigDecimal val = objective.get(key, Configuration.ADJUSTED);
+                BigDecimal val = objective.get(key, ADJUSTED_OBJECTIVE);
                 retVal.setInP(row, col, max ? val.negate() : val);
             }
         }
@@ -753,15 +838,15 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
                 int modelCol = key.index;
                 int solverCol = model.indexOfFreeVariable(modelCol);
                 if (solverCol >= 0 && solverCol < n) {
-                    BigDecimal value = constraint.get(key, Configuration.ADJUSTED);
+                    BigDecimal value = constraint.get(key, ADJUSTED_CONSTRAINTS);
                     retVal.setInA(row, solverCol, value);
                     // aBuilder.set(row, solverCol, value);
                 }
             }
 
-            BigDecimal lower = constraint.getLowerLimit(Configuration.ADJUSTED, Configuration.INFINITY2.negate());
-            BigDecimal upper = constraint.getUpperLimit(Configuration.ADJUSTED, Configuration.INFINITY2);
-            retVal.setConstraint(row, lower, constraint, upper, constraint.getConstraintType());
+            BigDecimal lower = constraint.getLowerLimit(ADJUSTED_CONSTRAINTS, Configuration.INFINITY2.negate());
+            BigDecimal upper = constraint.getUpperLimit(ADJUSTED_CONSTRAINTS, Configuration.INFINITY2);
+            retVal.setConstraint(row, lower, constraint, upper, constraint.getConstraintType(), ADJUSTED_CONSTRAINTS);
             row++;
         }
 
@@ -769,12 +854,13 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
 
             int index = model.indexOfFreeVariable(bound);
 
-            // aBuilder.set(row, index, PrimitiveMath.ONE);
-            retVal.setInA(row, index, BigMath.ONE);
+            BigDecimal coefficient = ADJUSTED_BOUNDS ? bound.adjust(BigMath.ONE) : BigMath.ONE;
+            retVal.setInA(row, index, coefficient);
 
-            BigDecimal lower = bound.getLowerLimit(false, Configuration.INFINITY2.negate());
-            BigDecimal upper = bound.getUpperLimit(false, Configuration.INFINITY2);
-            retVal.setConstraint(row, lower, bound, upper, bound.getConstraintType());
+            BigDecimal lower = bound.getLowerLimit(ADJUSTED_BOUNDS, Configuration.INFINITY2.negate());
+            BigDecimal upper = bound.getUpperLimit(ADJUSTED_BOUNDS, Configuration.INFINITY2);
+            retVal.setConstraint(row, lower, bound, upper, bound.getConstraintType(), ADJUSTED_BOUNDS);
+            retVal.getStructure().setBoundRow(index, row, coefficient.doubleValue());
             row++;
         }
 
@@ -864,6 +950,7 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
 
         double value = PrimitiveMath.NaN;
         state = Optimisation.State.UNEXPLORED;
+        boolean approximate = false;
 
         try {
 
@@ -909,11 +996,15 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
                 this.checkTermination(false);
             }
 
-            if (!state.isFeasible() && !this.checkTermination(true)) {
-                state = State.APPROXIMATE;
+            if (!state.isFeasible()) {
+                boolean terminal = this.checkTermination(true);
+                approximate = terminal && state.isOptimal();
+                if (!terminal || approximate) {
+                    state = State.APPROXIMATE;
+                }
             }
 
-            this.storeSolution();
+            this.storeSolution(approximate);
 
             if (debug) {
                 this.printRow(myWork);
@@ -929,18 +1020,31 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
 
         Supplier<Access1D<?>> reducedGradient = () -> ArrayR064.wrap(this.computeReducedGradient());
 
-        return mySolution.compose(value, state).withReducedGradient(reducedGradient);
+        Optimisation.Result retVal = mySolution.compose(value, state, approximate).withReducedGradient(reducedGradient);
+
+        if (myStructure.isEntityMap() && retVal.getDualSolution().isPresent()) {
+            retVal = retVal.withDualValues(myStructure.getConstraintsMetaData(), retVal.getDualSolution().get());
+        }
+
+        return retVal;
     }
 
     @Override
     public boolean updateRange(final int index, final double lower, final double upper) {
 
+        int row = myStructure.getBoundRow(index);
+        if (row < 0) {
+            return false;
+        }
+
         myCachedReducedGradient = null;
 
-        double scalar = myScaling.dual.values[index];
+        double scalar = myStructure.getBoundScale(index) * myScaling.dual.values[row];
 
-        myData.l[index] = lower * scalar;
-        myData.u[index] = upper * scalar;
+        myData.l[row] = lower * scalar;
+        myData.u[row] = upper * scalar;
+
+        myStructure.updateBoundLimits(index, lower, upper);
 
         state = State.UNEXPLORED;
 
@@ -1082,19 +1186,30 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
     }
 
     /**
-     * Computes the reduced gradient (gradient of the Lagrangian) in original (unscaled) coordinates.
+     * Computes the reduced gradient, in the bounded-variable sense, in original (unscaled) coordinates: the
+     * gradient of the Lagrangian without the variable-bound rows, so that at an optimum it is non-zero only for
+     * variables at an active bound. (The bound multipliers are also reported as dual values, with the
+     * variables.)
      * <p>
-     * Evaluates {@code P_s x_s + q_s + A_s' y_s} using scaled data and work arrays, then unscales each
-     * component by {@code primal.inverse[j] / cost}.
+     * Evaluates {@code P_s x_s + q_s + A_s' y_s}, with the bound rows' multipliers left out, using scaled data
+     * and work arrays, then unscales each component by {@code primal.inverse[j] / cost}, and by the objective's
+     * adjustment factor to get model units.
      */
     private double[] computeReducedGradient() {
         int n = myData.getColDim();
         double[] gradient = new double[n];
         double[] Px = new double[n];
         double[] yA = new double[n];
+        double[] rowMultipliers = Arrays.copyOf(myWork.y, myWork.y.length);
+        for (int j = 0; j < n; j++) {
+            int boundRow = myStructure.getBoundRow(j);
+            if (boundRow >= 0) {
+                rowMultipliers[boundRow] = PrimitiveMath.ZERO;
+            }
+        }
         R064CSC.multiplySymmetric(Px, myData.P, myWork.x);
-        R064CSC.multiply(yA, myWork.y, myData.A);
-        double invCost = PrimitiveMath.ONE / myScaling.cost;
+        R064CSC.multiply(yA, rowMultipliers, myData.A);
+        double invCost = PrimitiveMath.ONE / (myScaling.cost * myStructure.getObjectiveAdjustmentFactor());
         for (int j = 0; j < n; j++) {
             gradient[j] = (Px[j] + myData.q[j] + yA[j]) * myScaling.primal.inverse[j] * invCost;
         }
@@ -1290,10 +1405,13 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
 
     /**
      * Finalises and stores the solution; unscales if feasible, resets otherwise.
+     *
+     * @param approximate Not converged, but the relaxed tolerances are met - the iterate is kept (unscaled), as
+     *                    an approximate solution.
      */
-    private void storeSolution() {
+    private void storeSolution(final boolean approximate) {
 
-        if (state.isFeasible()) {
+        if (state.isFeasible() || approximate) {
 
             System.arraycopy(myWork.x, 0, mySolution.x, 0, myData.getColDim());
             System.arraycopy(myWork.y, 0, mySolution.y, 0, myData.getRowDim());
@@ -1373,7 +1491,8 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
     }
 
     /**
-     * Computes {@code ½ x' P x + q' x} in original (unscaled) coordinates.
+     * Computes {@code ½ x' P x + q' x} in model units: unscaled by the cost scaling as well as by the
+     * objective's adjustment factor.
      */
     double calculateObjectiveValue() {
 
@@ -1399,7 +1518,7 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
 
         retVal += DOT.invoke(myData.q, x);
 
-        retVal /= myScaling.cost;
+        retVal /= myScaling.cost * myStructure.getObjectiveAdjustmentFactor();
 
         return retVal;
     }

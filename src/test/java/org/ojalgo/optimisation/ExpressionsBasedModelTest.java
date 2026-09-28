@@ -35,6 +35,7 @@ import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation.Result;
+import org.ojalgo.optimisation.integer.IntegerStrategy;
 import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
@@ -128,6 +129,23 @@ class ExpressionsBasedModelTest extends OptimisationTests {
 
         TestUtils.assertEquals(1.0, result.doubleValue(0) + result.doubleValue(1), PrimitiveMath.MACHINE_EPSILON);
         TestUtils.assertEquals(4.0, result.doubleValue(2), PrimitiveMath.MACHINE_EPSILON);
+    }
+
+    /**
+     * The MIP gap is passed on to external solvers only when it is configured to be something other than the
+     * default.
+     */
+    @Test
+    void testConfiguredGapTolerance() {
+
+        Optimisation.Options options = new Optimisation.Options();
+        TestUtils.assertFalse(options.getConfiguredGapTolerance().isPresent());
+
+        options.integer(IntegerStrategy.DEFAULT.withGapTolerance(NumberContext.of(5, 7)));
+        TestUtils.assertFalse(options.getConfiguredGapTolerance().isPresent());
+
+        options.integer(IntegerStrategy.DEFAULT.withGapTolerance(NumberContext.of(6)));
+        TestUtils.assertEquals(NumberContext.of(6), options.getConfiguredGapTolerance().get());
     }
 
     @Test

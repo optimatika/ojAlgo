@@ -266,6 +266,17 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
          */
         boolean isNegated(int solverIndex);
 
+        /**
+         * Was the constraint row of this slack variable built from its entity's adjusted (scaled) parameters?
+         * If so, the solver's slack is the model's slack scaled by the entity's adjustment factor, see
+         * {@link ModelEntity#adjust(BigDecimal)}.
+         *
+         * @param ids Index of solver slack variable, as with {@link #getSlack(int)}
+         */
+        default boolean isSlackAdjusted(final int ids) {
+            return true;
+        }
+
     }
 
     public static abstract class ExpressionAnalyser extends Simplifier<Expression, ExpressionAnalyser> {
@@ -355,25 +366,64 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         }
 
         /**
-         * Reconstructs a model-level reduced cost from first principles: {@code rc_v = c_v - Σ a_iv · λ_i},
-         * using the variable's objective coefficient and the constraint multipliers reported on
-         * {@code solverState}. Useful for variables that the solver doesn't see (eliminated by presolve), and
-         * for solver paths whose internal index space prevents direct pass-through of the rc.
-         * <p>
-         * Returned value is in the same sense the multipliers are expressed in (i.e. typically MIN, the
-         * solver's internal sense). Callers should negate for MAX models if appropriate.
+         * @deprecated v58 Use
+         *             {@link #computeReducedCostFromMultipliers(ExpressionsBasedModel, int, Result, Access1D)}
+         *             instead. This version evaluates the objective's gradient at the origin, and so only
+         *             includes the objective's linear part.
          */
+        @Deprecated
         protected static double computeReducedCostFromMultipliers(final ExpressionsBasedModel model, final int variableIndex, final Result solverState) {
+            return ExpressionsBasedModel.Integration.computeReducedCostFromMultipliers(model, variableIndex, solverState,
+                    Access1D.wrap(new double[model.countVariables()]));
+        }
+
+        /**
+         * Reconstructs a model-level reduced cost from first principles, using the gradient of the objective
+         * function at {@code modelSolution} and the constraint multipliers reported on {@code solverState}
+         * (see {@link Result#getDualValues()} for their sign convention): {@code rc_v = ∂f/∂x_v - Σ a_iv · λ_i}
+         * over the LOWER constraints, {@code + Σ a_iv · λ_i} over the UPPER and EQUALITY constraints, with
+         * {@code f} in the minimisation form (negated for MAX models). Useful for variables that the solver
+         * doesn't see (eliminated by presolve), and for solver paths whose internal index space prevents
+         * direct pass-through of the rc.
+         * <p>
+         * Returned value is in the minimisation form, the solver's usual internal sense. Callers should negate
+         * for MAX models.
+         *
+         * @param modelSolution The solution in model space (all variables, including the fixed ones), where the
+         *                      gradient of a quadratic objective is evaluated
+         */
+        protected static double computeReducedCostFromMultipliers(final ExpressionsBasedModel model, final int variableIndex, final Result solverState,
+                final Access1D<?> modelSolution) {
 
             IntIndex key = new IntIndex(variableIndex);
-            double rc = model.objective().doubleValue(key, false);
+            Expression objective = model.objective();
+            double rc = objective.doubleValue(key, false);
+            if (objective.isAnyQuadraticFactorNonZero()) {
+                for (IntRowColumn quadratic : objective.getQuadraticKeySet()) {
+                    double factor = objective.doubleValue(quadratic, false);
+                    if (quadratic.row == variableIndex) {
+                        rc += factor * modelSolution.doubleValue(quadratic.column);
+                    }
+                    if (quadratic.column == variableIndex) {
+                        rc += factor * modelSolution.doubleValue(quadratic.row);
+                    }
+                }
+            }
+            if (model.getOptimisationSense() == Optimisation.Sense.MAX) {
+                rc = -rc;
+            }
 
             for (EntryPair.KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>> kp : solverState.getDualValues()) {
                 ModelEntity<?> entity = kp.getKey().getKey();
                 if (entity instanceof Expression) {
                     Expression expression = (Expression) entity;
                     if (expression.getLinearKeySet().contains(key)) {
-                        rc -= expression.doubleValue(key, false) * kp.doubleValue();
+                        double contribution = expression.doubleValue(key, false) * kp.doubleValue();
+                        if (kp.getKey().getValue() == ConstraintType.LOWER) {
+                            rc -= contribution;
+                        } else {
+                            rc += contribution;
+                        }
                     }
                 }
             }
@@ -444,21 +494,42 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             return scales;
         }
 
+        /**
+         * @deprecated v58 Use
+         *             {@link #expandFreeToFull(Optimisation.Result, ExpressionsBasedModel, DenseArray.Factory, Optional, Optimisation.Sense)}
+         *             instead. This version assumes the solver minimises, so the value of a solver that
+         *             maximises natively would be negated.
+         */
+        @Deprecated
         protected static Result expandFreeToFull(final Result solverState, final ExpressionsBasedModel model, final DenseArray.Factory<?, ?> factory) {
             return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, factory, Optional.empty(), Optimisation.Sense.MIN);
         }
 
+        /**
+         * @deprecated v58 Use
+         *             {@link #expandFreeToFull(Optimisation.Result, ExpressionsBasedModel, DenseArray.Factory, Optional, Optimisation.Sense)}
+         *             instead. This version assumes the solver minimises, so the value and reduced gradient of a
+         *             solver that maximises natively would be negated.
+         */
+        @Deprecated
         protected static Result expandFreeToFull(final Result solverState, final ExpressionsBasedModel model, final DenseArray.Factory<?, ?> factory,
                 final Optional<Supplier<Access1D<?>>> reducedGradient) {
             return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, factory, reducedGradient, Optimisation.Sense.MIN);
         }
 
         /**
+         * Maps the result of a solver that only works with the free (not presolve-fixed) variables to the full
+         * model: the solution, the objective function value (adding {@link #getObjectiveAdjustment(ExpressionsBasedModel)},
+         * the objective constant and the contribution of the fixed variables) and the reduced gradient
+         * (reconstructing it for the fixed variables). The solver's value and reduced gradient must already be
+         * in model units, with any objective scaling undone.
+         *
          * @param solverSense the {@link Optimisation.Sense} the solver internally optimises in (usually fixed
-         *                    per solver — most simplex/QP solvers minimise). If this differs from the model's
-         *                    {@link ExpressionsBasedModel#getOptimisationSense() optimisation sense}, the
-         *                    reduced gradient values are negated when mapped back to the model so that
-         *                    callers always see them in the model's sense.
+         *                    per solver — most simplex/QP solvers minimise), or null if it optimises in the
+         *                    model's own sense. If this differs from the model's
+         *                    {@link ExpressionsBasedModel#getOptimisationSense() optimisation sense}, the value
+         *                    and the reduced gradient are negated when mapped back to the model so that callers
+         *                    always see them in the model's sense.
          */
         protected static Result expandFreeToFull(final Result solverState, final ExpressionsBasedModel model, final DenseArray.Factory<?, ?> factory,
                 final Optional<Supplier<Access1D<?>>> reducedGradient, final Optimisation.Sense solverSense) {
@@ -504,10 +575,12 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
                         fullGradient.set(model.indexOf(freeVariables.get(i)), negate ? -v : v);
                     }
                     // Variables eliminated by presolve aren't seen by the solver, so their reduced cost
-                    // must be reconstructed from first principles: rc_v = c_v - Σ a_iv · λ_i.
+                    // must be reconstructed from first principles. That is in the minimisation form,
+                    // whatever the solver's sense.
+                    boolean max = modelSense == Optimisation.Sense.MAX;
                     for (IntIndex fixed : fixedVariables) {
-                        double rc = ExpressionsBasedModel.Integration.computeReducedCostFromMultipliers(model, fixed.index, solverState);
-                        fullGradient.set(fixed.index, negate ? -rc : rc);
+                        double rc = ExpressionsBasedModel.Integration.computeReducedCostFromMultipliers(model, fixed.index, solverState, modelSolution);
+                        fullGradient.set(fixed.index, max ? -rc : rc);
                     }
                     return fullGradient;
                 };
@@ -523,11 +596,23 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         }
 
         /**
-         * Reads the {@linkplain #setObjectiveAdjustment(ExpressionsBasedModel, double) stashed} model-sense
-         * objective offset. Returns 0 if nothing has been stashed.
+         * The objective constant plus the contribution of the presolve-fixed variables, in model units and the
+         * model's sense, as stashed when the model's objective is compensated for the fixed variables (see
+         * {@link Expression#compensate(Set)}). This is what an integration that only passes the free variables
+         * to its solver needs to add to the solver's objective function value. Returns 0 if nothing has been
+         * stashed.
          */
         protected static double getObjectiveAdjustment(final ExpressionsBasedModel model) {
             return model.getObjectiveAdjustment().doubleValue();
+        }
+
+        /**
+         * The model's objective constant, in model units and the model's sense. This is what an integration
+         * that passes all the model's variables (none eliminated) to its solver needs to add to the solver's
+         * objective function value.
+         */
+        protected static double getObjectiveConstant(final ExpressionsBasedModel model) {
+            return model.getObjectiveConstant().doubleValue();
         }
 
         protected final static boolean isSwitch(final ExpressionsBasedModel model, final IntegrationProperty property) {

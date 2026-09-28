@@ -615,6 +615,15 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     /**
+     * The model entity this one stands in for. Usually itself, but a compensated copy of an
+     * {@link Expression} (a solver's constraint row when some variables are fixed) returns the model
+     * expression it was derived from.
+     */
+    ModelEntity<?> getOrigin() {
+        return this;
+    }
+
+    /**
      * @return true if the lower limit equals {@code lower} and the upper limit equals {@code upper}
      */
     boolean isClosedRange(final BigDecimal lower, final BigDecimal upper) {

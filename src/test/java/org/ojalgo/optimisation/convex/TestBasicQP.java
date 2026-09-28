@@ -79,6 +79,38 @@ public class TestBasicQP extends OptimisationConvexTests implements TestBasic {
         return OptimisationCase.of(model, Optimisation.Sense.MIN, result);
     }
 
+    /**
+     * Minimise y - 3z + (y² + z²) / 2 subject to -y + z <= 1, with y in [0, 2] and z in [-2, 2]. The
+     * constraint is binding (multiplier 1.5), and it pays to increase y to relax it. The optimal solution is
+     * y = 0.5 and z = 1.5, with objective value -2.75.
+     * <p>
+     * COPT 8.0.6, with its default presolve, returned y = 0 and z = -2 (its lower bound) as optimal. Fixed in
+     * 8.0.7.
+     */
+    static OptimisationCase caseBindingConstraint() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable y = model.addVariable("y").lower(0.0).upper(2.0);
+        Variable z = model.addVariable("z").lower(-2.0).upper(2.0);
+
+        Expression objective = model.addExpression("obj");
+        objective.set(y, 1.0);
+        objective.set(z, -3.0);
+        objective.set(y, y, 0.5);
+        objective.set(z, z, 0.5);
+        objective.weight(1.0);
+
+        Expression constraint = model.addExpression("c");
+        constraint.set(y, -1.0);
+        constraint.set(z, 1.0);
+        constraint.upper(1.0);
+
+        Optimisation.Result result = Optimisation.Result.of(-2.75, State.OPTIMAL, 0.5, 1.5);
+
+        return OptimisationCase.of(model, Optimisation.Sense.MIN, result).accuracy(NumberContext.of(6));
+    }
+
     static OptimisationCase caseBoundedQPAsLP() {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
@@ -101,6 +133,31 @@ public class TestBasicQP extends OptimisationConvexTests implements TestBasic {
         Optimisation.Result result = Optimisation.Result.of(-15.9936, State.OPTIMAL, 0.0, 8.0);
 
         return OptimisationCase.of(model, Optimisation.Sense.MIN, result);
+    }
+
+    /**
+     * The cross term keyed with the higher variable index first, (y, x) rather than (x, y): minimise x² + y²
+     * + yx - 3x - 3y, with x and y in [-10, 10]. The optimal solution is at x = y = 1 with objective value
+     * -3. (Without the cross term it would be x = y = 1.5.)
+     */
+    static OptimisationCase caseCrossTermKeyOrder() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x = model.addVariable("x").lower(-10.0).upper(10.0);
+        Variable y = model.addVariable("y").lower(-10.0).upper(10.0);
+
+        Expression objective = model.addExpression("obj");
+        objective.set(x, x, 1.0);
+        objective.set(y, y, 1.0);
+        objective.set(y, x, 1.0);
+        objective.set(x, -3.0);
+        objective.set(y, -3.0);
+        objective.weight(1.0);
+
+        Optimisation.Result result = Optimisation.Result.of(-3.0, State.OPTIMAL, 1.0, 1.0);
+
+        return OptimisationCase.of(model, Optimisation.Sense.MIN, result).accuracy(NumberContext.of(6));
     }
 
     /**
@@ -405,6 +462,39 @@ public class TestBasicQP extends OptimisationConvexTests implements TestBasic {
         return OptimisationCase.of(model, Optimisation.Sense.MAX, result).accuracy(NumberContext.of(3));
     }
 
+    /**
+     * Small variables and coefficients far from 1: minimise 0.15y - 0.0502z + (y² + z²) / 4 subject to -1000y
+     * + 1000z <= 1.5, with y in [0, 0.003] and z in [-0.002, 0.002]. The optimal solution is y = 0 and z =
+     * 0.0015 (capped by the constraint), with objective value -7.47375e-5.
+     * <p>
+     * With values this small the accuracy that matters is mostly absolute: interior point solvers get within
+     * about 1e-8 of the solution. (COPT 8.0.6, with its default presolve, returned z = -0.002 as optimal –
+     * not because of the small magnitudes, see {@link #caseBindingConstraint()}. Fixed in 8.0.7.)
+     */
+    static OptimisationCase caseSmallMagnitudes() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable y = model.addVariable("y").lower(0.0).upper(0.003);
+        Variable z = model.addVariable("z").lower(-0.002).upper(0.002);
+
+        Expression objective = model.addExpression("obj");
+        objective.set(y, 0.15);
+        objective.set(z, -0.0502);
+        objective.set(y, y, 0.25);
+        objective.set(z, z, 0.25);
+        objective.weight(1.0);
+
+        Expression constraint = model.addExpression("c");
+        constraint.set(y, -1000.0);
+        constraint.set(z, 1000.0);
+        constraint.upper(1.5);
+
+        Optimisation.Result result = Optimisation.Result.of(-7.47375E-5, State.OPTIMAL, 0.0, 0.0015);
+
+        return OptimisationCase.of(model, Optimisation.Sense.MIN, result).accuracy(NumberContext.of(4, 7));
+    }
+
     static OptimisationCase caseUnconstrainedQuadraticWithBounds() {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
@@ -441,8 +531,24 @@ public class TestBasicQP extends OptimisationConvexTests implements TestBasic {
     }
 
     @Test
+    public void testBindingConstraint() {
+        OptimisationCase testCase = TestBasicQP.caseBindingConstraint();
+        for (Integration<?> integration : this.integrations()) {
+            testCase.assertResult(integration);
+        }
+    }
+
+    @Test
     public void testBoundedQPAsLP() {
         OptimisationCase testCase = TestBasicQP.caseBoundedQPAsLP();
+        for (Integration<?> integration : this.integrations()) {
+            testCase.assertResult(integration);
+        }
+    }
+
+    @Test
+    public void testCrossTermKeyOrder() {
+        OptimisationCase testCase = TestBasicQP.caseCrossTermKeyOrder();
         for (Integration<?> integration : this.integrations()) {
             testCase.assertResult(integration);
         }
@@ -531,6 +637,14 @@ public class TestBasicQP extends OptimisationConvexTests implements TestBasic {
     @Test
     public void testSimpleQPMaximise() {
         OptimisationCase testCase = TestBasicQP.caseSimpleQPMaximise();
+        for (Integration<?> integration : this.integrations()) {
+            testCase.assertResult(integration);
+        }
+    }
+
+    @Test
+    public void testSmallMagnitudes() {
+        OptimisationCase testCase = TestBasicQP.caseSmallMagnitudes();
         for (Integration<?> integration : this.integrations()) {
             testCase.assertResult(integration);
         }

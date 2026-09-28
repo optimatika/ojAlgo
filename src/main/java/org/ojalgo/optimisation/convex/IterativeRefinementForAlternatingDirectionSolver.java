@@ -21,6 +21,7 @@
  */
 package org.ojalgo.optimisation.convex;
 
+import org.ojalgo.array.ArrayR064;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
@@ -76,7 +77,6 @@ final class IterativeRefinementForAlternatingDirectionSolver extends ConvexSolve
         PhysicalStore<Quadruple> aggrY = GenericStore.R128.make(m, 1);
 
         state = Optimisation.State.UNEXPLORED;
-        double retValue = PrimitiveMath.ZERO;
         Optimisation.State iterState = Optimisation.State.UNEXPLORED;
 
         PhysicalStore<Quadruple> retX = GenericStore.R128.make(n, 1);
@@ -137,9 +137,9 @@ final class IterativeRefinementForAlternatingDirectionSolver extends ConvexSolve
             aggrX.modifyMatching(QuadrupleMath.ADD, iterX);
             aggrY.modifyMatching(QuadrupleMath.ADD, iterY);
 
-            iterState = iterationResult.getState();
-
-            retValue += (iterationResult.getValue() / zoom.doubleValue());
+            // The residuals of the aggregated solution define the next correction problem: the dual
+            // residual Px + q + A'y (with y in the same sign convention as the ADMM solver's) becomes its
+            // linear term, and l - Ax and u - Ax its constraint limits.
 
             aggrX.premultiply(probP).onMatching(probQ, QuadrupleMath.ADD).supplyTo(iterQ);
 
@@ -148,9 +148,6 @@ final class IterativeRefinementForAlternatingDirectionSolver extends ConvexSolve
 
             for (int i = 0; i < m; i++) {
                 Quadruple tmpY = aggrY.get(i);
-                if (tmpY.isAbsolute()) {
-                    tmpY = tmpY.negate();
-                }
                 if (!tmpY.isZero()) {
                     Access1D<Quadruple> rowA = probA.sliceRow(i);
                     for (int j = 0; j < n; j++) {
@@ -164,10 +161,11 @@ final class IterativeRefinementForAlternatingDirectionSolver extends ConvexSolve
 
             Quadruple magnDualResidual = iterQ.aggregateAll(Aggregator.LARGEST);
 
+            // The constraint violation: l - Ax > 0 or u - Ax < 0
             Quadruple magnPrimResidual = Quadruple.ZERO;
             for (int i = 0; i < m; i++) {
-                magnPrimResidual = QuadrupleMath.MAX.invoke(magnPrimResidual,
-                        QuadrupleMath.MIN.invoke(QuadrupleMath.ABS.invoke(iterL.get(i)), QuadrupleMath.ABS.invoke(iterU.get(i))));
+                magnPrimResidual = QuadrupleMath.MAX.invoke(magnPrimResidual, iterL.get(i));
+                magnPrimResidual = QuadrupleMath.MAX.invoke(magnPrimResidual, iterU.get(i).negate());
             }
 
             lastPrimError = currPrimError;
@@ -199,7 +197,48 @@ final class IterativeRefinementForAlternatingDirectionSolver extends ConvexSolve
             state = Optimisation.State.OPTIMAL;
         }
 
-        return new Optimisation.Result(state, retValue, retX).withDualSolution(() -> retY);
+        AlternatingDirectionSolver.Structure structure = myData.getStructure();
+        double objectiveScale = structure.getObjectiveAdjustmentFactor();
+
+        MatrixStore<Quadruple> probPx = probP.multiply(retX);
+        double retValue = (retX.dot(probPx) / 2.0 + retX.dot(probQ)) / objectiveScale;
+
+        Optimisation.Result retVal = new Optimisation.Result(state, retValue, retX).withDualSolution(() -> retY);
+
+        if (state.isFeasible()) {
+
+            boolean[] boundRows = new boolean[m];
+            for (int j = 0; j < n; j++) {
+                int boundRow = structure.getBoundRow(j);
+                if (boundRow >= 0) {
+                    boundRows[boundRow] = true;
+                }
+            }
+
+            double[] reducedGradient = new double[n];
+            for (int j = 0; j < n; j++) {
+                reducedGradient[j] = probPx.doubleValue(j) + probQ.doubleValue(j);
+            }
+            for (int i = 0; i < m; i++) {
+                double multiplier = retY.doubleValue(i);
+                if (multiplier != PrimitiveMath.ZERO && !boundRows[i]) {
+                    for (int j = 0; j < n; j++) {
+                        reducedGradient[j] += probA.doubleValue(i, j) * multiplier;
+                    }
+                }
+            }
+            for (int j = 0; j < n; j++) {
+                reducedGradient[j] /= objectiveScale;
+            }
+
+            retVal = retVal.withReducedGradient(() -> ArrayR064.wrap(reducedGradient));
+
+            if (structure.isEntityMap()) {
+                retVal = retVal.withDualValues(structure.getConstraintsMetaData(), () -> retY);
+            }
+        }
+
+        return retVal;
     }
 
 }

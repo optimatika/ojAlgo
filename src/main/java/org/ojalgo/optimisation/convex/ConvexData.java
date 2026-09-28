@@ -24,6 +24,7 @@ package org.ojalgo.optimisation.convex;
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import org.ojalgo.array.SparseArray;
+import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -31,6 +32,7 @@ import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.optimisation.ConstraintsMetaData;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ModelEntity;
+import org.ojalgo.optimisation.Variable;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D.RowView;
 import org.ojalgo.type.keyvalue.EntryPair;
@@ -178,6 +180,40 @@ public final class ConvexData<N extends Comparable<N>> implements ExpressionsBas
         return false;
     }
 
+    /**
+     * Adds the multiplier terms, {@code [AE]'λE + [AI]'λI}, of all constraint rows except those that are
+     * variable bounds. Added to the objective's gradient, {@code [Q][X] - [C]}, this gives the reduced gradient
+     * in the bounded-variable sense: at an optimum it is non-zero only for variables at an active bound. (The
+     * bound multipliers are also reported as dual values, with the variables.)
+     *
+     * @param gradient    The gradient to add the terms to
+     * @param multipliers The multipliers, [λE; λI], indexed as the constraints
+     */
+    void addMultiplierTerms(final double[] gradient, final Access1D<?> multipliers) {
+
+        int nbEqus = this.countEqualityConstraints();
+        int nbInes = this.countInequalityConstraints();
+
+        for (int i = 0; i < nbEqus; i++) {
+            double lambda = multipliers.doubleValue(i);
+            if (lambda != ZERO) {
+                for (NonzeroView<N> nz : myAE.getRow(i).nonzeros()) {
+                    gradient[Math.toIntExact(nz.index())] += nz.doubleValue() * lambda;
+                }
+            }
+        }
+
+        for (int i = 0; i < nbInes; i++) {
+            double lambda = multipliers.doubleValue(nbEqus + i);
+            EntryPair<ModelEntity<?>, ConstraintType> entry = myConstraintsMetaData.getEntry(nbEqus + i);
+            if (lambda != ZERO && (entry == null || !(entry.left() instanceof Variable))) {
+                for (NonzeroView<N> nz : myAI.getRow(i).nonzeros()) {
+                    gradient[Math.toIntExact(nz.index())] += nz.doubleValue() * lambda;
+                }
+            }
+        }
+    }
+
     void addObjective(final int row, final Comparable<?> value) {
         myObjective.linear().add(row, 0, value);
     }
@@ -250,6 +286,16 @@ public final class ConvexData<N extends Comparable<N>> implements ExpressionsBas
     }
 
     /**
+     * The objective's adjustment factor (10^exponent), the scaling applied to the objective when the data
+     * was copied from a model. The multipliers and the reduced gradient come out of the solver scaled by
+     * this factor; divide by it to map back to model space (the dual values are un-scaled via
+     * {@link ConstraintsMetaData#getMultiplierScale()}). 1.0 means no scaling.
+     */
+    double getObjectiveAdjustmentFactor() {
+        return myConstraintsMetaData.getMultiplierScale();
+    }
+
+    /**
      * Equality constraints body: [AE][X] == [BE]
      */
     ElementsSupplier<N> getSupplierAE() {
@@ -287,18 +333,28 @@ public final class ConvexData<N extends Comparable<N>> implements ExpressionsBas
         myBE.set(row, 0, value);
     }
 
-    void setBE(final int row, final ModelEntity<?> entity, final ConstraintType type, final Comparable<?> value, final boolean negated) {
+    /**
+     * @param adjusted Whether the row was built from the entity's adjusted (scaled) parameters, see
+     *                 {@link ConstraintsMetaData#setEntry(int, ModelEntity, ConstraintType, boolean, boolean)}
+     */
+    void setBE(final int row, final ModelEntity<?> entity, final ConstraintType type, final Comparable<?> value, final boolean negated,
+            final boolean adjusted) {
         myBE.set(row, 0, value);
-        myConstraintsMetaData.setEntry(row, entity, type, negated);
+        myConstraintsMetaData.setEntry(row, entity, type, negated, adjusted);
     }
 
     void setBI(final int row, final double value) {
         myBI.set(row, 0, value);
     }
 
-    void setBI(final int row, final ModelEntity<?> entity, final ConstraintType type, final Comparable<?> value, final boolean negated) {
+    /**
+     * @param adjusted Whether the row was built from the entity's adjusted (scaled) parameters, see
+     *                 {@link ConstraintsMetaData#setEntry(int, ModelEntity, ConstraintType, boolean, boolean)}
+     */
+    void setBI(final int row, final ModelEntity<?> entity, final ConstraintType type, final Comparable<?> value, final boolean negated,
+            final boolean adjusted) {
         myBI.set(row, 0, value);
-        myConstraintsMetaData.setEntry(myBE.getRowDim() + row, entity, type, negated);
+        myConstraintsMetaData.setEntry(myBE.getRowDim() + row, entity, type, negated, adjusted);
     }
 
     void setEntry(final int row, final ModelEntity<?> entity, final ConstraintType type, final boolean neg) {
@@ -319,6 +375,10 @@ public final class ConvexData<N extends Comparable<N>> implements ExpressionsBas
 
     void setObjective(final int row, final int col, final double value) {
         myObjective.quadratic().set(row, col, value);
+    }
+
+    void setObjectiveAdjustmentFactor(final double factor) {
+        myConstraintsMetaData.setMultiplierScale(factor);
     }
 
     void setVariableIndices(final int indexInSolver, final int indexInModel) {

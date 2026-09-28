@@ -30,6 +30,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.optimisation
 
 - Degenerate coefficient detection in presolving. A new `DEGENERATE` analyser scans expression coefficients for near-zero values and filters them from presolver logic, preventing false infeasibility from floating-point noise. Controlled by `Options.degeneracy`. (Discussion [#691](https://github.com/optimatika/ojAlgo/discussions/691))
+- `Options.getConfiguredGapTolerance()`: the MIP gap, but only when it is configured to something other than the default. 3rd party solver integrations pass it on to their solvers.
+- For solver integrations: `ExpressionsBasedModel.Integration.getObjectiveConstant(ExpressionsBasedModel)`, `expandFreeToFull(...)` with the solver's `Optimisation.Sense`, and `ConstraintsMetaData` support for signed (two-sided) row multipliers, rows built from unadjusted parameters, and `withLimits(int, double, double)`.
 
 #### org.ojalgo.structure
 
@@ -49,6 +51,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.optimisation
 
 - `Expression` now allocates the quadratic coefficient map lazily — only when quadratic terms are actually added. Models with only linear expressions use less memory.
+- The dual values and the reduced gradient of a `Result` follow one documented convention, whatever the solver: multipliers of the minimisation form Lagrangian (non-negative for inequalities), and reduced costs at the variables' bounds, in model units and relative to the (presolve tightened) bounds.
 - Model parameters are scaled by the adjustment exponent using `BigDecimal.scaleByPowerOfTen` instead of `movePointLeft`/`movePointRight`, so no digits are expanded when the scale becomes negative. `ModelEntity.adjust(BigDecimal)`, `reverseAdjustment(BigDecimal)`, `getLowerLimit(boolean, BigDecimal)`, `getUpperLimit(boolean, BigDecimal)` and `Expression.get(..., boolean)` may therefore return numbers with a negative scale (the values are the same).
 
 #### org.ojalgo.optimisation.linear
@@ -70,6 +73,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - `SparseLU.getMaxPivotMagnitude()`, `getFactorMaxPivotMagnitude()` and `getFactorMinPivotMagnitude()` are no longer used internally. `getMinPivotMagnitude()` remains.
 
+#### org.ojalgo.optimisation
+
+- `ExpressionsBasedModel.Integration.expandFreeToFull(...)` without an `Optimisation.Sense` (assumes the solver minimises), and `computeReducedCostFromMultipliers(ExpressionsBasedModel, int, Result)` (ignores quadratic objective terms).
+
 ### Fixed
 
 #### org.ojalgo.matrix.decomposition
@@ -82,6 +89,11 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - `SpecialOrderedSet` loop always read `mySequence[1]` instead of `mySequence[i]` — the loop variable was never used as the array index.
 - Integrations with interface-based configurators could not find the registered configurator. Added `ExpressionsBasedModel.getConfigurator(Class)` to look up by declared type. (Issue [#692](https://github.com/optimatika/ojAlgo/issues/692))
 - `ModelEntity.toAdjusted(BigDecimal)` and `reverseAdjustment(BigDecimal)` used the adjustment exponent without making sure it had been derived.
+- Dual values, reduced gradients and objective function values could be wrong – not unscaled, of the wrong sign, or missing the objective constant – mostly with scaled (adjusted) model parameters, maximisation or presolve fixed variables. The wrong objective function values could make the `IntegerSolver` return non-optimal MIQP solutions.
+
+#### org.ojalgo.optimisation.convex
+
+- `AlternatingDirectionSolver.updateRange(...)` updated the wrong row, and the extended precision (iterative refinement) variant returned wrong dual values. The null space solver computed wrong multipliers and a `NaN` objective function value.
 
 #### org.ojalgo.optimisation.integer
 
@@ -95,6 +107,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 #### org.ojalgo.type.context
 
+- `NumberContext.equals(Object)` and `hashCode()` compared object identity. They now compare precision, rounding mode and scale (not the format).
 - `NumberContext.isZero(BigDecimal)` treated any number smaller than a tenth of the last decimal as zero, although with the rounding modes `UP`, `CEILING` and `FLOOR` it may round to a non-zero value. With a negative scale, numbers that round to zero (such as 49 with scale -2) were reported as non-zero.
 
 ## [57.3.1] – 2026-09-21

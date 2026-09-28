@@ -661,10 +661,9 @@ public abstract class ConvexSolver extends GenericSolver {
     public static final ExpressionsBasedModel.Integration<ConvexSolver> INTEGRATION = new ModelIntegration();
 
     /**
-     * Should variable lower/upper bounds be read in their numerically-adjusted form? Bound-as-constraint
-     * rows in {@code [AI]} pair a unit body coefficient ({@code ONE}/{@code NEG}) with the variable's
-     * bound used as RHS — so the bound is naturally read in model units to stay consistent with the
-     * unit-valued row.
+     * Should variable lower/upper bounds be read in their numerically-adjusted form? Bounds are modelled as
+     * rows in {@code [AI]} with a single coefficient, the variable's adjustment factor if adjusted or else 1,
+     * and the bound as RHS. Unit rows keep the bounds in model units.
      */
     private static final boolean ADJUSTED_BOUNDS = false;
     /**
@@ -717,6 +716,8 @@ public abstract class ConvexSolver extends GenericSolver {
         boolean max = model.getOptimisationSense() == Optimisation.Sense.MAX;
         boolean didSet = false;
 
+        retVal.setObjectiveAdjustmentFactor(ADJUSTED_OBJECTIVE ? tmpObjExpr.getAdjustmentFactor() : ONE);
+
         if (tmpObjExpr.isAnyQuadraticFactorNonZero()) {
 
             for (IntRowColumn key : tmpObjExpr.getQuadraticKeySet()) {
@@ -767,7 +768,8 @@ public abstract class ConvexSolver extends GenericSolver {
                 retVal.setAE(i, model.indexOfFreeVariable(key.index), expression.get(key, ADJUSTED_CONSTRAINTS));
             }
 
-            retVal.setBE(i, expression, ConstraintType.EQUALITY, expression.getUpperLimit(ADJUSTED_CONSTRAINTS, BigMath.SMALLEST_POSITIVE_INFINITY), false);
+            retVal.setBE(i, expression, ConstraintType.EQUALITY, expression.getUpperLimit(ADJUSTED_CONSTRAINTS, BigMath.SMALLEST_POSITIVE_INFINITY), false,
+                    ADJUSTED_CONSTRAINTS);
 
             // constraintsMap.setEntry(i, expression, ConstraintType.EQUALITY, false);
         }
@@ -781,14 +783,15 @@ public abstract class ConvexSolver extends GenericSolver {
             for (IntIndex key : expression.getLinearKeySet()) {
                 retVal.setAI(base + i, model.indexOfFreeVariable(key.index), expression.get(key, ADJUSTED_CONSTRAINTS));
             }
-            retVal.setBI(base + i, expression, ConstraintType.UPPER, expression.getUpperLimit(ADJUSTED_CONSTRAINTS, BigMath.SMALLEST_POSITIVE_INFINITY), false);
+            retVal.setBI(base + i, expression, ConstraintType.UPPER, expression.getUpperLimit(ADJUSTED_CONSTRAINTS, BigMath.SMALLEST_POSITIVE_INFINITY), false,
+                    ADJUSTED_CONSTRAINTS);
         }
         base += nbUpExpr;
 
         for (int i = 0; i < nbUpVar; i++) {
             Variable variable = tmpUpVar.get(i);
-            retVal.setAI(base + i, model.indexOfFreeVariable(variable), ONE);
-            retVal.setBI(base + i, variable, ConstraintType.UPPER, variable.getUpperLimit(ADJUSTED_BOUNDS, BigMath.SMALLEST_POSITIVE_INFINITY), false);
+            retVal.setAI(base + i, model.indexOfFreeVariable(variable), ADJUSTED_BOUNDS ? variable.getAdjustmentFactor() : ONE);
+            retVal.setBI(base + i, variable, ConstraintType.UPPER, variable.getUpperLimit(ADJUSTED_BOUNDS, BigMath.SMALLEST_POSITIVE_INFINITY), false, ADJUSTED_BOUNDS);
         }
         base += nbUpVar;
 
@@ -797,14 +800,16 @@ public abstract class ConvexSolver extends GenericSolver {
             for (IntIndex key : expression.getLinearKeySet()) {
                 retVal.setAI(base + i, model.indexOfFreeVariable(key.index), expression.get(key, ADJUSTED_CONSTRAINTS).negate());
             }
-            retVal.setBI(base + i, expression, ConstraintType.LOWER, expression.getLowerLimit(ADJUSTED_CONSTRAINTS, BigMath.SMALLEST_NEGATIVE_INFINITY).negate(), true);
+            retVal.setBI(base + i, expression, ConstraintType.LOWER, expression.getLowerLimit(ADJUSTED_CONSTRAINTS, BigMath.SMALLEST_NEGATIVE_INFINITY).negate(), true,
+                    ADJUSTED_CONSTRAINTS);
         }
         base += nbLoExpr;
 
         for (int i = 0; i < nbLoVar; i++) {
             Variable variable = tmpLoVar.get(i);
-            retVal.setAI(base + i, model.indexOfFreeVariable(variable), NEG);
-            retVal.setBI(base + i, variable, ConstraintType.LOWER, variable.getLowerLimit(ADJUSTED_BOUNDS, BigMath.SMALLEST_NEGATIVE_INFINITY).negate(), true);
+            retVal.setAI(base + i, model.indexOfFreeVariable(variable), ADJUSTED_BOUNDS ? -variable.getAdjustmentFactor() : NEG);
+            retVal.setBI(base + i, variable, ConstraintType.LOWER, variable.getLowerLimit(ADJUSTED_BOUNDS, BigMath.SMALLEST_NEGATIVE_INFINITY).negate(), true,
+                    ADJUSTED_BOUNDS);
         }
         base += nbLoVar;
 

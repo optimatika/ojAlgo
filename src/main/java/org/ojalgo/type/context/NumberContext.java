@@ -300,6 +300,10 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     }
 
     /**
+     * Number contexts are equal if they have the same {@link MathContext} (precision and rounding mode) and
+     * scale – everything numeric follows from those. The format is not compared: it is for presentation only,
+     * and it is adjusted when first used.
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -307,7 +311,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj) || !(obj instanceof NumberContext)) {
+        if (!(obj instanceof NumberContext)) {
             return false;
         }
         NumberContext other = (NumberContext) obj;
@@ -397,8 +401,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     @Override
     public int hashCode() {
         int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (myMathContext == null ? 0 : myMathContext.hashCode());
+        int result = myMathContext == null ? 0 : myMathContext.hashCode();
         return prime * result + myScale;
     }
 

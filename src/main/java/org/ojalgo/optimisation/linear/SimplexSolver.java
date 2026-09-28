@@ -325,9 +325,9 @@ abstract class SimplexSolver extends LinearSolver {
     }
 
     /**
-     * Should variable lower/upper bounds be read in their numerically-adjusted form? Bounds are passed
-     * directly into the simplex store's primal bound arrays — keeping them in model space avoids the solution
-     * needing a second pass to be reported back in model units.
+     * Must be false. The simplex handles variable bounds natively, not as constraint rows, so adjusting them
+     * would mean rescaling the variables themselves (column scaling is the store's equilibrator's job).
+     * Bounds are passed directly into the simplex store's primal bound arrays, in model units.
      */
     private static final boolean ADJUSTED_BOUNDS = false;
     /**
@@ -343,6 +343,9 @@ abstract class SimplexSolver extends LinearSolver {
      */
     private static final boolean ADJUSTED_OBJECTIVE = true;
 
+    /**
+     * Reduced costs this small count as zero – dual feasible, not worth entering.
+     */
     private static final NumberContext COST = NumberContext.of(7);
     /**
      * Decides whether a basic variable outside its bounds counts as infeasible. Too loose and a marginally
@@ -420,7 +423,7 @@ abstract class SimplexSolver extends LinearSolver {
             mtrxB.set(i, expression.getUpperLimit(ADJUSTED_CONSTRAINTS, POSITIVE_INFINITY));
             lowerBounds[nbProbVars + i] = ZERO;
             upperBounds[nbProbVars + i] = POSITIVE_INFINITY;
-            structure.setConstraintMap(i, expression, ConstraintType.UPPER, false);
+            structure.setConstraintMap(i, expression, ConstraintType.UPPER, false, ADJUSTED_CONSTRAINTS);
         }
 
         for (int i = 0; i < nbLoConstr; i++) {
@@ -434,7 +437,7 @@ abstract class SimplexSolver extends LinearSolver {
             mtrxB.set(nbUpConstr + i, expression.getLowerLimit(ADJUSTED_CONSTRAINTS, NEGATIVE_INFINITY));
             lowerBounds[nbProbVars + nbUpConstr + i] = NEGATIVE_INFINITY;
             upperBounds[nbProbVars + nbUpConstr + i] = ZERO;
-            structure.setConstraintMap(nbUpConstr + i, expression, ConstraintType.LOWER, true);
+            structure.setConstraintMap(nbUpConstr + i, expression, ConstraintType.LOWER, true, ADJUSTED_CONSTRAINTS);
         }
 
         for (int i = 0; i < nbEqConstr; i++) {
@@ -448,7 +451,7 @@ abstract class SimplexSolver extends LinearSolver {
             mtrxB.set(nbUpConstr + nbLoConstr + i, expression.getUpperLimit(ADJUSTED_CONSTRAINTS, ZERO));
             lowerBounds[nbProbVars + nbSlckVars + i] = ZERO;
             upperBounds[nbProbVars + nbSlckVars + i] = ZERO;
-            structure.setConstraintMap(nbUpConstr + nbLoConstr + i, expression, ConstraintType.EQUALITY, false);
+            structure.setConstraintMap(nbUpConstr + nbLoConstr + i, expression, ConstraintType.EQUALITY, false, ADJUSTED_CONSTRAINTS);
         }
 
         for (int i = 0; i < nbProbVars; i++) {
@@ -458,7 +461,7 @@ abstract class SimplexSolver extends LinearSolver {
             structure.positivePartVariables[i] = model.indexOf(variable);
         }
 
-        structure.setObjectiveAdjustmentFactor(objective.getAdjustmentFactor());
+        structure.setObjectiveAdjustmentFactor(ADJUSTED_OBJECTIVE ? objective.getAdjustmentFactor() : ONE);
         boolean negate = model.getOptimisationSense() == Optimisation.Sense.MAX;
         for (IntIndex key : objective.getLinearKeySet()) {
             double weight = objective.doubleValue(key, ADJUSTED_OBJECTIVE);
@@ -1421,11 +1424,15 @@ abstract class SimplexSolver extends LinearSolver {
 
     }
 
+    /**
+     * Do all non-basic variables' reduced costs have the right sign, by the tolerance pricing uses
+     * ({@link #COST})? Violations are logged.
+     */
     private boolean verifyDualFeasibility() {
 
         boolean retVal = true;
 
-        double epsilon = options.feasibility.epsilon();
+        double epsilon = COST.getAbsoluteError();
 
         for (int je = 0, limit = mySimplex.excluded.length; je < limit; je++) {
             int j = mySimplex.excluded[je];

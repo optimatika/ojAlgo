@@ -654,15 +654,16 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         /**
          * Maps a solver reduced-gradient (indexed by the simplex split-variable layout [positives | negatives
          * | slacks/artificials]) back to a model-indexed reduced gradient. For variables present in both
-         * positives and negatives (x = x+ - x-), the model rc is taken as (rc<sub>positive</sub> -
-         * rc<sub>negative</sub>) — mirroring the value-mapping convention. Variables eliminated by presolve
-         * aren't present in the solver layout; their rc is reconstructed from the model's objective
-         * coefficient and the solver's constraint multipliers. If {@code negate} is true (MAX model — the
-         * solver minimises a negated objective), the result is negated so callers see rc in the model's
+         * positives and negatives (x = x+ - x-) the two parts' reduced costs are each other's negation, and the
+         * model rc is the positive part's; a variable with only a negative part (x = -x-) gets the negation of
+         * that part's. Variables eliminated by presolve
+         * aren't present in the solver layout; their rc is reconstructed from the model's objective (at
+         * {@code modelSolution}) and the solver's constraint multipliers. If {@code negate} is true (MAX model —
+         * the solver minimises a negated objective), the result is negated so callers see rc in the model's
          * optimisation sense.
          */
         private static double[] toModelReducedGradient(final Access1D<?> solverRg, final ExpressionsBasedModel model, final boolean negate,
-                final Result solverState) {
+                final Result solverState, final Access1D<?> modelSolution) {
 
             double[] modelRg = new double[model.countVariables()];
 
@@ -675,12 +676,14 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             List<Variable> negatives = model.getNegativeVariables();
             for (int n = 0; n < negatives.size(); n++) {
-                int idx = model.indexOf(negatives.get(n));
-                modelRg[idx] -= solverRg.doubleValue(nbPos + n);
+                Variable variable = negatives.get(n);
+                if (!variable.isPositive()) {
+                    modelRg[model.indexOf(variable)] = -solverRg.doubleValue(nbPos + n);
+                }
             }
 
             for (IntIndex fixed : model.getFixedVariables()) {
-                modelRg[fixed.index] = ExpressionsBasedModel.Integration.computeReducedCostFromMultipliers(model, fixed.index, solverState);
+                modelRg[fixed.index] = ExpressionsBasedModel.Integration.computeReducedCostFromMultipliers(model, fixed.index, solverState, modelSolution);
             }
 
             if (negate) {
@@ -765,7 +768,8 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             Optional<Supplier<Access1D<?>>> solverRg = solverState.getReducedGradient();
             if (solverRg.isPresent()) {
 
-                Supplier<Access1D<?>> mapped = () -> ArrayR064.wrap(OldIntegration.toModelReducedGradient(solverRg.get().get(), model, negate, solverState));
+                Supplier<Access1D<?>> mapped = () -> ArrayR064
+                        .wrap(OldIntegration.toModelReducedGradient(solverRg.get().get(), model, negate, solverState, modelSolution));
 
                 retVal = retVal.withReducedGradient(mapped);
             }
