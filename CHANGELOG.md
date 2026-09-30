@@ -20,6 +20,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.matrix.decomposition
 
 - `SparseLU.ftranColumn(R064CSC, int, DensityTrackingArray)` and `btranUnit(int, DensityTrackingArray)`: sparse solves for a column of a sparse matrix and for a unit vector. They keep partial results that a following `updateColumn(int, R064CSC, int)` reuses.
+- `MatrixDecomposition.Resizable`, implemented by `Cholesky`: updates the decomposition of a symmetric/Hermitian matrix when a row/column is appended (`appendColumn`) or removed (`removeColumn`), in O(n²) rather than recalculating it.
 
 #### org.ojalgo.matrix.store
 
@@ -47,12 +48,20 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - `SparseLU` is rewritten. Simplex bases are factorised with a triangular (singleton) pass followed by Markowitz pivoting, the sparse solves are hyper-sparse when the right hand side and the result are sparse enough, and Forrest-Tomlin updates reuse the partial results of the preceding solves.
 - `MinimumDegree` computes the same ordering as before, by a counting sort on the degrees, in linear instead of quadratic time.
+- `MatrixDecomposition.Updatable.updateColumn(...)` is an optional operation – a default method that returns false.
 
 #### org.ojalgo.optimisation
 
 - `Expression` now allocates the quadratic coefficient map lazily — only when quadratic terms are actually added. Models with only linear expressions use less memory.
 - The dual values and the reduced gradient of a `Result` follow one documented convention, whatever the solver: multipliers of the minimisation form Lagrangian (non-negative for inequalities), and reduced costs at the variables' bounds, in model units and relative to the (presolve tightened) bounds.
 - Model parameters are scaled by the adjustment exponent using `BigDecimal.scaleByPowerOfTen` instead of `movePointLeft`/`movePointRight`, so no digits are expanded when the scale becomes negative. `ModelEntity.adjust(BigDecimal)`, `reverseAdjustment(BigDecimal)`, `getLowerLimit(boolean, BigDecimal)`, `getUpperLimit(boolean, BigDecimal)` and `Expression.get(..., boolean)` may therefore return numbers with a negative scale (the values are the same).
+
+#### org.ojalgo.optimisation.convex
+
+- The active set solver is faster and more robust. The direct variant maintains a Cholesky decomposition of the Schur complement (updated, not recalculated, as constraints are included/excluded), linearly dependent constraints no longer make it cycle, and there is an iteration limit.
+- Default solver choice: the direct active set solver unless `Options.sparse` is `TRUE`, the null space variant for more problems (when there are no more than 64 variables per equality constraint), and ADMM when m + n ≥ 826 (was 750).
+- The iterative active set solver's default accuracy is `NumberContext.of(16, 12)` (was `of(10, 16)`, with which the iterative solutions were practically never used). The precision and scale are used differently – see `ConvexSolver.Configuration.iterative(NumberContext)`.
+- ADMM: at most 10 000 iterations (was 20 000), extended to twice that while predicted to converge, with convergence accuracy `NumberContext.of(9, 8)`.
 
 #### org.ojalgo.optimisation.linear
 
@@ -94,6 +103,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.optimisation.convex
 
 - `AlternatingDirectionSolver.updateRange(...)` updated the wrong row, and the extended precision (iterative refinement) variant returned wrong dual values. The null space solver computed wrong multipliers and a `NaN` objective function value.
+- The direct active set solver could return a non-optimal solution as optimal, and cycle (not terminate) when active constraints became linearly dependent.
 
 #### org.ojalgo.optimisation.integer
 

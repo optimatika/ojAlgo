@@ -76,7 +76,7 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
                 Boolean projection = options.convex().getProjection();
 
                 if (nbEqus > 0 && nbInes > 0 && nbEqus <= nbVars
-                        && (Boolean.TRUE.equals(projection) || (projection == null && (nbVars >= 80) && (nbVars / nbEqus <= 2)))) {
+                        && (Boolean.TRUE.equals(projection) || (projection == null && BasePrimitiveSolver.isProjectionPreferred(nbVars, nbEqus)))) {
 
                     return new NullSpaceASS(options, data);
 
@@ -127,9 +127,18 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
         return new BasePrimitiveSolver.Builder(matrices);
     }
 
+    /**
+     * The (default) choice to eliminate the equality constraints using a null space projection, when there
+     * are both equality and inequality constraints. Benchmarking shows it pays off unless there are very few
+     * equality constraints relative to the number of variables, or the problem is very small. The null space
+     * basis is dense, and that limits the size of the problems it's applied to.
+     */
+    static boolean isProjectionPreferred(final int nbVars, final int nbEqus) {
+        return nbVars >= 80 && nbVars <= 64 * nbEqus && (long) nbVars * (nbVars - nbEqus) <= 16_000_000L;
+    }
+
     static BasePrimitiveSolver newSolver(final ConvexData<Double> data, final Optimisation.Options options) {
 
-        int nbVars = data.countVariables();
         int nbEqus = data.countEqualityConstraints();
         int nbInes = data.countInequalityConstraints();
 
@@ -139,19 +148,9 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
 
                 return new IterativeASS(data, options);
 
-            } else if (Boolean.FALSE.equals(options.sparse)) {
-
-                return new DirectASS(data, options);
-
             } else {
 
-                double density = data.density();
-
-                if ((nbVars >= 200 && density >= THIRD) || (nbVars >= 500 && (nbEqus + nbInes) >= 1_000)) {
-                    return new DirectASS(data, options);
-                } else {
-                    return new IterativeASS(data, options);
-                }
+                return new DirectASS(data, options);
             }
 
         } else if (nbEqus > 0) {

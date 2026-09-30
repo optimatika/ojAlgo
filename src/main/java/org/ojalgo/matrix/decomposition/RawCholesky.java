@@ -23,6 +23,7 @@ package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.ojalgo.RecoverableCondition;
@@ -32,10 +33,30 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.matrix.transformation.InvertibleFactor;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 
 final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
+
+    /**
+     * When growing, a new row/column is rejected if its pivot (the new diagonal element of [L], squared) is
+     * not larger than this factor times the new diagonal element of the matrix – the new row/column is then
+     * (numerically) linearly dependent on the existing ones.
+     */
+    private static final double DEPENDENT = 1E-12;
+
+    /**
+     * When growing, the rows of [L] are extended with spare capacity so that they don't have to be copied
+     * every time. The first row is always exactly as long as the number of columns – it defines it.
+     */
+    private static double[] ensureLength(final double[] row, final int length) {
+        if (row.length >= length) {
+            return row;
+        } else {
+            return Arrays.copyOf(row, Math.max(length, 2 * row.length));
+        }
+    }
 
     private double myMaxDiag = ONE;
     private double myMinDiag = ZERO;
@@ -47,6 +68,61 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
      */
     RawCholesky() {
         super();
+    }
+
+    @Override
+    public boolean appendColumn(final Access1D<Double> column) {
+
+        int dim = this.isComputed() ? this.getRowDim() : 0;
+
+        if (column.size() != dim + 1) {
+            throw new IllegalArgumentException("The column must be of length " + (dim + 1) + "!");
+        }
+
+        double[][] data = this.getInternalData();
+
+        // [L][l] = [a], where [l] is the new row of [L] (without its diagonal element)
+        double[] newRow = new double[Math.max(dim + 1, 2 * dim)];
+        double sumOfSquares = ZERO;
+        for (int i = 0; i < dim; i++) {
+            double[] rowI = data[i];
+            double value = column.doubleValue(i);
+            for (int p = 0; p < i; p++) {
+                value -= rowI[p] * newRow[p];
+            }
+            value /= rowI[i];
+            newRow[i] = value;
+            sumOfSquares += value * value;
+        }
+
+        double diagonal = column.doubleValue(dim);
+        double pivot = diagonal - sumOfSquares;
+
+        if (!(pivot > DEPENDENT * diagonal)) {
+            return false;
+        }
+
+        newRow[dim] = SQRT.invoke(pivot);
+
+        double[][] newData = new double[dim + 1][];
+        for (int i = 0; i < dim; i++) {
+            newData[i] = RawCholesky.ensureLength(data[i], dim + 1);
+        }
+        newData[dim] = newRow;
+        newData[0] = Arrays.copyOf(newData[0], dim + 1);
+
+        this.setInternalData(newData);
+
+        if (dim == 0) {
+            myMaxDiag = pivot;
+            myMinDiag = pivot;
+        } else {
+            myMaxDiag = MAX.invoke(myMaxDiag, pivot);
+            myMinDiag = MIN.invoke(myMinDiag, pivot);
+        }
+        mySPD = true;
+
+        return this.computed(true);
     }
 
     @Override
@@ -203,6 +279,63 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
     @Override
     public PhysicalStore<Double> preallocate(final int nbEquations, final int nbVariables, final int nbSolutions) {
         return this.makeZero(nbEquations, nbSolutions);
+    }
+
+    @Override
+    public boolean removeColumn(final int index) {
+
+        int dim = this.isComputed() ? this.getRowDim() : 0;
+
+        if (index < 0 || index >= dim) {
+            throw new IllegalArgumentException("Index " + index + " is not in the range [0, " + dim + ")!");
+        }
+
+        double[][] data = this.getInternalData();
+        int newDim = dim - 1;
+
+        double[][] newData = new double[newDim][];
+        System.arraycopy(data, 0, newData, 0, index);
+        System.arraycopy(data, index + 1, newData, index, newDim - index);
+
+        // The rows, from index and on, now have one element after the diagonal.
+        // Givens rotations of the columns p and p+1 restore the triangular form.
+        for (int p = index; p < newDim; p++) {
+
+            double[] rowP = newData[p];
+            double a = rowP[p];
+            double b = rowP[p + 1];
+            double r = Math.hypot(a, b);
+            double c = a / r;
+            double s = b / r;
+
+            rowP[p] = r;
+            rowP[p + 1] = ZERO;
+
+            for (int q = p + 1; q < newDim; q++) {
+                double[] rowQ = newData[q];
+                double x = rowQ[p];
+                double y = rowQ[p + 1];
+                rowQ[p] = c * x + s * y;
+                rowQ[p + 1] = c * y - s * x;
+            }
+        }
+
+        if (newDim > 0) {
+            newData[0] = Arrays.copyOf(newData[0], newDim);
+        }
+
+        this.setInternalData(newData);
+
+        myMaxDiag = MACHINE_SMALLEST;
+        myMinDiag = MACHINE_LARGEST;
+        for (int ij = 0; ij < newDim; ij++) {
+            double pivot = newData[ij][ij] * newData[ij][ij];
+            myMaxDiag = MAX.invoke(myMaxDiag, pivot);
+            myMinDiag = MIN.invoke(myMinDiag, pivot);
+        }
+        mySPD = true;
+
+        return this.computed(true);
     }
 
     @Override

@@ -312,6 +312,44 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
 
     }
 
+    /**
+     * A decomposition of a symmetric/Hermitian matrix that can be updated when the matrix is resized – grows
+     * or shrinks by one row/column – without recalculating it.
+     * <p>
+     * Both methods are optional operations. The default implementations do nothing and return false –
+     * implementations that support resizing override them. A false return value means the decomposition is
+     * unchanged.
+     */
+    interface Resizable<N extends Comparable<N>> extends Hermitian<N> {
+
+        /**
+         * Extends the (symmetric/Hermitian) matrix, and its decomposition, with one row/column – as the last
+         * row/column. The new row is the (conjugate) transpose of the new column.
+         * <p>
+         * Can be called after a decomposition has been calculated, or on a new/reset instance to build the
+         * decomposition one row/column at the time (starting from an empty matrix).
+         *
+         * @param column The new column, including the new diagonal element (last). Its length is the current
+         *               dimension + 1.
+         * @return true if the decomposition was extended; false if not possible (for instance, if the
+         *         extended matrix would not have the properties the decomposition requires) or not supported
+         */
+        default boolean appendColumn(final Access1D<N> column) {
+            return false;
+        }
+
+        /**
+         * Removes one row/column from the (symmetric/Hermitian) matrix, and its decomposition.
+         *
+         * @param index The index of the row/column to remove
+         * @return true if the decomposition was updated; false if not possible or not supported
+         */
+        default boolean removeColumn(final int index) {
+            return false;
+        }
+
+    }
+
     interface Solver<N extends Comparable<N>> extends MatrixDecomposition<N>, SolverTask<N>, InverterTask<N>, Provider2D.Inverse<Optional<MatrixStore<N>>>,
             Provider2D.Solution<Optional<MatrixStore<N>>>, InvertibleFactor<N> {
 
@@ -457,12 +495,18 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          * like solving equation systems and getting the inverse, but extracting individual decomposition
          * factors or reconstructing the original (now modified) matrix may be complicated and not strictly
          * required to work.
+         * <p>
+         * This is an optional operation. The default implementation does nothing and returns false –
+         * implementations that support updating override it. After a false return value the decomposition can
+         * not be relied upon, and has to be recalculated.
          *
          * @param columnIndex The index of the column, in the original matrix, to replace
          * @param newColumn   The new column values
-         * @return true if update was successful, false if not.
+         * @return true if update was successful, false if not (or not supported).
          */
-        boolean updateColumn(int columnIndex, Access1D.Collectable<N, ? super TransformableRegion<N>> newColumn);
+        default boolean updateColumn(final int columnIndex, final Access1D.Collectable<N, ? super TransformableRegion<N>> newColumn) {
+            return false;
+        }
 
     }
 

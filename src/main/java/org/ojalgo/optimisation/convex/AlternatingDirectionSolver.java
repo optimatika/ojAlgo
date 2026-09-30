@@ -195,7 +195,7 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
         /**
          * Absolute iteration ceiling independent of problem size.
          */
-        private static final int MAX_ITERATIONS = 20_000;
+        private static final int MAX_ITERATIONS = 10_000;
 
         /**
          * How often (in iterations) to check termination and consider adapting rho. Higher values reduce
@@ -204,11 +204,14 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
         private static final int UPDATE_INTERVAL = 25;
 
         /**
-         * Convergence tolerance for optimality: primal and dual residuals (normalised by magnitudes) must be
-         * below {@code error(magnitude)} where error ≈ 1e-8 for large magnitudes. This matches the original
-         * OSQP default eps_abs=eps_rel=1e-3 after the 1+magnitude scaling.
+         * Convergence tolerance for optimality: the primal and dual residuals must be below
+         * {@code error(magnitude)} – a relative error of 1e-8, or an absolute error of 5e-9 for small
+         * magnitudes. The absolute error is what keeps the solutions feasible to ojAlgo's validation
+         * standards, and the primal residual (feasibility) is what takes most iterations to get down. The
+         * relative error is well below that of validation, but much looser than what a first-order method
+         * reaches without very many more iterations.
          */
-        static final NumberContext ACCURACY = NumberContext.of(12, 8);
+        static final NumberContext ACCURACY = NumberContext.of(9, 8);
 
         /**
          * Minimum factor by which a candidate {@code rho} must differ from the current one before a new
@@ -229,6 +232,12 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
 
         static final double INFINITY = 1E+32;
 
+        /**
+         * Tolerance for the primal infeasibility certificate – stricter than {@link #ACCURACY}, to not
+         * conclude infeasibility too easily.
+         */
+        static final NumberContext INFEASIBILITY = NumberContext.of(12, 8);
+
         static final BigDecimal INFINITY2 = BigMath.TEN.pow(64);
 
         /**
@@ -236,6 +245,23 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
          * setting; the runtime value is tracked separately in {@link Work#baseRho}. This value absolutely
          * must lie within {@code [RHO_MIN, RHO_MAX]}.
          */
+        /**
+         * Continuing beyond the iteration limit is only allowed up to this multiple of it – and only when
+         * convergence is predicted within that.
+         */
+        static final double PROGRESS_EXTENSION = 2.0;
+
+        /**
+         * Convergence is not assessed before this many iterations...
+         */
+        static final int PROGRESS_MIN_ITERATIONS = 500;
+
+        /**
+         * ...or before this fraction of the iteration limit. Convergence often stalls for a while before
+         * picking up again (typically after rho has been adapted).
+         */
+        static final double PROGRESS_START = 0.4;
+
         static final double RHO = 0.1;
         /**
          * Multiplier applied to base rho for equality constraints. Equality constraints benefit from a much
@@ -277,6 +303,16 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
 
             int candidate = (int) (400.0 * Math.sqrt(m + n));
             return Math.min(candidate, max);
+        }
+
+        /**
+         * @return The number of iterations that may be used when convergence is predicted soon after
+         *         {@link #maxIterations(int, int, Optimisation.Options)} – never more than the user's
+         *         {@link Options#iterations_abort}.
+         */
+        static int maxIterationsExtended(final int maxIterations, final Optimisation.Options options) {
+            int extended = (int) (PROGRESS_EXTENSION * maxIterations);
+            return Math.min(extended, options.iterations_abort);
         }
 
         static int updateInterval(final int maxIterations, final Optimisation.Options options) {
@@ -432,6 +468,72 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
     /**
      * Primal–dual solution pair (x, y).
      */
+    /**
+     * Tracks how fast the solver converges – how fast the (logarithm of the) ratio between the residuals and
+     * their tolerances decreases – to decide whether it is worth continuing. Continues, even beyond the
+     * iteration limit, as long as convergence is predicted within the extended limit. Stops early, before
+     * the iteration limit, when it is not. The rate is measured over the second half of the iterations so
+     * far, comparing the smallest ratios around the midpoint and in the last tenth.
+     */
+    static final class Progress {
+
+        private final int[] myIterations;
+        private final int myLimit;
+        private final int myLimitExtended;
+        private final double[] myLogRatios;
+        private int mySize = 0;
+
+        Progress(final int limit, final int limitExtended, final int interval) {
+            super();
+            myLimit = limit;
+            myLimitExtended = limitExtended;
+            int capacity = limitExtended / Math.max(1, interval) + 2;
+            myIterations = new int[capacity];
+            myLogRatios = new double[capacity];
+        }
+
+        private double minimum(final double fromIteration, final double toIteration) {
+            double retVal = Double.POSITIVE_INFINITY;
+            for (int i = 0; i < mySize; i++) {
+                if (myIterations[i] >= fromIteration && myIterations[i] <= toIteration) {
+                    retVal = Math.min(retVal, myLogRatios[i]);
+                }
+            }
+            return retVal;
+        }
+
+        /**
+         * @param iteration The current iteration
+         * @param ratio     The current {@link Work#cachedConvergenceRatio}
+         * @return true if it is worth continuing
+         */
+        boolean isWorthContinuing(final int iteration, final double ratio) {
+
+            if (!Double.isFinite(ratio) || ratio <= PrimitiveMath.ZERO) {
+                return iteration < myLimit;
+            }
+
+            if (mySize < myIterations.length) {
+                myIterations[mySize] = iteration;
+                myLogRatios[mySize] = Math.log10(ratio);
+                mySize++;
+            }
+
+            if (iteration < Math.max(Configuration.PROGRESS_START * myLimit, Configuration.PROGRESS_MIN_ITERATIONS)) {
+                return iteration < myLimit;
+            }
+
+            double then = this.minimum(0.45 * iteration, 0.55 * iteration);
+            double now = this.minimum(0.9 * iteration, iteration);
+            double rate = (then - now) / (0.5 * iteration);
+
+            double predicted = rate > PrimitiveMath.ZERO ? now / rate : Double.POSITIVE_INFINITY;
+
+            return iteration < myLimitExtended && predicted <= myLimitExtended - iteration;
+        }
+
+    }
+
     static final class Solution {
 
         /** Primal variables x. */
@@ -630,6 +732,12 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
          * {@link Configuration#RHO} and may be adapted during the solve.
          */
         double baseRho;
+
+        /**
+         * Cached ratio between the residuals and their tolerances, the larger of the primal and dual ones,
+         * from the last (non-approximate) checkTermination call. Converged when this is below 1.
+         */
+        double cachedConvergenceRatio = Double.NaN;
 
         /**
          * Cached dual magnitude (max of norm(q), norm(yA), norm(Px)) from last checkTermination call.
@@ -964,9 +1072,12 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
             }
 
             int maxIterations = Configuration.maxIterations(myData.getRowDim(), myData.getColDim(), options);
+            int maxIterationsExtended = Configuration.maxIterationsExtended(maxIterations, options);
             int updateInterval = Configuration.updateInterval(maxIterations, options);
 
-            for (int iter = 1; iter <= maxIterations; iter++) {
+            Progress progress = new Progress(maxIterations, maxIterationsExtended, updateInterval);
+
+            for (int iter = 1; iter <= maxIterationsExtended; iter++) {
                 this.incrementIterationsCount();
 
                 this.performIteration();
@@ -978,6 +1089,9 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
                         break;
                     }
                     if (!this.isIterationAllowed()) {
+                        break;
+                    }
+                    if (!progress.isWorthContinuing(iter, myWork.cachedConvergenceRatio)) {
                         break;
                     }
 
@@ -1151,17 +1265,21 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
 
         double primMagnitude = Math.max(NRMINF.invoke(myWork.z), NRMINF.invoke(myWork.Ax));
         myWork.cachedPrimalMagnitude = primMagnitude;
-        double primTolerance = accuracy.error(primMagnitude);
+        double primRatio = primalResidual / accuracy.error(primMagnitude);
 
-        if (primalResidual < primTolerance) {
+        if (primRatio < PrimitiveMath.ONE) {
             iterationPrimalFeasible = true;
         } else {
-            problemPrimalInfeasible = this.isPrimalInfeasible(accuracy);
+            problemPrimalInfeasible = this.isPrimalInfeasible(approximate ? Configuration.APPROXIMATE : Configuration.INFEASIBILITY);
         }
 
         double dualMagnitude = MissingMath.max(NRMINF.invoke(myData.q), NRMINF.invoke(myWork.yA), NRMINF.invoke(myWork.Px));
         myWork.cachedDualMagnitude = dualMagnitude;
         double dualTolerance = accuracy.error(dualMagnitude);
+
+        if (!approximate) {
+            myWork.cachedConvergenceRatio = Math.max(primRatio, dualResidual / dualTolerance);
+        }
 
         if (dualResidual < dualTolerance) {
             iterationDualFeasible = true;

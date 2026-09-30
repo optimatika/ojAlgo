@@ -101,6 +101,17 @@ abstract class RawDecomposition extends AbstractDecomposition<Double, R064Store>
         return myInternalData;
     }
 
+    /**
+     * Replaces the internal data, for decompositions that grow/shrink. The row count is the length of the
+     * array, and the column count the length of the first row. Other rows may be longer (spare capacity).
+     */
+    void setInternalData(final double[][] data) {
+        myInternalData = data;
+        myRowDim = data.length;
+        myColDim = data.length > 0 ? data[0].length : 0;
+        myInternalStore = data.length > 0 ? RawStore.wrap(data) : null;
+    }
+
     RawStore wrap(final double[][] data) {
         return RawStore.wrap(data);
     }

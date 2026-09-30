@@ -408,7 +408,7 @@ public abstract class ConvexSolver extends GenericSolver {
         private Algorithm myAlgorithm = null;
         private boolean myCombinedScaleFactor = true;
         private boolean myExtendedPrecision = false;
-        private NumberContext myIterativeAccuracy = NumberContext.of(10, 16).withMode(RoundingMode.HALF_DOWN);
+        private NumberContext myIterativeAccuracy = NumberContext.of(16, 12).withMode(RoundingMode.HALF_DOWN);
         private Supplier<Preconditioner> myIterativePreconditioner = SSORPreconditioner::new;
         private Supplier<IterativeSolverTask> myIterativeSolver = ConjugateGradientSolver::new;
         private Boolean myProjection = null;
@@ -476,6 +476,18 @@ public abstract class ConvexSolver extends GenericSolver {
          * The accuracy of the iterative Schur complement solver used in {@link IterativeASS}. This is the
          * step that calculates the Lagrange multipliers (dual variables). The iterative solver used is a
          * {@link ConjugateGradientSolver}.
+         * <p>
+         * The precision and the scale are used for different things:
+         * <ul>
+         * <li>The precision determines when the iterative solver stops – when the residual is small relative
+         * to the right-hand side (the relative error is 10<sup>1-precision</sup>).
+         * <li>The scale determines if the iterative solution is used – the relative residual has to be less
+         * than 0.5*10<sup>-scale</sup>. If not, the full KKT system is solved (using a matrix decomposition)
+         * instead.
+         * </ul>
+         * For the iterative solutions to actually be used, the precision needs to be (at least) 2 larger than
+         * the scale. The default is precision 16 and scale 12 – the iterative solver aims for full (double)
+         * precision, and its solution is used unless it is much less accurate than that.
          */
         public Configuration iterative(final NumberContext accuracy) {
             Objects.requireNonNull(accuracy);
@@ -486,6 +498,8 @@ public abstract class ConvexSolver extends GenericSolver {
         /**
          * Select which iterative linear system solver to use for the Schur-complement step in IterativeASS.
          * Default is {@link ConjugateGradientSolver}. You may set e.g. new {@code QMRSolver()}.
+         *
+         * @see #iterative(NumberContext)
          */
         public Configuration iterative(final Supplier<IterativeSolverTask> solver, final NumberContext accuracy) {
             Objects.requireNonNull(solver);
@@ -503,6 +517,9 @@ public abstract class ConvexSolver extends GenericSolver {
             return this;
         }
 
+        /**
+         * @see #iterative(NumberContext)
+         */
         public Configuration iterative(final Supplier<IterativeSolverTask> solver, final Supplier<Preconditioner> preconditioner,
                 final NumberContext accuracy) {
             Objects.requireNonNull(solver);
@@ -605,7 +622,7 @@ public abstract class ConvexSolver extends GenericSolver {
                     algorithm = Algorithm.ACTIVE_SET;
                 } else if (n > 100 * m) {
                     algorithm = Algorithm.ADMM;
-                } else if (m + n < 750) {
+                } else if (m + n < 826) {
                     algorithm = Algorithm.ACTIVE_SET;
                 } else {
                     algorithm = Algorithm.ADMM;
@@ -791,7 +808,8 @@ public abstract class ConvexSolver extends GenericSolver {
         for (int i = 0; i < nbUpVar; i++) {
             Variable variable = tmpUpVar.get(i);
             retVal.setAI(base + i, model.indexOfFreeVariable(variable), ADJUSTED_BOUNDS ? variable.getAdjustmentFactor() : ONE);
-            retVal.setBI(base + i, variable, ConstraintType.UPPER, variable.getUpperLimit(ADJUSTED_BOUNDS, BigMath.SMALLEST_POSITIVE_INFINITY), false, ADJUSTED_BOUNDS);
+            retVal.setBI(base + i, variable, ConstraintType.UPPER, variable.getUpperLimit(ADJUSTED_BOUNDS, BigMath.SMALLEST_POSITIVE_INFINITY), false,
+                    ADJUSTED_BOUNDS);
         }
         base += nbUpVar;
 
@@ -800,8 +818,8 @@ public abstract class ConvexSolver extends GenericSolver {
             for (IntIndex key : expression.getLinearKeySet()) {
                 retVal.setAI(base + i, model.indexOfFreeVariable(key.index), expression.get(key, ADJUSTED_CONSTRAINTS).negate());
             }
-            retVal.setBI(base + i, expression, ConstraintType.LOWER, expression.getLowerLimit(ADJUSTED_CONSTRAINTS, BigMath.SMALLEST_NEGATIVE_INFINITY).negate(), true,
-                    ADJUSTED_CONSTRAINTS);
+            retVal.setBI(base + i, expression, ConstraintType.LOWER,
+                    expression.getLowerLimit(ADJUSTED_CONSTRAINTS, BigMath.SMALLEST_NEGATIVE_INFINITY).negate(), true, ADJUSTED_CONSTRAINTS);
         }
         base += nbLoExpr;
 

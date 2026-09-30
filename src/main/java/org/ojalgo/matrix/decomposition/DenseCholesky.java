@@ -23,6 +23,7 @@ package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.ojalgo.RecoverableCondition;
@@ -39,6 +40,8 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 
@@ -84,12 +87,68 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
 
     }
 
+    /**
+     * When growing, a new row/column is rejected if its pivot (the new diagonal element of [L], squared) is
+     * not larger than this factor times the new diagonal element of the matrix – the new row/column is then
+     * (numerically) linearly dependent on the existing ones.
+     */
+    private static final double DEPENDENT = 1E-12;
+
     private double myMaxDiag = ONE;
     private double myMinDiag = ZERO;
     private boolean mySPD = false;
 
     protected DenseCholesky(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
         super(aFactory);
+    }
+
+    @Override
+    public boolean appendColumn(final Access1D<N> column) {
+
+        int dim = this.isComputed() ? this.getRowDim() : 0;
+
+        if (column.size() != dim + 1) {
+            throw new IllegalArgumentException("The column must be of length " + (dim + 1) + "!");
+        }
+
+        Scalar.Factory<N> scalar = this.scalar();
+        DecompositionStore<N> current = this.getInPlace();
+
+        // [A] = [L][L]^H, and the new row [l] of [L] (without its diagonal element) is given by [L][l]^H = [a]
+        List<Scalar<N>> conjugated = new ArrayList<>(dim);
+        double sumOfSquares = ZERO;
+        for (int i = 0; i < dim; i++) {
+            Scalar<N> value = scalar.convert(column.get(i));
+            for (int p = 0; p < i; p++) {
+                value = value.subtract(scalar.convert(current.get(i, p)).multiply(conjugated.get(p)));
+            }
+            value = value.divide(current.doubleValue(i, i));
+            conjugated.add(value);
+            double norm = value.norm();
+            sumOfSquares += norm * norm;
+        }
+
+        double diagonal = scalar.convert(column.get(dim)).doubleValue();
+        double pivot = diagonal - sumOfSquares;
+
+        if (!(pivot > DEPENDENT * diagonal)) {
+            return false;
+        }
+
+        DecompositionStore<N> extended = this.makeZero(dim + 1, dim + 1);
+        for (int j = 0; j < dim; j++) {
+            for (int i = j; i < dim; i++) {
+                extended.set(i, j, current.get(i, j));
+            }
+            extended.set(dim, j, conjugated.get(j).conjugate().get());
+        }
+        extended.set(dim, dim, SQRT.invoke(pivot));
+
+        this.setInPlace(extended);
+        this.updateDiagonalRange();
+        mySPD = true;
+
+        return this.computed(true);
     }
 
     @Override
@@ -264,6 +323,80 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
     }
 
     @Override
+    public boolean removeColumn(final int index) {
+
+        int dim = this.isComputed() ? this.getRowDim() : 0;
+
+        if (index < 0 || index >= dim) {
+            throw new IllegalArgumentException("Index " + index + " is not in the range [0, " + dim + ")!");
+        }
+
+        Scalar.Factory<N> scalar = this.scalar();
+        DecompositionStore<N> current = this.getInPlace();
+        int newDim = dim - 1;
+
+        // The rows of [L], except the removed one. Those after it get one element after the diagonal.
+        List<List<Scalar<N>>> rows = new ArrayList<>(newDim);
+        for (int i = 0; i < dim; i++) {
+            if (i != index) {
+                List<Scalar<N>> row = new ArrayList<>(i + 1);
+                for (int j = 0; j <= i; j++) {
+                    row.add(scalar.convert(current.get(i, j)));
+                }
+                rows.add(row);
+            }
+        }
+
+        // Unitary (Givens-like) transformations of the columns p and p+1 restore the triangular form:
+        // [x y] -> [x*g11 + y*g21, x*g12 + y*g22] with [a b] -> [r 0], where [a b] are row p's elements
+        for (int p = index; p < newDim; p++) {
+
+            List<Scalar<N>> rowP = rows.get(p);
+            Scalar<N> a = rowP.get(p);
+            Scalar<N> b = rowP.get(p + 1);
+            double absA = a.norm();
+            double r = Math.hypot(absA, b.norm());
+
+            Scalar<N> g11 = a.conjugate().divide(r);
+            Scalar<N> g21 = b.conjugate().divide(r);
+            Scalar<N> g12;
+            Scalar<N> g22;
+            if (absA > ZERO) {
+                g12 = a.invert().multiply(b).multiply(-absA / r);
+                g22 = scalar.convert(absA / r);
+            } else {
+                g12 = scalar.one();
+                g22 = scalar.zero();
+            }
+
+            rowP.set(p, scalar.convert(r));
+            rowP.remove(p + 1);
+
+            for (int q = p + 1; q < newDim; q++) {
+                List<Scalar<N>> rowQ = rows.get(q);
+                Scalar<N> x = rowQ.get(p);
+                Scalar<N> y = rowQ.get(p + 1);
+                rowQ.set(p, x.multiply(g11).add(y.multiply(g21)));
+                rowQ.set(p + 1, x.multiply(g12).add(y.multiply(g22)));
+            }
+        }
+
+        DecompositionStore<N> reduced = this.makeZero(newDim, newDim);
+        for (int i = 0; i < newDim; i++) {
+            List<Scalar<N>> row = rows.get(i);
+            for (int j = 0; j <= i; j++) {
+                reduced.set(i, j, row.get(j).get());
+            }
+        }
+
+        this.setInPlace(reduced);
+        this.updateDiagonalRange();
+        mySPD = true;
+
+        return this.computed(true);
+    }
+
+    @Override
     public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<N> preallocated) throws RecoverableCondition {
 
         this.decompose(this.wrap(body));
@@ -278,6 +411,18 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
     @Override
     protected boolean checkSolvability() {
         return mySPD && myMinDiag > this.getRankThreshold();
+    }
+
+    private void updateDiagonalRange() {
+        DecompositionStore<N> inPlace = this.getInPlace();
+        myMaxDiag = MACHINE_SMALLEST;
+        myMinDiag = MACHINE_LARGEST;
+        for (int ij = 0, limit = this.getRowDim(); ij < limit; ij++) {
+            double diagonal = inPlace.doubleValue(ij, ij);
+            double pivot = diagonal * diagonal;
+            myMaxDiag = MAX.invoke(myMaxDiag, pivot);
+            myMinDiag = MIN.invoke(myMinDiag, pivot);
+        }
     }
 
     boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean checkHermitian) {

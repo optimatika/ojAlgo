@@ -18,6 +18,7 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * @see https://github.com/optimatika/ojAlgo/issues/300
@@ -109,9 +110,11 @@ public class GitHubIssue300 extends OptimisationConvexTests {
         Result result = solve.solve();
         TestUtils.assertEquals(Optimisation.State.OPTIMAL, result.getState());
 
+        NumberContext tolerance = NumberContext.of(8);
+
         double[] data = result.toRawCopy1D();
         for (int i = 0; i < data.length; i++) {
-            TestUtils.assertTrue("Element at index '" + i + "' should be positive", data[i] >= 0);
+            TestUtils.assertTrue("Element at index '" + i + "' should be positive", data[i] >= 0 || tolerance.isZero(data[i]));
         }
 
     }

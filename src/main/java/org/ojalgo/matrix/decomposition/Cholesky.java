@@ -48,7 +48,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface Cholesky<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition.Hermitian<N> {
+public interface Cholesky<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition.Resizable<N> {
 
     interface Factory<N extends Comparable<N>> extends MatrixDecomposition.Factory<Cholesky<N>> {
 

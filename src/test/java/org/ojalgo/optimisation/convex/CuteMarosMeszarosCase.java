@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.ArrayR256;
@@ -234,12 +233,22 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
         CuteMarosMeszarosCase.doTest(name, ACCURACY);
     }
 
-    /**
-     * <p>
-     */
     @Test
-    @Tag("unstable")
-    @Tag("slow")
+    public void testAUG3DC() {
+        CuteMarosMeszarosCase.doTest("AUG3DC.SIF");
+    }
+
+    @Test
+    public void testAUG3DCQP() {
+        CuteMarosMeszarosCase.doTest("AUG3DCQP.SIF");
+    }
+
+    @Test
+    public void testCONT_050() {
+        CuteMarosMeszarosCase.doTest("CONT-050.SIF");
+    }
+
+    @Test
     public void testCVXQP1_M() {
         CuteMarosMeszarosCase.doTest("CVXQP1_M.SIF");
     }
@@ -249,12 +258,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
         CuteMarosMeszarosCase.doTest("CVXQP1_S.SIF");
     }
 
-    /**
-     * <p>
-     */
     @Test
-    @Tag("unstable")
-    @Tag("slow")
     public void testCVXQP2_M() {
         CuteMarosMeszarosCase.doTest("CVXQP2_M.SIF");
     }
@@ -450,6 +454,16 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
         CuteMarosMeszarosCase.doTest("HS76.SIF");
     }
 
+    @Test
+    public void testHUES_MOD() {
+        CuteMarosMeszarosCase.doTest("HUES-MOD.SIF");
+    }
+
+    @Test
+    public void testHUESTIS() {
+        CuteMarosMeszarosCase.doTest("HUESTIS.SIF");
+    }
+
     /**
      * <p>
      */
@@ -458,11 +472,16 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
         CuteMarosMeszarosCase.doTest("KSIP.SIF");
     }
 
-    /**
-     * <p>
-     * Just takes way too long – 275s
-     */
-    @Tag("slow")
+    @Test
+    public void testLASER() {
+        CuteMarosMeszarosCase.doTest("LASER.SIF");
+    }
+
+    @Test
+    public void testMOSARQP1() {
+        CuteMarosMeszarosCase.doTest("MOSARQP1.SIF");
+    }
+
     @Test
     public void testMOSARQP2() {
         CuteMarosMeszarosCase.doTest("MOSARQP2.SIF");
@@ -484,10 +503,6 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
         CuteMarosMeszarosCase.doTest("PRIMALC2.SIF", ACCURACY.withScale(6));
     }
 
-    /**
-     * <p>
-     */
-    @Tag("slow")
     @Test
     public void testPRIMALC8() {
         CuteMarosMeszarosCase.doTest("PRIMALC8.SIF", ACCURACY.withScale(6));
@@ -501,10 +516,6 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
         CuteMarosMeszarosCase.doTest("QPCBLEND.SIF");
     }
 
-    /**
-     * <p>
-     */
-    @Tag("slow")
     @Test
     public void testQPCBOEI1() {
         CuteMarosMeszarosCase.doTest("QPCBOEI1.SIF", ACCURACY.withScale(7));
@@ -515,9 +526,6 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
         CuteMarosMeszarosCase.doTest("QPCBOEI2.SIF", ACCURACY.withScale(7));
     }
 
-    /**
-     * <p>
-     */
     @Test
     public void testQPCSTAIR() {
         CuteMarosMeszarosCase.doTest("QPCSTAIR.SIF");
@@ -539,12 +547,27 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
         CuteMarosMeszarosCase.doTest("S268.SIF", ACCURACY.withScale(4));
     }
 
+    @Test
+    public void testSTCQP1() {
+        CuteMarosMeszarosCase.doTest("STCQP1.SIF");
+    }
+
+    @Test
+    public void testSTCQP2() {
+        CuteMarosMeszarosCase.doTest("STCQP2.SIF");
+    }
+
     /**
      * <p>
      */
     @Test
     public void testTAME() {
         CuteMarosMeszarosCase.doTest("TAME.SIF");
+    }
+
+    @Test
+    public void testVALUES() {
+        CuteMarosMeszarosCase.doTest("VALUES.SIF");
     }
 
     /**
