@@ -427,7 +427,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
          * If the intial reference is {0, 2, 3} and the slice dimension is 1 then the sliced 1D view will map
          * to the following elements in the AnyD data structure:
          *
-         * <pre>
+         * <pre>{@code
          * 0 => {0, 2, 3}
          * 1 => {0, 3, 3}
          * 2 => {0, 4, 3}
@@ -435,7 +435,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
          * 4 => {0, 6, 3}
          * 5 => {0, 7, 3}
          * 6 => ...
-         * </pre>
+         * }</pre>
          *
          * Meaning the row index is always '0', and the plane/matrix/area index is always '3', but the column
          * index starts at '2' and then increments.
@@ -700,7 +700,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
      * long[] of indices per dimension of the {@link AccessAnyD}, but any such array that is null, empty or
      * missing will be replaced by a "full selection" in that dimension. For instance if you have
      * 3-dimensional array and want to select only the second and third columns of any/all matrices:
-     * <code>select(null, {1,2})</code> You have to input null for the row indices (otherwise there is no way
+     * {@code select(null, {1,2})} You have to input null for the row indices (otherwise there is no way
      * of knowing that {1,2} refers to column indices) but may leave out specification of matrix indices.
      */
     default AccessAnyD<N> select(final long[]... selections) {

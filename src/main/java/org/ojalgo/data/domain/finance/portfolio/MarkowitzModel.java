@@ -36,56 +36,44 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * <p>
  * The Markowitz model, in this class, is defined as:
- * </p>
  * <p>
  * min (RAF/2) [w]<sup>T</sup>[C][w] - [w]<sup>T</sup>[r] <br>
  * subject to |[w]| = 1
- * </p>
  * <p>
  * RAF stands for Risk Aversion Factor. Instead of specifying a desired risk or return level you specify a
  * level of risk aversion that is used to balance the risk and return.
- * </p>
  * <p>
  * The expected returns for each of the assets must be excess returns. Otherwise this formulation is wrong.
- * </p>
  * <p>
  * The total weights of all assets will always be 100%, but shorting can be allowed or not according to your
  * preference. ( {@linkplain #setShortingAllowed(boolean)} ) In addition you may set lower and upper limits on
  * any individual asset. ( {@linkplain #setLowerLimit(int, BigDecimal)} and
  * {@linkplain #setUpperLimit(int, BigDecimal)} )
- * </p>
  * <p>
  * Risk-free asset: That means there is no excess return and zero variance. Don't (try to) include a risk-free
  * asset here.
- * </p>
  * <p>
  * Do not worry about the minus sign in front of the return part of the objective function - it is
  * handled/negated for you. When you're asked to supply the expected excess returns you should supply
  * precisely that.
- * </p>
  * <p>
  * Basic usage instructions
- * </p>
  * After you've instantiated the MarkowitzModel you need to do one of three different things:
  * <ol>
- * <li>{@link #setRiskAversion(Number)} unless this was already set in the {@link MarketEquilibrium} or
- * {@link FinancePortfolio.Context} used to instantiate the MarkowitzModel</li>
- * <li>{@link #setTargetReturn(BigDecimal)}</li>
- * <li>{@link #setTargetVariance(BigDecimal)}</li>
+ * <li>{@link #setRiskAversion(Comparable)} unless this was already set in the {@link MarketEquilibrium} or
+ * {@link FinancePortfolio.Context} used to instantiate the MarkowitzModel
+ * <li>{@link #setTargetReturn(BigDecimal)}
+ * <li>{@link #setTargetVariance(BigDecimal)}
  * </ol>
  * <p>
  * Optionally you may {@linkplain #setLowerLimit(int, BigDecimal)},
  * {@linkplain #setUpperLimit(int, BigDecimal)} or {@linkplain #setShortingAllowed(boolean)}.
- * </p>
  * <p>
  * To get the optimal asset weighs you simply call {@link #getWeights()} or {@link #getAssetWeights()}.
- * </p>
  * <p>
  * If the results are not what you expect the first thing you should try is to turn on optimisation model
- * validation: <code>model.optimisation().validate(true);</code>
- * </p>
+ * validation: {@code model.optimisation().validate(true);}
  *
  * @author apete
  */
@@ -133,21 +121,16 @@ public final class MarkowitzModel extends OptimisedPortfolio {
     }
 
     /**
-     * <p>
-     * Will set the target return to whatever you input and the target variance to <code>null</code>.
-     * </p>
+     * Will set the target return to whatever you input and the target variance to {@code null}.
      * <p>
      * Setting the target return implies that you disregard the risk aversion factor and want the minimum risk
      * portfolio with return that is equal to or as close to the target as possible.
-     * </p>
      * <p>
      * There is a performance penalty for setting a target return as the underlying optimisation model has to
      * be solved several (many) times with different pararmeters (different risk aversion factors).
-     * </p>
      * <p>
      * Setting a target return (or variance) is not recommnded. It's much better to simply modify the risk
      * aversion factor.
-     * </p>
      *
      * @see #setTargetVariance(BigDecimal)
      */
@@ -158,20 +141,15 @@ public final class MarkowitzModel extends OptimisedPortfolio {
     }
 
     /**
-     * <p>
-     * Will set the target variance to whatever you input and the target return to <code>null</code>.
-     * </p>
+     * Will set the target variance to whatever you input and the target return to {@code null}.
      * <p>
      * Setting the target variance implies that you disregard the risk aversion factor and want the maximum
      * return portfolio with risk that is equal to or as close to the target as possible.
-     * </p>
      * <p>
      * There is a performance penalty for setting a target variance as the underlying optimisation model has
      * to be solved several (many) times with different pararmeters (different risk aversion factors).
-     * </p>
      * <p>
      * Setting a target variance is not recommnded. It's much better to modify the risk aversion factor.
-     * </p>
      *
      * @see #setTargetReturn(BigDecimal)
      */

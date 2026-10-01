@@ -67,27 +67,23 @@ import org.ojalgo.type.context.NumberContext;
  * min 1/2 [X]<sup>T</sup>[Q][X] - [C]<sup>T</sup>[X]<br>
  * when [AE][X] == [BE]<br>
  * and [AI][X] <= [BI]
- * </p>
  * <p>
  * The matrix [Q] is assumed to be symmetric (it must be made that way) and positive (semi)definite:
- * </p>
  * <ul>
  * <li>If [Q] is positive semidefinite, then the objective function is convex: In this case the quadratic
  * program has a global minimizer if there exists some feasible vector [X] (satisfying the constraints) and if
- * the objective function is bounded below on the feasible region.</li>
+ * the objective function is bounded below on the feasible region.
  * <li>If [Q] is positive definite and the problem has a feasible solution, then the global minimizer is
- * unique.</li>
+ * unique.
  * </ul>
  * <p>
  * The general recommendation is to construct optimisation problems using {@linkplain ExpressionsBasedModel}
  * and not worry about solver details. If you do want to instantiate a convex solver directly use the
  * {@linkplain ConvexSolver.Builder} class. It will return an appropriate subclass for you.
- * </p>
  * <p>
  * When the KKT matrix is nonsingular, there is a unique optimal primal-dual pair (x,l). If the KKT matrix is
  * singular, but the KKT system is still solvable, any solution yields an optimal pair (x,l). If the KKT
  * system is not solvable, the quadratic optimization problem is unbounded below or infeasible.
- * </p>
  *
  * @author apete
  */

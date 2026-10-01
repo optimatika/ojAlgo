@@ -36,21 +36,18 @@ import org.ojalgo.type.context.NumberContext;
  * LU: [A] = [L][U]
  * <p>
  * Decomposes [this] into [L] and [U] (with pivot order information in an int[]) where:
- * </p>
  * <ul>
  * <li>[L] is a unit lower (left) triangular matrix. It has the same number of rows as [this], and ones on the
- * diagonal.</li>
- * <li>[U] is an upper (right) triangular matrix. It has the same number of columns as [this].</li>
- * <li>[this] = [L][U] (with reordered rows according to the pivot order)</li>
+ * diagonal.
+ * <li>[U] is an upper (right) triangular matrix. It has the same number of columns as [this].
+ * <li>[this] = [L][U] (with reordered rows according to the pivot order)
  * </ul>
  * <p>
  * Note: The number of columns in [L] and the number of rows in [U] is not specified by this interface.
- * </p>
  * <p>
  * The LU decomposition always exists - the compute method should always succeed - even for non-square and/or
  * singular matrices. The primary use of the LU decomposition is in the solution of systems of simultaneous
  * linear equations. That will, however, only work for square non-singular matrices.
- * </p>
  *
  * @author apete
  */
@@ -98,8 +95,8 @@ public interface LU<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition
     }
 
     /**
-     * http://en.wikipedia.org/wiki/Row_echelon_form <br>
-     * <br>
+     * http://en.wikipedia.org/wiki/Row_echelon_form
+     * <p>
      * This is the same as [D][U]. Together with the pivotOrder and [L] this constitutes an alternative, more
      * compact, way to express the decomposition.
      *

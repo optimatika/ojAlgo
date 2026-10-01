@@ -22,7 +22,7 @@
 package org.ojalgo.machine;
 
 /**
- * <pre>
+ * <pre>{@code
   B   byte       signed byte
   C   char       Unicode character code point in the Basic Multilingual Plane,
                  encoded with UTF-16
@@ -34,7 +34,7 @@ package org.ojalgo.machine;
   S   short      signed short
   Z   boolean    true or false
   [   reference  one array dimension
- * </pre>
+ * }</pre>
  *
  * https://stackoverflow.com/questions/32768036/why-is-l-the-prefix-for-reference-types-instead-of-some-other-letter
  *

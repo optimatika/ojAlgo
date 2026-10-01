@@ -105,7 +105,8 @@ class ExpressionsBasedModelTest extends OptimisationTests {
     }
 
     /**
-     * https://github.com/optimatika/ojAlgo-extensions/issues/3 <br>
+     * https://github.com/optimatika/ojAlgo-extensions/issues/3
+     * <p>
      * "compensating" didn't work because of an incorrectly used stream - did peek(...) instead of map(...).
      */
     @Test
@@ -207,7 +208,8 @@ class ExpressionsBasedModelTest extends OptimisationTests {
     }
 
     /**
-     * https://github.com/optimatika/ojAlgo-extensions/issues/2 <br>
+     * https://github.com/optimatika/ojAlgo-extensions/issues/2
+     * <p>
      * Reported as a problem with the Gurobi integration. The problem is unbounded. Many solvers do not return
      * a feasible solution in such case - even if they could.
      */

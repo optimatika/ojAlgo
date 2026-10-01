@@ -36,21 +36,19 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * QR: [A] = [Q][R] Decomposes [this] into [Q] and [R] where:
  * <ul>
- * <li>[Q] is an orthogonal matrix (orthonormal columns). It has the same number of rows as [this].</li>
- * <li>[R] is a right (upper) triangular matrix. It has the same number of columns as [this].</li>
- * <li>[this] = [Q][R]</li>
+ * <li>[Q] is an orthogonal matrix (orthonormal columns). It has the same number of rows as [this].
+ * <li>[R] is a right (upper) triangular matrix. It has the same number of columns as [this].
+ * <li>[this] = [Q][R]
  * </ul>
  * Note: Either Q or R will be square. The interface does not specify which.
  * <p>
- * You create instances of (some subclass of) this class by calling one of the static factory methods:
- * {@linkplain #Q128}, {@linkplain #C128}, {@linkplain #PRIMITIVE} or {@linkplain #make(Access2D)}
- * </p>
+ * You create instances of (some subclass of) this class by using one of the factories:
+ * {@linkplain #R064}, {@linkplain #R128}, {@linkplain #C128}, {@linkplain #H256} or {@linkplain #Q128}
  * <p>
  * The QR decompostion always exists, even if the matrix does not have full column rank, so the compute method
  * will never fail. The primary use of the QR decomposition is in the least squares solution of overdetermined
  * systems of simultaneous linear equations. This will fail if the matrix does not have full column rank. The
  * rank must be equal to the number of columns.
- * </p>
  *
  * @author apete
  */

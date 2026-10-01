@@ -368,14 +368,14 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
     /**
      * Requirements on the input matrix and summary of the factorisation semantics:
      * <ul>
-     * <li>Square.</li>
+     * <li>Square.
      * <li>Symmetric, with only the upper/right triangle stored. The lower/left triangle is not ignored; any
-     * explicitly stored non-zero entries there will cause the symbolic phase to fail.</li>
-     * <li>Sparse (not strictly required, but this implementation is optimised for sparse structure).</li>
+     * explicitly stored non-zero entries there will cause the symbolic phase to fail.
+     * <li>Sparse (not strictly required, but this implementation is optimised for sparse structure).
      * <li>Quasi-definite for a fully solvable system: during factorisation the diagonal entries D[i] are
      * classified relative to a small, scale-dependent tolerance derived from the largest |D[i]| seen so far
      * and the dimensional epsilon. All D[i] must be classified as positive for {@link #isSolvable()} to
-     * return {@code true}.</li>
+     * return {@code true}.
      * </ul>
      * The underlying QDLDL-style algorithm will return false if any diagonal entry in D is classified as
      * (numerically) zero. Indefinite or near-singular matrices may still factorise, but will typically yield
@@ -385,7 +385,7 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
      * This method performs both the symbolic analysis (elimination tree) and numeric factorisation. For
      * repeated factorisations with identical sparsity patterns and updated values, callers may instead use
      * {@link #factor(R064CSC, EliminationTree)} together with a cached symbolic tree obtained from
-     * {@link #getSymbolic()}.
+     * {@link #computeEliminationTree(R064CSC)}.
      */
     public boolean factor(final R064CSC matrix) {
         this.reset();

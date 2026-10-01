@@ -414,9 +414,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     /**
-     * <p>
      * About inverting matrices:
-     * </p>
      * <ul>
      * <li>"right inverse": [this][right inverse]=[I]. You may calculate it using
      * {@linkplain #solve(Access2D)}.
@@ -682,17 +680,14 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     /**
-     * <p>
      * This method solves a system of linear equations: [this][X]=[rhs]. A combination of columns in [this]
      * should produce a column(s) in [rhs]. It is ok for [rhs] to have more than 1 column.
-     * </p>
      * <ul>
-     * <li>If the problem is over-qualified an approximate solution is returned.</li>
-     * <li>If the problem is under-qualified one possible solution is returned.</li>
+     * <li>If the problem is over-qualified an approximate solution is returned.
+     * <li>If the problem is under-qualified one possible solution is returned.
      * </ul>
      * <p>
      * Remember that: [X][this]=[rhs] is equivalent to [this]<sup>T</sup>[X]<sup>T</sup>=[rhs]<sup>T</sup>
-     * </p>
      *
      * @param rhs The right hand side of the equation.
      * @return The solution, [X].

@@ -84,8 +84,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * 25FV47 — 822 rows × 1571 columns, 11127 non-zeros.<br>
-     * Optimal value: 5.5018458883E+03.<br>
+     * 25FV47 — 822 rows × 1571 columns, 11127 non-zeros.
+     * <ul>
+     * <li>Optimal value: 5.5018458883E+03.
+     * </ul>
      */
     @Test
     public void test25FV47() {
@@ -93,9 +95,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * 80BAU3B — 2263 rows × 9799 columns, 29063 non-zeros.<br>
-     * Has variable bounds (UP LO FX).<br>
-     * Optimal value: 9.8723216072E+05.<br>
+     * 80BAU3B — 2263 rows × 9799 columns, 29063 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP LO FX).
+     * <li>Optimal value: 9.8723216072E+05.
+     * </ul>
      */
     @Test
     public void test80BAU3B() {
@@ -103,8 +107,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * ADLITTLE — 57 rows × 97 columns, 465 non-zeros.<br>
-     * Optimal value: 2.2549496316E+05.<br>
+     * ADLITTLE — 57 rows × 97 columns, 465 non-zeros.
+     * <ul>
+     * <li>Optimal value: 2.2549496316E+05.
+     * </ul>
      */
     @Test
     public void testADLITTLE() {
@@ -112,8 +118,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * AFIRO — 28 rows × 32 columns, 88 non-zeros.<br>
-     * Optimal value: -4.6475314286E+02.<br>
+     * AFIRO — 28 rows × 32 columns, 88 non-zeros.
+     * <ul>
+     * <li>Optimal value: -4.6475314286E+02.
+     * </ul>
      */
     @Test
     public void testAFIRO() {
@@ -161,8 +169,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * AGG — 489 rows × 163 columns, 2541 non-zeros.<br>
-     * Optimal value: -3.5991767287E+07.<br>
+     * AGG — 489 rows × 163 columns, 2541 non-zeros.
+     * <ul>
+     * <li>Optimal value: -3.5991767287E+07.
+     * </ul>
      */
     @Test
     public void testAGG() {
@@ -170,8 +180,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * AGG2 — 517 rows × 302 columns, 4515 non-zeros.<br>
-     * Optimal value: -2.0239252356E+07.<br>
+     * AGG2 — 517 rows × 302 columns, 4515 non-zeros.
+     * <ul>
+     * <li>Optimal value: -2.0239252356E+07.
+     * </ul>
      */
     @Test
     public void testAGG2() {
@@ -179,8 +191,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * AGG3 — 517 rows × 302 columns, 4531 non-zeros.<br>
-     * Optimal value: 1.0312115935E+07.<br>
+     * AGG3 — 517 rows × 302 columns, 4531 non-zeros.
+     * <ul>
+     * <li>Optimal value: 1.0312115935E+07.
+     * </ul>
      */
     @Test
     public void testAGG3() {
@@ -188,8 +202,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * BANDM — 306 rows × 472 columns, 2659 non-zeros.<br>
-     * Optimal value: -1.5862801845E+02.<br>
+     * BANDM — 306 rows × 472 columns, 2659 non-zeros.
+     * <ul>
+     * <li>Optimal value: -1.5862801845E+02.
+     * </ul>
      */
     @Test
     public void testBANDM() {
@@ -197,8 +213,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * BEACONFD — 174 rows × 262 columns, 3476 non-zeros.<br>
-     * Optimal value: 3.3592485807E+04.<br>
+     * BEACONFD — 174 rows × 262 columns, 3476 non-zeros.
+     * <ul>
+     * <li>Optimal value: 3.3592485807E+04.
+     * </ul>
      */
     @Test
     public void testBEACONFD() {
@@ -206,8 +224,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * BLEND — 75 rows × 83 columns, 521 non-zeros.<br>
-     * Optimal value: -3.0812149846E+01.<br>
+     * BLEND — 75 rows × 83 columns, 521 non-zeros.
+     * <ul>
+     * <li>Optimal value: -3.0812149846E+01.
+     * </ul>
      */
     @Test
     public void testBLEND() {
@@ -215,8 +235,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * BNL1 — 644 rows × 1175 columns, 6129 non-zeros.<br>
-     * Optimal value: 1.9776292856E+03.<br>
+     * BNL1 — 644 rows × 1175 columns, 6129 non-zeros.
+     * <ul>
+     * <li>Optimal value: 1.9776292856E+03.
+     * </ul>
      */
     @Test
     public void testBNL1() {
@@ -224,8 +246,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * BNL2 — 2325 rows × 3489 columns, 16124 non-zeros.<br>
-     * Optimal value: 1.8112365404E+03.<br>
+     * BNL2 — 2325 rows × 3489 columns, 16124 non-zeros.
+     * <ul>
+     * <li>Optimal value: 1.8112365404E+03.
+     * </ul>
      */
     @Test
     public void testBNL2() {
@@ -233,9 +257,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * BOEING1 — 351 rows × 384 columns, 3865 non-zeros.<br>
-     * Has variable bounds (UP LO) and ranges on constraints.<br>
-     * Optimal value: -3.3521356751E+02.<br>
+     * BOEING1 — 351 rows × 384 columns, 3865 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP LO) and ranges on constraints.
+     * <li>Optimal value: -3.3521356751E+02.
+     * </ul>
      */
     @Test
     public void testBOEING1() {
@@ -243,9 +269,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * BOEING2 — 167 rows × 143 columns, 1339 non-zeros.<br>
-     * Has variable bounds (UP LO) and ranges on constraints.<br>
-     * Optimal value: -3.1501872802E+02.<br>
+     * BOEING2 — 167 rows × 143 columns, 1339 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP LO) and ranges on constraints.
+     * <li>Optimal value: -3.1501872802E+02.
+     * </ul>
      */
     @Test
     public void testBOEING2() {
@@ -253,10 +281,12 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * BORE3D — 234 rows × 315 columns, 1525 non-zeros.<br>
-     * Has variable bounds (UP LO FX).<br>
-     * Optimal value: 1.3730803942E+03.<br>
-     * RHS section is empty in the original SIF.<br>
+     * BORE3D — 234 rows × 315 columns, 1525 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP LO FX).
+     * <li>Optimal value: 1.3730803942E+03.
+     * <li>RHS section is empty in the original SIF.
+     * </ul>
      */
     @Test
     public void testBORE3D() {
@@ -264,8 +294,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * BRANDY — 221 rows × 249 columns, 2150 non-zeros.<br>
-     * Optimal value: 1.5185098965E+03.<br>
+     * BRANDY — 221 rows × 249 columns, 2150 non-zeros.
+     * <ul>
+     * <li>Optimal value: 1.5185098965E+03.
+     * </ul>
      */
     @Test
     public void testBRANDY() {
@@ -273,9 +305,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * CAPRI — 272 rows × 353 columns, 1786 non-zeros.<br>
-     * Has variable bounds (UP FX FR).<br>
-     * Optimal value: 2.6900129138E+03.<br>
+     * CAPRI — 272 rows × 353 columns, 1786 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP FX FR).
+     * <li>Optimal value: 2.6900129138E+03.
+     * </ul>
      */
     @Test
     public void testCAPRI() {
@@ -283,8 +317,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * CRE-A — 3517 rows × 4067 columns.<br>
-     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
+     * CRE-A — 3517 rows × 4067 columns.
+     * <ul>
+     * <li>From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).
+     * </ul>
      */
     @Test
     public void testCRE_A() {
@@ -293,8 +329,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
 
 
     /**
-     * CRE-C — 3069 rows × 3678 columns.<br>
-     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
+     * CRE-C — 3069 rows × 3678 columns.
+     * <ul>
+     * <li>From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).
+     * </ul>
      */
     @Test
     public void testCRE_C() {
@@ -303,10 +341,12 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
 
 
     /**
-     * CYCLE — 1904 rows × 2857 columns, 21322 non-zeros.<br>
-     * Has variable bounds (UP FR).<br>
-     * Optimal value: -5.2263930249E+00.<br>
-     * RHS section is empty in the original SIF.<br>
+     * CYCLE — 1904 rows × 2857 columns, 21322 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP FR).
+     * <li>Optimal value: -5.2263930249E+00.
+     * <li>RHS section is empty in the original SIF.
+     * </ul>
      */
     @Test
     public void testCYCLE() {
@@ -314,9 +354,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * CZPROB — 930 rows × 3523 columns, 14173 non-zeros.<br>
-     * Has variable bounds (FX).<br>
-     * Optimal value: 2.1851966989E+06.<br>
+     * CZPROB — 930 rows × 3523 columns, 14173 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (FX).
+     * <li>Optimal value: 2.1851966989E+06.
+     * </ul>
      */
     @Test
     public void testCZPROB() {
@@ -324,8 +366,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * D2Q06C — 2172 rows × 5167 columns, 35674 non-zeros.<br>
-     * Optimal value: 1.2278423615E+05.<br>
+     * D2Q06C — 2172 rows × 5167 columns, 35674 non-zeros.
+     * <ul>
+     * <li>Optimal value: 1.2278423615E+05.
+     * </ul>
      */
     @Test
     @Tag("slow")
@@ -334,9 +378,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * D6CUBE — 416 rows × 6184 columns, 43888 non-zeros.<br>
-     * Has variable bounds (LO).<br>
-     * Optimal value: 3.1549166667E+02.<br>
+     * D6CUBE — 416 rows × 6184 columns, 43888 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (LO).
+     * <li>Optimal value: 3.1549166667E+02.
+     * </ul>
      */
     @Test
     public void testD6CUBE() {
@@ -344,8 +390,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * DEGEN2 — 445 rows × 534 columns, 4449 non-zeros.<br>
-     * Optimal value: -1.4351780000E+03.<br>
+     * DEGEN2 — 445 rows × 534 columns, 4449 non-zeros.
+     * <ul>
+     * <li>Optimal value: -1.4351780000E+03.
+     * </ul>
      */
     @Test
     public void testDEGEN2() {
@@ -353,8 +401,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * DEGEN3 — 1504 rows × 1818 columns, 26230 non-zeros.<br>
-     * Optimal value: -9.8729400000E+02.<br>
+     * DEGEN3 — 1504 rows × 1818 columns, 26230 non-zeros.
+     * <ul>
+     * <li>Optimal value: -9.8729400000E+02.
+     * </ul>
      */
     @Test
     public void testDEGEN3() {
@@ -363,8 +413,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
 
 
     /**
-     * E226 — 224 rows × 282 columns, 2767 non-zeros.<br>
-     * Optimal value: -1.8751929066E+01.<br>
+     * E226 — 224 rows × 282 columns, 2767 non-zeros.
+     * <ul>
+     * <li>Optimal value: -1.8751929066E+01.
+     * </ul>
      */
     @Test
     public void testE226() {
@@ -372,9 +424,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * ETAMACRO — 401 rows × 688 columns, 2489 non-zeros.<br>
-     * Has variable bounds (UP LO FX).<br>
-     * Optimal value: -7.5571521774E+02.<br>
+     * ETAMACRO — 401 rows × 688 columns, 2489 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP LO FX).
+     * <li>Optimal value: -7.5571521774E+02.
+     * </ul>
      */
     @Test
     public void testETAMACRO() {
@@ -382,8 +436,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * FFFFF800 — 525 rows × 854 columns, 6235 non-zeros.<br>
-     * Optimal value: 5.5567961165E+05.<br>
+     * FFFFF800 — 525 rows × 854 columns, 6235 non-zeros.
+     * <ul>
+     * <li>Optimal value: 5.5567961165E+05.
+     * </ul>
      */
     @Test
     public void testFFFFF800() {
@@ -391,9 +447,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * FINNIS — 498 rows × 614 columns, 2714 non-zeros.<br>
-     * Has variable bounds (UP LO FX).<br>
-     * Optimal value: 1.7279096547E+05.<br>
+     * FINNIS — 498 rows × 614 columns, 2714 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP LO FX).
+     * <li>Optimal value: 1.7279096547E+05.
+     * </ul>
      */
     @Test
     public void testFINNIS() {
@@ -401,9 +459,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * FIT1D — 25 rows × 1026 columns, 14430 non-zeros.<br>
-     * Has variable bounds (UP).<br>
-     * Optimal value: -9.1463780924E+03.<br>
+     * FIT1D — 25 rows × 1026 columns, 14430 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP).
+     * <li>Optimal value: -9.1463780924E+03.
+     * </ul>
      */
     @Test
     public void testFIT1D() {
@@ -411,9 +471,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * FIT1P — 628 rows × 1677 columns, 10894 non-zeros.<br>
-     * Has variable bounds (UP).<br>
-     * Optimal value: 9.1463780924E+03.<br>
+     * FIT1P — 628 rows × 1677 columns, 10894 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP).
+     * <li>Optimal value: 9.1463780924E+03.
+     * </ul>
      */
     @Test
     public void testFIT1P() {
@@ -423,9 +485,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
 
 
     /**
-     * FORPLAN — 162 rows × 421 columns, 4916 non-zeros.<br>
-     * Has variable bounds (UP FX) and ranges on constraints.<br>
-     * Optimal value: -6.6421873953E+02.<br>
+     * FORPLAN — 162 rows × 421 columns, 4916 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP FX) and ranges on constraints.
+     * <li>Optimal value: -6.6421873953E+02.
+     * </ul>
      */
     @Test
     public void testFORPLAN() {
@@ -433,9 +497,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * GANGES — 1310 rows × 1681 columns, 7021 non-zeros.<br>
-     * Has variable bounds (UP LO).<br>
-     * Optimal value: -1.0958636356E+05.<br>
+     * GANGES — 1310 rows × 1681 columns, 7021 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP LO).
+     * <li>Optimal value: -1.0958636356E+05.
+     * </ul>
      */
     @Test
     public void testGANGES() {
@@ -443,9 +509,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * GFRD-PNC — 617 rows × 1092 columns, 3467 non-zeros.<br>
-     * Has variable bounds (UP LO).<br>
-     * Optimal value: 6.9022359995E+06.<br>
+     * GFRD-PNC — 617 rows × 1092 columns, 3467 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP LO).
+     * <li>Optimal value: 6.9022359995E+06.
+     * </ul>
      */
     @Test
     public void testGFRD_PNC() {
@@ -453,10 +521,12 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * GREENBEA — 2393 rows × 5405 columns, 31499 non-zeros.<br>
-     * Has variable bounds (UP LO FX).<br>
-     * Optimal value: -7.2462405908E+07.<br>
-     * RHS section is empty in the original SIF.<br>
+     * GREENBEA — 2393 rows × 5405 columns, 31499 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP LO FX).
+     * <li>Optimal value: -7.2462405908E+07.
+     * <li>RHS section is empty in the original SIF.
+     * </ul>
      */
     @Test
     public void testGREENBEA() {
@@ -464,10 +534,12 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * GREENBEB — 2393 rows × 5405 columns, 31499 non-zeros.<br>
-     * Has variable bounds (UP LO FX FR).<br>
-     * Optimal value: -4.3021476065E+06.<br>
-     * RHS section is empty in the original SIF.<br>
+     * GREENBEB — 2393 rows × 5405 columns, 31499 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP LO FX FR).
+     * <li>Optimal value: -4.3021476065E+06.
+     * <li>RHS section is empty in the original SIF.
+     * </ul>
      */
     @Test
     public void testGREENBEB() {
@@ -475,9 +547,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * GROW15 — 301 rows × 645 columns, 5665 non-zeros.<br>
-     * Has variable bounds (UP).<br>
-     * Optimal value: -1.0687094129E+08.<br>
+     * GROW15 — 301 rows × 645 columns, 5665 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP).
+     * <li>Optimal value: -1.0687094129E+08.
+     * </ul>
      */
     @Test
     public void testGROW15() {
@@ -485,9 +559,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * GROW22 — 441 rows × 946 columns, 8318 non-zeros.<br>
-     * Has variable bounds (UP).<br>
-     * Optimal value: -1.6083433648E+08.<br>
+     * GROW22 — 441 rows × 946 columns, 8318 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP).
+     * <li>Optimal value: -1.6083433648E+08.
+     * </ul>
      */
     @Test
     public void testGROW22() {
@@ -495,9 +571,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * GROW7 — 141 rows × 301 columns, 2633 non-zeros.<br>
-     * Has variable bounds (UP).<br>
-     * Optimal value: -4.7787811815E+07.<br>
+     * GROW7 — 141 rows × 301 columns, 2633 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP).
+     * <li>Optimal value: -4.7787811815E+07.
+     * </ul>
      */
     @Test
     public void testGROW7() {
@@ -505,8 +583,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * ISRAEL — 175 rows × 142 columns, 2358 non-zeros.<br>
-     * Optimal value: -8.9664482186E+05.<br>
+     * ISRAEL — 175 rows × 142 columns, 2358 non-zeros.
+     * <ul>
+     * <li>Optimal value: -8.9664482186E+05.
+     * </ul>
      */
     @Test
     public void testISRAEL() {
@@ -514,10 +594,12 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * KB2 — 44 rows × 41 columns, 291 non-zeros.<br>
-     * Has variable bounds (UP).<br>
-     * Optimal value: -1.7499001299E+03.<br>
-     * RHS section is empty in the original SIF.<br>
+     * KB2 — 44 rows × 41 columns, 291 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP).
+     * <li>Optimal value: -1.7499001299E+03.
+     * <li>RHS section is empty in the original SIF.
+     * </ul>
      */
     @Test
     public void testKB2() {
@@ -525,8 +607,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * KEN-07 — 2427 rows × 3602 columns.<br>
-     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
+     * KEN-07 — 2427 rows × 3602 columns.
+     * <ul>
+     * <li>From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).
+     * </ul>
      */
     @Test
     public void testKEN_07() {
@@ -537,8 +621,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
 
 
     /**
-     * LOTFI — 154 rows × 308 columns, 1086 non-zeros.<br>
-     * Optimal value: -2.5264706062E+01.<br>
+     * LOTFI — 154 rows × 308 columns, 1086 non-zeros.
+     * <ul>
+     * <li>Optimal value: -2.5264706062E+01.
+     * </ul>
      */
     @Test
     public void testLOTFI() {
@@ -546,9 +632,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * MAROS — 847 rows × 1443 columns, 10006 non-zeros.<br>
-     * Has variable bounds.<br>
-     * Optimal value: -5.8063743701E+04.<br>
+     * MAROS — 847 rows × 1443 columns, 10006 non-zeros.
+     * <ul>
+     * <li>Has variable bounds.
+     * <li>Optimal value: -5.8063743701E+04.
+     * </ul>
      */
     @Test
     public void testMAROS() {
@@ -556,8 +644,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * MAROS-R7 — 3137 rows × 9408 columns, 151120 non-zeros.<br>
-     * Optimal value: 1.4971851665E+06.<br>
+     * MAROS-R7 — 3137 rows × 9408 columns, 151120 non-zeros.
+     * <ul>
+     * <li>Optimal value: 1.4971851665E+06.
+     * </ul>
      */
     @Test
     public void testMAROS_R7() {
@@ -565,9 +655,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * MODSZK1 — 688 rows × 1620 columns, 4158 non-zeros.<br>
-     * Has variable bounds (FR).<br>
-     * Optimal value: 3.2061972906E+02.<br>
+     * MODSZK1 — 688 rows × 1620 columns, 4158 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (FR).
+     * <li>Optimal value: 3.2061972906E+02.
+     * </ul>
      */
     @Test
     public void testMODSZK1() {
@@ -575,9 +667,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * NESM — 663 rows × 2923 columns, 13988 non-zeros.<br>
-     * Has variable bounds (UP LO FX) and ranges on constraints.<br>
-     * Optimal value: 1.4076073035E+07.<br>
+     * NESM — 663 rows × 2923 columns, 13988 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP LO FX) and ranges on constraints.
+     * <li>Optimal value: 1.4076073035E+07.
+     * </ul>
      */
     @Test
     public void testNESM() {
@@ -589,8 +683,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
 
 
     /**
-     * PDS-02 — 2954 rows × 7535 columns.<br>
-     * From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).<br>
+     * PDS-02 — 2954 rows × 7535 columns.
+     * <ul>
+     * <li>From the Kennington test set (military airlift; see lp/data/kennington in the netlib distribution).
+     * </ul>
      */
     @Test
     public void testPDS_02() {
@@ -601,9 +697,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
 
 
     /**
-     * PEROLD — 626 rows × 1376 columns, 6026 non-zeros.<br>
-     * Has variable bounds (UP LO FX FR).<br>
-     * Optimal value: -9.3807580773E+03.<br>
+     * PEROLD — 626 rows × 1376 columns, 6026 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP LO FX FR).
+     * <li>Optimal value: -9.3807580773E+03.
+     * </ul>
      */
     @Test
     public void testPEROLD() {
@@ -611,9 +709,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * PILOT — 1442 rows × 3652 columns, 43220 non-zeros.<br>
-     * Has variable bounds (UP LO FX).<br>
-     * Optimal value: -5.5740430007E+02.<br>
+     * PILOT — 1442 rows × 3652 columns, 43220 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP LO FX).
+     * <li>Optimal value: -5.5740430007E+02.
+     * </ul>
      */
     @Test
     @Tag("slow")
@@ -622,9 +722,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * PILOT-JA — 941 rows × 1988 columns, 14706 non-zeros.<br>
-     * Has variable bounds (UP LO FX FR).<br>
-     * Optimal value: -6.1131344111E+03.<br>
+     * PILOT-JA — 941 rows × 1988 columns, 14706 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP LO FX FR).
+     * <li>Optimal value: -6.1131344111E+03.
+     * </ul>
      */
     @Test
     public void testPILOT_JA() {
@@ -632,9 +734,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * PILOT-WE — 723 rows × 2789 columns, 9218 non-zeros.<br>
-     * Has variable bounds (UP LO FX FR).<br>
-     * Optimal value: -2.7201027439E+06.<br>
+     * PILOT-WE — 723 rows × 2789 columns, 9218 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP LO FX FR).
+     * <li>Optimal value: -2.7201027439E+06.
+     * </ul>
      */
     @Test
     @Tag("slow")
@@ -644,9 +748,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * PILOT4 — 411 rows × 1000 columns, 5145 non-zeros.<br>
-     * Has variable bounds (UP FX FR PL).<br>
-     * Optimal value: -2.5811392641E+03.<br>
+     * PILOT4 — 411 rows × 1000 columns, 5145 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP FX FR PL).
+     * <li>Optimal value: -2.5811392641E+03.
+     * </ul>
      */
     @Test
     public void testPILOT4() {
@@ -654,9 +760,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * PILOT87 — 2031 rows × 4883 columns, 73804 non-zeros.<br>
-     * Has variable bounds.<br>
-     * Optimal value: 3.0171072827E+02.<br>
+     * PILOT87 — 2031 rows × 4883 columns, 73804 non-zeros.
+     * <ul>
+     * <li>Has variable bounds.
+     * <li>Optimal value: 3.0171072827E+02.
+     * </ul>
      */
     @Test
     @Tag("slow")
@@ -665,9 +773,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * PILOTNOV — 976 rows × 2172 columns, 13129 non-zeros.<br>
-     * Has variable bounds (UP FX).<br>
-     * Optimal value: -4.4972761882E+03.<br>
+     * PILOTNOV — 976 rows × 2172 columns, 13129 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP FX).
+     * <li>Optimal value: -4.4972761882E+03.
+     * </ul>
      */
     @Test
     public void testPILOTNOV() {
@@ -675,9 +785,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * QAP12 — 3193 rows × 8856 columns, 44244 non-zeros.<br>
-     * Optimal value: 5.2289435056E+02.<br>
-     * Non-zero count not reported in the netlib summary table.<br>
+     * QAP12 — 3193 rows × 8856 columns, 44244 non-zeros.
+     * <ul>
+     * <li>Optimal value: 5.2289435056E+02.
+     * <li>Non-zero count not reported in the netlib summary table.
+     * </ul>
      */
     @Test
     @Tag("unstable")
@@ -687,9 +799,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
 
 
     /**
-     * QAP8 — 913 rows × 1632 columns, 8304 non-zeros.<br>
-     * Optimal value: 2.0350000000E+02.<br>
-     * Non-zero count not reported in the netlib summary table.<br>
+     * QAP8 — 913 rows × 1632 columns, 8304 non-zeros.
+     * <ul>
+     * <li>Optimal value: 2.0350000000E+02.
+     * <li>Non-zero count not reported in the netlib summary table.
+     * </ul>
      */
     @Test
     public void testQAP8() {
@@ -697,7 +811,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * RECIPELP — 92 rows × 180 columns.<br>
+     * RECIPELP — 92 rows × 180 columns.
      */
     @Test
     public void testRECIPELP() {
@@ -705,8 +819,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SC105 — 106 rows × 103 columns, 281 non-zeros.<br>
-     * Optimal value: -5.2202061212E+01.<br>
+     * SC105 — 106 rows × 103 columns, 281 non-zeros.
+     * <ul>
+     * <li>Optimal value: -5.2202061212E+01.
+     * </ul>
      */
     @Test
     public void testSC105() {
@@ -714,8 +830,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SC205 — 206 rows × 203 columns, 552 non-zeros.<br>
-     * Optimal value: -5.2202061212E+01.<br>
+     * SC205 — 206 rows × 203 columns, 552 non-zeros.
+     * <ul>
+     * <li>Optimal value: -5.2202061212E+01.
+     * </ul>
      */
     @Test
     public void testSC205() {
@@ -723,8 +841,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SC50A — 51 rows × 48 columns, 131 non-zeros.<br>
-     * Optimal value: -6.4575077059E+01.<br>
+     * SC50A — 51 rows × 48 columns, 131 non-zeros.
+     * <ul>
+     * <li>Optimal value: -6.4575077059E+01.
+     * </ul>
      */
     @Test
     public void testSC50A() {
@@ -732,8 +852,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SC50B — 51 rows × 48 columns, 119 non-zeros.<br>
-     * Optimal value: -7.0000000000E+01.<br>
+     * SC50B — 51 rows × 48 columns, 119 non-zeros.
+     * <ul>
+     * <li>Optimal value: -7.0000000000E+01.
+     * </ul>
      */
     @Test
     public void testSC50B() {
@@ -741,8 +863,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SCAGR25 — 472 rows × 500 columns, 2029 non-zeros.<br>
-     * Optimal value: -1.4753433061E+07.<br>
+     * SCAGR25 — 472 rows × 500 columns, 2029 non-zeros.
+     * <ul>
+     * <li>Optimal value: -1.4753433061E+07.
+     * </ul>
      */
     @Test
     public void testSCAGR25() {
@@ -750,8 +874,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SCAGR7 — 130 rows × 140 columns, 553 non-zeros.<br>
-     * Optimal value: -2.3313892548E+06.<br>
+     * SCAGR7 — 130 rows × 140 columns, 553 non-zeros.
+     * <ul>
+     * <li>Optimal value: -2.3313892548E+06.
+     * </ul>
      */
     @Test
     public void testSCAGR7() {
@@ -759,8 +885,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SCFXM1 — 331 rows × 457 columns, 2612 non-zeros.<br>
-     * Optimal value: 1.8416759028E+04.<br>
+     * SCFXM1 — 331 rows × 457 columns, 2612 non-zeros.
+     * <ul>
+     * <li>Optimal value: 1.8416759028E+04.
+     * </ul>
      */
     @Test
     public void testSCFXM1() {
@@ -768,8 +896,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SCFXM2 — 661 rows × 914 columns, 5229 non-zeros.<br>
-     * Optimal value: 3.6660261565E+04.<br>
+     * SCFXM2 — 661 rows × 914 columns, 5229 non-zeros.
+     * <ul>
+     * <li>Optimal value: 3.6660261565E+04.
+     * </ul>
      */
     @Test
     public void testSCFXM2() {
@@ -777,8 +907,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SCFXM3 — 991 rows × 1371 columns, 7846 non-zeros.<br>
-     * Optimal value: 5.4901254550E+04.<br>
+     * SCFXM3 — 991 rows × 1371 columns, 7846 non-zeros.
+     * <ul>
+     * <li>Optimal value: 5.4901254550E+04.
+     * </ul>
      */
     @Test
     public void testSCFXM3() {
@@ -786,8 +918,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SCORPION — 389 rows × 358 columns, 1708 non-zeros.<br>
-     * Optimal value: 1.8781248227E+03.<br>
+     * SCORPION — 389 rows × 358 columns, 1708 non-zeros.
+     * <ul>
+     * <li>Optimal value: 1.8781248227E+03.
+     * </ul>
      */
     @Test
     public void testSCORPION() {
@@ -795,8 +929,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SCRS8 — 491 rows × 1169 columns, 4029 non-zeros.<br>
-     * Optimal value: 9.0429998619E+02.<br>
+     * SCRS8 — 491 rows × 1169 columns, 4029 non-zeros.
+     * <ul>
+     * <li>Optimal value: 9.0429998619E+02.
+     * </ul>
      */
     @Test
     public void testSCRS8() {
@@ -804,8 +940,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SCSD1 — 78 rows × 760 columns, 3148 non-zeros.<br>
-     * Optimal value: 8.6666666743E+00.<br>
+     * SCSD1 — 78 rows × 760 columns, 3148 non-zeros.
+     * <ul>
+     * <li>Optimal value: 8.6666666743E+00.
+     * </ul>
      */
     @Test
     public void testSCSD1() {
@@ -813,8 +951,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SCSD6 — 148 rows × 1350 columns, 5666 non-zeros.<br>
-     * Optimal value: 5.0500000078E+01.<br>
+     * SCSD6 — 148 rows × 1350 columns, 5666 non-zeros.
+     * <ul>
+     * <li>Optimal value: 5.0500000078E+01.
+     * </ul>
      */
     @Test
     public void testSCSD6() {
@@ -822,8 +962,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SCSD8 — 398 rows × 2750 columns, 11334 non-zeros.<br>
-     * Optimal value: 9.0499999993E+02.<br>
+     * SCSD8 — 398 rows × 2750 columns, 11334 non-zeros.
+     * <ul>
+     * <li>Optimal value: 9.0499999993E+02.
+     * </ul>
      */
     @Test
     public void testSCSD8() {
@@ -831,8 +973,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SCTAP1 — 301 rows × 480 columns, 2052 non-zeros.<br>
-     * Optimal value: 1.4122500000E+03.<br>
+     * SCTAP1 — 301 rows × 480 columns, 2052 non-zeros.
+     * <ul>
+     * <li>Optimal value: 1.4122500000E+03.
+     * </ul>
      */
     @Test
     public void testSCTAP1() {
@@ -840,8 +984,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SCTAP2 — 1091 rows × 1880 columns, 8124 non-zeros.<br>
-     * Optimal value: 1.7248071429E+03.<br>
+     * SCTAP2 — 1091 rows × 1880 columns, 8124 non-zeros.
+     * <ul>
+     * <li>Optimal value: 1.7248071429E+03.
+     * </ul>
      */
     @Test
     public void testSCTAP2() {
@@ -849,8 +995,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SCTAP3 — 1481 rows × 2480 columns, 10734 non-zeros.<br>
-     * Optimal value: 1.4240000000E+03.<br>
+     * SCTAP3 — 1481 rows × 2480 columns, 10734 non-zeros.
+     * <ul>
+     * <li>Optimal value: 1.4240000000E+03.
+     * </ul>
      */
     @Test
     public void testSCTAP3() {
@@ -858,9 +1006,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SEBA — 516 rows × 1028 columns, 4874 non-zeros.<br>
-     * Has variable bounds (UP LO) and ranges on constraints.<br>
-     * Optimal value: 1.5711600000E+04.<br>
+     * SEBA — 516 rows × 1028 columns, 4874 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP LO) and ranges on constraints.
+     * <li>Optimal value: 1.5711600000E+04.
+     * </ul>
      */
     @Test
     public void testSEBA() {
@@ -868,8 +1018,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SHARE1B — 118 rows × 225 columns, 1182 non-zeros.<br>
-     * Optimal value: -7.6589318579E+04.<br>
+     * SHARE1B — 118 rows × 225 columns, 1182 non-zeros.
+     * <ul>
+     * <li>Optimal value: -7.6589318579E+04.
+     * </ul>
      */
     @Test
     public void testSHARE1B() {
@@ -877,8 +1029,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SHARE2B — 97 rows × 79 columns, 730 non-zeros.<br>
-     * Optimal value: -4.1573224074E+02.<br>
+     * SHARE2B — 97 rows × 79 columns, 730 non-zeros.
+     * <ul>
+     * <li>Optimal value: -4.1573224074E+02.
+     * </ul>
      */
     @Test
     public void testSHARE2B() {
@@ -886,9 +1040,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SHELL — 537 rows × 1775 columns, 4900 non-zeros.<br>
-     * Has variable bounds (UP LO FX).<br>
-     * Optimal value: 1.2088253460E+09.<br>
+     * SHELL — 537 rows × 1775 columns, 4900 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP LO FX).
+     * <li>Optimal value: 1.2088253460E+09.
+     * </ul>
      */
     @Test
     public void testSHELL() {
@@ -896,8 +1052,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SHIP04L — 403 rows × 2118 columns, 8450 non-zeros.<br>
-     * Optimal value: 1.7933245380E+06.<br>
+     * SHIP04L — 403 rows × 2118 columns, 8450 non-zeros.
+     * <ul>
+     * <li>Optimal value: 1.7933245380E+06.
+     * </ul>
      */
     @Test
     public void testSHIP04L() {
@@ -905,8 +1063,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SHIP04S — 403 rows × 1458 columns, 5810 non-zeros.<br>
-     * Optimal value: 1.7987147004E+06.<br>
+     * SHIP04S — 403 rows × 1458 columns, 5810 non-zeros.
+     * <ul>
+     * <li>Optimal value: 1.7987147004E+06.
+     * </ul>
      */
     @Test
     public void testSHIP04S() {
@@ -914,8 +1074,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SHIP08L — 779 rows × 4283 columns, 17085 non-zeros.<br>
-     * Optimal value: 1.9090552114E+06.<br>
+     * SHIP08L — 779 rows × 4283 columns, 17085 non-zeros.
+     * <ul>
+     * <li>Optimal value: 1.9090552114E+06.
+     * </ul>
      */
     @Test
     public void testSHIP08L() {
@@ -923,8 +1085,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SHIP08S — 779 rows × 2387 columns, 9501 non-zeros.<br>
-     * Optimal value: 1.9200982105E+06.<br>
+     * SHIP08S — 779 rows × 2387 columns, 9501 non-zeros.
+     * <ul>
+     * <li>Optimal value: 1.9200982105E+06.
+     * </ul>
      */
     @Test
     public void testSHIP08S() {
@@ -932,8 +1096,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SHIP12L — 1152 rows × 5427 columns, 21597 non-zeros.<br>
-     * Optimal value: 1.4701879193E+06.<br>
+     * SHIP12L — 1152 rows × 5427 columns, 21597 non-zeros.
+     * <ul>
+     * <li>Optimal value: 1.4701879193E+06.
+     * </ul>
      */
     @Test
     public void testSHIP12L() {
@@ -941,8 +1107,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SHIP12S — 1152 rows × 2763 columns, 10941 non-zeros.<br>
-     * Optimal value: 1.4892361344E+06.<br>
+     * SHIP12S — 1152 rows × 2763 columns, 10941 non-zeros.
+     * <ul>
+     * <li>Optimal value: 1.4892361344E+06.
+     * </ul>
      */
     @Test
     public void testSHIP12S() {
@@ -950,9 +1118,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * SIERRA — 1228 rows × 2036 columns, 9252 non-zeros.<br>
-     * Has variable bounds (UP).<br>
-     * Optimal value: 1.5394362184E+07.<br>
+     * SIERRA — 1228 rows × 2036 columns, 9252 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP).
+     * <li>Optimal value: 1.5394362184E+07.
+     * </ul>
      */
     @Test
     public void testSIERRA() {
@@ -960,9 +1130,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * STAIR — 357 rows × 467 columns, 3857 non-zeros.<br>
-     * Has variable bounds (UP FX FR).<br>
-     * Optimal value: -2.5126695119E+02.<br>
+     * STAIR — 357 rows × 467 columns, 3857 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP FX FR).
+     * <li>Optimal value: -2.5126695119E+02.
+     * </ul>
      */
     @Test
     public void testSTAIR() {
@@ -970,9 +1142,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * STANDATA — 360 rows × 1075 columns, 3038 non-zeros.<br>
-     * Has variable bounds (UP FX).<br>
-     * Optimal value: 1.2576995000E+03.<br>
+     * STANDATA — 360 rows × 1075 columns, 3038 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP FX).
+     * <li>Optimal value: 1.2576995000E+03.
+     * </ul>
      */
     @Test
     public void testSTANDATA() {
@@ -980,8 +1154,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * STANDGUB — 362 rows × 1184 columns.<br>
-     * Optimal value depends on a generalised upper bound (GUB) reformulation; see netlib README NOTES.<br>
+     * STANDGUB — 362 rows × 1184 columns.
+     * <ul>
+     * <li>Optimal value depends on a generalised upper bound (GUB) reformulation; see netlib README NOTES.
+     * </ul>
      */
     @Test
     public void testSTANDGUB() {
@@ -989,9 +1165,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * STANDMPS — 468 rows × 1075 columns, 3686 non-zeros.<br>
-     * Has variable bounds (UP FX).<br>
-     * Optimal value: 1.4060175000E+03.<br>
+     * STANDMPS — 468 rows × 1075 columns, 3686 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP FX).
+     * <li>Optimal value: 1.4060175000E+03.
+     * </ul>
      */
     @Test
     public void testSTANDMPS() {
@@ -999,8 +1177,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * STOCFOR1 — 118 rows × 111 columns, 474 non-zeros.<br>
-     * Optimal value: -4.1131976219E+04.<br>
+     * STOCFOR1 — 118 rows × 111 columns, 474 non-zeros.
+     * <ul>
+     * <li>Optimal value: -4.1131976219E+04.
+     * </ul>
      */
     @Test
     public void testSTOCFOR1() {
@@ -1008,8 +1188,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * STOCFOR2 — 2158 rows × 2031 columns, 9492 non-zeros.<br>
-     * Optimal value: -3.9024408538E+04.<br>
+     * STOCFOR2 — 2158 rows × 2031 columns, 9492 non-zeros.
+     * <ul>
+     * <li>Optimal value: -3.9024408538E+04.
+     * </ul>
      */
     @Test
     public void testSTOCFOR2() {
@@ -1018,9 +1200,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
 
 
     /**
-     * TRUSS — 1001 rows × 8806 columns, 36642 non-zeros.<br>
-     * Optimal value: 4.5881584719E+05.<br>
-     * Non-zero count not reported in the netlib summary table.<br>
+     * TRUSS — 1001 rows × 8806 columns, 36642 non-zeros.
+     * <ul>
+     * <li>Optimal value: 4.5881584719E+05.
+     * <li>Non-zero count not reported in the netlib summary table.
+     * </ul>
      */
     @Test
     public void testTRUSS() {
@@ -1028,10 +1212,12 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * TUFF — 334 rows × 587 columns, 4523 non-zeros.<br>
-     * Has variable bounds (UP LO FX FR).<br>
-     * Optimal value: 2.9214776509E-01.<br>
-     * RHS section is empty in the original SIF.<br>
+     * TUFF — 334 rows × 587 columns, 4523 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP LO FX FR).
+     * <li>Optimal value: 2.9214776509E-01.
+     * <li>RHS section is empty in the original SIF.
+     * </ul>
      */
     @Test
     public void testTUFF() {
@@ -1039,9 +1225,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * VTP-BASE — 199 rows × 203 columns, 914 non-zeros.<br>
-     * Has variable bounds (UP LO FX FR).<br>
-     * Optimal value: 1.2983146246E+05.<br>
+     * VTP-BASE — 199 rows × 203 columns, 914 non-zeros.
+     * <ul>
+     * <li>Has variable bounds (UP LO FX FR).
+     * <li>Optimal value: 1.2983146246E+05.
+     * </ul>
      */
     @Test
     public void testVTP_BASE() {
@@ -1049,8 +1237,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * WOOD1P — 245 rows × 2594 columns, 70216 non-zeros.<br>
-     * Optimal value: 1.4429024116E+00.<br>
+     * WOOD1P — 245 rows × 2594 columns, 70216 non-zeros.
+     * <ul>
+     * <li>Optimal value: 1.4429024116E+00.
+     * </ul>
      */
     @Test
     public void testWOOD1P() {
@@ -1058,8 +1248,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * WOODW — 1099 rows × 8405 columns, 37478 non-zeros.<br>
-     * Optimal value: 1.3044763331E+00.<br>
+     * WOODW — 1099 rows × 8405 columns, 37478 non-zeros.
+     * <ul>
+     * <li>Optimal value: 1.3044763331E+00.
+     * </ul>
      */
     @Test
     public void testWOODW() {

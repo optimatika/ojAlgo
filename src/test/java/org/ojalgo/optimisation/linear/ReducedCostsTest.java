@@ -53,10 +53,10 @@ public class ReducedCostsTest extends OptimisationLinearTests {
     /**
      * Asserts the dual conditions for a primal-optimal LP solution:
      * <ul>
-     * <li>For a variable strictly interior to its bounds (basic at non-bound value): rc ~ 0.</li>
-     * <li>For a variable at its lower bound: rc >= 0 in MIN, rc <= 0 in MAX.</li>
-     * <li>For a variable at its upper bound: rc <= 0 in MIN, rc >= 0 in MAX.</li>
-     * <li>For a fixed variable (LB == UB): no constraint on rc.</li>
+     * <li>For a variable strictly interior to its bounds (basic at non-bound value): rc ~ 0.
+     * <li>For a variable at its lower bound: rc >= 0 in MIN, rc <= 0 in MAX.
+     * <li>For a variable at its upper bound: rc <= 0 in MIN, rc >= 0 in MAX.
+     * <li>For a fixed variable (LB == UB): no constraint on rc.
      * </ul>
      */
     private static void assertComplementarySlackness(final String id, final ExpressionsBasedModel model, final double[] rc, final Sense sense) {
@@ -120,11 +120,11 @@ public class ReducedCostsTest extends OptimisationLinearTests {
     /**
      * MIN with an equality constraint.
      *
-     * <pre>
+     * <pre>{@code
      * min  3x + 2y
      * s.t. x + y = 5
      *      x, y in [0, 10]
-     * </pre>
+     * }</pre>
      *
      * Optimum: x=0, y=5, value=10. Dual lambda on the equality satisfies rc_y = 0: 2 - 1 * lambda = 0 =>
      * lambda = 2. rc_x = 3 - 1 * 2 = +1.
@@ -146,12 +146,12 @@ public class ReducedCostsTest extends OptimisationLinearTests {
     /**
      * MIN with a presolvable variable that gets fixed by the combination of variable bounds and a constraint.
      *
-     * <pre>
+     * <pre>{@code
      * min  x + 3y
      * s.t. x + y <= 10
      *      y     >= 5
      *      x in [0, 10], y in [0, 5]
-     * </pre>
+     * }</pre>
      *
      * The bound y <= 5 and constraint y >= 5 force y = 5. Optimum: x=0, y=5, value=15.
      * <p>
@@ -181,14 +181,14 @@ public class ReducedCostsTest extends OptimisationLinearTests {
      * the model's own constraint instance. Each case has a non-degenerate optimum, where no nonbasic variable
      * is at a bound that presolve would use to imply a bound on the basic one.
      *
-     * <pre>
+     * <pre>{@code
      * min  x + 2y + 3z        s.t. x + y + z >= 2.5       x, y in [0, 10]
      *      x=2, y=0, value=3.5, lambda=1, rc_z = 3 - lambda = 2
      * max  x + 2y + 3z        s.t. x + y + z <= 2.5       x in [0, 10], y in [0, 1]
      *      x=1, y=1, value=4.5, lambda=1, rc_z = 3 - lambda = 2
      * min  x - y + 3w + 3z    s.t. x + y + w + z = 2.5    x in [0, 10], y, w in [0, 1]
      *      x=1, y=1, w=0, value=1.5, lambda=-1, rc_z = 3 + lambda = 2
-     * </pre>
+     * }</pre>
      */
     @Test
     public void testFixedInConstraint() {
@@ -228,12 +228,12 @@ public class ReducedCostsTest extends OptimisationLinearTests {
     /**
      * Free variable (no bounds) with cost coefficient driving the optimum to the active constraint.
      *
-     * <pre>
+     * <pre>{@code
      * min  -y + x
      * s.t. y <= 3
      *      x = 0     (used only to anchor the otherwise-free x)
      *      x in (-inf, +inf), y in [-inf, 5]
-     * </pre>
+     * }</pre>
      *
      * Free x is fixed by the equality x = 0 (so its rc reconstructs to c_x = 1). y's UB tightens from 5 to 3
      * via presolve folding c1, putting y at the (tightened) UB with rc = -1 in MIN. value=-3.
@@ -257,12 +257,12 @@ public class ReducedCostsTest extends OptimisationLinearTests {
      * MAX version of {@link #testMinInequalities}. Same degenerate optimum; bounded-variable rc flips sign
      * with MAX convention: rc = [0, 1] (y at UB => rc >= 0 in MAX).
      *
-     * <pre>
+     * <pre>{@code
      * max   x + 2y
      * s.t. x + y <= 4
      *      x     <= 3
      *      x, y in [0, 10]
-     * </pre>
+     * }</pre>
      */
     @Test
     public void testMaxInequalities() {
@@ -286,12 +286,12 @@ public class ReducedCostsTest extends OptimisationLinearTests {
      * split-variable primal tableau places x non-basic-at-LB and y basic-at-4, yielding rc = [1, 0] — equally
      * valid; relaxed checks accept both.
      *
-     * <pre>
+     * <pre>{@code
      * min  -x - 2y
      * s.t. x + y <= 4
      *      x     <= 3
      *      x, y in [0, 10]
-     * </pre>
+     * }</pre>
      */
     @Test
     public void testMinInequalities() {
@@ -312,11 +312,11 @@ public class ReducedCostsTest extends OptimisationLinearTests {
      * Variable with negative bounds, exercising the split-variable (positive + negative) path on the primal
      * tableau and the bounded-variable path on the dual.
      *
-     * <pre>
+     * <pre>{@code
      * min  x + 2y
      * s.t. x + y >= 0
      *      x in [-5, 5], y in [-3, 3]
-     * </pre>
+     * }</pre>
      *
      * Optimum: maximise -x - 2y. y at LB=-3 (rc <= 0 in MAX of negated => >= 0 in MIN), then x: x + (-3) >= 0
      * => x >= 3. To minimise x: x = 3 (basic, c1 active). value = 3 - 6 = -3.
@@ -339,13 +339,13 @@ public class ReducedCostsTest extends OptimisationLinearTests {
      * Tall LP (many more constraints than variables). Three single-variable cap constraints get folded into
      * variable bounds by presolve; the budget constraint c1 binds at the optimum.
      *
-     * <pre>
+     * <pre>{@code
      * min  -3x - 2y - z
      * s.t. x + y + z <= 10  (c1: budget)
      *      x         <=  3  (c2)
      *      y         <=  4  (c3)
      *      x, y, z in [0, 10]
-     * </pre>
+     * }</pre>
      *
      * Optimum: x=3 (UB), y=4 (UB), z=3 (basic), value=-20. c1 active; rc_z = 0 (basic), rc_x = -2, rc_y = -1.
      */
@@ -369,11 +369,11 @@ public class ReducedCostsTest extends OptimisationLinearTests {
     /**
      * MIN with a variable non-basic at its upper bound.
      *
-     * <pre>
+     * <pre>{@code
      * min  -3x - 2y
      * s.t. x + y <= 10
      *      x in [0, 4], y in [0, 10]
-     * </pre>
+     * }</pre>
      *
      * Optimum: x=4 (upper bound, non-basic), y=6 (interior, basic), value=-24. c1 active => lambda_1 = -2.
      * rc_x = -3 - 1 * (-2) = -1 (rc <= 0 at UB in MIN). rc_y = -2 - 1 * (-2) = 0.
@@ -396,11 +396,11 @@ public class ReducedCostsTest extends OptimisationLinearTests {
      * Wide LP (many more variables than constraints). Five items, a single budget cap. The optimum picks the
      * two most-negative-cost items at their UB and fills the budget with a partial third item.
      *
-     * <pre>
+     * <pre>{@code
      * min  -x1 - 2 x2 - 3 x3 - 4 x4 - 10 x5
      * s.t. x1 + x2 + x3 + x4 + x5 <= 8
      *      each x_i in [0, 5]
-     * </pre>
+     * }</pre>
      *
      * Optimum: x5=5 (UB), x4=3 (basic), x1=x2=x3=0 (LB). value=-62. lambda_c1=-4. rc_x1 = +3, rc_x2 = +2,
      * rc_x3 = +1, rc_x4 = 0, rc_x5 = -6.

@@ -129,7 +129,7 @@ public abstract class TypeUtils {
     }
 
     /**
-     * If the input {@linkplain java.lang.Comparale} is a {@linkplain java.math.BigDecimal} it is passed
+     * If the input {@linkplain java.lang.Comparable} is a {@linkplain java.math.BigDecimal} it is passed
      * through unaltered. Otherwise an equivalent BigDecimal is created. ALWAYS returns a valid
      * {@link BigDecimal} instance - which, among other things, means that null and NaN are replaced by 0.0
      * (zero).

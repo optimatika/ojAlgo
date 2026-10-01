@@ -137,11 +137,11 @@ public abstract class GammaFunction {
     /**
      * Lanczos approximation. The abritray constant is 7, and there are 9 coefficients used.
      *
-     * <pre>
+     * <pre>{@code
      * http://en.wikipedia.org/wiki/Lanczos_approximation
      * http://mathworld.wolfram.com/LanczosApproximation.html
      * https://mrob.com/pub/ries/lanczos-gamma.html
-     * </pre>
+     * }</pre>
      */
     static abstract class LanczosApproximation {
 

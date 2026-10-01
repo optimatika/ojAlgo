@@ -63,7 +63,7 @@ import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.type.math.MathType;
 
 /**
- * A {@linkplain double} implementation of {@linkplain PhysicalStore}.
+ * A {@code double} implementation of {@linkplain PhysicalStore}.
  *
  * @author apete
  */

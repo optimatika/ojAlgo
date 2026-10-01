@@ -32,12 +32,10 @@ import org.ojalgo.structure.StructureAnyD;
 import org.ojalgo.type.NumberDefinition;
 
 /**
- * <p>
  * An array implemented as a sequence of segments that together make up the data structure. Any
  * {@link BasicArray} subclass can be used for segments. A {@link BasicArray.Factory} is used to create sparse
  * segments (they're not guaranteed to actually be sparse) and a {@link DenseArray.Factory} is used to create
  * dense segments (guaranteed to be dense).
- * </p>
  *
  * @author apete
  */

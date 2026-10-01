@@ -32,20 +32,16 @@ import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * <p>
  * A {@linkplain Scalar} is:
- * </p>
  * <ol>
- * <li>An abstraction of a vector/matrix element.</li>
- * <li>A {@linkplain Comparable} decorator, increasing the number of things you can do with them.</li>
+ * <li>An abstraction of a vector/matrix element.
+ * <li>A {@linkplain Comparable} decorator, increasing the number of things you can do with them.
  * </ol>
  * <p>
  * Theoretically it is a Field or at least a Division ring.
- * </p>
  * <p>
  * The intention is that implementors should be final immutable subclasses of {@link Comparable} and that they
  * should be inline with the requirements for ValueBased classes.
- * </p>
  *
  * @author apete
  */
@@ -163,20 +159,17 @@ public interface Scalar<N extends Comparable<N>> extends AccessScalar<N>, Field<
      * Each implementation should test for zero as exactly as possible based on what's achievable with that
      * specific scalar type. The purpose is NOT to have similar behavior between different implementations,
      * but rather to leverage the full precision and capabilities of each type.
-     * </p>
      * <p>
      * For example:
      * <ul>
-     * <li>Primitive types (like {@code double}) should use exact equality comparison</li>
-     * <li>High-precision types (like {@link Quadruple}) should check both base and remainder components</li>
-     * <li>Arbitrary-precision types (like {@link BigDecimal}) should use their built-in zero detection</li>
-     * <li>Complex types should check both real and imaginary parts</li>
+     * <li>Primitive types (like {@code double}) should use exact equality comparison
+     * <li>High-precision types (like {@link Quadruple}) should check both base and remainder components
+     * <li>Arbitrary-precision types (like {@link BigDecimal}) should use their built-in zero detection
+     * <li>Complex types should check both real and imaginary parts
      * </ul>
-     * </p>
      * <p>
      * This method should NOT use tolerance-based comparisons or approximate zero detection, as those are
      * better handled by context-aware methods like {@link #isSmall(double)}.
-     * </p>
      *
      * @return true if this scalar represents exactly zero, false otherwise
      * @see #isSmall(double)

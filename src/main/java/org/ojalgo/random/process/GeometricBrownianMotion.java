@@ -32,9 +32,9 @@ import org.ojalgo.structure.Access1D;
 /**
  * Diffusion process defined by a stochastic differential equation:
  *
- * <pre>
+ * <pre>{@code
  * dX = r X dt + s X dW
- * </pre>
+ * }</pre>
  *
  * A stochastic process is said to follow a geometric Brownian motion if it satisfies this stochastic
  * differential equation.

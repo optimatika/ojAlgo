@@ -26,9 +26,9 @@ package org.ojalgo.type.context;
  * <ol>
  * <li>It enforces some sort of rule/limit regarding size, accuracy or similar. This feature is for instance
  * useful when writing data to a database where attributes are often very specifically typed. "enforcing" is
- * typically a one-way operation that cannot be undone.</li>
+ * typically a one-way operation that cannot be undone.
  * <li>It translates back and forth between some specific type and {@linkplain String} - essentially a
- * formatter.</li>
+ * formatter.
  * </ol>
  *
  * @author apete

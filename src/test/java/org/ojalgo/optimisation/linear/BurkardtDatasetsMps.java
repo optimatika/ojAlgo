@@ -147,17 +147,17 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
      * declaration, and the comment version makes more sense than the declaration. (The book has the same
      * mistake.)
      *
-     * <pre>
+     * <pre>{@code
      * RANGES
      *     RANGE1    BALANCE           10.0
-     * </pre>
+     * }</pre>
      *
      * should instead be
      *
-     * <pre>
+     * <pre>{@code
      * RANGES
      *     RANGE1    RES2              10.0
-     * </pre>
+     * }</pre>
      *
      * Further the MPS file does not contain an OBJSENSE section, but the comment/description states that it's
      * a maximisation problem. Funny thing is that when minimising the correct and incorrect models give the

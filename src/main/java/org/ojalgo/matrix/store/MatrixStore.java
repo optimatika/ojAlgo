@@ -44,24 +44,19 @@ import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * <p>
  * A {@linkplain MatrixStore} is a two dimensional store of numbers/scalars.
- * </p>
  * <p>
  * A {@linkplain MatrixStore} extends {@linkplain Access2D} (as well as
  * {@linkplain org.ojalgo.structure.Access2D.Visitable} and
- * {@linkplain org.ojalgo.structure.Access2D.Elements}) and defines some further functionality - mainly matrix
+ * {@linkplain org.ojalgo.structure.Access2D.Sliceable}) and defines some further functionality - mainly matrix
  * multiplication.
- * </p>
  * <p>
  * This interface does not define any methods that require implementations to alter the matrix. Either the
  * methods return matrix elements, some meta data or produce new instances.
- * </p>
  * <p>
  * The methods {@linkplain #conjugate()}, {@linkplain #copy()} and {@linkplain #transpose()} return
  * {@linkplain PhysicalStore} instances. {@linkplain PhysicalStore} extends {@linkplain MatrixStore}. It
  * defines additional methods, and is mutable.
- * </p>
  *
  * @author apete
  */
@@ -304,7 +299,7 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     }
 
     /**
-     * @deprecated v50 No need as {@link MatrixStore} now implements {@link Logical} and this method simply
+     * @deprecated v50 No need as {@link MatrixStore} now implements {@link Structure2D.Logical} and this method simply
      *             return "this".
      */
     @Deprecated
@@ -422,7 +417,7 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     }
 
     /**
-     * @deprecated v50 No need as {@link MatrixStore} now implements {@link Logical}.
+     * @deprecated v50 No need as {@link MatrixStore} now implements {@link Structure2D.Logical}.
      */
     @Deprecated
     default MatrixStore<N> logical() {
@@ -575,11 +570,11 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     }
 
     /**
-     * The <code>premultiply</code> method differs from <code>multiply</code> in 3 ways:
+     * The {@code premultiply} method differs from {@code multiply} in 3 ways:
      * <ol>
-     * <li>The matrix positions are swapped - left/right.</li>
-     * <li>It does NOT return a {@linkplain MatrixStore} but an {@linkplain ElementsSupplier} instead.</li>
-     * <li>It accepts an {@linkplain Access1D} as the argument left matrix.</li>
+     * <li>The matrix positions are swapped - left/right.
+     * <li>It does NOT return a {@linkplain MatrixStore} but an {@linkplain ElementsSupplier} instead.
+     * <li>It accepts an {@linkplain Access1D} as the argument left matrix.
      * </ol>
      *
      * @param left The left matrix

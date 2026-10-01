@@ -89,7 +89,7 @@ import java.util.function.IntPredicate;
  * <td>#</td>
  * <td>$</td>
  * <td>%</td>
- * <td>&amp;</td>
+ * <td>{@code &}</td>
  * <td>'</td>
  * </tr>
  * <tr>

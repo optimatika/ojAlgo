@@ -43,24 +43,24 @@ import org.ojalgo.structure.Structure2D;
 /**
  * Notation used to describe the various matrix decompositions:
  * <ul>
- * <li>[A] could be any matrix. (The original matrix to decompose.)</li>
- * <li>[A]<sup>-1</sup> is the inverse of [A].</li>
- * <li>[A]<sup>T</sup> is the transpose of [A].</li>
+ * <li>[A] could be any matrix. (The original matrix to decompose.)
+ * <li>[A]<sup>-1</sup> is the inverse of [A].
+ * <li>[A]<sup>T</sup> is the transpose of [A].
  * <li>[A]<sup>H</sup> is the conjugate transpose of [A]. [A]<sup>H</sup> is equivalent to [A]<sup>T</sup> if
- * the elements are all real.</li>
- * <li>[D] is a diagonal matrix. Possibly bi-, tri- or block-diagonal.</li>
- * <li>[H] is an, upper or lower, Hessenberg matrix.</li>
- * <li>[I] is an identity matrix - obviously orthogonal/unitary.</li>
- * <li>[L] is a lower (left) triangular matrix.</li>
+ * the elements are all real.
+ * <li>[D] is a diagonal matrix. Possibly bi-, tri- or block-diagonal.
+ * <li>[H] is an, upper or lower, Hessenberg matrix.
+ * <li>[I] is an identity matrix - obviously orthogonal/unitary.
+ * <li>[L] is a lower (left) triangular matrix.
  * <li>[P] is a permutation matrix - an identity matrix with interchanged rows or columns - and
- * orthogonal/unitary.</li>
+ * orthogonal/unitary.
  * <li>[Q] is an orthogonal/unitary matrix. [Q]<sup>-1</sup> = [Q]<sup>H</sup>, and with real matrices = [Q]
- * <sup>T</sup>.</li>
- * <li>[R] is a right (upper) tringular matrix. It is equivalent to [U].</li>
+ * <sup>T</sup>.
+ * <li>[R] is a right (upper) tringular matrix. It is equivalent to [U].
  * <li>[U] is an upper (right) triangular matrix. It is equivalent to [R]. Alternatively [U] is also used to
- * denominate the left, orthonormal, singular vectors.</li>
+ * denominate the left, orthonormal, singular vectors.
  * <li>[V] is an eigenvector matrix and/or an orthogonal matrix – the columns are the eigenvectors or the
- * right, orthonormal, singular vectors.</li>
+ * right, orthonormal, singular vectors.
  * </ul>
  *
  * @author apete
@@ -70,9 +70,7 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
     interface Determinant<N extends Comparable<N>> extends MatrixDecomposition<N>, DeterminantTask<N>, Provider2D.Determinant<N> {
 
         /**
-         * <p>
          * A matrix' determinant is the product of its eigenvalues.
-         * </p>
          *
          * @return The matrix' determinant
          */
@@ -91,8 +89,8 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
     /**
      * Several matrix decompositions can be expressed "economy sized" - some rows or columns of the decomposed
      * matrix parts are not needed for the most releveant use cases, and can therefore be left out. By default
-     * these matrix decompositions should be "economy sized". Setting {@link #setFullSize(boolean)} to
-     * <code>true</code> should switch to "full sized".
+     * these matrix decompositions should be "economy sized". Passing {@code fullSize = true} to a factory, e.g.
+     * {@link QR.Factory#make(Structure2D, boolean)}, switches to "full sized".
      *
      * @author apete
      */
@@ -215,7 +213,6 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
     }
 
     /**
-     * <p>
      * The pivot or pivot element is the element of a matrix, or an array, which is selected first by an
      * algorithm (e.g. Gaussian elimination, simplex algorithm, etc.), to do certain calculations. In the case
      * of matrix algorithms, a pivot entry is usually required to be at least distinct from zero, and often
@@ -223,17 +220,14 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
      * interchange of rows or columns to bring the pivot to a fixed position and allow the algorithm to
      * proceed successfully, and possibly to reduce round-off error. It is often used for verifying row
      * echelon form.
-     * </p>
      * <p>
      * Pivoting might be thought of as swapping or sorting rows or columns in a matrix, and thus it can be
      * represented as multiplication by permutation matrices. However, algorithms rarely move the matrix
      * elements because this would cost too much time; instead, they just keep track of the permutations.
-     * </p>
      * <p>
      * Overall, pivoting adds more operations to the computational cost of an algorithm. These additional
      * operations are sometimes necessary for the algorithm to work at all. Other times these additional
      * operations are worthwhile because they add numerical stability to the final result.
-     * </p>
      *
      * @author apete
      */
@@ -267,20 +261,18 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
      * A rank-revealing matrix decomposition of a matrix [A] is a decomposition that is, or can be transformed
      * to be, on the form [A]=[X][D][Y]<sup>T</sup> where:
      * <ul>
-     * <li>[X] and [Y] are square and well conditioned.</li>
-     * <li>[D] is diagonal with nonnegative and non-increasing values on the diagonal.</li>
+     * <li>[X] and [Y] are square and well conditioned.
+     * <li>[D] is diagonal with nonnegative and non-increasing values on the diagonal.
      * </ul>
      * <p>
      * The defintion that [X] and [Y] should be well conditioned is subject to interpretation. A specific
      * decomposition algorithm can be more or less good at revealing the rank. Typically the
      * {@link SingularValue} decomposition is the best.
-     * </p>
      * <p>
      * The requirement to have the diagonal elements of [D] ordered can be very practical, but is not always
      * strictly necessary in order to just reveal the rank. The method {@link #isOrdered()} indicates if the
      * elements (rows and columns) of the returned matrix factors actually are ordered or not for this
      * particular implementation.
-     * </p>
      */
     interface RankRevealing<N extends Comparable<N>> extends Ordered<N>, Provider2D.Rank {
 
@@ -373,16 +365,12 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
         }
 
         /**
-         * <p>
          * Implementing this method is optional.
-         * </p>
          * <p>
-         * Exactly how a specific implementation makes use of <code>preallocated</code> is not specified by
+         * Exactly how a specific implementation makes use of {@code preallocated} is not specified by
          * this interface. It must be documented for each implementation.
-         * </p>
          * <p>
          * Should produce the same results as calling {@link #getInverse()}.
-         * </p>
          *
          * @param preallocated Preallocated memory for the results, possibly some intermediate results. You
          *                     must assume this is modified, but you cannot assume it will contain the
@@ -401,16 +389,12 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
         }
 
         /**
-         * <p>
          * Implementing this method is optional.
-         * </p>
          * <p>
-         * Exactly how a specific implementation makes use of <code>preallocated</code> is not specified by
+         * Exactly how a specific implementation makes use of {@code preallocated} is not specified by
          * this interface. It must be documented for each implementation.
-         * </p>
          * <p>
          * Should produce the same results as calling {@link #getSolution(Collectable)}.
-         * </p>
          *
          * @param rhs          The Right Hand Side, wont be modfied
          * @param preallocated Preallocated memory for the results, possibly some intermediate results. You

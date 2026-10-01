@@ -45,10 +45,14 @@ All source lives under `org.ojalgo` with these key packages:
 
 ## Javadoc and Code Comments
 
-- Use HTML for layout but keep it tidy and readable in source.
+- Javadoc is read in source far more than as generated HTML. Use HTML for layout but keep it tidy and readable in source — write it as close to Markdown as HTML allows.
+- Write `<`, `>` and `&` as plain characters. Avoid HTML entities like `&lt;` `&gt;` `&amp;` or `&nbsp;` (the resulting javadoc warnings are accepted).
+- Use `{@code ...}` for inline code (not `<code>`), and `<pre>{@code ... }</pre>` for code or other preformatted blocks.
+- Put `<p>` on its own line between paragraphs — not before the first paragraph, at the end of a comment, or before a list or `<pre>` block.
 - Avoid unnecessary end tags like `</p>` and `</li>`.
-- Avoid unnecessary formatting tags like `<b>` and `<i>`.
-- Avoid HTML entities and symbols like `&lt;` `&gt;` `&nbsp;` or `&copy;`.
+- Use a list or a new paragraph instead of `<br>` line breaks.
+- Avoid unnecessary formatting tags like `<b>` and `<i>`; keep `<em>` for a single emphasised word. `<sup>` and `<sub>` are fine for math notation like `[A]<sup>T</sup>`.
+- In `{@link ...}` and `@see` references use erased parameter types (`#method(Collection, Supplier)`) and `Outer.Nested` for nested types. External links in `@see` are quoted strings: `@see "https://..."`.
 - Comment classes, methods, fields, and constants as proper Javadoc; avoid unattached line or block comments.
 - Treat inline line/block comments as a last resort — when the code needs explanation, attach concise Javadoc to the relevant declaration instead.
 - Prefer concise lists and paragraphs; link APIs with `{@link ...}` where it adds clarity.

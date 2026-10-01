@@ -74,12 +74,12 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
     /**
      * Assembles a linear program and builds a {@link LinearSolver}. The problem is expressed as:
      *
-     * <pre>
+     * <pre>{@code
      * min [c]'[x]
      * s.t. [AE][x] = [bE]
      *      [AI][x] <= [bI]
      *      [lb] <= [x] <= [ub]
-     * </pre>
+     * }</pre>
      *
      * Objective: set via {@link #objective(double...)} or the convenience factory
      * {@link LinearSolver#newBuilder(double...)}.
@@ -199,7 +199,6 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
          * <p>
          * The LP standard form does not dictate if expressed on minimisation or maximisation form. Here it
          * should be a minimisation.
-         * <p>
          *
          * @author apete
          */

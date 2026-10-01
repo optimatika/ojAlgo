@@ -189,7 +189,6 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
     }
 
     /**
-     * <p>
      * Example from The Gomory Mixed Integer Cut, by John Mitchell comparing a Gomory mixed integer cut with a
      * standard Gomory cut (all variables integer).
      */
@@ -475,7 +474,6 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
     }
 
     /**
-     * <p>
      * A few examples from: Generating Gomory's Cuts for linear integer programming problems: the HOW and WHY
      * <p>
      * http://www.ms.unimelb.edu.au/~moshe/620-362/gomory/index.html

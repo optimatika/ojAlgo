@@ -34,7 +34,7 @@ public interface Operation {
 
         /**
          * @param addend What to add
-         * @return <code>this + addend</code>
+         * @return {@code this + addend}
          */
         T add(T addend);
 
@@ -47,7 +47,7 @@ public interface Operation {
 
         /**
          * @param divisor The divisor
-         * @return <code>this / divisor</code>.
+         * @return {@code this / divisor}.
          */
         T divide(T divisor);
 
@@ -60,7 +60,7 @@ public interface Operation {
 
         /**
          * @param multiplicand The multiplicand
-         * @return <code>this * multiplicand</code>.
+         * @return {@code this * multiplicand}.
          */
         T multiply(T multiplicand);
 
@@ -78,7 +78,7 @@ public interface Operation {
 
         /**
          * @param subtrahend The subtrahend
-         * @return <code>this - subtrahend</code>.
+         * @return {@code this - subtrahend}.
          */
         T subtract(T subtrahend);
     }

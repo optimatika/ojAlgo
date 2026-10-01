@@ -32,20 +32,15 @@ import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * <p>
  * Problem reported on the ojalgu-user mailing list. A user claimed that Colt, Jama & Mtj calculated
  * eigenvalue decompositions that do not satisfy: [A][V] = [D][V]
- * </p>
  * <p>
  * The problem/solution was that you have to compare [A][V] = [V][D] instead.
- * </p>
  * <p>
  * The supplied matrix did however cause other problems...
- * </p>
  * <p>
  * (2009-04-13, years later) Unfortunately I forgot to document what those other problems were. I assume the
  * matrix is just generally numerically difficult.
- * </p>
  *
  * @author apete
  */

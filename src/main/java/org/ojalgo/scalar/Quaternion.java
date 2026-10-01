@@ -176,15 +176,15 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
      * <p>
      * The quaternion representation of the rotation may be expressed as:
      *
-     * <pre>
+     * <pre>{@code
      * q = cos(θ / 2) + sin(θ / 2) * (ub * i + uc * j + ud * k)
-     * </pre>
+     * }</pre>
      *
      * where θ is the angle of rotation and
      *
-     * <pre>
+     * <pre>{@code
      * [ub, uc, ud]
-     * </pre>
+     * }</pre>
      *
      * is the axis of rotation. This method accepts a single axis, so only a single imaginary component is
      * populated.
@@ -465,8 +465,8 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
     }
 
     /**
-     * Will calculate <code>this * reciprocal(arg)</code> which is <b>not</b> the same as
-     * <code>reciprocal(arg) * this</code>.
+     * Will calculate {@code this * reciprocal(arg)} which is <b>not</b> the same as
+     * {@code reciprocal(arg) * this}.
      */
     @Override
     public Quaternion divide(final Quaternion arg) {

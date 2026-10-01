@@ -110,9 +110,9 @@ abstract class AbstractDecomposition<N extends Comparable<N>, M extends Physical
      * <p>
      * Two variants:
      * <ul>
-     * <li><b>Forward (P):</b> ftran applies pivot order, btran applies reverse order. Materialises as
+     * <li>Forward (P): ftran applies pivot order, btran applies reverse order. Materialises as
      * identity with reordered columns.
-     * <li><b>Reverse (Q, P<sup>T</sup>):</b> ftran applies reverse order, btran applies pivot order.
+     * <li>Reverse (Q, P<sup>T</sup>): ftran applies reverse order, btran applies pivot order.
      * Materialises as identity with reordered rows.
      * </ul>
      *

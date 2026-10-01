@@ -31,14 +31,11 @@ import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
- * <p>
  * Only classes that will act as a delegate to a {@linkplain MatrixDecomposition} implementation from this
  * package should implement this interface. The interface specifications are entirely dictated by the classes
  * in this package.
- * </p>
  * <p>
  * Do not use it for anything else!
- * </p>
  *
  * @author apete
  */

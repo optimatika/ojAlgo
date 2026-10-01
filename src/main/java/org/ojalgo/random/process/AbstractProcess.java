@@ -33,7 +33,7 @@ abstract class AbstractProcess<D extends Distribution> implements RandomProcess<
     }
 
     /**
-     * Equivalent to calling {@link RandomProcess#getDistribution(double)} with argumant <code>1.0</code>, and
+     * Equivalent to calling {@link RandomProcess#getDistribution(double)} with argumant {@code 1.0}, and
      * then {@link Distribution#getExpected()}.
      */
     public final double getExpected() {
@@ -42,7 +42,7 @@ abstract class AbstractProcess<D extends Distribution> implements RandomProcess<
 
     /**
      * The same thing can be achieved by first calling {@link RandomProcess#getDistribution(double)} with
-     * argumant <code>1.0</code>, and then {@link ContinuousDistribution#getQuantile(double)} (but with
+     * argumant {@code 1.0}, and then {@link ContinuousDistribution#getQuantile(double)} (but with
      * different input argument).
      */
     public final double getLowerConfidenceQuantile(final double confidence) {
@@ -50,7 +50,7 @@ abstract class AbstractProcess<D extends Distribution> implements RandomProcess<
     }
 
     /**
-     * Equivalent to calling {@link RandomProcess#getDistribution(double)} with argumant <code>1.0</code>, and
+     * Equivalent to calling {@link RandomProcess#getDistribution(double)} with argumant {@code 1.0}, and
      * then {@link Distribution#getStandardDeviation()}.
      */
     public final double getStandardDeviation() {
@@ -59,7 +59,7 @@ abstract class AbstractProcess<D extends Distribution> implements RandomProcess<
 
     /**
      * The same thing can be achieved by first calling {@link RandomProcess#getDistribution(double)} with
-     * argumant <code>1.0</code>, and then {@link ContinuousDistribution#getQuantile(double)} (but with
+     * argumant {@code 1.0}, and then {@link ContinuousDistribution#getQuantile(double)} (but with
      * different input argument).
      */
     public final double getUpperConfidenceQuantile(final double confidence) {
@@ -67,7 +67,7 @@ abstract class AbstractProcess<D extends Distribution> implements RandomProcess<
     }
 
     /**
-     * Equivalent to calling {@link RandomProcess#getDistribution(double)} with argumant <code>1.0</code>, and
+     * Equivalent to calling {@link RandomProcess#getDistribution(double)} with argumant {@code 1.0}, and
      * then {@link Distribution#getVariance()}.
      */
     public final double getVariance() {

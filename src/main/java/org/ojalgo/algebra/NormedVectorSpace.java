@@ -37,16 +37,16 @@ public interface NormedVectorSpace<T, N extends Comparable<N>> extends VectorSpa
     }
 
     /**
-     * <code>this == this.normalised().multiply(this.norm())</code>
+     * {@code this == this.normalised().multiply(this.norm())}
      *
      * @return The norm
      */
     double norm();
 
     /**
-     * <code>this == this.normalised().multiply(this.norm())</code>
+     * {@code this == this.normalised().multiply(this.norm())}
      * <p>
-     * When <code>this.norm() == 0.0</code> it becomes arbitrary or undefined what this method should return.
+     * When {@code this.norm() == 0.0} it becomes arbitrary or undefined what this method should return.
      * It is up to specific implementors to document their behaviour in this case.
      *
      * @return A unit "vector"

@@ -42,10 +42,10 @@ import org.ojalgo.type.ReciprocalPair;
  * <p>
  * The KKT matrix has block structure
  *
- * <pre>
+ * <pre>{@code
  *     [ P + σ I      A']
  *     [   A     -diag(w⁻¹) ]
- * </pre>
+ * }</pre>
  *
  * where {@code P} is the quadratic term, {@code A} the constraint matrix, {@code σ > 0} a primal
  * regularisation parameter and {@code w} the per-constraint dual weights. The matrix is stored as a sparse,

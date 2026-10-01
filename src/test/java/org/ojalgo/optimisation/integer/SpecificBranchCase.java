@@ -136,7 +136,7 @@ public class SpecificBranchCase extends OptimisationIntegerTests implements Mode
     }
 
     /**
-     * <pre>
+     * <pre>{@code
     Branch&Bound Node
     5 (4) 7=0.0833333333333286 1167875.1663773148 [0=3<18, 1=57<72, 2=0<18, 3=57<75, 4=0<18, 5=57<75, 6=0<18, 7=67<67, 8=0<18, 9=71<75, 10=0<18]
     Solutions=0 Nodes/Iterations=3 INVALID Infinity @ { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }
@@ -148,7 +148,7 @@ public class SpecificBranchCase extends OptimisationIntegerTests implements Mode
     Lower bounds: [3, 57, 0, 57, 0, 57, 0, 67, 0, 71, 0]
     Upper bounds: [18, 72, 18, 75, 18, 75, 18, 67, 18, 75, 18]
     Done 4 IntegerSolver iterations in 0.043330625s with NodeStatistics [I=0, E=0, S=0, A=0]
-     * </pre>
+     * }</pre>
      *
      * When solving this node directly with the integer solver it is correctly identified as infeasible, but
      * when this node is reached during the branch and bound process the LP node solver marks it as optimal.
@@ -166,7 +166,7 @@ public class SpecificBranchCase extends OptimisationIntegerTests implements Mode
     }
 
     /**
-     * <pre>
+     * <pre>{@code
     Branch&Bound Node
     7 (5) 2=0.20399305555555447 1168080.295138889 [0=3<18, 1=57<72, 2=0<5, 3=57<75, 4=0<18, 5=57<75, 6=0<18, 7=67<67, 8=0<18, 9=71<75, 10=0<18]
     Solutions=0 Nodes/Iterations=4 { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }
@@ -178,7 +178,7 @@ public class SpecificBranchCase extends OptimisationIntegerTests implements Mode
     Lower bounds: [3, 57, 0, 57, 0, 57, 0, 67, 0, 71, 0]
     Upper bounds: [18, 72, 5, 75, 18, 75, 18, 67, 18, 75, 18]
     Done 5 IntegerSolver iterations in 0.140962034s with NodeStatistics [I=0, E=0, S=0, A=0]
-     * </pre>
+     * }</pre>
      */
     @Test
     public void testFlugplN7() {

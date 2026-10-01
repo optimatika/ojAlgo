@@ -376,15 +376,15 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
     /**
      * Solves [this][X] = [rhs] by first solving
      *
-     * <pre>
+     * <pre>{@code
      * [L][Y] = [rhs]
-     * </pre>
+     * }</pre>
      *
      * and then
      *
-     * <pre>
+     * <pre>{@code
      * [U][X] = [Y]
-     * </pre>
+     * }</pre>
      *
      * @param rhs The right hand side
      * @return [X] The solution will be written to "preallocated" and then returned.

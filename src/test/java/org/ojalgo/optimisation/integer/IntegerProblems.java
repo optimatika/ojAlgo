@@ -41,7 +41,7 @@ import org.ojalgo.type.context.NumberContext;
 public class IntegerProblems extends OptimisationIntegerTests {
 
     /**
-     * <pre>
+     * <pre>{@code
      * OPTIMAL -97.59 @ { 0, 1, 0, 1, 0, 1, 1, 0 }
      * ############################################
      * 0 <= X0: 0 (-4836) <= 1
@@ -57,7 +57,7 @@ public class IntegerProblems extends OptimisationIntegerTests {
      * 1 <= EXPR3: 1.0 <= 1
      * 1 <= EXPR0: 1.0 <= 1
      * ############################################
-     * </pre>
+     * }</pre>
      */
     public static ExpressionsBasedModel makeModelGitHub513() {
 
@@ -363,12 +363,10 @@ public class IntegerProblems extends OptimisationIntegerTests {
     }
 
     /**
-     * <p>
      * I am trying to call Ojalgo 40 from AnyLogic 7.3.2 (http://www.anylogic..com/downloads) on Ubuntu 16.04
      * in order to solve a Traveling Salesman Problem, but Ojalgo sometimes stops on a feasible solution
      * before the optimum. The following code works well without Anylogic and always finds 917.31 as optimal
      * solution: (Simply copy/paste the following code in a file called "Tsp.java" in order to test it.)
-     * </p>
      * <p>
      * Next, I try to run the same code in the "On startup" section of the "Agent actions" of the "Main" agent
      * in an AnyLogic model. (Click on the project name "Ojalgo" to change the location of ojalgo-40.0.0.jar,
@@ -377,19 +375,16 @@ public class IntegerProblems extends OptimisationIntegerTests {
      * AnyLogic to solve this same problem, which always returns the optimal solution, hence the problem seems
      * not to be due to AnyLogic. As shown by the above Java code, the problem is not due to Ojalgo as well,
      * but only related to the coupling of AnyLogic and Ojalgo. Thank you very much for Ojalgo and your help!
-     * </p>
      * <p>
      * apete: ExpressionsBasedModel has a feature that automatically rescales model parameters (to maximize
      * numerical accuracy) before invoking the solver. The current implementation of that feature (apparently)
      * doesn?t work very well with extremely large parameters in the model. I have now modified the behavior
      * of that feature to not scale anything when/if there are extremely large or small parameters present. As
      * far as I can see that solves the problem with your model.
-     * </p>
      * <p>
      * apete (later): Have also improved the presolve functionality to fix (not-include) uncorrelated and/or
      * unbounded variables. (Doesn't handle every case, but this one a a few more.) This was the real fix for
      * this problem!
-     * </p>
      */
     @Test
     public void testSimpleTSP20160701() {

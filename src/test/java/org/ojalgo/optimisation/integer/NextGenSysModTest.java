@@ -1380,13 +1380,10 @@ public class NextGenSysModTest extends OptimisationIntegerTests {
     }
 
     /**
-     * <p>
      * Will extract the correlation coefficients from the input covariance matrix. If "cleaning" is enabled
      * small and negative eigenvalues of the covariance matrix will be replaced with a new minimal value.
-     * </p>
      * <p>
      * Copied from ojAlgo-finance v2.1.1-SNAPSHOT (2019-05-23) org.ojalgo.finance.FinanceUtils.
-     * </p>
      */
     static MatrixR064 toCorrelations(final Access2D<?> covariances, final boolean clean) {
 
@@ -1449,13 +1446,10 @@ public class NextGenSysModTest extends OptimisationIntegerTests {
     }
 
     /**
-     * <p>
      * Vill constract a covariance matrix from the standard deviations (volatilities) and correlation
      * coefficient,
-     * </p>
      * <p>
      * Copied from ojAlgo-finance v2.1.1-SNAPSHOT (2019-05-23) org.ojalgo.finance.FinanceUtils.
-     * </p>
      */
     static MatrixR064 toCovariances(final Access1D<?> volatilities, final Access2D<?> correlations) {
 
@@ -1477,13 +1471,10 @@ public class NextGenSysModTest extends OptimisationIntegerTests {
     }
 
     /**
-     * <p>
      * Will extract the standard deviations (volatilities) from the input covariance matrix. If "cleaning" is
      * enabled small variances will be replaced with a new minimal value.
-     * </p>
      * <p>
      * Copied from ojAlgo-finance v2.1.1-SNAPSHOT (2019-05-23) org.ojalgo.finance.FinanceUtils.
-     * </p>
      */
     static MatrixR064 toVolatilities(final Access2D<?> covariances, final boolean clean) {
 

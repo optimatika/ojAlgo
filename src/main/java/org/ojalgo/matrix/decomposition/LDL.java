@@ -31,21 +31,17 @@ import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * <p>
  * LDL: [A] = [L][D][L]<sup>H</sup> (or [R]<sup>H</sup>[D][R])
- * </p>
  * <p>
  * [A]<sup>H</sup> = [A] = [L][D][L]<sup>H</sup>
- * </p>
  * <p>
  * If [A] is symmetric (but not necessarily positive definite) then it can be decomposed into [L][D][L]
  * <sup>T</sup> (or [R]<sup>H</sup>[D][R]).
- * </p>
  * <ul>
  * <li>[L] is a unit lower (left) triangular matrix. It has the same dimensions as [this], and ones on the
- * diagonal.</li>
- * <li>[D] is a diagonal matrix. It has the same dimensions as [this].</li>
- * <li>[this] = [L][D][L]<sup>H</sup></li>
+ * diagonal.
+ * <li>[D] is a diagonal matrix. It has the same dimensions as [this].
+ * <li>[this] = [L][D][L]<sup>H</sup>
  * </ul>
  *
  * @author apete

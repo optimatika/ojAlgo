@@ -69,10 +69,10 @@ import org.ojalgo.type.keyvalue.EntryPair;
  * <p>
  * As such it targets problems of the form
  *
- * <pre>
+ * <pre>{@code
  *   minimise   ½ x' P x + q' x
  *   subject to l ≤ A x ≤ u
- * </pre>
+ * }</pre>
  *
  * using alternating-direction updates on a regularised KKT system. A sparse factorisation is reused across
  * iterations while primal/dual residuals and penalty parameters are updated in an ADMM-like fashion. Compared

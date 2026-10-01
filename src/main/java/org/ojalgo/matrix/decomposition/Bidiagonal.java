@@ -33,11 +33,11 @@ import org.ojalgo.type.context.NumberContext;
  * A general matrix [A] can be factorized by similarity transformations into the form [A]=[LQ][D][RQ]
  * <sup>-1</sup> where:
  * <ul>
- * <li>[A] (m-by-n) is any, real or complex, matrix</li>
- * <li>[D] (r-by-r) or (m-by-n) is, upper or lower, bidiagonal</li>
- * <li>[LQ] (m-by-r) or (m-by-m) is orthogonal</li>
- * <li>[RQ] (n-by-r) or (n-by-n) is orthogonal</li>
- * <li>r = min(m,n)</li>
+ * <li>[A] (m-by-n) is any, real or complex, matrix
+ * <li>[D] (r-by-r) or (m-by-n) is, upper or lower, bidiagonal
+ * <li>[LQ] (m-by-r) or (m-by-m) is orthogonal
+ * <li>[RQ] (n-by-r) or (n-by-n) is orthogonal
+ * <li>r = min(m,n)
  * </ul>
  *
  * @author apete

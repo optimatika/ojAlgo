@@ -30,7 +30,6 @@ import org.ojalgo.optimisation.Optimisation;
  * Solves optimisation problems of the form:
  * <p>
  * min 1/2 [X]<sup>T</sup>[Q][X] - [C]<sup>T</sup>[X]
- * </p>
  *
  * @author apete
  */

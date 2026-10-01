@@ -35,20 +35,16 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.TypeUtils;
 
 /**
- * <p>
  * MarketEquilibrium translates between the market portfolio weights and the equilibrium excess returns. The
  * only things needed to do those translations are the covariance matrix and the (market) risk aversion factor
  * - that's what you need to supply when you instantiate this class.
- * </p>
  * <p>
  * This class performs unconstrained optimisation. For each set of asset returns there is an optimal set of
  * weights. It also performs reverse (unconstrained) optimisation producing the "optimal" expected returns
  * given a set of weights.
- * </p>
  * <p>
  * The name MarketEquilibrium is actually a bit misleading. By altering the risk aversion factor this class
  * can/will describe the weights/returns equilibrium for any investor.
- * </p>
  *
  * @see #calculateAssetReturns(MatrixR064)
  * @see #calculateAssetWeights(MatrixR064)

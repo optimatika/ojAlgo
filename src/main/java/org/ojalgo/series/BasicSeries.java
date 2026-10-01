@@ -323,7 +323,7 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Comparab
     /**
      * Will only work if values are types as Double.
      *
-     * @see #put(Comparable, Number)
+     * @see #put(Object, Object)
      */
     default double put(final K key, final double value) {
         Double tmpValue = Double.valueOf(value);

@@ -320,9 +320,9 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * @param eps the amount of error to allow when checking for equality
          * @return
          *         <ul>
-         *         <li>0 if {@link #equals(double, double, double) equals(x, y, eps)}</li>
-         *         <li>< 0 if !{@link #equals(double, double, double) equals(x, y, eps)} &amp;&amp; x < y</li>
-         *         <li>>0 if !{@link #equals(double, double, double) equals(x, y, eps)} &amp;&amp; x > y</li>
+         *         <li>0 if {@link #equals(double, double, double) equals(x, y, eps)}
+         *         <li>< 0 if !{@link #equals(double, double, double) equals(x, y, eps)} && x < y
+         *         <li>>0 if !{@link #equals(double, double, double) equals(x, y, eps)} && x > y
          *         </ul>
          */
         public static int compareTo(final double x, final double y, final double eps) {
@@ -347,10 +347,10 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          *                {@code y}.
          * @return
          *         <ul>
-         *         <li>0 if {@link #equals(double, double, int) equals(x, y, maxUlps)}</li>
-         *         <li>< 0 if !{@link #equals(double, double, int) equals(x, y, maxUlps)} &amp;&amp; x <
-         *         y</li>
-         *         <li>>0 if !{@link #equals(double, double, int) equals(x, y, maxUlps)} &amp;&amp; x > y</li>
+         *         <li>0 if {@link #equals(double, double, int) equals(x, y, maxUlps)}
+         *         <li>< 0 if !{@link #equals(double, double, int) equals(x, y, maxUlps)} && x <
+         *         y
+         *         <li>>0 if !{@link #equals(double, double, int) equals(x, y, maxUlps)} && x > y
          *         </ul>
          */
         public static int compareTo(final double x, final double y, final int maxUlps) {
@@ -562,13 +562,10 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
         /**
          * Computes a number {@code delta} close to {@code originalDelta} with the property that
-         * <p>
          *
-         * <pre>
-         * <code>
+         * <pre>{@code
          *   x + delta - x
-         * </code>
-         * </pre>
+         * }</pre>
          * <p>
          * is exactly machine-representable. This is useful when computing numerical derivatives, in order to
          * reduce roundoff errors.

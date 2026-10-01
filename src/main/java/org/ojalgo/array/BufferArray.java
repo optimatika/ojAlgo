@@ -46,10 +46,8 @@ import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.math.MathType;
 
 /**
- * <p>
  * The odd member among the array implementations. It allows to create arrays based on memory mapped files or
  * direct buffers.
- * </p>
  *
  * @author apete
  */

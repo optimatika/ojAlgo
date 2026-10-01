@@ -48,7 +48,7 @@ public interface ContinuousDistribution extends Distribution {
      * <a href="http://en.wikipedia.org/wiki/Cumulative_distribution_function">WikipediA</a>
      *
      * @param value x
-     * @return P(&le;x)
+     * @return P(≤x)
      */
     double getDistribution(double value);
 

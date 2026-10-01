@@ -37,20 +37,16 @@ import org.ojalgo.RecoverableCondition;
 import org.ojalgo.structure.Structure1D.IndexMapper;
 
 /**
- * <p>
  * Originally, long before Java 8 and its new Date and Time API, this class was designed to provide an
  * immutable complement to the existing {@linkplain Date} and {@linkplain Calendar} classes and to have
  * easy/direct access to the underlying epoch millisecond value.
- * </p>
  * <p>
  * In terms of the newer API it most closely corresponds to an {@linkplain Instant}, but does not have its
  * nanosecond granularity. At one point the plan was to remove and replace this class with
  * {@linkplain Instant}, but working with a single long as an "instant" representation is very practical and
  * efficient.
- * </p>
  * <p>
  * It has been retrofitted to implement the {@linkplain Temporal} interface.
- * </p>
  *
  * @see CalendarDateDuration
  * @see CalendarDateUnit

@@ -129,14 +129,14 @@ public class ScalingConsistencyTest extends OptimisationLinearTests {
      * Ill-conditioned LP: coefficient magnitudes span 10^5. Forces non-trivial Ruiz factors. All four
      * (sparse, dual) combinations must reach the analytical optimum and agree with each other.
      *
-     * <pre>
+     * <pre>{@code
      * min  -100*x - 0.01*y
      * s.t.  1000*x +   1*y <=  1000
      *          1*x + 100*y <=   100
      *       x, y >= 0
      *
      * Optimal: x=1, y=0, obj=-100.
-     * </pre>
+     * }</pre>
      * <p>
      * (Reduced gradients are not cross-checked across combinations: at this degenerate optimum, different
      * solver paths may converge to different dual optima and hence different reduced gradients. A separate
@@ -172,14 +172,14 @@ public class ScalingConsistencyTest extends OptimisationLinearTests {
      * and the cut machinery must produce valid cuts under scaling (no infinite loops, no
      * missing-the-optimum).
      *
-     * <pre>
+     * <pre>{@code
      * min  -600*x1 - 5*x2
      * s.t.  300*x1 + x2 <= 1100   (c1, large coefficients)
      *        -x1 + 2*x2 <=    5   (c2)
      *       x1, x2 >= 0 integer
      *
      * Optimal: x1 = 3, x2 = 4. Verify: 300*3+4=904 <= 1100, -3+8=5 <= 5. Obj = -1820.
-     * </pre>
+     * }</pre>
      */
     @Test
     public void testMipCutValidityUnderScaling() {

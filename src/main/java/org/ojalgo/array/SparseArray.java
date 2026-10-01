@@ -40,10 +40,8 @@ import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * <p>
  * Only stores nonzero elements and/or elements specifically set by the user. The nonzero elements are stored
  * internally in a {@link DenseArray}.
- * </p>
  *
  * @author apete
  */
@@ -448,9 +446,9 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> im
      * <p>
      * This method is optimized for sparse arrays and handles all cases efficiently:
      * <ul>
-     * <li>Both elements are nonzero (direct swap)</li>
-     * <li>One element is zero, other is nonzero (remove one, add other)</li>
-     * <li>Both elements are zero (no operation needed)</li>
+     * <li>Both elements are nonzero (direct swap)
+     * <li>One element is zero, other is nonzero (remove one, add other)
+     * <li>Both elements are zero (no operation needed)
      * </ul>
      *
      * @param indexA the first index to exchange

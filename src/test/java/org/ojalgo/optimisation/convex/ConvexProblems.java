@@ -277,7 +277,6 @@ public class ConvexProblems extends OptimisationConvexTests {
     }
 
     /**
-     * <p>
      * Quadratic model that fail in package org.ojalgo.matrix.store, ojAlgo, version 54.0, but worked with
      * v53.
      * <p>
@@ -949,17 +948,14 @@ public class ConvexProblems extends OptimisationConvexTests {
     }
 
     /**
-     * <p>
      * I'm trying to solve some quadratic programming systems using version 24. The ActiveSetSolver does not
      * always converge to a solution, but throws an exception, "Matrix is singular" (The exception is thrown
      * by org.ojalgo.matrix.jama.LUDecomposition). The thing is that if I run Matlabs quadprog method on the
      * exact same system, a solution is found without problems. Here is the code that produces the exception:
-     * </p>
      * <p>
      * 2015-02-21: Extended the test case with a few alternatives using ExpressionsBasedModel. Numerically
      * difficult problem as the formulation includes both large and very small parameters (like 1000000000 and
      * -7.646043242556307E-15).
-     * </p>
      */
     @Test
     public void testP20081014() {
@@ -1008,16 +1004,13 @@ public class ConvexProblems extends OptimisationConvexTests {
     }
 
     /**
-     * <p>
      * Continuation of {@link #testP20081014()}.
-     * </p>
      * <p>
      * Thanks for your answer, Anders, it did solve my system (even though the result state was FAILED). As
      * you might have guessed, I am using the ActiveSetSolver as a part of a larger system where the system
      * matrixes to be solved changes all the time (not the dimensions but the values of the matrixes). I still
      * get errors in certain situations. I will present a system that triggers an
      * ArrayIndexOutOfBoundsException in ActiveSetSolver. Again, Matlabs quadprog produces a correct result.
-     * </p>
      */
     @Test
     public void testP20081015() {
@@ -1062,17 +1055,13 @@ public class ConvexProblems extends OptimisationConvexTests {
     }
 
     /**
-     * <p>
      * Continuation of {@link #testP20081014()} and {@link #testP20081015()}.
-     * </p>
      * <p>
      * Originally the problem was an ArrayIndexOutOfBoundsException. When that was fixed it had the same
      * numerical difficulties as the previous versions.
-     * </p>
      * <p>
      * 2015-02-28: Var tvungen att ändra från NumberContext.of(7,11) till new NumberContext(3, 3) för
      * lösningen.
-     * </p>
      */
     @Test
     public void testP20081119() {
@@ -1375,21 +1364,18 @@ public class ConvexProblems extends OptimisationConvexTests {
      * as Q is not positive semidefinite.
      * <p>
      * 2016-03-07: Initially the solution (from AMPL/LOQO) was stated to be:
-     * <p>
      *
-     * <pre>
+     * <pre>{@code
      * 1.78684, 0.000326128, 1.78665, 0.000136478, 495.429, 0.00358488, 495.427, 0.00178874, 8.90701, 0.000339811, 8.90684, 0.000174032
-     * </pre>
+     * }</pre>
      * <p>
      * The ExpressionsBasedModel can only validate this solution to be correct using a very "poor" accuracy
      * context. When ExpressionsBasedModel uses CPLEX as the solver a slightly different solution is returned
      * that validates much better. Switched to using that solution as the expected solution in this test:
-     * <p>
      *
-     * <pre>
+     * <pre>{@code
      * 1.7856570552, 1.216415374E-5, 1.78565097263, 6.08157995E-6, 495.426247828, 2.478968927E-5, 495.426235433, 1.239483719E-5, 8.90673094088, 6.04347562E-6, 8.90672791911, 3.02171321E-6
-     * </pre>
-     * </p>
+     * }</pre>
      */
     @Test
     public void testP20111205() {
@@ -1445,7 +1431,6 @@ public class ConvexProblems extends OptimisationConvexTests {
     }
 
     /**
-     * <p>
      * Original problem report: I tried to use ojAlgo to implement a norm minimization problem, but the solver
      * fails even for very simple instances. The following example is one particular simple instance. Q is the
      * identity matrix, C the zero vector. The constraints express that the solution is a probability function
@@ -1537,12 +1522,10 @@ public class ConvexProblems extends OptimisationConvexTests {
      * identify and report these problems. Instead ojAlgo struggles and returns different solutions with
      * sequential executions. This test is designed to (only) ensure consistency between exections. (I don't
      * know what the correct solution is.)
-     * </p>
      * <p>
      * 2019-05-23: The solvers don't always return a feasible solution and the direct and iterative solvers
      * sometimes give different soltions – things go wrong and they go wrong to varying degrees. This test
      * should only verify consistency between exections.
-     * </p>
      *
      * @see <a href="https://github.com/optimatika/ojAlgo/issues/5">GitHub Issue 5</a>
      */
@@ -1693,16 +1676,13 @@ public class ConvexProblems extends OptimisationConvexTests {
     }
 
     /**
-     * <p>
      * I recently upgraded to v38.2 of Ojalgo for solving some quadratic programs. It seems that somewhere in
      * the code there is an assumption that whenever there are inequality constraints there must be at least
      * one equality constraint. My problem has a bunch of inequality constraints but no equality constraints
      * and running it gives a "divide by zero" error. Again, this only seems to manifest itself when there are
      * inequality constraints but no equality constraints. I have reproduced it below with a simple example.
-     * </p>
      * <p>
      * apete. Most likely the same problem as P20150908 (Cannot reproduce the problem with the leatest code.)
-     * </p>
      */
     @Test
     public void testP20150922() {
@@ -1746,7 +1726,6 @@ public class ConvexProblems extends OptimisationConvexTests {
      * Test for https://github.com/optimatika/ojAlgo/issues/280.
      * <p>
      * 2020-09-24: No multipliers was returned by org.ojalgo.optimisation.convex classes :
-     * </p>
      * Test from 'Numerical Optimization', 2ed, (2006), Jorge Nocedal and Stephen J. Wright. QP Example 16.2
      * p453 minimize function F(x1,x2,x3) = 3*x1*x1 + 2*x1*x2 + x1*x3 + 2.5*x2*x2 + 2*x2*x3 + 2*x3*x3 - 8*x1 -
      * 3*x2 - 3*x3 constraints x1 + x3 = 3, x2 + x3 = 0 result: x = [2, -1, 1]' multipliers = [3, -2]'

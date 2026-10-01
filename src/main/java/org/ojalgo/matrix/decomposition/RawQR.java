@@ -511,7 +511,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
     }
 
     /**
-     * Makes no use of <code>preallocated</code> at all. Simply delegates to {@link #getInverse()}.
+     * Makes no use of {@code preallocated} at all. Simply delegates to {@link #getInverse()}.
      */
     private MatrixStore<Double> doGetInverse(final R064Store preallocated) {
 

@@ -53,7 +53,7 @@ import org.ojalgo.structure.Transformation2D;
 import org.ojalgo.type.math.MathType;
 
 /**
- * A {@linkplain float} implementation of {@linkplain PhysicalStore}.
+ * A {@code float} implementation of {@linkplain PhysicalStore}.
  *
  * @author apete
  */

@@ -41,14 +41,13 @@ import org.ojalgo.type.context.NumberContext;
  * <ul>
  * <li>[U] is an orthogonal matrix. The columns are the left, orthonormal, singular vectors of [this]. Its
  * columns are the eigenvectors of [A][A]<sup>T</sup>, and therefore has the same number of rows as [this].
- * </li>
  * <li>[S] is a diagonal matrix. The elements on the diagonal are the singular values of [this]. It is either
  * square or has the same dimensions as [this]. The singular values of [this] are the square roots of the
- * nonzero eigenvalues of [A][A]<sup>T</sup> and [A]<sup>T</sup>[A] (they are the same)</li>
+ * nonzero eigenvalues of [A][A]<sup>T</sup> and [A]<sup>T</sup>[A] (they are the same)
  * <li>[V] is an orthogonal matrix. The columns are the right, orthonormal, singular vectors of [this]. Its
  * columns are the eigenvectors of [A][A]<sup>T</sup>, and therefore has the same number of rows as [this] has
- * columns.</li>
- * <li>[this] = [U][S][V]<sup>T</sup></li>
+ * columns.
+ * <li>[this] = [U][S][V]<sup>T</sup>
  * </ul>
  * A singular values decomposition always exists.
  *
@@ -252,13 +251,10 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
     double getFrobeniusNorm();
 
     /**
-     * <p>
      * Ky Fan k-norm.
-     * </p>
      * <p>
      * The first Ky Fan k-norm is the operator norm (the largest singular value), and the last is called the
      * trace norm (the sum of all singular values).
-     * </p>
      *
      * @param k The number of singular values to add up.
      * @return The sum of the k largest singular values.
@@ -300,8 +296,8 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
     /**
      * If [A] is m-by-n and its rank is r, then:
      * <ul>
-     * <li>The first r columns of [U] span the column space, range or image of [A].</li>
-     * <li>The last m-r columns of [U] span the left nullspace or cokernel of [A].</li>
+     * <li>The first r columns of [U] span the column space, range or image of [A].
+     * <li>The last m-r columns of [U] span the left nullspace or cokernel of [A].
      * </ul>
      * Calculating the QR decomposition of [A] is a faster alternative.
      */
@@ -310,8 +306,8 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
     /**
      * If [A] is m-by-n and its rank is r, then:
      * <ul>
-     * <li>The first r columns of [V] span the row space or coimage of [A].</li>
-     * <li>The last n-r columns of [V] span the nullspace or kernel of [A].</li>
+     * <li>The first r columns of [V] span the row space or coimage of [A].
+     * <li>The last n-r columns of [V] span the nullspace or kernel of [A].
      * </ul>
      * Calculating the QR decomposition of [A]<sup>T</sup> is a faster alternative.
      */

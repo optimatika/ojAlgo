@@ -47,7 +47,6 @@ import org.ojalgo.type.ObjectPool;
  * min 1/2 [X]<sup>T</sup>[Q][X] - [C]<sup>T</sup>[X]<br>
  * when [AE][X] == [BE]<br>
  * and [AI][X] <= [BI]
- * </p>
  * Where [AE] and [BE] are optinal.
  *
  * @author apete

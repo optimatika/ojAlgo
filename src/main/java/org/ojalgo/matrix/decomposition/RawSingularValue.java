@@ -42,7 +42,6 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 
 /**
- * <p>
  * Singular Value Decomposition.
  * <P>
  * For an m-by-n matrix A with m >= n, the singular value decomposition is an m-by-n orthogonal matrix U, an
@@ -52,7 +51,6 @@ import org.ojalgo.structure.Access2D.Collectable;
  * <P>
  * The singular value decompostion always exists, so the constructor will never fail. The matrix condition
  * number and the effective numerical rank can be computed from this decomposition.
- * <p>
  *
  * @author apete
  */
@@ -119,7 +117,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     /**
      * [A]=[U][S][V]<sup>T</sup> — scale by [S]<sup>-1</sup> (reciprocal singular values).
      * <p>
-     * ftran: y[i] /= s[i] for i &lt; rank
+     * ftran: y[i] /= s[i] for i < rank
      * <p>
      * btran: same as ftran (diagonal is symmetric)
      */

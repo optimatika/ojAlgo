@@ -36,11 +36,9 @@ import java.util.concurrent.TimeUnit;
 import org.ojalgo.function.constant.PrimitiveMath;
 
 /**
- * <p>
  * Designed to complement {@linkplain CalendarDate}. It is essentially equivalent to {@linkplain ChronoUnit},
  * but with a slightly smaller set of members (and the additional {@linkplain #QUARTER}). It has been
  * retrofitted to implement the {@linkplain TemporalUnit} interface.
- * </p>
  *
  * @see CalendarDate
  * @see CalendarDateDuration

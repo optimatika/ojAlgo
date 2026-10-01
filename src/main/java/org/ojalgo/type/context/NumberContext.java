@@ -38,19 +38,16 @@ import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.format.NumberStyle;
 
 /**
- * <p>
  * Think of this as a {@linkplain MathContext} that specifies both precision and scale. Numeric data types
  * (non-integers) in databases are specified using precision and scale. While doing maths the precision is all
  * that matters, but before sending a number to a database, or printing/displaying it, rounding to a specified
  * scale is desirable.
- * </p>
  * <p>
  * The enforce methods first enforce the precision and then, if the number has more decimals than the scale
  * allows, round to the scale. Trailing zeros are neither added nor removed; the result may have trailing
  * zeros, and it may have fewer decimals than the scale. It is also possible to define a context with a scale
  * that is larger than the precision. This is NOT how precision and scale is used with numeric types in
  * databases.
- * </p>
  *
  * @author apete
  */

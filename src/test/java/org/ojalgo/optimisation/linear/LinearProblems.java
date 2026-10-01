@@ -72,7 +72,8 @@ public class LinearProblems extends OptimisationLinearTests {
     }
 
     /**
-     * https://github.com/optimatika/ojAlgo/issues/117 <br>
+     * https://github.com/optimatika/ojAlgo/issues/117
+     * <p>
      * Problem was getting different state after second solve.
      */
     @Test

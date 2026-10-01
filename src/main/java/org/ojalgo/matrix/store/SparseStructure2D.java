@@ -31,19 +31,16 @@ import org.ojalgo.structure.Structure2D;
  * matrices where most elements are zero. Implementations typically use specialized data structures like
  * Compressed Sparse Row (CSR), Compressed Sparse Column (CSC), or Coordinate Format (COO) to efficiently
  * store and access non-zero elements.
- * </p>
  * <p>
  * The interface provides methods to:
  * <ul>
- * <li>Count the number of non-zero elements in the matrix</li>
- * <li>Calculate the density of the matrix (ratio of non-zero elements to total elements)</li>
- * <li>Convert the sparse matrix to specific sparse formats (CSR, CSC)</li>
+ * <li>Count the number of non-zero elements in the matrix
+ * <li>Calculate the density of the matrix (ratio of non-zero elements to total elements)
+ * <li>Convert the sparse matrix to specific sparse formats (CSR, CSC)
  * </ul>
- * </p>
  * <p>
  * Note: This interface extends {@link Structure2D} and provides additional sparse-specific functionality. The
  * main matrix functionality is defined in other interfaces that implement this one.
- * </p>
  *
  * @author apete
  */

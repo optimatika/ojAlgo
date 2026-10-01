@@ -122,7 +122,7 @@ public final class RawStore implements PhysicalStore<Double>, Factory2D.Builder<
 
     /**
      * Will create a single row matrix with the supplied array as the inner array. You access it using
-     * <code>data[0]</code>.
+     * {@code data[0]}.
      */
     public static RawStore wrap(final double... data) {
         return new RawStore(new double[][] { data }, data.length);

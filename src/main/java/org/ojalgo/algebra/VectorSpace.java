@@ -22,27 +22,23 @@
 package org.ojalgo.algebra;
 
 /**
- * <p>
  * A vector space is a set of objects called vectors, where a vector is a tuple of fields/scalars/numbers.
  * Each vector space has two operations: vector addition and scalar multiplication. Eight axioms must be
  * satisfied. The first four are the group axioms of the additive group of vectors. The remaining four relates
  * to scalar multiplication, and are:
- * </p>
  * <ul>
- * <li>Compatibility of scalar multiplication with field multiplication: a(bV) = (ab)V</li>
+ * <li>Compatibility of scalar multiplication with field multiplication: a(bV) = (ab)V
  * <li>Identity element of scalar multiplication: 1V = V, where 1 denotes the multiplicative identity of the
- * field.</li>
- * <li>Distributivity of scalar multiplication with respect to vector addition: a(U + V) = aU + aV</li>
- * <li>Distributivity of scalar multiplication with respect to field addition: (a + b)V = aV + bV</li>
+ * field.
+ * <li>Distributivity of scalar multiplication with respect to vector addition: a(U + V) = aU + aV
+ * <li>Distributivity of scalar multiplication with respect to field addition: (a + b)V = aV + bV
  * </ul>
  * <p>
  * To enable the use of existing Java classes as scalars this interface declares the scalar type to be a
  * subclass of {@linkplain Comparable} (think {@linkplain Number}) rather than an implementation of
  * {@linkplain Field}.
- * </p>
  * <p>
  * Any field is also a vector space in itself.
- * </p>
  *
  * @param <T> The vector type
  * @param <N> The scalar type
@@ -55,17 +51,13 @@ package org.ojalgo.algebra;
 public interface VectorSpace<T, N extends Comparable<N>> extends Group.Additive<T>, ScalarOperation.Multiplication<T, N> {
 
     /**
-     * <p>
-     * <b>This method will (most likely) be moved to some other interface in the future! Just have to figure
-     * out where it fits...</b>
-     * </p>
+     * This method will (most likely) be moved to some other interface in the future! Just have to figure
+     * out where it fits...
      * <p>
      * The conjugate transpose of a matrix and/or the conjugate of a scalar/field like ComplexNumber or
      * Quaternion.
-     * </p>
      * <p>
      * The conjugate transpose of a real matrix is simply its transpose.
-     * </p>
      */
     T conjugate();
 

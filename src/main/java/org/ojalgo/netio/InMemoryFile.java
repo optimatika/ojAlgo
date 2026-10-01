@@ -29,7 +29,7 @@ import java.io.OutputStream;
 import java.util.Optional;
 
 /**
- * An in-memory "file" that can be used with some {@link ToFileWriter} and/or {@link FromFileReaderr}
+ * An in-memory "file" that can be used with some {@link ToFileWriter} and/or {@link FromFileReader}
  * implementations instead of a {@link File}.
  * <p>
  * To dynamically create file contents that only exist in memory (for download): Feed an instance of
@@ -38,13 +38,13 @@ import java.util.Optional;
  * get the (file) contents from that instance.
  * <p>
  * To parse some data you have in memory: Create an instance of {@link InMemoryFile} using one of the
- * constructors that take <code>byte[]</code> or {@link String} as input, and feed that to a
+ * constructors that take {@code byte[]} or {@link String} as input, and feed that to a
  * {@link FromFileReader} that support doing so (like the {@link TextLineReader}).
  * <p>
  * Note that you can obtain both {@link OutputStream} and {@link InputStream} instances from an
  * {@link InMemoryFile} – you can write to AND (later) read from the same instance.
  * <p>
- * This class is essentially a <code>byte[]</code> wrapper making use of {@link ByteArrayInputStream} and
+ * This class is essentially a {@code byte[]} wrapper making use of {@link ByteArrayInputStream} and
  * {@link ByteArrayOutputStream}.
  *
  * @author apete

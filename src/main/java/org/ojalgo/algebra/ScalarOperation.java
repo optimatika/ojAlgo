@@ -29,19 +29,19 @@ public interface ScalarOperation {
     public interface Addition<T, N extends Comparable<N>> extends ScalarOperation {
 
         /**
-         * @return <code>this + scalarAddend</code>.
+         * @return {@code this + scalarAddend}.
          */
         T add(double scalarAddend);
 
         /**
-         * @return <code>this + scalarAddend</code>.
+         * @return {@code this + scalarAddend}.
          */
         default T add(final float scalarAddend) {
             return this.add((double) scalarAddend);
         }
 
         /**
-         * @return <code>this + scalarAddend</code>.
+         * @return {@code this + scalarAddend}.
          */
         T add(N scalarAddend);
 
@@ -50,19 +50,19 @@ public interface ScalarOperation {
     public interface Division<T, N extends Comparable<N>> extends ScalarOperation {
 
         /**
-         * @return <code>this / scalarDivisor</code>.
+         * @return {@code this / scalarDivisor}.
          */
         T divide(double scalarDivisor);
 
         /**
-         * @return <code>this / scalarDivisor</code>.
+         * @return {@code this / scalarDivisor}.
          */
         default T divide(final float scalarDivisor) {
             return this.divide((double) scalarDivisor);
         }
 
         /**
-         * @return <code>this / scalarDivisor</code>.
+         * @return {@code this / scalarDivisor}.
          */
         T divide(N scalarDivisor);
 
@@ -71,19 +71,19 @@ public interface ScalarOperation {
     public interface Multiplication<T, N extends Comparable<N>> extends ScalarOperation {
 
         /**
-         * @return <code>this * scalarMultiplicand</code>.
+         * @return {@code this * scalarMultiplicand}.
          */
         T multiply(double scalarMultiplicand);
 
         /**
-         * @return <code>this * scalarMultiplicand</code>.
+         * @return {@code this * scalarMultiplicand}.
          */
         default T multiply(final float scalarMultiplicand) {
             return this.multiply((double) scalarMultiplicand);
         }
 
         /**
-         * @return <code>this * multiplicand</code>.
+         * @return {@code this * multiplicand}.
          */
         T multiply(N scalarMultiplicand);
 
@@ -92,19 +92,19 @@ public interface ScalarOperation {
     public interface Subtraction<T, N extends Comparable<N>> extends ScalarOperation {
 
         /**
-         * @return <code>this - scalarSubtrahend</code>.
+         * @return {@code this - scalarSubtrahend}.
          */
         T subtract(double scalarSubtrahend);
 
         /**
-         * @return <code>this - scalarSubtrahend</code>.
+         * @return {@code this - scalarSubtrahend}.
          */
         default T subtract(final float scalarSubtrahend) {
             return this.subtract((double) scalarSubtrahend);
         }
 
         /**
-         * @return <code>this - scalarSubtrahend</code>.
+         * @return {@code this - scalarSubtrahend}.
          */
         T subtract(N scalarSubtrahend);
 

@@ -41,9 +41,10 @@ public abstract class ErrorFunction {
     }
 
     /**
-     * Error Function <br>
-     * <a href="http://en.wikipedia.org/wiki/Error_function">erf()&nbsp;@&nbsp;Wikipedia</a> <br>
-     * <a href="http://mathworld.wolfram.com/Erf.html">erf()&nbsp;@&nbsp;Wolfram MathWorld</a>
+     * Error Function
+     *
+     * @see "http://en.wikipedia.org/wiki/Error_function"
+     * @see "http://mathworld.wolfram.com/Erf.html"
      */
     public static double erf(final double arg) {
 
@@ -74,18 +75,20 @@ public abstract class ErrorFunction {
     }
 
     /**
-     * Complementary Error Function <br>
-     * <a href="http://en.wikipedia.org/wiki/Error_function">erf()&nbsp;@&nbsp;Wikipedia</a> <br>
-     * <a href="http://mathworld.wolfram.com/Erf.html">erf()&nbsp;@&nbsp;Wolfram MathWorld</a>
+     * Complementary Error Function
+     *
+     * @see "http://en.wikipedia.org/wiki/Error_function"
+     * @see "http://mathworld.wolfram.com/Erf.html"
      */
     public static double erfc(final double arg) {
         return ONE - ErrorFunction.erf(arg);
     }
 
     /**
-     * Inverse Error Function <br>
-     * <a href="http://en.wikipedia.org/wiki/Error_function">erf()&nbsp;@&nbsp;Wikipedia</a> <br>
-     * <a href="http://mathworld.wolfram.com/Erf.html">erf()&nbsp;@&nbsp;Wolfram MathWorld</a>
+     * Inverse Error Function
+     *
+     * @see "http://en.wikipedia.org/wiki/Error_function"
+     * @see "http://mathworld.wolfram.com/Erf.html"
      */
     public static double erfi(final double arg) {
 

@@ -87,12 +87,12 @@ public class UpdatableSolverTest extends OptimisationLinearTests {
      * Verify that solution, dual multipliers and reduced gradients are correct after re-solving with a fixed
      * variable via {@link org.ojalgo.optimisation.UpdatableSolver#fixVariable(int, double)}.
      *
-     * <pre>
+     * <pre>{@code
      * min  -2*x1 - 3*x2
      * s.t.   x1 +   x2 <= 4   (constraint 0)
      *        x1 + 3*x2 <= 6   (constraint 1)
      *        x1, x2 >= 0
-     * </pre>
+     * }</pre>
      *
      * After fixing x1=2: x2=4/3 (constraint 1 binding), obj=-8. Constraint 0 has slack 2/3 so its dual must
      * be zero. The fixed variable x1 is non-basic so its reduced gradient should be non-zero; x2 is basic so
@@ -132,12 +132,12 @@ public class UpdatableSolverTest extends OptimisationLinearTests {
      * constraints are slack. Duals must be zero by complementary slackness. Reduced gradients equal the
      * objective coefficients (since all duals are zero).
      *
-     * <pre>
+     * <pre>{@code
      * min  2*x1 + 3*x2 + x3
      * s.t. x1 + x2 + x3 <= 10   (constraint 0)
      *      2*x1 +      x3 <= 8   (constraint 1)
      *      x1, x2, x3 >= 0
-     * </pre>
+     * }</pre>
      */
     @Test
     public void testAllVariablesAtLowerBound() {
@@ -169,12 +169,12 @@ public class UpdatableSolverTest extends OptimisationLinearTests {
      * Verify complementary slackness holds numerically: if a constraint is slack its dual must be zero, and
      * if a variable is strictly positive its reduced gradient must be zero.
      *
-     * <pre>
+     * <pre>{@code
      * min  -2*x1 - 3*x2
      * s.t.   x1 +   x2 <= 4   (constraint 0)
      *        x1 + 3*x2 <= 6   (constraint 1)
      *        x1, x2 >= 0
-     * </pre>
+     * }</pre>
      */
     @Test
     public void testComplementarySlackness() {
@@ -222,7 +222,7 @@ public class UpdatableSolverTest extends OptimisationLinearTests {
      * values are equal, the primal's dual multipliers match the dual's solution, and the dual's dual
      * multipliers match the primal's solution.
      *
-     * <pre>
+     * <pre>{@code
      * Primal: min  -5*x1 - 4*x2
      *   s.t.  6*x1 + 4*x2 <= 24
      *         3*x1 + 6*x2 <= 24
@@ -232,7 +232,7 @@ public class UpdatableSolverTest extends OptimisationLinearTests {
      *   s.t.  6*y1 + 3*y2 <= 5
      *         4*y1 + 6*y2 <= 4
      *         y1, y2 >= 0
-     * </pre>
+     * }</pre>
      */
     @Test
     public void testPrimalDualCrossCheck() {
@@ -290,11 +290,11 @@ public class UpdatableSolverTest extends OptimisationLinearTests {
      * Trivial LP where the constraint is slack at optimum. The reduced gradient for x1 equals its objective
      * coefficient (since the dual is zero); x2 has zero objective coefficient and zero reduced gradient.
      *
-     * <pre>
+     * <pre>{@code
      * min  x1
      * s.t. x1 + x2 <= 5   (constraint 0)
      *      x1, x2 >= 0
-     * </pre>
+     * }</pre>
      */
     @Test
     public void testSingleConstraintTrivial() {
@@ -322,13 +322,13 @@ public class UpdatableSolverTest extends OptimisationLinearTests {
      * One binding constraint and two slack constraints. Duals for slack constraints must be zero. Both
      * variables are basic (positive) so their reduced gradients must be zero.
      *
-     * <pre>
+     * <pre>{@code
      * min  -x1 - x2
      * s.t. x1 + x2 <= 4   (constraint 0, binding)
      *      x1      <= 6   (constraint 1, slack)
      *           x2 <= 6   (constraint 2, slack)
      *      x1, x2 >= 0
-     * </pre>
+     * }</pre>
      *
      * Optimal: x1+x2=4, obj=-4. Dual of binding constraint = 1. Slack constraint duals = 0.
      */
@@ -363,12 +363,12 @@ public class UpdatableSolverTest extends OptimisationLinearTests {
     /**
      * Two binding inequality constraints, two basic variables.
      *
-     * <pre>
+     * <pre>{@code
      * min  -2*x1 - 3*x2
      * s.t.   x1 +   x2 <= 4   (constraint 0)
      *        x1 + 3*x2 <= 6   (constraint 1)
      *        x1, x2 >= 0
-     * </pre>
+     * }</pre>
      *
      * Optimal: x1=3, x2=1, obj=-9. Both constraints bind. Both variables are basic so their reduced gradients
      * must be zero. Duals: y1=3/2, y2=1/2.
@@ -400,12 +400,12 @@ public class UpdatableSolverTest extends OptimisationLinearTests {
     /**
      * Two variables, two binding constraints, non-trivial duals.
      *
-     * <pre>
+     * <pre>{@code
      * min  -5*x1 - 4*x2
      * s.t.  6*x1 + 4*x2 <= 24   (constraint 0)
      *       3*x1 + 6*x2 <= 24   (constraint 1)
      *       x1, x2 >= 0
-     * </pre>
+     * }</pre>
      *
      * Optimal: x1=2, x2=3, obj=-22. Duals: y1=3/4, y2=1/6.
      */

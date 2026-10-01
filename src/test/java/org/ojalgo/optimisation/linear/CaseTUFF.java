@@ -44,7 +44,7 @@ import org.ojalgo.type.context.NumberContext;
  * work well. The generated models become infeasible due to very tight numerical bounds. Need to improve how
  * these bounds are set.
  *
- * <pre>
+ * <pre>{@code
 The TUFF instance from the Netlib collection of LP (linear programming) models is notable for its challenging characteristics, which test certain aspects of an LP solver’s numerical stability and performance. The key thing for the LP solver to “get right” to solve TUFF effectively is managing numerical stability and precision. Here’s what that entails:
 
 Key Challenges of TUFF
@@ -76,9 +76,9 @@ Key Solver Requirements for TUFF
 Conclusion
 
 The TUFF instance primarily tests the solver’s ability to handle numerical challenges arising from ill-conditioning, degeneracy, and the dense structure of the problem. Solvers like CPLEX, Gurobi, and modern implementations of the simplex or interior-point methods tend to succeed on TUFF due to their advanced preprocessing, numerical stability enhancements, and robustness to degeneracy. Older or simpler solvers may struggle without these techniques.     *
- * </pre>
+ * }</pre>
  *
- * <pre>
+ * <pre>{@code
 Yes, the linear programming problem named TUFF from the Netlib collection is known to have multiple optimal solutions.
 
 Why TUFF Has Multiple Optimal Solutions
@@ -100,7 +100,7 @@ Testing and Analysis
 If you’d like to explore this further:
     1.  Use an LP Solver: Experiment with TUFF in solvers like Gurobi, CPLEX, or open-source solvers like GLPK or COIN-OR.
     2.  Perturb the Objective Coefficients: Introduce a small perturbation to the objective function coefficients to see how the optimal solution changes. If the solution remains similar, it is likely one of multiple optimal points.
- * </pre>
+ * }</pre>
  */
 @Disabled
 public class CaseTUFF extends OptimisationLinearTests {

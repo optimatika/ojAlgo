@@ -22,43 +22,37 @@
 package org.ojalgo.matrix.decomposition;
 
 /**
- * <p>
  * LDU: [A] = [L][D][U] ( [P<sub>L</sub>][L][D][U][P<sub>U</sub>] )
- * </p>
  * <ul>
- * <li>[A] can be any matrix.</li>
+ * <li>[A] can be any matrix.
  * <li>[L] is a unit lower (left) triangular matrix. It has the same number of rows as [A], and ones on the
- * diagonal.</li>
- * <li>[D] is a square diagonal matrix.</li>
+ * diagonal.
+ * <li>[D] is a square diagonal matrix.
  * <li>[U] is a unit upper (right) triangular matrix. It has the same number of columns as [A], and ones on
- * the diagonal.</li>
- * <li>[P<sub>L</sub>] is a permutation matrix (row pivot order).</li>
- * <li>[P<sub>U</sub>] is a permutation matrix (column pivot order).</li>
+ * the diagonal.
+ * <li>[P<sub>L</sub>] is a permutation matrix (row pivot order).
+ * <li>[P<sub>U</sub>] is a permutation matrix (column pivot order).
  * </ul>
  * <p>
  * Row and/or column permutations may not be necessary and are therefore optional. Numerical stability usually
  * does require ordering of either the rows or columns (most algorithms reorder rows).
- * </p>
  * <p>
  * Solving the equation system [A][X]=[B] turns into this [L][D][U][X] = [B] and is solved in these steps:
- * </p>
  * <ol>
- * <li>[L][Z]=[B] ( [Z] = [D][U][X] )</li>
- * <li>[D][Y]=[Z] ( [Y] = [U][X] )</li>
- * <li>[U][X]=[Y]</li>
+ * <li>[L][Z]=[B] ( [Z] = [D][U][X] )
+ * <li>[D][Y]=[Z] ( [Y] = [U][X] )
+ * <li>[U][X]=[Y]
  * </ol>
  * <p>
  * [A]<sup>H</sup> = [U]<sup>H</sup>[D]<sup>H</sup>[L]<sup>H</sup>
- * </p>
  * <p>
  * ojAlgo does not have a full/general LDU decompositions but contains 3 variations of it:
- * </p>
  * <ul>
- * <li>LU: [A] = [L][U] where [U<sub>LU</sub>] = [D<sub>LDU</sub>][U<sub>LDU</sub>]</li>
+ * <li>LU: [A] = [L][U] where [U<sub>LU</sub>] = [D<sub>LDU</sub>][U<sub>LDU</sub>]
  * <li>Cholesky: [A] = [L][L]<sup>H</sup> where [A] is hermitian positive definite and [L<sub>Cholesky</sub>]
- * = [L<sub>LDU</sub>][D<sub>LDU</sub>]<sup>½</sup></li>
+ * = [L<sub>LDU</sub>][D<sub>LDU</sub>]<sup>½</sup>
  * <li>LDL: [A] = [L][D][L]<sup>H</sup> where [A] is hermitian and [L<sub>LDL</sub>]<sup>H</sup> = [U
- * <sub>LDU</sub>]</li>
+ * <sub>LDU</sub>]
  * </ul>
  *
  * @author apete

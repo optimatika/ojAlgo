@@ -260,9 +260,9 @@ abstract class SimplexStore {
      * Translate a tableau body row from scaled space to original-space coefficients. For row i with basic
      * variable j_basic (caller must ensure j_basic is a model variable):
      *
-     * <pre>
+     * <pre>{@code
      * row_orig[k] = primal.values[j_basic] / C_p[k] * row_scaled[k]
-     * </pre>
+     * }</pre>
      *
      * where {@code C_p[k] = primal.values[k]} for model columns and {@code C_p[k] = 1 / dual.values[h]} for a
      * slack/artificial at home row {@code h = k - nbModelVars}. No-op when no scaling has been installed.
@@ -782,7 +782,7 @@ abstract class SimplexStore {
 
     /**
      * Prepare the store for an iteration sequence. {@code warm == false} (cold solve) does the full prepare —
-     * recompute duals &amp; reduced costs and refresh the basic solution. {@code warm == true} (retained
+     * recompute duals and reduced costs and refresh the basic solution. {@code warm == true} (retained
      * optimal basis after a bound-only change) does the lean prepare — duals/reduced costs are unchanged so
      * they are kept; only the basic solution is refreshed.
      */

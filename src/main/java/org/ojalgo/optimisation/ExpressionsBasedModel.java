@@ -166,9 +166,9 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      * Connects solver constraints and variables back to model entities. Used for 2 things:
      * <ol>
      * <li>Solvers that manipulate models (like the {@link IntegerSolver}) need this to map between model
-     * entities and solver indices.</li>
+     * entities and solver indices.
      * <li>Simplifies implementation of
-     * {@link ExpressionsBasedModel.Integration#toModelState(org.ojalgo.optimisation.Optimisation.Result, ExpressionsBasedModel)}.</li>
+     * {@link ExpressionsBasedModel.Integration#toModelState(org.ojalgo.optimisation.Optimisation.Result, ExpressionsBasedModel)}.
      * </ol>
      */
     public interface EntityMap extends ProblemStructure {
@@ -1342,7 +1342,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      * <ol>
      * <li>A simple expression measuring the sum of the (binary) variable values (the number of binary
      * variables that are "ON"). The upper, and optionally lower, limits are set as defined by the
-     * <code>max</code> and <code>min</code> parameter values.
+     * {@code max} and {@code min} parameter values.
      * <li>A custom presolver (specific to this SOS) to be used by the MIP solver. This presolver helps to
      * keep track of which combinations of variable values are feasible, and is the only thing that enforces
      * the order.
@@ -1944,7 +1944,6 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
-     * <p>
      * The general recommendation is to NOT call this method directly. Instead you should use/call
      * {@link #maximise()} or {@link #minimise()}.
      * <p>

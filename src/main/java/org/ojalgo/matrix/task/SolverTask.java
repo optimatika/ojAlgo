@@ -226,15 +226,12 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
     PhysicalStore<N> preallocate(final int nbEquations, final int nbVariables, final int nbSolutions);
 
     /**
-     * <p>
      * Will create a {@linkplain PhysicalStore} instance suitable for use with
      * {@link #solve(Access2D, Access2D, PhysicalStore)}. The dimensions of the returned instance is not
      * specified by this interface - it is specified by the behaviour/requirements of each implementation.
-     * </p>
      * <p>
      * When solving an equation system [A][X]=[B] ([mxn][nxb]=[mxb]) the preallocated memory/matrix will
      * typically be either mxb or nxb.
-     * </p>
      */
     default PhysicalStore<N> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
 
@@ -257,16 +254,12 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
     }
 
     /**
-     * <p>
-     * Exactly how (if at all) a specific implementation makes use of <code>preallocated</code> is not
+     * Exactly how (if at all) a specific implementation makes use of {@code preallocated} is not
      * specified by this interface. It must be documented for each implementation.
-     * </p>
      * <p>
      * Should produce the same results as calling {@link #solve(Access2D, Access2D)}.
-     * </p>
      * <p>
-     * Use {@link #preallocate(Structure2D, Structure2D)} to obtain a suitbale <code>preallocated</code>.
-     * </p>
+     * Use {@link #preallocate(Structure2D, Structure2D)} to obtain a suitbale {@code preallocated}.
      *
      * @param rhs          The Right Hand Side, wont be modfied
      * @param preallocated Preallocated memory for the results, possibly some intermediate results. You must

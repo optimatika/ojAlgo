@@ -14,36 +14,30 @@ import org.ojalgo.optimisation.Variable;
  * <p>
  * the attached Java program solves a relatively simple ILP with ojAlgo. However, the solution calculates is
  * invalid. Can somehow shed some light into why this is?
- * </p>
  * <p>
  * Hopefully the program explains itself, but here is some more text:
- * </p>
  * <p>
  * The function getCoefficients() returns the coefficients for 202 inequalities of the form coef[0]*x +
  * coef[1]*y < 0. The main function creates an ExpressionsBasedModel from this, transformimg the "< 0" into
  * "<= -1" (which is valid since this is about integer values). It prints the solution calculated and then
  * checks if all the inequalities really are satisfied.
- * </p>
  * <p>
  * However, this fails since the solution calculated doesn't solve all inequalities:
  *
- * <pre>
+ * <pre>{@code
  * x = 19.999999999999993 ~ 20
  * y = -0.9950000000000006 ~ -1
  * Exception in thread "main" java.lang.Exception: -10*x + -200*y = 0 must be negative (exact: -0.9999999999998100)
  *     at Solve.main(Solve.java:60)
- * </pre>
+ * }</pre>
  *
  * The program also prints the exact solutions calculated from the BigDecimals that ojAlgo produced. This is
  * the "exact" value you see in the error message above and, as you see, this value (almost) satisfies the
  * condition "<= -1".
- * </p>
  * <p>
  * Valid solutions to this inequality systems would be x=21, y=-1 or x=201, y=-10.
- * </p>
  * <p>
  * Obviously, this seems to be a rounding issue. Is there anything that can be done about it?
- * </p>
  * Cheers, Uli * http://bugzilla.optimatika.se/show_bug.cgi?id=224
  */
 public class P20150127a {

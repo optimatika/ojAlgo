@@ -53,7 +53,7 @@ final class FileFormatMPS {
     /**
      * BoundType used with the BOUNDS section.
      *
-     * <pre>
+     * <pre>{@code
      *  type            meaning
      * ---------------------------------------------------
      *   LO    lower bound        b <= x (< +inf)
@@ -68,7 +68,7 @@ final class FileFormatMPS {
      *   SC    semi-cont variable x = 0 or l <= x <= b
      *         l is the lower bound on the variable
      *         If none set then defaults to 1
-     * </pre>
+     * }</pre>
      *
      * @author apete
      */
@@ -359,7 +359,7 @@ final class FileFormatMPS {
     /**
      * RowType used with the ROWS and RANGES sections.
      *
-     * <pre>
+     * <pre>{@code
      * type      meaning
      * ---------------------------
      *  E    equality
@@ -374,7 +374,7 @@ final class FileFormatMPS {
      *    L            + or -       b - |r|      b
      *    E              +            b        b + |r|
      *    E              -          b - |r|      b
-     * </pre>
+     * }</pre>
      *
      * @author apete
      */

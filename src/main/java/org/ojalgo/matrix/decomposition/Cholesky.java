@@ -31,20 +31,15 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * <p>
  * Cholesky: [A] = [L][L]<sup>H</sup> (or [R]<sup>H</sup>[R])
- * </p>
  * <p>
  * [A]<sup>H</sup> = [A] = [L][L]<sup>H</sup>
- * </p>
  * <p>
  * If [A] is symmetric and positive definite then the general LU decomposition - [P][L][D][U] - becomes
  * [I][L][D][L]<sup>T</sup> (or [I][U]<sup>T</sup>[D][U]). [I] can be left out and [D] is normally split in
  * halves and merged with [L] (and/or [U]). We'll express it as [A] = [L][L]<sup>T</sup>.
- * </p>
  * <p>
  * A cholesky decomposition is still/also an LU decomposition where [P][L][D][U] => [L][L]<sup>T</sup>.
- * </p>
  *
  * @author apete
  */

@@ -32,11 +32,9 @@ import java.util.List;
 import org.ojalgo.function.constant.PrimitiveMath;
 
 /**
- * <p>
  * Designed to complement {@linkplain CalendarDate}. It is similar to {@linkplain Duration} or
  * {@linkplain Period}, but supports a decimal/fractional measure. It has been retrofitted to implement the
  * {@linkplain TemporalAmount} interface.
- * </p>
  *
  * @see CalendarDate
  * @see CalendarDateUnit

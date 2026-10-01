@@ -55,7 +55,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      * https://miplib.zib.de/instance_details_b-ball.html
      * <ul>
      * Mac Pro (Early 2009)
-     * <li>2019-01-28: 300s suffice with optimal solution</li>
+     * <li>2019-01-28: 300s suffice with optimal solution
      * </ul>
      */
     @Test
@@ -67,7 +67,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      * https://miplib.zib.de/instance_details_ej.html
      * <ul>
      * Mac Pro (Early 2009)
-     * <li>2019-01-28: 900s terminated without finding any feasible solution</li>
+     * <li>2019-01-28: 900s terminated without finding any feasible solution
      * </ul>
      */
     @Test
@@ -79,7 +79,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      * https://miplib.zib.de/instance_details_flugpl.html
      * <ul>
      * Mac Pro (Early 2009)
-     * <li>2019-01-28: 1s finsihed with optimal solution</li>
+     * <li>2019-01-28: 1s finsihed with optimal solution
      * </ul>
      */
     @Test
@@ -91,7 +91,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      * https://miplib.zib.de/instance_details_gen-ip002.html
      * <ul>
      * Mac Pro (Early 2009)
-     * <li>2019-01-28: 300s expected: <-4783.733392> but was: <-4778.1844607></li>
+     * <li>2019-01-28: 300s expected: <-4783.733392> but was: <-4778.1844607>
      * </ul>
      */
     @Test
@@ -103,7 +103,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      * https://miplib.zib.de/instance_details_gen-ip021.html
      * <ul>
      * Mac Pro (Early 2009)
-     * <li>2019-01-28: 300s expected: <2361.45419519> but was: <2362.7631500641996></li>
+     * <li>2019-01-28: 300s expected: <2361.45419519> but was: <2362.7631500641996>
      * </ul>
      */
     @Test
@@ -115,7 +115,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      * https://miplib.zib.de/instance_details_gen-ip036.html
      * <ul>
      * Mac Pro (Early 2009)
-     * <li>2019-01-28: 300s expected: <-4606.67961> but was: <-4602.60643892></li>
+     * <li>2019-01-28: 300s expected: <-4606.67961> but was: <-4602.60643892>
      * </ul>
      */
     @Test
@@ -127,7 +127,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      * https://miplib.zib.de/instance_details_gen-ip054.html
      * <ul>
      * Mac Pro (Early 2009)
-     * <li>2019-01-28: 300s expected: <6840.966> but was: <6852.1883509></li>
+     * <li>2019-01-28: 300s expected: <6840.966> but was: <6852.1883509>
      * </ul>
      */
     @Test
@@ -139,7 +139,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      * https://miplib.zib.de/instance_details_gr4x6.html
      * <ul>
      * Mac Pro (Early 2009)
-     * <li>2019-01-28: 0s finsihed with optimal solution</li>
+     * <li>2019-01-28: 0s finsihed with optimal solution
      * </ul>
      */
     @Test
@@ -159,7 +159,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      * https://miplib.zib.de/instance_details_markshare_4_0.html
      * <ul>
      * Mac Pro (Early 2009)
-     * <li>2019-01-28: 15s finsihed with optimal solution</li>
+     * <li>2019-01-28: 15s finsihed with optimal solution
      * </ul>
      */
     @Test
@@ -168,19 +168,14 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
     }
 
     /**
-     * <p>
      * <a href="http://miplib.zib.de/miplib2010/markshare_5_0.php">MIPLIB 2010</a>
      * https://miplib.zib.de/instance_details_markshare_5_0.html
-     * </p>
      * <p>
      * N/A in MIPLIB 2003
-     * </p>
      * <p>
      * LP: 0.00000000e+00
-     * </p>
      * <p>
      * MIP: 1.00000000e+00
-     * </p>
      */
     @Test
     public void testMarkshare_5_0() {
@@ -191,16 +186,12 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      * https://miplib.zib.de/instance_details_markshare1.html
      * <p>
      * N/A in MIPLIB 2010
-     * </p>
      * <p>
      * <a href="http://miplib.zib.de/miplib2003/miplib2003/markshare1.php">MIPLIB 2003</a>
-     * </p>
      * <p>
      * LP: 0.00000000e+00
-     * </p>
      * <p>
      * MIP: 1.00000000e+00
-     * </p>
      */
     @Test
     public void testMarkshare1() {
@@ -208,18 +199,13 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
     }
 
     /**
-     * <p>
      * N/A in MIPLIB 2010
-     * </p>
      * <p>
      * <a href="http://miplib.zib.de/miplib2003/miplib2003/markshare2.php">MIPLIB 2003</a>
-     * </p>
      * <p>
      * LP: 0.00000000e+00
-     * </p>
      * <p>
      * MIP: 1.00000000e+00
-     * </p>
      */
     @Test
     public void testMarkshare2() {
@@ -227,18 +213,13 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
     }
 
     /**
-     * <p>
      * N/A in MIPLIB 2010
-     * </p>
      * <p>
      * <a href="http://miplib.zib.de/miplib2003/miplib2003/mas76.php">MIPLIB 2003</a>
-     * </p>
      * <p>
      * LP: 3.88939036e+04
-     * </p>
      * <p>
      * MIP: 4.00050541e+04
-     * </p>
      */
     @Test
     public void testMas76() {
@@ -246,18 +227,13 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
     }
 
     /**
-     * <p>
      * N/A in MIPLIB 2010
-     * </p>
      * <p>
      * <a href="http://miplib.zib.de/miplib2003/miplib2003/modglob.php">MIPLIB 2003</a>
-     * </p>
      * <p>
      * LP: 2.04309476e+07
-     * </p>
      * <p>
      * MIP: 2.07405081e+07
-     * </p>
      */
     @Test
     public void testModglob() {
@@ -268,7 +244,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      * https://miplib.zib.de/instance_details_neos5.html
      * <ul>
      * Mac Pro (Early 2009)
-     * <li>2019-01-28: 300s suffice with optimal solution</li>
+     * <li>2019-01-28: 300s suffice with optimal solution
      * </ul>
      */
     @Test
@@ -277,18 +253,13 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
     }
 
     /**
-     * <p>
      * <a href="http://miplib.zib.de/miplib2010/neos-911880.php">MIPLIB 2010</a>
-     * </p>
      * <p>
      * N/A in MIPLIB 2003
-     * </p>
      * <p>
      * LP: 23.26
-     * </p>
      * <p>
      * MIP: 54.76
-     * </p>
      */
     @Test
     public void testNeos911880() {
@@ -296,18 +267,13 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
     }
 
     /**
-     * <p>
      * N/A in MIPLIB 2010
-     * </p>
      * <p>
      * <a href="http://miplib.zib.de/miplib2003/miplib2003/noswot.php">MIPLIB 2003</a>
-     * </p>
      * <p>
      * LP: -4.30000000e+01
-     * </p>
      * <p>
      * MIP: -4.10000000e+01
-     * </p>
      */
     @Test
     public void testNoswot() {
@@ -315,18 +281,13 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
     }
 
     /**
-     * <p>
      * <a href="http://miplib.zib.de/miplib2010/p2m2p1m1p0n100.php">MIPLIB 2010</a>
-     * </p>
      * <p>
      * N/A in MIPLIB 2003
-     * </p>
      * <p>
      * LP: 80424
-     * </p>
      * <p>
      * MIP: Infeasible
-     * </p>
      */
     @Test
     public void testP2m2p1m1p0n100() {
@@ -334,31 +295,26 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
     }
 
     /**
-     * <p>
      * N/A in MIPLIB 2010
-     * </p>
      * <p>
      * <a href="http://miplib.zib.de/miplib2003/miplib2003/pk1.php">MIPLIB 2003</a>
-     * </p>
      * <p>
      * LP: 1.47389881e-09
-     * </p>
      * <p>
      * MIP: 1.10000000e+01
-     * </p>
      * https://miplib.zib.de/instance_details_pk1.html
      * <ul>
      * Mac Pro (Early 2009)
-     * <li>2013-04-01: (suffice=4h abort=8h) Stopped with optimal integer solution after 1h50min</li>
-     * <li>2013-12-08: (suffice=4h abort=8h) Stopped with optimal integer solution after 412s</li>
-     * <li>2015-11-07: (suffice=4h abort=8h) Stopped with optimal integer solution after 372s</li>
-     * <li>2017-10-20: (suffice=4h abort=8h) Stopped with optimal integer solution after 796s</li>
-     * <li>2017-10-20: (suffice=5min abort=1h) Stopped with optimal integer solution after 5min</li>
-     * <li>2018-02-07: (suffice=5min, abort=15min, mip_gap=0.001) Suffice with optimal solution</li>
-     * <li>2018-02-07: (suffice=15min, abort=15min, mip_gap=0.001) Found optimal solution in 344s</li>
-     * <li>2018-04-47: (suffice=5min, abort=15min, mip_gap=0.001) Found optimal solution in 227s</li>
-     * <li>2018-08-16: sufficed: <11.0> but was: <14.0></li>
-     * <li>2019-01-28: 300s expected: <11.0> but was: <11.999999999999979></li>
+     * <li>2013-04-01: (suffice=4h abort=8h) Stopped with optimal integer solution after 1h50min
+     * <li>2013-12-08: (suffice=4h abort=8h) Stopped with optimal integer solution after 412s
+     * <li>2015-11-07: (suffice=4h abort=8h) Stopped with optimal integer solution after 372s
+     * <li>2017-10-20: (suffice=4h abort=8h) Stopped with optimal integer solution after 796s
+     * <li>2017-10-20: (suffice=5min abort=1h) Stopped with optimal integer solution after 5min
+     * <li>2018-02-07: (suffice=5min, abort=15min, mip_gap=0.001) Suffice with optimal solution
+     * <li>2018-02-07: (suffice=15min, abort=15min, mip_gap=0.001) Found optimal solution in 344s
+     * <li>2018-04-47: (suffice=5min, abort=15min, mip_gap=0.001) Found optimal solution in 227s
+     * <li>2018-08-16: sufficed: <11.0> but was: <14.0>
+     * <li>2019-01-28: 300s expected: <11.0> but was: <11.999999999999979>
      * </ul>
      */
     @Test
@@ -459,18 +415,13 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
     }
 
     /**
-     * <p>
      * N/A in MIPLIB 2010
-     * </p>
      * <p>
      * <a href="http://miplib.zib.de/miplib2003/miplib2003/pp08a.php">MIPLIB 2003</a>
-     * </p>
      * <p>
      * LP: 2.74834524e+03
-     * </p>
      * <p>
      * MIP: 7.35000000e+03
-     * </p>
      */
     @Test
     public void testPp08a() {
@@ -478,18 +429,13 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
     }
 
     /**
-     * <p>
      * N/A in MIPLIB 2010
-     * </p>
      * <p>
      * <a href="http://miplib.zib.de/miplib2003/miplib2003/pp08aCUTS.php">MIPLIB 2003</a>
-     * </p>
      * <p>
      * LP: 5.48060616e+03
-     * </p>
      * <p>
      * MIP: 7.35000000e+03
-     * </p>
      */
     @Test
     public void testPp08aCUTS() {
@@ -497,18 +443,13 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
     }
 
     /**
-     * <p>
      * <a href="http://miplib.zib.de/miplib2010/timtab1.php">MIPLIB 2010</a>
-     * </p>
      * <p>
      * <a href="http://miplib.zib.de/miplib2003/miplib2003/timtab1.php">MIPLIB 2003</a>
-     * </p>
      * <p>
      * LP: 28694
-     * </p>
      * <p>
      * MIP: 764772
-     * </p>
      */
     @Test
     public void testTimtab1() {
@@ -516,18 +457,13 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
     }
 
     /**
-     * <p>
      * N/A in MIPLIB 2010
-     * </p>
      * <p>
      * <a href="http://miplib.zib.de/miplib2003/miplib2003/vpm2.php">MIPLIB 2003</a>
-     * </p>
      * <p>
      * LP: 9.88926460e+00
-     * </p>
      * <p>
      * MIP: 1.37500000e+01
-     * </p>
      */
     @Test
     public void testVpm2() {

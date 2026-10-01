@@ -34,7 +34,6 @@ import org.ojalgo.optimisation.Optimisation;
  * <p>
  * min 1/2 [X]<sup>T</sup>[Q][X] - [C]<sup>T</sup>[X]<br>
  * when [AE][X] == [BE]
- * </p>
  *
  * @author apete
  */

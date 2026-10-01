@@ -145,10 +145,10 @@ public class P20140819 extends OptimisationIntegerTests {
     /**
      * Just a branch(ing) that seemed interesting at some point...
      *
-     * <pre>
+     * <pre>{@code
      * 8 (5) 7=0.09999999999999998 38573.68831776007 [0=0<414, 1=0<414, 2=0<414, 3=0<414, 4=0<414, 5=0<414, 6=0<414, 7=1<414, 8=0<414, 9=0<5, 10=0<0, 11=0<0, 12=0<414, 13=0<414, 14=0<414, 15=0<414]
      * Still hope, branching on 2 @ 0.12500000000000178 >>> 0 <= x2 (2605.89588) <= 414
-     * </pre>
+     * }</pre>
      */
     @Test
     public void testBranchingOn2() {
@@ -211,8 +211,8 @@ public class P20140819 extends OptimisationIntegerTests {
     /**
      * Tweaked the CPLEX integration so that the ojAlgo {@link IntegerSolver} would handle the integer part
      * and CPLEX solve the LP at each node. Also cleared all ojAlgo presolvers.Then took note of the 9 first
-     * nodes that CPLEX reported as infeasible.<br>
-     * <br>
+     * nodes that CPLEX reported as infeasible.
+     * <p>
      * 15 (13) 6=0.12500000000000178 39086.517558237 [0=0<414, 1=0<414, 2=0<0, 3=0<414, 4=0<414, 5=0<414,
      * 6=0<0, 7=1<414, 8=0<0, 9=0<5, 10=0<0, 11=0<0, 12=0<414, 13=0<414, 14=0<414, 15=0<0]
      */
@@ -509,7 +509,7 @@ public class P20140819 extends OptimisationIntegerTests {
     }
 
     /**
-     * <pre>
+     * <pre>{@code
      * Branch&Bound Node
      * 75 (73) 15=0.19999999999998863 38949.697838651235 [0=0<414, 1=0<0, 2=0<0, 3=0<2, 4=0<414, 5=1<414, 6=0<0, 7=0<0, 8=0<0, 9=5<5, 10=0<0, 11=0<0, 12=0<414, 13=0<414, 14=0<414, 15=0<0]
      * Solutions=0 Nodes/Iterations=0 { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }
@@ -520,7 +520,7 @@ public class P20140819 extends OptimisationIntegerTests {
      * Integer indices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
      * Lower bounds: [0, 0, 0, 0, 0, 1, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0]
      * Upper bounds: [414, 0, 0, 2, 414, 414, 0, 0, 0, 5, 0, 0, 414, 414, 414, 0]
-     * </pre>
+     * }</pre>
      */
     @Test
     public void testProblematicNodeB() {

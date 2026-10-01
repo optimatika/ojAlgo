@@ -22,11 +22,9 @@
 package org.ojalgo.algebra;
 
 /**
- * <p>
  * A ring is a commutative group (addition operation) with a second binary operation (multiplication) that is
  * distributive over the commutative group operation and is associative. Note that multiplications is not
  * required to be commutative.
- * </p>
  *
  * @author apete
  * @see <a href="https://en.wikipedia.org/wiki/Ring_(mathematics)">Ring</a>

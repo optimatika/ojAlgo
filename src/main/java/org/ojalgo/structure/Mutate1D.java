@@ -60,7 +60,7 @@ public interface Mutate1D extends Structure1D {
 
         /**
          * Will fill the elements of [this] with the corresponding input values, and in the process (if
-         * necessary) convert the elements to the correct type: <code>this(i) = values(i)</code>
+         * necessary) convert the elements to the correct type: {@code this(i) = values(i)}
          */
         default void fillMatching(final Access1D<?> values) {
             for (long i = 0L, limit = Math.min(this.count(), values.count()); i < limit; i++) {

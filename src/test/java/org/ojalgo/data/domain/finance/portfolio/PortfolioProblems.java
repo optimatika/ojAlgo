@@ -241,20 +241,16 @@ public class PortfolioProblems extends FinancePortfolioTests {
     }
 
     /**
-     * <p>
      * First of all, let me say that I really like ojAlgo so thank you for making it! I do, however, think
      * that you should make tmpIterCount and _0_000005 variables fields (with getters and setters) in the
      * MarkowitzModel.java class. We are finding that we get suboptimal solutions with the hard-coded limit of
      * 20 iterations in a mean variance optimisation (solving for the highest return given a target variance).
      * We are now testing it (against our own Python model) with a limit of 100. Please let me know what you
      * think when you get a chance.
-     * </p>
      * <p>
      * Borrowed test data from {@link #testP20090115()}.
-     * </p>
      * <p>
      * 2015-04-14: Changed test evaluation context from <7,14> to <4,4>.
-     * </p>
      */
     @Test
     public void testP20141202() {
@@ -456,18 +452,17 @@ public class PortfolioProblems extends FinancePortfolioTests {
     }
 
     /**
-     * https://github.com/optimatika/ojAlgo-finance/issues/23 <br>
-     * <br>
+     * https://github.com/optimatika/ojAlgo-finance/issues/23
+     * <p>
      * The solver never converged to a solution with this model. The problem is bad data:
      *
-     * <pre>
+     * <pre>{@code
      * Q not positive semidefinite!
      * The eigenvalues are: { (43.12350103807128 + 0.0i), (20.084991767170866 + 0.0i), (-4.2462987329436865 + 0.0i), (0.3478453733737204 + 0.0i) }
-     * </pre>
+     * }</pre>
      *
      * The user asked to be able to set timeout / iteration limit on solver. Added support for time limit.
-     * <br>
-     * <br>
+     * <p>
      * This test verifies that the solver terminates with a time limit set, and that cleaning the covariance
      * matrix solves the data problem (in terms of solver capability).
      */

@@ -578,7 +578,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
 
     /**
      * Solves the same model repeatedly while the range of X shifts. The data is random, but seeded, and every
-     * shift is feasible: with |a1 - a2| &lt; 2 and |x| &le; 3, (a1 - a2) x &lt; 6 &le; b1 - b2, so some y
+     * shift is feasible: with |a1 - a2| < 2 and |x| ≤ 3, (a1 - a2) x < 6 ≤ b1 - b2, so some y
      * satisfies both constraints for every x. (With unrestricted b1 and b2 some shifts were infeasible, and
      * presolve's conclusions from an infeasible solve then made later, feasible, re-solves of the same model
      * report infeasible too.)

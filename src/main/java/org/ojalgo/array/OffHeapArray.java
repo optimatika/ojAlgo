@@ -30,7 +30,6 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.math.MathType;
 
 /**
- * <p>
  * Off heap memory array.
  * <p>
  * When just instantiated these array classes contain uninitialized memory – memory is allocated but not

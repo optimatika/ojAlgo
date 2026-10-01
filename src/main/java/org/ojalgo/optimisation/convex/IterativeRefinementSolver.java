@@ -35,7 +35,8 @@ import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.structure.Access1D;
 
 /**
- * Algorithm from: Solving quadratic programs to high precision using scaled iterative refinement <br>
+ * Algorithm from: Solving quadratic programs to high precision using scaled iterative refinement
+ * <p>
  * Mathematical Programming Computation (2019) 11:421–455 https://doi.org/10.1007/s12532-019-00154-6
  *
  * @author Programmer-Magnus

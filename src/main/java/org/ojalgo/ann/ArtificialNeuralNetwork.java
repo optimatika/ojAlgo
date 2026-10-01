@@ -66,7 +66,8 @@ public final class ArtificialNeuralNetwork {
          */
         SIGMOID(ArtificialNeuralNetwork::doSigmoid, arg -> arg * (ONE - arg), true),
         /**
-         * [0,1] <br>
+         * [0,1]
+         * <p>
          * Currently this can only be used in the final layer in combination with
          * {@link ArtificialNeuralNetwork.Error#CROSS_ENTROPY}. All other usage will give incorrect network
          * training.

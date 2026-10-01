@@ -506,8 +506,8 @@ public final class R064CSC extends CompressedSparseR064 {
     /**
      * Creates a new CSC matrix store.
      *
-     * @param rows           The number of rows in the matrix
-     * @param cols           The number of columns in the matrix
+     * @param nbRows         The number of rows in the matrix
+     * @param nbCols         The number of columns in the matrix
      * @param elementValues  The non-zero values
      * @param rowIndices     The row index for each non-zero value
      * @param columnPointers The starting position in elementValues/rowIndices for each column

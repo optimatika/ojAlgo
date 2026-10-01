@@ -124,7 +124,7 @@ final class Pivot {
 
     /**
      * Equivalent to selecting the rows (or columns) in the pivot order,
-     * <code>arg.rows(pivot.getOrder())</code>.
+     * {@code arg.rows(pivot.getOrder())}.
      */
     <N extends Comparable<N>, M extends Access2D<N> & Mutate2D> void applyPivotOrder(final M arg) {
         if (myModified) {
@@ -140,7 +140,7 @@ final class Pivot {
 
     /**
      * Equivalent to selecting the rows (or columns) in the reverse order,
-     * <code>arg.rows(pivot.reverseOrder())</code>.
+     * {@code arg.rows(pivot.reverseOrder())}.
      */
     <N extends Comparable<N>, M extends Access2D<N> & Mutate2D> void applyReverseOrder(final M arg) {
         if (myModified) {
@@ -178,11 +178,9 @@ final class Pivot {
      * <p>
      * This method applies a cycle permutation that moves the element at position ind1 to position ind2, while
      * shifting all elements in between one position to the left.
-     * </p>
      * <p>
      * The method only performs the cycle if ind1 is less than ind2. If ind1 is greater than or equal to ind2,
      * no changes are made to the pivot order.
-     * </p>
      *
      * @param ind1 The starting index of the cycle
      * @param ind2 The ending index of the cycle

@@ -199,16 +199,12 @@ public interface InverterTask<N extends Comparable<N>> extends MatrixTask<N> {
     }
 
     /**
-     * <p>
-     * Exactly how (if at all) a specific implementation makes use of <code>preallocated</code> is not
+     * Exactly how (if at all) a specific implementation makes use of {@code preallocated} is not
      * specified by this interface. It must be documented for each implementation.
-     * </p>
      * <p>
      * Should produce the same results as calling {@link #invert(Access2D)}.
-     * </p>
      * <p>
-     * Use {@link #preallocate(Structure2D)} to obtain a suitbale <code>preallocated</code>.
-     * </p>
+     * Use {@link #preallocate(Structure2D)} to obtain a suitbale {@code preallocated}.
      *
      * @param preallocated Preallocated memory for the results, possibly some intermediate results. You must
      *                     assume this is modified, but you cannot assume it will contain the
@@ -221,14 +217,11 @@ public interface InverterTask<N extends Comparable<N>> extends MatrixTask<N> {
     PhysicalStore<N> preallocate(final int nbRows, final int nbCols);
 
     /**
-     * <p>
      * Will create a {@linkplain PhysicalStore} instance suitable for use with
      * {@link #invert(Access2D, PhysicalStore)}.
-     * </p>
      * <p>
      * When inverting a matrix (mxn) the preallocated memory/matrix will typically be nxm (and of course most
      * of the time A is square).
-     * </p>
      */
     default PhysicalStore<N> preallocate(final Structure2D template) {
         return this.preallocate(template.getRowDim(), template.getColDim());

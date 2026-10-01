@@ -255,15 +255,15 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
     /**
      * Solves [this][X] = [rhs] by first solving
      *
-     * <pre>
+     * <pre>{@code
      * [L][Y] = [RHS]
-     * </pre>
+     * }</pre>
      *
      * and then
      *
-     * <pre>
+     * <pre>{@code
      * [U][X] = [Y]
-     * </pre>
+     * }</pre>
      *
      * .
      *

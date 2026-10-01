@@ -720,7 +720,7 @@ abstract class SimplexSolver extends LinearSolver {
     /**
      * Reused across solves. {@link IterDescr} only captures the (stable, lifetime-fixed) {@code excluded}
      * /{@code included} arrays of the store, so a single instance can be {@code reset()} and reused every
-     * {@link #prepareToIterate(boolean)} instead of allocating one per solve — cuts per-B&amp;B-node GC
+     * {@link #prepareToIterate(boolean)} instead of allocating one per solve — cuts per-B&B-node GC
      * pressure. Lazily created on first use.
      */
     private IterDescr myIteration = null;

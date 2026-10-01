@@ -167,7 +167,6 @@ public class DesignCase extends OptimisationIntegerTests {
     }
 
     /**
-     * <p>
      * Example from a presentation by John E. Mitchell titled Gomory Cutting Planes.
      * <p>
      * Primarily tests "Expressing the cut in the original variables"

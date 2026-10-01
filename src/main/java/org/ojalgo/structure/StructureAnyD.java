@@ -305,8 +305,8 @@ public interface StructureAnyD extends Structure1D {
     }
 
     /**
-     * @param structure An access structure
-     * @return The size of an access with that structure
+     * @param shape The size of each dimension
+     * @return The total number of elements in a structure with that shape
      */
     static long count(final int... shape) {
         long retVal = 1L;

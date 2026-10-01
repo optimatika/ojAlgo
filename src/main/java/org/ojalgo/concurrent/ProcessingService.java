@@ -265,8 +265,7 @@ public final class ProcessingService {
     }
 
     /**
-     * @deprecated v54 Use {@link #reduceMergeable(Collection<W>,int,Supplier<? extends
-     *             TwoStepMapper.Mergeable<W, R>>)} instead
+     * @deprecated v54 Use {@link #reduceMergeable(Collection, int, Supplier)} instead
      */
     @Deprecated
     public <W, R> R reduce(final Collection<W> work, final int parallelism, final Supplier<? extends TwoStepMapper.Mergeable<W, R>> reducer) {
@@ -274,8 +273,7 @@ public final class ProcessingService {
     }
 
     /**
-     * @deprecated v54 Use {@link #reduceMergeable(Collection<W>,IntSupplier,Supplier<? extends
-     *             TwoStepMapper.Mergeable<W, R>>)} instead
+     * @deprecated v54 Use {@link #reduceMergeable(Collection, IntSupplier, Supplier)} instead
      */
     @Deprecated
     public <W, R> R reduce(final Collection<W> work, final IntSupplier parallelism, final Supplier<? extends TwoStepMapper.Mergeable<W, R>> reducer) {
@@ -283,8 +281,7 @@ public final class ProcessingService {
     }
 
     /**
-     * @deprecated v54 Use {@link #reduceMergeable(Collection<W>,Supplier<? extends TwoStepMapper.Mergeable<W,
-     *             R>>)} instead
+     * @deprecated v54 Use {@link #reduceMergeable(Collection, Supplier)} instead
      */
     @Deprecated
     public <W, R> R reduce(final Collection<W> work, final Supplier<? extends TwoStepMapper.Mergeable<W, R>> reducer) {

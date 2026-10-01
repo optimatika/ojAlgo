@@ -57,7 +57,6 @@ import org.ojalgo.netio.ResourceLocator.Method;
  * Make http/https calls.
  * <p>
  * Based on {@link HttpClient} and somewhat designed after how {@link ResourceLocator} works.
- * <p>
  *
  * @author apete
  */

@@ -72,12 +72,9 @@ public abstract class MissingMath {
     }
 
     /**
-     * <p>
      * https://math.stackexchange.com/questions/1098487/atan2-faster-approximation/1105038
      * <p>
-     * </p>
      * This is about 10x faster than {@link Math#atan2(double, double)}
-     * </p>
      */
     public static double atan2(final double y, final double x) {
 
@@ -161,8 +158,8 @@ public abstract class MissingMath {
     }
 
     /**
-     * <code>13!</code> does not fit in an <code>int</code>, and <code>21!</code> does not fit in a
-     * <code>long</code> - that's why this method returns a <code>double</code>.
+     * {@code 13!} does not fit in an {@code int}, and {@code 21!} does not fit in a
+     * {@code long} - that's why this method returns a {@code double}.
      */
     public static double factorial(final int arg) {
         if (arg < 0) {

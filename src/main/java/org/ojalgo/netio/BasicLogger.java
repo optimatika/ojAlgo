@@ -43,16 +43,16 @@ import org.ojalgo.type.context.NumberContext;
  * that meant we had to create something a little better than plain {@link System#out} for internal use.
  * <ul>
  * <li>If you want to redirect whatever ojAlgo outputs then set {@link BasicLogger#DEBUG} and
- * {@link BasicLogger#ERROR} to something suitable. {@linkplain BasicLogger.Printer} is an interface so it
+ * {@link BasicLogger#ERROR} to something suitable. {@linkplain BasicLogger} is an interface so it
  * should be possible to create some implementation that wraps your logging system. ojAlgo supplies 3
- * implementations of that interface.</li>
+ * implementations of that interface.
  * <li>ojAlgo typically doesn't do much logging. There's really not much to redirect. The main/only area where
  * BasicLogger is used is for debugging the various optimisation solvers. This is not intended to be "on" in
- * production.</li>
+ * production.
  * <li>The logging you need, you do in your code. ojAlgo's main contribution here is to have useful toString()
- * methods.</li>
+ * methods.
  * <li>If you want to stop any/all possible output from ojAlgo then set {@link BasicLogger#DEBUG} and
- * {@link BasicLogger#ERROR} to null.</li>
+ * {@link BasicLogger#ERROR} to null.
  * </ul>
  *
  * @author apete
@@ -438,7 +438,7 @@ public interface BasicLogger {
      * Will print 1 line/row with the objects in fixed width columns
      *
      * @param width   The exact witdth of each column
-     * @param columns The column objects, {@link #toString()} and then fix the length/width
+     * @param columns The column objects, {@link Object#toString()} and then fix the length/width
      */
     default void columns(final int width, final Object... columns) {
 

@@ -129,7 +129,7 @@ public interface Optimisation {
         /**
          * Corresponds to setting both {@link ModelEntity#lower(Comparable)} and
          * {@link ModelEntity#upper(Comparable)}, but to different values, and/or checking
-         * {@link Constraint#isRangeConstraint()}.
+         * {@link Constraint#getConstraintType()}.
          */
         RANGE,
         /**
@@ -570,9 +570,9 @@ public interface Optimisation {
         /**
          * Controls sparse/iterative vs dense/direct solver selection:
          * <ul>
-         * <li>{@code TRUE} — sparse linear solver and iterative convex solver</li>
-         * <li>{@code FALSE} — dense linear solver and direct convex solver</li>
-         * <li>{@code null} (default) — ojAlgo chooses automatically</li>
+         * <li>{@code TRUE} — sparse linear solver and iterative convex solver
+         * <li>{@code FALSE} — dense linear solver and direct convex solver
+         * <li>{@code null} (default) — ojAlgo chooses automatically
          * </ul>
          */
         public Boolean sparse = null;
@@ -610,7 +610,7 @@ public interface Optimisation {
 
         /**
          * Set the {@link #time_abort} to the given duration. A duration may be constructed this way:
-         * <code>CalendarDateUnit.HOUR.newDuration(0.5)</code>.
+         * {@code CalendarDateUnit.HOUR.newDuration(0.5)}.
          */
         public Options abort(final CalendarDateDuration duration) {
             ProgrammingError.throwIfNull(duration);
@@ -676,7 +676,7 @@ public interface Optimisation {
          * {@linkplain IntegerSolver} and may also be forwarded to external/3rd-party solvers that support
          * thread configuration. The default is {@linkplain Parallelism#CORES}.
          *
-         * @see #setParallelism(ParallelismSupplier)
+         * @see #parallelism(IntSupplier)
          */
         public int getParallelism() {
             return myParallelism;
@@ -731,7 +731,7 @@ public interface Optimisation {
 
         /**
          * Set the {@link #time_suffice} to the given duration. A duration may be constructed this way:
-         * <code>CalendarDateUnit.HOUR.newDuration(0.5)</code>.
+         * {@code CalendarDateUnit.HOUR.newDuration(0.5)}.
          */
         public Options suffice(final CalendarDateDuration duration) {
             ProgrammingError.throwIfNull(duration);
@@ -1128,14 +1128,11 @@ public interface Optimisation {
     }
 
     /**
-     * <p>
      * An {@linkplain Optimisation.Solver} instance implements a specific optimisation algorithm. Typically
      * each algorithm solves problems of (at least) one problem category. {@linkplain Optimisation.Model}
      * represents a problem category.
-     * </p>
      * <p>
      * A solver internally works with primitive double.
-     * </p>
      *
      * @author apete
      */
@@ -1203,7 +1200,7 @@ public interface Optimisation {
          * other optimisation tools interpret "unbounded".
          * <p>
          * If a feasible solution has not been found, the correct state indicator to use is
-         * {@link #INFEASIBLE} or possibly {@link #INVALID}, {@link} #FAILED} or {@link #APPROXIMATE}.
+         * {@link #INFEASIBLE} or possibly {@link #INVALID}, {@link #FAILED} or {@link #APPROXIMATE}.
          * <p>
          * If a problem is concluded to be unbounded but a feasible solution has been found, it may still be
          * preferable to us {@link #FEASIBLE} rather than {@link #UNBOUNDED}.

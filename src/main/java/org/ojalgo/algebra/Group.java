@@ -22,21 +22,18 @@
 package org.ojalgo.algebra;
 
 /**
- * <p>
  * A group is a set of elements paired with a binary operation. Four conditions called the group axioms must
  * be satisfied:
- * </p>
  * <ul>
- * <li>Closure: If A and B are both members of the set then the result of A op B is also a member.</li>
- * <li>Associativity: Invocation/execution order doesn't matter - ((A op B) op C) == (A op (B op C))</li>
- * <li>The identity property: There is an identity element in the set, I, so that I op A == A op I == A</li>
+ * <li>Closure: If A and B are both members of the set then the result of A op B is also a member.
+ * <li>Associativity: Invocation/execution order doesn't matter - ((A op B) op C) == (A op (B op C))
+ * <li>The identity property: There is an identity element in the set, I, so that I op A == A op I == A
  * <li>The inverse property: For each element in the set there must be an inverse element (opposite or
- * reciprocal) so that A<sup>-1</sup> op A == A op A<sup>-1</sup> == I</li>
+ * reciprocal) so that A<sup>-1</sup> op A == A op A<sup>-1</sup> == I
  * </ul>
  * <p>
  * Note that commutativity is not a requirement - A op B doesn't always have to be equal to B op A. If the
  * operation is commutative then the group is called an abelian group or simply a commutative group.
- * </p>
  *
  * @author apete
  * @see <a href="https://en.wikipedia.org/wiki/Group_(mathematics)">Group</a>
@@ -51,7 +48,7 @@ public interface Group {
         /**
          * The additive inverse of this.
          *
-         * @return <code>-this</code>.
+         * @return {@code -this}.
          */
         T negate();
 
@@ -65,7 +62,7 @@ public interface Group {
         /**
          * The multiplicative inverse.
          *
-         * @return <code>IDENTITY / this</code>.
+         * @return {@code IDENTITY / this}.
          */
         T invert();
 

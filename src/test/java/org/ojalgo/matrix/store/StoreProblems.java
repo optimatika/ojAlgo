@@ -109,8 +109,8 @@ public class StoreProblems extends MatrixStoreTests {
     }
 
     /**
-     * https://github.com/optimatika/ojAlgo/issues/252 <br>
-     * <br>
+     * https://github.com/optimatika/ojAlgo/issues/252
+     * <p>
      * Test that the multiplication logic works when there are more elements that an int can count.
      */
     @Test

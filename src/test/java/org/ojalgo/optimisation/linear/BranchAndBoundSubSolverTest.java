@@ -292,14 +292,14 @@ public class BranchAndBoundSubSolverTest extends OptimisationLinearTests {
      * {@link LinearSolver#getReducedGradient} and {@link LinearSolver#getDualMultiplier} after each node, and
      * {@link LinearSolver#updateRange} to tighten bounds in-place.
      *
-     * <pre>
+     * <pre>{@code
      * min  -2*x0 - 3*x1 + x2 - 5*x3
      * s.t. 2*x0 + 3*x1 +  x2 + 2*x3 = 17    (equality)
      *      3*x0 +  x1        + 2*x3 <= 9      (inequality 0)
      *       x0       + 2*x2 + 3*x3 <= 8       (inequality 1)
      *      0 <= x0 <= 4,  1 <= x1 <= 5,  0 <= x2 <= 3,  0 <= x3 <= 3
      *      all integer (relaxed to continuous)
-     * </pre>
+     * }</pre>
      */
     @Test
     public void testLowLevelSolver() {

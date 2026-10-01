@@ -195,7 +195,7 @@ public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, 
     }
 
     /**
-     * To allow syntax like <code>array.modifyAll(DIVIDE.by(3.0));</code>
+     * To allow syntax like {@code array.modifyAll(DIVIDE.by(3.0));}
      *
      * @see #second(double)
      */
@@ -204,7 +204,7 @@ public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, 
     }
 
     /**
-     * To allow syntax like <code>array.modifyAll(DIVIDE.by(3.0));</code>
+     * To allow syntax like {@code array.modifyAll(DIVIDE.by(3.0));}
      *
      * @see #second(double)
      */

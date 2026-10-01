@@ -44,7 +44,6 @@ import org.ojalgo.structure.StructureAnyD;
 import org.ojalgo.type.math.MathType;
 
 /**
- * <p>
  * A BasicArray is 1-dimensional, but designed to easily be extended or encapsulated, and then treated as
  * arbitrary-dimensional. It stores/handles (any subclass of) {@linkplain java.lang.Comparable} elements
  * depending on the subclass/implementation.

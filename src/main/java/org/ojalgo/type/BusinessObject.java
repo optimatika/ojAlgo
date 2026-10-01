@@ -31,13 +31,13 @@ import java.util.Set;
  * <li>Each/every business object interface should extends this {@link BusinessObject} interface (and
  * preferably nothing else). Don't build hierarchies among the business object interfaces. If some interfaces
  * have common properties they can/should extend some common package-private (not public) interface that does
- * not exted BusinessObject.</li>
+ * not exted BusinessObject.
  * <li>Every interface should have an inner abstract static class named Logic. These classes contain static
  * business logic methods defined in terms of the interfaces. Those methods are the real reason the business
  * object interfaces exist. Do NOT add anything to the interfaces that is not required by any of the business
- * logic methods!</li>
+ * logic methods!
  * <li>Try to avoid defining relationships to other BusinessObject in the interfaces, particularly to-many
- * relationships. Prefer having the logic methods take collections as input parameters.</li>
+ * relationships. Prefer having the logic methods take collections as input parameters.
  * </ul>
  *
  * @author apete

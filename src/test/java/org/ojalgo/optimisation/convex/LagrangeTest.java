@@ -129,7 +129,7 @@ public class LagrangeTest extends OptimisationConvexTests {
      * With quadratic terms in z the objective's gradient with respect to z, at the solution, takes the place
      * of its linear coefficient.
      *
-     * <pre>
+     * <pre>{@code
      * min  (x^2 + y^2) / 2 + 3z             s.t. x + y + z >= 2.5    x=y=1, lambda=1, rc_z = 3 - lambda = 2
      * min  (x^2 + y^2) / 2 - 3x - 3y + 3z   s.t. x + y + z <= 2.5    x=y=1, lambda=2, rc_z = 3 + lambda = 5
      * max  -(x^2 + y^2) / 2 + 3z            s.t. x + y + z = 2.5     x=y=1, lambda=-1, rc_z = -(-3 + lambda) = 4
@@ -137,7 +137,7 @@ public class LagrangeTest extends OptimisationConvexTests {
      *      x=0.75, y=1.25, lambda=1.25, rc_z = (z + x + 3) - lambda = 3
      * max  -(f - 3x - 3y)                                           s.t. x + y + z <= 2.5
      *      x=0.75, y=1.25, lambda=1.75, rc_z = -((z + x + 3) + lambda) = -6
-     * </pre>
+     * }</pre>
      */
     @Test
     public void testFixedInConstraint() {
@@ -259,11 +259,11 @@ public class LagrangeTest extends OptimisationConvexTests {
      * Copy of {@link ConvexProblems#testP20200924()} and then modified...
      * <p>
      * Nocedal & Wright give the multipliers [3, -2] (because they defined KKT that way) but ojAlgo returns
-     * [-3, 2] <br>
+     * [-3, 2].
+     * <p>
      * Test for https://github.com/optimatika/ojAlgo/issues/280.
      * <p>
      * 2020-09-24: No multipliers was returned by org.ojalgo.optimisation.convex classes :
-     * </p>
      * Test from 'Numerical Optimization', 2ed, (2006), Jorge Nocedal and Stephen J. Wright. QP Example 16.2
      * p453 minimize function F(x1,x2,x3) = 3*x1*x1 + 2*x1*x2 + x1*x3 + 2.5*x2*x2 + 2*x2*x3 + 2*x3*x3 - 8*x1 -
      * 3*x2 - 3*x3 constraints x1 + x3 = 3, x2 + x3 = 0 result: x = [2, -1, 1]' multipliers = [3, -2]'

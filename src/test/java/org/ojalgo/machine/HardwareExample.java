@@ -309,14 +309,14 @@ class HardwareExample extends MachineTests {
             new BasicMachine(8L * K * K, 8), new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
 
     /**
-     * <pre>
+     * <pre>{@code
      * "Gulftown" (32 nm) Model: SLBUZ (B1)
      * Intel Core i7-980 3.33GHz
      * 8/25/2010
      * ref: http://ark.intel.com/products/47932
      *      https://en.wikipedia.org/wiki/List_of_Intel_Core_i7_microprocessors
      *      Device Manager
-     * </pre>
+     * }</pre>
      *
      * Intel Core i7-980
      * <ul>

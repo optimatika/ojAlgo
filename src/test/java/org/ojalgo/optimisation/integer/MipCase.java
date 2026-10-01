@@ -59,7 +59,7 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
      * https://miplib.zib.de/instance_details_ej.html
      * <ul>
      * Mac Pro (Early 2009)
-     * <li>2019-01-28: 900s terminated without finding any feasible solution</li>
+     * <li>2019-01-28: 900s terminated without finding any feasible solution
      * </ul>
      * MacBook Pro (16-inch, 2019)
      * <ul>
@@ -76,7 +76,7 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
      * https://miplib.zib.de/instance_details_gen-ip002.html
      * <ul>
      * Mac Pro (Early 2009)
-     * <li>2019-01-28: 300s expected: <-4783.733392> but was: <-4778.1844607></li>
+     * <li>2019-01-28: 300s expected: <-4783.733392> but was: <-4778.1844607>
      * </ul>
      * MacBook Pro (16-inch, 2019)
      * <ul>
@@ -93,7 +93,7 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
      * https://miplib.zib.de/instance_details_gen-ip021.html
      * <ul>
      * Mac Pro (Early 2009)
-     * <li>2019-01-28: 300s expected: <2361.45419519> but was: <2362.7631500641996></li>
+     * <li>2019-01-28: 300s expected: <2361.45419519> but was: <2362.7631500641996>
      * </ul>
      * MacBook Pro (16-inch, 2019)
      * <ul>
@@ -112,7 +112,7 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
      * https://miplib.zib.de/instance_details_gen-ip036.html
      * <ul>
      * Mac Pro (Early 2009)
-     * <li>2019-01-28: 300s expected: <-4606.67961> but was: <-4602.60643892></li>
+     * <li>2019-01-28: 300s expected: <-4606.67961> but was: <-4602.60643892>
      * </ul>
      * MacBook Pro (16-inch, 2019)
      * <ul>
@@ -131,7 +131,7 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
      * https://miplib.zib.de/instance_details_gen-ip054.html
      * <ul>
      * Mac Pro (Early 2009)
-     * <li>2019-01-28: 300s expected: <6840.966> but was: <6852.1883509></li>
+     * <li>2019-01-28: 300s expected: <6840.966> but was: <6852.1883509>
      * </ul>
      * MacBook Pro (16-inch, 2019)
      * <ul>
@@ -155,12 +155,12 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
      * https://miplib.zib.de/instance_details_markshare_5_0.html
      * <ul>
      * Mac Pro (Early 2009)
-     * <li>2013-04-01: (suffice=4h abort=8h) Stopped with optimal solution after 4h</li>
+     * <li>2013-04-01: (suffice=4h abort=8h) Stopped with optimal solution after 4h
      * <li>2018-01-08: (suffice=5min abort=1h) Stopped with integer solution 2.0 rather than 1.0 after
-     * 5min</li>
-     * <li>2018-02-07: (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with optimal solution</li>
-     * <li>2018-08-16: sufficed with optimal solution</li>
-     * <li>2019-01-28: 300s expected: <1.0> but was: <1.9999999999999953></li>
+     * 5min
+     * <li>2018-02-07: (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with optimal solution
+     * <li>2018-08-16: sufficed with optimal solution
+     * <li>2019-01-28: 300s expected: <1.0> but was: <1.9999999999999953>
      * </ul>
      * MacBook Pro (16-inch, 2019)
      * <ul>
@@ -178,13 +178,13 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
      * <ul>
      * Mac Pro (Early 2009)
      * <li>2013-04-01: (suffice=4h abort=8h) Stopped with integer solution 6.0 rather than 1.0 after 4h
-     * expected:<1.0> but was:<5.999999999999929></li>
+     * expected:<1.0> but was:<5.999999999999929>
      * <li>2018-01-08: (suffice=5min abort=1h) Stopped with integer solution 5.0 rather than 1.0 after
-     * 5min</li>
+     * 5min
      * <li>2018-02-07: (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<1.0> but
-     * was:<5.0></li>
-     * <li>2018-08-16: sufficed: <1.0> but was: <8.0></li>
-     * <li>2019-01-28: 300s expected: <1.0> but was: <6.000000000000018></li>
+     * was:<5.0>
+     * <li>2018-08-16: sufficed: <1.0> but was: <8.0>
+     * <li>2019-01-28: 300s expected: <1.0> but was: <6.000000000000018>
      * </ul>
      * MacBook Pro (16-inch, 2019)
      * <ul>
@@ -200,13 +200,13 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
     /**
      * <ul>
      * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with integer solution 14.0 rather than 1.0
-     * solution after 4h expected:<1.0> but was:<14.000000000000192></li>
+     * solution after 4h expected:<1.0> but was:<14.000000000000192>
      * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped with integer solution 19.0 rather than 1.0 after
-     * 5min</li>
+     * 5min
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<1.0> but
-     * was:<19.00000000000008></li>
-     * <li>2018-08-16: MacPro sufficed: <1.0> but was: <14.0></li>
-     * <li>2019-01-28: MacPro sufficed 300s - expected: <1.0> but was: <16.00000000000005></li>
+     * was:<19.00000000000008>
+     * <li>2018-08-16: MacPro sufficed: <1.0> but was: <14.0>
+     * <li>2019-01-28: MacPro sufficed 300s - expected: <1.0> but was: <16.00000000000005>
      * </ul>
      * MacBook Pro (16-inch, 2019)
      * <ul>
@@ -223,17 +223,17 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
 
     /**
      * <ul>
-     * <li>2012-11-30: Solved to optimality 40005.05414200003. Don't now how fast, but within 3 hours.</li>
+     * <li>2012-11-30: Solved to optimality 40005.05414200003. Don't now how fast, but within 3 hours.
      * <li>2013-03-28: (MacPro) Had a time limit of 1h and that resulted in 40116.054142000015 rather than
-     * 40005.0541</li>
-     * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 4h</li>
-     * <li>2013-12-10: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 29min</li>
-     * <li>2015-08-28: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 97min</li>
-     * <li>2015-11-07: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 107min</li>
-     * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped with optimal integer solution after 5min</li>
-     * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with optimal solution</li>
-     * <li>2018-08-16: MacPro sufficed with optimal solution</li>
-     * <li>2019-01-28: MacPro sufficed with optimal solution after 300s</li>
+     * 40005.0541
+     * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 4h
+     * <li>2013-12-10: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 29min
+     * <li>2015-08-28: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 97min
+     * <li>2015-11-07: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 107min
+     * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped with optimal integer solution after 5min
+     * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with optimal solution
+     * <li>2018-08-16: MacPro sufficed with optimal solution
+     * <li>2019-01-28: MacPro sufficed with optimal solution after 300s
      * </ul>
      * MacBook Pro (16-inch, 2019)
      * <ul>
@@ -253,13 +253,13 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
     /**
      * <ul>
      * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped after 4h expected:<2.07405081E7> but was:
-     * <2.2769621121583242E7></li>
+     * <2.2769621121583242E7>
      * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped with integer solution 2.626301334355273E7 rather
-     * than 2.07405081E7 after 5min</li>
+     * than 2.07405081E7 after 5min
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<2.07405081E7>
-     * but was:<2.45509922222574E7></li>
-     * <li>2018-08-16: MacPro sufficed: <2.07405081E7> but was: <2.4337382015089516E7></li>
-     * <li>2019-01-28: MacPro sufficed 300s - expected: <2.07405081E7> but was: <2.4548449266857613E7></li>
+     * but was:<2.45509922222574E7>
+     * <li>2018-08-16: MacPro sufficed: <2.07405081E7> but was: <2.4337382015089516E7>
+     * <li>2019-01-28: MacPro sufficed 300s - expected: <2.07405081E7> but was: <2.4548449266857613E7>
      * </ul>
      * MacBook Pro (16-inch, 2019)
      * <ul>
@@ -279,10 +279,9 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
     /**
      * <ul>
      * <li>2015-02-08: MacPro (suffice=4h abort=8h) Stopped after 4.75h: expected:<54.76> but was:<220.69>
-     * </li>
-     * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Aborted with no integer solution</li>
-     * <li>2018-08-16: MacPro aborted with no integer solution</li>
-     * <li>2019-01-28: MacPro aborted with no integer solution 900s</li>
+     * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Aborted with no integer solution
+     * <li>2018-08-16: MacPro aborted with no integer solution
+     * <li>2019-01-28: MacPro aborted with no integer solution 900s
      * </ul>
      * MacBook Pro (16-inch, 2019)
      * <ul>
@@ -302,12 +301,12 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
     /**
      * https://github.com/optimatika/ojAlgo/issues/120
      * <ul>
-     * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 4h</li>
-     * <li>2013-11-29: MacPro (suffice=4h abort=8h) Stopped after 4h: expected:<-41.0> but was:<-40.0></li>
-     * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped with optimal integer solution after 5min</li>
-     * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with optimal solution</li>
-     * <li>2018-08-16: MacPro sufficed with optimal solution</li>
-     * <li>2019-01-28: MacPro sufficed 300s - expected: <-41.0> but was: <-40.0></li>
+     * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 4h
+     * <li>2013-11-29: MacPro (suffice=4h abort=8h) Stopped after 4h: expected:<-41.0> but was:<-40.0>
+     * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped with optimal integer solution after 5min
+     * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with optimal solution
+     * <li>2018-08-16: MacPro sufficed with optimal solution
+     * <li>2019-01-28: MacPro sufficed 300s - expected: <-41.0> but was: <-40.0>
      * </ul>
      * MacBook Pro (16-inch, 2019)
      * <ul>
@@ -326,12 +325,12 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
 
     /**
      * <ul>
-     * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped after 4h expected:<7350.0> but was:<9180.0></li>
-     * <li>2013-11-30: MacPro (suffice=4h abort=8h) Stopped after 4h expected:<7350.0> but was:<8020.0></li>
+     * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped after 4h expected:<7350.0> but was:<9180.0>
+     * <li>2013-11-30: MacPro (suffice=4h abort=8h) Stopped after 4h expected:<7350.0> but was:<8020.0>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<7350.0> but
-     * was:<7580.0></li>
-     * <li>2018-08-16: MacPro sufficed: <7350.0> but was: <7490.0></li>
-     * <li>2019-01-28: MacPro sufficed 300s: expected: <7350.0> but was: <7490.0></li>
+     * was:<7580.0>
+     * <li>2018-08-16: MacPro sufficed: <7350.0> but was: <7490.0>
+     * <li>2019-01-28: MacPro sufficed 300s: expected: <7350.0> but was: <7490.0>
      * </ul>
      * MacBook Pro (16-inch, 2019)
      * <ul>
@@ -350,11 +349,11 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
 
     /**
      * <ul>
-     * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped after 4h expected:<7350.0> but was:<8080.0></li>
+     * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped after 4h expected:<7350.0> but was:<8080.0>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<7350.0> but
-     * was:<7500.0></li>
-     * <li>2018-08-16: MacPro sufficed: <7350.0> but was: <7580.0></li>
-     * <li>2019-01-28: MacPro sufficed 300s: expected: <7350.0> but was: <7550.000000000001></li>
+     * was:<7500.0>
+     * <li>2018-08-16: MacPro sufficed: <7350.0> but was: <7580.0>
+     * <li>2019-01-28: MacPro sufficed 300s: expected: <7350.0> but was: <7550.000000000001>
      * </ul>
      * MacBook Pro (16-inch, 2019)
      * <ul>
@@ -374,10 +373,10 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
     /**
      * <ul>
      * <li>2013-11-24: MacPro (suffice=4h abort=8h) Stopped after 4h expected:<764772.0> but was:
-     * <1012900.999999></li>
-     * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Aborted with no integer solution</li>
-     * <li>2018-08-16: MacPro sufficed: <764772.0> but was: <1256281.99999962></li>
-     * <li>2019-01-28: MacPro sufficed 300s: expected: <764772.0> but was: <1256281.99999962></li>
+     * <1012900.999999>
+     * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Aborted with no integer solution
+     * <li>2018-08-16: MacPro sufficed: <764772.0> but was: <1256281.99999962>
+     * <li>2019-01-28: MacPro sufficed 300s: expected: <764772.0> but was: <1256281.99999962>
      * </ul>
      * MacBook Pro (16-inch, 2019)
      * <ul>
@@ -396,13 +395,13 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
 
     /**
      * <ul>
-     * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped after 4h expected:<13.75> but was:<20.25></li>
-     * <li>2013-11-24: MacPro (suffice=4h abort=8h) Stopped after 4h expected:<13.75> but was:<16.5></li>
-     * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped after 5min expected:<13.75> but was:<16.25></li>
+     * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped after 4h expected:<13.75> but was:<20.25>
+     * <li>2013-11-24: MacPro (suffice=4h abort=8h) Stopped after 4h expected:<13.75> but was:<16.5>
+     * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped after 5min expected:<13.75> but was:<16.25>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<13.75> but
-     * was:<16.0></li>
-     * <li>2018-08-16: MacPro sufficed: <13.75> but was: <16.5></li>
-     * <li>2019-01-28: MacPro sufficed 300s: <13.75> but was: <16.5></li>
+     * was:<16.0>
+     * <li>2018-08-16: MacPro sufficed: <13.75> but was: <16.5>
+     * <li>2019-01-28: MacPro sufficed 300s: <13.75> but was: <16.5>
      * </ul>
      * MacBook Pro (16-inch, 2019)
      * <ul>

@@ -49,22 +49,19 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * [A] = [V][D][V]<sup>-1</sup> ([A][V] = [V][D])
  * <ul>
- * <li>[A] = any square matrix.</li>
- * <li>[V] = contains the eigenvectors as columns.</li>
- * <li>[D] = a diagonal matrix with the eigenvalues on the diagonal (possibly in blocks).</li>
+ * <li>[A] = any square matrix.
+ * <li>[V] = contains the eigenvectors as columns.
+ * <li>[D] = a diagonal matrix with the eigenvalues on the diagonal (possibly in blocks).
  * </ul>
  * <p>
  * [A] is normal if [A][A]<sup>H</sup> = [A]<sup>H</sup>[A], and [A] is normal if and only if there exists a
  * unitary matrix [Q] such that [A] = [Q][D][Q]<sup>H</sup>. Hermitian matrices are normal.
- * </p>
  * <p>
  * [V] and [D] can always be calculated in the sense that they will satisfy [A][V] = [V][D], but it is not
  * always possible to calculate [V]<sup>-1</sup>. (Check the rank and/or the condition number of [V] to
  * determine the validity of [V][D][V]<sup>-1</sup>.)
- * </p>
  * <p>
  * The eigenvalues (and their corresponding eigenvectors) of a non-symmetric matrix could be complex.
- * </p>
  *
  * @author apete
  */
@@ -466,10 +463,10 @@ public interface Eigenvalue<N extends Comparable<N>>
      * The only requirements on [D] are that it should contain the eigenvalues and that [A][V] = [V][D]. The
      * ordering of the eigenvalues is not specified.
      * <ul>
-     * <li>If [A] is real and symmetric then [D] is (purely) diagonal with real eigenvalues.</li>
+     * <li>If [A] is real and symmetric then [D] is (purely) diagonal with real eigenvalues.
      * <li>If [A] is real but not symmetric then [D] is block-diagonal with real eigenvalues in 1-by-1 blocks
-     * and complex eigenvalues in 2-by-2 blocks.</li>
-     * <li>If [A] is complex then [D] is (purely) diagonal with complex eigenvalues.</li>
+     * and complex eigenvalues in 2-by-2 blocks.
+     * <li>If [A] is complex then [D] is (purely) diagonal with complex eigenvalues.
      * </ul>
      *
      * @return The (block) diagonal eigenvalue matrix.
@@ -541,14 +538,11 @@ public interface Eigenvalue<N extends Comparable<N>>
     // }
 
     /**
-     * <p>
      * Even for real matrices the eigenvalues (and eigenvectors) are potentially complex numbers. Typically
      * they need to be expressed as complex numbers when [A] is not symmetric.
-     * </p>
      * <p>
      * The values should be in the same order as the matrices "V" and "D", and if they are ordered or not is
      * indicated by the {@link #isOrdered()} method.
-     * </p>
      *
      * @return The eigenvalues.
      */

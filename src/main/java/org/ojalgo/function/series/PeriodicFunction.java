@@ -41,30 +41,34 @@ public final class PeriodicFunction implements PrimitiveFunction.Unary {
 
     /**
      * https://en.wikipedia.org/wiki/Sawtooth_wave
-     * <p>
-     * Domain: (-∞, ∞) by repeating/shifting the definition interval [0, 2π).<br>
-     * Range: [-1, 1].
+     * <ul>
+     * <li>Domain: (-∞, ∞) by repeating/shifting the definition interval [0, 2π).
+     * <li>Range: [-1, 1].
+     * </ul>
      */
     public static final PeriodicFunction SAWTOOTH = PeriodicFunction.of(arg -> Math.atan(Math.tan(arg / TWO)) / HALF_PI);
     /**
      * https://en.wikipedia.org/wiki/Sine_wave
-     * <p>
-     * Domain: (-∞, ∞) by repeating/shifting the definition interval [0, 2π).<br>
-     * Range: [-1, 1].
+     * <ul>
+     * <li>Domain: (-∞, ∞) by repeating/shifting the definition interval [0, 2π).
+     * <li>Range: [-1, 1].
+     * </ul>
      */
     public static final PeriodicFunction SINE = PeriodicFunction.of(SIN);
     /**
      * https://en.wikipedia.org/wiki/Square_wave
-     * <p>
-     * Domain: (-∞, ∞) by repeating/shifting the definition interval [0, 2π).<br>
-     * Range: [-1, 1].
+     * <ul>
+     * <li>Domain: (-∞, ∞) by repeating/shifting the definition interval [0, 2π).
+     * <li>Range: [-1, 1].
+     * </ul>
      */
     public static final PeriodicFunction SQUARE = PeriodicFunction.of(arg -> Math.signum(Math.sin(arg)));
     /**
      * https://en.wikipedia.org/wiki/Triangle_wave
-     * <p>
-     * Domain: (-∞, ∞) by repeating/shifting the definition interval [0, 2π).<br>
-     * Range: [-1, 1].
+     * <ul>
+     * <li>Domain: (-∞, ∞) by repeating/shifting the definition interval [0, 2π).
+     * <li>Range: [-1, 1].
+     * </ul>
      */
     public static final PeriodicFunction TRIANGLE = PeriodicFunction.of(arg -> Math.asin(Math.sin(arg)) / HALF_PI);
 

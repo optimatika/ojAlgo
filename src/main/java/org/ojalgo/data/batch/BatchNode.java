@@ -51,7 +51,7 @@ import org.ojalgo.type.management.Throughput;
  * Data is stored in sharded files, and data is written/consumed and processed concurrently.
  * <p>
  * The data is processed in batches. Each batch is processed in a single thread. The number of threads is
- * controlled by {@link #parallelism(IntSupplier)}.
+ * controlled by {@link Builder#parallelism(IntSupplier)}.
  */
 public final class BatchNode<T> {
 
@@ -294,7 +294,7 @@ public final class BatchNode<T> {
     /**
      * Similar to {@link #processMergeable(Supplier, Consumer)} but the {@code processor} is called with the
      * aggregator instance itself rather than its extracted results. This corresponds to
-     * {@link TwoStepMapper#Combineable} rather than {@link TwoStepMapper#Mergeable}.
+     * {@link TwoStepMapper.Combineable} rather than {@link TwoStepMapper.Mergeable}.
      *
      * @see #processMergeable(Supplier, Consumer)
      */
@@ -319,8 +319,7 @@ public final class BatchNode<T> {
      * @param aggregatorFactory Produces the {@link TwoStepMapper} mapping instances
      * @param processor         Consumes the mapped/derived data - the results of one whole
      *                          {@link TwoStepMapper} instance at the time
-     * @deprecated v54 Use {@link #processMergeable(Supplier<? extends TwoStepMapper<T, H>>,Consumer<H>)}
-     *             instead
+     * @deprecated v54 Use {@link #processMergeable(Supplier, Consumer)} instead
      */
     @Deprecated
     public <R> void processMapped(final Supplier<? extends TwoStepMapper<T, R>> aggregatorFactory, final Consumer<R> processor) {
@@ -351,7 +350,7 @@ public final class BatchNode<T> {
 
     /**
      * Calls {@link #processCombineable(Supplier, Consumer)} with the
-     * {@link TwoStepMapper.Combineable#merge(Object)} method of a global {@link TwoStepMapper.Combineable}
+     * {@link TwoStepMapper.Combineable#combine(TwoStepMapper.Combineable)} method of a global {@link TwoStepMapper.Combineable}
      * instance as the {@code consumer}.
      */
     public <R, A extends TwoStepMapper.Combineable<T, R, A>> R reduceByCombining(final Supplier<A> aggregatorFactory) {
@@ -379,14 +378,14 @@ public final class BatchNode<T> {
 
     /**
      * Same as {@link #processMergeable(Supplier, Consumer)}, but then also reduce/merge the total results
-     * using {@link TwoStepMapper#merge(Object)}.
+     * using {@link TwoStepMapper.Mergeable#merge(Object)}.
      * <P>
      * Create a class that implements {@link TwoStepMapper} and make sure to also implement
-     * {@link TwoStepMapper#merge(Object)} - you can only use this if merging partial (sub)results is
+     * {@link TwoStepMapper.Mergeable#merge(Object)} - you can only use this if merging partial (sub)results is
      * possible. Use a constructor or factory method that produce instances of that type as the argument to
      * this method.
      *
-     * @deprecated v54 Use {@link #reduceByMerging(Supplier<A>)} instead
+     * @deprecated v54 Use {@link #reduceByMerging(Supplier)} instead
      */
     @Deprecated
     public <R, A extends TwoStepMapper.Mergeable<T, R>> R reduceMapped(final Supplier<A> aggregatorFactory) {

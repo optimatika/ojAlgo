@@ -34,7 +34,7 @@ public class ReductionTest {
 
     /**
      * https://stackoverflow.com/questions/49682219/how-to-get-average-of-elements-along-columns-or-rows-in-an-ojalgo-matrix
-     * <br>
+     * <p>
      * https://github.com/optimatika/ojAlgo/issues/91#issuecomment-379399975
      */
     @Test

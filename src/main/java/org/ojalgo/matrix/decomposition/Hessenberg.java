@@ -34,8 +34,8 @@ import org.ojalgo.type.context.NumberContext;
  * Hessenberg: [A] = [Q][H][Q]<sup>T</sup> A general square matrix [A] can be decomposed by orthogonal
  * similarity transformations into the form [A]=[Q][H][Q]<sup>T</sup> where
  * <ul>
- * <li>[H] is upper (or lower) hessenberg matrix</li>
- * <li>[Q] is orthogonal/unitary</li>
+ * <li>[H] is upper (or lower) hessenberg matrix
+ * <li>[Q] is orthogonal/unitary
  * </ul>
  *
  * @author apete

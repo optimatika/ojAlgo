@@ -22,16 +22,13 @@
 package org.ojalgo.algebra;
 
 /**
- * <p>
  * A field is a commutative ring (even the multiplication operation) with notions of addition, subtraction,
  * multiplication, and division. Any field may be used as the scalars for a vector space, which is the
  * standard general context for linear algebra.
- * </p>
  * <p>
  * A division ring is a ring in which division is possible. Division rings differ from fields only in that
  * their multiplication is not required to be commutative. In terms of a Java interface/class there is no need
  * to differentiate between a field and a division ring.
- * </p>
  *
  * @author apete
  * @see <a href="https://en.wikipedia.org/wiki/Field_(mathematics)">Field</a>

@@ -44,13 +44,10 @@ import org.ojalgo.tensor.TensorFactory1D;
 import org.ojalgo.tensor.TensorFactory2D;
 
 /**
- * <p>
  * PhysicalStore:s, as opposed to MatrixStore:s, are mutable. The vast majority of the methods defined here
  * return void and none return {@linkplain PhysicalStore} or {@linkplain MatrixStore}.
- * </p>
  * <p>
  * This interface and its implementations are central to ojAlgo.
- * </p>
  *
  * @author apete
  */
@@ -231,8 +228,8 @@ public interface PhysicalStore<N extends Comparable<N>>
      * Will solve the equation system [A][X]=[B] where:
      * <ul>
      * <li>[body][this]=[this] is [A][X]=[B] ("this" is the right hand side, and it will be overwritten with
-     * the solution).</li>
-     * <li>[A] is upper/right triangular</li>
+     * the solution).
+     * <li>[A] is upper/right triangular
      * </ul>
      *
      * @see SubstituteBackwards#invoke(double[], int, int, int, Access2D, boolean, boolean, boolean)
@@ -245,8 +242,8 @@ public interface PhysicalStore<N extends Comparable<N>>
      * Will solve the equation system [A][X]=[B] where:
      * <ul>
      * <li>[body][this]=[this] is [A][X]=[B] ("this" is the right hand side, and it will be overwritten with
-     * the solution).</li>
-     * <li>[A] is lower/left triangular</li>
+     * the solution).
+     * <li>[A] is lower/left triangular
      * </ul>
      *
      * @see SubstituteForwards#invoke(double[], int, int, int, Access2D, boolean, boolean, boolean)
@@ -265,17 +262,13 @@ public interface PhysicalStore<N extends Comparable<N>>
     void transformLeft(Householder<N> transformation, int firstColumn);
 
     /**
-     * <p>
      * As in {@link MatrixStore#premultiply(Access1D)} where the left/parameter matrix is a plane rotation.
-     * </p>
      * <p>
      * Multiplying by a plane rotation from the left means that [this] gets two of its rows updated to new
      * combinations of those two (current) rows.
-     * </p>
      * <p>
      * There are two ways to transpose/invert a rotation. Either you negate the angle or you interchange the
      * two indeces that define the rotation plane.
-     * </p>
      *
      * @see #transformRight(Rotation)
      */
@@ -284,17 +277,13 @@ public interface PhysicalStore<N extends Comparable<N>>
     void transformRight(Householder<N> transformation, int firstRow);
 
     /**
-     * <p>
      * As in {@link MatrixStore#multiply(MatrixStore)} where the right/parameter matrix is a plane rotation.
-     * </p>
      * <p>
      * Multiplying by a plane rotation from the right means that [this] gets two of its columns updated to new
      * combinations of those two (current) columns.
-     * </p>
      * <p>
      * There result is undefined if the two input indeces are the same (in which case the rotation plane is
      * undefined).
-     * </p>
      *
      * @see #transformLeft(Rotation)
      */

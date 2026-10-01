@@ -36,11 +36,11 @@ import org.ojalgo.netio.BasicLogger;
  * <p>
  * Use it in a try-with-resources block around the blocking call:
  *
- * <pre>
+ * <pre>{@code
  * try (InterruptForwarder fwd = InterruptForwarder.watch(solver::stop)) {
  *     solver.solve();
  * }
- * </pre>
+ * }</pre>
  */
 public final class InterruptForwarder implements AutoCloseable {
 

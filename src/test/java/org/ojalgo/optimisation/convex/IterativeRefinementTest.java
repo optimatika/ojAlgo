@@ -321,7 +321,7 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
      * The example from "Solving quadratic programs to high precision using scaled iterative refinement".
      * <p>
      * Modelled using {@link ExpressionsBasedModel} and with
-     * <code>model.options.convex().extendedPrecision(true)</code> this should find the exact solution of that
+     * {@code model.options.convex().extendedPrecision(true)} this should find the exact solution of that
      * example.
      */
     @Test

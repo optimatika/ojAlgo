@@ -236,10 +236,10 @@ public abstract class Presolvers {
      * Verifies that the variable is actually referenced/used in some expression. If not then that variable
      * can either be fixed or marked as unbounded.
      *
-     * <pre>
+     * <pre>{@code
      * 2019-02-15: Turned this off. Very slow for large models
      * 2019-02-22: Turned this on again, different implementation
-     * </pre>
+     * }</pre>
      */
     public static final ExpressionsBasedModel.VariableAnalyser UNREFERENCED = new ExpressionsBasedModel.VariableAnalyser(30) {
 

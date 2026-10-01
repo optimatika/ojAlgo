@@ -160,20 +160,20 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
      * This algorithm is a variation of the Bartels-Golub-Reid method that preserves the form of the matrices
      * during column updates. Key characteristics:
      * <ul>
-     * <li>Preserves the triangular structure of L and U matrices</li>
-     * <li>Handles column updates efficiently by tracking the last non-zero row</li>
-     * <li>Performs row and column exchanges to maintain numerical stability</li>
-     * <li>Updates both L and U matrices to reflect the changes</li>
-     * <li>Maintains the relationship L*U = P*A*Q where P and Q are permutation matrices</li>
+     * <li>Preserves the triangular structure of L and U matrices
+     * <li>Handles column updates efficiently by tracking the last non-zero row
+     * <li>Performs row and column exchanges to maintain numerical stability
+     * <li>Updates both L and U matrices to reflect the changes
+     * <li>Maintains the relationship L*U = P*A*Q where P and Q are permutation matrices
      * </ul>
      * <p>
      * The algorithm works by:
      * <ol>
-     * <li>Applying forward substitution to transform the new column</li>
-     * <li>Finding the last non-zero row in the transformed column</li>
-     * <li>Performing column exchanges to position the column correctly</li>
-     * <li>Applying row exchanges and updates to maintain triangular form</li>
-     * <li>Updating both L and U matrices to reflect all changes</li>
+     * <li>Applying forward substitution to transform the new column
+     * <li>Finding the last non-zero row in the transformed column
+     * <li>Performing column exchanges to position the column correctly
+     * <li>Applying row exchanges and updates to maintain triangular form
+     * <li>Updating both L and U matrices to reflect all changes
      * </ol>
      * <p>
      * This method is particularly effective for maintaining the structure of sparse matrices during updates,

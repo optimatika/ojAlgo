@@ -587,8 +587,8 @@ public interface Structure2D extends Structure1D {
     }
 
     /**
-     * The default value is simply <code>0</code>, and if all elements are zeros then
-     * <code>this.countRows()</code>.
+     * The default value is simply {@code 0}, and if all elements are zeros then
+     * {@code this.countRows()}.
      *
      * @param col The column index
      * @return The row index of the first non-zero element in the specified column
@@ -598,8 +598,8 @@ public interface Structure2D extends Structure1D {
     }
 
     /**
-     * The default value is simply <code>0</code>, and if all elements are zeros then
-     * <code>this.countColumns()</code>.
+     * The default value is simply {@code 0}, and if all elements are zeros then
+     * {@code this.countColumns()}.
      *
      * @return The column index of the first non-zero element in the specified row
      */
@@ -629,7 +629,6 @@ public interface Structure2D extends Structure1D {
      * 2D data structures are either square, tall, fat or empty.
      * <p>
      * m <= 0 or n <= 0
-     * </p>
      * Historically some ojAlgo data structures did allow to create "empty" instances. Currently this is not
      * encouraged, but still possible in some instances.
      *
@@ -643,7 +642,6 @@ public interface Structure2D extends Structure1D {
      * 2D data structures are either square, tall, fat or empty.
      * <p>
      * 1 <= m < n
-     * </p>
      *
      * @return true if matrix is fat
      */
@@ -663,7 +661,6 @@ public interface Structure2D extends Structure1D {
      * 2D data structures are either square, tall, fat or empty.
      * <p>
      * m = n <> 0
-     * </p>
      *
      * @return true if matrix is square
      */
@@ -676,7 +673,6 @@ public interface Structure2D extends Structure1D {
      * 2D data structures are either square, tall, fat or empty.
      * <p>
      * m < n >= 1
-     * </p>
      *
      * @return true if matrix is tall
      */
@@ -693,8 +689,8 @@ public interface Structure2D extends Structure1D {
     }
 
     /**
-     * The default value is simply <code>this.countRows()</code>, and if all elements are zeros then
-     * <code>0</code>.
+     * The default value is simply {@code this.countRows()}, and if all elements are zeros then
+     * {@code 0}.
      *
      * @return The row index of the first zero element, after all non-zeros, in the specified column (index of
      *         the last non-zero + 1)
@@ -704,8 +700,8 @@ public interface Structure2D extends Structure1D {
     }
 
     /**
-     * The default value is simply <code>this.countColumns()</code>, and if all elements are zeros then
-     * <code>0</code>.
+     * The default value is simply {@code this.countColumns()}, and if all elements are zeros then
+     * {@code 0}.
      *
      * @return The column index of the first zero element, after all non-zeros, in the specified row (index of
      *         the last non-zero + 1)

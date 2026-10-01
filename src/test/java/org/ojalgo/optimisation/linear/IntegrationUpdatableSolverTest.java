@@ -64,14 +64,14 @@ public class IntegrationUpdatableSolverTest extends OptimisationLinearTests {
     }
 
     /**
-     * <pre>
+     * <pre>{@code
      * min  -2*x0 - 3*x1 + x2 - 5*x3
      * s.t. 2*x0 + 3*x1 +  x2 + 2*x3 = 17    (equality)
      *      3*x0 +  x1        + 2*x3 <= 9      (inequality 0)
      *       x0       + 2*x2 + 3*x3 <= 8       (inequality 1)
      *      0 <= x0 <= 4,  1 <= x1 <= 5,  0 <= x2 <= 3,  0 <= x3 <= 3
      *      all integer
-     * </pre>
+     * }</pre>
      */
     private static ExpressionsBasedModel newSmallMIPModel() {
 
@@ -90,12 +90,12 @@ public class IntegrationUpdatableSolverTest extends OptimisationLinearTests {
     }
 
     /**
-     * <pre>
+     * <pre>{@code
      * min  -2*x - 3*y
      * s.t.   x +   y <= 4   (constraint 0)
      *        x + 3*y <= 6   (constraint 1)
      *        x, y in [0, 10]
-     * </pre>
+     * }</pre>
      *
      * Optimal: x=3, y=1, obj=-9. Both constraints bind. Duals: 3/2, 1/2. Reduced gradients: 0, 0.
      */
@@ -113,12 +113,12 @@ public class IntegrationUpdatableSolverTest extends OptimisationLinearTests {
     }
 
     /**
-     * <pre>
+     * <pre>{@code
      * min  -2*x - 3*y - z
      * s.t.  x +  y + z <= 4   (constraint 0)
      *       x + 3y + z <= 6   (constraint 1)
      *       x, y, z in [0, 10]
-     * </pre>
+     * }</pre>
      *
      * Optimal: x=3, y=1, z=0, obj=-9. Both constraints bind. z is non-basic at its lower bound with
      * |reduced gradient| = 1.0.
@@ -138,12 +138,12 @@ public class IntegrationUpdatableSolverTest extends OptimisationLinearTests {
     }
 
     /**
-     * <pre>
+     * <pre>{@code
      * min  -x - 2y
      * s.t.  1 <= x + y <= 3    (ranged: both lower and upper, not equality)
      *            x + 3y <= 6   (upper only)
      *       x, y in [0, 10]
-     * </pre>
+     * }</pre>
      *
      * Optimal: x=1.5, y=1.5, obj=-4.5. The ranged constraint binds at its upper bound (x+y=3) and the
      * upper-only constraint also binds (x+3y=6). The lower bound of the ranged constraint does not bind.

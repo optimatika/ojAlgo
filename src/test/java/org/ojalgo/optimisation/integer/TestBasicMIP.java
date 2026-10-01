@@ -20,7 +20,7 @@ import org.ojalgo.optimisation.Variable;
 public class TestBasicMIP extends OptimisationIntegerTests implements TestBasic {
 
     /**
-     * <pre>
+     * <pre>{@code
      * min  -2*x0 - 3*x1 + x2 - 5*x3
      * s.t. 2*x0 + 3*x1 +  x2 + 2*x3 = 17    (equality)
      *      3*x0 +  x1        + 2*x3 <= 9      (inequality 0)
@@ -30,7 +30,7 @@ public class TestBasicMIP extends OptimisationIntegerTests implements TestBasic 
      *      0 <= x2 <= 3
      *      0 <= x3 <= 3
      *      x0, x1, x2, x3 integer)
-     * </pre>
+     * }</pre>
      */
     public static OptimisationCase caseBranchAndBoundSubSolverTest() {
 

@@ -40,13 +40,13 @@ import com.sun.management.OperatingSystemMXBean;
  * cache. (Do not worry about how many cache units there are - describe one unit.)
  * <li>The array must have at least 2 elements. You must describe the total system resources and the L1 cache.
  * It is strongly recommended to also describe the L2 cache. The L3 cache, if it exists, is less important to
- * describe. The derived attributes <code>processors</code>, <code>cores</code> and <code>units</code> may be
+ * describe. The derived attributes {@code processors}, {@code cores} and {@code units} may be
  * incorrectly calculated if you fail to specify the caches. Known issue: If you have more than one processor,
- * nut no L3 cache; the <code>processors</code> attribute will be incorrectly set 1. A workaround that
+ * nut no L3 cache; the {@code processors} attribute will be incorrectly set 1. A workaround that
  * currently works is to define an L3 cache anyway and set the memory/size of that cache to 0bytes. This
  * Workaround may stop working in the future.
- * <li><code>new MemoryThreads[] { SYSTEM, L3, L2, L1 }</code> or
- * <code>new MemoryThreads[] { SYSTEM, L2, L1 }</code> or <code>new MemoryThreads[] { SYSTEM, L1 }</code>
+ * <li>{@code new MemoryThreads[] { SYSTEM, L3, L2, L1 }} or
+ * {@code new MemoryThreads[] { SYSTEM, L2, L1 }} or {@code new MemoryThreads[] { SYSTEM, L1 }}
  * </ul>
  *
  * @author apete
@@ -126,7 +126,6 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
      * <p>
      * The architecture string is normalized to standard values for consistency across different JVM
      * implementations and operating systems.
-     * <p>
      *
      * @return The normalized processor architecture string, never null. Defaults to "other" if the
      *         architecture cannot be determined.
@@ -176,20 +175,20 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
      * The value represents the total number of logical processors that the JVM can utilize for parallel
      * execution. This is used by ojAlgo to:
      * <ul>
-     * <li>Size thread pools for parallel matrix operations</li>
-     * <li>Determine when to use parallel vs. sequential algorithms</li>
-     * <li>Configure parallelism thresholds for different operations</li>
-     * <li>Estimate optimal block sizes for parallel decomposition</li>
+     * <li>Size thread pools for parallel matrix operations
+     * <li>Determine when to use parallel vs. sequential algorithms
+     * <li>Configure parallelism thresholds for different operations
+     * <li>Estimate optimal block sizes for parallel decomposition
      * </ul>
      * <p>
-     * <b>Typical values:</b>
+     * Typical values:
      * <ul>
-     * <li><code>1</code> - Single-core systems or restricted environments</li>
-     * <li><code>2</code> - Dual-core systems or dual-core with hyperthreading disabled</li>
-     * <li><code>4</code> - Quad-core systems or dual-core with hyperthreading</li>
-     * <li><code>8</code> - Octa-core systems or quad-core with hyperthreading</li>
-     * <li><code>16-32</code> - High-end consumer or workstation processors</li>
-     * <li><code>64-128+</code> - Server-class processors with many cores</li>
+     * <li>{@code 1} - Single-core systems or restricted environments
+     * <li>{@code 2} - Dual-core systems or dual-core with hyperthreading disabled
+     * <li>{@code 4} - Quad-core systems or dual-core with hyperthreading
+     * <li>{@code 8} - Octa-core systems or quad-core with hyperthreading
+     * <li>{@code 16-32} - High-end consumer or workstation processors
+     * <li>{@code 64-128+} - Server-class processors with many cores
      * </ul>
      *
      * @return The number of logical processors available to the JVM, always at least 1.
@@ -234,7 +233,7 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
     }
 
     /**
-     * @deprecated v56 Use {@link #make(String, long, int, String) instead
+     * @deprecated v56 Use {@link #make(Architecture, long, int)} instead
      */
     @Deprecated
     public static Hardware makeSimple(final Architecture systemArchitecture, final long systemMemory, final int systemThreads) {
@@ -542,8 +541,8 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
     private final BasicMachine[] myLevels;
 
     /**
-     * <code>new BasicMachine[] { SYSTEM, L3, L2, L1 }</code>,
-     * <code>new MemoryThreads[] { SYSTEM, L2, L1 }</code> or <code>new MemoryThreads[] { SYSTEM, L1 }</code>
+     * {@code new BasicMachine[] { SYSTEM, L3, L2, L1 }},
+     * {@code new MemoryThreads[] { SYSTEM, L2, L1 }} or {@code new MemoryThreads[] { SYSTEM, L1 }}
      */
     public Hardware(final Architecture arch, final BasicMachine[] levels) {
 

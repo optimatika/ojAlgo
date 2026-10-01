@@ -269,7 +269,6 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     }
 
     /**
-     * <p>
      * The QP solver ends up (de)activating inequality constraints "forever"...
      */
     @Test
@@ -302,41 +301,26 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
         CuteMarosMeszarosCase.doTest("DUAL4.SIF");
     }
 
-    /**
-     * <p>
-     */
     @Test
     public void testDUALC1() {
         CuteMarosMeszarosCase.doTest("DUALC1.SIF");
     }
 
-    /**
-     * <p>
-     */
     @Test
     public void testDUALC2() {
         CuteMarosMeszarosCase.doTest("DUALC2.SIF", ACCURACY.withPrecision(7));
     }
 
-    /**
-     * <p>
-     */
     @Test
     public void testDUALC5() {
         CuteMarosMeszarosCase.doTest("DUALC5.SIF");
     }
 
-    /**
-     * <p>
-     */
     @Test
     public void testDUALC8() {
         CuteMarosMeszarosCase.doTest("DUALC8.SIF");
     }
 
-    /**
-     * <p>
-     */
     @Test
     public void testGENHS28() {
         CuteMarosMeszarosCase.doTest("GENHS28.SIF");
@@ -347,26 +331,22 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
         CuteMarosMeszarosCase.doTest("HS118.SIF");
     }
 
-    /**
-     * <p>
-     */
     @Test
     public void testHS21() {
         CuteMarosMeszarosCase.doTest("HS21.SIF");
     }
 
     /**
-     * <p>
      * The given objective function value is 5.7310705e-07 but CPLEX gets 1.1702830307e-05 (and ojAlgo
      * 1.9521E-23). The CPLEX solution is:
      *
-     * <pre>
+     * <pre>{@code
     C------1                      0.995735
     C------2                      1.995283
     C------3                     -0.999028
     C------4                      2.989736
     C------5                     -3.982628
-     * </pre>
+     * }</pre>
      *
      * Guessing that { 1.0, 2.0, -1.0, 3.0, -4.0 } is the exact/actual optimal solution. That gives the
      * objective value 0.0 (exactly).
@@ -406,49 +386,31 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
         TestUtils.assertEquals(BigMath.ZERO, propVal, VERY_HIGH_PRECISION);
     }
 
-    /**
-     * <p>
-     */
     @Test
     public void testHS35() {
         CuteMarosMeszarosCase.doTest("HS35.SIF", ACCURACY.withPrecision(6));
     }
 
-    /**
-     * <p>
-     */
     @Test
     public void testHS35MOD() {
         CuteMarosMeszarosCase.doTest("HS35MOD.SIF");
     }
 
-    /**
-     * <p>
-     */
     @Test
     public void testHS51() {
         CuteMarosMeszarosCase.doTest("HS51.SIF", ACCURACY.withScale(8));
     }
 
-    /**
-     * <p>
-     */
     @Test
     public void testHS52() {
         CuteMarosMeszarosCase.doTest("HS52.SIF", ACCURACY.withScale(7));
     }
 
-    /**
-     * <p>
-     */
     @Test
     public void testHS53() {
         CuteMarosMeszarosCase.doTest("HS53.SIF");
     }
 
-    /**
-     * <p>
-     */
     @Test
     public void testHS76() {
         CuteMarosMeszarosCase.doTest("HS76.SIF");
@@ -464,9 +426,6 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
         CuteMarosMeszarosCase.doTest("HUESTIS.SIF");
     }
 
-    /**
-     * <p>
-     */
     @Test
     public void testKSIP() {
         CuteMarosMeszarosCase.doTest("KSIP.SIF");
@@ -487,17 +446,11 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
         CuteMarosMeszarosCase.doTest("MOSARQP2.SIF");
     }
 
-    /**
-     * <p>
-     */
     @Test
     public void testPRIMAL1() {
         CuteMarosMeszarosCase.doTest("PRIMAL1.SIF", ACCURACY.withScale(6));
     }
 
-    /**
-     * <p>
-     */
     @Test
     public void testPRIMALC2() {
         CuteMarosMeszarosCase.doTest("PRIMALC2.SIF", ACCURACY.withScale(6));
@@ -508,9 +461,6 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
         CuteMarosMeszarosCase.doTest("PRIMALC8.SIF", ACCURACY.withScale(6));
     }
 
-    /**
-     * <p>
-     */
     @Test
     public void testQPCBLEND() {
         CuteMarosMeszarosCase.doTest("QPCBLEND.SIF");
@@ -531,17 +481,11 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
         CuteMarosMeszarosCase.doTest("QPCSTAIR.SIF");
     }
 
-    /**
-     * <p>
-     */
     @Test
     public void testQPTEST() {
         CuteMarosMeszarosCase.doTest("QPTEST.SIF");
     }
 
-    /**
-     * <p>
-     */
     @Test
     public void testS268() {
         CuteMarosMeszarosCase.doTest("S268.SIF", ACCURACY.withScale(4));
@@ -557,9 +501,6 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
         CuteMarosMeszarosCase.doTest("STCQP2.SIF");
     }
 
-    /**
-     * <p>
-     */
     @Test
     public void testTAME() {
         CuteMarosMeszarosCase.doTest("TAME.SIF");
@@ -570,9 +511,6 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
         CuteMarosMeszarosCase.doTest("VALUES.SIF");
     }
 
-    /**
-     * <p>
-     */
     @Test
     public void testZECEVIC2() {
         CuteMarosMeszarosCase.doTest("ZECEVIC2.SIF");

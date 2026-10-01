@@ -40,11 +40,11 @@ public abstract class StandardType {
 
     /**
      * <ul>
-     * <li>Precision: 16</li>
-     * <li>Scale: 2</li>
-     * <li>Rounding Mode: {@linkplain RoundingMode#HALF_EVEN}</li>
-     * <li>Locale: JVM Default</li>
-     * <li>Style: {@linkplain NumberStyle#CURRENCY}</li>
+     * <li>Precision: 16
+     * <li>Scale: 2
+     * <li>Rounding Mode: {@linkplain RoundingMode#HALF_EVEN}
+     * <li>Locale: JVM Default
+     * <li>Style: {@linkplain NumberStyle#CURRENCY}
      * </ul>
      * Fits within the Sybase (and MS SQL Server) money type which is (19,4). Typically you have
      * {@linkplain #QUANTITY} x {@linkplain #PRICE} = {@linkplain #AMOUNT}, an alternative is
@@ -58,82 +58,82 @@ public abstract class StandardType {
     public static final DateContext DATETIME = new DateContext(DatePart.DATETIME);
     /**
      * <ul>
-     * <li>Precision: 7</li>
-     * <li>Scale: 3</li>
-     * <li>Rounding Mode: {@linkplain RoundingMode#HALF_EVEN}</li>
-     * <li>Locale: JVM Default</li>
-     * <li>Style: {@linkplain NumberStyle#GENERAL}</li>
+     * <li>Precision: 7
+     * <li>Scale: 3
+     * <li>Rounding Mode: {@linkplain RoundingMode#HALF_EVEN}
+     * <li>Locale: JVM Default
+     * <li>Style: {@linkplain NumberStyle#GENERAL}
      * </ul>
      */
     public static final NumberContext DECIMAL_032 = NumberContext.ofMath(MathContext.DECIMAL32).withScale(MathContext.DECIMAL32.getPrecision() / 2);
     /**
      * <ul>
-     * <li>Precision: 16</li>
-     * <li>Scale: 8</li>
-     * <li>Rounding Mode: {@linkplain RoundingMode#HALF_EVEN}</li>
-     * <li>Locale: JVM Default</li>
-     * <li>Style: {@linkplain NumberStyle#GENERAL}</li>
+     * <li>Precision: 16
+     * <li>Scale: 8
+     * <li>Rounding Mode: {@linkplain RoundingMode#HALF_EVEN}
+     * <li>Locale: JVM Default
+     * <li>Style: {@linkplain NumberStyle#GENERAL}
      * </ul>
      */
     public static final NumberContext DECIMAL_064 = NumberContext.ofMath(MathContext.DECIMAL64).withScale(MathContext.DECIMAL64.getPrecision() / 2);
     /**
      * <ul>
-     * <li>Precision: 34</li>
-     * <li>Scale: 17</li>
-     * <li>Rounding Mode: {@linkplain RoundingMode#HALF_EVEN}</li>
-     * <li>Locale: JVM Default</li>
-     * <li>Style: {@linkplain NumberStyle#GENERAL}</li>
+     * <li>Precision: 34
+     * <li>Scale: 17
+     * <li>Rounding Mode: {@linkplain RoundingMode#HALF_EVEN}
+     * <li>Locale: JVM Default
+     * <li>Style: {@linkplain NumberStyle#GENERAL}
      * </ul>
      */
     public static final NumberContext DECIMAL_128 = NumberContext.ofMath(MathContext.DECIMAL128).withScale(MathContext.DECIMAL128.getPrecision() / 2);
     /**
      * <ul>
-     * <li>Precision: 7</li>
-     * <li>Scale: 7</li>
-     * <li>Rounding Mode: {@linkplain RoundingMode#HALF_EVEN}</li>
-     * <li>Locale: JVM Default</li>
-     * <li>Style: {@linkplain NumberStyle#GENERAL}</li>
+     * <li>Precision: 7
+     * <li>Scale: 7
+     * <li>Rounding Mode: {@linkplain RoundingMode#HALF_EVEN}
+     * <li>Locale: JVM Default
+     * <li>Style: {@linkplain NumberStyle#GENERAL}
      * </ul>
      */
     public static final NumberContext MATH_032 = NumberContext.ofMath(MathContext.DECIMAL32).withScale(MathContext.DECIMAL32.getPrecision());
     /**
      * <ul>
-     * <li>Precision: 16</li>
-     * <li>Scale: 16</li>
-     * <li>Rounding Mode: {@linkplain RoundingMode#HALF_EVEN}</li>
-     * <li>Locale: JVM Default</li>
-     * <li>Style: {@linkplain NumberStyle#GENERAL}</li>
+     * <li>Precision: 16
+     * <li>Scale: 16
+     * <li>Rounding Mode: {@linkplain RoundingMode#HALF_EVEN}
+     * <li>Locale: JVM Default
+     * <li>Style: {@linkplain NumberStyle#GENERAL}
      * </ul>
      */
     public static final NumberContext MATH_064 = NumberContext.ofMath(MathContext.DECIMAL64).withScale(MathContext.DECIMAL64.getPrecision());
     /**
      * <ul>
-     * <li>Precision: 34</li>
-     * <li>Scale: 34</li>
-     * <li>Rounding Mode: {@linkplain RoundingMode#HALF_EVEN}</li>
-     * <li>Locale: JVM Default</li>
-     * <li>Style: {@linkplain NumberStyle#GENERAL}</li>
+     * <li>Precision: 34
+     * <li>Scale: 34
+     * <li>Rounding Mode: {@linkplain RoundingMode#HALF_EVEN}
+     * <li>Locale: JVM Default
+     * <li>Style: {@linkplain NumberStyle#GENERAL}
      * </ul>
      */
     public static final NumberContext MATH_128 = NumberContext.ofMath(MathContext.DECIMAL128).withScale(MathContext.DECIMAL128.getPrecision());
     /**
      * <ul>
-     * <li>Precision: 7</li>
-     * <li>Scale: 4</li>
-     * <li>Rounding Mode: {@linkplain RoundingMode#HALF_EVEN}</li>
-     * <li>Locale: JVM Default</li>
-     * <li>Style: {@linkplain NumberStyle#PERCENT}</li>
+     * <li>Precision: 7
+     * <li>Scale: 4
+     * <li>Rounding Mode: {@linkplain RoundingMode#HALF_EVEN}
+     * <li>Locale: JVM Default
+     * <li>Style: {@linkplain NumberStyle#PERCENT}
      * </ul>
      */
     public static final NumberContext PERCENT = StandardType.percent(Locale.getDefault());
     /**
      * Price or conversion rate (foreign exchange rate).
      * <ul>
-     * <li>Precision: 16</li>
-     * <li>Scale: 8</li>
-     * <li>Rounding Mode: {@linkplain RoundingMode#HALF_EVEN}</li>
-     * <li>Locale: JVM Default</li>
-     * <li>Style: {@linkplain NumberStyle#GENERAL}</li>
+     * <li>Precision: 16
+     * <li>Scale: 8
+     * <li>Rounding Mode: {@linkplain RoundingMode#HALF_EVEN}
+     * <li>Locale: JVM Default
+     * <li>Style: {@linkplain NumberStyle#GENERAL}
      * </ul>
      * Typically you have {@linkplain #QUANTITY} x {@linkplain #PRICE} = {@linkplain #AMOUNT}, an alternative
      * is {@linkplain #QUANTITY} x {@linkplain #PRICE} = {@linkplain #QUANTITY}.
@@ -141,11 +141,11 @@ public abstract class StandardType {
     public static final NumberContext PRICE = NumberContext.ofScale(8);
     /**
      * <ul>
-     * <li>Precision: 16</li>
-     * <li>Scale: 6</li>
-     * <li>Rounding Mode: {@linkplain RoundingMode#HALF_EVEN}</li>
-     * <li>Locale: JVM Default</li>
-     * <li>Style: {@linkplain NumberStyle#GENERAL}</li>
+     * <li>Precision: 16
+     * <li>Scale: 6
+     * <li>Rounding Mode: {@linkplain RoundingMode#HALF_EVEN}
+     * <li>Locale: JVM Default
+     * <li>Style: {@linkplain NumberStyle#GENERAL}
      * </ul>
      * Typically you have {@linkplain #QUANTITY} x {@linkplain #PRICE} = {@linkplain #AMOUNT}, an alternative
      * is {@linkplain #QUANTITY} x {@linkplain #PRICE} = {@linkplain #QUANTITY}.

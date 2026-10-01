@@ -33,19 +33,15 @@ import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * <p>
- * Data for this test case originates from &quot;A STEP-BY-STEP GUIDE TO THE BLACK-LITTERMAN MODEL&quot; by
+ * Data for this test case originates from "A STEP-BY-STEP GUIDE TO THE BLACK-LITTERMAN MODEL" by
  * Thomas M. Idzorek.
- * </p>
  * <p>
  * Unfortunately the numbers in that paper are not specified with high enough precision to (directly)
  * construct unit tests without problems, but the tests available here should still be enough to indicate that
  * the ojAlgo Black-Litterman model class works correctly.
- * </p>
  * <p>
  * There are also various papers and presentations derived from that original paper available (on the
  * Internet). To some extent those are also used.
- * </p>
  *
  * @author apete
  */

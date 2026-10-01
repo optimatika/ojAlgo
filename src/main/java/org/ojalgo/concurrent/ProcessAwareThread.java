@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * <P>
  * Typical usage:
  *
- * <pre>
+ * <pre>{@code
  * Thread t = DaemonPoolExecutor.newProcessAwareThreadFactory("ojAlgo-proc").newThread(() -> {
  *     Process p = new ProcessBuilder("sleep", "10").start();
  *     if (Thread.currentThread() instanceof ProcessAwareThread pat) pat.setProcess(p);
@@ -38,7 +38,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * t.start();
  * // later...
  * t.interrupt(); // will destroy the process
- * </pre>
+ * }</pre>
  */
 final class ProcessAwareThread extends Thread {
 

@@ -30,7 +30,7 @@ import org.ojalgo.structure.Mutate1D;
 
 /**
  * The ?axpy routines perform a vector-vector operation defined as y := a*x + y where: a is a scalar x and y
- * are vectors each with a number of elements that equals n. <code>y[] += a * x[]</code>
+ * are vectors each with a number of elements that equals n. {@code y[] += a * x[]}
  *
  * @author apete
  */
