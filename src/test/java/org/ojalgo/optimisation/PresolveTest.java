@@ -25,16 +25,18 @@ public class PresolveTest extends OptimisationTests {
      * Was a problem with the pre-solve logic. A purely quadratic expression was passed to a pre-solver that
      * only works for linear expressions. This caused an ArithmeticException and a complete failure.
      * <p>
-     * Further this model is infeasible and should be recognised as such (by the pre-solver).
+     * Further this model is infeasible and should be recognised as such by the pre-solver alone, without
+     * invoking any solver. That the model solves (is reported infeasible) is tested in
+     * {@code ConvexUserFiles}.
      */
     @Test
     void testGitHubIssue663() {
 
         ExpressionsBasedModel model = ModelFileTest.makeModel("usersupplied", "GitHub663.ebm", false);
 
-        Result result = model.minimise();
+        model.simplify();
 
-        TestUtils.assertStateInfeasible(result);
+        TestUtils.assertTrue(model.isInfeasible());
     }
 
     /**
@@ -61,15 +63,18 @@ public class PresolveTest extends OptimisationTests {
      * https://github.com/optimatika/ojAlgo/issues/690
      * <p>
      * https://github.com/optimatika/ojAlgo/discussions/691
+     * <p>
+     * The pre-solver used to (falsely) declare this model infeasible. That the model solves is tested in
+     * {@code LinearUserFiles}.
      */
     @Test
     void testGitHubIssue690b() {
 
         ExpressionsBasedModel model = ModelFileTest.makeModel("usersupplied", "GitHub690.ebm", false);
 
-        Result result = model.minimise();
+        model.simplify();
 
-        TestUtils.assertStateNotLessThanFeasible(result);
+        TestUtils.assertFalse(model.isInfeasible());
     }
 
     /**

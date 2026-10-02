@@ -63,6 +63,17 @@ public class ConvexUserFiles extends OptimisationConvexTests implements ModelFil
     }
 
     /**
+     * https://github.com/optimatika/ojAlgo/issues/663
+     * <p>
+     * Quadratic objective and one (convex) quadratic constraint. The model is infeasible – two of the linear
+     * constraints fix the same variable to different values – and must be reported as such.
+     */
+    @Test
+    public void testGitHub663() {
+        ConvexUserFiles.doTest("GitHub663.ebm", "", "");
+    }
+
+    /**
      * Numerically rather extreme/difficult model. After some tweaking ojAlgo gets the same solution as CPLEX
      * or GUROBI to 4 digits precision.
      */

@@ -59,6 +59,29 @@ public class LinearUserFiles extends OptimisationLinearTests implements ModelFil
         return model;
     }
 
+    /**
+     * https://github.com/optimatika/ojAlgo/issues/546
+     * <p>
+     * The original (primal tableau) simplex solver reported this model INFEASIBLE.
+     */
+    @Test
+    public void testGitHub546() {
+        LinearUserFiles.doTest("GitHub546.ebm", "857550000", null);
+    }
+
+    /**
+     * https://github.com/optimatika/ojAlgo/issues/690
+     * <p>
+     * https://github.com/optimatika/ojAlgo/discussions/691
+     * <p>
+     * Presolve used to declare this model infeasible. It has many constraint coefficients that are 1e-16
+     * (floating-point noise). The expected value is from HiGHS and SCIP.
+     */
+    @Test
+    public void testGitHub690() {
+        LinearUserFiles.doTest("GitHub690.ebm", "-0.568551938967134", null);
+    }
+
     @Test
     public void testHFLP201501020845() {
         LinearUserFiles.doTest("HFLP201501020845.ebm", null, "874.0050946596");
