@@ -1,4 +1,6 @@
 {
+  "url": "https://context7.com/optimatika/ojalgo",
+  "public_key": "pk_0r3ALdJ0Hbcs3be6VBkpE"
   "$schema": "https://context7.com/schema/context7.json",
   "projectTitle": "ojAlgo",
   "description": "Pure Java, zero-dependency library for mathematical optimisation (LP, QP and MIP solvers behind ExpressionsBasedModel), linear algebra and data science.",
