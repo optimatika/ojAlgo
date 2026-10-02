@@ -13,7 +13,7 @@ oj! Algorithms - ojAlgo - is Open Source Java code that has to do with mathemati
 - A growing collection of utilities for data science, including Artificial Neural Networks, clustering and a collection of tools for reading/writing/processing data
 - Various other things like time series, random numbers, stochastic processes, descriptive statistics…
 
-General information about ojAlgo is available at the project web site: http://ojalgo.org/
+General information about ojAlgo is available at the project web site: https://www.ojalgo.org/
 
 ### Artifacts
 
@@ -28,9 +28,49 @@ ojAlgo is available at [The Central (Maven) Repository](https://mvnrepository.co
 </dependency>
 ```
 
+### A First Optimisation Model
+
+Decide how many chairs and tables to make to maximise profit, with 400 machine hours available:
+
+```java
+import org.ojalgo.optimisation.Expression;
+import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.Variable;
+
+public class FirstModel {
+
+    public static void main(final String[] args) {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        // Variables: bounds, and a weight that is the objective coefficient
+        Variable chairs = model.newVariable("Chairs").lower(0).upper(100).weight(45);
+        Variable tables = model.newVariable("Tables").lower(0).upper(40).weight(80);
+
+        // A constraint: 2 hours per chair + 5 hours per table <= 400 hours
+        Expression hours = model.newExpression("Machine hours").upper(400);
+        hours.set(chairs, 2).set(tables, 5);
+
+        Optimisation.Result result = model.maximise();
+
+        if (result.getState().isOptimal()) {
+            System.out.println("Profit: " + result.getValue());
+            System.out.println("Chairs: " + chairs.getValue().toPlainString());
+            System.out.println("Tables: " + tables.getValue().toPlainString());
+        }
+    }
+}
+```
+
+The same pattern covers LP, QP and MIP: call `integer()` or `binary()` on a variable for integer models, and set quadratic terms on an expression for quadratic ones. The [Optimisation Cookbook](https://www.ojalgo.org/optimisation-cookbook/) has complete, runnable models for common problem shapes – assignment, bin packing, shift scheduling, blending, facility location, portfolio optimisation and more.
+
 ### Documentation and Support
 
-User documentation is available in the form of blog posts at the ojAlgo web site: http://ojalgo.org/
+- [Optimisation Cookbook](https://www.ojalgo.org/optimisation-cookbook/) – complete models to copy and adapt, and the rules every model should follow
+- [Documentation](https://www.ojalgo.org/documentation/) – a curated reading order through the articles: optimisation, linear algebra, arrays and data
+- [API reference](https://javadoc.io/doc/org.ojalgo/ojalgo) (Javadoc)
+- For AI coding assistants: [llms.txt](https://www.ojalgo.org/llms.txt) and the [ojAlgo skill](https://github.com/optimatika/ojAlgo-skills)
 
 ojAlgo is Open Source, and you are strongly encouraged to clone or fork this repository and work directly with the source code. The source code is (part of) the documentation, and you should read it.
 
