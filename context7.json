@@ -17,6 +17,7 @@
     "Give every expression a unique name. Creating a second expression with a name already in use replaces the first, and that constraint silently disappears.",
     "Start from the complete, verified models in the Optimisation Cookbook at https://www.ojalgo.org/optimisation-cookbook/ rather than writing a model from scratch.",
     "ojAlgo is one Maven dependency (org.ojalgo:ojalgo) with no native code. Do not add JNI or native solver dependencies unless asked to.",
-    "Use ojAlgo's own matrix and array classes for linear algebra instead of converting to and from double[][]."
+    "Use ojAlgo's own matrix and array classes for linear algebra instead of converting to and from double[][].",
+    "Do not use old names that no longer compile: Variable.make and addVariable(Variable) are now model.newVariable(name); PrimitiveMatrix and Primitive64Matrix are MatrixR064; PrimitiveDenseStore and Primitive64Store are R064Store. See https://www.ojalgo.org/updating-old-code/"
   ]
 }
