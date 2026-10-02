@@ -43,6 +43,28 @@ import org.ojalgo.type.context.NumberContext;
 class ExpressionsBasedModelTest extends OptimisationTests {
 
     @Test
+    void testDuplicateExpressionNamesNotAllowed() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        model.newExpression("c");
+        TestUtils.assertThrows(IllegalArgumentException.class, () -> model.newExpression("c"));
+        TestUtils.assertEquals(1, model.countExpressions());
+
+        // Generated names must not clash with existing ones
+        model.newExpression("EXPR2");
+        model.addExpression();
+        model.removeExpression("c");
+        model.addExpression();
+        TestUtils.assertEquals(3, model.countExpressions());
+
+        // A removed name can be used again, and a copy keeps enforcing uniqueness
+        model.newExpression("c");
+        ExpressionsBasedModel copy = model.copy();
+        TestUtils.assertThrows(IllegalArgumentException.class, () -> copy.newExpression("c"));
+    }
+
+    @Test
     void testAddingVariableToExpression() {
         ExpressionsBasedModel model = new ExpressionsBasedModel();
         Variable x1 = model.newVariable("x1").lower(0).upper(20).weight(1);

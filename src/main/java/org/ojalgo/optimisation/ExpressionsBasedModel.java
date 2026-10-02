@@ -1303,7 +1303,12 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     public Expression addExpression() {
-        return this.newExpression("EXPR" + myExpressions.size());
+        int suffix = myExpressions.size();
+        String name = "EXPR" + suffix;
+        while (myExpressions.containsKey(name)) {
+            name = "EXPR" + ++suffix;
+        }
+        return this.newExpression(name);
     }
 
     public Expression addExpression(final String name) {
@@ -1849,11 +1854,21 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         return this.optimise(Optimisation.Sense.MIN, forcedIntegration);
     }
 
+    /**
+     * @throws IllegalArgumentException if the model already contains an expression with that name
+     */
     public Expression newExpression(final String name) {
         return this.newExpression(name, myEnvironment.getExpressionFactory());
     }
 
+    /**
+     * @throws IllegalArgumentException if the model already contains an expression with that name
+     */
     public <E extends Expression> E newExpression(final String name, final Expression.Factory<E> factory) {
+
+        if (myExpressions.containsKey(name)) {
+            throw new IllegalArgumentException("This model already contains an expression named \"" + name + "\"!");
+        }
 
         E retVal = factory.make(name, this);
 

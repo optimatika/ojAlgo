@@ -52,6 +52,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 #### org.ojalgo.optimisation
 
+- `ExpressionsBasedModel.newExpression` (and `addExpression`) now throws an `IllegalArgumentException` if the model already contains an expression with that name. Previously the new expression silently replaced the first – a constraint was lost without notice. `addExpression()` generates a name that does not clash with existing ones.
 - `Expression` now allocates the quadratic coefficient map lazily — only when quadratic terms are actually added. Models with only linear expressions use less memory.
 - The dual values and the reduced gradient of a `Result` follow one documented convention, whatever the solver: multipliers of the minimisation form Lagrangian (non-negative for inequalities), and reduced costs at the variables' bounds, in model units and relative to the (presolve tightened) bounds.
 - Model parameters are scaled by the adjustment exponent using `BigDecimal.scaleByPowerOfTen` instead of `movePointLeft`/`movePointRight`, so no digits are expanded when the scale becomes negative. `ModelEntity.adjust(BigDecimal)`, `reverseAdjustment(BigDecimal)`, `getLowerLimit(boolean, BigDecimal)`, `getUpperLimit(boolean, BigDecimal)` and `Expression.get(..., boolean)` may therefore return numbers with a negative scale (the values are the same).
