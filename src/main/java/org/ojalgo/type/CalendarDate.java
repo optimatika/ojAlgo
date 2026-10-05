@@ -214,11 +214,11 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
     }
 
     public static CalendarDate valueOf(final OffsetDateTime offsetDateTime) {
-        return new CalendarDate(offsetDateTime.toEpochSecond() * MILLIS_PER_SECOND);
+        return new CalendarDate(offsetDateTime.toInstant().toEpochMilli());
     }
 
     public static CalendarDate valueOf(final ZonedDateTime zonedDateTime) {
-        return new CalendarDate(zonedDateTime.toEpochSecond() * MILLIS_PER_SECOND);
+        return new CalendarDate(zonedDateTime.toInstant().toEpochMilli());
     }
 
     static long millis(final TemporalAccessor temporal) {
