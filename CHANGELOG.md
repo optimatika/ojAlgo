@@ -89,6 +89,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Fixed
 
+#### org.ojalgo.type
+
+- `CalendarDate.valueOf(OffsetDateTime)` and `CalendarDate.valueOf(ZonedDateTime)` retain millisecond precision, matching the `Instant` overload.
+
 #### org.ojalgo.matrix.decomposition
 
 - `SparseQDLDL.getSolution(...)` for a 1x1 matrix solved only the first of several right hand sides.
