@@ -21,49 +21,73 @@
  */
 package org.ojalgo.data.domain.finance.portfolio.simulator;
 
-import java.math.BigDecimal;
+import static org.ojalgo.function.constant.PrimitiveMath.ONE;
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+
 import java.util.List;
 
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.array.ArrayR064;
-import org.ojalgo.data.domain.finance.portfolio.SimplePortfolio;
-import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.random.process.GeometricBrownianMotion;
 import org.ojalgo.random.process.Process1D;
 import org.ojalgo.random.process.RandomProcess;
 import org.ojalgo.structure.Access2D;
 
+/**
+ * Simulates the value of a portfolio of assets modelled as (correlated) geometric Brownian motions, with or
+ * without periodic rebalancing.
+ */
 public class PortfolioSimulator {
 
-    private Process1D<GeometricBrownianMotion> myProcess;
+    /**
+     * @param correlations   The correlations of the processes' growth rates (the Wiener process increments),
+     *                       not of the returns. May be null, meaning uncorrelated processes.
+     * @param assetProcesses One process per asset, with the initial value set to the amount invested in that
+     *                       asset.
+     */
+    public static PortfolioSimulator of(final Access2D<?> correlations, final List<GeometricBrownianMotion> assetProcesses) {
+        return new PortfolioSimulator(PortfolioSimulator.toProcess(correlations, assetProcesses));
+    }
 
-    public PortfolioSimulator(final Access2D<?> correlations, final List<GeometricBrownianMotion> assetProcesses) {
-
-        super();
+    private static Process1D<GeometricBrownianMotion> toProcess(final Access2D<?> correlations, final List<GeometricBrownianMotion> assetProcesses) {
 
         if (assetProcesses == null || assetProcesses.size() < 1) {
             throw new IllegalArgumentException();
         }
 
         if (correlations != null) {
-            myProcess = Process1D.of(correlations, assetProcesses);
+            return Process1D.of(correlations, assetProcesses);
         } else {
-            myProcess = Process1D.of(assetProcesses);
+            return Process1D.of(assetProcesses);
         }
     }
 
-    @SuppressWarnings("unused")
-    private PortfolioSimulator() {
+    private final Process1D<GeometricBrownianMotion> myProcess;
+
+    /**
+     * @deprecated v57 Use {@link #of(Access2D, List)} instead.
+     */
+    @Deprecated
+    public PortfolioSimulator(final Access2D<?> correlations, final List<GeometricBrownianMotion> assetProcesses) {
+        this(PortfolioSimulator.toProcess(correlations, assetProcesses));
+    }
+
+    PortfolioSimulator(final Process1D<GeometricBrownianMotion> process) {
+
         super();
+
+        myProcess = process;
     }
 
     public RandomProcess.SimulationResults simulate(final int aNumberOfRealisations, final int aNumberOfSteps, final double aStepSize) {
         return this.simulate(aNumberOfRealisations, aNumberOfSteps, aStepSize, null);
     }
 
+    /**
+     * @param rebalancingInterval Every this many steps the portfolio is rebalanced to the initial (relative)
+     *                            weights.
+     */
     public RandomProcess.SimulationResults simulate(final int aNumberOfRealisations, final int aNumberOfSteps, final double aStepSize,
             final int rebalancingInterval) {
         return this.simulate(aNumberOfRealisations, aNumberOfSteps, aStepSize, Integer.valueOf(rebalancingInterval));
@@ -75,11 +99,17 @@ public class PortfolioSimulator {
         int tmpProcDim = myProcess.size();
 
         ArrayR064 tmpInitialValues = myProcess.getValues();
-        Comparable<?>[] tmpValues = new Comparable<?>[tmpProcDim];
+
+        double tmpInitialValue = ZERO;
         for (int p = 0; p < tmpProcDim; p++) {
-            tmpValues[p] = tmpInitialValues.get(p);
+            tmpInitialValue += tmpInitialValues.doubleValue(p);
         }
-        List<BigDecimal> tmpWeights = new SimplePortfolio(tmpValues).normalise().getWeights();
+
+        double tmpTotal = tmpInitialValue != ZERO ? tmpInitialValue : ONE;
+        double[] tmpWeights = new double[tmpProcDim];
+        for (int p = 0; p < tmpProcDim; p++) {
+            tmpWeights[p] = tmpInitialValues.doubleValue(p) / tmpTotal;
+        }
 
         Array2D<Double> tmpRealisationValues = Array2D.R064.make(aNumberOfRealisations, aNumberOfSteps);
 
@@ -92,25 +122,22 @@ public class PortfolioSimulator {
                     double tmpPortfolioValue = tmpRealisationValues.doubleValue(r, s - 1);
 
                     for (int p = 0; p < tmpProcDim; p++) {
-                        myProcess.setValue(p, tmpPortfolioValue * tmpWeights.get(p).doubleValue());
+                        myProcess.setValue(p, tmpPortfolioValue * tmpWeights[p]);
                     }
                 }
 
                 Array1D<Double> tmpRealisation = myProcess.step(aStepSize);
 
-                AggregatorFunction<Double> tmpAggregator = Aggregator.SUM.getFunction(PrimitiveAggregator.getSet());
-                tmpRealisation.visitAll(tmpAggregator);
-                tmpRealisationValues.set(r, s, tmpAggregator.doubleValue());
+                double tmpPortfolioValue = ZERO;
+                for (int p = 0; p < tmpProcDim; p++) {
+                    tmpPortfolioValue += tmpRealisation.doubleValue(p);
+                }
+                tmpRealisationValues.set(r, s, tmpPortfolioValue);
             }
 
             myProcess.setValues(tmpInitialValues);
         }
 
-        AggregatorFunction<Double> tmpAggregator = Aggregator.SUM.getFunction(PrimitiveAggregator.getSet());
-        for (int i = 0; i < tmpInitialValues.count(); i++) {
-            tmpAggregator.invoke(tmpInitialValues.doubleValue(i));
-        }
-
-        return new RandomProcess.SimulationResults(tmpAggregator.doubleValue(), tmpRealisationValues);
+        return new RandomProcess.SimulationResults(tmpInitialValue, tmpRealisationValues);
     }
 }

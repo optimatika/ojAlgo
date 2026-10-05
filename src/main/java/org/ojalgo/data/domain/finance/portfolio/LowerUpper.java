@@ -22,10 +22,24 @@
 package org.ojalgo.data.domain.finance.portfolio;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.ojalgo.type.TypeUtils;
 
+/**
+ * A lower and an upper limit - either may be null.
+ */
 final class LowerUpper {
+
+    /**
+     * The indices sorted, without duplicates, to use as a map key - constraints on the same set of
+     * assets/components replace each other.
+     */
+    static List<Integer> key(final int... indices) {
+        return Arrays.stream(indices).sorted().distinct().boxed().collect(Collectors.toUnmodifiableList());
+    }
 
     final BigDecimal lower;
     final BigDecimal upper;

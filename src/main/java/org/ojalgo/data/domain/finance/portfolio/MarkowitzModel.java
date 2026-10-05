@@ -21,93 +21,116 @@
  */
 package org.ojalgo.data.domain.finance.portfolio;
 
-import static org.ojalgo.function.constant.BigMath.ZERO;
+import static org.ojalgo.function.constant.BigMath.HALF;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixR064;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
  * The Markowitz model, in this class, is defined as:
  * <p>
  * min (RAF/2) [w]<sup>T</sup>[C][w] - [w]<sup>T</sup>[r] <br>
- * subject to |[w]| = 1
+ * subject to the weights summing to 1 (100%)
  * <p>
- * RAF stands for Risk Aversion Factor. Instead of specifying a desired risk or return level you specify a
- * level of risk aversion that is used to balance the risk and return.
+ * RAF stands for Risk Aversion Factor - it balances risk and return. The expected returns, [r], must be
+ * excess returns. Don't include a risk-free asset (no excess return and zero variance).
  * <p>
- * The expected returns for each of the assets must be excess returns. Otherwise this formulation is wrong.
+ * Shorting can be allowed or not, {@link #setShortingAllowed(boolean)}, and there can be limits on individual
+ * assets, {@link #setLowerLimit(int, BigDecimal)} and {@link #setUpperLimit(int, BigDecimal)}, or on groups
+ * of assets, {@link #addConstraint(BigDecimal, BigDecimal, int...)}.
  * <p>
- * The total weights of all assets will always be 100%, but shorting can be allowed or not according to your
- * preference. ( {@linkplain #setShortingAllowed(boolean)} ) In addition you may set lower and upper limits on
- * any individual asset. ( {@linkplain #setLowerLimit(int, BigDecimal)} and
- * {@linkplain #setUpperLimit(int, BigDecimal)} )
- * <p>
- * Risk-free asset: That means there is no excess return and zero variance. Don't (try to) include a risk-free
- * asset here.
- * <p>
- * Do not worry about the minus sign in front of the return part of the objective function - it is
- * handled/negated for you. When you're asked to supply the expected excess returns you should supply
- * precisely that.
- * <p>
- * Basic usage instructions
- * After you've instantiated the MarkowitzModel you need to do one of three different things:
+ * Do one of:
  * <ol>
- * <li>{@link #setRiskAversion(Comparable)} unless this was already set in the {@link MarketEquilibrium} or
- * {@link FinancePortfolio.Context} used to instantiate the MarkowitzModel
+ * <li>{@link #setRiskAversion(Comparable)} - or use the risk aversion of the {@link MarketEquilibrium}
  * <li>{@link #setTargetReturn(BigDecimal)}
  * <li>{@link #setTargetVariance(BigDecimal)}
  * </ol>
+ * and then call {@link #getWeights()} or {@link #getAssetWeights()}.
  * <p>
- * Optionally you may {@linkplain #setLowerLimit(int, BigDecimal)},
- * {@linkplain #setUpperLimit(int, BigDecimal)} or {@linkplain #setShortingAllowed(boolean)}.
- * <p>
- * To get the optimal asset weighs you simply call {@link #getWeights()} or {@link #getAssetWeights()}.
- * <p>
- * If the results are not what you expect the first thing you should try is to turn on optimisation model
- * validation: {@code model.optimisation().validate(true);}
+ * Check {@code model.optimiser().getState()} - if no usable solution was found, all weights are zero. If the
+ * results are not what you expect, turn on optimisation model validation:
+ * {@code model.optimiser().validate(true);}
  *
  * @author apete
  */
 public final class MarkowitzModel extends OptimisedPortfolio {
 
-    private static final double _0_0 = ZERO.doubleValue();
-    private static final double INIT = PrimitiveMath.SQRT.invoke(PrimitiveMath.TEN);
-    private static final double MAX = PrimitiveMath.HUNDRED * PrimitiveMath.HUNDRED;
-    private static final double MIN = PrimitiveMath.HUNDREDTH;
+    /**
+     * When searching for a risk aversion factor that gives the target variance, the bracketing interval is
+     * expanded by a factor 10 at most this many times (in either direction).
+     */
+    private static final int MAX_EXPANSIONS = 20;
     private static final NumberContext TARGET_CONTEXT = NumberContext.of(5, 4);
 
-    private final HashMap<int[], LowerUpper> myConstraints = new HashMap<>();
-    private transient ExpressionsBasedModel myOptimisationModel;
+    /**
+     * The covariances and (expected excess) returns from the context, and the default risk aversion (1.0).
+     */
+    public static MarkowitzModel of(final FinancePortfolio.Context portfolioContext) {
+        return new MarkowitzModel(MarketEquilibrium.of(portfolioContext.getCovariances()), portfolioContext.getAssetReturns());
+    }
+
+    /**
+     * @param marketEquilibrium     The covariances and risk aversion
+     * @param expectedExcessReturns The expected excess returns
+     */
+    public static MarkowitzModel of(final MarketEquilibrium marketEquilibrium, final MatrixR064 expectedExcessReturns) {
+        return new MarkowitzModel(marketEquilibrium, expectedExcessReturns);
+    }
+
+    /**
+     * With the default risk aversion (1.0).
+     */
+    public static MarkowitzModel of(final Access2D<?> covariances, final MatrixR064 expectedExcessReturns) {
+        return new MarkowitzModel(MarketEquilibrium.of(covariances), expectedExcessReturns);
+    }
+
+    private final Map<List<Integer>, LowerUpper> myConstraints = new LinkedHashMap<>();
     private BigDecimal myTargetReturn;
     private BigDecimal myTargetVariance;
 
+    /**
+     * @deprecated v57 Use {@link #of(FinancePortfolio.Context)} instead.
+     */
+    @Deprecated
     public MarkowitzModel(final FinancePortfolio.Context portfolioContext) {
-        super(portfolioContext);
+        this(MarketEquilibrium.of(portfolioContext.getCovariances()), portfolioContext.getAssetReturns());
     }
 
+    /**
+     * @deprecated v57 Use {@link #of(MarketEquilibrium, MatrixR064)} instead. This constructor will become
+     *             package-private.
+     */
+    @Deprecated
     public MarkowitzModel(final MarketEquilibrium marketEquilibrium, final MatrixR064 expectedExcessReturns) {
         super(marketEquilibrium, expectedExcessReturns);
     }
 
+    /**
+     * @deprecated v57 Use {@link #of(Access2D, MatrixR064)} instead.
+     */
+    @Deprecated
     public MarkowitzModel(final MatrixR064 covarianceMatrix, final MatrixR064 expectedExcessReturns) {
-        super(covarianceMatrix, expectedExcessReturns);
+        this(MarketEquilibrium.of(covarianceMatrix), expectedExcessReturns);
     }
 
     /**
      * Will add a constraint on the sum of the asset weights specified by the asset indices. Either (but not
-     * both) of the limits may be null.
+     * both) of the limits may be null. A constraint on the same set of assets replaces any previous one.
      */
-    public LowerUpper addConstraint(final BigDecimal lowerLimit, final BigDecimal upperLimit, final int... assetIndeces) {
-        return myConstraints.put(assetIndeces, new LowerUpper(lowerLimit, upperLimit));
+    public void addConstraint(final BigDecimal lowerLimit, final BigDecimal upperLimit, final int... assetIndices) {
+        myConstraints.put(LowerUpper.key(assetIndices), new LowerUpper(lowerLimit, upperLimit));
+        this.reset();
     }
 
     public void clearAllConstraints() {
@@ -123,14 +146,14 @@ public final class MarkowitzModel extends OptimisedPortfolio {
     /**
      * Will set the target return to whatever you input and the target variance to {@code null}.
      * <p>
-     * Setting the target return implies that you disregard the risk aversion factor and want the minimum risk
-     * portfolio with return that is equal to or as close to the target as possible.
-     * <p>
-     * There is a performance penalty for setting a target return as the underlying optimisation model has to
-     * be solved several (many) times with different pararmeters (different risk aversion factors).
-     * <p>
-     * Setting a target return (or variance) is not recommnded. It's much better to simply modify the risk
-     * aversion factor.
+     * Setting the target return implies that you disregard the risk aversion factor and want the minimum
+     * variance portfolio with a return of at least the target. That is a single (quadratic) optimisation
+     * problem.
+     * <ul>
+     * <li>If the target is below the return of the minimum variance portfolio, you get the minimum variance
+     * portfolio - its return is higher than the target.
+     * <li>If the target is above the maximum attainable return, you get the maximum return portfolio.
+     * </ul>
      *
      * @see #setTargetVariance(BigDecimal)
      */
@@ -144,12 +167,15 @@ public final class MarkowitzModel extends OptimisedPortfolio {
      * Will set the target variance to whatever you input and the target return to {@code null}.
      * <p>
      * Setting the target variance implies that you disregard the risk aversion factor and want the maximum
-     * return portfolio with risk that is equal to or as close to the target as possible.
-     * <p>
+     * return portfolio with variance (approximately) equal to the target.
+     * <ul>
+     * <li>If the target is below the variance of the minimum variance portfolio, you get the minimum variance
+     * portfolio.
+     * <li>If the target is above the variance of the maximum return portfolio, you get the maximum return
+     * portfolio.
+     * </ul>
      * There is a performance penalty for setting a target variance as the underlying optimisation model has
-     * to be solved several (many) times with different pararmeters (different risk aversion factors).
-     * <p>
-     * Setting a target variance is not recommnded. It's much better to modify the risk aversion factor.
+     * to be solved several (many) times with different parameters (different risk aversion factors).
      *
      * @see #setTargetReturn(BigDecimal)
      */
@@ -164,34 +190,85 @@ public final class MarkowitzModel extends OptimisedPortfolio {
         this.reset();
     }
 
-    @Override
-    public String toString() {
+    private Optimisation.Result solveForTargetReturn(final BigDecimal targetReturn) {
 
-        if (myOptimisationModel == null) {
-            this.calculateAssetWeights();
+        Optimisation.Result retVal = this.solveMinimumVariance(targetReturn);
+
+        if (!retVal.getState().isFeasible()) {
+            // Target not attainable - settle for the maximum return portfolio
+            retVal = this.solve(myConstraints, PrimitiveMath.ZERO);
         }
 
-        return myOptimisationModel.toString();
+        return retVal;
     }
 
-    private ExpressionsBasedModel generateOptimisationModel(final double riskAversion) {
+    private Optimisation.Result solveForTargetVariance(final double targetVariance) {
 
-        if (myOptimisationModel == null) {
-            myOptimisationModel = this.makeModel(myConstraints);
+        Optimisation.Result retVal = this.solveMinimumVariance(null);
+        if (!retVal.getState().isFeasible() || this.calculatePortfolioVariance(retVal).doubleValue() >= targetVariance) {
+            return retVal;
         }
 
-        myOptimisationModel.getExpression(VARIANCE).weight(riskAversion / 2.0);
-
-        if (this.getOptimisationOptions().logger_appender != null) {
-            BasicLogger.debug();
-            BasicLogger.debug("@@@@@@@@@@@");
-            BasicLogger.debug("Iteration RAF: {}", riskAversion);
-            BasicLogger.debug("Iteration point: {}", myOptimisationModel.getVariableValues());
-            BasicLogger.debug("@@@@@@@@@@@");
-            BasicLogger.debug();
+        retVal = this.solve(myConstraints, PrimitiveMath.ZERO);
+        if (retVal.getState() != Optimisation.State.UNBOUNDED && this.calculatePortfolioVariance(retVal).doubleValue() <= targetVariance) {
+            return retVal;
         }
 
-        return myOptimisationModel;
+        // The target is now between the variances of the minimum variance and the maximum return portfolios.
+        // The variance decreases monotonically with increasing risk aversion.
+
+        double low = this.getRiskAversion().doubleValue(); // variance(low) >= target
+        double high = low; // variance(high) <= target
+
+        retVal = this.solve(myConstraints, low);
+        double variance = this.calculatePortfolioVariance(retVal).doubleValue();
+
+        if (variance > targetVariance) {
+            for (int i = 0; variance > targetVariance && i < MAX_EXPANSIONS; i++) {
+                low = high;
+                high *= PrimitiveMath.TEN;
+                retVal = this.solve(myConstraints, high);
+                variance = this.calculatePortfolioVariance(retVal).doubleValue();
+            }
+        } else {
+            for (int i = 0; variance < targetVariance && i < MAX_EXPANSIONS; i++) {
+                high = low;
+                low /= PrimitiveMath.TEN;
+                retVal = this.solve(myConstraints, low);
+                variance = this.calculatePortfolioVariance(retVal).doubleValue();
+            }
+        }
+
+        while (!TARGET_CONTEXT.isSmall(targetVariance, variance - targetVariance) && TARGET_CONTEXT.isDifferent(PrimitiveMath.ONE, high / low)) {
+
+            double middle = PrimitiveMath.SQRT.invoke(low * high);
+
+            retVal = this.solve(myConstraints, middle);
+            variance = this.calculatePortfolioVariance(retVal).doubleValue();
+
+            if (variance > targetVariance) {
+                low = middle;
+            } else {
+                high = middle;
+            }
+        }
+
+        return retVal;
+    }
+
+    /**
+     * min (1/2) [w]<sup>T</sup>[C][w] subject to [w]<sup>T</sup>[r] >= minimumReturn (if not null)
+     */
+    private Optimisation.Result solveMinimumVariance(final BigDecimal minimumReturn) {
+
+        ExpressionsBasedModel model = this.makeModel(myConstraints);
+
+        model.getExpression(VARIANCE).weight(HALF);
+        if (minimumReturn != null) {
+            model.getExpression(RETURN).lower(minimumReturn);
+        }
+
+        return model.minimise();
     }
 
     /**
@@ -200,104 +277,17 @@ public final class MarkowitzModel extends OptimisedPortfolio {
     @Override
     protected MatrixR064 calculateAssetWeights() {
 
-        if (this.getOptimisationOptions().logger_appender != null) {
-            BasicLogger.debug();
-            BasicLogger.debug("###################################################");
-            BasicLogger.debug("BEGIN RAF: {} MarkowitzModel optimisation", this.getRiskAversion());
-            BasicLogger.debug("###################################################");
-            BasicLogger.debug();
-        }
+        Optimisation.Result result;
 
-        Optimisation.Result tmpResult;
-
-        if (myTargetReturn != null || myTargetVariance != null) {
-
-            final double tmpTargetValue;
-            if (myTargetVariance != null) {
-                tmpTargetValue = myTargetVariance.doubleValue();
-            } else if (myTargetReturn != null) {
-                tmpTargetValue = myTargetReturn.doubleValue();
-            } else {
-                tmpTargetValue = _0_0;
-            }
-
-            tmpResult = this.generateOptimisationModel(_0_0).minimise();
-
-            double tmpTargetNow = _0_0;
-            double tmpTargetDiff = _0_0;
-            double tmpTargetLast = _0_0;
-
-            if (tmpResult.getState().isFeasible()) {
-
-                double tmpCurrent;
-                double tmpLow;
-                double tmpHigh;
-                if (this.isDefaultRiskAversion()) {
-                    tmpCurrent = INIT;
-                    tmpLow = MAX;
-                    tmpHigh = MIN;
-                } else {
-                    tmpCurrent = this.getRiskAversion().doubleValue();
-                    tmpLow = tmpCurrent * INIT;
-                    tmpHigh = tmpCurrent / INIT;
-                }
-
-                do {
-
-                    final ExpressionsBasedModel tmpModel = this.generateOptimisationModel(tmpCurrent);
-                    tmpResult = tmpModel.minimise();
-
-                    tmpTargetLast = tmpTargetNow;
-                    if (myTargetVariance != null) {
-                        tmpTargetNow = this.calculatePortfolioVariance(tmpResult).doubleValue();
-                    } else if (myTargetReturn != null) {
-                        tmpTargetNow = this.calculatePortfolioReturn(tmpResult, this.calculateAssetReturns()).doubleValue();
-                    } else {
-                        tmpTargetNow = tmpTargetValue;
-                    }
-                    tmpTargetDiff = tmpTargetNow - tmpTargetValue;
-
-                    if (this.getOptimisationOptions().logger_appender != null) {
-                        BasicLogger.debug();
-                        BasicLogger.debug("RAF:   {}", tmpCurrent);
-                        BasicLogger.debug("Last: {}", tmpTargetLast);
-                        BasicLogger.debug("Now: {}", tmpTargetNow);
-                        BasicLogger.debug("Target: {}", tmpTargetValue);
-                        BasicLogger.debug("Diff:   {}", tmpTargetDiff);
-                        BasicLogger.debug("Iteration:   {}", tmpResult);
-                        BasicLogger.debug();
-                    }
-
-                    if (tmpTargetDiff < _0_0) {
-                        tmpLow = tmpCurrent;
-                    } else if (tmpTargetDiff > _0_0) {
-                        tmpHigh = tmpCurrent;
-                    }
-                    tmpCurrent = PrimitiveMath.SQRT.invoke(tmpLow * tmpHigh);
-
-                } while (!TARGET_CONTEXT.isSmall(tmpTargetValue, tmpTargetDiff) && TARGET_CONTEXT.isDifferent(tmpHigh, tmpLow));
-            }
-
+        if (myTargetReturn != null) {
+            result = this.solveForTargetReturn(myTargetReturn);
+        } else if (myTargetVariance != null) {
+            result = this.solveForTargetVariance(myTargetVariance.doubleValue());
         } else {
-
-            tmpResult = this.generateOptimisationModel(this.getRiskAversion().doubleValue()).minimise();
-
+            result = this.solve(myConstraints, this.getRiskAversion().doubleValue());
         }
 
-        return this.handle(tmpResult);
-    }
-
-    @Override
-    protected void reset() {
-
-        super.reset();
-
-        myOptimisationModel = null;
-
-    }
-
-    Scalar<?> calculatePortfolioReturn(final Access1D<?> weightsVctr, final MatrixR064 returnsVctr) {
-        return super.calculatePortfolioReturn(MATRIX_FACTORY.column(weightsVctr), returnsVctr);
+        return this.handle(result);
     }
 
     Scalar<?> calculatePortfolioVariance(final Access1D<?> weightsVctr) {

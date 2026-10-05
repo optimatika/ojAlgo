@@ -50,9 +50,9 @@ public class MultidimensionalSimulatorTest extends PortfolioSimulatorTests {
 
         R064Store correlation = R064Store.FACTORY.makeEye(3, 3);
 
-        GeometricBrownianMotion orgProc1 = new SimpleAsset(ZERO, 0.01, THIRD).forecast();
-        GeometricBrownianMotion orgProc2 = new SimpleAsset(ZERO, 0.02, THIRD).forecast();
-        GeometricBrownianMotion orgProc3 = new SimpleAsset(ZERO, 0.03, THIRD).forecast();
+        GeometricBrownianMotion orgProc1 = SimpleAsset.of(ZERO, 0.01, THIRD).forecast();
+        GeometricBrownianMotion orgProc2 = SimpleAsset.of(ZERO, 0.02, THIRD).forecast();
+        GeometricBrownianMotion orgProc3 = SimpleAsset.of(ZERO, 0.03, THIRD).forecast();
 
         TestUtils.assertEquals(0.01, orgProc1.getStandardDeviation(), 0.005);
         TestUtils.assertEquals(0.02, orgProc2.getStandardDeviation(), 0.005);

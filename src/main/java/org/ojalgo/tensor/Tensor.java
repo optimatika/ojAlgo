@@ -33,7 +33,7 @@ import org.ojalgo.array.ArrayAnyD;
  * If all you want is multi-dimesional arrays this interface and its implementations is NOT what you're
  * looking for. In that case just use {@link ArrayAnyD} instead.
  *
- * @see https://mathworld.wolfram.com/Tensor.html
+ * @see "https://mathworld.wolfram.com/Tensor.html"
  * @author apete
  */
 public interface Tensor<N extends Comparable<N>, T extends Tensor<N, T>> extends NormedVectorSpace<T, N> {

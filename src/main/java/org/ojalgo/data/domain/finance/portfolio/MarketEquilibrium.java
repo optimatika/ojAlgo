@@ -63,6 +63,33 @@ public class MarketEquilibrium {
         return PrimitiveScalar.valueOf(assetWeights.dot(assetReturns));
     }
 
+    /**
+     * With the default risk aversion (1.0) and generated asset keys.
+     */
+    public static MarketEquilibrium of(final Access2D<?> covariances) {
+        return MarketEquilibrium.of(covariances, DEFAULT_RISK_AVERSION);
+    }
+
+    /**
+     * With generated asset keys.
+     *
+     * @throws IllegalArgumentException if the risk aversion factor is not positive
+     */
+    public static MarketEquilibrium of(final Access2D<?> covariances, final Comparable<?> riskAversion) {
+        return new MarketEquilibrium(MarketEquilibrium.makeSymbols((int) covariances.countRows()), MarketEquilibrium.toCovariances(covariances),
+                TypeUtils.toBigDecimal(riskAversion));
+    }
+
+    /**
+     * @param assetKeys    Names/keys of the assets (copied)
+     * @param covariances  The covariance matrix
+     * @param riskAversion The (market) risk aversion factor - 1.0 is the default
+     * @throws IllegalArgumentException if the risk aversion factor is not positive
+     */
+    public static MarketEquilibrium of(final String[] assetKeys, final Access2D<?> covariances, final Comparable<?> riskAversion) {
+        return new MarketEquilibrium(COPY.copyOf(assetKeys), MarketEquilibrium.toCovariances(covariances), TypeUtils.toBigDecimal(riskAversion));
+    }
+
     private static String[] makeSymbols(final int count) {
 
         final String[] retVal = new String[count];
@@ -81,66 +108,90 @@ public class MarketEquilibrium {
         return retVal;
     }
 
+    private static MatrixR064 toCovariances(final Access2D<?> covariances) {
+        if (covariances instanceof MatrixR064) {
+            return (MatrixR064) covariances;
+        } else {
+            return MatrixR064.FACTORY.copy(covariances);
+        }
+    }
+
+    private static BigDecimal toRiskAversion(final Comparable<?> factor) {
+
+        BigDecimal retVal = TypeUtils.toBigDecimal(factor);
+
+        if (retVal.signum() <= 0) {
+            throw new IllegalArgumentException("The risk aversion factor must be positive: " + retVal);
+        }
+
+        return retVal;
+    }
+
     private final String[] myAssetKeys;
     private final MatrixR064 myCovariances;
     private BigDecimal myRiskAversion;
 
+    /**
+     * @deprecated v57 Use {@link #of(Access2D)} instead.
+     */
+    @Deprecated
     public MarketEquilibrium(final Access2D<?> covarianceMatrix) {
-        this(covarianceMatrix, DEFAULT_RISK_AVERSION);
-    }
-
-    public MarketEquilibrium(final Access2D<?> covarianceMatrix, final Comparable<?> riskAversionFactor) {
-        this(MarketEquilibrium.makeSymbols((int) covarianceMatrix.countRows()), covarianceMatrix, riskAversionFactor);
-    }
-
-    public MarketEquilibrium(final String[] assetNamesOrKeys, final Access2D<?> covarianceMatrix) {
-        this(assetNamesOrKeys, covarianceMatrix, DEFAULT_RISK_AVERSION);
-    }
-
-    public MarketEquilibrium(final String[] assetNamesOrKeys, final Access2D<?> covarianceMatrix, final Comparable<?> riskAversionFactor) {
-
-        super();
-
-        myAssetKeys = COPY.copyOf(assetNamesOrKeys);
-        if (covarianceMatrix instanceof MatrixR064) {
-            myCovariances = (MatrixR064) covarianceMatrix;
-        } else {
-            myCovariances = MatrixR064.FACTORY.copy(covarianceMatrix);
-        }
-
-        myRiskAversion = TypeUtils.toBigDecimal(riskAversionFactor);
-    }
-
-    MarketEquilibrium(final MarketEquilibrium marketEquilibrium) {
-        this(marketEquilibrium.getAssetKeys(), marketEquilibrium.getCovariances(), marketEquilibrium.getRiskAversion().get());
+        this(MarketEquilibrium.makeSymbols((int) covarianceMatrix.countRows()), MarketEquilibrium.toCovariances(covarianceMatrix), DEFAULT_RISK_AVERSION);
     }
 
     /**
-     * If the input vector of asset weights are the weights of the market portfolio, then the ouput is the
+     * @deprecated v57 Use {@link #of(Access2D, Comparable)} instead.
+     */
+    @Deprecated
+    public MarketEquilibrium(final Access2D<?> covarianceMatrix, final Comparable<?> riskAversionFactor) {
+        this(MarketEquilibrium.makeSymbols((int) covarianceMatrix.countRows()), MarketEquilibrium.toCovariances(covarianceMatrix),
+                TypeUtils.toBigDecimal(riskAversionFactor));
+    }
+
+    /**
+     * @deprecated v57 Use {@link #of(String[], Access2D, Comparable)}, with risk aversion 1.0, instead.
+     */
+    @Deprecated
+    public MarketEquilibrium(final String[] assetNamesOrKeys, final Access2D<?> covarianceMatrix) {
+        this(COPY.copyOf(assetNamesOrKeys), MarketEquilibrium.toCovariances(covarianceMatrix), DEFAULT_RISK_AVERSION);
+    }
+
+    /**
+     * @deprecated v57 Use {@link #of(String[], Access2D, Comparable)} instead.
+     */
+    @Deprecated
+    public MarketEquilibrium(final String[] assetNamesOrKeys, final Access2D<?> covarianceMatrix, final Comparable<?> riskAversionFactor) {
+        this(COPY.copyOf(assetNamesOrKeys), MarketEquilibrium.toCovariances(covarianceMatrix), TypeUtils.toBigDecimal(riskAversionFactor));
+    }
+
+    MarketEquilibrium(final String[] assetKeys, final MatrixR064 covariances, final BigDecimal riskAversion) {
+
+        super();
+
+        myAssetKeys = assetKeys;
+        myCovariances = covariances;
+        myRiskAversion = MarketEquilibrium.toRiskAversion(riskAversion);
+    }
+
+    /**
+     * If the input vector of asset weights are the weights of the market portfolio, then the output is the
      * equilibrium excess returns.
      */
     public MatrixR064 calculateAssetReturns(final MatrixR064 assetWeights) {
-        final MatrixR064 tmpAssetWeights = myRiskAversion.compareTo(DEFAULT_RISK_AVERSION) == 0 ? assetWeights
-                : assetWeights.multiply(myRiskAversion.doubleValue());
-        return myCovariances.multiply(tmpAssetWeights);
+        return myCovariances.multiply(assetWeights).multiply(myRiskAversion.doubleValue());
     }
 
     /**
      * If the input vector of returns are the equilibrium excess returns then the output is the market
-     * portfolio weights. This is unconstrained optimisation - there are no constraints on the resulting
-     * instrument weights.
+     * portfolio weights. This is unconstrained optimisation - there are no constraints on the resulting asset
+     * weights.
      */
     public MatrixR064 calculateAssetWeights(final MatrixR064 assetReturns) {
-        final MatrixR064 tmpAssetWeights = myCovariances.solve(assetReturns);
-        if (myRiskAversion.compareTo(DEFAULT_RISK_AVERSION) == 0) {
-            return tmpAssetWeights;
-        } else {
-            return tmpAssetWeights.divide(myRiskAversion.doubleValue());
-        }
+        return myCovariances.solve(assetReturns).divide(myRiskAversion.doubleValue());
     }
 
     /**
-     * Calculates the portfolio variance using the input instrument weights.
+     * Calculates the portfolio variance using the input asset weights.
      */
     public Scalar<?> calculatePortfolioVariance(final MatrixR064 assetWeights) {
 
@@ -161,12 +212,21 @@ public class MarketEquilibrium {
     /**
      * Will set the risk aversion factor to the best fit for an observed pair of market portfolio asset
      * weights and equilibrium/historical excess returns.
+     *
+     * @return true if calibrated, false if the implied risk aversion is not positive - the weights and
+     *         returns don't imply a positive risk premium (e.g. historical returns from a falling market).
+     *         The risk aversion is then left unchanged.
      */
-    public void calibrate(final MatrixR064 assetWeights, final MatrixR064 assetReturns) {
+    public boolean calibrate(final MatrixR064 assetWeights, final MatrixR064 assetReturns) {
 
-        final Scalar<?> tmpImpliedRiskAversion = this.calculateImpliedRiskAversion(assetWeights, assetReturns);
+        double implied = this.calculateImpliedRiskAversion(assetWeights, assetReturns);
 
-        this.setRiskAversion(tmpImpliedRiskAversion.get());
+        if (implied > PrimitiveMath.ZERO) {
+            this.setRiskAversion(implied);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -184,7 +244,7 @@ public class MarketEquilibrium {
     }
 
     public MarketEquilibrium copy() {
-        return new MarketEquilibrium(this);
+        return new MarketEquilibrium(myAssetKeys, myCovariances, myRiskAversion);
     }
 
     public String getAssetKey(final int index) {
@@ -203,17 +263,11 @@ public class MarketEquilibrium {
         return BigScalar.of(myRiskAversion);
     }
 
+    /**
+     * @throws IllegalArgumentException if the factor is not positive
+     */
     public void setRiskAversion(final Comparable<?> factor) {
-
-        final BigDecimal tmpFactor = TypeUtils.toBigDecimal(factor);
-
-        if (tmpFactor.signum() == 0) {
-            myRiskAversion = DEFAULT_RISK_AVERSION;
-        } else if (tmpFactor.signum() < 0) {
-            myRiskAversion = tmpFactor.negate();
-        } else {
-            myRiskAversion = tmpFactor;
-        }
+        myRiskAversion = MarketEquilibrium.toRiskAversion(factor);
     }
 
     public int size() {
@@ -225,24 +279,13 @@ public class MarketEquilibrium {
     }
 
     /**
-     * Will calculate the risk aversion factor that is the best fit for an observed pair of market portfolio
-     * weights and equilibrium/historical excess returns.
+     * Will calculate the risk aversion factor that is the (least squares) best fit for an observed pair of
+     * market portfolio weights and equilibrium/historical excess returns: [r] = RAF [C][w]. The result is not
+     * necessarily positive (or even a number).
      */
-    Scalar<?> calculateImpliedRiskAversion(final MatrixR064 assetWeights, final MatrixR064 assetReturns) {
-
-        Scalar<?> retVal = myCovariances.multiply(assetWeights).solve(assetReturns).toScalar(0, 0);
-
-        if (retVal.isSmall(PrimitiveMath.ONE)) {
-            retVal = BigScalar.ONE;
-        } else if (!retVal.isAbsolute()) {
-            retVal = retVal.negate();
-        }
-
-        return retVal;
-    }
-
-    boolean isDefaultRiskAversion() {
-        return myRiskAversion.compareTo(DEFAULT_RISK_AVERSION) == 0;
+    double calculateImpliedRiskAversion(final MatrixR064 assetWeights, final MatrixR064 assetReturns) {
+        MatrixR064 covarWeights = myCovariances.multiply(assetWeights);
+        return covarWeights.dot(assetReturns) / covarWeights.dot(covarWeights);
     }
 
 }

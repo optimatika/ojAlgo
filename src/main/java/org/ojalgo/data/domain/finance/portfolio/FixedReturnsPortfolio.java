@@ -23,20 +23,40 @@ package org.ojalgo.data.domain.finance.portfolio;
 
 import java.util.List;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.matrix.MatrixR064;
 
+/**
+ * The asset returns are given. The weights are the unconstrained equilibrium weights, [w] =
+ * [C]<sup>-1</sup>[r] / RAF - they do not necessarily sum to 1.
+ */
 public final class FixedReturnsPortfolio extends EquilibriumModel {
+
+    /**
+     * The covariances and returns from the context, and the default risk aversion (1.0).
+     */
+    public static FixedReturnsPortfolio of(final Context context) {
+        return new FixedReturnsPortfolio(MarketEquilibrium.of(context.getCovariances()), context.getAssetReturns());
+    }
+
+    public static FixedReturnsPortfolio of(final MarketEquilibrium marketEquilibrium, final MatrixR064 returns) {
+        return new FixedReturnsPortfolio(marketEquilibrium, returns);
+    }
 
     private final MatrixR064 myReturns;
 
+    /**
+     * @deprecated v57 Use {@link #of(FinancePortfolio.Context)} instead.
+     */
+    @Deprecated
     public FixedReturnsPortfolio(final Context aContext) {
-
-        super(aContext);
-
-        myReturns = aContext.getAssetReturns();
+        this(MarketEquilibrium.of(aContext.getCovariances()), aContext.getAssetReturns());
     }
 
+    /**
+     * @deprecated v57 Use {@link #of(MarketEquilibrium, MatrixR064)} instead. This constructor will become
+     *             package-private.
+     */
+    @Deprecated
     public FixedReturnsPortfolio(final MarketEquilibrium aMarketEquilibrium, final MatrixR064 returnsVector) {
 
         super(aMarketEquilibrium);
@@ -44,22 +64,22 @@ public final class FixedReturnsPortfolio extends EquilibriumModel {
         myReturns = returnsVector;
     }
 
-    @SuppressWarnings("unused")
-    private FixedReturnsPortfolio(final MarketEquilibrium aMarketEquilibrium) {
-
-        super(aMarketEquilibrium);
-
-        myReturns = null;
-
-        ProgrammingError.throwForIllegalInvocation();
+    /**
+     * Sets the risk aversion to the best fit for these weights and returns.
+     *
+     * @return true if calibrated, false if the implied risk aversion is not positive - the weights and
+     *         returns don't imply a positive risk premium (e.g. historical returns from a falling market).
+     *         The risk aversion is then left unchanged.
+     */
+    public boolean calibrate(final FinancePortfolio targetWeights) {
+        return this.calibrate(targetWeights.getWeights());
     }
 
-    public void calibrate(final FinancePortfolio targetWeights) {
-        this.calibrate(targetWeights.getWeights());
-    }
-
-    public void calibrate(final List<? extends Comparable<?>> targetWeights) {
-        this.calibrate(FinancePortfolio.MATRIX_FACTORY.column(targetWeights), myReturns);
+    /**
+     * @see #calibrate(FinancePortfolio)
+     */
+    public boolean calibrate(final List<? extends Comparable<?>> targetWeights) {
+        return this.calibrate(FinancePortfolio.MATRIX_FACTORY.column(targetWeights), myReturns);
     }
 
     @Override

@@ -38,6 +38,9 @@ import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.PrimitiveNumber;
 import org.ojalgo.type.keyvalue.KeyValue;
 
+/**
+ * Reads historical prices from a (CSV or similar) file. The symbol is derived from the file name.
+ */
 public final class FinanceDataReader<DP extends DatePrice> implements FinanceData<DP>, DataFetcher {
 
     public static <T extends DatePrice> FinanceDataReader<T> of(final File file, final TextLineReader.Parser<T> parser) {

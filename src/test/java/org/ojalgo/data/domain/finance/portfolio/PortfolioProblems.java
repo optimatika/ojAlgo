@@ -73,8 +73,8 @@ public class PortfolioProblems extends FinancePortfolioTests {
         MatrixR064 expectedExcessReturns = tm.getExpectedExcessReturns(assets_return); // Why not negate?
         BigDecimal riskAversion = new BigDecimal(1.0);
 
-        MarketEquilibrium marketEquilibrium = new MarketEquilibrium(covariances, riskAversion);
-        MarkowitzModel markowitzModel = new MarkowitzModel(marketEquilibrium, expectedExcessReturns);
+        MarketEquilibrium marketEquilibrium = MarketEquilibrium.of(covariances, riskAversion);
+        MarkowitzModel markowitzModel = MarkowitzModel.of(marketEquilibrium, expectedExcessReturns);
 
         for (int i = 0; i < assetNum; i++) {
             markowitzModel.setLowerLimit(i, new BigDecimal(0.0));
@@ -115,9 +115,9 @@ public class PortfolioProblems extends FinancePortfolioTests {
         tmpReturnsBuilder.set(2, 0, 0.18);
         MatrixR064 tmpReturs = tmpReturnsBuilder.get();
 
-        MarketEquilibrium tmpME = new MarketEquilibrium(tmpCovars);
+        MarketEquilibrium tmpME = MarketEquilibrium.of(tmpCovars);
 
-        MarkowitzModel tmpMarkowitz = new MarkowitzModel(tmpME, tmpReturs);
+        MarkowitzModel tmpMarkowitz = MarkowitzModel.of(tmpME, tmpReturs);
 
         for (int i = 1; i < 10; i++) {
 
@@ -200,14 +200,14 @@ public class PortfolioProblems extends FinancePortfolioTests {
         //        tmpEvD.compute(tmpCovariances, true);
         //        BasicLogger.debug("Eigenvalues: {}", tmpEvD.getEigenvalues());
 
-        MarketEquilibrium tmpMarketEquilibrium = new MarketEquilibrium(tmpCovariances, BigMath.THOUSAND);
+        MarketEquilibrium tmpMarketEquilibrium = MarketEquilibrium.of(tmpCovariances, BigMath.THOUSAND);
 
         MatrixR064.DenseReceiver tmpExcessReturnsBuilder = MatrixR064.FACTORY.newDenseBuilder(2, 1);
         tmpExcessReturnsBuilder.set(0, 0, 0.1400);
         tmpExcessReturnsBuilder.set(1, 0, 0.0800);
         MatrixR064 tmpExcessReturns = tmpExcessReturnsBuilder.get();
 
-        MarkowitzModel tmpMarkowitzModel = new MarkowitzModel(tmpMarketEquilibrium, tmpExcessReturns);
+        MarkowitzModel tmpMarkowitzModel = MarkowitzModel.of(tmpMarketEquilibrium, tmpExcessReturns);
         tmpMarkowitzModel.setLowerLimit(0, BigMath.ZERO);
         tmpMarkowitzModel.setUpperLimit(0, BigMath.ONE);
         tmpMarkowitzModel.setLowerLimit(1, BigMath.ZERO);
@@ -270,8 +270,8 @@ public class PortfolioProblems extends FinancePortfolioTests {
         MatrixR064 tmpCovariances = tm.getCovariances(assets_return);
         MatrixR064 tmpExpectedExcessReturns = tm.getExpectedExcessReturns(assets_return).negate();
 
-        MarketEquilibrium tmpME = new MarketEquilibrium(tmpCovariances).clean();
-        MarkowitzModel tmpMarkowitz = new MarkowitzModel(tmpME, tmpExpectedExcessReturns);
+        MarketEquilibrium tmpME = MarketEquilibrium.of(tmpCovariances).clean();
+        MarkowitzModel tmpMarkowitz = MarkowitzModel.of(tmpME, tmpExpectedExcessReturns);
 
         BigDecimal[] tmpRiskAversions = { BigMath.HUNDREDTH, BigMath.TWELFTH, BigMath.EIGHTH, BigMath.HALF, BigMath.ONE, BigMath.TWO, BigMath.EIGHT,
                 BigMath.TWELVE, BigMath.HUNDRED, BigMath.THOUSAND };
@@ -325,8 +325,8 @@ public class PortfolioProblems extends FinancePortfolioTests {
         MatrixR064 cov = matrixFactory.copy(RawStore.wrap(new double[][] { { 0.01, 0.0018, 0.0011 }, { 0.0018, 0.0109, 0.0026 }, { 0.0011, 0.0026, 0.0199 } }));
         MatrixR064 ret = matrixFactory.column(0.0427, 0.0015, 0.0285);
 
-        MarketEquilibrium marketEquilibrium = new MarketEquilibrium(cov);
-        MarkowitzModel markowitz = new MarkowitzModel(marketEquilibrium, ret);
+        MarketEquilibrium marketEquilibrium = MarketEquilibrium.of(cov);
+        MarkowitzModel markowitz = MarkowitzModel.of(marketEquilibrium, ret);
         markowitz.setShortingAllowed(true);
         markowitz.setTargetReturn(BigDecimal.valueOf(0.0427));
 
@@ -373,8 +373,8 @@ public class PortfolioProblems extends FinancePortfolioTests {
         tmpBuilder.add(1, 0.40000);
         MatrixR064 returns = tmpBuilder.get();
 
-        MarketEquilibrium marketEq = new MarketEquilibrium(covariances);
-        MarkowitzModel markowitzModel = new MarkowitzModel(marketEq, returns);
+        MarketEquilibrium marketEq = MarketEquilibrium.of(covariances);
+        MarkowitzModel markowitzModel = MarkowitzModel.of(marketEq, returns);
 
         for (int r = 0; r <= 10; r++) {
             BigDecimal targetReturn = StandardType.PERCENT.enforce(new BigDecimal(0.2 + 0.02 * r));
@@ -425,8 +425,8 @@ public class PortfolioProblems extends FinancePortfolioTests {
             assetsReturnsMatrix.set(i, 0, assetsReturns[i]);
         }
 
-        MarketEquilibrium marketEq = new MarketEquilibrium(assetsCovariancesMatrix.get());
-        MarkowitzModel markowitzModel = new MarkowitzModel(marketEq, assetsReturnsMatrix.get());
+        MarketEquilibrium marketEq = MarketEquilibrium.of(assetsCovariancesMatrix.get());
+        MarkowitzModel markowitzModel = MarkowitzModel.of(marketEq, assetsReturnsMatrix.get());
         BigDecimal value = StandardType.PERCENT.enforce(BigDecimal.valueOf(targetReturn));
 
         markowitzModel.setTargetReturn(value);
@@ -478,15 +478,15 @@ public class PortfolioProblems extends FinancePortfolioTests {
         MatrixR064 ret = matrixFactory
                 .copy(RawStore.wrap(new double[][] { { 0.16373354541629026 }, { 0.007304578002244022 }, { 0.05247478842401128 }, { 0.12286070470561875 } }));
 
-        MarketEquilibrium marketEquilibrium = new MarketEquilibrium(cov);
+        MarketEquilibrium marketEquilibrium = MarketEquilibrium.of(cov);
 
-        MarkowitzModel markowitzWithTimeLimit = new MarkowitzModel(marketEquilibrium, ret);
+        MarkowitzModel markowitzWithTimeLimit = MarkowitzModel.of(marketEquilibrium, ret);
         markowitzWithTimeLimit.optimiser().time(new CalendarDateDuration(5, CalendarDateUnit.SECOND));
 
         List<BigDecimal> tmpWeights1 = markowitzWithTimeLimit.getWeights();
         TestUtils.assertTrue(markowitzWithTimeLimit.optimiser().getState().isFeasible());
 
-        MarkowitzModel cleanedMarkowitz = new MarkowitzModel(marketEquilibrium.clean(), ret);
+        MarkowitzModel cleanedMarkowitz = MarkowitzModel.of(marketEquilibrium.clean(), ret);
 
         List<BigDecimal> tmpWeights2 = cleanedMarkowitz.getWeights();
         TestUtils.assertTrue(cleanedMarkowitz.optimiser().getState().isFeasible());

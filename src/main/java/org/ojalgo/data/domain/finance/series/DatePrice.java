@@ -30,6 +30,10 @@ import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.PrimitiveNumber;
 import org.ojalgo.type.keyvalue.EntryPair;
 
+/**
+ * A (closing) price at a date. Subclasses may carry more data (open, high, low, volume...) - the
+ * {@link #getPrice()} method returns the price to use for analysis, typically the (adjusted) close.
+ */
 public abstract class DatePrice implements EntryPair.KeyedPrimitive<LocalDate> {
 
     static final class DefaultDP extends DatePrice {

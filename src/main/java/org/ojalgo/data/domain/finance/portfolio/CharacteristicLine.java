@@ -21,48 +21,190 @@
  */
 package org.ojalgo.data.domain.finance.portfolio;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.function.constant.PrimitiveMath;
+import static org.ojalgo.function.constant.PrimitiveMath.SQRT;
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
+import java.math.BigDecimal;
+import java.util.List;
+
+import org.ojalgo.matrix.MatrixR064;
+import org.ojalgo.random.SampleSet;
+import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.type.TypeUtils;
+
+/**
+ * The (security) characteristic line of one asset against the market: r<sub>a</sub> = alpha + beta
+ * r<sub>M</sub> + epsilon, where r<sub>a</sub> and r<sub>M</sub> are the (excess) returns of the asset and
+ * the market, and epsilon is the asset specific (residual) part of the return - uncorrelated with the market.
+ * <p>
+ * There are 2 sets of factory methods:
+ * <ol>
+ * <li>Assuming CAPM - the asset is correctly priced (alpha is 0), and beta is implied by the expected
+ * returns: {@link #assumingCAPM(FinancePortfolio, FinancePortfolio)}
+ * <li>Not assuming CAPM - alpha and beta are derived from the covariances of a portfolio model,
+ * {@link #of(FinancePortfolio.Context, FinancePortfolio, int)}, or estimated from samples,
+ * {@link #estimate(Access1D, Access1D)}.
+ * </ol>
+ */
 public final class CharacteristicLine {
 
-    public double beta, alpha, epsilon;
+    /**
+     * Assuming CAPM the asset is correctly priced, alpha is 0, and beta = E[r<sub>a</sub>] /
+     * E[r<sub>M</sub>]. Only the expected returns and volatilities of the asset and the market are used.
+     *
+     * @throws IllegalArgumentException if the asset's variance is less than the part explained by the market
+     *                                  (beta<sup>2</sup> Var[r<sub>M</sub>]) - the inputs are not consistent
+     *                                  with CAPM
+     */
+    public static CharacteristicLine assumingCAPM(final FinancePortfolio market, final FinancePortfolio asset) {
 
-    private final FinancePortfolio myMarketPortfolio;
+        double beta = asset.getMeanReturn() / market.getMeanReturn();
+        double marketVariance = market.getReturnVariance();
 
-    public CharacteristicLine(final FinancePortfolio theMarketPortfolio) {
+        double residualVariance = CharacteristicLine.toResidualVariance(asset.getReturnVariance(), beta * beta * marketVariance);
+
+        return new CharacteristicLine(ZERO, beta, marketVariance, residualVariance);
+    }
+
+    /**
+     * Least squares fit to paired samples of (excess) returns - the asset's and the market's returns over the
+     * same periods.
+     * <p>
+     * beta = Cov[r<sub>a</sub>, r<sub>M</sub>] / Var[r<sub>M</sub>] and alpha = mean(r<sub>a</sub>) - beta
+     * mean(r<sub>M</sub>)
+     */
+    public static CharacteristicLine estimate(final Access1D<?> marketReturns, final Access1D<?> assetReturns) {
+
+        if (marketReturns.count() != assetReturns.count() || marketReturns.count() < 2L) {
+            throw new IllegalArgumentException("Need (at least 2) paired samples!");
+        }
+
+        SampleSet market = SampleSet.wrap(marketReturns);
+        SampleSet asset = SampleSet.wrap(assetReturns);
+
+        double marketVariance = market.getVariance();
+        double covariance = asset.getCovariance(market);
+
+        double beta = covariance / marketVariance;
+        double alpha = asset.getMean() - beta * market.getMean();
+
+        double residualVariance = CharacteristicLine.toResidualVariance(asset.getVariance(), beta * covariance);
+
+        return new CharacteristicLine(alpha, beta, marketVariance, residualVariance);
+    }
+
+    /**
+     * The line implied by a portfolio model - its asset returns and covariances - and the market portfolio
+     * weights (normalised to sum to 1).
+     * <p>
+     * beta = Cov[r<sub>a</sub>, r<sub>M</sub>] / Var[r<sub>M</sub>] and alpha = E[r<sub>a</sub>] - beta
+     * E[r<sub>M</sub>]
+     * <p>
+     * Weighted by the market portfolio, the betas average to 1 and the alphas to 0. If the model's asset
+     * returns are the equilibrium returns of the market portfolio, all alphas are 0.
+     *
+     * @param context The asset returns and covariances
+     * @param market  The market portfolio weights
+     * @param asset   The index of the asset
+     */
+    public static CharacteristicLine of(final FinancePortfolio.Context context, final FinancePortfolio market, final int asset) {
+
+        List<BigDecimal> weights = market.getWeights();
+
+        if (weights.size() != context.size()) {
+            throw new IllegalArgumentException("The market portfolio and the context must have the same number of assets!");
+        }
+
+        BigDecimal total = weights.stream().reduce(BigDecimal.ZERO, BigDecimal::add);
+        if (total.signum() == 0) {
+            throw new IllegalArgumentException("The market portfolio weights sum to 0!");
+        }
+        MatrixR064 marketWeights = FinancePortfolio.MATRIX_FACTORY.column(weights).divide(total.doubleValue());
+
+        MatrixR064 assetReturns = context.getAssetReturns();
+        MatrixR064 covariances = context.getCovariances();
+
+        MatrixR064 covariancesWithMarket = covariances.multiply(marketWeights);
+
+        double marketVariance = marketWeights.dot(covariancesWithMarket);
+        double marketReturn = marketWeights.dot(assetReturns);
+
+        double beta = covariancesWithMarket.doubleValue(asset) / marketVariance;
+        double alpha = assetReturns.doubleValue(asset) - beta * marketReturn;
+
+        double residualVariance = CharacteristicLine.toResidualVariance(covariances.doubleValue(asset, asset), beta * beta * marketVariance);
+
+        return new CharacteristicLine(alpha, beta, marketVariance, residualVariance);
+    }
+
+    /**
+     * The part of the asset's variance not explained by the market. Small negative values (rounding errors)
+     * are set to 0.
+     */
+    private static double toResidualVariance(final double assetVariance, final double explainedVariance) {
+
+        double retVal = assetVariance - explainedVariance;
+
+        if (retVal < ZERO) {
+            if (!PrimitiveScalar.isSmall(assetVariance, retVal)) {
+                throw new IllegalArgumentException(
+                        "The asset's variance (" + assetVariance + ") is less than the part explained by the market (" + explainedVariance + ")!");
+            }
+            retVal = ZERO;
+        }
+
+        return retVal;
+    }
+
+    private final double myAlpha;
+    private final double myBeta;
+    private final double myMarketVariance;
+    private final double myResidualVariance;
+
+    CharacteristicLine(final double alpha, final double beta, final double marketVariance, final double residualVariance) {
 
         super();
 
-        myMarketPortfolio = theMarketPortfolio;
+        myAlpha = alpha;
+        myBeta = beta;
+        myMarketVariance = marketVariance;
+        myResidualVariance = residualVariance;
     }
 
-    @SuppressWarnings("unused")
-    private CharacteristicLine() {
-
-        this(null);
-
-        ProgrammingError.throwForIllegalInvocation();
+    public double getAlpha() {
+        return myAlpha;
     }
 
-    public double calculateBeta(final FinancePortfolio anyAsset) {
-        return anyAsset.getMeanReturn() / myMarketPortfolio.getMeanReturn();
+    public double getBeta() {
+        return myBeta;
     }
 
-    public double calculateCorrelation(final FinancePortfolio anyAsset) {
-
-        final double tmpCovar = this.calculateCovariance(anyAsset);
-
-        final double tmpVal = myMarketPortfolio.getReturnVariance() * anyAsset.getReturnVariance();
-
-        return tmpCovar / PrimitiveMath.SQRT.invoke(tmpVal);
+    /**
+     * The correlation between the asset's and the market's returns.
+     */
+    public double getCorrelation() {
+        double explainedVariance = myBeta * myBeta * myMarketVariance;
+        return Math.signum(myBeta) * SQRT.invoke(explainedVariance / (explainedVariance + myResidualVariance));
     }
 
-    public double calculateCovariance(final FinancePortfolio anyAsset) {
+    /**
+     * The covariance between the asset's and the market's returns.
+     */
+    public double getCovariance() {
+        return myBeta * myMarketVariance;
+    }
 
-        final double tmpBeta = this.calculateBeta(anyAsset);
+    /**
+     * The standard deviation of epsilon - the asset specific risk.
+     */
+    public double getResidualVolatility() {
+        return SQRT.invoke(myResidualVariance);
+    }
 
-        return myMarketPortfolio.getReturnVariance() * tmpBeta;
+    @Override
+    public String toString() {
+        return TypeUtils.format("alpha={}, beta={}, residual volatility={}", myAlpha, myBeta, this.getResidualVolatility());
     }
 
 }

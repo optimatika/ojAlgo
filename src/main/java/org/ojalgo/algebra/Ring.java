@@ -27,9 +27,9 @@ package org.ojalgo.algebra;
  * required to be commutative.
  *
  * @author apete
- * @see <a href="https://en.wikipedia.org/wiki/Ring_(mathematics)">Ring</a>
- * @see <a href="https://en.wikipedia.org/wiki/Distributive_property">Distributive property</a>
- * @see <a href="https://en.wikipedia.org/wiki/Associative_property">Associative property</a>
+ * @see "https://en.wikipedia.org/wiki/Ring_(mathematics)"
+ * @see "https://en.wikipedia.org/wiki/Distributive_property"
+ * @see "https://en.wikipedia.org/wiki/Associative_property"
  */
 public interface Ring<T> extends Group.Additive<T>, Operation.Multiplication<T> {
 

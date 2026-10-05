@@ -27,6 +27,8 @@ import org.ojalgo.netio.ASCII;
 import org.ojalgo.netio.BasicParser;
 
 /**
+ * Parses Yahoo Finance historical data (CSV). The price is the adjusted close.
+ *
  * @author apete
  */
 public class YahooParser implements BasicParser<YahooParser.Data> {

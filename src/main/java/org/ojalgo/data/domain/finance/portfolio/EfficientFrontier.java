@@ -22,64 +22,75 @@
 package org.ojalgo.data.domain.finance.portfolio;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
-import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.matrix.MatrixR064;
-import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.Optimisation.Result;
+import org.ojalgo.structure.Access2D;
 
 /**
- * Represents a portfolio on the efficient fronter. You get different efficient portfolios by altering the
+ * Represents a portfolio on the efficient frontier. You get different efficient portfolios by altering the
  * risk aversion.
+ * <p>
+ * Check {@code portfolio.optimiser().getState()} - if no usable solution was found, all weights are zero.
  *
  * @author apete
  */
 public final class EfficientFrontier extends OptimisedPortfolio {
 
-    private static final Map<int[], LowerUpper> CONSTRAINTS = Collections.emptyMap();
+    private static final Map<List<Integer>, LowerUpper> CONSTRAINTS = Collections.emptyMap();
 
-    private final ExpressionsBasedModel myOptimisationModel;
+    /**
+     * The covariances and (expected excess) returns from the context, and the default risk aversion (1.0).
+     */
+    public static EfficientFrontier of(final FinancePortfolio.Context portfolioContext) {
+        return new EfficientFrontier(MarketEquilibrium.of(portfolioContext.getCovariances()), portfolioContext.getAssetReturns());
+    }
 
+    /**
+     * @param marketEquilibrium     The covariances and risk aversion
+     * @param expectedExcessReturns The expected excess returns
+     */
+    public static EfficientFrontier of(final MarketEquilibrium marketEquilibrium, final MatrixR064 expectedExcessReturns) {
+        return new EfficientFrontier(marketEquilibrium, expectedExcessReturns);
+    }
+
+    /**
+     * With the default risk aversion (1.0).
+     */
+    public static EfficientFrontier of(final Access2D<?> covariances, final MatrixR064 expectedExcessReturns) {
+        return new EfficientFrontier(MarketEquilibrium.of(covariances), expectedExcessReturns);
+    }
+
+    /**
+     * @deprecated v57 Use {@link #of(FinancePortfolio.Context)} instead.
+     */
+    @Deprecated
     public EfficientFrontier(final FinancePortfolio.Context portfolioContext) {
-
-        super(portfolioContext);
-
-        myOptimisationModel = this.makeModel(CONSTRAINTS);
+        this(MarketEquilibrium.of(portfolioContext.getCovariances()), portfolioContext.getAssetReturns());
     }
 
+    /**
+     * @deprecated v57 Use {@link #of(MarketEquilibrium, MatrixR064)} instead. This constructor will become
+     *             package-private.
+     */
+    @Deprecated
     public EfficientFrontier(final MarketEquilibrium marketEquilibrium, final MatrixR064 expectedExcessReturns) {
-
         super(marketEquilibrium, expectedExcessReturns);
-
-        myOptimisationModel = this.makeModel(CONSTRAINTS);
     }
 
+    /**
+     * @deprecated v57 Use {@link #of(Access2D, MatrixR064)} instead.
+     */
+    @Deprecated
     public EfficientFrontier(final MatrixR064 covarianceMatrix, final MatrixR064 expectedExcessReturns) {
-
-        super(covarianceMatrix, expectedExcessReturns);
-
-        myOptimisationModel = this.makeModel(CONSTRAINTS);
+        this(MarketEquilibrium.of(covarianceMatrix), expectedExcessReturns);
     }
 
     @Override
     protected MatrixR064 calculateAssetWeights() {
 
-        myOptimisationModel.getExpression(VARIANCE).weight(this.getRiskAversion().doubleValue() / 2.0);
-
-        final Result tmpResult = myOptimisationModel.minimise();
-
-        return this.handle(tmpResult);
-    }
-
-    @Override
-    protected void reset() {
-
-        super.reset();
-
-        final boolean tmpAllowed = this.isShortingAllowed();
-        myOptimisationModel.getVariables().forEach(v -> v.lower(tmpAllowed ? null : BigMath.ZERO));
-
+        return this.handle(this.solve(CONSTRAINTS, this.getRiskAversion().doubleValue()));
     }
 
 }

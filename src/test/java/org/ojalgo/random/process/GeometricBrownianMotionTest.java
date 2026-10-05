@@ -86,6 +86,27 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
         }
     }
 
+    /**
+     * Converting to another time unit used to reset the current value to 1.0. Twelve months of the converted
+     * process should be the same as one year of the original.
+     */
+    @Test
+    public void testConvert() {
+
+        GeometricBrownianMotion yearly = GeometricBrownianMotion.make(1.08, 0.04);
+        yearly.setValue(2.5);
+
+        GeometricBrownianMotion monthly = yearly.convert(ONE / TWELVE);
+
+        TestUtils.assertEquals(2.5, monthly.getValue());
+
+        LogNormal expected = yearly.getDistribution(ONE);
+        LogNormal actual = monthly.getDistribution(TWELVE);
+
+        TestUtils.assertEquals(expected.getExpected(), actual.getExpected(), NumberContext.of(12));
+        TestUtils.assertEquals(expected.getVariance(), actual.getVariance(), NumberContext.of(12));
+    }
+
     @Test
     public void testDistributionConsistency() {
 

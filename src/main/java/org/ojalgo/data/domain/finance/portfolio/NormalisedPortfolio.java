@@ -25,28 +25,32 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * Normalised weights Portfolio
+ * Another portfolio with its weights scaled to sum to 1, and rounded. The mean return and volatility are
+ * scaled accordingly.
  *
  * @author apete
  */
 final class NormalisedPortfolio extends FinancePortfolio {
 
-    private final FinancePortfolio myBasePortfolio;
-    private transient BigDecimal myTotalWeight;
-    private final NumberContext myWeightsContext;
+    /**
+     * The sum of the weights, or 1 if that sum is 0.
+     */
+    private static BigDecimal total(final List<BigDecimal> weights) {
 
-    @SuppressWarnings("unused")
-    private NormalisedPortfolio() {
+        BigDecimal retVal = BigMath.ZERO;
+        for (BigDecimal weight : weights) {
+            retVal = retVal.add(weight);
+        }
 
-        this(null, null);
-
-        ProgrammingError.throwForIllegalInvocation();
+        return retVal.signum() == 0 ? BigMath.ONE : retVal;
     }
+
+    private final FinancePortfolio myBasePortfolio;
+    private final NumberContext myWeightsContext;
 
     NormalisedPortfolio(final FinancePortfolio basePortfolio, final NumberContext weightsContext) {
 
@@ -58,12 +62,12 @@ final class NormalisedPortfolio extends FinancePortfolio {
 
     @Override
     public double getMeanReturn() {
-        return myBasePortfolio.getMeanReturn() / this.getTotalWeight().doubleValue();
+        return myBasePortfolio.getMeanReturn() / NormalisedPortfolio.total(myBasePortfolio.getWeights()).doubleValue();
     }
 
     @Override
     public double getVolatility() {
-        return myBasePortfolio.getVolatility() / this.getTotalWeight().doubleValue();
+        return myBasePortfolio.getVolatility() / NormalisedPortfolio.total(myBasePortfolio.getWeights()).abs().doubleValue();
     }
 
     @Override
@@ -71,13 +75,13 @@ final class NormalisedPortfolio extends FinancePortfolio {
 
         List<BigDecimal> retVal = new ArrayList<>();
 
-        BigDecimal totalWeight = this.getTotalWeight();
+        List<BigDecimal> weights = myBasePortfolio.getWeights();
+        BigDecimal totalWeight = NormalisedPortfolio.total(weights);
 
         BigDecimal tmpSum = BigMath.ZERO;
         BigDecimal tmpLargest = BigMath.ZERO;
         int tmpIndexOfLargest = -1;
 
-        List<BigDecimal> weights = myBasePortfolio.getWeights();
         BigDecimal weight;
         for (int i = 0; i < weights.size(); i++) {
 
@@ -102,27 +106,9 @@ final class NormalisedPortfolio extends FinancePortfolio {
         return retVal;
     }
 
-    private BigDecimal getTotalWeight() {
-
-        if (myTotalWeight == null) {
-            myTotalWeight = BigMath.ZERO;
-            for (final BigDecimal tmpWeight : myBasePortfolio.getWeights()) {
-                myTotalWeight = myTotalWeight.add(tmpWeight);
-            }
-            if (myTotalWeight.signum() == 0) {
-                myTotalWeight = BigMath.ONE;
-            }
-        }
-
-        return myTotalWeight;
-    }
-
     @Override
     protected void reset() {
-
         myBasePortfolio.reset();
-
-        myTotalWeight = null;
     }
 
 }

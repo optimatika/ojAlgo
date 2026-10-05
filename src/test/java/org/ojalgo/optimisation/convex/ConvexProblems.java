@@ -88,7 +88,7 @@ public class ConvexProblems extends OptimisationConvexTests {
                 { -0.000012954723060403266, -0.0000070052245518771815, -0.000007477057858706954, 0.00011097998789484925, 0.0000013056146551724419,
                         0.0000005898510775862205, 0.00009143821659482758, 0.00004461044181034483, 0.00006761920797413792 } }));
 
-        // MarketEquilibrium tmpME = new MarketEquilibrium(tmpCovariances, BigMath.PI.multiply(BigMath.E));
+        // MarketEquilibrium tmpME = MarketEquilibrium.of(tmpCovariances, BigMath.PI.multiply(BigMath.E));
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
@@ -296,7 +296,7 @@ public class ConvexProblems extends OptimisationConvexTests {
      * optimisation problem is to use {@link ExpressionsBasedModel}. That has a built-in presolve and
      * parameter scaling, and with that it works.
      *
-     * @see https://github.com/optimatika/ojAlgo/issues/587
+     * @see "https://github.com/optimatika/ojAlgo/issues/587"
      */
     @Test
     public void testGitHub587() {
@@ -1480,8 +1480,8 @@ public class ConvexProblems extends OptimisationConvexTests {
      * passes(!). I’ve been running this test (alone) in TestNG. I’m using Ojalgo v35 and Java 1.7.55. The Q
      * matrix is positive definite.
      *
-     * @see http://bugzilla.optimatika.se/show_bug.cgi?id=210
-     * @see https://sourceforge.net/p/ojalgo/mailman/ojalgo-user/?viewmonth=201405
+     * @see "http://bugzilla.optimatika.se/show_bug.cgi?id=210"
+     * @see "https://sourceforge.net/p/ojalgo/mailman/ojalgo-user/?viewmonth=201405"
      */
     @Test
     public void testP20140522() {
@@ -1527,7 +1527,7 @@ public class ConvexProblems extends OptimisationConvexTests {
      * sometimes give different soltions – things go wrong and they go wrong to varying degrees. This test
      * should only verify consistency between exections.
      *
-     * @see <a href="https://github.com/optimatika/ojAlgo/issues/5">GitHub Issue 5</a>
+     * @see "https://github.com/optimatika/ojAlgo/issues/5"
      */
     @Test
     public void testP20150720() {

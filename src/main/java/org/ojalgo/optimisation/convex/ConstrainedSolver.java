@@ -147,8 +147,20 @@ abstract class ConstrainedSolver extends BasePrimitiveSolver {
         return mySlackE;
     }
 
+    @Override
+    PhysicalStore<Double> copyDualSolution() {
+        return mySolutionL.copy();
+    }
+
     R064Store getSolutionL() {
         return mySolutionL;
+    }
+
+    @Override
+    void restoreDualSolution(final PhysicalStore<Double> copy) {
+        if (copy != null) {
+            mySolutionL.fillMatching(copy);
+        }
     }
 
 }

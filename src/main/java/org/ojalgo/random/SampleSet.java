@@ -397,7 +397,7 @@ public final class SampleSet implements Access1D<Double> {
      * mean from an individual raw score and then dividing the difference by the population standard
      * deviation.
      *
-     * @see <a href="https://en.wikipedia.org/wiki/Standard_score">WikipediA</a>
+     * @see "https://en.wikipedia.org/wiki/Standard_score"
      */
     public double getStandardScore(final int index) {
         return (this.doubleValue(index) - this.getMean()) / this.getStandardDeviation();
@@ -409,7 +409,7 @@ public final class SampleSet implements Access1D<Double> {
      * unadjusted measure of dispersion (also called variability). When scaled for the number of degrees of
      * freedom, it estimates the variance, or spread of the observations about their mean value.
      *
-     * @see <a href="http://en.wikipedia.org/wiki/Sum_of_squares">WikipediA</a>
+     * @see "http://en.wikipedia.org/wiki/Sum_of_squares"
      */
     public double getSumOfSquares() {
 

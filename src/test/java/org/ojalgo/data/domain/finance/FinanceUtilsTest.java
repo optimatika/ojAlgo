@@ -29,6 +29,8 @@ import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.integer.NextGenSysModTest;
+import org.ojalgo.random.LogNormal;
+import org.ojalgo.random.process.GeometricBrownianMotion;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.context.NumberContext;
 
@@ -149,4 +151,43 @@ public class FinanceUtilsTest extends FinanceTests {
         }
 
     }
+
+    /**
+     * Converting between expected values/covariances of growth rates and of returns. The diagonal must match
+     * the univariate {@link LogNormal}, and converting back and forth must give the original values.
+     */
+    @Test
+    public void testGrowthRateConversions() {
+
+        MatrixR064 growthRates = MatrixR064.FACTORY.column(new double[] { 0.06, 0.08 });
+        MatrixR064 growthRateCovariances = MatrixR064.FACTORY.copy(RawStore.wrap(new double[][] { { 0.04, -0.03 }, { -0.03, 0.09 } }));
+
+        MatrixR064 returns = FinanceUtils.toExpectedReturnsFromGrowthRates(growthRates, growthRateCovariances);
+        MatrixR064 covariances = FinanceUtils.toCovariancesFromGrowthRates(growthRates, growthRateCovariances);
+
+        for (int i = 0; i < 2; i++) {
+            LogNormal growthFactor = new LogNormal(growthRates.doubleValue(i), PrimitiveMath.SQRT.invoke(growthRateCovariances.doubleValue(i, i)));
+            TestUtils.assertEquals(growthFactor.getExpected() - PrimitiveMath.ONE, returns.doubleValue(i), ACCEPTABLE_ACCURACY);
+            TestUtils.assertEquals(growthFactor.getVariance(), covariances.doubleValue(i, i), ACCEPTABLE_ACCURACY);
+        }
+
+        TestUtils.assertEquals(growthRates, FinanceUtils.toExpectedGrowthRatesFromReturns(returns, covariances), ACCEPTABLE_ACCURACY);
+        TestUtils.assertEquals(growthRateCovariances, FinanceUtils.toGrowthRateCovariancesFromReturns(returns, covariances), ACCEPTABLE_ACCURACY);
+    }
+
+    /**
+     * VaR is calculated using a geometric Brownian motion (matched to the expected return and standard
+     * deviation). It used to assume normally distributed returns.
+     */
+    @Test
+    public void testValueAtRisk() {
+
+        GeometricBrownianMotion process = GeometricBrownianMotion.make(1.08, 0.04);
+
+        for (double time : new double[] { 0.5, 1.0, 2.0 }) {
+            double valueAtRisk = FinanceUtils.calculateValueAtRisk(0.08, 0.20, 0.95, time);
+            TestUtils.assertEquals(0.05, process.getDistribution(time).getDistribution(PrimitiveMath.ONE - valueAtRisk), 1E-9);
+        }
+    }
+
 }

@@ -47,6 +47,11 @@ import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.PrimitiveNumber;
 import org.ojalgo.type.keyvalue.KeyValue;
 
+/**
+ * A {@link FinanceData} implementation combining a {@link DataFetcher} with a parser. Use
+ * {@link #newFileReader(File, BasicParser)} to read files. {@link #coordinated()} builds a set of series,
+ * from several sources, sharing the same dates (resampled to a common resolution).
+ */
 public final class DataSource implements FinanceData<DatePrice> {
 
     public static final class Coordinated implements Supplier<CoordinatedSet<LocalDate>> {

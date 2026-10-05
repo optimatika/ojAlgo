@@ -13,7 +13,7 @@ import org.ojalgo.type.CalendarDateUnit;
  * <P>
  * Fetch historical financial time series data from Alpha Vantage: https://www.alphavantage.co
  *
- * @see https://www.alphavantage.co
+ * @see "https://www.alphavantage.co"
  * @author stefanvanegmond
  * @deprecated
  */

@@ -121,14 +121,21 @@ public final class GeometricBrownianMotion extends SingleValueBasedProcess<LogNo
     }
 
     /**
-     * @param convertionFactor A step size change factor.
+     * The same process, with the same current value, but expressed in a different time unit.
+     *
+     * @param conversionFactor The new time unit expressed in the current one. For example, 1.0 / 12.0
+     *                         converts from years to months.
      */
-    public GeometricBrownianMotion convert(final double convertionFactor) {
+    public GeometricBrownianMotion convert(final double conversionFactor) {
 
-        double tmpDrift = myLocalDrift * convertionFactor;
-        double tmpDiff = myDiffusionFunction * SQRT.invoke(convertionFactor);
+        double tmpDrift = myLocalDrift * conversionFactor;
+        double tmpDiff = myDiffusionFunction * SQRT.invoke(conversionFactor);
 
-        return new GeometricBrownianMotion(tmpDrift, tmpDiff);
+        GeometricBrownianMotion retVal = new GeometricBrownianMotion(tmpDrift, tmpDiff);
+
+        retVal.setValue(this.getValue());
+
+        return retVal;
     }
 
     public LogNormal getDistribution(final double evaluationPoint) {

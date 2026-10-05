@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ojalgo.data.domain.finance.FinanceUtils;
 import org.ojalgo.data.domain.finance.portfolio.FinancePortfolio.Context;
 import org.ojalgo.data.domain.finance.portfolio.simulator.PortfolioSimulator;
 import org.ojalgo.function.constant.PrimitiveMath;
@@ -33,14 +34,55 @@ import org.ojalgo.random.process.GeometricBrownianMotion;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access2D;
 
+/**
+ * A portfolio defined by its assets ({@link SimpleAsset} - weight, mean return and volatility) and their
+ * correlations. It is also a {@link FinancePortfolio.Context} for other portfolios of the same assets.
+ */
 public final class SimplePortfolio extends FinancePortfolio implements Context {
+
+    /**
+     * @param correlations The correlations between the assets
+     * @param assets       The assets (with mean return, volatility and weight)
+     */
+    public static SimplePortfolio of(final Access2D<?> correlations, final List<SimpleAsset> assets) {
+        return new SimplePortfolio(MATRIX_FACTORY.copy(correlations), assets);
+    }
+
+    /**
+     * The mean returns and volatilities from the context (its asset returns and covariances), the
+     * correlations from the context, and the weights from the portfolio.
+     */
+    public static SimplePortfolio of(final Context portfolioContext, final FinancePortfolio weightsPortfolio) {
+        return new SimplePortfolio(portfolioContext.getCorrelations(), SimplePortfolio.toSimpleAssets(portfolioContext, weightsPortfolio));
+    }
+
+    /**
+     * Uncorrelated assets
+     */
+    public static SimplePortfolio of(final List<SimpleAsset> assets) {
+        return new SimplePortfolio(MATRIX_FACTORY.makeEye(assets.size(), assets.size()), assets);
+    }
+
+    /**
+     * Only weights - uncorrelated assets with mean return and volatility 0.0
+     */
+    public static SimplePortfolio ofWeights(final Comparable<?>... weights) {
+        return SimplePortfolio.of(SimplePortfolio.toSimpleAssets(weights));
+    }
+
+    /**
+     * Only weights - uncorrelated assets with mean return and volatility 0.0
+     */
+    public static SimplePortfolio ofWeights(final double[] weights) {
+        return SimplePortfolio.of(SimplePortfolio.toSimpleAssets(weights));
+    }
 
     static List<SimpleAsset> toSimpleAssets(final Comparable<?>[] someWeights) {
 
         final ArrayList<SimpleAsset> retVal = new ArrayList<>(someWeights.length);
 
         for (int i = 0; i < someWeights.length; i++) {
-            retVal.add(new SimpleAsset(someWeights[i]));
+            retVal.add(SimpleAsset.ofWeight(someWeights[i]));
         }
 
         return retVal;
@@ -51,7 +93,28 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
         final ArrayList<SimpleAsset> retVal = new ArrayList<>(someWeights.length);
 
         for (int i = 0; i < someWeights.length; i++) {
-            retVal.add(new SimpleAsset(someWeights[i]));
+            retVal.add(SimpleAsset.ofWeight(someWeights[i]));
+        }
+
+        return retVal;
+    }
+
+    private static List<SimpleAsset> toSimpleAssets(final Context portfolioContext, final FinancePortfolio weightsPortfolio) {
+
+        final MatrixR064 tmpCovariances = portfolioContext.getCovariances();
+        final MatrixR064 tmpAssetReturns = portfolioContext.getAssetReturns();
+
+        final List<BigDecimal> tmpWeights = weightsPortfolio.getWeights();
+
+        if (tmpWeights.size() != portfolioContext.size()) {
+            throw new IllegalArgumentException("Input dimensions don't match!");
+        }
+
+        final List<SimpleAsset> retVal = new ArrayList<>(tmpWeights.size());
+        for (int i = 0; i < tmpWeights.size(); i++) {
+            final double tmpMeanReturn = tmpAssetReturns.doubleValue(i);
+            final double tmpVolatility = PrimitiveMath.SQRT.invoke(tmpCovariances.doubleValue(i, i));
+            retVal.add(new SimpleAsset(tmpMeanReturn, tmpVolatility, tmpWeights.get(i)));
         }
 
         return retVal;
@@ -65,55 +128,58 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
     private transient MatrixR064 myCovariances = null;
     private transient Comparable<?> myMeanReturn;
     private transient Comparable<?> myReturnVariance;
-
     private transient List<BigDecimal> myWeights;
 
+    /**
+     * @deprecated v57 Use {@link #of(Access2D, List)} instead.
+     */
+    @Deprecated
     public SimplePortfolio(final Access2D<?> correlationsMatrix, final List<SimpleAsset> someAssets) {
-
-        super();
-
-        if (someAssets.size() != correlationsMatrix.countRows() || someAssets.size() != correlationsMatrix.countColumns()) {
-            throw new IllegalArgumentException("Input dimensions don't match!");
-        }
-
-        myCorrelations = MATRIX_FACTORY.copy(correlationsMatrix);
-        myComponents = someAssets;
+        this(MATRIX_FACTORY.copy(correlationsMatrix), someAssets);
     }
 
+    /**
+     * @deprecated v57 Use {@link #ofWeights(Comparable...)} instead.
+     */
+    @Deprecated
     public SimplePortfolio(final Comparable<?>... someWeights) {
         this(SimplePortfolio.toSimpleAssets(someWeights));
     }
 
+    /**
+     * @deprecated v57 Use {@link #of(FinancePortfolio.Context, FinancePortfolio)} instead.
+     */
+    @Deprecated
     public SimplePortfolio(final Context portfolioContext, final FinancePortfolio weightsPortfolio) {
-
-        super();
-
-        myCorrelations = portfolioContext.getCorrelations();
-
-        final MatrixR064 tmpCovariances = portfolioContext.getCovariances();
-        final MatrixR064 tmpAssetReturns = portfolioContext.getAssetReturns();
-
-        final List<BigDecimal> tmpWeights = weightsPortfolio.getWeights();
-
-        if (tmpWeights.size() != myCorrelations.countRows() || tmpWeights.size() != myCorrelations.countColumns()) {
-            throw new IllegalArgumentException("Input dimensions don't match!");
-        }
-
-        myComponents = new ArrayList<>(tmpWeights.size());
-        for (int i = 0; i < tmpWeights.size(); i++) {
-            final double tmpMeanReturn = tmpAssetReturns.doubleValue(i, 0);
-            final double tmpVolatilty = PrimitiveMath.SQRT.invoke(tmpCovariances.doubleValue(i, i));
-            final BigDecimal tmpWeight = tmpWeights.get(i);
-            myComponents.add(new SimpleAsset(tmpMeanReturn, tmpVolatilty, tmpWeight));
-        }
+        this(portfolioContext.getCorrelations(), SimplePortfolio.toSimpleAssets(portfolioContext, weightsPortfolio));
     }
 
+    /**
+     * @deprecated v57 Use {@link #ofWeights(double[])} instead.
+     */
+    @Deprecated
     public SimplePortfolio(final double[] someWeights) {
         this(SimplePortfolio.toSimpleAssets(someWeights));
     }
 
+    /**
+     * @deprecated v57 Use {@link #of(List)} instead.
+     */
+    @Deprecated
     public SimplePortfolio(final List<SimpleAsset> someAssets) {
         this(MATRIX_FACTORY.makeEye(someAssets.size(), someAssets.size()), someAssets);
+    }
+
+    SimplePortfolio(final MatrixR064 correlations, final List<SimpleAsset> assets) {
+
+        super();
+
+        if (assets.size() != correlations.countRows() || assets.size() != correlations.countColumns()) {
+            throw new IllegalArgumentException("Input dimensions don't match!");
+        }
+
+        myCorrelations = correlations;
+        myComponents = new ArrayList<>(assets);
     }
 
     @Override
@@ -128,7 +194,7 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
     public double calculatePortfolioVariance(final FinancePortfolio weightsPortfolio) {
         final List<BigDecimal> tmpWeights = weightsPortfolio.getWeights();
         final MatrixR064 tmpAssetWeights = MATRIX_FACTORY.column(tmpWeights);
-        return new MarketEquilibrium(this.getCovariances()).calculatePortfolioVariance(tmpAssetWeights).doubleValue();
+        return tmpAssetWeights.dot(this.getCovariances().multiply(tmpAssetWeights));
     }
 
     @Override
@@ -235,9 +301,8 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
     public double getReturnVariance() {
 
         if (myReturnVariance == null) {
-            final MarketEquilibrium tmpMarketEquilibrium = new MarketEquilibrium(this.getCovariances());
             final MatrixR064 tmpWeightsVector = this.getAssetWeights();
-            myReturnVariance = tmpMarketEquilibrium.calculatePortfolioVariance(tmpWeightsVector).get();
+            myReturnVariance = tmpWeightsVector.dot(this.getCovariances().multiply(tmpWeightsVector));
         }
 
         return Scalar.doubleValue(myReturnVariance);
@@ -247,6 +312,12 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
         return myComponents.get(index).getReturnVariance();
     }
 
+    /**
+     * Each asset is modelled by its {@link SimpleAsset#forecast()}, with the initial value set to its weight.
+     * The asset processes are correlated so that the simulated returns (one time unit ahead) have the
+     * covariances of this portfolio - the correlations of the processes' growth rates are derived using
+     * {@link FinanceUtils#toGrowthRateCovariancesFromReturns}.
+     */
     public PortfolioSimulator getSimulator() {
 
         final List<GeometricBrownianMotion> tmpAssetProcesses = new ArrayList<>(myComponents.size());
@@ -257,7 +328,9 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
             tmpAssetProcesses.add(tmpForecast);
         }
 
-        return new PortfolioSimulator(myCorrelations, tmpAssetProcesses);
+        MatrixR064 growthRateCovariances = FinanceUtils.toGrowthRateCovariancesFromReturns(this.getAssetReturns(), this.getCovariances());
+
+        return PortfolioSimulator.of(FinanceUtils.toCorrelations(growthRateCovariances), tmpAssetProcesses);
     }
 
     public double getVolatility(final int index) {

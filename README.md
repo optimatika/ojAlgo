@@ -30,7 +30,7 @@ ojAlgo is available at [The Central (Maven) Repository](https://mvnrepository.co
 
 ### A First Optimisation Model
 
-Decide how many chairs and tables to make to maximise profit, with 400 machine hours available:
+A chair earns a profit of 45 and a table 80. Decide how many of each to make to maximise total profit, with 400 machine hours available:
 
 ```java
 import org.ojalgo.optimisation.Expression;
@@ -44,7 +44,8 @@ public class FirstModel {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        // Variables: bounds, and a weight that is the objective coefficient
+        // Variables: bounds, and a weight. The weight is the objective coefficient,
+        // here the profit per unit.
         Variable chairs = model.newVariable("Chairs").lower(0).upper(100).weight(45);
         Variable tables = model.newVariable("Tables").lower(0).upper(40).weight(80);
 

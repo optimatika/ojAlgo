@@ -84,6 +84,23 @@ final class IterativeRefinementSolver extends ConvexSolver {
         return data;
     }
 
+    /**
+     * @return The dual solution, an empty vector if there are no constraints (no dual variables), or null if
+     *         it's missing even though there are constraints.
+     */
+    private static MatrixStore<Quadruple> getDualSolution(final Optimisation.Result result, final long nbConstraints) {
+
+        Optional<Access1D<?>> duals = result.getDualSolution().map(Supplier::get);
+
+        if (duals.isPresent()) {
+            return GenericStore.R128.column(duals.get());
+        } else if (nbConstraints == 0L) {
+            return GenericStore.R128.make(0, 1);
+        } else {
+            return null;
+        }
+    }
+
     private static void updateConvexDoubleData(final ConvexData<Double> data, final MatrixStore<Quadruple> C, final MatrixStore<Quadruple> Be,
             final MatrixStore<Quadruple> Bi) {
         data.getObjective().linear().fillMatching(C);
@@ -135,13 +152,18 @@ final class IterativeRefinementSolver extends ConvexSolver {
         data = IterativeRefinementSolver.getDoubleConvexData(data, Q, C, Ae, Be, Ai, Bi);
 
         Optimisation.Result x_y_double = BasePrimitiveSolver.newSolver(data, options).solve();
-        if (x_y_double.getState() == Optimisation.State.INFEASIBLE) {
-            //         trust solver and abort if infeasible.
+        if (x_y_double.getState() == Optimisation.State.INFEASIBLE || x_y_double.getState() == Optimisation.State.UNBOUNDED) {
+            //         trust solver and abort if infeasible or unbounded.
             return x_y_double;
         }
 
+        long nbConstraints = Ae.countRows() + Ai.countRows();
+
         MatrixStore<Quadruple> x0 = GenericStore.R128.column(x_y_double);
-        MatrixStore<Quadruple> y0 = GenericStore.R128.column(x_y_double.getDualSolution().map(Supplier::get).orElseThrow());
+        MatrixStore<Quadruple> y0 = IterativeRefinementSolver.getDualSolution(x_y_double, nbConstraints);
+        if (y0 == null) {
+            return x_y_double;
+        }
         double initialSolutionValue = x_y_double.getValue();
 
         //  Set initial values
@@ -164,7 +186,10 @@ final class IterativeRefinementSolver extends ConvexSolver {
             MatrixStore<Quadruple> residual_Bi = Bi.subtract(Ai.multiply(x0));
             double maxInequalityResidual = residual_Bi.negate().aggregateAll(Aggregator.MAXIMUM).doubleValue();
             double maxPrimalResidual = Math.max(maxEqualityResidual, maxInequalityResidual);
-            MatrixStore<Quadruple> residual_C = C.subtract(Q.multiply(x0)).subtract(Ae.below(Ai).transpose().multiply(y0));
+            MatrixStore<Quadruple> residual_C = C.subtract(Q.multiply(x0));
+            if (nbConstraints > 0L) {
+                residual_C = residual_C.subtract(Ae.below(Ai).transpose().multiply(y0));
+            }
             double maxGradientResidual = residual_C.negate().aggregateAll(Aggregator.LARGEST).norm();
             // SUM_i ABS(C1_i * x_i) / |residual_C|
             double relativeComplementarySlackness1 = residual_C.onMatching(QuadrupleMath.MULTIPLY, x0).collect(GenericStore.R128)
@@ -254,7 +279,10 @@ final class IterativeRefinementSolver extends ConvexSolver {
             } while (!x_y_double.getState().isOptimal());
 
             MatrixStore<Quadruple> x0_ = GenericStore.R128.column(x_y_double);
-            MatrixStore<Quadruple> y0_ = GenericStore.R128.column(x_y_double.getDualSolution().map(Supplier::get).orElseThrow());
+            MatrixStore<Quadruple> y0_ = IterativeRefinementSolver.getDualSolution(x_y_double, nbConstraints);
+            if (y0_ == null) {
+                break refinement;
+            }
             // refine the Quadruple precision solution
             MatrixStore<Quadruple> x1 = x0.add(x0_.divide(scaleP1));
             MatrixStore<Quadruple> y1 = y0.add(y0_.divide(scaleD1));

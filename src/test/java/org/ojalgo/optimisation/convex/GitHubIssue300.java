@@ -21,7 +21,7 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * @see https://github.com/optimatika/ojAlgo/issues/300
+ * @see "https://github.com/optimatika/ojAlgo/issues/300"
  */
 public class GitHubIssue300 extends OptimisationConvexTests {
 

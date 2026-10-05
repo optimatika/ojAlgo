@@ -21,11 +21,10 @@
  */
 package org.ojalgo.data.domain.finance.portfolio;
 
-import static org.ojalgo.function.constant.BigMath.ONE;
-import static org.ojalgo.function.constant.BigMath.ZERO;
+import static org.ojalgo.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.ojalgo.matrix.MatrixR064;
@@ -34,68 +33,12 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
-import org.ojalgo.type.CalendarDateDuration;
-import org.ojalgo.type.TypeUtils;
 
+/**
+ * Base class of the portfolio models where the asset returns are given and the weights are calculated by
+ * (constrained) optimisation.
+ */
 abstract class OptimisedPortfolio extends EquilibriumModel {
-
-    public final class Optimiser {
-
-        /**
-         * Will turn on debug logging for the optimisation solver.
-         */
-        public Optimiser debug(final boolean debug) {
-
-            boolean tmpValidate = myOptimisationOptions.validate;
-
-            if (debug) {
-                myOptimisationOptions.debug(Optimisation.Solver.class);
-            } else {
-                myOptimisationOptions.debug(null);
-            }
-
-            myOptimisationOptions.validate = tmpValidate;
-
-            return this;
-        }
-
-        public Optimiser feasibility(final int scale) {
-            myOptimisationOptions.feasibility = myOptimisationOptions.feasibility.withScale(scale);
-            return this;
-        }
-
-        /**
-         * You have to call some method that will trigger the calculation (any method that requires the
-         * calculation results) before you check the optimisation state. Otherwise you'll simply get
-         * State.UNEXPLORED.
-         */
-        public State getState() {
-            if (myOptimisationState == null) {
-                myOptimisationState = State.UNEXPLORED;
-            }
-            return myOptimisationState;
-        }
-
-        /**
-         * @param max The maximum amount of time for the optimisation solver
-         */
-        public Optimiser time(final CalendarDateDuration max) {
-            long maxDurationInMillis = max.toDurationInMillis();
-            myOptimisationOptions.time_abort = maxDurationInMillis;
-            myOptimisationOptions.time_suffice = maxDurationInMillis;
-            return this;
-        }
-
-        /**
-         * Will validate the generated optimisation problem and throws an excption if it's not ok. This should
-         * typically not be enabled in a production environment.
-         */
-        public Optimiser validate(final boolean validate) {
-            myOptimisationOptions.validate = validate;
-            return this;
-        }
-
-    }
 
     static final class Template {
 
@@ -103,7 +46,6 @@ abstract class OptimisedPortfolio extends EquilibriumModel {
         final String name;
         BigDecimal upper;
         BigDecimal value;
-        BigDecimal weight;
 
         Template(final String name) {
             super();
@@ -113,6 +55,7 @@ abstract class OptimisedPortfolio extends EquilibriumModel {
     }
 
     static final String BALANCE = "Balance";
+    static final String RETURN = "Return";
     static final String VARIANCE = "Variance";
 
     private final MatrixR064 myExpectedExcessReturns;
@@ -120,22 +63,6 @@ abstract class OptimisedPortfolio extends EquilibriumModel {
     private transient State myOptimisationState = State.UNEXPLORED;
     private boolean myShortingAllowed = false;
     private final Template[] myTemplates;
-
-    OptimisedPortfolio(final FinancePortfolio.Context portfolioContext) {
-
-        super(portfolioContext);
-
-        myExpectedExcessReturns = portfolioContext.getAssetReturns();
-
-        String[] symbols = this.getMarketEquilibrium().getAssetKeys();
-        myTemplates = new Template[symbols.length];
-        for (int i = 0; i < symbols.length; i++) {
-            myTemplates[i] = new Template(symbols[i]);
-            myTemplates[i].weight = TypeUtils.toBigDecimal(myExpectedExcessReturns.get(i)).negate();
-        }
-
-        myOptimisationOptions.solution = myOptimisationOptions.solution.withPrecision(7).withScale(6);
-    }
 
     OptimisedPortfolio(final MarketEquilibrium marketEquilibrium, final MatrixR064 expectedExcessReturns) {
 
@@ -151,22 +78,17 @@ abstract class OptimisedPortfolio extends EquilibriumModel {
         myTemplates = new Template[symbols.length];
         for (int i = 0; i < symbols.length; i++) {
             myTemplates[i] = new Template(symbols[i]);
-            myTemplates[i].weight = TypeUtils.toBigDecimal(expectedExcessReturns.get(i)).negate();
         }
 
         myOptimisationOptions.solution = myOptimisationOptions.solution.withPrecision(7).withScale(6);
-    }
-
-    OptimisedPortfolio(final MatrixR064 covarianceMatrix, final MatrixR064 expectedExcessReturns) {
-        this(new MarketEquilibrium(covarianceMatrix), expectedExcessReturns);
     }
 
     public final boolean isShortingAllowed() {
         return myShortingAllowed;
     }
 
-    public Optimiser optimiser() {
-        return new Optimiser();
+    public PortfolioOptimiser optimiser() {
+        return new PortfolioOptimiser(this);
     }
 
     public final void setShortingAllowed(final boolean allowed) {
@@ -179,12 +101,16 @@ abstract class OptimisedPortfolio extends EquilibriumModel {
         return myExpectedExcessReturns;
     }
 
+    /**
+     * Records the optimisation state and extracts the asset weights. Unless the state is feasible, and not
+     * unbounded, all weights are zero.
+     */
     protected final MatrixR064 handle(final Optimisation.Result optimisationResult) {
 
         int nbAssets = myTemplates.length;
 
         myOptimisationState = optimisationResult.getState();
-        boolean tmpFeasible = optimisationResult.getState().isFeasible();
+        boolean tmpFeasible = myOptimisationState.isFeasible() && myOptimisationState != State.UNBOUNDED;
         boolean tmpShortingAllowed = this.isShortingAllowed();
 
         MatrixR064.DenseReceiver mtrxBuilder = MATRIX_FACTORY.makeDense(nbAssets);
@@ -215,11 +141,15 @@ abstract class OptimisedPortfolio extends EquilibriumModel {
         return myOptimisationOptions;
     }
 
+    final State getOptimisationState() {
+        return myOptimisationState;
+    }
+
     Template getVariable(final int index) {
         return myTemplates[index];
     }
 
-    final ExpressionsBasedModel makeModel(final Map<int[], LowerUpper> constraints) {
+    final ExpressionsBasedModel makeModel(final Map<List<Integer>, LowerUpper> constraints) {
 
         ExpressionsBasedModel retVal = new ExpressionsBasedModel(myOptimisationOptions);
 
@@ -228,11 +158,16 @@ abstract class OptimisedPortfolio extends EquilibriumModel {
         for (int i = 0; i < nbAssets; i++) {
 
             Template template = myTemplates[i];
-            Variable variable = retVal.newVariable(template.name).weight(template.weight).lower(template.lower).upper(template.upper).value(template.value);
+            Variable variable = retVal.newVariable(template.name).lower(template.lower).upper(template.upper).value(template.value);
 
             if (!this.isShortingAllowed() && (template.lower == null || template.lower.signum() == -1)) {
                 variable.lower(ZERO);
             }
+        }
+
+        Expression optimisationReturn = retVal.newExpression(RETURN);
+        for (int i = 0; i < nbAssets; i++) {
+            optimisationReturn.set(i, myExpectedExcessReturns.doubleValue(i));
         }
 
         Expression optimisationVariance = retVal.newExpression(VARIANCE);
@@ -249,19 +184,33 @@ abstract class OptimisedPortfolio extends EquilibriumModel {
         }
         balanceExpression.level(ONE);
 
-        for (Map.Entry<int[], LowerUpper> entry : constraints.entrySet()) {
+        for (Map.Entry<List<Integer>, LowerUpper> entry : constraints.entrySet()) {
 
-            int[] key = entry.getKey();
+            List<Integer> key = entry.getKey();
             LowerUpper value = entry.getValue();
 
-            Expression expression = retVal.newExpression(Arrays.toString(key));
-            for (int i = 0; i < key.length; i++) {
-                expression.set(key[i], ONE);
+            Expression expression = retVal.newExpression(key.toString());
+            for (int i : key) {
+                expression.set(i, ONE);
             }
             expression.lower(value.lower).upper(value.upper);
         }
 
         return retVal;
+    }
+
+    /**
+     * min (RAF/2) [w]<sup>T</sup>[C][w] - [w]<sup>T</sup>[r] using a new model instance. With RAF = 0 this is
+     * the maximum return (LP) problem.
+     */
+    final Optimisation.Result solve(final Map<List<Integer>, LowerUpper> constraints, final double riskAversion) {
+
+        ExpressionsBasedModel model = this.makeModel(constraints);
+
+        model.getExpression(VARIANCE).weight(riskAversion / 2.0);
+        model.getExpression(RETURN).weight(NEG);
+
+        return model.minimise();
     }
 
 }

@@ -561,7 +561,7 @@ public class IntegerProblems extends OptimisationIntegerTests {
      * INFEASIBLE is misleading. Either it should be FEASIBLE/OPTIMAL as the returned solutions happens to be
      * (total coincident) or UNEXPLORED/FAILED to reflect what the solver managed to do.
      *
-     * @see https://github.com/optimatika/ojAlgo/issues/310
+     * @see "https://github.com/optimatika/ojAlgo/issues/310"
      */
     @Test
     public void testStatusForAbortedOptimizationGitHubIssue310() {

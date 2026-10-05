@@ -31,44 +31,95 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
 
 /**
- * SimpleAsset is used to describe 1 asset (portfolio member).
+ * One asset (portfolio member) - its weight, mean return and volatility.
  *
  * @author apete
  */
 public final class SimpleAsset extends FinancePortfolio {
 
+    /**
+     * With weight 1.0
+     */
+    public static SimpleAsset of(final Comparable<?> meanReturn, final Comparable<?> volatility) {
+        return SimpleAsset.of(meanReturn, volatility, BigMath.ONE);
+    }
+
+    /**
+     * A null mean return or volatility is treated as 0.0
+     */
+    public static SimpleAsset of(final Comparable<?> meanReturn, final Comparable<?> volatility, final Comparable<?> weight) {
+        return new SimpleAsset(SimpleAsset.toDouble(meanReturn), SimpleAsset.toDouble(volatility), TypeUtils.toBigDecimal(weight));
+    }
+
+    /**
+     * The mean return and volatility of the portfolio, and the given weight
+     */
+    public static SimpleAsset of(final FinancePortfolio portfolio, final Comparable<?> weight) {
+        return new SimpleAsset(portfolio.getMeanReturn(), portfolio.getVolatility(), TypeUtils.toBigDecimal(weight));
+    }
+
+    /**
+     * Only a weight - mean return and volatility are 0.0
+     */
+    public static SimpleAsset ofWeight(final Comparable<?> weight) {
+        return new SimpleAsset(PrimitiveMath.ZERO, PrimitiveMath.ZERO, TypeUtils.toBigDecimal(weight));
+    }
+
+    private static double toDouble(final Comparable<?> number) {
+        return number != null ? Scalar.doubleValue(number) : PrimitiveMath.ZERO;
+    }
+
     private final double myMeanReturn;
     private final double myVolatility;
     private final BigDecimal myWeight;
 
+    /**
+     * @deprecated v57 Use {@link #ofWeight(Comparable)} instead.
+     */
+    @Deprecated
     public SimpleAsset(final Comparable<?> weight) {
-        this(PrimitiveMath.ZERO, PrimitiveMath.ZERO, weight);
+        this(PrimitiveMath.ZERO, PrimitiveMath.ZERO, TypeUtils.toBigDecimal(weight));
     }
 
+    /**
+     * @deprecated v57 Use {@link #of(Comparable, Comparable)} instead.
+     */
+    @Deprecated
     public SimpleAsset(final Comparable<?> meanReturn, final Comparable<?> volatility) {
-        this(meanReturn, volatility, BigMath.ONE);
+        this(SimpleAsset.toDouble(meanReturn), SimpleAsset.toDouble(volatility), BigMath.ONE);
     }
 
+    /**
+     * @deprecated v57 Use {@link #of(Comparable, Comparable, Comparable)} instead.
+     */
+    @Deprecated
     public SimpleAsset(final Comparable<?> meanReturn, final Comparable<?> volatility, final Comparable<?> weight) {
-
-        super();
-
-        myMeanReturn = meanReturn != null ? Scalar.doubleValue(meanReturn) : PrimitiveMath.ZERO;
-        myVolatility = volatility != null ? Scalar.doubleValue(volatility) : PrimitiveMath.ZERO;
-        myWeight = TypeUtils.toBigDecimal(weight);
+        this(SimpleAsset.toDouble(meanReturn), SimpleAsset.toDouble(volatility), TypeUtils.toBigDecimal(weight));
     }
 
+    /**
+     * @deprecated v57 Use {@link #of(FinancePortfolio, Comparable)}, with weight 1.0, instead.
+     */
+    @Deprecated
     public SimpleAsset(final FinancePortfolio portfolio) {
         this(portfolio.getMeanReturn(), portfolio.getVolatility(), BigMath.ONE);
     }
 
+    /**
+     * @deprecated v57 Use {@link #of(FinancePortfolio, Comparable)} instead.
+     */
+    @Deprecated
     public SimpleAsset(final FinancePortfolio portfolio, final Comparable<?> weight) {
-        this(portfolio.getMeanReturn(), portfolio.getVolatility(), weight);
+        this(portfolio.getMeanReturn(), portfolio.getVolatility(), TypeUtils.toBigDecimal(weight));
     }
 
-    @SuppressWarnings("unused")
-    private SimpleAsset() {
-        this(BigMath.ZERO, BigMath.ZERO, BigMath.ONE);
+    SimpleAsset(final double meanReturn, final double volatility, final BigDecimal weight) {
+
+        super();
+
+        myMeanReturn = meanReturn;
+        myVolatility = volatility;
+        myWeight = weight;
     }
 
     @Override

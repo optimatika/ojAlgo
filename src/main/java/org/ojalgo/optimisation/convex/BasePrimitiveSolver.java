@@ -50,6 +50,7 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D.Collectable;
+import org.ojalgo.type.context.NumberContext;
 
 abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolver {
 
@@ -116,11 +117,15 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
 
     }
 
+    /**
+     * Correct the solution for the error caused by patching [Q] when that error is not small compared to the
+     * size of the gradient terms.
+     */
+    private static final NumberContext BIAS = NumberContext.of(7);
     private static final String Q_NOT_POSITIVE_SEMIDEFINITE = "Q not positive semidefinite!";
     private static final String Q_NOT_SYMMETRIC = "Q not symmetric!";
 
     static final Integration INTEGRATION = new Integration();
-
     static final Factory<Double, R064Store> MATRIX_FACTORY = R064Store.FACTORY;
 
     static BasePrimitiveSolver.Builder builder(final MatrixStore<Double>[] matrices) {
@@ -193,8 +198,11 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
     }
 
     private transient double[] myCachedReducedGradient = null;
+    /**
+     * The constant added to the diagonal of [Q] (to make it positive definite), or 0.0 if [Q] was not patched
+     */
+    private double myDiagonalPatch = ZERO;
     private final ConvexData<Double> myMatrices;
-    private boolean myPatchedQ = false;
     private final R064Store mySolutionX;
     private final MatrixDecomposition.Solver<Double> mySolverGeneral;
     private final MatrixDecomposition.Solver<Double> mySolverQ;
@@ -242,15 +250,14 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
 
         if (this.initialise(kickStarter)) {
 
-            this.resetIterationsCount();
+            this.iterate();
 
-            if (this.isIteratingPossible()) {
-
-                do {
-
-                    this.performIteration();
-
-                } while (this.isIterationAllowed() && this.needsAnotherIteration());
+            if (myDiagonalPatch > ZERO && state.isFeasible() && state != State.UNBOUNDED) {
+                if (this.isUnbounded()) {
+                    state = State.UNBOUNDED;
+                } else if (this.isBiased()) {
+                    this.correctBias();
+                }
             }
         }
 
@@ -260,6 +267,37 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
     @Override
     public String toString() {
         return myMatrices.toString();
+    }
+
+    /**
+     * The patch, p, makes the solution, x, violate the optimality conditions of the original problem by p[x].
+     * Re-solving (once) with the linear term [C] + p[x], warm started from x, is a proximal point step - its
+     * solution satisfies the original optimality conditions far better. If the re-solve fails the previous
+     * solution is kept.
+     */
+    private void correctBias() {
+
+        PhysicalStore<Double> mtrxX = this.getSolutionX();
+        PhysicalStore<Double> mtrxC = myMatrices.getObjective().linear();
+
+        State previousState = state;
+        PhysicalStore<Double> previousX = mtrxX.copy();
+        PhysicalStore<Double> previousC = mtrxC.copy();
+        PhysicalStore<Double> previousL = this.copyDualSolution();
+
+        mtrxC.modifyMatching(ADD, previousX.multiply(myDiagonalPatch));
+
+        if (this.initialise(new Optimisation.Result(previousState, previousX))) {
+            this.iterate();
+        }
+
+        mtrxC.fillMatching(previousC);
+
+        if (!state.isFeasible()) {
+            state = previousState;
+            mtrxX.fillMatching(previousX);
+            this.restoreDualSolution(previousL);
+        }
     }
 
     /**
@@ -275,6 +313,92 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
             }
         }
         return gradient;
+    }
+
+    /**
+     * Is the error caused by the patch, p, large enough to be worth correcting? The solution, x, violates the
+     * original optimality conditions by p[x] - compared to the size of the gradient terms [C] and [Q][x].
+     */
+    private boolean isBiased() {
+
+        PhysicalStore<Double> mtrxX = this.getSolutionX();
+
+        double largestX = mtrxX.aggregateAll(Aggregator.LARGEST).doubleValue();
+        double largestC = this.getMatrixC().aggregateAll(Aggregator.LARGEST).doubleValue();
+        double largestQX = this.getMatrixQ().multiply(mtrxX).aggregateAll(Aggregator.LARGEST).doubleValue();
+
+        return !BIAS.isSmall(Math.max(largestC, largestQX), myDiagonalPatch * largestX);
+    }
+
+    /**
+     * When [Q] had to be patched, a small constant added to its diagonal, the problem actually solved is
+     * strictly convex and always has a finite solution - also when the original problem is unbounded. Then
+     * the solution is huge, dominated by a direction along which the original objective decreases without
+     * bound. That's detected by checking that:
+     * <ol>
+     * <li>The solution is larger than the problem data suggests - closer, in log scale, to the size implied
+     * by the patch than to the natural size, |[C]| / |[Q]|.
+     * <li>The solution direction is an unbounded direction of the original problem: [Q][d] = 0, [AE][d] = 0,
+     * [AI][d] <= 0 and [C]<sup>T</sup>[d] > 0.
+     * </ol>
+     */
+    private boolean isUnbounded() {
+
+        double tolerance = SQRT.invoke(options.convex().smallDiagonal());
+
+        PhysicalStore<Double> x = this.getSolutionX();
+        MatrixStore<Double> c = this.getMatrixC();
+
+        double largestX = x.aggregateAll(Aggregator.LARGEST).doubleValue();
+        double largestC = c.aggregateAll(Aggregator.LARGEST).doubleValue();
+
+        if (myDiagonalPatch * largestX <= tolerance * largestC) {
+            return false;
+        }
+
+        MatrixStore<Double> d = x.divide(largestX);
+
+        if (c.dot(d) <= tolerance * largestC) {
+            return false;
+        }
+
+        double largestQ = myDiagonalPatch / options.convex().smallDiagonal();
+        MatrixStore<Double> originalQd = this.getMatrixQ().multiply(d).subtract(d.multiply(myDiagonalPatch));
+        if (originalQd.aggregateAll(Aggregator.LARGEST).doubleValue() > tolerance * largestQ) {
+            return false;
+        }
+
+        if (this.countEqualityConstraints() > 0) {
+            MatrixStore<Double> mtrxAE = this.getMatrixAE();
+            double largestAE = mtrxAE.aggregateAll(Aggregator.LARGEST).doubleValue();
+            if (mtrxAE.multiply(d).aggregateAll(Aggregator.LARGEST).doubleValue() > tolerance * largestAE) {
+                return false;
+            }
+        }
+
+        if (this.countInequalityConstraints() > 0) {
+            MatrixStore<Double> mtrxAI = this.getMatrixAI();
+            double largestAI = mtrxAI.aggregateAll(Aggregator.LARGEST).doubleValue();
+            if (mtrxAI.multiply(d).aggregateAll(Aggregator.MAXIMUM).doubleValue() > tolerance * largestAI) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void iterate() {
+
+        this.resetIterationsCount();
+
+        if (this.isIteratingPossible()) {
+
+            do {
+
+                this.performIteration();
+
+            } while (this.isIterationAllowed() && this.needsAnotherIteration());
+        }
     }
 
     protected Optimisation.Result buildResult() {
@@ -303,11 +427,16 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
         return myMatrices.countVariables();
     }
 
+    /**
+     * With the original (unpatched) [Q]
+     */
     protected double evaluateFunction(final Access1D<?> solution) {
 
         MatrixStore<Double> tmpX = this.getSolutionX();
 
-        return tmpX.transpose().multiply(this.getMatrixQ().multiply(tmpX)).multiply(0.5).subtract(tmpX.transpose().multiply(this.getMatrixC())).doubleValue(0L);
+        double quadratic = tmpX.dot(this.getMatrixQ().multiply(tmpX)) - myDiagonalPatch * tmpX.dot(tmpX);
+
+        return quadratic / TWO - tmpX.dot(this.getMatrixC());
     }
 
     protected MatrixStore<Double> extractSolution() {
@@ -429,17 +558,20 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
             this.log(Q_NOT_SYMMETRIC, matrixQ);
         }
 
-        myPatchedQ = false;
-        myZeroQ = false;
-        if (!mySolverQ.isComputed() && !mySolverQ.compute(matrixQ)) {
-            double largest = matrixQ.aggregateAll(Aggregator.LARGEST).doubleValue();
-            double small = options.convex().smallDiagonal();
-            if (largest > small) {
-                matrixQ.modifyDiagonal(ADD.by(small * largest));
-                mySolverQ.compute(matrixQ);
-                myPatchedQ = true;
-            } else {
-                myZeroQ = true;
+        if (!mySolverQ.isComputed()) {
+            // Only when (re)computing - a re-initialisation, re-using the decomposition, keeps the patch
+            myDiagonalPatch = ZERO;
+            myZeroQ = false;
+            if (!mySolverQ.compute(matrixQ)) {
+                double largest = matrixQ.aggregateAll(Aggregator.LARGEST).doubleValue();
+                double small = options.convex().smallDiagonal();
+                if (largest > small) {
+                    myDiagonalPatch = small * largest;
+                    matrixQ.modifyDiagonal(ADD.by(myDiagonalPatch));
+                    mySolverQ.compute(matrixQ);
+                } else {
+                    myZeroQ = true;
+                }
             }
         }
 
@@ -514,7 +646,7 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
 
         if (this.isLogDebug()) {
             this.log("LP solution: {}", resultLP);
-            this.log("LP duals: {}", resultLP.getMultipliers().get());
+            this.log("LP duals: {}", resultLP.getDualSolution().map(Supplier::get).get());
         }
 
         if (!myZeroQ && resultLP.getState().isFeasible()) {
@@ -526,7 +658,7 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
 
     /**
      * Compute the reduced gradient vector (gradient of the Lagrangian w.r.t. x). The base implementation
-     * returns Qx - c; {@link ConstrainedSolver} overrides to add A'λ.
+     * returns Qx - c, with the original (unpatched) [Q]; {@link ConstrainedSolver} overrides to add A'λ.
      */
     double[] computeReducedGradient() {
         int n = this.countVariables();
@@ -535,9 +667,16 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
         MatrixStore<Double> Qx = this.getMatrixQ().multiply(x);
         MatrixStore<Double> c = this.getMatrixC();
         for (int j = 0; j < n; j++) {
-            gradient[j] = Qx.doubleValue(j) - c.doubleValue(j);
+            gradient[j] = Qx.doubleValue(j) - myDiagonalPatch * x.doubleValue(j) - c.doubleValue(j);
         }
         return gradient;
+    }
+
+    /**
+     * A copy of the dual solution (Lagrange multipliers), or null if there is none.
+     */
+    PhysicalStore<Double> copyDualSolution() {
+        return null;
     }
 
     ConstraintsMetaData getConstraintsMetaData() {
@@ -549,11 +688,18 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
     }
 
     boolean isPatchedQ() {
-        return myPatchedQ;
+        return myDiagonalPatch > ZERO;
     }
 
     boolean isZeroQ() {
         return myZeroQ;
+    }
+
+    /**
+     * @see #copyDualSolution()
+     */
+    void restoreDualSolution(final PhysicalStore<Double> copy) {
+        // No dual solution
     }
 
     /**

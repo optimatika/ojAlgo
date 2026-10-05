@@ -1,6 +1,7 @@
 package org.ojalgo.optimisation.convex;
 
 import java.math.BigDecimal;
+import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
@@ -113,7 +114,7 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
             Result resultStep1 = ConvexSolver.newBuilder(mtrxQ).linear(mtrxC).equalities(mtrxAE, mtrxBE).inequalities(mtrxAI, mtrxBI).solve();
 
             GenericStore<RationalNumber> step1X = Q128.column(resultStep1);
-            GenericStore<RationalNumber> step1L = Q128.column(resultStep1.getMultipliers().get());
+            GenericStore<RationalNumber> step1L = Q128.column(resultStep1.getDualSolution().map(Supplier::get).get());
 
             if (DEBUG) {
                 BasicLogger.debugMatrix("Step 1 Solution", step1X);
@@ -145,7 +146,7 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
             Result resultStep2 = ConvexSolver.newBuilder(mtrxQ).linear(mtrxC).equalities(mtrxAE, mtrxBE).inequalities(mtrxAI, mtrxBI).solve();
 
             GenericStore<RationalNumber> step2X = Q128.column(resultStep2);
-            GenericStore<RationalNumber> step2L = Q128.column(resultStep2.getMultipliers().get());
+            GenericStore<RationalNumber> step2L = Q128.column(resultStep2.getDualSolution().map(Supplier::get).get());
 
             if (DEBUG) {
                 BasicLogger.debugMatrix("Step 2 Solution", step2X);
@@ -419,6 +420,26 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
     /**
      * https://github.com/optimatika/ojAlgo/discussions/608
      */
+    /**
+     * A problem without constraints (no dual variables) used to throw NoSuchElementException.
+     */
+    @Test
+    public void testWithoutConstraints() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+        model.options.convex().extendedPrecision(true);
+
+        Variable x0 = model.newVariable("x0").weight(-0.1);
+        Variable x1 = model.newVariable("x1");
+        model.newExpression("Q").weight(0.5).set(x0, x0, 0.01).set(x1, x1, 0.01);
+
+        Result result = model.minimise();
+
+        TestUtils.assertStateNotLessThanOptimal(result);
+        TestUtils.assertEquals(10.0, result.doubleValue(0), HIGH_ACCURACY);
+        TestUtils.assertEquals(0.0, result.doubleValue(1), HIGH_ACCURACY);
+    }
+
     @Test
     public void testZECEVIC2() {
 
@@ -480,7 +501,7 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
         Optimisation.Result result = IterativeRefinementSolver.doSolve(Q, C, AE, BE, AI, BI, options);
 
         MatrixStore<Double> x = R064Store.FACTORY.column(result);
-        MatrixStore<Double> y = R064Store.FACTORY.column(result.getMultipliers().get());
+        MatrixStore<Double> y = R064Store.FACTORY.column(result.getDualSolution().map(Supplier::get).get());
 
         double precision = IterativeRefinementTest.getResidualQuadruplePrecision(x, y, Q, C, AE, BE, AI, BI);
         TestUtils.assertLessThan(1e-15, precision);
@@ -507,7 +528,7 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
         Optimisation.Result result = IterativeRefinementSolver.doSolve(Q, C, AE, BE, AI, BI, options);
 
         MatrixStore<Double> x = R064Store.FACTORY.column(result);
-        MatrixStore<Double> y = R064Store.FACTORY.column(result.getMultipliers().get());
+        MatrixStore<Double> y = R064Store.FACTORY.column(result.getDualSolution().map(Supplier::get).get());
 
         double precision = IterativeRefinementTest.getResidualQuadruplePrecision(x, y, Q, C, AE, BE, AI, BI);
         TestUtils.assertLessThan(1e-15, precision);
@@ -531,7 +552,7 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
                 { 0.0, 0.0, 1.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 1.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 1.0 } }));
         Optimisation.Result result = IterativeRefinementSolver.doSolve(Q, C, AE, BE, AI, BI, options);
         MatrixStore<Double> x = R064Store.FACTORY.column(result);
-        MatrixStore<Double> y = R064Store.FACTORY.column(result.getMultipliers().get());
+        MatrixStore<Double> y = R064Store.FACTORY.column(result.getDualSolution().map(Supplier::get).get());
 
         double precision = IterativeRefinementTest.getResidualQuadruplePrecision(x, y, Q, C, AE, BE, AI, BI);
         TestUtils.assertLessThan(1e-12, precision);
@@ -589,7 +610,7 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
         Optimisation.Result resultQuadruple = IterativeRefinementSolver.doSolve(Q, C, AE, BE, AI, BI, options);
 
         MatrixStore<Double> xQ = R064Store.FACTORY.column(resultQuadruple);
-        MatrixStore<Double> yQ = R064Store.FACTORY.column(resultQuadruple.getMultipliers().get());
+        MatrixStore<Double> yQ = R064Store.FACTORY.column(resultQuadruple.getDualSolution().map(Supplier::get).get());
 
         double precisionQuadruple = IterativeRefinementTest.getResidualQuadruplePrecision(xQ, yQ, Q, C, AE, BE, AI, BI);
         // TestUtils.assertLessThan(1e-15, precision);
@@ -598,7 +619,7 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
         ConvexSolver model = ConvexSolver.newBuilder().objective(Q, C).equalities(AE, BE).inequalities(AI, BI).build(options);
         Result resultDouble = model.solve();
         MatrixStore<Double> xD = R064Store.FACTORY.column(resultDouble);
-        MatrixStore<Double> yD = R064Store.FACTORY.column(resultDouble.getMultipliers().get());
+        MatrixStore<Double> yD = R064Store.FACTORY.column(resultDouble.getDualSolution().map(Supplier::get).get());
         double precisionDouble = IterativeRefinementTest.getResidualQuadruplePrecision(xD, yD, Q, C, AE, BE, AI, BI);
         double improvement = (resultDouble.getValue() - resultQuadruple.getValue()) / resultDouble.getValue();
 

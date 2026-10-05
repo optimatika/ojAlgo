@@ -97,6 +97,20 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         mySlackI = MATRIX_FACTORY.make(nbInes, 1L);
     }
 
+    /**
+     * The step is negligible if every component is small compared to the corresponding component of the
+     * current solution. Comparing with the largest component (of the solution) would ignore steps in small
+     * variables whenever some other variable is large.
+     */
+    private static boolean isNegligible(final Access1D<Double> current, final Access1D<Double> step) {
+        for (int i = 0, limit = current.size(); i < limit; i++) {
+            if (!SOLUTION.isSmall(Math.abs(current.doubleValue(i)), step.doubleValue(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private static double norm(final SparseArray<Double> row) {
         return Math.max(Math.sqrt(row.dot(row)), MACHINE_EPSILON);
     }
@@ -130,7 +144,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         }
 
-        if (!SOLUTION.isSmall(normCurrX, normStepX)) {
+        if (!ActiveSetSolver.isNegligible(soluX, iterX)) {
             // Non-zero solution
 
             double stepLength = ONE;

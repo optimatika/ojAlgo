@@ -31,8 +31,8 @@ package org.ojalgo.algebra;
  * to differentiate between a field and a division ring.
  *
  * @author apete
- * @see <a href="https://en.wikipedia.org/wiki/Field_(mathematics)">Field</a>
- * @see <a href="https://en.wikipedia.org/wiki/Division_ring">Division ring</a>
+ * @see "https://en.wikipedia.org/wiki/Field_(mathematics)"
+ * @see "https://en.wikipedia.org/wiki/Division_ring"
  */
 public interface Field<T> extends Ring<T>, Group.Multiplicative<T>, Operation.Subtraction<T>, Operation.Division<T> {
 

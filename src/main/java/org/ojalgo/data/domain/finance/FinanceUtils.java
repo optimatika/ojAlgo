@@ -34,7 +34,6 @@ import java.util.Map.Entry;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.function.special.ErrorFunction;
 import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -50,16 +49,38 @@ import org.ojalgo.series.CoordinationSet;
 import org.ojalgo.series.primitive.PrimitiveSeries;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Primitive1D;
 import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.CalendarDateUnit;
 
+/**
+ * Utilities to estimate and convert financial quantities: covariance matrices from price series, conversions
+ * between (arithmetic) returns and growth rates (logarithmic returns), between time units, and value at risk.
+ * Returns and interest rates are fractions (0.05 means 5%), unless stated otherwise. See the
+ * {@link org.ojalgo.data.domain.finance.portfolio} package for the terminology.
+ */
 public abstract class FinanceUtils {
 
+    /**
+     * Value at Risk (VaR) is the maximum loss not exceeded with a given probability defined as the confidence
+     * level, over a given period of time. It is expressed as a fraction of the initial value.
+     * <p>
+     * The value is modelled as a geometric Brownian motion matched to the expected return and the standard
+     * deviation of the return over one time unit - the same model as
+     * {@link org.ojalgo.data.domain.finance.portfolio.FinancePortfolio#getValueAtRisk(Number, Number)}.
+     *
+     * @param expRet     The expected return over one time unit
+     * @param stdDev     The standard deviation of the return over one time unit
+     * @param confidence The confidence level, e.g. 0.95
+     * @param time       The time period (number of time units)
+     */
     public static double calculateValueAtRisk(final double expRet, final double stdDev, final double confidence, final double time) {
 
-        double tmpConfidenceScale = SQRT_TWO * ErrorFunction.erfi(ONE - TWO * (ONE - confidence));
+        GeometricBrownianMotion process = GeometricBrownianMotion.make(ONE + expRet, stdDev * stdDev);
 
-        return PrimitiveMath.MAX.invoke(PrimitiveMath.SQRT.invoke(time) * stdDev * tmpConfidenceScale - time * expRet, ZERO);
+        double quantile = process.getDistribution(time).getQuantile(ONE - confidence);
+
+        return PrimitiveMath.MAX.invoke(ONE - quantile, ZERO);
     }
 
     public static GeometricBrownianMotion estimateExcessDiffusionProcess(final CalendarDateSeries<?> priceSeries,
@@ -67,9 +88,9 @@ public abstract class FinanceUtils {
 
         SampleSet tmpSampleSet = FinanceUtils.makeExcessGrowthRateSampleSet(priceSeries, riskFreeInterestRateSeries);
 
-        // The average number of millis between to subsequent keys in the series.
+        // The average number of millis between two subsequent keys in the series.
         double tmpStepSize = priceSeries.getResolution().toDurationInMillis();
-        // The time between to keys expressed in terms of the specified time meassure and unit.
+        // The time between two keys expressed in terms of the specified time measure and unit.
         tmpStepSize /= timeUnit.toDurationInMillis();
 
         double tmpExp = tmpSampleSet.getMean();
@@ -119,7 +140,9 @@ public abstract class FinanceUtils {
     }
 
     /**
-     * @return Annualised covariances
+     * @return Annualised covariances of the growth rates (logarithmic returns), not of the returns. Use
+     *         {@link #toCovariancesFromGrowthRates(Access1D, Access2D)} to get the covariances of the
+     *         returns.
      */
     public static <V extends Comparable<V>> MatrixR064 makeCovarianceMatrix(final Collection<CalendarDateSeries<V>> timeSeriesCollection) {
 
@@ -135,7 +158,8 @@ public abstract class FinanceUtils {
             for (int i = 0; i < tmpSize1; i++) {
                 retVal[i] = PrimitiveMath.LOG.invoke(values[i + 1] / values[i]);
             }
-            SampleSet tmpMakeUsingLogarithmicChanges = SampleSet.wrap(Access1D.wrap(retVal));
+            final double[] target = retVal;
+            SampleSet tmpMakeUsingLogarithmicChanges = SampleSet.wrap(Primitive1D.of(target));
             tmpSampleSets.add(tmpMakeUsingLogarithmicChanges);
         }
 
@@ -166,7 +190,9 @@ public abstract class FinanceUtils {
     /**
      * @param listOfTimeSeries   An ordered collection of time series
      * @param mayBeMissingValues Individual series may be missing some values - try to fix this or not
-     * @return Annualised covariances
+     * @return Annualised covariances of the growth rates (logarithmic returns), not of the returns. Use
+     *         {@link #toCovariancesFromGrowthRates(Access1D, Access2D)} to get the covariances of the
+     *         returns.
      */
     public static <N extends Comparable<N>> MatrixR064 makeCovarianceMatrix(final List<CalendarDateSeries<N>> listOfTimeSeries,
             final boolean mayBeMissingValues) {
@@ -271,7 +297,7 @@ public abstract class FinanceUtils {
      * @param priceSeries                A series of prices
      * @param riskFreeInterestRateSeries A series of interest rates (risk free return expressed in %, 5.0
      *                                   means 5.0% annualized risk free return)
-     * @return A sample set of price growth rates adjusted for risk free return
+     * @return A price series, starting at 1.0, that grows with the price in excess of the risk free return
      */
     public static CalendarDateSeries<Double> makeNormalisedExcessPrice(final CalendarDateSeries<?> priceSeries,
             final CalendarDateSeries<?> riskFreeInterestRateSeries) {
@@ -323,11 +349,11 @@ public abstract class FinanceUtils {
     }
 
     /**
-     * GrowthRate = ln(GrowthFactor)
+     * AnnualReturn = GrowthFactor<sup>GrowthFactorUnitsPerYear</sup> - 1.0
      *
      * @param growthFactor     A growth factor per unit (day, week, month, year...)
      * @param growthFactorUnit A growth factor unit
-     * @return Annualised return (percentage per year)
+     * @return Annualised return
      */
     public static double toAnnualReturnFromGrowthFactor(final double growthFactor, final CalendarDateUnit growthFactorUnit) {
         double tmpGrowthFactorUnitsPerYear = growthFactorUnit.convert(CalendarDateUnit.YEAR);
@@ -339,7 +365,7 @@ public abstract class FinanceUtils {
      *
      * @param growthRate     A growth rate per unit (day, week, month, year...)
      * @param growthRateUnit A growth rate unit
-     * @return Annualised return (percentage per year)
+     * @return Annualised return
      */
     public static double toAnnualReturnFromGrowthRate(final double growthRate, final CalendarDateUnit growthRateUnit) {
         double tmpGrowthRateUnitsPerYear = growthRateUnit.convert(CalendarDateUnit.YEAR);
@@ -415,8 +441,8 @@ public abstract class FinanceUtils {
     }
 
     /**
-     * Vill constract a covariance matrix from the standard deviations (volatilities) and correlation
-     * coefficient,
+     * Will construct a covariance matrix from the standard deviations (volatilities) and correlation
+     * coefficients.
      */
     public static MatrixR064 toCovariances(final Access1D<?> volatilities, final Access2D<?> correlations) {
 
@@ -438,9 +464,91 @@ public abstract class FinanceUtils {
     }
 
     /**
-     * GrowthFactor = exp(GrowthRate)
+     * The covariances of the returns, given the expected values and covariances of the growth rates.
+     * <p>
+     * Covariance(i,j) = GrowthFactor(i) * GrowthFactor(j) * (exp(GrowthRateCovariance(i,j)) - 1.0) where
+     * GrowthFactor(i) = exp(ExpectedGrowthRate(i) + GrowthRateCovariance(i,i) / 2.0) is the expected growth
+     * factor.
+     * <p>
+     * The growth factors (1.0 + return) are assumed to be jointly log-normally distributed. All inputs and
+     * outputs refer to the same time period/unit.
      *
-     * @param annualReturn     Annualised return (percentage per year)
+     * @see #toGrowthRateCovariancesFromReturns(Access1D, Access2D)
+     */
+    public static MatrixR064 toCovariancesFromGrowthRates(final Access1D<?> expectedGrowthRates, final Access2D<?> growthRateCovariances) {
+
+        int size = expectedGrowthRates.size();
+
+        double[] growthFactors = new double[size];
+        for (int i = 0; i < size; i++) {
+            growthFactors[i] = EXP.invoke(expectedGrowthRates.doubleValue(i) + HALF * growthRateCovariances.doubleValue(i, i));
+        }
+
+        MatrixR064.DenseReceiver retVal = MatrixR064.FACTORY.newDenseBuilder(size, size);
+
+        for (int j = 0; j < size; j++) {
+            for (int i = 0; i < size; i++) {
+                retVal.set(i, j, growthFactors[i] * growthFactors[j] * EXPM1.invoke(growthRateCovariances.doubleValue(i, j)));
+            }
+        }
+
+        return retVal.get();
+    }
+
+    /**
+     * The expected growth rates, given the expected values and covariances of the returns.
+     * <p>
+     * ExpectedGrowthRate(i) = ln(1.0 + ExpectedReturn(i)) - GrowthRateCovariance(i,i) / 2.0
+     * <p>
+     * The growth factors (1.0 + return) are assumed to be jointly log-normally distributed. All inputs and
+     * outputs refer to the same time period/unit.
+     *
+     * @see #toGrowthRateCovariancesFromReturns(Access1D, Access2D)
+     * @see #toExpectedReturnsFromGrowthRates(Access1D, Access2D)
+     */
+    public static MatrixR064 toExpectedGrowthRatesFromReturns(final Access1D<?> expectedReturns, final Access2D<?> covariances) {
+
+        int size = expectedReturns.size();
+
+        MatrixR064.DenseReceiver retVal = MatrixR064.FACTORY.makeDense(size);
+
+        for (int i = 0; i < size; i++) {
+            double growthFactor = ONE + expectedReturns.doubleValue(i);
+            double growthRateVariance = LOG1P.invoke(covariances.doubleValue(i, i) / (growthFactor * growthFactor));
+            retVal.set(i, LOG.invoke(growthFactor) - HALF * growthRateVariance);
+        }
+
+        return retVal.get();
+    }
+
+    /**
+     * The expected returns, given the expected values and covariances of the growth rates.
+     * <p>
+     * ExpectedReturn(i) = exp(ExpectedGrowthRate(i) + GrowthRateCovariance(i,i) / 2.0) - 1.0
+     * <p>
+     * The growth factors (1.0 + return) are assumed to be jointly log-normally distributed. All inputs and
+     * outputs refer to the same time period/unit.
+     *
+     * @see #toCovariancesFromGrowthRates(Access1D, Access2D)
+     * @see #toExpectedGrowthRatesFromReturns(Access1D, Access2D)
+     */
+    public static MatrixR064 toExpectedReturnsFromGrowthRates(final Access1D<?> expectedGrowthRates, final Access2D<?> growthRateCovariances) {
+
+        int size = expectedGrowthRates.size();
+
+        MatrixR064.DenseReceiver retVal = MatrixR064.FACTORY.makeDense(size);
+
+        for (int i = 0; i < size; i++) {
+            retVal.set(i, EXPM1.invoke(expectedGrowthRates.doubleValue(i) + HALF * growthRateCovariances.doubleValue(i, i)));
+        }
+
+        return retVal.get();
+    }
+
+    /**
+     * GrowthFactor = (1.0 + AnnualReturn)<sup>YearsPerGrowthFactorUnit</sup>
+     *
+     * @param annualReturn     Annualised return
      * @param growthFactorUnit A growth factor unit
      * @return A growth factor per unit (day, week, month, year...)
      */
@@ -451,9 +559,41 @@ public abstract class FinanceUtils {
     }
 
     /**
-     * GrowthRate = ln(1.0 + InterestRate) / GrowthRateUnitsPerYear
+     * The covariances of the growth rates, given the expected values and covariances of the returns.
+     * <p>
+     * GrowthRateCovariance(i,j) = ln(1.0 + Covariance(i,j) / (GrowthFactor(i) * GrowthFactor(j))) where
+     * GrowthFactor(i) = 1.0 + ExpectedReturn(i) is the expected growth factor.
+     * <p>
+     * The growth factors (1.0 + return) are assumed to be jointly log-normally distributed. All inputs and
+     * outputs refer to the same time period/unit.
      *
-     * @param annualReturn   Annualised return (percentage per year)
+     * @see #toCovariancesFromGrowthRates(Access1D, Access2D)
+     * @see #toExpectedGrowthRatesFromReturns(Access1D, Access2D)
+     */
+    public static MatrixR064 toGrowthRateCovariancesFromReturns(final Access1D<?> expectedReturns, final Access2D<?> covariances) {
+
+        int size = expectedReturns.size();
+
+        double[] growthFactors = new double[size];
+        for (int i = 0; i < size; i++) {
+            growthFactors[i] = ONE + expectedReturns.doubleValue(i);
+        }
+
+        MatrixR064.DenseReceiver retVal = MatrixR064.FACTORY.newDenseBuilder(size, size);
+
+        for (int j = 0; j < size; j++) {
+            for (int i = 0; i < size; i++) {
+                retVal.set(i, j, LOG1P.invoke(covariances.doubleValue(i, j) / (growthFactors[i] * growthFactors[j])));
+            }
+        }
+
+        return retVal.get();
+    }
+
+    /**
+     * GrowthRate = ln(1.0 + AnnualReturn) / GrowthRateUnitsPerYear
+     *
+     * @param annualReturn   Annualised return
      * @param growthRateUnit A growth rate unit
      * @return A growth rate per unit (day, week, month, year...)
      */

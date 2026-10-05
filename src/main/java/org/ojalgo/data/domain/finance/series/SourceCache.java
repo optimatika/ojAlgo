@@ -34,6 +34,11 @@ import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.PrimitiveNumber;
 
+/**
+ * Caches price series from {@link FinanceData} sources. Entries are refreshed, and unused entries evicted, at
+ * the specified interval. A secondary source can be registered as fallback for when the primary source
+ * returns no data.
+ */
 public final class SourceCache {
 
     private static final class Value {

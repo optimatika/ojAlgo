@@ -26,38 +26,63 @@ import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 
+/**
+ * The asset returns and covariances (or volatilities and correlations) needed to calculate the return and
+ * variance of any portfolio, of those assets, from its weights.
+ */
 public class PortfolioContext implements FinancePortfolio.Context {
+
+    /**
+     * @param assetReturns The (expected) asset returns
+     * @param covariances  The covariances of the asset returns
+     */
+    public static PortfolioContext of(final Access1D<?> assetReturns, final Access2D<?> covariances) {
+        return new PortfolioContext(FinancePortfolio.MATRIX_FACTORY.column(assetReturns), null, null, FinancePortfolio.MATRIX_FACTORY.copy(covariances));
+    }
+
+    /**
+     * @param assetReturns      The (expected) asset returns
+     * @param assetVolatilities The volatilities (standard deviations) of the asset returns
+     * @param correlations      The correlations between the asset returns
+     */
+    public static PortfolioContext of(final Access1D<?> assetReturns, final Access1D<?> assetVolatilities, final Access2D<?> correlations) {
+        return new PortfolioContext(FinancePortfolio.MATRIX_FACTORY.column(assetReturns), FinancePortfolio.MATRIX_FACTORY.column(assetVolatilities),
+                FinancePortfolio.MATRIX_FACTORY.copy(correlations), null);
+    }
 
     private final MatrixR064 myAssetReturns;
     private MatrixR064 myAssetVolatilities = null;
     private MatrixR064 myCorrelations = null;
     private MatrixR064 myCovariances = null;
 
+    /**
+     * @deprecated v57 Use {@link #of(Access1D, Access1D, Access2D)} instead.
+     */
+    @Deprecated
     public PortfolioContext(final Access1D<?> assetReturns, final Access1D<?> assetVolatilities, final Access2D<?> correlations) {
-
-        super();
-
-        myAssetReturns = FinancePortfolio.MATRIX_FACTORY.column(assetReturns);
-
-        myAssetVolatilities = FinancePortfolio.MATRIX_FACTORY.column(assetVolatilities);
-        myCorrelations = FinancePortfolio.MATRIX_FACTORY.copy(correlations);
+        this(FinancePortfolio.MATRIX_FACTORY.column(assetReturns), FinancePortfolio.MATRIX_FACTORY.column(assetVolatilities),
+                FinancePortfolio.MATRIX_FACTORY.copy(correlations), null);
     }
 
+    /**
+     * @deprecated v57 Use {@link #of(Access1D, Access2D)} instead.
+     */
+    @Deprecated
     public PortfolioContext(final Access1D<?> assetReturns, final Access2D<?> covariances) {
-
-        super();
-
-        myAssetReturns = FinancePortfolio.MATRIX_FACTORY.column(assetReturns);
-
-        myCovariances = FinancePortfolio.MATRIX_FACTORY.copy(covariances);
+        this(FinancePortfolio.MATRIX_FACTORY.column(assetReturns), null, null, FinancePortfolio.MATRIX_FACTORY.copy(covariances));
     }
 
-    @SuppressWarnings("unused")
-    private PortfolioContext() {
+    /**
+     * Either the volatilities and correlations, or the covariances, must be given - the others may be null.
+     */
+    PortfolioContext(final MatrixR064 assetReturns, final MatrixR064 assetVolatilities, final MatrixR064 correlations, final MatrixR064 covariances) {
 
         super();
 
-        myAssetReturns = null;
+        myAssetReturns = assetReturns;
+        myAssetVolatilities = assetVolatilities;
+        myCorrelations = correlations;
+        myCovariances = covariances;
     }
 
     @Override

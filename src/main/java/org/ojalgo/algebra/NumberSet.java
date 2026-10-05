@@ -24,7 +24,7 @@ package org.ojalgo.algebra;
 /**
  * Some special sets of numbers commonly used in mathematics
  *
- * @see https://en.wikipedia.org/wiki/Set_(mathematics)
+ * @see "https://en.wikipedia.org/wiki/Set_(mathematics)"
  * @author apete
  */
 public enum NumberSet {

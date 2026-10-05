@@ -28,6 +28,9 @@ import org.ojalgo.netio.TextLineReader;
 import org.ojalgo.netio.TextLineReader.Parser;
 import org.ojalgo.type.CalendarDateUnit;
 
+/**
+ * Provides the raw (text) data, for a single symbol, that a parser turns into {@link DatePrice} instances.
+ */
 public interface DataFetcher {
 
     InputStream getInputStream();

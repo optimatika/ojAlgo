@@ -88,7 +88,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
          * of the same size, and then the operation was performed. The actual implementation may be more
          * efficient than that.
          *
-         * @see https://se.mathworks.com/help/matlab/matlab_prog/compatible-array-sizes-for-basic-operations.html
+         * @see "https://se.mathworks.com/help/matlab/matlab_prog/compatible-array-sizes-for-basic-operations.html"
          */
         default void fillCompatible(final Access2D<N> left, final BinaryFunction<N> operator, final Access2D<N> right) {
             FillCompatible.invoke(this, left, operator, right);
@@ -352,7 +352,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
          * The "compatible" part of the method name references MATLAB's terminology "Compatible Array Sizes".
          * Here the possible combinations are somewhat limited as 'this' is modified in-place.
          *
-         * @see https://se.mathworks.com/help/matlab/matlab_prog/compatible-array-sizes-for-basic-operations.html
+         * @see "https://se.mathworks.com/help/matlab/matlab_prog/compatible-array-sizes-for-basic-operations.html"
          */
         default void modifyCompatible(final Access2D<N> left, final BinaryFunction<N> operator) {
 

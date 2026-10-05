@@ -26,28 +26,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ojalgo.array.Array1D;
+import org.ojalgo.data.domain.finance.FinanceUtils;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
 
+/**
+ * Base class of the portfolio models built on a {@link MarketEquilibrium} - its covariances and risk
+ * aversion. Subclasses define how the asset weights and returns are derived. Derived values are calculated
+ * lazily, and reset when the inputs change.
+ */
 abstract class EquilibriumModel extends FinancePortfolio implements FinancePortfolio.Context {
 
     private transient MatrixR064 myAssetReturns;
     private transient MatrixR064 myAssetVolatilities;
     private transient MatrixR064 myAssetWeights;
+    private transient MatrixR064 myCorrelations;
+    private transient MatrixR064 myCovariances;
     private final MarketEquilibrium myMarketEquilibrium;
     private transient Scalar<?> myMeanReturn;
     private transient Scalar<?> myReturnVariance;
 
-    protected EquilibriumModel(final FinancePortfolio.Context portfolioContext) {
-
-        super();
-
-        myMarketEquilibrium = new MarketEquilibrium(portfolioContext.getCovariances());
-    }
-
-    protected EquilibriumModel(final MarketEquilibrium marketEquilibrium) {
+    EquilibriumModel(final MarketEquilibrium marketEquilibrium) {
 
         super();
 
@@ -80,7 +81,7 @@ abstract class EquilibriumModel extends FinancePortfolio implements FinancePortf
     @Override
     public final MatrixR064 getAssetVolatilities() {
         if (myAssetVolatilities == null) {
-            myAssetVolatilities = myMarketEquilibrium.toCorrelations();
+            myAssetVolatilities = FinanceUtils.toVolatilities(this.getCovariances());
         }
         return myAssetVolatilities;
     }
@@ -94,12 +95,21 @@ abstract class EquilibriumModel extends FinancePortfolio implements FinancePortf
 
     @Override
     public final MatrixR064 getCorrelations() {
-        return myMarketEquilibrium.toCorrelations();
+        if (myCorrelations == null) {
+            myCorrelations = FinanceUtils.toCorrelations(this.getCovariances());
+        }
+        return myCorrelations;
     }
 
+    /**
+     * @see #calculateCovariances()
+     */
     @Override
     public final MatrixR064 getCovariances() {
-        return myMarketEquilibrium.getCovariances();
+        if (myCovariances == null) {
+            myCovariances = this.calculateCovariances();
+        }
+        return myCovariances;
     }
 
     public final MarketEquilibrium getMarketEquilibrium() {
@@ -109,11 +119,7 @@ abstract class EquilibriumModel extends FinancePortfolio implements FinancePortf
     @Override
     public final double getMeanReturn() {
         if (myMeanReturn == null) {
-            final MatrixR064 tmpAssetWeights = this.getAssetWeights();
-            final MatrixR064 tmpAssetReturns = this.getAssetReturns();
-            if (tmpAssetWeights != null && tmpAssetReturns != null) {
-                myMeanReturn = this.calculatePortfolioReturn(tmpAssetWeights, tmpAssetReturns);
-            }
+            myMeanReturn = this.calculatePortfolioReturn(this.getAssetWeights(), this.getAssetReturns());
         }
         return myMeanReturn.doubleValue();
     }
@@ -136,17 +142,7 @@ abstract class EquilibriumModel extends FinancePortfolio implements FinancePortf
 
     @Override
     public final List<BigDecimal> getWeights() {
-
-        final MatrixR064 tmpAssetWeights = this.getAssetWeights();
-
-        if (tmpAssetWeights != null) {
-
-            return Array1D.R256.copy(tmpAssetWeights);
-
-        } else {
-
-            return null;
-        }
+        return Array1D.R256.copy(this.getAssetWeights());
     }
 
     public final void setRiskAversion(final Comparable<?> factor) {
@@ -190,14 +186,29 @@ abstract class EquilibriumModel extends FinancePortfolio implements FinancePortf
 
     protected abstract MatrixR064 calculateAssetReturns();
 
+    /**
+     * Using the market equilibrium - its covariances and risk aversion.
+     */
     protected final MatrixR064 calculateAssetReturns(final MatrixR064 aWeightsVctr) {
         return myMarketEquilibrium.calculateAssetReturns(aWeightsVctr);
     }
 
     protected abstract MatrixR064 calculateAssetWeights();
 
+    /**
+     * Using the market equilibrium - its covariances and risk aversion.
+     */
     protected final MatrixR064 calculateAssetWeights(final MatrixR064 aReturnsVctr) {
         return myMarketEquilibrium.calculateAssetWeights(aReturnsVctr);
+    }
+
+    /**
+     * The covariances of this model. By default those of the market equilibrium, but subclasses may override
+     * this. The asset volatilities, the correlations and the portfolio variances are all derived from these
+     * covariances (but the mapping between asset weights and returns always uses the market equilibrium).
+     */
+    protected MatrixR064 calculateCovariances() {
+        return myMarketEquilibrium.getCovariances();
     }
 
     protected final Scalar<?> calculatePortfolioReturn(final MatrixR064 aWeightsVctr, final MatrixR064 aReturnsVctr) {
@@ -205,14 +216,38 @@ abstract class EquilibriumModel extends FinancePortfolio implements FinancePortf
     }
 
     protected final Scalar<?> calculatePortfolioVariance(final MatrixR064 aWeightsVctr) {
-        return myMarketEquilibrium.calculatePortfolioVariance(aWeightsVctr);
+
+        MatrixR064 tmpLeft;
+        MatrixR064 tmpRight;
+
+        if (aWeightsVctr.countColumns() == 1L) {
+            tmpLeft = aWeightsVctr.transpose();
+            tmpRight = aWeightsVctr;
+        } else {
+            tmpLeft = aWeightsVctr;
+            tmpRight = aWeightsVctr.transpose();
+        }
+
+        return tmpLeft.multiply(this.getCovariances().multiply(tmpRight)).toScalar(0, 0);
     }
 
-    protected final void calibrate(final MatrixR064 aWeightsVctr, final MatrixR064 aReturnsVctr) {
+    /**
+     * Sets the risk aversion to the best fit for the weights and returns.
+     *
+     * @return true if calibrated, false if the implied risk aversion is not positive - the weights and
+     *         returns don't imply a positive risk premium (e.g. historical returns from a falling market).
+     *         The risk aversion is then left unchanged.
+     */
+    protected final boolean calibrate(final MatrixR064 aWeightsVctr, final MatrixR064 aReturnsVctr) {
 
-        final Scalar<?> tmpRiskAvesrion = myMarketEquilibrium.calculateImpliedRiskAversion(aWeightsVctr, aReturnsVctr);
+        double implied = myMarketEquilibrium.calculateImpliedRiskAversion(aWeightsVctr, aReturnsVctr);
 
-        this.setRiskAversion(tmpRiskAvesrion.get());
+        if (implied > PrimitiveMath.ZERO) {
+            this.setRiskAversion(implied);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
@@ -221,10 +256,9 @@ abstract class EquilibriumModel extends FinancePortfolio implements FinancePortf
         myAssetReturns = null;
         myMeanReturn = null;
         myReturnVariance = null;
-    }
-
-    final boolean isDefaultRiskAversion() {
-        return myMarketEquilibrium.isDefaultRiskAversion();
+        myCovariances = null;
+        myAssetVolatilities = null;
+        myCorrelations = null;
     }
 
 }

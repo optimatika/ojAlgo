@@ -34,6 +34,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.type.StandardType;
 import org.ojalgo.type.TypeUtils;
@@ -69,7 +70,7 @@ public class TestEquilibrium extends FinancePortfolioTests {
 
         BigDecimal riskAversion = new BigDecimal(1000.0);
 
-        MarketEquilibrium marketEquilibrium = new MarketEquilibrium(covariances, riskAversion);
+        MarketEquilibrium marketEquilibrium = MarketEquilibrium.of(covariances, riskAversion);
 
         MatrixR064.DenseReceiver expectedExcessReturns1 = MatrixR064.FACTORY.newDenseBuilder(assetNum, 1);
         expectedExcessReturns1.set(0, 0, 0.03360872);
@@ -91,7 +92,7 @@ public class TestEquilibrium extends FinancePortfolioTests {
 
         System.out.println("Return Matrix" + expectedExcessReturns1.get());
 
-        MarkowitzModel markowitzModel = new MarkowitzModel(marketEquilibrium, expectedExcessReturns1.get());
+        MarkowitzModel markowitzModel = MarkowitzModel.of(marketEquilibrium, expectedExcessReturns1.get());
 
         //markowitzModel.setTargetReturn(new BigDecimal("0.01051787"));
         markowitzModel.setTargetReturn(new BigDecimal("0.003081388"));
@@ -135,6 +136,44 @@ public class TestEquilibrium extends FinancePortfolioTests {
         return covariances.get();
     }
 
+    /**
+     * Used to return the correlations matrix rather than the volatilities.
+     */
+    @Test
+    public void testAssetVolatilities() {
+
+        MatrixR064 covariances = MatrixR064.FACTORY.copy(RawStore.wrap(new double[][] { { 0.04, 0.006 }, { 0.006, 0.09 } }));
+        MatrixR064 weights = MatrixR064.FACTORY.column(new double[] { 0.5, 0.5 });
+
+        FixedWeightsPortfolio portfolio = FixedWeightsPortfolio.of(MarketEquilibrium.of(covariances), weights);
+
+        TestUtils.assertEquals(MatrixR064.FACTORY.column(new double[] { 0.2, 0.3 }), portfolio.getAssetVolatilities());
+    }
+
+    /**
+     * Returns that are exactly 3 times [C][w] imply a risk aversion of 3. Returns pointing the other way (no
+     * positive risk premium) used to have the sign of the implied risk aversion silently flipped - now the
+     * calibration is reported as unsuccessful and the risk aversion is left unchanged.
+     */
+    @Test
+    public void testImpliedRiskAversion() {
+
+        MatrixR064 covariances = MatrixR064.FACTORY.copy(RawStore.wrap(new double[][] { { 0.04, 0.006 }, { 0.006, 0.09 } }));
+        MatrixR064 weights = MatrixR064.FACTORY.column(new double[] { 0.5, 0.5 });
+
+        FixedWeightsPortfolio portfolio = FixedWeightsPortfolio.of(MarketEquilibrium.of(covariances), weights);
+
+        TestUtils.assertTrue(portfolio.calibrate(List.of(0.069, 0.144)));
+        TestUtils.assertEquals(3.0, portfolio.getRiskAversion().doubleValue(), 1E-12);
+
+        TestUtils.assertFalse(portfolio.calibrate(List.of(-0.069, -0.144)));
+        TestUtils.assertEquals(3.0, portfolio.getRiskAversion().doubleValue(), 1E-12);
+
+        MarketEquilibrium equilibrium = MarketEquilibrium.of(covariances);
+        TestUtils.assertFalse(equilibrium.calibrate(MatrixR064.FACTORY.column(new double[] { 0.0, 0.0 }), MatrixR064.FACTORY.column(new double[] { 0.069, 0.144 })));
+        TestUtils.assertEquals(1.0, equilibrium.getRiskAversion().doubleValue(), 1E-12);
+    }
+
     @Test
     @Tag("unstable")
     public void testRandomProblemsComparedToEquilibrium() {
@@ -160,22 +199,22 @@ public class TestEquilibrium extends FinancePortfolioTests {
 
         double raf = PrimitiveMath.POW.invoke(10.0, uniformRiskAversionExponent.doubleValue());
 
-        MarketEquilibrium equilibrium = new MarketEquilibrium(covarianceMatrix, raf).clean();
+        MarketEquilibrium equilibrium = MarketEquilibrium.of(covarianceMatrix, raf).clean();
 
         double[] rawWeights = MatrixR064.FACTORY.makeFilled(dim, 1, uniformWeight).toRawCopy1D();
-        List<BigDecimal> normalisedWeights = new SimplePortfolio(rawWeights).normalise().getWeights();
+        List<BigDecimal> normalisedWeights = SimplePortfolio.ofWeights(rawWeights).normalise().getWeights();
 
         MatrixR064 generatedWeights = MatrixR064.FACTORY.column(normalisedWeights);
         MatrixR064 matchingReturns = equilibrium.calculateAssetReturns(generatedWeights);
         TestUtils.assertEquals(generatedWeights, equilibrium.calculateAssetWeights(matchingReturns), weightsContext);
 
-        FixedWeightsPortfolio portfFW = new FixedWeightsPortfolio(equilibrium, generatedWeights);
+        FixedWeightsPortfolio portfFW = FixedWeightsPortfolio.of(equilibrium, generatedWeights);
         TestUtils.assertEquals(matchingReturns, portfFW.getAssetReturns(), weightsContext);
 
-        FixedReturnsPortfolio portfFR = new FixedReturnsPortfolio(equilibrium, matchingReturns);
+        FixedReturnsPortfolio portfFR = FixedReturnsPortfolio.of(equilibrium, matchingReturns);
         TestUtils.assertEquals(generatedWeights, portfFR.getAssetWeights(), weightsContext);
 
-        BlackLittermanModel modelBL = new BlackLittermanModel(equilibrium, generatedWeights);
+        BlackLittermanModel modelBL = BlackLittermanModel.of(equilibrium, generatedWeights);
         for (int i = 0; i < dim; i++) {
             List<BigDecimal> viewAssetWeights = new ArrayList<>();
             for (int j = 0; j < dim; j++) {
@@ -191,8 +230,24 @@ public class TestEquilibrium extends FinancePortfolioTests {
         }
         TestUtils.assertEquals(generatedWeights, modelBL.getAssetWeights(), weightsContext);
 
-        MarkowitzModel modelM = new MarkowitzModel(equilibrium, matchingReturns);
+        MarkowitzModel modelM = MarkowitzModel.of(equilibrium, matchingReturns);
         TestUtils.assertEquals(generatedWeights, modelM.getAssetWeights(), weightsContext);
+    }
+
+    /**
+     * Zero and negative values used to be silently replaced by 1 and the absolute value respectively.
+     */
+    @Test
+    public void testRiskAversionMustBePositive() {
+
+        MatrixR064 covariances = MatrixR064.FACTORY.copy(RawStore.wrap(new double[][] { { 0.04, 0.006 }, { 0.006, 0.09 } }));
+
+        TestUtils.assertThrows(IllegalArgumentException.class, () -> MarketEquilibrium.of(covariances, 0));
+
+        MarketEquilibrium equilibrium = MarketEquilibrium.of(covariances);
+        TestUtils.assertThrows(IllegalArgumentException.class, () -> equilibrium.setRiskAversion(0));
+        TestUtils.assertThrows(IllegalArgumentException.class, () -> equilibrium.setRiskAversion(-2));
+        TestUtils.assertEquals(1.0, equilibrium.getRiskAversion().doubleValue(), 1E-12);
     }
 
 }

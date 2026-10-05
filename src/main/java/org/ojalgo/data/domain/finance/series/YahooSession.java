@@ -37,7 +37,7 @@ import org.ojalgo.type.CalendarDateUnit;
  * <P>
  * Fetch historical financial time series data from Yahoo Finance: https://finance.yahoo.com
  *
- * @see https://finance.yahoo.com
+ * @see "https://finance.yahoo.com"
  * @author apete
  * @deprecated
  */

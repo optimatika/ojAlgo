@@ -52,8 +52,8 @@ import org.ojalgo.type.context.NumberContext;
  * </ul>
  *
  * @author apete
- * @see https://en.wikipedia.org/wiki/Conjugate_gradient_method
- * @see https://optimization.cbe.cornell.edu/index.php?title=Conjugate_gradient_methods
+ * @see "https://en.wikipedia.org/wiki/Conjugate_gradient_method"
+ * @see "https://optimization.cbe.cornell.edu/index.php?title=Conjugate_gradient_methods"
  */
 public final class ConjugateGradientSolver extends IterativeSolverTask {
 

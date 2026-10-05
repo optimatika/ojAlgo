@@ -18,7 +18,7 @@ import org.ojalgo.type.CalendarDateUnit;
  * fetcher needs to be re-implemented.
  *
  * @author stefanvanegmond
- * @see https://iexcloud.io
+ * @see "https://iexcloud.io"
  * @deprecated It needs to be updated to function...
  */
 @Deprecated

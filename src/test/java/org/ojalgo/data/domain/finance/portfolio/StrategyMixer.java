@@ -31,11 +31,13 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.random.Uniform;
+import org.ojalgo.type.context.NumberContext;
 
 public class StrategyMixer extends FinancePortfolioTests {
 
@@ -46,13 +48,13 @@ public class StrategyMixer extends FinancePortfolioTests {
     @Test
     public void testStratCombPortfolioMixer() {
 
-        FinancePortfolio tmpTarget = new SimplePortfolio(THIRD, THIRD, THIRD).normalise();
+        FinancePortfolio tmpTarget = SimplePortfolio.ofWeights(THIRD, THIRD, THIRD).normalise();
 
-        FinancePortfolio tmpStrat1 = new SimplePortfolio(HALF, HALF, ZERO);
-        FinancePortfolio tmpStrat2 = new SimplePortfolio(HALF, ZERO, HALF);
-        FinancePortfolio tmpStrat3 = new SimplePortfolio(ZERO, HALF, HALF);
+        FinancePortfolio tmpStrat1 = SimplePortfolio.ofWeights(HALF, HALF, ZERO);
+        FinancePortfolio tmpStrat2 = SimplePortfolio.ofWeights(HALF, ZERO, HALF);
+        FinancePortfolio tmpStrat3 = SimplePortfolio.ofWeights(ZERO, HALF, HALF);
 
-        PortfolioMixer tmpMixer = new PortfolioMixer(tmpTarget, tmpStrat1, tmpStrat2, tmpStrat3);
+        PortfolioMixer tmpMixer = PortfolioMixer.of(tmpTarget, tmpStrat1, tmpStrat2, tmpStrat3);
 
         int tmpExpectedNumberOfStrategies = 2;
         List<BigDecimal> tmpStrategyWeights = tmpMixer.mix(tmpExpectedNumberOfStrategies);
@@ -71,19 +73,41 @@ public class StrategyMixer extends FinancePortfolioTests {
         TestUtils.assertEquals(PrimitiveMath.ONE, tmpTotalWeight, 1E-14 / PrimitiveMath.THREE);
     }
 
+    /**
+     * Constraints used to be applied to the wrong model variables, and only the first index was used.
+     */
+    @Test
+    public void testStratCombPortfolioMixerConstrained() {
+
+        FinancePortfolio target = SimplePortfolio.ofWeights(THIRD, THIRD, THIRD).normalise();
+
+        FinancePortfolio strat1 = SimplePortfolio.ofWeights(HALF, HALF, ZERO);
+        FinancePortfolio strat2 = SimplePortfolio.ofWeights(HALF, ZERO, HALF);
+        FinancePortfolio strat3 = SimplePortfolio.ofWeights(ZERO, HALF, HALF);
+
+        PortfolioMixer mixer = PortfolioMixer.of(target, strat1, strat2, strat3);
+
+        mixer.addComponentConstraint(ONE, null, 1, 2); // excludes strat1
+        mixer.addAssetConstraint(new BigDecimal("0.3"), null, 1); // requires strat3 share >= 0.6
+
+        List<BigDecimal> shares = mixer.mix(2);
+
+        TestUtils.assertEquals(MatrixR064.FACTORY.column(new double[] { 0.0, 0.4, 0.6 }), MatrixR064.FACTORY.column(shares), NumberContext.of(6));
+    }
+
     @Test
     @Tag("unstable")
     public void testStratCombPortfolioMixerRandom() {
 
-        FinancePortfolio tmpTarget = new SimplePortfolio(QUARTER, QUARTER, QUARTER, QUARTER).normalise();
+        FinancePortfolio tmpTarget = SimplePortfolio.ofWeights(QUARTER, QUARTER, QUARTER, QUARTER).normalise();
 
         Uniform tmpGen = new Uniform();
 
-        FinancePortfolio tmpStrat1 = new SimplePortfolio(tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue()).normalise();
-        FinancePortfolio tmpStrat2 = new SimplePortfolio(tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue()).normalise();
-        FinancePortfolio tmpStrat3 = new SimplePortfolio(tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue()).normalise();
+        FinancePortfolio tmpStrat1 = SimplePortfolio.ofWeights(tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue()).normalise();
+        FinancePortfolio tmpStrat2 = SimplePortfolio.ofWeights(tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue()).normalise();
+        FinancePortfolio tmpStrat3 = SimplePortfolio.ofWeights(tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue()).normalise();
 
-        PortfolioMixer tmpMixer = new PortfolioMixer(tmpTarget, tmpStrat1, tmpStrat2, tmpStrat3);
+        PortfolioMixer tmpMixer = PortfolioMixer.of(tmpTarget, tmpStrat1, tmpStrat2, tmpStrat3);
 
         int tmpExpectedNumberOfStrategies = 2;
         List<BigDecimal> tmpStrategyWeights = tmpMixer.mix(tmpExpectedNumberOfStrategies);

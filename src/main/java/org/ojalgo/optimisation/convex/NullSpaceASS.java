@@ -45,6 +45,11 @@ class NullSpaceASS extends ConvexSolver {
 
         NullSpaceProjection projection = NullSpaceProjection.reduce(myOriginal);
 
+        if (projection.isReducedHessianNegligible(options.convex().smallDiagonal())) {
+            // Effectively an LP in the null space of the equality constraints - solve the original problem instead
+            return BasePrimitiveSolver.newSolver(myOriginal, options).solve(kickStarter);
+        }
+
         ConvexData<Double> reduced = projection.getReduced();
 
         ConvexSolver solver = BasePrimitiveSolver.newSolver(reduced, options);
@@ -53,9 +58,7 @@ class NullSpaceASS extends ConvexSolver {
 
         Optimisation.Result result = solver.solve(start);
 
-        Result retVal = projection.toFullModelState(result);
-
-        return retVal;
+        return projection.toFullModelState(result);
     }
 
 }

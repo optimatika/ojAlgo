@@ -17,6 +17,16 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - `DensityTrackingArray` has `supplyTo(DensityTrackingArray)`, `axpy(double, double[])`, `dot(double[])`, `tighten(double)`, `reindex()`, `invalidateIndex()` and `setNonzeroCount(int)`, for code that works directly with the values and the index of nonzeros.
 
+#### org.ojalgo.data.domain.finance
+
+- `FinanceUtils` conversions between the expected values and covariances of returns and of growth rates (logarithmic returns), assuming log-normal growth factors: `toExpectedReturnsFromGrowthRates`, `toCovariancesFromGrowthRates`, `toExpectedGrowthRatesFromReturns` and `toGrowthRateCovariancesFromReturns`.
+
+#### org.ojalgo.data.domain.finance.portfolio
+
+- `BlackLittermanModel.Mode`: `RETURNS` (as before, the default), `FULL` (He & Litterman, posterior covariances) and `MARKET` (Meucci, conditional covariances). Each mode has a default confidence (tau).
+- `BlackLittermanModel.addViewWithConfidenceLevel(...)`: Idzorek's percentage confidence.
+- Static factory methods, `of(...)` (and `SimpleAsset.ofWeight`, `SimplePortfolio.ofWeights`), replacing the public constructors.
+
 #### org.ojalgo.matrix.decomposition
 
 - `SparseLU.ftranColumn(R064CSC, int, DensityTrackingArray)` and `btranUnit(int, DensityTrackingArray)`: sparse solves for a column of a sparse matrix and for a unit vector. They keep partial results that a following `updateColumn(int, R064CSC, int)` reuses.
@@ -43,6 +53,20 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.array
 
 - `DensityTrackingArray.countNonzeros()` and `density()` count the listed positions, which may include values that have become zero (set to zero, or cancelled when adding), until the next `reset()`, `reindex()` or `tighten(double)`. Previously setting a value to zero made the next call rescan, so the count was exact.
+
+#### org.ojalgo.data.domain.finance
+
+- `FinanceUtils.calculateValueAtRisk(...)` uses a geometric Brownian motion (log-normal), not a normal distribution.
+
+#### org.ojalgo.data.domain.finance.portfolio
+
+- Value at Risk uses the same geometric Brownian motion model as `forecast()` and `getLossProbability()`, not a normal distribution.
+- `MarkowitzModel` target return is solved as one QP (minimum variance with return at least the target), and the target variance search no longer depends on the initial risk aversion. Targets outside the attainable range give the minimum variance or maximum return portfolio.
+- The risk aversion, and the Black-Litterman confidence, must be positive (`IllegalArgumentException`, previously silently changed). `calibrate(...)` returns `boolean`, and leaves the risk aversion unchanged if the implied one is not positive.
+- The new `PortfolioOptimiser` is now the return type of `optimiser()` (was the nested `OptimisedPortfolio.Optimiser`, which could not be named outside the package).
+- `MarkowitzModel.addConstraint` and `PortfolioMixer.add*Constraint` return `void`, and a constraint on the same set of indices replaces the previous one.
+- An unbounded optimisation gives zero weights, as other failures do.
+- `CharacteristicLine` is reimplemented – an instance is the line of one asset against the market, created with `assumingCAPM(...)`, `of(...)` or `estimate(...)`. The previous, unfinished, API is removed.
 
 #### org.ojalgo.matrix.decomposition
 
@@ -79,6 +103,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Deprecated
 
+#### org.ojalgo.data.domain.finance.portfolio
+
+- The public constructors of `BlackLittermanModel`, `EfficientFrontier`, `FixedReturnsPortfolio`, `FixedWeightsPortfolio`, `MarketEquilibrium`, `MarkowitzModel`, `PortfolioContext`, `PortfolioMixer`, `PortfolioSimulator`, `SimpleAsset` and `SimplePortfolio`. Use the static factory methods.
+
 #### org.ojalgo.matrix.decomposition
 
 - `SparseLU.getMaxPivotMagnitude()`, `getFactorMaxPivotMagnitude()` and `getFactorMinPivotMagnitude()` are no longer used internally. `getMinPivotMagnitude()` remains.
@@ -88,6 +116,15 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - `ExpressionsBasedModel.Integration.expandFreeToFull(...)` without an `Optimisation.Sense` (assumes the solver minimises), and `computeReducedCostFromMultipliers(ExpressionsBasedModel, int, Result)` (ignores quadratic objective terms).
 
 ### Fixed
+
+#### org.ojalgo.data.domain.finance.portfolio
+
+- `getAssetVolatilities()` of the equilibrium models (including Markowitz and Black-Litterman) returned the correlations.
+- Black-Litterman views and confidence, and Markowitz constraints, added after a calculation were ignored.
+- `EfficientFrontier` gave wrong weights after `setShortingAllowed(true)`.
+- `MarkowitzModel` target return/variance could miss the target, silently, when the risk aversion was not 1.
+- `PortfolioMixer` applied asset and component constraints to the wrong variables.
+- `BlackLittermanModel` without views threw an exception, `NormalisedPortfolio` could have a negative volatility, and the `SimplePortfolio` simulator's covariances were slightly off.
 
 #### org.ojalgo.matrix.decomposition
 
@@ -105,6 +142,11 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - `AlternatingDirectionSolver.updateRange(...)` updated the wrong row, and the extended precision (iterative refinement) variant returned wrong dual values. The null space solver computed wrong multipliers and a `NaN` objective function value.
 - The direct active set solver could return a non-optimal solution as optimal, and cycle (not terminate) when active constraints became linearly dependent.
+- Unbounded problems with a singular [Q] were reported as optimal, with huge solutions, and ADMM reported them as infeasible.
+- With a singular [Q] the solutions, multipliers and reduced gradients had an error proportional to the size of the solution (from the small constant added to the diagonal of [Q]).
+- The null space (projection) variant gave meaningless solutions when the projected [Q] was zero apart from rounding errors.
+- The active set solver could stop at a non-optimal solution when variables differed much in magnitude.
+- Extended precision failed with problems without constraints.
 
 #### org.ojalgo.optimisation.integer
 
@@ -115,6 +157,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - The LP solver could report an optimal solution that violated a constraint (netlib PILOT-JA). If the primal simplex iterations leave basic variables outside their bounds, by more than `Options.feasibility` allows, dual simplex iterations now restore feasibility.
 - The primal ratio test no longer pivots on elements that are tiny relative to the rest of the entering column, unless nothing else limits the step. Such pivots could make the basis nearly singular, and the solve wrongly end as unbounded.
 - A numerically singular basis in the revised simplex ends the solve as `FAILED`, rather than continuing with meaningless solves.
+
+#### org.ojalgo.random.process
+
+- `GeometricBrownianMotion.convert(double)` reset the current value to 1.0.
 
 #### org.ojalgo.type
 

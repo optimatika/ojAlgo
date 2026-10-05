@@ -46,7 +46,7 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
          * of the same size, and then the operation was performed. The actual implementation may be more
          * efficient than that.
          *
-         * @see https://se.mathworks.com/help/matlab/matlab_prog/compatible-array-sizes-for-basic-operations.html
+         * @see "https://se.mathworks.com/help/matlab/matlab_prog/compatible-array-sizes-for-basic-operations.html"
          */
         default void fillCompatible(final AccessAnyD<N> left, final BinaryFunction<N> operator, final AccessAnyD<N> right) {
             FillCompatible.invoke(this, left, operator, right);

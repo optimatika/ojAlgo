@@ -21,13 +21,14 @@
  */
 package org.ojalgo.data.domain.finance.portfolio;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.ONE;
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.ojalgo.data.domain.finance.FinanceUtils;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.function.special.ErrorFunction;
 import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.random.process.GeometricBrownianMotion;
 import org.ojalgo.type.StandardType;
@@ -36,11 +37,22 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * A FinancePortfolio is primarily a set of portfolio asset weights.
+ * <p>
+ * The mean return, return variance and volatility refer to the return over one time unit - whatever unit
+ * (year, month...) the inputs are expressed in.
+ * <p>
+ * The loss probability and Value at Risk are calculated using {@link #forecast()}.
  *
  * @author apete
  */
 public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
 
+    /**
+     * The asset returns, volatilities, correlations and covariances all refer to the returns over one time
+     * unit. Growth rate statistics, e.g. from {@link FinanceUtils#makeCovarianceMatrix}, can be converted
+     * using {@link FinanceUtils#toExpectedReturnsFromGrowthRates} and
+     * {@link FinanceUtils#toCovariancesFromGrowthRates}.
+     */
     public interface Context {
 
         double calculatePortfolioReturn(final FinancePortfolio weightsPortfolio);
@@ -65,11 +77,18 @@ public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
         super();
     }
 
+    /**
+     * Compares the Sharpe ratios.
+     */
     @Override
     public final int compareTo(final FinancePortfolio reference) {
         return NumberContext.compare(this.getSharpeRatio(), reference.getSharpeRatio());
     }
 
+    /**
+     * A geometric Brownian motion, with initial value 1.0, matched to the mean return and return variance: At
+     * time 1.0 its expected value is 1.0 + mean return, and its variance is the return variance.
+     */
     public final GeometricBrownianMotion forecast() {
 
         final double tmpInitialValue = ONE;
@@ -80,6 +99,9 @@ public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
         return GeometricBrownianMotion.make(tmpInitialValue, tmpExpectedValue, tmpValueVariance, tmpHorizon);
     }
 
+    /**
+     * The cosine similarity of the weights: 1.0 means the same relative weights, 0.0 that there's no overlap.
+     */
     public final double getConformance(final FinancePortfolio reference) {
 
         final MatrixR064 tmpMyWeights = MATRIX_FACTORY.column(this.getWeights());
@@ -96,6 +118,10 @@ public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
         return this.getLossProbability(ONE);
     }
 
+    /**
+     * The probability that the value, after the given time period, is less than the initial value - using the
+     * {@link #forecast()} model.
+     */
     public final double getLossProbability(final Number timePeriod) {
 
         final GeometricBrownianMotion tmpProc = this.forecast();
@@ -107,13 +133,13 @@ public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
     }
 
     /**
-     * The mean/expected return of this instrument. May return either the absolute or excess return of the
-     * instrument. The context in which an instance is used should make it clear which. return.
+     * The mean/expected return of this portfolio. May be either the absolute or the excess return - the
+     * context in which an instance is used should make it clear which.
      */
     public abstract double getMeanReturn();
 
     /**
-     * The instrument's return variance. Subclasses must override either {@linkplain #getReturnVariance()} or
+     * The return variance. Subclasses must override either {@linkplain #getReturnVariance()} or
      * {@linkplain #getVolatility()}.
      */
     public double getReturnVariance() {
@@ -121,6 +147,10 @@ public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
         return tmpVolatility * tmpVolatility;
     }
 
+    /**
+     * (mean return - risk-free return) / volatility. Without a risk-free return, the mean return is assumed
+     * to already be an excess return.
+     */
     public final double getSharpeRatio() {
         return this.getSharpeRatio(null);
     }
@@ -134,17 +164,17 @@ public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
 
     /**
      * Value at Risk (VaR) is the maximum loss not exceeded with a given probability defined as the confidence
-     * level, over a given period of time.
+     * level, over a given period of time. It is expressed as a fraction of the initial value, and calculated
+     * using the same (geometric Brownian motion) model as {@link #forecast()} and
+     * {@link #getLossProbability(Number)}.
      */
     public final double getValueAtRisk(final Number confidenceLevel, final Number timePeriod) {
 
-        final double aReturn = this.getMeanReturn();
-        final double aStdDev = this.getVolatility();
+        GeometricBrownianMotion process = this.forecast();
 
-        final double tmpConfidenceScale = SQRT_TWO * ErrorFunction.erfi(ONE - TWO * (ONE - confidenceLevel.doubleValue()));
-        final double tmpTimePeriod = timePeriod.doubleValue();
+        double quantile = process.getDistribution(timePeriod.doubleValue()).getQuantile(ONE - confidenceLevel.doubleValue());
 
-        return PrimitiveMath.MAX.invoke(PrimitiveMath.SQRT.invoke(tmpTimePeriod) * aStdDev * tmpConfidenceScale - tmpTimePeriod * aReturn, ZERO);
+        return PrimitiveMath.MAX.invoke(process.getValue() - quantile, ZERO);
     }
 
     public final double getValueAtRisk95() {

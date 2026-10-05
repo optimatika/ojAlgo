@@ -36,12 +36,12 @@ package org.ojalgo.algebra;
  * operation is commutative then the group is called an abelian group or simply a commutative group.
  *
  * @author apete
- * @see <a href="https://en.wikipedia.org/wiki/Group_(mathematics)">Group</a>
+ * @see "https://en.wikipedia.org/wiki/Group_(mathematics)"
  */
 public interface Group {
 
     /**
-     * @see <a href="https://en.wikipedia.org/wiki/Additive_group">Additive group</a>
+     * @see "https://en.wikipedia.org/wiki/Additive_group"
      */
     public interface Additive<T> extends Group, Operation.Addition<T> {
 
@@ -55,7 +55,7 @@ public interface Group {
     }
 
     /**
-     * @see <a href="https://en.wikipedia.org/wiki/Multiplicative_group">Multiplicative group</a>
+     * @see "https://en.wikipedia.org/wiki/Multiplicative_group"
      */
     public interface Multiplicative<T> extends Group, Operation.Multiplication<T> {
 

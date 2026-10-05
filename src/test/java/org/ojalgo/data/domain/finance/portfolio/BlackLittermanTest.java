@@ -212,6 +212,47 @@ public class BlackLittermanTest extends FinancePortfolioTests {
         TestUtils.assertEquals(tmpExp, tmpAct, EVAL_CNTXT);
     }
 
+    /**
+     * Adding views, or changing the confidence, after the weights have been calculated used to have no
+     * effect (cached results were not reset).
+     */
+    @Test
+    public void testChangesAfterCalculation() {
+
+        MatrixR064 viewPortfolios = BlackLittermanTest.getInvestorPortfoliosMatrix();
+        MatrixR064 viewReturns = BlackLittermanTest.getInvestorReturnsMatrix();
+        MatrixR064 viewVariances = BlackLittermanTest.getInvestorConfidencesMatrix();
+
+        BlackLittermanModel expected = BlackLittermanModel.of(this.makeMarketEquilibrium(), BlackLittermanTest.getMarketWeights());
+        expected.setConfidence(BlackLittermanTest.getWeightOnViews());
+        for (int i = 0; i < viewPortfolios.countRows(); i++) {
+            expected.addViewWithStandardDeviation(Array1D.R256.copy(viewPortfolios.logical().rows(i).get()), TypeUtils.toBigDecimal(viewReturns.get(i, 0)),
+                    BigMath.SQRT.invoke(TypeUtils.toBigDecimal(viewVariances.get(i, i))));
+        }
+
+        BlackLittermanModel actual = BlackLittermanModel.of(this.makeMarketEquilibrium(), BlackLittermanTest.getMarketWeights());
+        for (int i = 0; i < viewPortfolios.countRows(); i++) {
+            actual.addViewWithStandardDeviation(Array1D.R256.copy(viewPortfolios.logical().rows(i).get()), TypeUtils.toBigDecimal(viewReturns.get(i, 0)),
+                    BigMath.SQRT.invoke(TypeUtils.toBigDecimal(viewVariances.get(i, i))));
+            actual.getAssetWeights();
+        }
+        actual.setConfidence(BlackLittermanTest.getWeightOnViews());
+
+        TestUtils.assertEquals(expected.getAssetWeights(), actual.getAssetWeights(), DEF_CNTXT);
+    }
+
+    /**
+     * Confidence 0 used to give division by zero.
+     */
+    @Test
+    public void testConfidenceMustBePositive() {
+
+        BlackLittermanModel model = BlackLittermanModel.of(this.makeMarketEquilibrium(), BlackLittermanTest.getMarketWeights());
+
+        TestUtils.assertThrows(IllegalArgumentException.class, () -> model.setConfidence(BigMath.ZERO));
+        TestUtils.assertThrows(IllegalArgumentException.class, () -> model.setConfidence(BigMath.HALF.negate()));
+    }
+
     @Test
     public void testCovarianceData() {
 
@@ -289,6 +330,17 @@ public class BlackLittermanTest extends FinancePortfolioTests {
         TestUtils.assertEquals(tmpExp, tmpAct, EVAL_CNTXT);
     }
 
+    /**
+     * With no views the posterior is the prior. Used to throw ArrayIndexOutOfBoundsException.
+     */
+    @Test
+    public void testNoViews() {
+
+        BlackLittermanModel model = BlackLittermanModel.of(this.makeMarketEquilibrium(), BlackLittermanTest.getMarketWeights());
+
+        TestUtils.assertEquals(BlackLittermanTest.getMarketWeights(), model.getAssetWeights(), DEF_CNTXT);
+    }
+
     @Test
     public void testVarianceOfInvestorViewPortfolios() {
 
@@ -312,7 +364,7 @@ public class BlackLittermanTest extends FinancePortfolioTests {
         final MarketEquilibrium tmpME = this.makeMarketEquilibrium();
         final MatrixR064 tmpMarketWeights = BlackLittermanTest.getMarketWeights();
 
-        final BlackLittermanModel tmpBLM = new BlackLittermanModel(tmpME, tmpMarketWeights);
+        final BlackLittermanModel tmpBLM = BlackLittermanModel.of(tmpME, tmpMarketWeights);
 
         tmpBLM.setRiskAversion(BlackLittermanTest.getRiskAversionFactor());
         tmpBLM.setConfidence(BlackLittermanTest.getWeightOnViews());
@@ -335,7 +387,7 @@ public class BlackLittermanTest extends FinancePortfolioTests {
         final MarketEquilibrium tmpME = this.makeMarketEquilibrium();
         final MatrixR064 tmpMarketWeights = BlackLittermanTest.getMarketWeights();
 
-        final BlackLittermanModel tmpBLM = new BlackLittermanModel(tmpME, tmpMarketWeights);
+        final BlackLittermanModel tmpBLM = BlackLittermanModel.of(tmpME, tmpMarketWeights);
 
         tmpBLM.setRiskAversion(BlackLittermanTest.getRiskAversionFactor());
         tmpBLM.setConfidence(BlackLittermanTest.getWeightOnViews());
@@ -409,7 +461,7 @@ public class BlackLittermanTest extends FinancePortfolioTests {
         final String[] tmpNames = BlackLittermanTest.getAssetNames();
         final MatrixR064 tmpCovars = BlackLittermanTest.getCovariances();
 
-        return new MarketEquilibrium(tmpNames, tmpCovars, BlackLittermanTest.getRiskAversionFactor());
+        return MarketEquilibrium.of(tmpNames, tmpCovars, BlackLittermanTest.getRiskAversionFactor());
     }
 
 }

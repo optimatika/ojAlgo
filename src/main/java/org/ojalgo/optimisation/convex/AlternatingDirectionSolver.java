@@ -79,8 +79,8 @@ import org.ojalgo.type.keyvalue.EntryPair;
  * to the C reference implementation, some things are done differently and not all features and configurations
  * are present/supported. It does however follow the core concepts described in the original paper.
  *
- * @see https://web.stanford.edu/~boyd/papers/pdf/osqp.pdf
- * @see https://osqp.org/
+ * @see "https://web.stanford.edu/~boyd/papers/pdf/osqp.pdf"
+ * @see "https://osqp.org/"
  */
 final class AlternatingDirectionSolver extends ConvexSolver implements UpdatableSolver {
 
@@ -188,7 +188,7 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
     /**
      * Solver settings and algorithm parameters.
      *
-     * @see https://osqp.org/docs/interfaces/solver_settings.html
+     * @see "https://osqp.org/docs/interfaces/solver_settings.html"
      */
     abstract static class Configuration {
 
@@ -230,13 +230,13 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
          */
         static final NumberContext APPROXIMATE = NumberContext.of(4);
 
-        static final double INFINITY = 1E+32;
-
         /**
          * Tolerance for the primal infeasibility certificate – stricter than {@link #ACCURACY}, to not
          * conclude infeasibility too easily.
          */
         static final NumberContext INFEASIBILITY = NumberContext.of(12, 8);
+
+        static final double INFINITY = 1E+32;
 
         static final BigDecimal INFINITY2 = BigMath.TEN.pow(64);
 
@@ -346,8 +346,8 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
         }
 
         /**
-         * An approximate solution - not converged, but the relaxed tolerances are met - is accepted as optimal
-         * if it validates against the model.
+         * An approximate solution - not converged, but the relaxed tolerances are met - is accepted as
+         * optimal if it validates against the model.
          */
         @Override
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
@@ -471,9 +471,9 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
     /**
      * Tracks how fast the solver converges – how fast the (logarithm of the) ratio between the residuals and
      * their tolerances decreases – to decide whether it is worth continuing. Continues, even beyond the
-     * iteration limit, as long as convergence is predicted within the extended limit. Stops early, before
-     * the iteration limit, when it is not. The rate is measured over the second half of the iterations so
-     * far, comparing the smallest ratios around the midpoint and in the last tenth.
+     * iteration limit, as long as convergence is predicted within the extended limit. Stops early, before the
+     * iteration limit, when it is not. The rate is measured over the second half of the iterations so far,
+     * comparing the smallest ratios around the midpoint and in the last tenth.
      */
     static final class Progress {
 
@@ -1294,7 +1294,8 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
             state = State.INFEASIBLE;
             exitflag = true;
         } else if (problemDualInfeasible) {
-            state = State.INFEASIBLE;
+            // Dual infeasibility certifies that the (primal) problem is unbounded
+            state = State.UNBOUNDED;
             exitflag = true;
         } else {
             state = State.APPROXIMATE;
@@ -1305,13 +1306,13 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
 
     /**
      * Computes the reduced gradient, in the bounded-variable sense, in original (unscaled) coordinates: the
-     * gradient of the Lagrangian without the variable-bound rows, so that at an optimum it is non-zero only for
-     * variables at an active bound. (The bound multipliers are also reported as dual values, with the
+     * gradient of the Lagrangian without the variable-bound rows, so that at an optimum it is non-zero only
+     * for variables at an active bound. (The bound multipliers are also reported as dual values, with the
      * variables.)
      * <p>
-     * Evaluates {@code P_s x_s + q_s + A_s' y_s}, with the bound rows' multipliers left out, using scaled data
-     * and work arrays, then unscales each component by {@code primal.inverse[j] / cost}, and by the objective's
-     * adjustment factor to get model units.
+     * Evaluates {@code P_s x_s + q_s + A_s' y_s}, with the bound rows' multipliers left out, using scaled
+     * data and work arrays, then unscales each component by {@code primal.inverse[j] / cost}, and by the
+     * objective's adjustment factor to get model units.
      */
     private double[] computeReducedGradient() {
         int n = myData.getColDim();
@@ -1524,8 +1525,8 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
     /**
      * Finalises and stores the solution; unscales if feasible, resets otherwise.
      *
-     * @param approximate Not converged, but the relaxed tolerances are met - the iterate is kept (unscaled), as
-     *                    an approximate solution.
+     * @param approximate Not converged, but the relaxed tolerances are met - the iterate is kept (unscaled),
+     *                    as an approximate solution.
      */
     private void storeSolution(final boolean approximate) {
 

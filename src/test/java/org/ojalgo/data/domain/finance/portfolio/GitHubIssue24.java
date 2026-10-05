@@ -230,13 +230,13 @@ public class GitHubIssue24 extends FinancePortfolioTests {
                         3.9609092637332395E-4, -0.0012151819283578002, 0.00637053301651962, 0.006696955305486993, -1.5727884198208E-4, 0.004083169149099768,
                         0.00288619107186696, -3.18539969399288E-4, 0.006329914612237217, 0.006494430855358576, 0.0064963600000000005 } };
 
-        MarketEquilibrium marketEquilibrium = new MarketEquilibrium(RawStore.wrap(covariance));
+        MarketEquilibrium marketEquilibrium = MarketEquilibrium.of(RawStore.wrap(covariance));
 
         if (cleanCovariances) {
             marketEquilibrium = marketEquilibrium.clean();
         }
 
-        MarkowitzModel retVal = new MarkowitzModel(marketEquilibrium, MatrixR064.FACTORY.row(expectedReturns));
+        MarkowitzModel retVal = MarkowitzModel.of(marketEquilibrium, MatrixR064.FACTORY.row(expectedReturns));
 
         retVal.optimiser().debug(debugOptimisationSolver).validate(validateOptimisationModel);
 

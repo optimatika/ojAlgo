@@ -153,7 +153,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     /**
      * Test case based on problem/example from GitHub issue 442
      *
-     * @see https://github.com/optimatika/ojAlgo/issues/442
+     * @see "https://github.com/optimatika/ojAlgo/issues/442"
      */
     @Test
     public void testComplexEigenpair() {
@@ -197,7 +197,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     /**
      * Test case based on problem/example from GitHub issue 443
      *
-     * @see https://github.com/optimatika/ojAlgo/issues/443
+     * @see "https://github.com/optimatika/ojAlgo/issues/443"
      */
     @Test
     public void testGeneralisedComplexEigenvalue() {

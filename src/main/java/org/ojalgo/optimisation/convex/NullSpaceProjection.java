@@ -23,8 +23,11 @@ package org.ojalgo.optimisation.convex;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.function.Supplier;
+
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.SparseArray;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -146,6 +149,20 @@ class NullSpaceProjection {
     }
 
     /**
+     * Is the reduced Hessian, [Z]<sup>T</sup>[Q][Z], negligible compared to the original [Q]? Then the
+     * reduced problem is effectively an LP - [Q] is zero in the null space of the equality constraints. With
+     * rounding errors the reduced Hessian may still be (numerically) positive definite, but tiny, and would
+     * then give huge meaningless solutions.
+     */
+    boolean isReducedHessianNegligible(final double relativeTolerance) {
+
+        double largestOriginal = myOriginal.getObjective().quadratic().aggregateAll(Aggregator.LARGEST).doubleValue();
+        double largestReduced = this.getReduced().getObjective().quadratic().aggregateAll(Aggregator.LARGEST).doubleValue();
+
+        return largestReduced <= relativeTolerance * largestOriginal;
+    }
+
+    /**
      * Maps a solution of the reduced problem back to a solution of the original full problem.
      */
     Optimisation.Result toFullModelState(final Optimisation.Result reducedlState) {
@@ -177,8 +194,8 @@ class NullSpaceProjection {
         rhsStation.modifyMatching(SUBTRACT, orgQx);
 
         PhysicalStore<Double> lambdaI = null;
-        if (nbOrgInes > 0 && reducedlState.getMultipliers().isPresent()) {
-            Access1D<?> yI = reducedlState.getMultipliers().get();
+        if (nbOrgInes > 0 && reducedlState.getDualSolution().map(Supplier::get).isPresent()) {
+            Access1D<?> yI = reducedlState.getDualSolution().map(Supplier::get).get();
             int copyLen = Math.min(nbOrgInes, yI.size());
             lambdaI = R064Store.FACTORY.make(nbOrgInes, 1);
             for (int i = 0; i < copyLen; i++) {
@@ -215,8 +232,7 @@ class NullSpaceProjection {
         }
 
         Optimisation.Result retVal = new Optimisation.Result(reducedlState.getState(), value, x);
-        return retVal.withDualValues(myOriginal.getConstraintsMetaData(), () -> multipliers)
-                .withReducedGradient(() -> ArrayR064.wrap(reducedGradient));
+        return retVal.withDualValues(myOriginal.getConstraintsMetaData(), () -> multipliers).withReducedGradient(() -> ArrayR064.wrap(reducedGradient));
     }
 
     /**

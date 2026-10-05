@@ -45,8 +45,8 @@ package org.ojalgo.algebra;
  * @author apete
  * @see Group.Additive
  * @see Field
- * @see <a href="https://en.wikipedia.org/wiki/Vector_space">Vector space</a>
- * @see <a href="https://en.wikipedia.org/wiki/Examples_of_vector_spaces">Examples of vector spaces</a>
+ * @see "https://en.wikipedia.org/wiki/Vector_space"
+ * @see "https://en.wikipedia.org/wiki/Examples_of_vector_spaces"
  */
 public interface VectorSpace<T, N extends Comparable<N>> extends Group.Additive<T>, ScalarOperation.Multiplication<T, N> {
 
