@@ -132,7 +132,7 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution {
     @SuppressWarnings({ "unchecked" })
     public <R extends Temporal> R addTo(final R temporal, final long amount) {
         if (temporal instanceof CalendarDate) {
-            return (R) new CalendarDate(((CalendarDate) temporal).millis + this.toDurationInMillis());
+            return (R) new CalendarDate(((CalendarDate) temporal).millis + amount * myDurationInMillis);
         } else if (myChronoUnit != null) {
             return myChronoUnit.addTo(temporal, amount);
         } else { // QUARTER
@@ -147,7 +147,7 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution {
 
     @Override
     public long adjustInto(final long epochMilli) {
-        return epochMilli / myDurationInMillis * myDurationInMillis + myHalf;
+        return Math.floorDiv(epochMilli, myDurationInMillis) * myDurationInMillis + myHalf;
     }
 
     @Override
@@ -271,7 +271,7 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution {
     }
 
     public long count(final long aFromValue, final long aToValue) {
-        return (myHalf + this.adjustInto(aToValue) - this.adjustInto(aFromValue)) / myDurationInMillis;
+        return Math.floorDiv(myHalf + this.adjustInto(aToValue) - this.adjustInto(aFromValue), myDurationInMillis);
     }
 
     public long get(final TemporalUnit unit) {

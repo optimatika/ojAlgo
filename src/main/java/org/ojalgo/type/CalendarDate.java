@@ -79,7 +79,7 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
         default long adjustInto(final long epochMilli) {
             long duration = this.toDurationInMillis();
             long half = duration / 2L;
-            return epochMilli / duration * duration + half;
+            return Math.floorDiv(epochMilli, duration) * duration + half;
         }
 
         /**
@@ -214,11 +214,11 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
     }
 
     public static CalendarDate valueOf(final OffsetDateTime offsetDateTime) {
-        return new CalendarDate(offsetDateTime.toInstant().toEpochMilli());
+        return new CalendarDate(offsetDateTime.toEpochSecond() * MILLIS_PER_SECOND + offsetDateTime.getNano() / NANOS_PER_MILLIS);
     }
 
     public static CalendarDate valueOf(final ZonedDateTime zonedDateTime) {
-        return new CalendarDate(zonedDateTime.toInstant().toEpochMilli());
+        return new CalendarDate(zonedDateTime.toEpochSecond() * MILLIS_PER_SECOND + zonedDateTime.getNano() / NANOS_PER_MILLIS);
     }
 
     static long millis(final TemporalAccessor temporal) {
@@ -309,15 +309,15 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
         if (temporal instanceof CalendarDate) {
             return (T) this;
         } else {
-            long seconds = millis / MILLIS_PER_SECOND;
-            long nanos = millis % MILLIS_PER_SECOND * (NANOS_PER_SECOND / MILLIS_PER_SECOND);
+            long seconds = Math.floorDiv(millis, MILLIS_PER_SECOND);
+            long nanos = Math.floorMod(millis, MILLIS_PER_SECOND) * NANOS_PER_MILLIS;
             return (T) temporal.with(INSTANT_SECONDS, seconds).with(NANO_OF_SECOND, nanos);
         }
     }
 
     @Override
     public int compareTo(final CalendarDate ref) {
-        return Long.signum(millis - ref.millis);
+        return Long.compare(millis, ref.millis);
     }
 
     @Override
@@ -347,7 +347,11 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
     public long getLong(final TemporalField field) {
         if (field instanceof ChronoField) {
             if (field == ChronoField.INSTANT_SECONDS) {
-                return millis / MILLIS_PER_SECOND;
+                return Math.floorDiv(millis, MILLIS_PER_SECOND);
+            } else if (field == ChronoField.MILLI_OF_SECOND) {
+                return Math.floorMod(millis, MILLIS_PER_SECOND);
+            } else if (field == ChronoField.NANO_OF_SECOND) {
+                return Math.floorMod(millis, MILLIS_PER_SECOND) * NANOS_PER_MILLIS;
             } else {
                 throw new UnsupportedTemporalTypeException("Unsupported field: " + field);
             }
@@ -364,7 +368,7 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
     @Override
     public boolean isSupported(final TemporalField field) {
         if (field instanceof ChronoField) {
-            return field == ChronoField.INSTANT_SECONDS || field == ChronoField.MILLI_OF_SECOND;
+            return field == ChronoField.INSTANT_SECONDS || field == ChronoField.MILLI_OF_SECOND || field == ChronoField.NANO_OF_SECOND;
         } else {
             return field.isSupportedBy(this);
         }
@@ -384,11 +388,11 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
     }
 
     @Override
-    public Temporal plus(final long amountToAdd, final TemporalUnit unit) {
+    public CalendarDate plus(final long amountToAdd, final TemporalUnit unit) {
         if (unit instanceof CalendarDateUnit) {
-            return this.step((int) amountToAdd, (CalendarDateUnit) unit);
+            return new CalendarDate(millis + amountToAdd * ((CalendarDateUnit) unit).toDurationInMillis());
         } else if (unit instanceof ChronoUnit) {
-            return this.toInstant().plus(amountToAdd, unit);
+            return CalendarDate.valueOf(this.toInstant().plus(amountToAdd, unit));
         } else {
             return unit.addTo(this, amountToAdd);
         }
@@ -450,16 +454,16 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
 
     public LocalDateTime toLocalDateTime(final ZoneOffset offset) {
         long tmpSeconds = Math.floorDiv(millis, MILLIS_PER_SECOND);
-        int tmpNanos = (int) Math.floorMod(millis, MILLIS_PER_SECOND);
+        int tmpNanos = (int) Math.floorMod(millis, MILLIS_PER_SECOND) * NANOS_PER_MILLIS;
         return LocalDateTime.ofEpochSecond(tmpSeconds, tmpNanos, offset);
     }
 
     public LocalTime toLocalTime(final ZoneOffset offset) {
         long tmpSeconds = Math.floorDiv(millis, MILLIS_PER_SECOND);
-        int tmpNanos = (int) Math.floorMod(millis, MILLIS_PER_SECOND);
+        int tmpNanos = (int) Math.floorMod(millis, MILLIS_PER_SECOND) * NANOS_PER_MILLIS;
         long tmpLocalSeconds = tmpSeconds + offset.getTotalSeconds();
-        int tmpSecondOfDay = (int) Math.floorMod(tmpLocalSeconds, CalendarDate.SECONDS_PER_DAY);
-        int tmpNanoOfDay = tmpSecondOfDay * CalendarDate.NANOS_PER_SECOND + tmpNanos;
+        long tmpSecondOfDay = Math.floorMod(tmpLocalSeconds, CalendarDate.SECONDS_PER_DAY);
+        long tmpNanoOfDay = tmpSecondOfDay * CalendarDate.NANOS_PER_SECOND + tmpNanos;
         return LocalTime.ofNanoOfDay(tmpNanoOfDay);
     }
 
@@ -496,11 +500,16 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
     public CalendarDate with(final TemporalField field, final long newValue) {
         if (field instanceof ChronoField) {
             if (field == ChronoField.INSTANT_SECONDS) {
-                long tmpMillisOfSecond = millis % MILLIS_PER_SECOND;
+                long tmpMillisOfSecond = Math.floorMod(millis, MILLIS_PER_SECOND);
                 return new CalendarDate(newValue * MILLIS_PER_SECOND + tmpMillisOfSecond);
             } else if (field == ChronoField.MILLI_OF_SECOND) {
-                long tmpSeconds = millis / MILLIS_PER_SECOND;
+                ChronoField.MILLI_OF_SECOND.checkValidValue(newValue);
+                long tmpSeconds = Math.floorDiv(millis, MILLIS_PER_SECOND);
                 return new CalendarDate(tmpSeconds * MILLIS_PER_SECOND + newValue);
+            } else if (field == ChronoField.NANO_OF_SECOND) {
+                ChronoField.NANO_OF_SECOND.checkValidValue(newValue);
+                long tmpSeconds = Math.floorDiv(millis, MILLIS_PER_SECOND);
+                return new CalendarDate(tmpSeconds * MILLIS_PER_SECOND + newValue / NANOS_PER_MILLIS);
             } else {
                 throw new UnsupportedTemporalTypeException("Unsupported field: " + field);
             }

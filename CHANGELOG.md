@@ -89,10 +89,6 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Fixed
 
-#### org.ojalgo.type
-
-- `CalendarDate.valueOf(OffsetDateTime)` and `CalendarDate.valueOf(ZonedDateTime)` retain millisecond precision, matching the `Instant` overload.
-
 #### org.ojalgo.matrix.decomposition
 
 - `SparseQDLDL.getSolution(...)` for a 1x1 matrix solved only the first of several right hand sides.
@@ -119,6 +115,15 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - The LP solver could report an optimal solution that violated a constraint (netlib PILOT-JA). If the primal simplex iterations leave basic variables outside their bounds, by more than `Options.feasibility` allows, dual simplex iterations now restore feasibility.
 - The primal ratio test no longer pivots on elements that are tiny relative to the rest of the entering column, unless nothing else limits the step. Such pivots could make the basis nearly singular, and the solve wrongly end as unbounded.
 - A numerically singular basis in the revised simplex ends the solve as `FAILED`, rather than continuing with meaningless solves.
+
+#### org.ojalgo.type
+
+- `CalendarDate.valueOf(OffsetDateTime)` and `CalendarDate.valueOf(ZonedDateTime)` retain millisecond precision, matching the `Instant` overload. (Issue [#694](https://github.com/optimatika/ojAlgo/issues/694))
+- `CalendarDate.toLocalDateTime(...)`, `toOffsetDateTime(...)` and `toZonedDateTime(...)` turned the milliseconds into nanoseconds (123 ms became 123 ns), and `toLocalTime(...)` returned an arbitrary time (`int` overflow).
+- `CalendarDate` and `CalendarDateUnit` truncated instead of rounding down for instants before 1970: `getLong(INSTANT_SECONDS)`, `with(...)` and `adjustInto(Temporal)` (which threw an exception), and `adjustInto(long)`/`filter(...)`, which mapped pre-1970 instants to the next period (day, hour…).
+- `CalendarDate.getLong(MILLI_OF_SECOND)` threw although `isSupported(MILLI_OF_SECOND)` returned `true`. `NANO_OF_SECOND` is now supported as well, so `Instant.from(CalendarDate)` and `until(CalendarDate, ChronoUnit)` work. `with(MILLI_OF_SECOND, ...)` and `with(NANO_OF_SECOND, ...)` reject out of range values, as `Instant` does.
+- `CalendarDate.plus(long, ChronoUnit)` returned an `Instant` (now a `CalendarDate`), and `plus(long, CalendarDateUnit)` cast the amount to `int`, so `minus(CalendarDateDuration)` of more than about 25 days in milliseconds was wrong. `CalendarDateUnit.addTo(CalendarDate, long)` ignored the amount.
+- `CalendarDate.compareTo(...)` could overflow.
 
 #### org.ojalgo.type.context
 
