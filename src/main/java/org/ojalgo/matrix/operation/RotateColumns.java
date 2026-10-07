@@ -19,13 +19,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.decomposition.function;
+package org.ojalgo.matrix.operation;
 
+/**
+ * Applies a plane (Givens) rotation from the right, combining the two columns low and high, to some implicit
+ * target matrix.
+ *
+ * @author apete
+ */
 @FunctionalInterface
-public interface ExchangeColumns {
+public interface RotateColumns {
 
-    ExchangeColumns NULL = (colA, colB) -> {};
+    RotateColumns NULL = (low, high, cos, sin) -> {};
 
-    void exchangeColumns(int colA, int colB);
+    void rotateColumns(int low, int high, double cos, double sin);
 
 }

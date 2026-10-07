@@ -19,54 +19,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.decomposition;
+package org.ojalgo.matrix.operation;
 
-import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.transformation.Householder;
 
-abstract class DenseTridiagonal<N extends Comparable<N>> extends InPlaceDecomposition<N> implements Tridiagonal<N> {
+/**
+ * Generates a Householder transformation from (the remaining part of) a column or row, applies it to that
+ * column or row and copies it to the destination. Returns false when there was nothing to transform.
+ * Implemented by {@link GenerateApplyAndCopyHouseholderColumn} and
+ * {@link GenerateApplyAndCopyHouseholderRow}.
+ *
+ * @author apete
+ */
+@FunctionalInterface
+public interface HouseholderStep<N extends Comparable<N>> {
 
-    private transient MatrixStore<N> myD = null;
-    private transient PhysicalStore<N> myQ = null;
-
-    protected DenseTridiagonal(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> factory) {
-        super(factory);
-    }
-
-    @Override
-    public final MatrixStore<N> getD() {
-        if (myD == null) {
-            myD = this.makeD();
-        }
-        return myD;
-    }
-
-    @Override
-    public final MatrixStore<N> getQ() {
-        return this.getDecompositionQ();
-    }
-
-    @Override
-
-    public void reset() {
-
-        super.reset();
-
-        myD = null;
-        myQ = null;
-    }
-
-    protected final PhysicalStore<N> getDecompositionQ() {
-        if (myQ == null) {
-            myQ = this.makeQ();
-        }
-        return myQ;
-    }
-
-    protected abstract void supplyDiagonalTo(double[] d, double[] e);
-
-    abstract MatrixStore<N> makeD();
-
-    abstract PhysicalStore<N> makeQ();
+    boolean invoke(PhysicalStore<N> store, int row, int column, Householder<N> destination);
 
 }

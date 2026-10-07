@@ -31,9 +31,9 @@ import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.DOT;
 import org.ojalgo.array.operation.NRM2;
 import org.ojalgo.array.operation.NRMINF;
-import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
-import org.ojalgo.matrix.decomposition.function.NegateColumn;
-import org.ojalgo.matrix.decomposition.function.RotateRight;
+import org.ojalgo.matrix.operation.ExchangeColumns;
+import org.ojalgo.matrix.operation.NegateColumn;
+import org.ojalgo.matrix.operation.RotateColumns;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
@@ -726,7 +726,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
             }
         }
 
-        final RotateRight q1RotR = factors ? (low, high, cos, sin) -> {
+        final RotateColumns q1RotR = factors ? (low, high, cos, sin) -> {
             final double[] colLow = myUt[low];
             final double[] colHigh = myUt[high];
             double valLow;
@@ -737,9 +737,9 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                 colLow[i] = -sin * valHigh + cos * valLow;
                 colHigh[i] = cos * valHigh + sin * valLow;
             }
-        } : RotateRight.NULL;
+        } : RotateColumns.NULL;
 
-        final RotateRight q2RotR = factors ? (low, high, cos, sin) -> {
+        final RotateColumns q2RotR = factors ? (low, high, cos, sin) -> {
             final double[] colLow = myVt[low];
             final double[] colHigh = myVt[high];
             double valLow;
@@ -750,7 +750,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                 colLow[i] = -sin * valHigh + cos * valLow;
                 colHigh[i] = cos * valHigh + sin * valLow;
             }
-        } : RotateRight.NULL;
+        } : RotateColumns.NULL;
 
         final ExchangeColumns q1XchgCols = factors ? (colA, colB) -> {
             final double[] col1 = myUt[colA];

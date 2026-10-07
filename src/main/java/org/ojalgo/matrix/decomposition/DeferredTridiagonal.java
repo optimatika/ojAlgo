@@ -24,8 +24,13 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.matrix.operation.GenerateApplyAndCopyHouseholderColumn;
+import org.ojalgo.matrix.operation.HermitianStep;
+import org.ojalgo.matrix.operation.HouseholderHermitian;
+import org.ojalgo.matrix.operation.HouseholderStep;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.matrix.transformation.Householder;
@@ -45,7 +50,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends DenseTridiag
     static final class C128 extends DeferredTridiagonal<ComplexNumber> {
 
         C128() {
-            super(GenericStore.C128);
+            super(GenericStore.C128, GenerateApplyAndCopyHouseholderColumn::invokeGeneric, HouseholderHermitian::invokeGeneric);
         }
 
         @Override
@@ -82,7 +87,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends DenseTridiag
     static final class H256 extends DeferredTridiagonal<Quaternion> {
 
         H256() {
-            super(GenericStore.H256);
+            super(GenericStore.H256, GenerateApplyAndCopyHouseholderColumn::invokeGeneric, HouseholderHermitian::invokeGeneric);
         }
 
         @Override
@@ -119,7 +124,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends DenseTridiag
     static final class Q128 extends DeferredTridiagonal<RationalNumber> {
 
         Q128() {
-            super(GenericStore.Q128);
+            super(GenericStore.Q128, GenerateApplyAndCopyHouseholderColumn::invokeGeneric, HouseholderHermitian::invokeGeneric);
         }
 
         @Override
@@ -131,7 +136,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends DenseTridiag
     static final class R064 extends DeferredTridiagonal<Double> {
 
         R064() {
-            super(R064Store.FACTORY);
+            super(R064Store.FACTORY, GenerateApplyAndCopyHouseholderColumn::invokeR064, HouseholderHermitian::invokeR064);
         }
 
         @Override
@@ -144,7 +149,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends DenseTridiag
     static final class R128 extends DeferredTridiagonal<Quadruple> {
 
         R128() {
-            super(GenericStore.R128);
+            super(GenericStore.R128, GenerateApplyAndCopyHouseholderColumn::invokeGeneric, HouseholderHermitian::invokeGeneric);
         }
 
         @Override
@@ -155,10 +160,16 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends DenseTridiag
 
     private transient BasicArray<N> myDiagD = null;
     private transient BasicArray<N> myDiagE = null;
+    private final HouseholderStep<N> myHouseholderColumn;
+    private final HermitianStep<N> myHouseholderHermitian;
     private Array1D<N> myInitDiagQ = null;
+    private transient BasicArray<N> myWorker = null;
 
-    protected DeferredTridiagonal(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory) {
+    protected DeferredTridiagonal(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> factory, final HouseholderStep<N> householderColumn,
+            final HermitianStep<N> householderHermitian) {
         super(factory);
+        myHouseholderColumn = householderColumn;
+        myHouseholderHermitian = householderHermitian;
     }
 
     public boolean decompose(final Access2D.Collectable<N, ? super TransformableRegion<N>> matrix) {
@@ -171,21 +182,22 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends DenseTridiag
 
             MatrixStore<N> logicallyTriangularMatrix = this.collect(matrix).triangular(false, false);
             // TODO Not optimal code here!
-            DecompositionStore<N> inPlace = this.setInPlace(logicallyTriangularMatrix);
+            PhysicalStore<N> inPlace = this.setInPlace(logicallyTriangularMatrix);
 
             int size = this.getMinDim();
 
             if (myDiagD == null || myDiagD.count() != size) {
                 myDiagD = this.makeArray(size);
                 myDiagE = this.makeArray(size);
+                myWorker = this.makeArray(size);
             }
 
             Householder<N> tmpHouseholder = this.makeHouseholder(size);
 
             int limit = size - 2;
             for (int ij = 0; ij < limit; ij++) {
-                if (inPlace.generateApplyAndCopyHouseholderColumn(ij + 1, ij, tmpHouseholder)) {
-                    inPlace.transformSymmetric(tmpHouseholder);
+                if (myHouseholderColumn.invoke(inPlace, ij + 1, ij, tmpHouseholder)) {
+                    myHouseholderHermitian.invoke(inPlace, tmpHouseholder, myWorker);
                 }
             }
 
@@ -228,12 +240,13 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends DenseTridiag
     }
 
     @Override
-    DecompositionStore<N> makeQ() {
+    PhysicalStore<N> makeQ() {
 
-        DecompositionStore<N> retVal = this.getInPlace();
+        PhysicalStore<N> retVal = this.getInPlace();
         int tmpDim = this.getMinDim();
 
         HouseholderReference<N> tmpReference = HouseholderReference.makeColumn(retVal);
+        N zero = this.scalar().zero().get();
 
         if (myInitDiagQ != null) {
             retVal.set(tmpDim - 1, tmpDim - 1, myInitDiagQ.get(tmpDim - 1));
@@ -258,7 +271,8 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends DenseTridiag
                 retVal.transformLeft(tmpReference, ij);
             }
 
-            retVal.setToIdentity(ij);
+            retVal.set(ij, ij, PrimitiveMath.ONE);
+            retVal.fillColumn(ij + 1, ij, zero);
             if (myInitDiagQ != null) {
                 retVal.set(ij, ij, myInitDiagQ.get(ij));
             }

@@ -29,9 +29,12 @@ import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
-import org.ojalgo.matrix.decomposition.function.NegateColumn;
-import org.ojalgo.matrix.decomposition.function.RotateRight;
+import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.matrix.operation.ExchangeColumns;
+import org.ojalgo.matrix.operation.NegateColumn;
+import org.ojalgo.matrix.operation.RotateColumns;
+import org.ojalgo.matrix.operation.RotateRight;
+import org.ojalgo.matrix.operation.RotationStep;
 import org.ojalgo.matrix.store.DiagonalStore;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -50,7 +53,7 @@ import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
-abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecomposition<N, DecompositionStore<N>> implements SingularValue<N> {
+abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecomposition<N, PhysicalStore<N>> implements SingularValue<N> {
 
     static final class C128 extends DenseSingularValue<ComplexNumber> {
 
@@ -59,7 +62,7 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
         }
 
         C128(final boolean fullSize) {
-            super(GenericStore.C128, new DenseBidiagonal.C128(fullSize), fullSize);
+            super(GenericStore.C128, new DenseBidiagonal.C128(fullSize), fullSize, RotateRight::invokeGeneric);
         }
 
     }
@@ -265,7 +268,7 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
         }
 
         H256(final boolean fullSize) {
-            super(GenericStore.H256, new DenseBidiagonal.H256(fullSize), fullSize);
+            super(GenericStore.H256, new DenseBidiagonal.H256(fullSize), fullSize, RotateRight::invokeGeneric);
         }
 
     }
@@ -277,7 +280,7 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
         }
 
         Q128(final boolean fullSize) {
-            super(GenericStore.Q128, new DenseBidiagonal.Q128(fullSize), fullSize);
+            super(GenericStore.Q128, new DenseBidiagonal.Q128(fullSize), fullSize, RotateRight::invokeGeneric);
         }
 
     }
@@ -289,7 +292,7 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
         }
 
         R064(final boolean fullSize) {
-            super(R064Store.FACTORY, new DenseBidiagonal.R064(fullSize), fullSize);
+            super(R064Store.FACTORY, new DenseBidiagonal.R064(fullSize), fullSize, RotateRight::invokeR064);
         }
 
     }
@@ -301,7 +304,7 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
         }
 
         R128(final boolean fullSize) {
-            super(GenericStore.R128, new DenseBidiagonal.R128(fullSize), fullSize);
+            super(GenericStore.R128, new DenseBidiagonal.R128(fullSize), fullSize, RotateRight::invokeGeneric);
         }
 
     }
@@ -311,7 +314,7 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
      */
     private static final double TINY = Math.pow(2.0, -966.0);
 
-    private static void doCase1(final double[] s, final double[] e, final int p, final int k, final RotateRight q2RotR) {
+    private static void doCase1(final double[] s, final double[] e, final int p, final int k, final RotateColumns q2RotR) {
 
         double f = e[p - 2];
         e[p - 2] = ZERO;
@@ -325,7 +328,7 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
             sin = f / tmp;
             s[j] = tmp;
 
-            q2RotR.rotateRight(p - 1, j, cos, sin);
+            q2RotR.rotateColumns(p - 1, j, cos, sin);
 
             tmp = e[j - 1];
             f = -sin * tmp;
@@ -337,10 +340,10 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
         sin = f / tmp;
         s[k] = tmp;
 
-        q2RotR.rotateRight(p - 1, k, cos, sin);
+        q2RotR.rotateColumns(p - 1, k, cos, sin);
     }
 
-    private static void doCase2(final double[] s, final double[] e, final int p, final int k, final RotateRight mtrxQ1) {
+    private static void doCase2(final double[] s, final double[] e, final int p, final int k, final RotateColumns mtrxQ1) {
 
         double f = e[k - 1];
         e[k - 1] = ZERO;
@@ -354,7 +357,7 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
             sin = f / tmp;
             s[j] = tmp;
 
-            mtrxQ1.rotateRight(k - 1, j, cos, sin);
+            mtrxQ1.rotateColumns(k - 1, j, cos, sin);
 
             tmp = e[j];
             f = -sin * tmp;
@@ -362,7 +365,7 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
         }
     }
 
-    private static void doCase3(final double[] s, final double[] e, final int p, final int k, final RotateRight q1RotR, final RotateRight q2RotR) {
+    private static void doCase3(final double[] s, final double[] e, final int p, final int k, final RotateColumns q1RotR, final RotateColumns q2RotR) {
 
         // Calculate the shift.
         final double scale = MAX.invoke(MAX.invoke(MAX.invoke(MAX.invoke(ABS.invoke(s[p - 1]), ABS.invoke(s[p - 2])), ABS.invoke(e[p - 2])), ABS.invoke(s[k])),
@@ -408,7 +411,7 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
             g = sin * s[j + 1];
             s[j + 1] = cos * s[j + 1];
 
-            q2RotR.rotateRight(j + 1, j, cos, sin);
+            q2RotR.rotateColumns(j + 1, j, cos, sin);
 
             tmp = HYPOT.invoke(f, g);
             cos = f / tmp;
@@ -420,7 +423,7 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
             g = sin * e[j + 1];
             e[j + 1] = cos * e[j + 1];
 
-            q1RotR.rotateRight(j + 1, j, cos, sin);
+            q1RotR.rotateColumns(j + 1, j, cos, sin);
         }
 
         e[p - 2] = f;
@@ -450,7 +453,7 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
         }
     }
 
-    static void toDiagonal(final double[] s, final double[] e, final RotateRight q1RotR, final RotateRight q2RotR, final ExchangeColumns q1XchgCols,
+    static void toDiagonal(final double[] s, final double[] e, final RotateColumns q1RotR, final RotateColumns q2RotR, final ExchangeColumns q1XchgCols,
             final ExchangeColumns q2XchgCols, final NegateColumn q2NegCol) {
 
         int p = s.length;
@@ -545,6 +548,7 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
         }
     };
     private transient MatrixStore<N> myInverse = null;
+    private final RotationStep<N> myRotateRight;
     private transient MatrixStore<N> myS = null;
     private transient Array1D<Double> mySingularValues = null;
     private boolean myTransposed = false;
@@ -553,13 +557,14 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
     private boolean myValuesOnly = false;
     private double[] s = null;
 
-    DenseSingularValue(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory, final DenseBidiagonal<N> bidiagonal,
-            final boolean fullSize) {
+    DenseSingularValue(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> factory, final DenseBidiagonal<N> bidiagonal, final boolean fullSize,
+            final RotationStep<N> rotateRight) {
 
         super(factory);
 
         myBidiagonal = bidiagonal;
         myFullSize = fullSize;
+        myRotateRight = rotateRight;
     }
 
     @Override
@@ -918,7 +923,7 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
         throw RecoverableCondition.newEquationSystemNotSolvable();
     }
 
-    private MatrixStore<N> getInverseOldVersion(final DecompositionStore<N> preallocated) {
+    private MatrixStore<N> getInverseOldVersion(final PhysicalStore<N> preallocated) {
 
         if (myInverse == null) {
 
@@ -991,8 +996,8 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
 
         DiagonalStore<N, Array1D<N>> tmpBidiagonal = myBidiagonal.doGetDiagonal();
 
-        DecompositionStore<N> tmpQ1 = valuesOnly ? null : myBidiagonal.doGetLQ();
-        DecompositionStore<N> tmpQ2 = valuesOnly ? null : myBidiagonal.doGetRQ();
+        PhysicalStore<N> tmpQ1 = valuesOnly ? null : myBidiagonal.doGetLQ();
+        PhysicalStore<N> tmpQ2 = valuesOnly ? null : myBidiagonal.doGetRQ();
 
         int size = tmpBidiagonal.getDimension();
 
@@ -1004,11 +1009,13 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
         tmpBidiagonal.supplyMainDiagonalTo(s);
         tmpBidiagonal.supplySuperdiagonalTo(e);
 
-        RotateRight q1RotR = tmpQ1 != null ? tmpQ1 : RotateRight.NULL;
-        RotateRight q2RotR = tmpQ2 != null ? tmpQ2 : RotateRight.NULL;
-        ExchangeColumns q1XchgCols = tmpQ1 != null ? tmpQ1 : ExchangeColumns.NULL;
-        ExchangeColumns q2XchgCols = tmpQ2 != null ? tmpQ2 : ExchangeColumns.NULL;
-        NegateColumn q2NegCol = tmpQ1 != null ? tmpQ2 : NegateColumn.NULL;
+        UnaryFunction<N> negate = this.function().negate();
+
+        RotateColumns q1RotR = tmpQ1 != null ? (low, high, cos, sin) -> myRotateRight.invoke(tmpQ1, low, high, cos, sin) : RotateColumns.NULL;
+        RotateColumns q2RotR = tmpQ2 != null ? (low, high, cos, sin) -> myRotateRight.invoke(tmpQ2, low, high, cos, sin) : RotateColumns.NULL;
+        ExchangeColumns q1XchgCols = tmpQ1 != null ? tmpQ1::exchangeColumns : ExchangeColumns.NULL;
+        ExchangeColumns q2XchgCols = tmpQ2 != null ? tmpQ2::exchangeColumns : ExchangeColumns.NULL;
+        NegateColumn q2NegCol = tmpQ2 != null ? col -> tmpQ2.modifyColumn(0L, col, negate) : NegateColumn.NULL;
 
         DenseSingularValue.toDiagonal(s, e, q1RotR, q2RotR, q1XchgCols, q2XchgCols, q2NegCol);
 

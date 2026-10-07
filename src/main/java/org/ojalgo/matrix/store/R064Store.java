@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix.store;
 
-import static org.ojalgo.function.constant.PrimitiveMath.ONE;
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import java.util.Arrays;
@@ -29,9 +28,7 @@ import java.util.Arrays;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
-import org.ojalgo.array.ArrayC128;
 import org.ojalgo.array.ArrayR064;
-import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.FillCompatible;
 import org.ojalgo.array.operation.FillMatchingDual;
@@ -50,8 +47,6 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.machine.MemoryEstimator;
-import org.ojalgo.matrix.decomposition.DecompositionStore;
-import org.ojalgo.matrix.decomposition.EvD1D;
 import org.ojalgo.matrix.operation.*;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
@@ -69,7 +64,7 @@ import org.ojalgo.type.math.MathType;
  *
  * @author apete
  */
-public final class R064Store extends ArrayR064 implements PhysicalStore<Double>, DecompositionStore<Double>, Factory2D.Builder<R064Store> {
+public final class R064Store extends ArrayR064 implements PhysicalStore<Double>, Factory2D.Builder<R064Store> {
 
     public static final PrimitiveFactory<R064Store> FACTORY = new PrimitiveFactory<>() {
 
@@ -358,76 +353,6 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
     }
 
     @Override
-    public void applyCholesky(final int iterationPoint, final BasicArray<Double> multipliers) {
-
-        final double[] tmpData = data;
-        final double[] tmpColumn = ((ArrayR064) multipliers).data;
-
-        if (myColDim - iterationPoint - 1 > ApplyCholesky.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                protected void conquer(final int first, final int limit) {
-                    ApplyCholesky.invoke(tmpData, myRowDim, first, limit, tmpColumn);
-                }
-            };
-
-            tmpConquerer.invoke(iterationPoint + 1, myColDim, ApplyCholesky.THRESHOLD);
-
-        } else {
-
-            ApplyCholesky.invoke(tmpData, myRowDim, iterationPoint + 1, myColDim, tmpColumn);
-        }
-    }
-
-    @Override
-    public void applyLDL(final int iterationPoint, final BasicArray<Double> multipliers) {
-
-        final double[] column = ((ArrayR064) multipliers).data;
-
-        if (myColDim - iterationPoint - 1 > ApplyLDL.THRESHOLD) {
-
-            final DivideAndConquer conquerer = new DivideAndConquer() {
-
-                @Override
-                protected void conquer(final int first, final int limit) {
-                    ApplyLDL.invoke(data, myRowDim, first, limit, column, iterationPoint);
-                }
-            };
-
-            conquerer.invoke(iterationPoint + 1, myColDim, ApplyLDL.THRESHOLD);
-
-        } else {
-
-            ApplyLDL.invoke(data, myRowDim, iterationPoint + 1, myColDim, column, iterationPoint);
-        }
-    }
-
-    @Override
-    public void applyLU(final int iterationPoint, final BasicArray<Double> multipliers) {
-
-        final double[] column = ((ArrayR064) multipliers).data;
-
-        if (myColDim - iterationPoint - 1 > ApplyLU.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                protected void conquer(final int first, final int limit) {
-                    ApplyLU.invoke(data, myRowDim, first, limit, column, iterationPoint);
-                }
-            };
-
-            tmpConquerer.invoke(iterationPoint + 1, myColDim, ApplyLU.THRESHOLD);
-
-        } else {
-
-            ApplyLU.invoke(data, myRowDim, iterationPoint + 1, myColDim, column, iterationPoint);
-        }
-    }
-
-    @Override
     public Array1D<Double> asList() {
         return myUtility.flatten();
     }
@@ -439,42 +364,6 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
 
     public void caxpy(final double aSclrA, final int aColX, final int aColY, final int aFirstRow) {
         AXPY.invoke(data, aColY * myRowDim + aFirstRow, aSclrA, data, aColX * myRowDim + aFirstRow, 0, myRowDim - aFirstRow);
-    }
-
-    @Override
-    public Array1D<ComplexNumber> computeInPlaceSchur(final PhysicalStore<Double> transformationCollector, final boolean eigenvalue) {
-
-        // final PrimitiveDenseStore tmpThisCopy = this.copy();
-        // final PrimitiveDenseStore tmpCollCopy = (PrimitiveDenseStore)
-        // aTransformationCollector.copy();
-        //
-        // tmpThisCopy.computeInPlaceHessenberg(true);
-
-        // Actual
-
-        final double[] tmpData = data;
-
-        final double[] tmpCollectorData = ((R064Store) transformationCollector).data;
-
-        final double[] tmpVctrWork = new double[this.getMinDim()];
-        EvD1D.orthes(tmpData, tmpCollectorData, tmpVctrWork);
-
-        // BasicLogger.logDebug("Schur Step", this);
-        // BasicLogger.logDebug("Hessenberg", tmpThisCopy);
-
-        final double[][] tmpDiags = EvD1D.hqr2(tmpData, tmpCollectorData, eigenvalue);
-        final double[] aRawReal = tmpDiags[0];
-        final double[] aRawImag = tmpDiags[1];
-        final int tmpLength = Math.min(aRawReal.length, aRawImag.length);
-
-        final ArrayC128 retVal = ArrayC128.make(tmpLength);
-        final ComplexNumber[] tmpRaw = retVal.data;
-
-        for (int i = 0; i < tmpLength; i++) {
-            tmpRaw[i] = ComplexNumber.of(aRawReal[i], aRawImag[i]);
-        }
-
-        return Array1D.C128.wrap(retVal);
     }
 
     @Override
@@ -495,19 +384,6 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
     @Override
     public long countRows() {
         return myRowDim;
-    }
-
-    @Override
-    public void divideAndCopyColumn(final int row, final int column, final BasicArray<Double> destination) {
-
-        double[] destinationData = ((ArrayR064) destination).data;
-
-        int index = row + column * myRowDim;
-        double denominator = data[index];
-
-        for (int i = row + 1; i < myRowDim; i++) {
-            destinationData[i] = data[++index] /= denominator;
-        }
     }
 
     @Override
@@ -533,38 +409,6 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
     @Override
     public void exchangeColumns(final long colA, final long colB) {
         myUtility.exchangeColumns(colA, colB);
-    }
-
-    @Override
-    public void exchangeHermitian(final int indexA, final int indexB) {
-
-        final int indexMin = Math.min(indexA, indexB);
-        final int indexMax = Math.max(indexA, indexB);
-
-        double tmpVal;
-
-        for (int j = 0; j < indexMin; j++) {
-            tmpVal = this.doubleValue(indexMin, j);
-            this.set(indexMin, j, this.doubleValue(indexMax, j));
-            this.set(indexMax, j, tmpVal);
-        }
-
-        tmpVal = this.doubleValue(indexMin, indexMin);
-        this.set(indexMin, indexMin, this.doubleValue(indexMax, indexMax));
-        this.set(indexMax, indexMax, tmpVal);
-
-        for (int ij = indexMin + 1; ij < indexMax; ij++) {
-            tmpVal = this.doubleValue(ij, indexMin);
-            this.set(ij, indexMin, this.doubleValue(indexMax, ij));
-            this.set(indexMax, ij, tmpVal);
-        }
-
-        for (int i = indexMax + 1; i < myRowDim; i++) {
-            tmpVal = this.doubleValue(i, indexMin);
-            this.set(i, indexMin, this.doubleValue(i, indexMax));
-            this.set(i, indexMax, tmpVal);
-        }
-
     }
 
     @Override
@@ -717,16 +561,6 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
     }
 
     @Override
-    public boolean generateApplyAndCopyHouseholderColumn(final int row, final int column, final Householder<Double> destination) {
-        return GenerateApplyAndCopyHouseholderColumn.invoke(data, myRowDim, row, column, (Householder.Primitive64) destination);
-    }
-
-    @Override
-    public boolean generateApplyAndCopyHouseholderRow(final int row, final int column, final Householder<Double> destination) {
-        return GenerateApplyAndCopyHouseholderRow.invoke(data, myRowDim, row, column, (Householder.Primitive64) destination);
-    }
-
-    @Override
     public MatrixStore<Double> get() {
         return this;
     }
@@ -838,11 +672,6 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
     }
 
     @Override
-    public void negateColumn(final int column) {
-        myUtility.modifyColumn(0, column, PrimitiveMath.NEGATE);
-    }
-
-    @Override
     public PhysicalStore.Factory<Double, R064Store> physical() {
         return FACTORY;
     }
@@ -873,11 +702,6 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
     }
 
     @Override
-    public void rotateRight(final int low, final int high, final double cos, final double sin) {
-        RotateRight.invoke(data, myRowDim, low, high, cos, sin);
-    }
-
-    @Override
     public void set(final int row, final int col, final double value) {
         myUtility.set(row, col, value);
     }
@@ -888,9 +712,8 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
     }
 
     @Override
-    public void setToIdentity(final int col) {
-        myUtility.set(col, col, ONE);
-        myUtility.fillColumn(col + 1, col, ZERO);
+    public Array1D<Double> sliceColumn(final long col) {
+        return myUtility.sliceColumn(0L, col);
     }
 
     @Override
@@ -906,6 +729,11 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
     @Override
     public Array1D<Double> sliceRange(final long first, final long limit) {
         return myUtility.sliceRange(first, limit);
+    }
+
+    @Override
+    public Array1D<Double> sliceRow(final long row) {
+        return myUtility.sliceRow(row, 0L);
     }
 
     @Override
@@ -1037,16 +865,6 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
         } else {
             myUtility.modifyColumn(0, tmpHigh, PrimitiveMath.NEGATE);
         }
-    }
-
-    @Override
-    public void transformSymmetric(final Householder<Double> transformation) {
-        HouseholderHermitian.invoke(data, R064Store.cast(transformation), this.getWorkerColumn());
-    }
-
-    @Override
-    public void tred2(final BasicArray<Double> mainDiagonal, final BasicArray<Double> offDiagonal, final boolean yesvecs) {
-        HouseholderHermitian.tred2j(data, ((ArrayR064) mainDiagonal).data, ((ArrayR064) offDiagonal).data, yesvecs);
     }
 
     @Override

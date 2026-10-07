@@ -32,6 +32,9 @@ import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.matrix.operation.ApplyLU;
+import org.ojalgo.matrix.operation.DivideAndCopyColumn;
+import org.ojalgo.matrix.operation.PivotStep;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -52,7 +55,7 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
     static final class C128 extends DenseLU<ComplexNumber> {
 
         C128() {
-            super(GenericStore.C128);
+            super(GenericStore.C128, DivideAndCopyColumn::invokeGeneric, ApplyLU::invokeGeneric);
         }
 
     }
@@ -62,9 +65,9 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
      */
     static final class FactorL<N extends Comparable<N>> implements MatrixDecomposition.Factor<N> {
 
-        private final DecompositionStore<N> myBody;
+        private final PhysicalStore<N> myBody;
 
-        FactorL(final DecompositionStore<N> body) {
+        FactorL(final PhysicalStore<N> body) {
             super();
             myBody = body;
         }
@@ -111,10 +114,10 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
      */
     static final class FactorU<N extends Comparable<N>> implements MatrixDecomposition.Factor<N> {
 
-        private final DecompositionStore<N> myBody;
+        private final PhysicalStore<N> myBody;
         private final Pivot myColPivot;
 
-        FactorU(final DecompositionStore<N> body, final Pivot colPivot) {
+        FactorU(final PhysicalStore<N> body, final Pivot colPivot) {
             super();
             myBody = body;
             myColPivot = colPivot;
@@ -164,7 +167,7 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
     static final class H256 extends DenseLU<Quaternion> {
 
         H256() {
-            super(GenericStore.H256);
+            super(GenericStore.H256, DivideAndCopyColumn::invokeGeneric, ApplyLU::invokeGeneric);
         }
 
     }
@@ -172,7 +175,7 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
     static final class Q128 extends DenseLU<RationalNumber> {
 
         Q128() {
-            super(GenericStore.Q128);
+            super(GenericStore.Q128, DivideAndCopyColumn::invokeGeneric, ApplyLU::invokeGeneric);
         }
 
     }
@@ -180,7 +183,7 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
     static final class R064 extends DenseLU<Double> {
 
         R064() {
-            super(R064Store.FACTORY);
+            super(R064Store.FACTORY, DivideAndCopyColumn::invokeR064, ApplyLU::invokeR064);
         }
 
     }
@@ -188,18 +191,22 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
     static final class R128 extends DenseLU<Quadruple> {
 
         R128() {
-            super(GenericStore.R128);
+            super(GenericStore.R128, DivideAndCopyColumn::invokeGeneric, ApplyLU::invokeGeneric);
         }
 
     }
 
+    private final PivotStep<N> myApplyLU;
     private Pivot myColPivot = null;
+    private final PivotStep<N> myDivideAndCopyColumn;
     private final Pivot myPivot = new Pivot();
     private transient PhysicalStore<N> myWorkerColumn = null;
     private transient PhysicalStore<N> myWorkerRow = null;
 
-    protected DenseLU(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
-        super(aFactory);
+    protected DenseLU(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> factory, final PivotStep<N> divideAndCopyColumn, final PivotStep<N> applyLU) {
+        super(factory);
+        myDivideAndCopyColumn = divideAndCopyColumn;
+        myApplyLU = applyLU;
     }
 
     @Override
@@ -209,7 +216,7 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
             myColPivot.applyPivotOrder(arg);
         }
 
-        DecompositionStore<N> body = this.getInPlace();
+        PhysicalStore<N> body = this.getInPlace();
 
         body.substituteForwards(true, false, arg);
 
@@ -225,7 +232,7 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
             myColPivot.applyPivotOrder(arg);
         }
 
-        DecompositionStore<N> body = this.getInPlace();
+        PhysicalStore<N> body = this.getInPlace();
 
         body.substituteForwards(true, false, arg);
 
@@ -243,7 +250,7 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
     @Override
     public int countSignificant(final double threshold) {
 
-        DecompositionStore<N> internal = this.getInPlace();
+        PhysicalStore<N> internal = this.getInPlace();
 
         int significant = 0;
         for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
@@ -270,7 +277,7 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
         myPivot.applyPivotOrder(arg);
 
-        DecompositionStore<N> body = this.getInPlace();
+        PhysicalStore<N> body = this.getInPlace();
 
         body.substituteForwards(false, true, arg);
 
@@ -286,7 +293,7 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
         myPivot.applyPivotOrder(arg);
 
-        DecompositionStore<N> body = this.getInPlace();
+        PhysicalStore<N> body = this.getInPlace();
 
         body.substituteForwards(false, true, arg);
 
@@ -336,7 +343,7 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
             }
         }
 
-        DecompositionStore<N> body = this.getInPlace();
+        PhysicalStore<N> body = this.getInPlace();
 
         preallocated.substituteForwards(body, true, false, !myPivot.isModified());
 
@@ -396,7 +403,7 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
         this.applyPivotOrder(myPivot, preallocated);
 
-        DecompositionStore<N> body = this.getInPlace();
+        PhysicalStore<N> body = this.getInPlace();
 
         preallocated.substituteForwards(body, true, false, false);
 
@@ -480,7 +487,7 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
         this.reset();
 
-        DecompositionStore<N> tmpInPlace = this.setInPlace(matrix);
+        PhysicalStore<N> tmpInPlace = this.setInPlace(matrix);
 
         int tmpRowDim = this.getRowDim();
         this.getColDim();
@@ -511,10 +518,10 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
                 // Calculate multipliers and copy to local column
                 // Current column, below the diagonal
-                tmpInPlace.divideAndCopyColumn(ij, ij, tmpMultipliers);
+                myDivideAndCopyColumn.invoke(tmpInPlace, ij, tmpMultipliers);
 
                 // Apply transformations to everything below and to the right of the pivot element
-                tmpInPlace.applyLU(ij, tmpMultipliers);
+                myApplyLU.invoke(tmpInPlace, ij, tmpMultipliers);
 
             } else {
 
@@ -569,7 +576,7 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
         int[] retVal = new int[this.getRank()];
         int[] tmpFullPivots = this.getPivotOrder();
 
-        DecompositionStore<N> tmpInPlace = this.getInPlace();
+        PhysicalStore<N> tmpInPlace = this.getInPlace();
 
         int tmpRedInd = 0;
         for (int ij = 0; ij < tmpFullPivots.length; ij++) {

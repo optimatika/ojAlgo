@@ -25,10 +25,16 @@ import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import java.util.Arrays;
 
+import org.ojalgo.array.ArrayR064;
+import org.ojalgo.array.BasicArray;
+import org.ojalgo.array.ScalarArray;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.FillMatchingSingle;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.matrix.store.GenericStore;
+import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
@@ -147,6 +153,25 @@ public abstract class HouseholderHermitian implements MatrixOperation {
 
             HermitianRank2Update.invoke(data, tmpFirst, tmpLength, tmpVector, worker);
         }
+    }
+
+    public static <N extends Scalar<N>> void invokeGeneric(final PhysicalStore<N> store, final Householder<N> transformation, final BasicArray<N> worker) {
+
+        Scalar.Factory<N> scalar = store.physical().scalar();
+        ScalarArray<N> workerArray = (ScalarArray<N>) worker;
+
+        Arrays.fill(workerArray.data, scalar.zero().get());
+
+        HouseholderHermitian.invoke(((GenericStore<N>) store).data, (Householder.Generic<N>) transformation, workerArray.data, scalar);
+    }
+
+    public static void invokeR064(final PhysicalStore<Double> store, final Householder<Double> transformation, final BasicArray<Double> worker) {
+
+        ArrayR064 workerArray = (ArrayR064) worker;
+
+        Arrays.fill(workerArray.data, ZERO);
+
+        HouseholderHermitian.invoke(((R064Store) store).data, (Householder.Primitive64) transformation, workerArray.data);
     }
 
     /**

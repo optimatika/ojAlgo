@@ -19,13 +19,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.decomposition.function;
+package org.ojalgo.matrix.operation;
 
+import org.ojalgo.matrix.store.PhysicalStore;
+
+/**
+ * Exchanges two rows and the corresponding two columns of a hermitian matrix, of which only the lower/left
+ * triangular part is stored. Implemented by {@link ExchangeHermitian}.
+ *
+ * @author apete
+ */
 @FunctionalInterface
-public interface RotateRight {
+public interface ExchangeStep<N extends Comparable<N>> {
 
-    RotateRight NULL = (low, high, cos, sin) -> {};
-
-    void rotateRight(int low, int high, double cos, double sin);
+    void invoke(PhysicalStore<N> store, int indexA, int indexB);
 
 }

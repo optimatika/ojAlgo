@@ -82,6 +82,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - The non-symmetric eigenvalue decomposition (`RawEigenvalue`) and `RawQR.getQ()` work row by row instead of down the columns of their row-major arrays, so the inner loops are contiguous and vectorised. Results are unchanged.
 - `RawSingularValue` (the default SVD up to 1024 columns) computes its Householder column/row norms by scaling with the largest element (as `RawQR` does) rather than by repeated `hypot` – almost 2x faster for tall, skinny matrices. Results change in the last bits.
 - The single-column backward triangular solves used by `ftran`/`btran` (dense LU, Cholesky, LDL and QR) are faster: a column sweep for upper triangular bodies, and for the transposed case each dot product is summed from the far end, so that consecutive rows no longer wait for each other. Per backward solve from about the same speed (n = 10) to 2x (transposed) or 4x (upper) at n = 100. Results change in the last bits.
+- The dense decompositions no longer need their in-place store to implement `DecompositionStore` (removed). Each one declares the in-place operations it needs as functional interfaces, implemented by the matrix operations (static methods) rather than by the stores. Same kernels in the same order – results are unchanged.
 
 #### org.ojalgo.matrix.store
 
@@ -151,6 +152,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.matrix.decomposition
 
 - `SparseQDLDL.getSolution(...)` for a 1x1 matrix solved only the first of several right hand sides.
+- The R064 Hermitian eigenvalue decomposition (`SimultaneousTridiagonal`) reallocated its diagonal arrays when the matrix size was unchanged, and kept arrays of the wrong length when it changed – re-using an instance on a matrix of a different size could fail.
 
 #### org.ojalgo.matrix.store
 
@@ -207,6 +209,16 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - `NumberContext.equals(Object)` and `hashCode()` compared object identity. They now compare precision, rounding mode and scale (not the format).
 - `NumberContext.isZero(BigDecimal)` treated any number smaller than a tenth of the last decimal as zero, although with the rounding modes `UP`, `CEILING` and `FLOOR` it may round to a non-zero value. With a negative scale, numbers that round to zero (such as 49 with scale -2) were reported as non-zero.
+
+### Removed
+
+#### org.ojalgo.matrix.decomposition
+
+- `DecompositionStore`. It existed only for the dense decompositions, which no longer use it.
+
+#### org.ojalgo.matrix.store
+
+- The `DecompositionStore` methods of `R064Store` and `GenericStore`: `applyCholesky`, `applyLDL`, `applyLU`, `computeInPlaceSchur`, `divideAndCopyColumn`, `exchangeHermitian`, `generateApplyAndCopyHouseholderColumn`, `generateApplyAndCopyHouseholderRow`, `negateColumn`, `rotateRight`, `setToIdentity`, `transformSymmetric` and `tred2`.
 
 ## [57.3.1] – 2026-09-21
 

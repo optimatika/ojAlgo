@@ -37,8 +37,8 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
-import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
-import org.ojalgo.matrix.decomposition.function.RotateRight;
+import org.ojalgo.matrix.operation.ExchangeColumns;
+import org.ojalgo.matrix.operation.RotateColumns;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
@@ -781,7 +781,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         // Tridiagonalize > Diagonalize
 
-        RotateRight tmpRotateRight = valuesOnly ? RotateRight.NULL : (low, high, cos, sin) -> {
+        RotateColumns tmpRotateColumns = valuesOnly ? RotateColumns.NULL : (low, high, cos, sin) -> {
             double[] tmpVi0 = data[low];
             double tmpVi0k;
             double[] tmpVi1 = data[high];
@@ -797,7 +797,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             }
 
         };
-        HermitianEvD.tql2(d, e, tmpRotateRight);
+        HermitianEvD.tql2(d, e, tmpRotateColumns);
 
         // Diagonalize > Sort
 

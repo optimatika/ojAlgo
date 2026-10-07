@@ -29,8 +29,12 @@ import org.ojalgo.array.operation.ModifyAll;
 
 /**
  * Contents in this package loosely corresponds to BLAS. The exact selection of operations and their API:s are
- * entirely dictated by the requirements of the various {@linkplain org.ojalgo.matrix.store.MatrixStore}
- * implementations.
+ * entirely dictated by the requirements of the various {@linkplain org.ojalgo.matrix.store.MatrixStore} and
+ * {@linkplain org.ojalgo.matrix.decomposition.MatrixDecomposition} implementations.
+ * <p>
+ * The functional interfaces in this package ({@link PivotStep}, {@link HouseholderStep},
+ * {@link RotateColumns} and others) declare what the decompositions need. They are implemented by static
+ * methods of the operation classes, or by lambdas.
  * <ul>
  * <li>http://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms
  * <li>http://www.netlib.org/blas/

@@ -32,6 +32,11 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.matrix.operation.ApplyLDL;
+import org.ojalgo.matrix.operation.DivideAndCopyColumn;
+import org.ojalgo.matrix.operation.ExchangeHermitian;
+import org.ojalgo.matrix.operation.ExchangeStep;
+import org.ojalgo.matrix.operation.PivotStep;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -52,7 +57,7 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
     static final class C128 extends DenseLDL<ComplexNumber> {
 
         C128() {
-            super(GenericStore.C128);
+            super(GenericStore.C128, ExchangeHermitian::invokeGeneric, DivideAndCopyColumn::invokeGeneric, ApplyLDL::invokeGeneric);
         }
 
     }
@@ -62,10 +67,10 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
      */
     static final class FactorD<N extends Comparable<N>> implements MatrixDecomposition.Factor<N> {
 
-        private final DecompositionStore<N> myDiagonal;
+        private final PhysicalStore<N> myDiagonal;
         private final BinaryFunction<N> myDivide;
 
-        FactorD(final DecompositionStore<N> diagonal, final BinaryFunction<N> divide) {
+        FactorD(final PhysicalStore<N> diagonal, final BinaryFunction<N> divide) {
             super();
             myDiagonal = diagonal;
             myDivide = divide;
@@ -115,7 +120,7 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
     static final class H256 extends DenseLDL<Quaternion> {
 
         H256() {
-            super(GenericStore.H256);
+            super(GenericStore.H256, ExchangeHermitian::invokeGeneric, DivideAndCopyColumn::invokeGeneric, ApplyLDL::invokeGeneric);
         }
 
     }
@@ -123,7 +128,7 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
     static final class Q128 extends DenseLDL<RationalNumber> {
 
         Q128() {
-            super(GenericStore.Q128);
+            super(GenericStore.Q128, ExchangeHermitian::invokeGeneric, DivideAndCopyColumn::invokeGeneric, ApplyLDL::invokeGeneric);
         }
 
     }
@@ -131,7 +136,7 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
     static final class R064 extends DenseLDL<Double> {
 
         R064() {
-            super(R064Store.FACTORY);
+            super(R064Store.FACTORY, ExchangeHermitian::invokeR064, DivideAndCopyColumn::invokeR064, ApplyLDL::invokeR064);
         }
 
     }
@@ -139,16 +144,23 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
     static final class R128 extends DenseLDL<Quadruple> {
 
         R128() {
-            super(GenericStore.R128);
+            super(GenericStore.R128, ExchangeHermitian::invokeGeneric, DivideAndCopyColumn::invokeGeneric, ApplyLDL::invokeGeneric);
         }
 
     }
 
+    private final PivotStep<N> myApplyLDL;
+    private final PivotStep<N> myDivideAndCopyColumn;
+    private final ExchangeStep<N> myExchangeHermitian;
     private final Pivot myPivot = new Pivot();
     private double myThreshold = Double.NaN;
 
-    protected DenseLDL(final PhysicalStore.Factory<N, ? extends DecompositionStore<N>> factory) {
+    protected DenseLDL(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> factory, final ExchangeStep<N> exchangeHermitian,
+            final PivotStep<N> divideAndCopyColumn, final PivotStep<N> applyLDL) {
         super(factory);
+        myExchangeHermitian = exchangeHermitian;
+        myDivideAndCopyColumn = divideAndCopyColumn;
+        myApplyLDL = applyLDL;
     }
 
     @Override
@@ -170,7 +182,7 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
     @Override
     public int countSignificant(final double threshold) {
 
-        DecompositionStore<N> internal = this.getInPlace();
+        PhysicalStore<N> internal = this.getInPlace();
 
         int significant = 0;
         for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
@@ -197,7 +209,7 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
 
         myPivot.applyPivotOrder(arg);
 
-        DecompositionStore<N> body = this.getInPlace();
+        PhysicalStore<N> body = this.getInPlace();
 
         body.substituteForwards(false, true, arg);
 
@@ -215,7 +227,7 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
 
         this.applyPivotOrder(myPivot, arg);
 
-        DecompositionStore<N> body = this.getInPlace();
+        PhysicalStore<N> body = this.getInPlace();
 
         body.substituteForwards(false, true, arg);
 
@@ -251,7 +263,7 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
     @Override
     public List<InvertibleFactor<N>> getFactors() {
 
-        DecompositionStore<N> inPlace = this.getInPlace();
+        PhysicalStore<N> inPlace = this.getInPlace();
         MatrixStore<N> identity = this.makeIdentity(this.getRowDim());
 
         return List.of(new FactorPivot<>(identity, myPivot, true), new FactorLower<>(inPlace, true), new FactorD<>(inPlace, this.function().divide()),
@@ -271,7 +283,7 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
             }
         }
 
-        DecompositionStore<N> body = this.getInPlace();
+        PhysicalStore<N> body = this.getInPlace();
 
         preallocated.substituteForwards(body, true, false, !modified);
 
@@ -316,7 +328,7 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
 
         preallocated.fillMatching(this.collect(rhs).rows(order));
 
-        DecompositionStore<N> body = this.getInPlace();
+        PhysicalStore<N> body = this.getInPlace();
 
         preallocated.substituteForwards(body, true, false, false);
 
@@ -383,7 +395,7 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
 
         this.reset();
 
-        DecompositionStore<N> store = this.setInPlace(matrix);
+        PhysicalStore<N> store = this.setInPlace(matrix);
 
         int dim = this.getMinDim();
 
@@ -399,7 +411,7 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
                 int pivotRow = store.indexOfLargestOnDiagonal(ij, ij);
                 // Pivot?
                 if (pivotRow != ij) {
-                    store.exchangeHermitian(pivotRow, ij);
+                    myExchangeHermitian.invoke(store, pivotRow, ij);
                     myPivot.change(pivotRow, ij);
                 }
             }
@@ -428,10 +440,10 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
 
                 // Calculate multipliers and copy to local column
                 // Current column, below the diagonal
-                store.divideAndCopyColumn(ij, ij, multipliers);
+                myDivideAndCopyColumn.invoke(store, ij, multipliers);
 
                 // Apply transformations to everything below and to the right of the pivot element
-                store.applyLDL(ij, multipliers);
+                myApplyLDL.invoke(store, ij, multipliers);
 
             } else {
 

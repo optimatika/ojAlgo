@@ -26,13 +26,13 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.structure.Access2D;
 
-abstract class InPlaceDecomposition<N extends Comparable<N>> extends AbstractDecomposition<N, DecompositionStore<N>> {
+abstract class InPlaceDecomposition<N extends Comparable<N>> extends AbstractDecomposition<N, PhysicalStore<N>> {
 
     private int myColDim;
-    private DecompositionStore<N> myInPlace;
+    private PhysicalStore<N> myInPlace;
     private int myRowDim;
 
-    InPlaceDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory) {
+    InPlaceDecomposition(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> factory) {
         super(factory);
     }
 
@@ -55,11 +55,11 @@ abstract class InPlaceDecomposition<N extends Comparable<N>> extends AbstractDec
         return myRowDim;
     }
 
-    final DecompositionStore<N> getInPlace() {
+    final PhysicalStore<N> getInPlace() {
         return myInPlace;
     }
 
-    final DecompositionStore<N> setInPlace(final Access2D.Collectable<N, ? super DecompositionStore<N>> matrix) {
+    final PhysicalStore<N> setInPlace(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
 
         int tmpRowDim = matrix.getRowDim();
         int tmpColDim = matrix.getColDim();

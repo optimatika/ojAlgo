@@ -24,12 +24,13 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 
-abstract class DenseEigenvalue<N extends Comparable<N>> extends AbstractDecomposition<N, DecompositionStore<N>> implements Eigenvalue<N> {
+abstract class DenseEigenvalue<N extends Comparable<N>> extends AbstractDecomposition<N, PhysicalStore<N>> implements Eigenvalue<N> {
 
     private MatrixStore<N> myD = null;
     private Array1D<ComplexNumber> myEigenvalues = null;
@@ -37,7 +38,7 @@ abstract class DenseEigenvalue<N extends Comparable<N>> extends AbstractDecompos
     private MatrixStore<N> myV = null;
     private boolean myValuesOnly = false;
 
-    DenseEigenvalue(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
+    DenseEigenvalue(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> aFactory) {
         super(aFactory);
     }
 

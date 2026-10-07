@@ -21,6 +21,9 @@
  */
 package org.ojalgo.matrix.operation;
 
+import org.ojalgo.matrix.store.GenericStore;
+import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.scalar.Scalar;
 
 public abstract class RotateRight implements MatrixOperation {
@@ -88,6 +91,15 @@ public abstract class RotateRight implements MatrixOperation {
             indexA++;
             indexB++;
         }
+    }
+
+    public static <N extends Scalar<N>> void invokeGeneric(final PhysicalStore<N> store, final int low, final int high, final double cos, final double sin) {
+        Scalar.Factory<N> scalar = store.physical().scalar();
+        RotateRight.invoke(((GenericStore<N>) store).data, store.getRowDim(), low, high, scalar.cast(cos), scalar.cast(sin));
+    }
+
+    public static void invokeR064(final PhysicalStore<Double> store, final int low, final int high, final double cos, final double sin) {
+        RotateRight.invoke(((R064Store) store).data, store.getRowDim(), low, high, cos, sin);
     }
 
 }

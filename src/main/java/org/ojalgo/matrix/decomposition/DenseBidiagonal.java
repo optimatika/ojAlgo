@@ -23,6 +23,9 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.matrix.operation.GenerateApplyAndCopyHouseholderColumn;
+import org.ojalgo.matrix.operation.GenerateApplyAndCopyHouseholderRow;
+import org.ojalgo.matrix.operation.HouseholderStep;
 import org.ojalgo.matrix.store.DiagonalStore;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -47,7 +50,7 @@ abstract class DenseBidiagonal<N extends Comparable<N>> extends InPlaceDecomposi
         }
 
         C128(final boolean fullSize) {
-            super(GenericStore.C128, fullSize);
+            super(GenericStore.C128, fullSize, GenerateApplyAndCopyHouseholderColumn::invokeGeneric, GenerateApplyAndCopyHouseholderRow::invokeGeneric);
         }
 
         @Override
@@ -135,7 +138,7 @@ abstract class DenseBidiagonal<N extends Comparable<N>> extends InPlaceDecomposi
         }
 
         H256(final boolean fullSize) {
-            super(GenericStore.H256, fullSize);
+            super(GenericStore.H256, fullSize, GenerateApplyAndCopyHouseholderColumn::invokeGeneric, GenerateApplyAndCopyHouseholderRow::invokeGeneric);
         }
 
         @Override
@@ -153,7 +156,7 @@ abstract class DenseBidiagonal<N extends Comparable<N>> extends InPlaceDecomposi
         }
 
         Q128(final boolean fullSize) {
-            super(GenericStore.Q128, fullSize);
+            super(GenericStore.Q128, fullSize, GenerateApplyAndCopyHouseholderColumn::invokeGeneric, GenerateApplyAndCopyHouseholderRow::invokeGeneric);
         }
 
         @Override
@@ -170,7 +173,7 @@ abstract class DenseBidiagonal<N extends Comparable<N>> extends InPlaceDecomposi
         }
 
         R064(final boolean fullSize) {
-            super(R064Store.FACTORY, fullSize);
+            super(R064Store.FACTORY, fullSize, GenerateApplyAndCopyHouseholderColumn::invokeR064, GenerateApplyAndCopyHouseholderRow::invokeR064);
         }
 
         @Override
@@ -187,7 +190,7 @@ abstract class DenseBidiagonal<N extends Comparable<N>> extends InPlaceDecomposi
         }
 
         R128(final boolean fullSize) {
-            super(GenericStore.R128, fullSize);
+            super(GenericStore.R128, fullSize, GenerateApplyAndCopyHouseholderColumn::invokeGeneric, GenerateApplyAndCopyHouseholderRow::invokeGeneric);
         }
 
         @Override
@@ -199,14 +202,19 @@ abstract class DenseBidiagonal<N extends Comparable<N>> extends InPlaceDecomposi
 
     private transient DiagonalStore<N, Array1D<N>> myDiagonal;
     private final boolean myFullSize;
+    private final HouseholderStep<N> myHouseholderColumn;
+    private final HouseholderStep<N> myHouseholderRow;
     private Array1D<N> myInitDiagLQ = null;
     private Array1D<N> myInitDiagRQ = null;
-    private transient DecompositionStore<N> myLQ;
-    private transient DecompositionStore<N> myRQ;
+    private transient PhysicalStore<N> myLQ;
+    private transient PhysicalStore<N> myRQ;
 
-    protected DenseBidiagonal(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory, final boolean fullSize) {
+    protected DenseBidiagonal(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> factory, final boolean fullSize,
+            final HouseholderStep<N> householderColumn, final HouseholderStep<N> householderRow) {
         super(factory);
         myFullSize = fullSize;
+        myHouseholderColumn = householderColumn;
+        myHouseholderRow = householderRow;
     }
 
     @Override
@@ -214,7 +222,7 @@ abstract class DenseBidiagonal<N extends Comparable<N>> extends InPlaceDecomposi
 
         this.reset();
 
-        DecompositionStore<N> storage = this.setInPlace(matrix);
+        PhysicalStore<N> storage = this.setInPlace(matrix);
 
         int tmpRowDim = this.getRowDim();
         int tmpColDim = this.getColDim();
@@ -228,11 +236,11 @@ abstract class DenseBidiagonal<N extends Comparable<N>> extends InPlaceDecomposi
 
             for (int ij = 0; ij < tmpLimit; ij++) {
 
-                if (ij + 1 < tmpRowDim && storage.generateApplyAndCopyHouseholderColumn(ij, ij, tmpHouseholderCol)) {
+                if (ij + 1 < tmpRowDim && myHouseholderColumn.invoke(storage, ij, ij, tmpHouseholderCol)) {
                     storage.transformLeft(tmpHouseholderCol, ij + 1);
                 }
 
-                if (ij + 2 < tmpColDim && storage.generateApplyAndCopyHouseholderRow(ij, ij + 1, tmpHouseholderRow)) {
+                if (ij + 2 < tmpColDim && myHouseholderRow.invoke(storage, ij, ij + 1, tmpHouseholderRow)) {
                     storage.transformRight(tmpHouseholderRow, ij + 1);
                 }
             }
@@ -247,11 +255,11 @@ abstract class DenseBidiagonal<N extends Comparable<N>> extends InPlaceDecomposi
 
             for (int ij = 0; ij < tmpLimit; ij++) {
 
-                if (ij + 1 < tmpColDim && storage.generateApplyAndCopyHouseholderRow(ij, ij, tmpHouseholderRow)) {
+                if (ij + 1 < tmpColDim && myHouseholderRow.invoke(storage, ij, ij, tmpHouseholderRow)) {
                     storage.transformRight(tmpHouseholderRow, ij + 1);
                 }
 
-                if (ij + 2 < tmpRowDim && storage.generateApplyAndCopyHouseholderColumn(ij + 1, ij, tmpHouseholderCol)) {
+                if (ij + 2 < tmpRowDim && myHouseholderColumn.invoke(storage, ij + 1, ij, tmpHouseholderCol)) {
                     storage.transformLeft(tmpHouseholderCol, ij + 1);
                 }
             }
@@ -315,31 +323,31 @@ abstract class DenseBidiagonal<N extends Comparable<N>> extends InPlaceDecomposi
 
     private DiagonalStore<N, Array1D<N>> makeDiagonal() {
 
-        DecompositionStore<N> storage = this.getInPlace();
+        PhysicalStore<N> storage = this.getInPlace();
 
-        Array1D<N> diagMain = storage.sliceDiagonal(0, 0);
+        Array1D<N> diagMain = (Array1D<N>) storage.sliceDiagonal(0, 0);
         Array1D<N> diagSuper;
         Array1D<N> diagSub;
 
         if (this.isAspectRatioNormal()) {
-            diagSuper = storage.sliceDiagonal(0, 1);
+            diagSuper = (Array1D<N>) storage.sliceDiagonal(0, 1);
             diagSub = null;
         } else {
             diagSuper = null;
-            diagSub = storage.sliceDiagonal(1, 0);
+            diagSub = (Array1D<N>) storage.sliceDiagonal(1, 0);
         }
 
         return this.makeDiagonal(diagMain).superdiagonal(diagSuper).subdiagonal(diagSub).get();
     }
 
-    private DecompositionStore<N> makeLQ() {
+    private PhysicalStore<N> makeLQ() {
 
         HouseholderReference<N> tmpReference = HouseholderReference.makeColumn(this.getInPlace());
 
         int tmpRowDim = this.getRowDim();
         int tmpMinDim = this.getMinDim();
 
-        DecompositionStore<N> retVal = null;
+        PhysicalStore<N> retVal = null;
         if (myInitDiagLQ != null) {
             retVal = this.makeZero(tmpRowDim, myFullSize ? tmpRowDim : tmpMinDim);
             for (int ij = 0; ij < tmpMinDim; ij++) {
@@ -362,14 +370,14 @@ abstract class DenseBidiagonal<N extends Comparable<N>> extends InPlaceDecomposi
         return retVal;
     }
 
-    private DecompositionStore<N> makeRQ() {
+    private PhysicalStore<N> makeRQ() {
 
         HouseholderReference<N> tmpReference = HouseholderReference.makeRow(this.getInPlace());
 
         int tmpColDim = this.getColDim();
         int tmpMinDim = this.getMinDim();
 
-        DecompositionStore<N> retVal = null;
+        PhysicalStore<N> retVal = null;
         if (myInitDiagRQ != null) {
             retVal = this.makeZero(tmpColDim, myFullSize ? tmpColDim : tmpMinDim);
             for (int ij = 0; ij < tmpMinDim; ij++) {
@@ -420,12 +428,12 @@ abstract class DenseBidiagonal<N extends Comparable<N>> extends InPlaceDecomposi
         }
     }
 
-    private DecompositionStore<N> solve2(final PhysicalStore<N> aMtrxV, final MatrixStore<N> aMtrxD, final DiagonalStore<N, ?> aMtrxSimilar) {
+    private PhysicalStore<N> solve2(final PhysicalStore<N> aMtrxV, final MatrixStore<N> aMtrxD, final DiagonalStore<N, ?> aMtrxSimilar) {
 
         int tmpDim = (int) aMtrxV.countRows();
         int tmpLim = tmpDim - 1;
 
-        DecompositionStore<N> retVal = this.makeZero(tmpDim, tmpDim);
+        PhysicalStore<N> retVal = this.makeZero(tmpDim, tmpDim);
 
         double tmpSingular;
         for (int j = 0; j < tmpDim; j++) {
@@ -455,14 +463,14 @@ abstract class DenseBidiagonal<N extends Comparable<N>> extends InPlaceDecomposi
         return myDiagonal;
     }
 
-    DecompositionStore<N> doGetLQ() {
+    PhysicalStore<N> doGetLQ() {
         if (myLQ == null) {
             myLQ = this.makeLQ();
         }
         return myLQ;
     }
 
-    DecompositionStore<N> doGetRQ() {
+    PhysicalStore<N> doGetRQ() {
         if (myRQ == null) {
             myRQ = this.makeRQ();
         }

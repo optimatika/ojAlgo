@@ -28,6 +28,8 @@ import java.util.List;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
+import org.ojalgo.matrix.operation.GenerateApplyAndCopyHouseholderColumn;
+import org.ojalgo.matrix.operation.HouseholderStep;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -53,7 +55,7 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
         }
 
         C128(final boolean fullSize) {
-            super(GenericStore.C128, fullSize);
+            super(GenericStore.C128, fullSize, GenerateApplyAndCopyHouseholderColumn::invokeGeneric);
         }
 
     }
@@ -65,7 +67,7 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
         }
 
         H256(final boolean fullSize) {
-            super(GenericStore.H256, fullSize);
+            super(GenericStore.H256, fullSize, GenerateApplyAndCopyHouseholderColumn::invokeGeneric);
         }
 
     }
@@ -77,7 +79,7 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
         }
 
         Q128(final boolean fullSize) {
-            super(GenericStore.Q128, fullSize);
+            super(GenericStore.Q128, fullSize, GenerateApplyAndCopyHouseholderColumn::invokeGeneric);
         }
 
     }
@@ -89,7 +91,7 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
         }
 
         R064(final boolean fullSize) {
-            super(R064Store.FACTORY, fullSize);
+            super(R064Store.FACTORY, fullSize, GenerateApplyAndCopyHouseholderColumn::invokeR064);
         }
 
     }
@@ -101,7 +103,7 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
         }
 
         R128(final boolean fullSize) {
-            super(GenericStore.R128, fullSize);
+            super(GenericStore.R128, fullSize, GenerateApplyAndCopyHouseholderColumn::invokeGeneric);
         }
 
     }
@@ -114,12 +116,12 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
      */
     static final class FactorQ<N extends Comparable<N>> implements MatrixDecomposition.Factor<N> {
 
-        private final DecompositionStore<N> myBody;
+        private final PhysicalStore<N> myBody;
         private final PhysicalStore.Factory<N, ?> myFactory;
         private final boolean myFullSize;
         private final int myMinDim;
 
-        FactorQ(final DecompositionStore<N> body, final PhysicalStore.Factory<N, ?> factory, final int minDim, final boolean fullSize) {
+        FactorQ(final PhysicalStore<N> body, final PhysicalStore.Factory<N, ?> factory, final int minDim, final boolean fullSize) {
             super();
             myBody = body;
             myFactory = factory;
@@ -212,10 +214,10 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
      */
     static final class FactorR<N extends Comparable<N>> implements MatrixDecomposition.Factor<N> {
 
-        private final DecompositionStore<N> myBody;
+        private final PhysicalStore<N> myBody;
         private final boolean myFullSize;
 
-        FactorR(final DecompositionStore<N> body, final boolean fullSize) {
+        FactorR(final PhysicalStore<N> body, final boolean fullSize) {
             super();
             myBody = body;
             myFullSize = fullSize;
@@ -269,16 +271,18 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
     }
 
     private final boolean myFullSize;
+    private final HouseholderStep<N> myHouseholderColumn;
     private int myNumberOfHouseholderTransformations = 0;
 
-    protected DenseQR(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory, final boolean fullSize) {
+    protected DenseQR(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> factory, final boolean fullSize, final HouseholderStep<N> householderColumn) {
         super(factory);
         myFullSize = fullSize;
+        myHouseholderColumn = householderColumn;
     }
 
     @Override
     public void btran(final double[] arg) {
-        DecompositionStore<N> x = this.copyColumn(arg);
+        PhysicalStore<N> x = this.copyColumn(arg);
         this.btran(x);
         x.supplyTo(arg);
     }
@@ -286,7 +290,7 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
     @Override
     public void btran(final PhysicalStore<N> arg) {
 
-        DecompositionStore<N> body = this.getInPlace();
+        PhysicalStore<N> body = this.getInPlace();
 
         arg.substituteForwards(body, false, true, false);
 
@@ -311,7 +315,7 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
     @Override
     public int countSignificant(final double threshold) {
 
-        DecompositionStore<N> internal = this.getInPlace();
+        PhysicalStore<N> internal = this.getInPlace();
 
         int significant = 0;
         for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
@@ -328,7 +332,7 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
         this.reset();
 
-        DecompositionStore<N> tmpStore = this.setInPlace(matrix);
+        PhysicalStore<N> tmpStore = this.setInPlace(matrix);
 
         int m = this.getRowDim();
         int r = this.getMinDim();
@@ -336,7 +340,7 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
         Householder<N> tmpHouseholder = this.makeHouseholder(m);
 
         for (int k = 0; k < r; k++) {
-            if (k + 1 < m && tmpStore.generateApplyAndCopyHouseholderColumn(k, k, tmpHouseholder)) {
+            if (k + 1 < m && myHouseholderColumn.invoke(tmpStore, k, k, tmpHouseholder)) {
                 tmpStore.transformLeft(tmpHouseholder, k + 1);
                 myNumberOfHouseholderTransformations++;
             }
@@ -347,7 +351,7 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
     @Override
     public void ftran(final double[] arg) {
-        DecompositionStore<N> x = this.copyColumn(arg);
+        PhysicalStore<N> x = this.copyColumn(arg);
         this.ftran(x);
         x.supplyTo(arg);
     }
@@ -355,7 +359,7 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
     @Override
     public void ftran(final PhysicalStore<N> arg) {
 
-        DecompositionStore<N> body = this.getInPlace();
+        PhysicalStore<N> body = this.getInPlace();
 
         HouseholderReference<N> reference = HouseholderReference.makeColumn(body);
 
@@ -430,7 +434,7 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
         rhs.supplyTo(preallocated);
 
-        DecompositionStore<N> body = this.getInPlace();
+        PhysicalStore<N> body = this.getInPlace();
         int m = this.getRowDim();
         int n = this.getColDim();
 
@@ -522,7 +526,7 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
      * [A]=[Q][R]
      */
     MatrixDecomposition.Factor<N> getFactorQ() {
-        DecompositionStore<N> body = this.getInPlace();
+        PhysicalStore<N> body = this.getInPlace();
         return new FactorQ<>(body, body.physical(), this.getMinDim(), myFullSize);
     }
 
@@ -536,14 +540,14 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
     /**
      * @return L as in R<sup>T</sup>.
      */
-    protected DecompositionStore<N> getL() {
+    protected PhysicalStore<N> getL() {
 
         int tmpRowDim = this.getColDim();
         int tmpColDim = this.getMinDim();
 
-        DecompositionStore<N> retVal = this.makeZero(tmpRowDim, tmpColDim);
+        PhysicalStore<N> retVal = this.makeZero(tmpRowDim, tmpColDim);
 
-        DecompositionStore<N> tmpStore = this.getInPlace();
+        PhysicalStore<N> tmpStore = this.getInPlace();
         for (int j = 0; j < tmpColDim; j++) {
             for (int i = j; i < tmpRowDim; i++) {
                 retVal.set(i, j, tmpStore.get(j, i));

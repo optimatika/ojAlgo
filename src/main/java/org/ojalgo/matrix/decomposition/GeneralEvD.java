@@ -23,6 +23,7 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.array.ArrayC128;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
@@ -57,7 +58,31 @@ abstract class GeneralEvD<N extends Comparable<N>> extends DenseEigenvalue<N> {
 
     }
 
-    protected GeneralEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory) {
+    /**
+     * Only implemented for {@link R064Store}.
+     */
+    private static Array1D<ComplexNumber> computeInPlaceSchur(final PhysicalStore<?> matrix, final PhysicalStore<?> transformationCollector) {
+
+        R064Store mtrxA = (R064Store) matrix;
+        R064Store mtrxV = (R064Store) transformationCollector;
+
+        EvD1D.orthes(mtrxA.data, mtrxV.data, new double[mtrxA.getMinDim()]);
+
+        double[][] diagonals = EvD1D.hqr2(mtrxA.data, mtrxV.data, true);
+        double[] real = diagonals[0];
+        double[] imaginary = diagonals[1];
+        int length = Math.min(real.length, imaginary.length);
+
+        ArrayC128 retVal = ArrayC128.make(length);
+
+        for (int i = 0; i < length; i++) {
+            retVal.data[i] = ComplexNumber.of(real[i], imaginary[i]);
+        }
+
+        return Array1D.C128.wrap(retVal);
+    }
+
+    protected GeneralEvD(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> factory) {
         super(factory);
     }
 
@@ -81,7 +106,7 @@ abstract class GeneralEvD<N extends Comparable<N>> extends DenseEigenvalue<N> {
         return null;
     }
 
-    public MatrixStore<N> getInverse(final DecompositionStore<N> newPreallocated) {
+    public MatrixStore<N> getInverse(final PhysicalStore<N> newPreallocated) {
         ProgrammingError.throwForUnsupportedOptionalOperation();
         return null;
     }
@@ -116,13 +141,13 @@ abstract class GeneralEvD<N extends Comparable<N>> extends DenseEigenvalue<N> {
 
         final int tmpDiagDim = (int) matrix.countRows();
 
-        // final DecompositionStore<N> tmpMtrxA = this.copy(matrix.get());
-        final DecompositionStore<N> tmpMtrxA = this.makeZero(tmpDiagDim, tmpDiagDim);
+        // final PhysicalStore<N> tmpMtrxA = this.copy(matrix.get());
+        final PhysicalStore<N> tmpMtrxA = this.makeZero(tmpDiagDim, tmpDiagDim);
         matrix.supplyTo(tmpMtrxA);
 
-        final DecompositionStore<N> tmpV = this.makeEye(tmpDiagDim, tmpDiagDim);
+        final PhysicalStore<N> tmpV = this.makeEye(tmpDiagDim, tmpDiagDim);
 
-        final Array1D<ComplexNumber> tmpEigenvalues = tmpMtrxA.computeInPlaceSchur(tmpV, true);
+        final Array1D<ComplexNumber> tmpEigenvalues = GeneralEvD.computeInPlaceSchur(tmpMtrxA, tmpV);
 
         this.setV(tmpV);
         this.setEigenvalues(tmpEigenvalues);

@@ -32,6 +32,7 @@ import org.ojalgo.matrix.MatrixR064.DenseReceiver;
 import org.ojalgo.matrix.P20030422Case;
 import org.ojalgo.matrix.SimpleCholeskyCase;
 import org.ojalgo.matrix.SimpleEquationCase;
+import org.ojalgo.matrix.operation.GenerateApplyAndCopyHouseholderColumn;
 import org.ojalgo.matrix.operation.MatrixOperation;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -129,15 +130,15 @@ public class CaseQR extends MatrixDecompositionTests {
         final MatrixStore<ComplexNumber> tmpDecompQ = tmpDecomposition.getQ();
         final MatrixStore<ComplexNumber> tmpDecompR = tmpDecomposition.getR();
 
-        final DecompositionStore<ComplexNumber> tmpInPlace = GenericStore.C128.copy(tmpOriginal);
+        final PhysicalStore<ComplexNumber> tmpInPlace = GenericStore.C128.copy(tmpOriginal);
 
-        final DecompositionStore<ComplexNumber> tmpNowQ = GenericStore.C128.makeEye(DIMENSION, DIMENSION);
-        final DecompositionStore<ComplexNumber> tmpNowR = GenericStore.C128.copy(tmpOriginal);
+        final PhysicalStore<ComplexNumber> tmpNowQ = GenericStore.C128.makeEye(DIMENSION, DIMENSION);
+        final PhysicalStore<ComplexNumber> tmpNowR = GenericStore.C128.copy(tmpOriginal);
 
-        final DecompositionStore<ComplexNumber> tmpForwardQ = GenericStore.C128.makeEye(DIMENSION, DIMENSION);
-        final DecompositionStore<ComplexNumber> tmpForwardR = GenericStore.C128.copy(tmpOriginal);
+        final PhysicalStore<ComplexNumber> tmpForwardQ = GenericStore.C128.makeEye(DIMENSION, DIMENSION);
+        final PhysicalStore<ComplexNumber> tmpForwardR = GenericStore.C128.copy(tmpOriginal);
 
-        final DecompositionStore<ComplexNumber> tmpReverseQ = GenericStore.C128.makeEye(DIMENSION, DIMENSION);
+        final PhysicalStore<ComplexNumber> tmpReverseQ = GenericStore.C128.makeEye(DIMENSION, DIMENSION);
 
         final Householder.Generic<ComplexNumber>[] tmpHouseholders = new Householder.Generic[tmpLim];
 
@@ -145,7 +146,7 @@ public class CaseQR extends MatrixDecompositionTests {
 
             final Householder.Generic<ComplexNumber> tmpVector = new Householder.Generic<>(ComplexNumber.FACTORY, DIMENSION);
 
-            if (tmpInPlace.generateApplyAndCopyHouseholderColumn(ij, ij, tmpVector)) {
+            if (GenerateApplyAndCopyHouseholderColumn.invokeGeneric(tmpInPlace, ij, ij, tmpVector)) {
                 tmpInPlace.transformLeft(tmpVector, ij + 1);
                 tmpNowQ.transformRight(tmpVector, 0);
                 tmpNowR.transformLeft(tmpVector, ij);

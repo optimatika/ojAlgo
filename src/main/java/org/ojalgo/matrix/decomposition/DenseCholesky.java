@@ -30,6 +30,9 @@ import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
+import org.ojalgo.matrix.operation.ApplyCholesky;
+import org.ojalgo.matrix.operation.DivideAndCopyColumn;
+import org.ojalgo.matrix.operation.PivotStep;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -50,7 +53,7 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
     static final class C128 extends DenseCholesky<ComplexNumber> {
 
         C128() {
-            super(GenericStore.C128);
+            super(GenericStore.C128, DivideAndCopyColumn::invokeGeneric, ApplyCholesky::invokeGeneric);
         }
 
     }
@@ -58,7 +61,7 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
     static final class H256 extends DenseCholesky<Quaternion> {
 
         H256() {
-            super(GenericStore.H256);
+            super(GenericStore.H256, DivideAndCopyColumn::invokeGeneric, ApplyCholesky::invokeGeneric);
         }
 
     }
@@ -66,7 +69,7 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
     static final class Q128 extends DenseCholesky<RationalNumber> {
 
         Q128() {
-            super(GenericStore.Q128);
+            super(GenericStore.Q128, DivideAndCopyColumn::invokeGeneric, ApplyCholesky::invokeGeneric);
         }
 
     }
@@ -74,7 +77,7 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
     static final class R064 extends DenseCholesky<Double> {
 
         R064() {
-            super(R064Store.FACTORY);
+            super(R064Store.FACTORY, DivideAndCopyColumn::invokeR064, ApplyCholesky::invokeR064);
         }
 
     }
@@ -82,7 +85,7 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
     static final class R128 extends DenseCholesky<Quadruple> {
 
         R128() {
-            super(GenericStore.R128);
+            super(GenericStore.R128, DivideAndCopyColumn::invokeGeneric, ApplyCholesky::invokeGeneric);
         }
 
     }
@@ -94,12 +97,17 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
      */
     private static final double DEPENDENT = 1E-12;
 
+    private final PivotStep<N> myApplyCholesky;
+    private final PivotStep<N> myDivideAndCopyColumn;
     private double myMaxDiag = ONE;
     private double myMinDiag = ZERO;
     private boolean mySPD = false;
 
-    protected DenseCholesky(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
-        super(aFactory);
+    protected DenseCholesky(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> factory, final PivotStep<N> divideAndCopyColumn,
+            final PivotStep<N> applyCholesky) {
+        super(factory);
+        myDivideAndCopyColumn = divideAndCopyColumn;
+        myApplyCholesky = applyCholesky;
     }
 
     @Override
@@ -112,7 +120,7 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
         }
 
         Scalar.Factory<N> scalar = this.scalar();
-        DecompositionStore<N> current = this.getInPlace();
+        PhysicalStore<N> current = this.getInPlace();
 
         // [A] = [L][L]^H, and the new row [l] of [L] (without its diagonal element) is given by [L][l]^H = [a]
         List<Scalar<N>> conjugated = new ArrayList<>(dim);
@@ -135,7 +143,7 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
             return false;
         }
 
-        DecompositionStore<N> extended = this.makeZero(dim + 1, dim + 1);
+        PhysicalStore<N> extended = this.makeZero(dim + 1, dim + 1);
         for (int j = 0; j < dim; j++) {
             for (int i = j; i < dim; i++) {
                 extended.set(i, j, current.get(i, j));
@@ -177,7 +185,7 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
 
         double minimum = Math.sqrt(threshold);
 
-        DecompositionStore<N> internal = this.getInPlace();
+        PhysicalStore<N> internal = this.getInPlace();
 
         int significant = 0;
         for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
@@ -197,7 +205,7 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
     @Override
     public void ftran(final double[] arg) {
 
-        DecompositionStore<N> body = this.getInPlace();
+        PhysicalStore<N> body = this.getInPlace();
 
         body.substituteForwards(false, false, arg);
         body.substituteBackwards(true, false, arg);
@@ -206,7 +214,7 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
     @Override
     public void ftran(final PhysicalStore<N> arg) {
 
-        DecompositionStore<N> body = this.getInPlace();
+        PhysicalStore<N> body = this.getInPlace();
 
         body.substituteForwards(false, false, arg);
         body.substituteBackwards(true, false, arg);
@@ -224,7 +232,7 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
 
     @Override
     public List<InvertibleFactor<N>> getFactors() {
-        DecompositionStore<N> inPlace = this.getInPlace();
+        PhysicalStore<N> inPlace = this.getInPlace();
         return List.of(new FactorLower<>(inPlace, false), new FactorUpperConjugate<>(inPlace, false));
     }
 
@@ -233,7 +241,7 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
 
         // No need to reset the contents of preallocated
 
-        DecompositionStore<N> body = this.getInPlace();
+        PhysicalStore<N> body = this.getInPlace();
 
         // With the last arg true, preallocated is assumed to an identity
         preallocated.substituteForwards(body, false, false, true);
@@ -275,7 +283,7 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
 
         rhs.supplyTo(preallocated);
 
-        DecompositionStore<N> body = this.getInPlace();
+        PhysicalStore<N> body = this.getInPlace();
 
         preallocated.substituteForwards(body, false, false, false);
         preallocated.substituteBackwards(body, false, true, false);
@@ -332,7 +340,7 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
         }
 
         Scalar.Factory<N> scalar = this.scalar();
-        DecompositionStore<N> current = this.getInPlace();
+        PhysicalStore<N> current = this.getInPlace();
         int newDim = dim - 1;
 
         // The rows of [L], except the removed one. Those after it get one element after the diagonal.
@@ -381,7 +389,7 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
             }
         }
 
-        DecompositionStore<N> reduced = this.makeZero(newDim, newDim);
+        PhysicalStore<N> reduced = this.makeZero(newDim, newDim);
         for (int i = 0; i < newDim; i++) {
             List<Scalar<N>> row = rows.get(i);
             for (int j = 0; j <= i; j++) {
@@ -414,7 +422,7 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
     }
 
     private void updateDiagonalRange() {
-        DecompositionStore<N> inPlace = this.getInPlace();
+        PhysicalStore<N> inPlace = this.getInPlace();
         myMaxDiag = MACHINE_SMALLEST;
         myMinDiag = MACHINE_LARGEST;
         for (int ij = 0, limit = this.getRowDim(); ij < limit; ij++) {
@@ -429,7 +437,7 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
 
         this.reset();
 
-        DecompositionStore<N> tmpInPlace = this.setInPlace(matrix);
+        PhysicalStore<N> tmpInPlace = this.setInPlace(matrix);
 
         int tmpRowDim = this.getRowDim();
         int tmpColDim = this.getColDim();
@@ -462,10 +470,10 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
 
                 // Calculate multipliers and copy to local column
                 // Current column, below the diagonal
-                tmpInPlace.divideAndCopyColumn(ij, ij, tmpMultipliers);
+                myDivideAndCopyColumn.invoke(tmpInPlace, ij, tmpMultipliers);
 
                 // Remaining columns, below the diagonal
-                tmpInPlace.applyCholesky(ij, tmpMultipliers);
+                myApplyCholesky.invoke(tmpInPlace, ij, tmpMultipliers);
 
             } else {
 

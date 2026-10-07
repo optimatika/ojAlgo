@@ -28,8 +28,6 @@ import org.ojalgo.array.operation.AMAX;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.matrix.decomposition.function.TriangularSolveBackwards;
-import org.ojalgo.matrix.decomposition.function.TriangularSolveForwards;
 import org.ojalgo.matrix.operation.SubstituteBackwards;
 import org.ojalgo.matrix.operation.SubstituteForwards;
 import org.ojalgo.matrix.transformation.Householder;
@@ -51,8 +49,7 @@ import org.ojalgo.tensor.TensorFactory2D;
  *
  * @author apete
  */
-public interface PhysicalStore<N extends Comparable<N>>
-        extends MatrixStore<N>, TransformableRegion<N>, TriangularSolveForwards<N>, TriangularSolveBackwards<N> {
+public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, TransformableRegion<N> {
 
     public interface Factory<N extends Comparable<N>, I extends PhysicalStore<N> & Factory2D.Builder<I>> extends Factory2D.TwoStep<I, I> {
 
@@ -239,6 +236,25 @@ public interface PhysicalStore<N extends Comparable<N>>
     void substituteBackwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean hermitian);
 
     /**
+     * Solves [A][x]=[b] in place, where [A] is the upper/right triangular part of this matrix – or, when
+     * conjugated, the conjugate transpose of its lower/left triangular part.
+     *
+     * @param conjugated   Use the conjugate transpose of the lower/left triangular part
+     * @param unitDiagonal Assume a unit diagonal
+     * @param arg          [b] on input, overwritten with the solution [x]
+     */
+    void substituteBackwards(boolean conjugated, boolean unitDiagonal, double[] arg);
+
+    /**
+     * @see #substituteBackwards(boolean, boolean, double[])
+     */
+    default void substituteBackwards(final boolean conjugated, final boolean unitDiagonal, final PhysicalStore<N> arg) {
+        double[] argCopy = arg.toRawCopy1D();
+        this.substituteBackwards(conjugated, unitDiagonal, argCopy);
+        arg.fillMatching(argCopy);
+    }
+
+    /**
      * Will solve the equation system [A][X]=[B] where:
      * <ul>
      * <li>[body][this]=[this] is [A][X]=[B] ("this" is the right hand side, and it will be overwritten with
@@ -251,6 +267,25 @@ public interface PhysicalStore<N extends Comparable<N>>
      */
     @Deprecated
     void substituteForwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean identity);
+
+    /**
+     * Solves [A][x]=[b] in place, where [A] is the lower/left triangular part of this matrix – or, when
+     * conjugated, the conjugate transpose of its upper/right triangular part.
+     *
+     * @param conjugated   Use the conjugate transpose of the upper/right triangular part
+     * @param unitDiagonal Assume a unit diagonal
+     * @param arg          [b] on input, overwritten with the solution [x]
+     */
+    void substituteForwards(boolean conjugated, boolean unitDiagonal, double[] arg);
+
+    /**
+     * @see #substituteForwards(boolean, boolean, double[])
+     */
+    default void substituteForwards(final boolean conjugated, final boolean unitDiagonal, final PhysicalStore<N> arg) {
+        double[] argCopy = arg.toRawCopy1D();
+        this.substituteForwards(conjugated, unitDiagonal, argCopy);
+        arg.fillMatching(argCopy);
+    }
 
     @Override
     default void supplyTo(final TransformableRegion<N> receiver) {

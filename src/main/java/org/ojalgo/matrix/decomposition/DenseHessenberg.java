@@ -21,6 +21,9 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.ojalgo.matrix.operation.GenerateApplyAndCopyHouseholderColumn;
+import org.ojalgo.matrix.operation.GenerateApplyAndCopyHouseholderRow;
+import org.ojalgo.matrix.operation.HouseholderStep;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -39,7 +42,7 @@ abstract class DenseHessenberg<N extends Comparable<N>> extends InPlaceDecomposi
     static final class C128 extends DenseHessenberg<ComplexNumber> {
 
         C128() {
-            super(GenericStore.C128);
+            super(GenericStore.C128, GenerateApplyAndCopyHouseholderColumn::invokeGeneric, GenerateApplyAndCopyHouseholderRow::invokeGeneric);
         }
 
     }
@@ -47,7 +50,7 @@ abstract class DenseHessenberg<N extends Comparable<N>> extends InPlaceDecomposi
     static final class H256 extends DenseHessenberg<Quaternion> {
 
         H256() {
-            super(GenericStore.H256);
+            super(GenericStore.H256, GenerateApplyAndCopyHouseholderColumn::invokeGeneric, GenerateApplyAndCopyHouseholderRow::invokeGeneric);
         }
 
     }
@@ -55,7 +58,7 @@ abstract class DenseHessenberg<N extends Comparable<N>> extends InPlaceDecomposi
     static final class Q128 extends DenseHessenberg<RationalNumber> {
 
         Q128() {
-            super(GenericStore.Q128);
+            super(GenericStore.Q128, GenerateApplyAndCopyHouseholderColumn::invokeGeneric, GenerateApplyAndCopyHouseholderRow::invokeGeneric);
         }
 
     }
@@ -63,7 +66,7 @@ abstract class DenseHessenberg<N extends Comparable<N>> extends InPlaceDecomposi
     static final class R064 extends DenseHessenberg<Double> {
 
         R064() {
-            super(R064Store.FACTORY);
+            super(R064Store.FACTORY, GenerateApplyAndCopyHouseholderColumn::invokeR064, GenerateApplyAndCopyHouseholderRow::invokeR064);
         }
 
     }
@@ -71,17 +74,22 @@ abstract class DenseHessenberg<N extends Comparable<N>> extends InPlaceDecomposi
     static final class R128 extends DenseHessenberg<Quadruple> {
 
         R128() {
-            super(GenericStore.R128);
+            super(GenericStore.R128, GenerateApplyAndCopyHouseholderColumn::invokeGeneric, GenerateApplyAndCopyHouseholderRow::invokeGeneric);
         }
 
     }
 
-    private transient DecompositionStore<N> myQ = null;
+    private final HouseholderStep<N> myHouseholderColumn;
+    private final HouseholderStep<N> myHouseholderRow;
+    private transient PhysicalStore<N> myQ = null;
 
     private boolean myUpper = true;
 
-    protected DenseHessenberg(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
-        super(aFactory);
+    protected DenseHessenberg(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> factory, final HouseholderStep<N> householderColumn,
+            final HouseholderStep<N> householderRow) {
+        super(factory);
+        myHouseholderColumn = householderColumn;
+        myHouseholderRow = householderRow;
     }
 
     @Override
@@ -91,7 +99,7 @@ abstract class DenseHessenberg<N extends Comparable<N>> extends InPlaceDecomposi
 
         myUpper = upper;
 
-        final DecompositionStore<N> tmpStore = this.setInPlace(matrix);
+        final PhysicalStore<N> tmpStore = this.setInPlace(matrix);
 
         final int tmpRowDim = this.getRowDim();
         final int tmpColDim = this.getColDim();
@@ -103,7 +111,7 @@ abstract class DenseHessenberg<N extends Comparable<N>> extends InPlaceDecomposi
             final int tmpLimit = Math.min(tmpRowDim, tmpColDim) - 2;
 
             for (int ij = 0; ij < tmpLimit; ij++) {
-                if (tmpStore.generateApplyAndCopyHouseholderColumn(ij + 1, ij, tmpHouseholderCol)) {
+                if (myHouseholderColumn.invoke(tmpStore, ij + 1, ij, tmpHouseholderCol)) {
                     tmpStore.transformLeft(tmpHouseholderCol, ij + 1);
                     tmpStore.transformRight(tmpHouseholderCol, 0);
                 }
@@ -116,7 +124,7 @@ abstract class DenseHessenberg<N extends Comparable<N>> extends InPlaceDecomposi
             final int tmpLimit = Math.min(tmpRowDim, tmpColDim) - 2;
 
             for (int ij = 0; ij < tmpLimit; ij++) {
-                if (tmpStore.generateApplyAndCopyHouseholderRow(ij, ij + 1, tmpHouseholderRow)) {
+                if (myHouseholderRow.invoke(tmpStore, ij, ij + 1, tmpHouseholderRow)) {
                     tmpStore.transformRight(tmpHouseholderRow, ij + 1);
                     tmpStore.transformLeft(tmpHouseholderRow, 0);
                 }
@@ -158,7 +166,7 @@ abstract class DenseHessenberg<N extends Comparable<N>> extends InPlaceDecomposi
         myUpper = true;
     }
 
-    private final DecompositionStore<N> makeQ(final DecompositionStore<N> storeToTransform, final boolean upper, final boolean eye) {
+    private final PhysicalStore<N> makeQ(final PhysicalStore<N> storeToTransform, final boolean upper, final boolean eye) {
 
         final int tmpRowAndColDim = (int) storeToTransform.countRows();
 
@@ -176,7 +184,7 @@ abstract class DenseHessenberg<N extends Comparable<N>> extends InPlaceDecomposi
         return storeToTransform;
     }
 
-    final DecompositionStore<N> doQ(final DecompositionStore<N> aStoreToTransform) {
+    final PhysicalStore<N> doQ(final PhysicalStore<N> aStoreToTransform) {
         return this.makeQ(aStoreToTransform, myUpper, false);
     }
 

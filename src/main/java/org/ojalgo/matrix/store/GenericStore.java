@@ -30,7 +30,6 @@ import org.ojalgo.array.ArrayC128;
 import org.ojalgo.array.ArrayH256;
 import org.ojalgo.array.ArrayQ128;
 import org.ojalgo.array.ArrayR128;
-import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.ScalarArray;
 import org.ojalgo.array.operation.FillMatchingDual;
 import org.ojalgo.array.operation.FillMatchingSingle;
@@ -45,7 +44,6 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.special.MissingMath;
-import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.operation.*;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
@@ -65,8 +63,7 @@ import org.ojalgo.type.math.MathType;
  *
  * @author apete
  */
-public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
-        implements PhysicalStore<N>, DecompositionStore<N>, Factory2D.Builder<GenericStore<N>> {
+public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> implements PhysicalStore<N>, Factory2D.Builder<GenericStore<N>> {
 
     public static final class Factory<N extends Scalar<N>> implements PhysicalStore.Factory<N, GenericStore<N>> {
 
@@ -235,7 +232,6 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
     private final GenericStore.Factory<N> myFactory;
     private final int myRowDim;
     private final Array2D<N> myUtility;
-    private transient N[] myWorkerColumn;
 
     GenericStore(final GenericStore.Factory<N> factory, final int numbRows, final int numbCols, final N[] dataArray) {
 
@@ -279,78 +275,6 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
     }
 
     @Override
-    public void applyCholesky(final int iterationPoint, final BasicArray<N> multipliers) {
-
-        final N[] tmpData = data;
-        final N[] tmpColumn = ((ScalarArray<N>) multipliers).data;
-
-        if (myColDim - iterationPoint - 1 > ApplyCholesky.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                protected void conquer(final int aFirst, final int aLimit) {
-                    ApplyCholesky.invoke(tmpData, myRowDim, aFirst, aLimit, tmpColumn);
-                }
-            };
-
-            tmpConquerer.invoke(iterationPoint + 1, myColDim, ApplyCholesky.THRESHOLD);
-
-        } else {
-
-            ApplyCholesky.invoke(tmpData, myRowDim, iterationPoint + 1, myColDim, tmpColumn);
-        }
-    }
-
-    @Override
-    public void applyLDL(final int iterationPoint, final BasicArray<N> multipliers) {
-
-        final N[] tmpData = data;
-        final N[] tmpColumn = ((ScalarArray<N>) multipliers).data;
-
-        if (myColDim - iterationPoint - 1 > ApplyLDL.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                protected void conquer(final int first, final int limit) {
-                    ApplyLDL.invoke(tmpData, myRowDim, first, limit, tmpColumn, iterationPoint);
-                }
-            };
-
-            tmpConquerer.invoke(iterationPoint + 1, myColDim, ApplyLDL.THRESHOLD);
-
-        } else {
-
-            ApplyLDL.invoke(tmpData, myRowDim, iterationPoint + 1, myColDim, tmpColumn, iterationPoint);
-        }
-    }
-
-    @Override
-    public void applyLU(final int iterationPoint, final BasicArray<N> multipliers) {
-
-        final N[] tmpData = data;
-        final N[] tmpColumn = ((ScalarArray<N>) multipliers).data;
-
-        if (myColDim - iterationPoint - 1 > ApplyLU.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                protected void conquer(final int aFirst, final int aLimit) {
-                    ApplyLU.invoke(tmpData, myRowDim, aFirst, aLimit, tmpColumn, iterationPoint);
-                }
-            };
-
-            tmpConquerer.invoke(iterationPoint + 1, myColDim, ApplyLU.THRESHOLD);
-
-        } else {
-
-            ApplyLU.invoke(tmpData, myRowDim, iterationPoint + 1, myColDim, tmpColumn, iterationPoint);
-        }
-    }
-
-    @Override
     public Array1D<N> asList() {
         return myUtility.flatten();
     }
@@ -358,12 +282,6 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
     @Override
     public GenericStore<N> build() {
         return this;
-    }
-
-    @Override
-    public Array1D<ComplexNumber> computeInPlaceSchur(final PhysicalStore<N> transformationCollector, final boolean eigenvalue) {
-        ProgrammingError.throwForUnsupportedOptionalOperation();
-        return null;
     }
 
     @Override
@@ -384,20 +302,6 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
     @Override
     public long countRows() {
         return myRowDim;
-    }
-
-    @Override
-    public void divideAndCopyColumn(final int row, final int column, final BasicArray<N> destination) {
-
-        N[] destinationData = ((ScalarArray<N>) destination).data;
-
-        int index = row + column * myRowDim;
-        N denominator = data[index];
-
-        for (int i = row + 1; i < myRowDim; i++) {
-            index++;
-            destinationData[i] = data[index] = data[index].divide(denominator).get();
-        }
     }
 
     @Override
@@ -433,36 +337,6 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
     @Override
     public void exchangeColumns(final long colA, final long colB) {
         myUtility.exchangeColumns(colA, colB);
-    }
-
-    @Override
-    public void exchangeHermitian(final int indexA, final int indexB) {
-
-        final int tmpMin = Math.min(indexA, indexB);
-        final int tmpMax = Math.max(indexA, indexB);
-
-        N tmpVal;
-        for (int j = 0; j < tmpMin; j++) {
-            tmpVal = this.get(tmpMin, j);
-            this.set(tmpMin, j, this.get(tmpMax, j));
-            this.set(tmpMax, j, tmpVal);
-        }
-
-        tmpVal = this.get(tmpMin, tmpMin);
-        this.set(tmpMin, tmpMin, this.get(tmpMax, tmpMax));
-        this.set(tmpMax, tmpMax, tmpVal);
-
-        for (int ij = tmpMin + 1; ij < tmpMax; ij++) {
-            tmpVal = this.get(ij, tmpMin);
-            this.set(ij, tmpMin, this.get(tmpMax, ij).conjugate().get());
-            this.set(tmpMax, ij, tmpVal.conjugate().get());
-        }
-
-        for (int i = tmpMax + 1; i < myRowDim; i++) {
-            tmpVal = this.get(i, tmpMin);
-            this.set(i, tmpMin, this.get(i, tmpMax));
-            this.set(i, tmpMax, tmpVal);
-        }
     }
 
     @Override
@@ -631,16 +505,6 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
     }
 
     @Override
-    public boolean generateApplyAndCopyHouseholderColumn(final int row, final int column, final Householder<N> destination) {
-        return GenerateApplyAndCopyHouseholderColumn.invoke(data, myRowDim, row, column, (Householder.Generic<N>) destination, myFactory.scalar());
-    }
-
-    @Override
-    public boolean generateApplyAndCopyHouseholderRow(final int row, final int column, final Householder<N> destination) {
-        return GenerateApplyAndCopyHouseholderRow.invoke(data, myRowDim, row, column, (Householder.Generic<N>) destination, myFactory.scalar());
-    }
-
-    @Override
     public MatrixStore<N> get() {
         return this;
     }
@@ -759,11 +623,6 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
     }
 
     @Override
-    public void negateColumn(final int column) {
-        myUtility.modifyColumn(0, column, myFactory.function().negate());
-    }
-
-    @Override
     public PhysicalStore.Factory<N, GenericStore<N>> physical() {
         return myFactory;
     }
@@ -794,11 +653,6 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
     }
 
     @Override
-    public void rotateRight(final int low, final int high, final double cos, final double sin) {
-        RotateRight.invoke(data, myRowDim, low, high, myFactory.scalar().cast(cos), myFactory.scalar().cast(sin));
-    }
-
-    @Override
     public void set(final int row, final int col, final double value) {
         myUtility.set(row, col, value);
     }
@@ -809,9 +663,8 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
     }
 
     @Override
-    public void setToIdentity(final int col) {
-        myUtility.set(col, col, myFactory.scalar().one().get());
-        myUtility.fillColumn(col + 1, col, myFactory.scalar().zero().get());
+    public Array1D<N> sliceColumn(final long col) {
+        return myUtility.sliceColumn(0L, col);
     }
 
     @Override
@@ -827,6 +680,11 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
     @Override
     public Array1D<N> sliceRange(final long first, final long limit) {
         return myUtility.sliceRange(first, limit);
+    }
+
+    @Override
+    public Array1D<N> sliceRow(final long row) {
+        return myUtility.sliceRow(row, 0L);
     }
 
     @Override
@@ -1002,18 +860,8 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
     }
 
     @Override
-    public void transformSymmetric(final Householder<N> transformation) {
-        HouseholderHermitian.invoke(data, this.cast(transformation), this.getWorkerColumn(), myFactory.scalar());
-    }
-
-    @Override
     public MatrixStore<N> transpose() {
         return new TransposedStore<>(this);
-    }
-
-    @Override
-    public void tred2(final BasicArray<N> mainDiagonal, final BasicArray<N> offDiagonal, final boolean yesvecs) {
-        ProgrammingError.throwForUnsupportedOptionalOperation();
     }
 
     @Override
@@ -1056,17 +904,6 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
             return (Rotation.Generic<N>) transformation;
         }
         return new Rotation.Generic<>(transformation);
-    }
-
-    private N[] getWorkerColumn() {
-
-        if (myWorkerColumn == null) {
-            myWorkerColumn = myFactory.scalar().newArrayInstance(myRowDim);
-        }
-
-        Arrays.fill(myWorkerColumn, myFactory.scalar().zero().get());
-
-        return myWorkerColumn;
     }
 
 }

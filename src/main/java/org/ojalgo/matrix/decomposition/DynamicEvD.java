@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.scalar.ComplexNumber;
@@ -44,14 +45,14 @@ abstract class DynamicEvD<N extends Comparable<N>> extends DenseEigenvalue<N> {
     private final DenseEigenvalue<N> myHermitianDelegate;
 
     @SuppressWarnings("unused")
-    private DynamicEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory) {
+    private DynamicEvD(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> factory) {
 
         this(factory, null, null);
 
         ProgrammingError.throwForIllegalInvocation();
     }
 
-    protected DynamicEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory, final DenseEigenvalue<N> hermitianDelegate,
+    protected DynamicEvD(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> factory, final DenseEigenvalue<N> hermitianDelegate,
             final DenseEigenvalue<N> generalDelegate) {
 
         super(factory);

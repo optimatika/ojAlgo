@@ -31,7 +31,7 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.PlainArray;
 import org.ojalgo.matrix.Provider2D;
-import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
+import org.ojalgo.matrix.operation.ExchangeColumns;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;

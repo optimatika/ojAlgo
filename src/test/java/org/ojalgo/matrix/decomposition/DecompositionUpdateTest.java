@@ -300,7 +300,7 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         int m = mtrxL.getRowDim();
         int n = mtrxU.getColDim();
 
-        DecompositionStore<Double> combined = R064Store.FACTORY.make(m, n);
+        R064Store combined = R064Store.FACTORY.make(m, n);
         for (int j = 0; j < n; j++) {
             for (int i = j + 1; i < m; i++) {
                 combined.set(i, j, mtrxL.doubleValue(i, j));

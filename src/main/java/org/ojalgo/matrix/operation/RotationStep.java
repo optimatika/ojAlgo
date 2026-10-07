@@ -19,13 +19,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.decomposition.function;
+package org.ojalgo.matrix.operation;
 
+import org.ojalgo.matrix.store.PhysicalStore;
+
+/**
+ * Applies a plane (Givens) rotation from the right, combining the two columns low and high. Implemented by
+ * {@link RotateRight}.
+ *
+ * @author apete
+ */
 @FunctionalInterface
-public interface NegateColumn {
+public interface RotationStep<N extends Comparable<N>> {
 
-    NegateColumn NULL = col -> {};
-
-    void negateColumn(int col);
+    void invoke(PhysicalStore<N> store, int low, int high, double cos, double sin);
 
 }

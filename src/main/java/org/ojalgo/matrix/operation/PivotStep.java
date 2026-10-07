@@ -19,54 +19,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.decomposition;
+package org.ojalgo.matrix.operation;
 
-import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.store.PhysicalStore;
 
-abstract class DenseTridiagonal<N extends Comparable<N>> extends InPlaceDecomposition<N> implements Tridiagonal<N> {
+/**
+ * An in-place step, at a diagonal (pivot) element, of an LU, LDL or Cholesky decomposition. Implemented by
+ * {@link ApplyCholesky}, {@link ApplyLDL}, {@link ApplyLU} and {@link DivideAndCopyColumn}.
+ *
+ * @author apete
+ */
+@FunctionalInterface
+public interface PivotStep<N extends Comparable<N>> {
 
-    private transient MatrixStore<N> myD = null;
-    private transient PhysicalStore<N> myQ = null;
-
-    protected DenseTridiagonal(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> factory) {
-        super(factory);
-    }
-
-    @Override
-    public final MatrixStore<N> getD() {
-        if (myD == null) {
-            myD = this.makeD();
-        }
-        return myD;
-    }
-
-    @Override
-    public final MatrixStore<N> getQ() {
-        return this.getDecompositionQ();
-    }
-
-    @Override
-
-    public void reset() {
-
-        super.reset();
-
-        myD = null;
-        myQ = null;
-    }
-
-    protected final PhysicalStore<N> getDecompositionQ() {
-        if (myQ == null) {
-            myQ = this.makeQ();
-        }
-        return myQ;
-    }
-
-    protected abstract void supplyDiagonalTo(double[] d, double[] e);
-
-    abstract MatrixStore<N> makeD();
-
-    abstract PhysicalStore<N> makeQ();
+    void invoke(PhysicalStore<N> store, int iterationPoint, BasicArray<N> multipliers);
 
 }
