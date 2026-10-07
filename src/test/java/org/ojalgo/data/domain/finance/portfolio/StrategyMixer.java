@@ -103,9 +103,12 @@ public class StrategyMixer extends FinancePortfolioTests {
 
         Uniform tmpGen = new Uniform();
 
-        FinancePortfolio tmpStrat1 = SimplePortfolio.ofWeights(tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue()).normalise();
-        FinancePortfolio tmpStrat2 = SimplePortfolio.ofWeights(tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue()).normalise();
-        FinancePortfolio tmpStrat3 = SimplePortfolio.ofWeights(tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue()).normalise();
+        FinancePortfolio tmpStrat1 = SimplePortfolio.ofWeights(tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue())
+                .normalise();
+        FinancePortfolio tmpStrat2 = SimplePortfolio.ofWeights(tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue())
+                .normalise();
+        FinancePortfolio tmpStrat3 = SimplePortfolio.ofWeights(tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue())
+                .normalise();
 
         PortfolioMixer tmpMixer = PortfolioMixer.of(tmpTarget, tmpStrat1, tmpStrat2, tmpStrat3);
 

@@ -587,8 +587,7 @@ public interface Structure2D extends Structure1D {
     }
 
     /**
-     * The default value is simply {@code 0}, and if all elements are zeros then
-     * {@code this.countRows()}.
+     * The default value is simply {@code 0}, and if all elements are zeros then {@code this.countRows()}.
      *
      * @param col The column index
      * @return The row index of the first non-zero element in the specified column
@@ -598,8 +597,7 @@ public interface Structure2D extends Structure1D {
     }
 
     /**
-     * The default value is simply {@code 0}, and if all elements are zeros then
-     * {@code this.countColumns()}.
+     * The default value is simply {@code 0}, and if all elements are zeros then {@code this.countColumns()}.
      *
      * @return The column index of the first non-zero element in the specified row
      */
@@ -628,9 +626,8 @@ public interface Structure2D extends Structure1D {
     /**
      * 2D data structures are either square, tall, fat or empty.
      * <p>
-     * m <= 0 or n <= 0
-     * Historically some ojAlgo data structures did allow to create "empty" instances. Currently this is not
-     * encouraged, but still possible in some instances.
+     * m <= 0 or n <= 0 Historically some ojAlgo data structures did allow to create "empty" instances.
+     * Currently this is not encouraged, but still possible in some instances.
      *
      * @return true if matrix is empty
      */
@@ -689,8 +686,7 @@ public interface Structure2D extends Structure1D {
     }
 
     /**
-     * The default value is simply {@code this.countRows()}, and if all elements are zeros then
-     * {@code 0}.
+     * The default value is simply {@code this.countRows()}, and if all elements are zeros then {@code 0}.
      *
      * @return The row index of the first zero element, after all non-zeros, in the specified column (index of
      *         the last non-zero + 1)
@@ -700,8 +696,7 @@ public interface Structure2D extends Structure1D {
     }
 
     /**
-     * The default value is simply {@code this.countColumns()}, and if all elements are zeros then
-     * {@code 0}.
+     * The default value is simply {@code this.countColumns()}, and if all elements are zeros then {@code 0}.
      *
      * @return The column index of the first zero element, after all non-zeros, in the specified row (index of
      *         the last non-zero + 1)

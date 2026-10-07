@@ -78,8 +78,8 @@ public class PresolveTest extends OptimisationTests {
     }
 
     /**
-     * Presolve writes its conclusions (infeasibility and redundancy flags, tightened variable limits) into the
-     * model, and nothing undoes them when the model is changed and solved again. A known, long-standing,
+     * Presolve writes its conclusions (infeasibility and redundancy flags, tightened variable limits) into
+     * the model, and nothing undoes them when the model is changed and solved again. A known, long-standing,
      * problem. Here the first solve is infeasible, and the second, after the limits have been relaxed, still
      * reports infeasible. This is what {@code RevisedSimplexSolverTest.testShiftingRange} used to run into
      * with some random data. Tagged unstable (it fails) until that is fixed.

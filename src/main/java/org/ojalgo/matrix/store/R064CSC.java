@@ -386,8 +386,8 @@ public final class R064CSC extends CompressedSparseR064 {
 
     /**
      * As {@link #of(Access2D.Collectable)}, but only with the nonzero elements whose (row, column) position
-     * the filter accepts. The CSC form of a sparse structure is filtered column by column (an
-     * {@link R064CSC} without an intermediate copy). A null filter accepts everything.
+     * the filter accepts. The CSC form of a sparse structure is filtered column by column (an {@link R064CSC}
+     * without an intermediate copy). A null filter accepts everything.
      */
     public static R064CSC of(final Access2D.Collectable<Double, ? super TransformableRegion<Double>> matrix, final Structure2D.IntRowColPredicate filter) {
 

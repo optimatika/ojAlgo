@@ -39,8 +39,7 @@ import org.ojalgo.structure.Access2D;
  * <p>
  * min 1/2 [X]<sup>T</sup>[Q][X] - [C]<sup>T</sup>[X]<br>
  * when [AE][X] == [BE]<br>
- * and [AI][X] <= [BI]
- * Where [AE] and [BE] are optional.
+ * and [AI][X] <= [BI] Where [AE] and [BE] are optional.
  *
  * @author apete
  */

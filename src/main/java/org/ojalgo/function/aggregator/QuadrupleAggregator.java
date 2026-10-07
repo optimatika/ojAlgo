@@ -165,10 +165,11 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
             return new QuadrupleAggregatorFunction() {
 
                 private Quadruple myNumber = Quadruple.NEGATIVE_INFINITY;
+                private boolean myVisited = false;
 
                 @Override
                 public Quadruple get() {
-                    return myNumber;
+                    return myVisited ? myNumber : Quadruple.ZERO;
                 }
 
                 @Override
@@ -179,11 +180,13 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
                 @Override
                 public void invoke(final Quadruple anArg) {
                     myNumber = QuadrupleMath.MAX.invoke(myNumber, anArg);
+                    myVisited = true;
                 }
 
                 @Override
                 public AggregatorFunction<Quadruple> reset() {
                     myNumber = Quadruple.NEGATIVE_INFINITY;
+                    myVisited = false;
                     return this;
                 }
 
@@ -198,13 +201,11 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
             return new QuadrupleAggregatorFunction() {
 
                 private Quadruple myNumber = Quadruple.POSITIVE_INFINITY;
+                private boolean myVisited = false;
 
                 @Override
                 public Quadruple get() {
-                    if (Quadruple.isInfinite(myNumber)) {
-                        return Quadruple.ZERO;
-                    }
-                    return myNumber;
+                    return myVisited ? myNumber : Quadruple.ZERO;
                 }
 
                 @Override
@@ -215,11 +216,13 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
                 @Override
                 public void invoke(final Quadruple anArg) {
                     myNumber = QuadrupleMath.MIN.invoke(myNumber, anArg);
+                    myVisited = true;
                 }
 
                 @Override
                 public AggregatorFunction<Quadruple> reset() {
                     myNumber = Quadruple.POSITIVE_INFINITY;
+                    myVisited = false;
                     return this;
                 }
 
@@ -369,13 +372,11 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
             return new QuadrupleAggregatorFunction() {
 
                 private Quadruple myNumber = Quadruple.POSITIVE_INFINITY;
+                private boolean myVisited = false;
 
                 @Override
                 public Quadruple get() {
-                    if (Quadruple.isInfinite(myNumber)) {
-                        return Quadruple.ZERO;
-                    }
-                    return myNumber;
+                    return myVisited ? myNumber : Quadruple.ZERO;
                 }
 
                 @Override
@@ -387,12 +388,14 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
                 public void invoke(final Quadruple anArg) {
                     if (!Quadruple.isSmall(PrimitiveMath.ONE, anArg)) {
                         myNumber = QuadrupleMath.MIN.invoke(myNumber, QuadrupleMath.ABS.invoke(anArg));
+                        myVisited = true;
                     }
                 }
 
                 @Override
                 public AggregatorFunction<Quadruple> reset() {
                     myNumber = Quadruple.POSITIVE_INFINITY;
+                    myVisited = false;
                     return this;
                 }
 

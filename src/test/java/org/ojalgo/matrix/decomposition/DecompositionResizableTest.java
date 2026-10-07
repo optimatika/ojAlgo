@@ -14,15 +14,14 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * Tests {@link MatrixDecomposition.Resizable} implementations – resizing a decomposition one
- * row/column at the time should give the same result as decomposing the (sub)matrix.
+ * Tests {@link MatrixDecomposition.Resizable} implementations – resizing a decomposition one row/column at
+ * the time should give the same result as decomposing the (sub)matrix.
  */
 public class DecompositionResizableTest extends MatrixDecompositionTests {
 
     private static final NumberContext ACCURACY = NumberContext.of(10);
 
-    private static <N extends Comparable<N>> boolean append(final Cholesky<N> cholesky, final MatrixStore<N> full, final List<Integer> rows,
-            final int row) {
+    private static <N extends Comparable<N>> boolean append(final Cholesky<N> cholesky, final MatrixStore<N> full, final List<Integer> rows, final int row) {
 
         List<Integer> extended = new ArrayList<>(rows);
         extended.add(row);
@@ -123,8 +122,8 @@ public class DecompositionResizableTest extends MatrixDecompositionTests {
     }
 
     /**
-     * Growing with a row/column that is linearly dependent on the existing ones (making the matrix singular) is
-     * rejected, and leaves the decomposition unchanged.
+     * Growing with a row/column that is linearly dependent on the existing ones (making the matrix singular)
+     * is rejected, and leaves the decomposition unchanged.
      */
     private static void testRejectDependent(final Cholesky<Double> cholesky) {
 

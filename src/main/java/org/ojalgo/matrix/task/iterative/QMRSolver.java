@@ -238,13 +238,8 @@ public final class QMRSolver extends IterativeSolverTask {
                 final Equation row = equations.get(i);
                 final double qi = q.doubleValue(row.index);
                 if (qi != ZERO) {
-                    // z_j += qi * a_ij  (accumulate into wtilde as A^T*q)
-                    for (int j = 0; j < row.size(); j++) {
-                        final double aij = row.doubleValue(j);
-                        if (aij != ZERO) {
-                            wtilde.add(j, qi * aij); // wtilde_j += qi * a_ij
-                        }
-                    }
+                    // wtilde_j += qi * a_ij, visiting only the nonzeros of sparse rows
+                    row.getBody().axpy(qi, wtilde);
                 }
             }
 

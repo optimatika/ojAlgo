@@ -255,14 +255,13 @@ public abstract class SubstituteForwards implements MatrixOperation {
 
             for (int j = 0; j < n; j++) {
 
+                float solved = data[j] - DOT.invoke(bodyData, j * bodyStructure, 1, data, 0, 1, j);
+
                 if (!unitDiagonal) {
-                    data[j] /= bodyData[j + j * bodyStructure];
+                    solved /= bodyData[j + j * bodyStructure];
                 }
 
-                float solved = data[j];
-                if (solved != 0F) {
-                    AXPY.invoke(data, 0, -solved, bodyData, j * bodyStructure, j + 1, n);
-                }
+                data[j] = solved;
             }
 
         } else {

@@ -53,7 +53,7 @@ public final class InterruptForwarder implements AutoCloseable {
      * {@link #close()} as soon as it returns.
      *
      * @param stopAction called repeatedly from the scheduler thread once the interrupt is detected; must be
-     *        safe to call while the blocking operation is running and to call more than once.
+     *                   safe to call while the blocking operation is running and to call more than once.
      */
     public static InterruptForwarder watch(final Runnable stopAction) {
 

@@ -55,8 +55,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
      */
     private static final int ITERATIONS_FACTOR = 10;
     /**
-     * How many times larger than the numerical noise a slack change has to be, to be considered moving towards
-     * the constraint boundary.
+     * How many times larger than the numerical noise a slack change has to be, to be considered moving
+     * towards the constraint boundary.
      */
     private static final double NOISE_FACTOR = TEN;
     private static final NumberContext LAGRANGE = NumberContext.of(12, 6).withMode(RoundingMode.HALF_DOWN);

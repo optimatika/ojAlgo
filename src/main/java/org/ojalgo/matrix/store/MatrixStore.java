@@ -48,8 +48,8 @@ import org.ojalgo.type.context.NumberContext;
  * <p>
  * A {@linkplain MatrixStore} extends {@linkplain Access2D} (as well as
  * {@linkplain org.ojalgo.structure.Access2D.Visitable} and
- * {@linkplain org.ojalgo.structure.Access2D.Sliceable}) and defines some further functionality - mainly matrix
- * multiplication.
+ * {@linkplain org.ojalgo.structure.Access2D.Sliceable}) and defines some further functionality - mainly
+ * matrix multiplication.
  * <p>
  * This interface does not define any methods that require implementations to alter the matrix. Either the
  * methods return matrix elements, some meta data or produce new instances.
@@ -299,8 +299,8 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     }
 
     /**
-     * @deprecated v50 No need as {@link MatrixStore} now implements {@link Structure2D.Logical} and this method simply
-     *             return "this".
+     * @deprecated v50 No need as {@link MatrixStore} now implements {@link Structure2D.Logical} and this
+     *             method simply return "this".
      */
     @Deprecated
     default MatrixStore<N> get() {

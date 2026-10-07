@@ -165,10 +165,11 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
             return new PrimitiveAggregatorFunction() {
 
                 private double myValue = NEGATIVE_INFINITY;
+                private boolean myVisited = false;
 
                 @Override
                 public double doubleValue() {
-                    return myValue;
+                    return myVisited ? myValue : ZERO;
                 }
 
                 @Override
@@ -179,11 +180,13 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                 @Override
                 public void invoke(final double anArg) {
                     myValue = PrimitiveMath.MAX.invoke(myValue, anArg);
+                    myVisited = true;
                 }
 
                 @Override
                 public AggregatorFunction<Double> reset() {
                     myValue = NEGATIVE_INFINITY;
+                    myVisited = false;
                     return this;
                 }
 
@@ -198,13 +201,11 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
             return new PrimitiveAggregatorFunction() {
 
                 private double myValue = POSITIVE_INFINITY;
+                private boolean myVisited = false;
 
                 @Override
                 public double doubleValue() {
-                    if (Double.isInfinite(myValue)) {
-                        return ZERO;
-                    }
-                    return myValue;
+                    return myVisited ? myValue : ZERO;
                 }
 
                 @Override
@@ -215,11 +216,13 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                 @Override
                 public void invoke(final double anArg) {
                     myValue = PrimitiveMath.MIN.invoke(myValue, anArg);
+                    myVisited = true;
                 }
 
                 @Override
                 public AggregatorFunction<Double> reset() {
                     myValue = POSITIVE_INFINITY;
+                    myVisited = false;
                     return this;
                 }
 
@@ -368,13 +371,11 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
             return new PrimitiveAggregatorFunction() {
 
                 private double myValue = POSITIVE_INFINITY;
+                private boolean myVisited = false;
 
                 @Override
                 public double doubleValue() {
-                    if (Double.isInfinite(myValue)) {
-                        return ZERO;
-                    }
-                    return myValue;
+                    return myVisited ? myValue : ZERO;
                 }
 
                 @Override
@@ -387,12 +388,14 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                     final double tmpArg = PrimitiveMath.ABS.invoke(anArg);
                     if (NumberContext.compare(tmpArg, ZERO) != 0) {
                         myValue = PrimitiveMath.MIN.invoke(myValue, tmpArg);
+                        myVisited = true;
                     }
                 }
 
                 @Override
                 public AggregatorFunction<Double> reset() {
                     myValue = POSITIVE_INFINITY;
+                    myVisited = false;
                     return this;
                 }
 

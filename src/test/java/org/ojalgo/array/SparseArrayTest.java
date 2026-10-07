@@ -62,6 +62,48 @@ public class SparseArrayTest extends ArrayTests {
         TestUtils.assertEquals(expected, array2D.aggregateAll(Aggregator.SUM).doubleValue());
     }
 
+    /**
+     * Removed elements must not be visited (aggregated) through a wrapping {@link Array1D}.
+     */
+    @Test
+    public void testAggregateThroughArray1DAfterRemove() {
+
+        SparseArray<Double> array = SparseArray.factory(ArrayR064.FACTORY).make(100);
+        Array1D<Double> view = Array1D.R064.wrap(array);
+
+        array.set(10, 1.0);
+        array.set(20, 5.0);
+        array.set(30, 2.0);
+        array.remove(20);
+
+        TestUtils.assertEquals(3.0, view.aggregateAll(Aggregator.SUM).doubleValue());
+        TestUtils.assertEquals(2.0, view.aggregateAll(Aggregator.LARGEST).doubleValue());
+        TestUtils.assertEquals(0.0, view.aggregateAll(Aggregator.MINIMUM).doubleValue());
+    }
+
+    /**
+     * Elements cleared by {@link SparseArray#reset()} must not be visited (aggregated) through a wrapping
+     * {@link Array1D}.
+     */
+    @Test
+    public void testAggregateThroughArray1DAfterReset() {
+
+        SparseArray<Double> array = SparseArray.factory(ArrayR064.FACTORY).make(100);
+        Array1D<Double> view = Array1D.R064.wrap(array);
+
+        array.set(10, 1.0);
+        array.set(20, 5.0);
+        array.set(30, 2.0);
+        array.reset();
+
+        TestUtils.assertEquals(0.0, view.aggregateAll(Aggregator.SUM).doubleValue());
+        TestUtils.assertEquals(0.0, view.aggregateAll(Aggregator.LARGEST).doubleValue());
+
+        array.set(40, 3.0);
+
+        TestUtils.assertEquals(3.0, view.aggregateAll(Aggregator.SUM).doubleValue());
+    }
+
     @Test
     public void testExchange() {
 
@@ -174,6 +216,23 @@ public class SparseArrayTest extends ArrayTests {
         sparseArray.set(index, -2.0);
 
         TestUtils.assertEquals(index, sparseArray.indexOfLargest());
+    }
+
+    /**
+     * Through a wrapping {@link Array1D} the index of the largest element must be the element's index, not
+     * its position among the stored nonzeros.
+     */
+    @Test
+    public void testIndexOfLargestThroughArray1D() {
+
+        SparseArray<Double> array = SparseArray.factory(ArrayR064.FACTORY).make(100);
+        Array1D<Double> view = Array1D.R064.wrap(array);
+
+        array.set(10, 1.0);
+        array.set(20, -5.0);
+        array.set(30, 2.0);
+
+        TestUtils.assertEquals(20L, view.indexOfLargest());
     }
 
     @Test

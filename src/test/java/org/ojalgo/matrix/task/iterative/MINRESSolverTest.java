@@ -4,10 +4,12 @@
 package org.ojalgo.matrix.task.iterative;
 
 import org.junit.jupiter.api.Test;
+import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.R032Store;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.optimisation.Optimisation;
@@ -436,6 +438,21 @@ public class MINRESSolverTest {
         double resMINRES = MINRESSolverTest.residualNorm(A, xMINRES, b);
         double resLU = MINRESSolverTest.residualNorm(A, xLU, b);
         TestUtils.assertTrue(resMINRES <= Math.max(1e-13, 50 * resLU), "MINRES residual too large on Poisson1D: " + resMINRES + " vs LU " + resLU);
+    }
+
+    /**
+     * The (preallocated) solution may be any physical store, not only an {@link R064Store}.
+     */
+    @Test
+    public void testPreallocatedNotR064Store() throws RecoverableCondition {
+
+        R064Store A = R064Store.FACTORY.rows(new double[][] { { 4.0, 1.0, 0.0 }, { 1.0, 3.0, 1.0 }, { 0.0, 1.0, 2.0 } });
+        R064Store b = R064Store.FACTORY.column(1.0, 2.0, 3.0);
+
+        MatrixStore<Double> expected = new MINRESSolver().solve(A, b, R064Store.FACTORY.make(3, 1));
+
+        TestUtils.assertEquals(expected, new MINRESSolver().solve(A, b, RawStore.FACTORY.make(3, 1)), NumberContext.of(12));
+        TestUtils.assertEquals(expected, new MINRESSolver().solve(A, b, R032Store.FACTORY.make(3, 1)), NumberContext.of(6));
     }
 
     @Test

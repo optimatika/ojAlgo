@@ -327,7 +327,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
         CuteNetlibCase.doTest("CRE-A.SIF", "2.3595407060971607E7", "4.000288201473081E7", ACCURACY);
     }
 
-
     /**
      * CRE-C — 3069 rows × 3678 columns.
      * <ul>
@@ -338,7 +337,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     public void testCRE_C() {
         CuteNetlibCase.doTest("CRE-C.SIF", "2.5275116140880212E7", "3.762512696726111E7", ACCURACY);
     }
-
 
     /**
      * CYCLE — 1904 rows × 2857 columns, 21322 non-zeros.
@@ -411,7 +409,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
         CuteNetlibCase.doTest("DEGEN3.SIF", "-987.2940000000001", "-876.2800000000008", ACCURACY);
     }
 
-
     /**
      * E226 — 224 rows × 282 columns, 2767 non-zeros.
      * <ul>
@@ -481,8 +478,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     public void testFIT1P() {
         CuteNetlibCase.doTest("FIT1P.SIF", "9146.378092420955", null, ACCURACY);
     }
-
-
 
     /**
      * FORPLAN — 162 rows × 421 columns, 4916 non-zeros.
@@ -617,9 +612,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
         CuteNetlibCase.doTest("KEN-07.SIF", "-6.795204433816869E8", "-1.61949281194431E8", ACCURACY);
     }
 
-
-
-
     /**
      * LOTFI — 154 rows × 308 columns, 1086 non-zeros.
      * <ul>
@@ -678,10 +670,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
         CuteNetlibCase.doTest("NESM.SIF", "1.4076036487562722E7", "3.6088214327411644E7", ACCURACY);
     }
 
-
-
-
-
     /**
      * PDS-02 — 2954 rows × 7535 columns.
      * <ul>
@@ -692,9 +680,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     public void testPDS_02() {
         CuteNetlibCase.doTest("PDS-02.SIF", "2.885786201E10", "2.931365171E10", ACCURACY);
     }
-
-
-
 
     /**
      * PEROLD — 626 rows × 1376 columns, 6026 non-zeros.
@@ -796,7 +781,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     public void testQAP12() {
         CuteNetlibCase.doTest("QAP12.SIF", "522.8943505591718", "1104.1482908677572", ACCURACY);
     }
-
 
     /**
      * QAP8 — 913 rows × 1632 columns, 8304 non-zeros.
@@ -1197,7 +1181,6 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     public void testSTOCFOR2() {
         CuteNetlibCase.doTest("STOCFOR2.SIF", "-39024.4085378819", null, ACCURACY);
     }
-
 
     /**
      * TRUSS — 1001 rows × 8806 columns, 36642 non-zeros.

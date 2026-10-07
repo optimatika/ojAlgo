@@ -220,8 +220,8 @@ public class ReducedCostsTest extends OptimisationLinearTests {
             Variable equalityZ = equalityModel.newVariable("z").level(0.5).weight(3);
             Expression equality = equalityModel.newExpression("c").set(equalityX, 1).set(equalityY, 1).set(equalityW, 1).set(equalityZ, 1).level(2.5);
 
-            ReducedCostsTest.assertFixedInConstraint("fixedInConstraint/EQUALITY/" + entry.getKey(), equalityModel.minimise(entry.getValue()), equality, 3,
-                    1.5, -1.0, 2.0);
+            ReducedCostsTest.assertFixedInConstraint("fixedInConstraint/EQUALITY/" + entry.getKey(), equalityModel.minimise(entry.getValue()), equality, 3, 1.5,
+                    -1.0, 2.0);
         }
     }
 

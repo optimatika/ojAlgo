@@ -38,8 +38,8 @@ import java.util.Optional;
  * get the (file) contents from that instance.
  * <p>
  * To parse some data you have in memory: Create an instance of {@link InMemoryFile} using one of the
- * constructors that take {@code byte[]} or {@link String} as input, and feed that to a
- * {@link FromFileReader} that support doing so (like the {@link TextLineReader}).
+ * constructors that take {@code byte[]} or {@link String} as input, and feed that to a {@link FromFileReader}
+ * that support doing so (like the {@link TextLineReader}).
  * <p>
  * Note that you can obtain both {@link OutputStream} and {@link InputStream} instances from an
  * {@link InMemoryFile} – you can write to AND (later) read from the same instance.

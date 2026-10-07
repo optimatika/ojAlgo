@@ -23,6 +23,7 @@ package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.ojalgo.RecoverableCondition;
@@ -109,22 +110,25 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
             RawStore retVal = RawDecomposition.make(myM, myMinDim);
             double[][] retData = retVal.data;
+            double[] work = new double[myMinDim];
 
             for (int k = myMinDim - 1; k >= 0; k--) {
                 for (int i = 0; i < myM; i++) {
                     retData[i][k] = ZERO;
                 }
                 retData[k][k] = ONE;
-                for (int j = k; j < myMinDim; j++) {
-                    if (myData[k][k] != 0) {
-                        double s = ZERO;
-                        for (int i = k; i < myM; i++) {
-                            s += myData[k][i] * retData[i][j];
-                        }
-                        s = -s / myData[k][k];
-                        for (int i = k; i < myM; i++) {
-                            retData[i][j] += s * myData[k][i];
-                        }
+                if (myData[k][k] != 0) {
+                    double[] colK = myData[k];
+                    // Row by row: s[j] = -sum(colK[i] * Q[i][j]) / colK[k], then Q[i][j] += s[j] * colK[i]
+                    Arrays.fill(work, k, myMinDim, ZERO);
+                    for (int i = k; i < myM; i++) {
+                        AXPY.invoke(work, 0, colK[i], retData[i], 0, k, myMinDim);
+                    }
+                    for (int j = k; j < myMinDim; j++) {
+                        work[j] = -work[j] / colK[k];
+                    }
+                    for (int i = k; i < myM; i++) {
+                        AXPY.invoke(retData[i], 0, colK[i], work, 0, k, myMinDim);
                     }
                 }
             }

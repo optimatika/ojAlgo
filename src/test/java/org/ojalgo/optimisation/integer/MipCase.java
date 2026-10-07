@@ -156,8 +156,7 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
      * <ul>
      * Mac Pro (Early 2009)
      * <li>2013-04-01: (suffice=4h abort=8h) Stopped with optimal solution after 4h
-     * <li>2018-01-08: (suffice=5min abort=1h) Stopped with integer solution 2.0 rather than 1.0 after
-     * 5min
+     * <li>2018-01-08: (suffice=5min abort=1h) Stopped with integer solution 2.0 rather than 1.0 after 5min
      * <li>2018-02-07: (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with optimal solution
      * <li>2018-08-16: sufficed with optimal solution
      * <li>2019-01-28: 300s expected: <1.0> but was: <1.9999999999999953>
@@ -179,10 +178,8 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
      * Mac Pro (Early 2009)
      * <li>2013-04-01: (suffice=4h abort=8h) Stopped with integer solution 6.0 rather than 1.0 after 4h
      * expected:<1.0> but was:<5.999999999999929>
-     * <li>2018-01-08: (suffice=5min abort=1h) Stopped with integer solution 5.0 rather than 1.0 after
-     * 5min
-     * <li>2018-02-07: (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<1.0> but
-     * was:<5.0>
+     * <li>2018-01-08: (suffice=5min abort=1h) Stopped with integer solution 5.0 rather than 1.0 after 5min
+     * <li>2018-02-07: (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<1.0> but was:<5.0>
      * <li>2018-08-16: sufficed: <1.0> but was: <8.0>
      * <li>2019-01-28: 300s expected: <1.0> but was: <6.000000000000018>
      * </ul>

@@ -32,6 +32,8 @@ import java.util.Optional;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.SparseArray.NonzeroView;
+import org.ojalgo.array.operation.NRM2;
+import org.ojalgo.array.operation.NRMINF;
 import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.ColumnsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -147,6 +149,42 @@ public abstract class IterativeSolverTask implements SolverTask<Double> {
     }
 
     static final NumberContext DEFAULT = NumberContext.ofMath(MathContext.DECIMAL64);
+
+    /**
+     * The 2-norm (Euclidean length), without under/overflow – scaled by the largest absolute value.
+     */
+    static double norm2(final Access1D<?> vector) {
+        if (vector instanceof R064Store) {
+            return IterativeSolverTask.norm2(((R064Store) vector).data);
+        } else {
+            return IterativeSolverTask.norm2Generic(vector);
+        }
+    }
+
+    static double norm2(final double[] data) {
+        double scale = NRMINF.invoke(data, 0, data.length);
+        return scale != ZERO ? NRM2.invoke(data, scale, 0, data.length) : ZERO;
+    }
+
+    static double norm2Generic(final Access1D<?> vector) {
+
+        long count = vector.count();
+
+        double scale = ZERO;
+        for (long i = 0L; i < count; i++) {
+            scale = Math.max(scale, Math.abs(vector.doubleValue(i)));
+        }
+        if (scale == ZERO) {
+            return ZERO;
+        }
+
+        double sumOfSquares = ZERO;
+        for (long i = 0L; i < count; i++) {
+            double scaled = vector.doubleValue(i) / scale;
+            sumOfSquares += scaled * scaled;
+        }
+        return scale * Math.sqrt(sumOfSquares);
+    }
 
     static List<Equation> toListOfRows(final Access2D<?> body, final Access2D<?> rhs) {
 

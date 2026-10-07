@@ -883,9 +883,9 @@ final class SimplexTableauSolver extends LinearSolver {
     /**
      * The tableau has the variable bounds as constraint rows, so its reduced costs include the bound
      * multipliers (and are 0 at an active bound). This moves them back out, giving the bounded-variable
-     * reduced cost, non-zero at an active bound. (The bound multipliers are also reported as dual values, with
-     * the variables.) In the minimisation form, with x = x+ - x-, a bound x <= u contributes μ(x+ - x- - u)
-     * and a bound x >= l contributes μ(l - x+ + x-).
+     * reduced cost, non-zero at an active bound. (The bound multipliers are also reported as dual values,
+     * with the variables.) In the minimisation form, with x = x+ - x-, a bound x <= u contributes μ(x+ - x- -
+     * u) and a bound x >= l contributes μ(l - x+ + x-).
      */
     private void moveBoundMultipliers(final double[] gradients) {
 

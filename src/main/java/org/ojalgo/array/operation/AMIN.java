@@ -46,11 +46,21 @@ public abstract class AMIN implements ArrayOperation {
         double smallest = PrimitiveMath.POSITIVE_INFINITY;
         double candidate;
 
-        for (int i = first; i < limit; i += step) {
-            candidate = PrimitiveMath.ABS.invoke(data[i]);
-            if (candidate < smallest) {
-                smallest = candidate;
-                retVal = i;
+        if (step == 1) {
+            for (int i = first; i < limit; i++) {
+                candidate = PrimitiveMath.ABS.invoke(data[i]);
+                if (candidate < smallest) {
+                    smallest = candidate;
+                    retVal = i;
+                }
+            }
+        } else {
+            for (int i = first; i < limit; i += step) {
+                candidate = PrimitiveMath.ABS.invoke(data[i]);
+                if (candidate < smallest) {
+                    smallest = candidate;
+                    retVal = i;
+                }
             }
         }
         return retVal;

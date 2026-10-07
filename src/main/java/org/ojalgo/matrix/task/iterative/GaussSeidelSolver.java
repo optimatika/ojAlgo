@@ -75,8 +75,10 @@ public final class GaussSeidelSolver extends IterativeSolverTask {
         double normRHS = ZERO;
 
         for (int r = 0; r < m; r++) {
-            normRHS = HYPOT.invoke(normRHS, equations.get(r).getRHS());
+            double rhs = equations.get(r).getRHS();
+            normRHS += rhs * rhs;
         }
+        normRHS = Math.sqrt(normRHS);
 
         double relaxationFactor = this.getRelaxationFactor();
 
@@ -85,8 +87,10 @@ public final class GaussSeidelSolver extends IterativeSolverTask {
             normErr = ZERO;
 
             for (int r = 0; r < m; r++) {
-                normErr = HYPOT.invoke(normErr, equations.get(r).adjust(solution, relaxationFactor));
+                double adjustment = equations.get(r).adjust(solution, relaxationFactor);
+                normErr += adjustment * adjustment;
             }
+            normErr = Math.sqrt(normErr);
 
             nbIterations++;
 

@@ -82,11 +82,21 @@ public abstract class AMAX implements ArrayOperation {
         byte largest = 0;
         byte candidate;
 
-        for (int i = first; i < limit; i += step) {
-            candidate = (byte) Math.abs(data[i]);
-            if (candidate > largest) {
-                largest = candidate;
-                retVal = i;
+        if (step == 1) {
+            for (int i = first; i < limit; i++) {
+                candidate = (byte) Math.abs(data[i]);
+                if (candidate > largest) {
+                    largest = candidate;
+                    retVal = i;
+                }
+            }
+        } else {
+            for (int i = first; i < limit; i += step) {
+                candidate = (byte) Math.abs(data[i]);
+                if (candidate > largest) {
+                    largest = candidate;
+                    retVal = i;
+                }
             }
         }
 
@@ -105,11 +115,21 @@ public abstract class AMAX implements ArrayOperation {
         double largest = 0D;
         double candidate;
 
-        for (int i = first; i < limit; i += step) {
-            candidate = Math.abs(data[i]);
-            if (candidate > largest) {
-                largest = candidate;
-                retVal = i;
+        if (step == 1) {
+            for (int i = first; i < limit; i++) {
+                candidate = Math.abs(data[i]);
+                if (candidate > largest) {
+                    largest = candidate;
+                    retVal = i;
+                }
+            }
+        } else {
+            for (int i = first; i < limit; i += step) {
+                candidate = Math.abs(data[i]);
+                if (candidate > largest) {
+                    largest = candidate;
+                    retVal = i;
+                }
             }
         }
 
@@ -148,11 +168,21 @@ public abstract class AMAX implements ArrayOperation {
         float largest = 0F;
         float candidate;
 
-        for (int i = first; i < limit; i += step) {
-            candidate = Math.abs(data[i]);
-            if (candidate > largest) {
-                largest = candidate;
-                retVal = i;
+        if (step == 1) {
+            for (int i = first; i < limit; i++) {
+                candidate = Math.abs(data[i]);
+                if (candidate > largest) {
+                    largest = candidate;
+                    retVal = i;
+                }
+            }
+        } else {
+            for (int i = first; i < limit; i += step) {
+                candidate = Math.abs(data[i]);
+                if (candidate > largest) {
+                    largest = candidate;
+                    retVal = i;
+                }
             }
         }
 
@@ -165,11 +195,21 @@ public abstract class AMAX implements ArrayOperation {
         int largest = 0;
         int candidate;
 
-        for (int i = first; i < limit; i += step) {
-            candidate = Math.abs(data[i]);
-            if (candidate > largest) {
-                largest = candidate;
-                retVal = i;
+        if (step == 1) {
+            for (int i = first; i < limit; i++) {
+                candidate = Math.abs(data[i]);
+                if (candidate > largest) {
+                    largest = candidate;
+                    retVal = i;
+                }
+            }
+        } else {
+            for (int i = first; i < limit; i += step) {
+                candidate = Math.abs(data[i]);
+                if (candidate > largest) {
+                    largest = candidate;
+                    retVal = i;
+                }
             }
         }
 
@@ -182,11 +222,21 @@ public abstract class AMAX implements ArrayOperation {
         long largest = 0L;
         long candidate;
 
-        for (int i = first; i < limit; i += step) {
-            candidate = Math.abs(data[i]);
-            if (candidate > largest) {
-                largest = candidate;
-                retVal = i;
+        if (step == 1) {
+            for (int i = first; i < limit; i++) {
+                candidate = Math.abs(data[i]);
+                if (candidate > largest) {
+                    largest = candidate;
+                    retVal = i;
+                }
+            }
+        } else {
+            for (int i = first; i < limit; i += step) {
+                candidate = Math.abs(data[i]);
+                if (candidate > largest) {
+                    largest = candidate;
+                    retVal = i;
+                }
             }
         }
 
@@ -233,11 +283,21 @@ public abstract class AMAX implements ArrayOperation {
         short largest = 0;
         short candidate;
 
-        for (int i = first; i < limit; i += step) {
-            candidate = (short) Math.abs(data[i]);
-            if (candidate > largest) {
-                largest = candidate;
-                retVal = i;
+        if (step == 1) {
+            for (int i = first; i < limit; i++) {
+                candidate = (short) Math.abs(data[i]);
+                if (candidate > largest) {
+                    largest = candidate;
+                    retVal = i;
+                }
+            }
+        } else {
+            for (int i = first; i < limit; i += step) {
+                candidate = (short) Math.abs(data[i]);
+                if (candidate > largest) {
+                    largest = candidate;
+                    retVal = i;
+                }
             }
         }
 

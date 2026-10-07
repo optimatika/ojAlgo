@@ -79,9 +79,10 @@ public final class ParallelGaussSeidelSolver extends IterativeSolverTask {
 
         double tmpNorm = ZERO;
         for (int r = 0; r < m; r++) {
-            tmpNorm = HYPOT.invoke(tmpNorm, equations.get(r).getRHS());
+            double rhs = equations.get(r).getRHS();
+            tmpNorm += rhs * rhs;
         }
-        double normRHS = tmpNorm;
+        double normRHS = Math.sqrt(tmpNorm);
 
         ParallelGaussSeidelSolver.divide(m, (first, limit) -> this.resolve(equations, solution, normRHS, iterationsCounter, first, limit));
 
@@ -104,8 +105,10 @@ public final class ParallelGaussSeidelSolver extends IterativeSolverTask {
             normErr = ZERO;
 
             for (int r = first; r < limit; r++) {
-                normErr = HYPOT.invoke(normErr, equations.get(r).adjust(solution, relaxation));
+                double adjustment = equations.get(r).adjust(solution, relaxation);
+                normErr += adjustment * adjustment;
             }
+            normErr = Math.sqrt(normErr);
 
             iterationsCounter.incrementAndGet();
 

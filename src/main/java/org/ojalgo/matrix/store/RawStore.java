@@ -748,8 +748,16 @@ public final class RawStore implements PhysicalStore<Double>, Factory2D.Builder<
         int tmpColDim = myNumberOfColumns;
 
         int tmpFirst = transformation.first();
+        int tmpSize = (int) transformation.count();
 
-        double[] tmpWorkCopy = new double[(int) transformation.count()];
+        double[] tmpWorkCopy = new double[tmpSize];
+        double tmpVal, tmpVal2 = PrimitiveMath.ZERO;
+        for (int i = tmpFirst; i < tmpSize; i++) {
+            tmpVal = transformation.doubleValue(i);
+            tmpVal2 += tmpVal * tmpVal;
+            tmpWorkCopy[i] = tmpVal;
+        }
+        double tmpBeta = PrimitiveMath.TWO / tmpVal2;
 
         double tmpScale;
         for (int j = firstColumn; j < tmpColDim; j++) {
@@ -757,14 +765,7 @@ public final class RawStore implements PhysicalStore<Double>, Factory2D.Builder<
             for (int i = tmpFirst; i < tmpRowDim; i++) {
                 tmpScale += tmpWorkCopy[i] * tmpArray[i][j];
             }
-            double tmpVal, tmpVal2 = PrimitiveMath.ZERO;
-            int tmpSize = (int) transformation.count();
-            for (int i1 = transformation.first(); i1 < tmpSize; i1++) {
-                tmpVal = transformation.doubleValue(i1);
-                tmpVal2 += tmpVal * tmpVal;
-                tmpWorkCopy[i1] = tmpVal;
-            }
-            tmpScale *= PrimitiveMath.TWO / tmpVal2;
+            tmpScale *= tmpBeta;
             for (int i = tmpFirst; i < tmpRowDim; i++) {
                 tmpArray[i][j] -= tmpScale * tmpWorkCopy[i];
             }
@@ -814,8 +815,16 @@ public final class RawStore implements PhysicalStore<Double>, Factory2D.Builder<
         int tmpColDim = myNumberOfColumns;
 
         int tmpFirst = transformation.first();
+        int tmpSize = (int) transformation.count();
 
-        double[] tmpWorkCopy = new double[(int) transformation.count()];
+        double[] tmpWorkCopy = new double[tmpSize];
+        double tmpVal, tmpVal2 = PrimitiveMath.ZERO;
+        for (int j = tmpFirst; j < tmpSize; j++) {
+            tmpVal = transformation.doubleValue(j);
+            tmpVal2 += tmpVal * tmpVal;
+            tmpWorkCopy[j] = tmpVal;
+        }
+        double tmpBeta = PrimitiveMath.TWO / tmpVal2;
 
         double tmpScale;
         for (int i = firstRow; i < tmpRowDim; i++) {
@@ -823,14 +832,7 @@ public final class RawStore implements PhysicalStore<Double>, Factory2D.Builder<
             for (int j = tmpFirst; j < tmpColDim; j++) {
                 tmpScale += tmpWorkCopy[j] * tmpArray[i][j];
             }
-            double tmpVal, tmpVal2 = PrimitiveMath.ZERO;
-            int tmpSize = (int) transformation.count();
-            for (int i1 = transformation.first(); i1 < tmpSize; i1++) {
-                tmpVal = transformation.doubleValue(i1);
-                tmpVal2 += tmpVal * tmpVal;
-                tmpWorkCopy[i1] = tmpVal;
-            }
-            tmpScale *= PrimitiveMath.TWO / tmpVal2;
+            tmpScale *= tmpBeta;
             for (int j = tmpFirst; j < tmpColDim; j++) {
                 tmpArray[i][j] -= tmpScale * tmpWorkCopy[j];
             }

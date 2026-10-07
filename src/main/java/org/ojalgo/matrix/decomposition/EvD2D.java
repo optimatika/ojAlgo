@@ -2,6 +2,10 @@ package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.Arrays;
+
+import org.ojalgo.array.operation.AXPY;
+
 import org.ojalgo.type.context.NumberContext;
 
 abstract class EvD2D {
@@ -451,16 +455,14 @@ abstract class EvD2D {
         if (trnspV != null) {
 
             // Back transformation to get eigenvectors of original matrix
+            double[] work = new double[size];
             for (int j = size - 1; j >= 0; j--) {
-                for (int i = 0; i <= size - 1; i++) {
-                    z = ZERO;
-                    for (int k = 0; k <= Math.min(j, size - 1); k++) {
-                        //z = z + (V[i][k] * H[k][j]);
-                        z = z + trnspV[k][i] * mtrxH[k][j];
-                    }
-                    //V[i][j] = z;
-                    trnspV[j][i] = z;
+                Arrays.fill(work, ZERO);
+                for (int k = 0; k <= j; k++) {
+                    // V[i][j] = sum(V[i][k] * H[k][j]) for all i, row by row of trnspV
+                    AXPY.invoke(work, 0, mtrxH[k][j], trnspV[k], 0, 0, size);
                 }
+                System.arraycopy(work, 0, trnspV[j], 0, size);
             }
         }
     }
@@ -475,6 +477,7 @@ abstract class EvD2D {
 
         final int sizeM1 = size - 1;
         final int sizeM2 = size - 2;
+        double[] work = new double[size];
         for (int m = 0 + 1; m <= sizeM2; m++) {
             final int ij = m - 1;
 
@@ -505,15 +508,16 @@ abstract class EvD2D {
                 // Apply Householder similarity transformation
                 // H = (I-u*u'/h)*H*(I-u*u')/h)
 
+                // Row by row: f[j] = sum(u[i] * H[i][j]) / h, then H[i][j] -= f[j] * u[i]
+                Arrays.fill(work, m, size, ZERO);
+                for (int i = sizeM1; i >= m; i--) {
+                    AXPY.invoke(work, 0, vctrWork[i], mtrxH[i], 0, m, size);
+                }
                 for (int j = m; j < size; j++) {
-                    double f = ZERO;
-                    for (int i = sizeM1; i >= m; i--) {
-                        f += vctrWork[i] * mtrxH[i][j];
-                    }
-                    f = f / h;
-                    for (int i = m; i <= sizeM1; i++) {
-                        mtrxH[i][j] -= f * vctrWork[i];
-                    }
+                    work[j] = work[j] / h;
+                }
+                for (int i = m; i <= sizeM1; i++) {
+                    AXPY.invoke(mtrxH[i], 0, -vctrWork[i], work, 0, m, size);
                 }
 
                 for (int i = 0; i <= sizeM1; i++) {

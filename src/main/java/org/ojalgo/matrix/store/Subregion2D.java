@@ -1440,17 +1440,17 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
 
         @Override
         public void fillDiagonal(final long row, final long col, final NullaryFunction<?> supplier) {
-            myBase.fillRow(col, row, supplier);
+            myBase.fillDiagonal(col, row, supplier);
         }
 
         @Override
         public void fillRow(final long row, final long col, final N value) {
-            myBase.fillDiagonal(col, row, value);
+            myBase.fillColumn(col, row, value);
         }
 
         @Override
         public void fillRow(final long row, final long col, final NullaryFunction<?> supplier) {
-            myBase.fillDiagonal(col, row, supplier);
+            myBase.fillColumn(col, row, supplier);
         }
 
         @Override

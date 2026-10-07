@@ -44,6 +44,8 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.machine.JavaType;
@@ -286,6 +288,73 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
     @Override
     public void add(final long row, final long col, final double addend) {
         myUtility.add(row, col, addend);
+    }
+
+    /**
+     * The common aggregators are computed directly on the array – the same arithmetic in the same order as
+     * the aggregator functions, but without a (megamorphic) function call per element.
+     */
+    @Override
+    public Double aggregateAll(final Aggregator aggregator) {
+
+        double retVal;
+
+        switch (aggregator) {
+
+            case LARGEST:
+                retVal = ZERO;
+                for (int i = 0; i < data.length; i++) {
+                    retVal = Math.max(retVal, Math.abs(data[i]));
+                }
+                return Double.valueOf(retVal);
+
+            case MAXIMUM:
+                retVal = PrimitiveMath.NEGATIVE_INFINITY;
+                for (int i = 0; i < data.length; i++) {
+                    retVal = Math.max(retVal, data[i]);
+                }
+                return Double.valueOf(data.length > 0 ? retVal : ZERO);
+
+            case MINIMUM:
+                retVal = PrimitiveMath.POSITIVE_INFINITY;
+                for (int i = 0; i < data.length; i++) {
+                    retVal = Math.min(retVal, data[i]);
+                }
+                return Double.valueOf(data.length > 0 ? retVal : ZERO);
+
+            case NORM1:
+                retVal = ZERO;
+                for (int i = 0; i < data.length; i++) {
+                    retVal += Math.abs(data[i]);
+                }
+                return Double.valueOf(retVal);
+
+            case NORM2:
+                retVal = ZERO;
+                for (int i = 0; i < data.length; i++) {
+                    retVal += data[i] * data[i];
+                }
+                return Double.valueOf(Math.sqrt(retVal));
+
+            case SUM:
+                retVal = ZERO;
+                for (int i = 0; i < data.length; i++) {
+                    retVal += data[i];
+                }
+                return Double.valueOf(retVal);
+
+            case SUM2:
+                retVal = ZERO;
+                for (int i = 0; i < data.length; i++) {
+                    retVal += data[i] * data[i];
+                }
+                return Double.valueOf(retVal);
+
+            default:
+                AggregatorFunction<Double> visitor = this.physical().aggregator().get(aggregator);
+                this.visitAll(visitor);
+                return visitor.get();
+        }
     }
 
     @Override

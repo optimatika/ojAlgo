@@ -198,13 +198,11 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
             return new QuaternionAggregatorFunction() {
 
                 private Quaternion myNumber = Quaternion.INFINITY;
+                private boolean myVisited = false;
 
                 @Override
                 public Quaternion get() {
-                    if (Quaternion.isInfinite(myNumber)) {
-                        return Quaternion.ZERO;
-                    }
-                    return myNumber;
+                    return myVisited ? myNumber : Quaternion.ZERO;
                 }
 
                 @Override
@@ -215,11 +213,13 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                 @Override
                 public void invoke(final Quaternion anArg) {
                     myNumber = QuaternionMath.MIN.invoke(myNumber, anArg);
+                    myVisited = true;
                 }
 
                 @Override
                 public AggregatorFunction<Quaternion> reset() {
                     myNumber = Quaternion.INFINITY;
+                    myVisited = false;
                     return this;
                 }
 
@@ -369,13 +369,11 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
             return new QuaternionAggregatorFunction() {
 
                 private Quaternion myNumber = Quaternion.INFINITY;
+                private boolean myVisited = false;
 
                 @Override
                 public Quaternion get() {
-                    if (Quaternion.isInfinite(myNumber)) {
-                        return Quaternion.ZERO;
-                    }
-                    return myNumber;
+                    return myVisited ? myNumber : Quaternion.ZERO;
                 }
 
                 @Override
@@ -387,12 +385,14 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                 public void invoke(final Quaternion anArg) {
                     if (!Quaternion.isSmall(PrimitiveMath.ONE, anArg)) {
                         myNumber = QuaternionMath.MIN.invoke(myNumber, QuaternionMath.ABS.invoke(anArg));
+                        myVisited = true;
                     }
                 }
 
                 @Override
                 public AggregatorFunction<Quaternion> reset() {
                     myNumber = Quaternion.INFINITY;
+                    myVisited = false;
                     return this;
                 }
 

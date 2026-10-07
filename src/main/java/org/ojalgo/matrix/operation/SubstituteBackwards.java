@@ -32,17 +32,6 @@ public abstract class SubstituteBackwards implements MatrixOperation {
 
     public static int THRESHOLD = 64;
 
-    /**
-     * Single-RHS backward substitution operating directly on raw column-major body data. Uses AXPY-style
-     * column sweep iterating from the last row to the first: each solved element immediately updates all
-     * preceding elements, reading body columns contiguously.
-     *
-     * @param data          Single-column RHS, overwritten with the solution
-     * @param bodyData      Column-major body data (upper triangular, or lower when conjugated)
-     * @param bodyStructure Row count (stride between columns) of the body
-     * @param unitDiagonal  Assume the body has a unit diagonal
-     * @param conjugated    Body is transposed: upper part stored in lower columns
-     */
     public static void invoke(final double[] data, final Access2D<?> body, final boolean unitDiagonal, final boolean conjugated, final double[] work) {
 
         if (conjugated) {
@@ -81,6 +70,23 @@ public abstract class SubstituteBackwards implements MatrixOperation {
         }
     }
 
+    /**
+     * Single-RHS backward substitution operating directly on raw column-major body data.
+     * <p>
+     * Not conjugated (upper triangular body): a column sweep from the last column to the first – each solved
+     * element immediately updates all preceding elements, reading the body column contiguously.
+     * <p>
+     * Conjugated (the transpose of a lower triangular body): one dot product per element, reading a body
+     * column contiguously. Each dot product is summed from the far end, so that the element solved just
+     * before is the last term. Summed the other way, every dot product has to wait for the previous element
+     * before it can start, and the solve becomes latency-bound (more than twice as slow).
+     *
+     * @param data          Single-column RHS, overwritten with the solution
+     * @param bodyData      Column-major body data (upper triangular, or lower when conjugated)
+     * @param bodyStructure Row count (stride between columns) of the body
+     * @param unitDiagonal  Assume the body has a unit diagonal
+     * @param conjugated    Body is transposed: upper part stored in lower columns
+     */
     public static void invoke(final double[] data, final double[] bodyData, final int bodyStructure, final boolean unitDiagonal, final boolean conjugated) {
 
         int n = data.length;
@@ -90,7 +96,7 @@ public abstract class SubstituteBackwards implements MatrixOperation {
             for (int j = n - 1; j >= 0; j--) {
 
                 int count = n - j - 1;
-                double solved = data[j] - DOT.invoke(bodyData, j * bodyStructure + (j + 1), 1, data, j + 1, 1, count);
+                double solved = data[j] - DOT.invoke(bodyData, j * bodyStructure + (n - 1), -1, data, n - 1, -1, count);
 
                 if (!unitDiagonal) {
                     solved /= bodyData[j + j * bodyStructure];
@@ -103,14 +109,14 @@ public abstract class SubstituteBackwards implements MatrixOperation {
 
             for (int j = n - 1; j >= 0; j--) {
 
-                int count = n - j - 1;
-                double solved = data[j] - DOT.invoke(bodyData, j + (j + 1) * bodyStructure, bodyStructure, data, j + 1, 1, count);
-
                 if (!unitDiagonal) {
-                    solved /= bodyData[j + j * bodyStructure];
+                    data[j] /= bodyData[j + j * bodyStructure];
                 }
 
-                data[j] = solved;
+                double solved = data[j];
+                if (solved != PrimitiveMath.ZERO) {
+                    AXPY.invoke(data, 0, -solved, bodyData, j * bodyStructure, 0, j);
+                }
             }
         }
     }
@@ -248,14 +254,14 @@ public abstract class SubstituteBackwards implements MatrixOperation {
 
             for (int j = n - 1; j >= 0; j--) {
 
+                int count = n - j - 1;
+                float solved = data[j] - DOT.invoke(bodyData, j * bodyStructure + (j + 1), 1, data, j + 1, 1, count);
+
                 if (!unitDiagonal) {
-                    data[j] /= bodyData[j + j * bodyStructure];
+                    solved /= bodyData[j + j * bodyStructure];
                 }
 
-                float solved = data[j];
-                if (solved != 0F) {
-                    AXPY.invoke(data, 0, -solved, bodyData, j * bodyStructure, 0, j);
-                }
+                data[j] = solved;
             }
 
         } else {

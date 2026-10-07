@@ -123,8 +123,7 @@ final class Pivot {
     }
 
     /**
-     * Equivalent to selecting the rows (or columns) in the pivot order,
-     * {@code arg.rows(pivot.getOrder())}.
+     * Equivalent to selecting the rows (or columns) in the pivot order, {@code arg.rows(pivot.getOrder())}.
      */
     <N extends Comparable<N>, M extends Access2D<N> & Mutate2D> void applyPivotOrder(final M arg) {
         if (myModified) {

@@ -301,8 +301,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      * <p>
      * LP: 1.47389881e-09
      * <p>
-     * MIP: 1.10000000e+01
-     * https://miplib.zib.de/instance_details_pk1.html
+     * MIP: 1.10000000e+01 https://miplib.zib.de/instance_details_pk1.html
      * <ul>
      * Mac Pro (Early 2009)
      * <li>2013-04-01: (suffice=4h abort=8h) Stopped with optimal integer solution after 1h50min

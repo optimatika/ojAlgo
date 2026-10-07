@@ -47,7 +47,8 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
      * The program logic here does not assume variables to be binary or even integer
      */
     @Override
-    public boolean simplify(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper, final NumberContext precision) {
+    public boolean simplify(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
+            final NumberContext precision) {
 
         if (!expression.equals(myExpression)) {
             return false;

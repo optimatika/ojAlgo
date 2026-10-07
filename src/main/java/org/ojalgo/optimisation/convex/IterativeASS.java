@@ -46,8 +46,7 @@ import org.ojalgo.type.ObjectPool;
  * <p>
  * min 1/2 [X]<sup>T</sup>[Q][X] - [C]<sup>T</sup>[X]<br>
  * when [AE][X] == [BE]<br>
- * and [AI][X] <= [BI]
- * Where [AE] and [BE] are optinal.
+ * and [AI][X] <= [BI] Where [AE] and [BE] are optinal.
  *
  * @author apete
  */
@@ -162,8 +161,8 @@ final class IterativeASS extends ActiveSetSolver {
 
     /**
      * Limits the number of iterations of the iterative (Schur complement) solver to this factor times the
-     * number of rows (active constraints), plus {@link #CG_ITERATIONS_OFFSET}. If it has not converged by then
-     * it is not going to, and the full KKT system is solved instead.
+     * number of rows (active constraints), plus {@link #CG_ITERATIONS_OFFSET}. If it has not converged by
+     * then it is not going to, and the full KKT system is solved instead.
      */
     private static final int CG_ITERATIONS_FACTOR = 2;
     private static final int CG_ITERATIONS_OFFSET = 10;

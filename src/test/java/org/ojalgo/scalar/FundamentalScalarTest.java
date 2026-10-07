@@ -244,8 +244,8 @@ public class FundamentalScalarTest extends ScalarTests {
     }
 
     /**
-     * Verify that signum() returns zero for zero input and unit norm otherwise,
-     * mimicking the behaviour of {@link Math#signum(double)}.
+     * Verify that signum() returns zero for zero input and unit norm otherwise, mimicking the behaviour of
+     * {@link Math#signum(double)}.
      */
     @Test
     public void testSignum() {

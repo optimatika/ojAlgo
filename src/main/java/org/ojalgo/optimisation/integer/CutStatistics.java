@@ -31,10 +31,10 @@ import org.ojalgo.optimisation.integer.IntegerStrategy.CutType;
 import org.ojalgo.optimisation.integer.NodeSolver.Separator;
 
 /**
- * What the cut separators did during one {@link IntegerSolver} solve: per separator type, and separately
- * for the root and for the other nodes, how many candidates were attempted, how many were kept, and how
- * many were rejected by which filter; and per cut round (all separators together, since the LP is only
- * re-solved once per round) by how much the LP bound moved. Updated from all worker threads.
+ * What the cut separators did during one {@link IntegerSolver} solve: per separator type, and separately for
+ * the root and for the other nodes, how many candidates were attempted, how many were kept, and how many were
+ * rejected by which filter; and per cut round (all separators together, since the LP is only re-solved once
+ * per round) by how much the LP bound moved. Updated from all worker threads.
  */
 final class CutStatistics {
 
@@ -150,8 +150,8 @@ final class CutStatistics {
     }
 
     /**
-     * Record the LP bound before and after a cut round (all separators of that round together), and the
-     * time the re-solve took.
+     * Record the LP bound before and after a cut round (all separators of that round together), and the time
+     * the re-solve took.
      */
     void recordRound(final boolean root, final double valueBefore, final double valueAfter, final long resolveNanos) {
         double improvement = mySense == Optimisation.Sense.MAX ? valueBefore - valueAfter : valueAfter - valueBefore;
@@ -163,19 +163,19 @@ final class CutStatistics {
     private void append(final StringBuilder builder, final String where, final Map<CutType, Entry> entries, final Rounds rounds) {
 
         builder.append(where).append(": rounds=").append(rounds.rounds.sum()).append(", improving=").append(rounds.roundsWithImprovement.sum())
-                .append(", bound improvement=").append(rounds.improvement.sum()).append(", re-solve ms=").append(rounds.resolveNanos.sum() / 1_000_000L).append('\n');
+                .append(", bound improvement=").append(rounds.improvement.sum()).append(", re-solve ms=").append(rounds.resolveNanos.sum() / 1_000_000L)
+                .append('\n');
 
         for (Map.Entry<CutType, Entry> mapEntry : entries.entrySet()) {
             Entry entry = mapEntry.getValue();
             if (entry.calls.sum() == 0L) {
                 continue;
             }
-            builder.append("  ").append(mapEntry.getKey().code).append(": ms=").append(entry.nanos.sum() / 1_000_000L).append(", calls=").append(entry.calls.sum())
-                    .append(" (with cuts ").append(entry.callsWithCuts.sum())
-                    .append("), attempted=").append(entry.attempted.sum()).append(", accepted=").append(entry.accepted.sum()).append(", rejected efficacy=")
-                    .append(entry.rejectedEfficacy.sum()).append(" density=").append(entry.rejectedDensity.sum()).append(" dynamism=")
-                    .append(entry.rejectedDynamism.sum()).append(" similar=").append(entry.rejectedSimilar.sum()).append(", skipped=").append(entry.skipped.sum())
-                    .append('\n');
+            builder.append("  ").append(mapEntry.getKey().code).append(": ms=").append(entry.nanos.sum() / 1_000_000L).append(", calls=")
+                    .append(entry.calls.sum()).append(" (with cuts ").append(entry.callsWithCuts.sum()).append("), attempted=").append(entry.attempted.sum())
+                    .append(", accepted=").append(entry.accepted.sum()).append(", rejected efficacy=").append(entry.rejectedEfficacy.sum()).append(" density=")
+                    .append(entry.rejectedDensity.sum()).append(" dynamism=").append(entry.rejectedDynamism.sum()).append(" similar=")
+                    .append(entry.rejectedSimilar.sum()).append(", skipped=").append(entry.skipped.sum()).append('\n');
         }
     }
 

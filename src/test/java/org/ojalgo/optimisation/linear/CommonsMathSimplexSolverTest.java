@@ -348,8 +348,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * @return
          *         <ul>
          *         <li>0 if {@link #equals(double, double, int) equals(x, y, maxUlps)}
-         *         <li>< 0 if !{@link #equals(double, double, int) equals(x, y, maxUlps)} && x <
-         *         y
+         *         <li>< 0 if !{@link #equals(double, double, int) equals(x, y, maxUlps)} && x < y
          *         <li>>0 if !{@link #equals(double, double, int) equals(x, y, maxUlps)} && x > y
          *         </ul>
          */
@@ -564,7 +563,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * Computes a number {@code delta} close to {@code originalDelta} with the property that
          *
          * <pre>{@code
-         *   x + delta - x
+         * x + delta - x
          * }</pre>
          * <p>
          * is exactly machine-representable. This is useful when computing numerical derivatives, in order to

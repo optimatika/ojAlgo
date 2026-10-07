@@ -86,10 +86,10 @@ public class LagrangeTest extends OptimisationConvexTests {
     }
 
     /**
-     * Optimise (x^2 + z^2) / 2 - 2 * bound * x (negated when maximising) subject to x <= bound and z >= bound.
-     * The solution is x = z = bound, and the multipliers of both bounds are bound. The variables v and w, and
-     * the equality constraint between them, don't change that but make it possible to use the null-space
-     * projection solver.
+     * Optimise (x^2 + z^2) / 2 - 2 * bound * x (negated when maximising) subject to x <= bound and z >=
+     * bound. The solution is x = z = bound, and the multipliers of both bounds are bound. The variables v and
+     * w, and the equality constraint between them, don't change that but make it possible to use the
+     * null-space projection solver.
      */
     private static Result solveScaledBounds(final double bound, final Boolean projection, final Optimisation.Sense sense) {
 
@@ -123,11 +123,11 @@ public class LagrangeTest extends OptimisationConvexTests {
     }
 
     /**
-     * A fixed variable, z = 0.5, is removed from the constraints before they reach the solver. The dual
-     * value must still be reported with the model's own constraint instance, and the reduced gradient of the
-     * fixed variable is reconstructed from it (see {@link Result#getDualValues()} for the sign convention).
-     * With quadratic terms in z the objective's gradient with respect to z, at the solution, takes the place
-     * of its linear coefficient.
+     * A fixed variable, z = 0.5, is removed from the constraints before they reach the solver. The dual value
+     * must still be reported with the model's own constraint instance, and the reduced gradient of the fixed
+     * variable is reconstructed from it (see {@link Result#getDualValues()} for the sign convention). With
+     * quadratic terms in z the objective's gradient with respect to z, at the solution, takes the place of
+     * its linear coefficient.
      *
      * <pre>{@code
      * min  (x^2 + y^2) / 2 + 3z             s.t. x + y + z >= 2.5    x=y=1, lambda=1, rc_z = 3 - lambda = 2
@@ -175,8 +175,7 @@ public class LagrangeTest extends OptimisationConvexTests {
         Variable minQuadraticZ = minQuadraticModel.addVariable("z").level(0.5);
         minQuadraticModel.addExpression("objective").weight(1).set(minQuadraticX, minQuadraticX, 0.5).set(minQuadraticY, minQuadraticY, 0.5)
                 .set(minQuadraticZ, minQuadraticZ, 0.5).set(minQuadraticX, minQuadraticZ, 1).set(minQuadraticZ, 3);
-        Expression minQuadratic = minQuadraticModel.addExpression("constraint").set(minQuadraticX, 1).set(minQuadraticY, 1).set(minQuadraticZ, 1)
-                .lower(2.5);
+        Expression minQuadratic = minQuadraticModel.addExpression("constraint").set(minQuadraticX, 1).set(minQuadraticY, 1).set(minQuadraticZ, 1).lower(2.5);
 
         LagrangeTest.assertFixedInConstraint(minQuadraticModel.minimise(), minQuadratic, 0.75, 1.25, 1.25, 3.0);
 
@@ -187,8 +186,7 @@ public class LagrangeTest extends OptimisationConvexTests {
         maxQuadraticModel.addExpression("objective").weight(-1).set(maxQuadraticX, maxQuadraticX, 0.5).set(maxQuadraticY, maxQuadraticY, 0.5)
                 .set(maxQuadraticZ, maxQuadraticZ, 0.5).set(maxQuadraticX, maxQuadraticZ, 1).set(maxQuadraticZ, 3).set(maxQuadraticX, -3)
                 .set(maxQuadraticY, -3);
-        Expression maxQuadratic = maxQuadraticModel.addExpression("constraint").set(maxQuadraticX, 1).set(maxQuadraticY, 1).set(maxQuadraticZ, 1)
-                .upper(2.5);
+        Expression maxQuadratic = maxQuadraticModel.addExpression("constraint").set(maxQuadraticX, 1).set(maxQuadraticY, 1).set(maxQuadraticZ, 1).upper(2.5);
 
         LagrangeTest.assertFixedInConstraint(maxQuadraticModel.maximise(), maxQuadratic, 0.75, 1.25, 1.75, -6.0);
     }
@@ -263,10 +261,10 @@ public class LagrangeTest extends OptimisationConvexTests {
      * <p>
      * Test for https://github.com/optimatika/ojAlgo/issues/280.
      * <p>
-     * 2020-09-24: No multipliers was returned by org.ojalgo.optimisation.convex classes :
-     * Test from 'Numerical Optimization', 2ed, (2006), Jorge Nocedal and Stephen J. Wright. QP Example 16.2
-     * p453 minimize function F(x1,x2,x3) = 3*x1*x1 + 2*x1*x2 + x1*x3 + 2.5*x2*x2 + 2*x2*x3 + 2*x3*x3 - 8*x1 -
-     * 3*x2 - 3*x3 constraints x1 + x3 = 3, x2 + x3 = 0 result: x = [2, -1, 1]' multipliers = [3, -2]'
+     * 2020-09-24: No multipliers was returned by org.ojalgo.optimisation.convex classes : Test from
+     * 'Numerical Optimization', 2ed, (2006), Jorge Nocedal and Stephen J. Wright. QP Example 16.2 p453
+     * minimize function F(x1,x2,x3) = 3*x1*x1 + 2*x1*x2 + x1*x3 + 2.5*x2*x2 + 2*x2*x3 + 2*x3*x3 - 8*x1 - 3*x2
+     * - 3*x3 constraints x1 + x3 = 3, x2 + x3 = 0 result: x = [2, -1, 1]' multipliers = [3, -2]'
      *
      * @throws RecoverableCondition
      */
@@ -398,10 +396,10 @@ public class LagrangeTest extends OptimisationConvexTests {
     }
 
     /**
-     * The objective value reported by each of the convex solvers must be in model units, regardless of how the
-     * objective is scaled internally. Solving an {@link ExpressionsBasedModel} re-evaluates the value from the
-     * solution, but the branch-and-bound uses the node solvers' values directly. At the solution x = y = 1
-     * the value is scale.
+     * The objective value reported by each of the convex solvers must be in model units, regardless of how
+     * the objective is scaled internally. Solving an {@link ExpressionsBasedModel} re-evaluates the value
+     * from the solution, but the branch-and-bound uses the node solvers' values directly. At the solution x =
+     * y = 1 the value is scale.
      */
     @Test
     public void testScaledObjectiveValue() {

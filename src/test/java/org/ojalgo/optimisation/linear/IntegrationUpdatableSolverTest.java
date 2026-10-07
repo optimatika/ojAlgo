@@ -120,8 +120,8 @@ public class IntegrationUpdatableSolverTest extends OptimisationLinearTests {
      *       x, y, z in [0, 10]
      * }</pre>
      *
-     * Optimal: x=3, y=1, z=0, obj=-9. Both constraints bind. z is non-basic at its lower bound with
-     * |reduced gradient| = 1.0.
+     * Optimal: x=3, y=1, z=0, obj=-9. Both constraints bind. z is non-basic at its lower bound with |reduced
+     * gradient| = 1.0.
      */
     private static ExpressionsBasedModel newThreeVariableModel() {
 
@@ -401,16 +401,14 @@ public class IntegrationUpdatableSolverTest extends OptimisationLinearTests {
 
             int totalConstraints = map.countConstraints();
             TestUtils.assertTrue(tag + " constraints >= 2", totalConstraints >= 2);
-            TestUtils.assertEquals(tag + " eq + ineq = total", totalConstraints,
-                    map.countEqualityConstraints() + map.countInequalityConstraints());
+            TestUtils.assertEquals(tag + " eq + ineq = total", totalConstraints, map.countEqualityConstraints() + map.countInequalityConstraints());
             TestUtils.assertEquals(tag + " no equality constraints", 0, map.countEqualityConstraints());
 
             for (int c = 0; c < totalConstraints; c++) {
                 EntryPair<ModelEntity<?>, ConstraintType> entry = map.getConstraint(c);
                 TestUtils.assertNotNull(entry);
                 String name = entry.getKey().getName();
-                TestUtils.assertTrue(tag + " constraint " + c + " maps to known expression (" + name + ")",
-                        "range".equals(name) || "ub".equals(name));
+                TestUtils.assertTrue(tag + " constraint " + c + " maps to known expression (" + name + ")", "range".equals(name) || "ub".equals(name));
             }
         }
     }

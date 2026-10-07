@@ -39,27 +39,25 @@ import org.ojalgo.data.proximity.DistanceMeasure;
  * Provides utilities to cluster arbitrary data by mapping items to {@link Point}s (immutable float[] feature
  * vectors).
  * <p>
- * Usage: Use {@link #cluster(Collection, Function)} to cluster your own data by providing an extractor
- * that produces the feature vector for each item. The result is a list of clusters, each represented as a
+ * Usage: Use {@link #cluster(Collection, Function)} to cluster your own data by providing an extractor that
+ * produces the feature vector for each item. The result is a list of clusters, each represented as a
  * {@code Map<T, float[]>} containing the original items and their extracted features.
  * <p>
  * Available clustering algorithms:
  * <ul>
  * <li>{@link #newAutomatic(DistanceMeasure)}: Automatic clustering that determines the number of clusters and
  * thresholds based on distance statistics.
- * <li>{@link #newGreedy(DistanceMeasure, double)}: Greedy, single-pass clustering using a distance
- * threshold.
- * <li>{@link #newKMeans(DistanceMeasure, int)}: K-means style clustering with a specified number of
- * clusters.
+ * <li>{@link #newGreedy(DistanceMeasure, double)}: Greedy, single-pass clustering using a distance threshold.
+ * <li>{@link #newKMeans(DistanceMeasure, int)}: K-means style clustering with a specified number of clusters.
  * <li>{@link #newSpectral(DistanceMeasure, int)}: Spectral clustering using a Gaussian kernel and Laplacian
  * embedding.
  * </ul>
  * <p>
- * Performance: Internally, distances are cached for efficiency. All clustering is performed on
- * {@link Point} objects with unique ids and float[] coordinates.
+ * Performance: Internally, distances are cached for efficiency. All clustering is performed on {@link Point}
+ * objects with unique ids and float[] coordinates.
  * <p>
- * Extensibility: Subclasses implement {@link #cluster(Collection)} to provide concrete clustering
- * strategies over {@link Point}s.
+ * Extensibility: Subclasses implement {@link #cluster(Collection)} to provide concrete clustering strategies
+ * over {@link Point}s.
  * <p>
  * Thread safety: Not thread-safe. Each instance maintains internal state for distance caching.
  *

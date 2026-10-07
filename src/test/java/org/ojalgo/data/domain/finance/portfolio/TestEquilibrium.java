@@ -170,7 +170,8 @@ public class TestEquilibrium extends FinancePortfolioTests {
         TestUtils.assertEquals(3.0, portfolio.getRiskAversion().doubleValue(), 1E-12);
 
         MarketEquilibrium equilibrium = MarketEquilibrium.of(covariances);
-        TestUtils.assertFalse(equilibrium.calibrate(MatrixR064.FACTORY.column(new double[] { 0.0, 0.0 }), MatrixR064.FACTORY.column(new double[] { 0.069, 0.144 })));
+        TestUtils.assertFalse(
+                equilibrium.calibrate(MatrixR064.FACTORY.column(new double[] { 0.0, 0.0 }), MatrixR064.FACTORY.column(new double[] { 0.069, 0.144 })));
         TestUtils.assertEquals(1.0, equilibrium.getRiskAversion().doubleValue(), 1E-12);
     }
 

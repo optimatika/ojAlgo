@@ -33,8 +33,8 @@ import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * Data for this test case originates from "A STEP-BY-STEP GUIDE TO THE BLACK-LITTERMAN MODEL" by
- * Thomas M. Idzorek.
+ * Data for this test case originates from "A STEP-BY-STEP GUIDE TO THE BLACK-LITTERMAN MODEL" by Thomas M.
+ * Idzorek.
  * <p>
  * Unfortunately the numbers in that paper are not specified with high enough precision to (directly)
  * construct unit tests without problems, but the tests available here should still be enough to indicate that
@@ -213,8 +213,8 @@ public class BlackLittermanTest extends FinancePortfolioTests {
     }
 
     /**
-     * Adding views, or changing the confidence, after the weights have been calculated used to have no
-     * effect (cached results were not reset).
+     * Adding views, or changing the confidence, after the weights have been calculated used to have no effect
+     * (cached results were not reset).
      */
     @Test
     public void testChangesAfterCalculation() {

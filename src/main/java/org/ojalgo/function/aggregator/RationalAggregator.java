@@ -165,10 +165,11 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
             return new RationalAggregatorFunction() {
 
                 private RationalNumber myNumber = RationalNumber.NEGATIVE_INFINITY;
+                private boolean myVisited = false;
 
                 @Override
                 public RationalNumber get() {
-                    return myNumber;
+                    return myVisited ? myNumber : RationalNumber.ZERO;
                 }
 
                 @Override
@@ -179,11 +180,13 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                 @Override
                 public void invoke(final RationalNumber anArg) {
                     myNumber = RationalMath.MAX.invoke(myNumber, anArg);
+                    myVisited = true;
                 }
 
                 @Override
                 public AggregatorFunction<RationalNumber> reset() {
                     myNumber = RationalNumber.NEGATIVE_INFINITY;
+                    myVisited = false;
                     return this;
                 }
 
@@ -198,13 +201,11 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
             return new RationalAggregatorFunction() {
 
                 private RationalNumber myNumber = RationalNumber.POSITIVE_INFINITY;
+                private boolean myVisited = false;
 
                 @Override
                 public RationalNumber get() {
-                    if (RationalNumber.isInfinite(myNumber)) {
-                        return RationalNumber.ZERO;
-                    }
-                    return myNumber;
+                    return myVisited ? myNumber : RationalNumber.ZERO;
                 }
 
                 @Override
@@ -215,11 +216,13 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                 @Override
                 public void invoke(final RationalNumber anArg) {
                     myNumber = RationalMath.MIN.invoke(myNumber, anArg);
+                    myVisited = true;
                 }
 
                 @Override
                 public AggregatorFunction<RationalNumber> reset() {
                     myNumber = RationalNumber.POSITIVE_INFINITY;
+                    myVisited = false;
                     return this;
                 }
 
@@ -369,13 +372,11 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
             return new RationalAggregatorFunction() {
 
                 private RationalNumber myNumber = RationalNumber.POSITIVE_INFINITY;
+                private boolean myVisited = false;
 
                 @Override
                 public RationalNumber get() {
-                    if (RationalNumber.isInfinite(myNumber)) {
-                        return RationalNumber.ZERO;
-                    }
-                    return myNumber;
+                    return myVisited ? myNumber : RationalNumber.ZERO;
                 }
 
                 @Override
@@ -387,12 +388,14 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                 public void invoke(final RationalNumber anArg) {
                     if (!RationalNumber.isSmall(PrimitiveMath.ONE, anArg)) {
                         myNumber = RationalMath.MIN.invoke(myNumber, RationalMath.ABS.invoke(anArg));
+                        myVisited = true;
                     }
                 }
 
                 @Override
                 public AggregatorFunction<RationalNumber> reset() {
                     myNumber = RationalNumber.POSITIVE_INFINITY;
+                    myVisited = false;
                     return this;
                 }
 

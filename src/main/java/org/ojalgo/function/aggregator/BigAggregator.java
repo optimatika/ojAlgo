@@ -166,10 +166,11 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
             return new BigAggregatorFunction() {
 
                 private BigDecimal myNumber = VERY_NEGATIVE;
+                private boolean myVisited = false;
 
                 @Override
                 public BigDecimal get() {
-                    return myNumber;
+                    return myVisited ? myNumber : ZERO;
                 }
 
                 @Override
@@ -180,11 +181,13 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 @Override
                 public void invoke(final BigDecimal anArg) {
                     myNumber = myNumber.max(anArg);
+                    myVisited = true;
                 }
 
                 @Override
                 public AggregatorFunction<BigDecimal> reset() {
                     myNumber = VERY_NEGATIVE;
+                    myVisited = false;
                     return this;
                 }
 
@@ -199,13 +202,11 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
             return new BigAggregatorFunction() {
 
                 private BigDecimal myNumber = VERY_POSITIVE;
+                private boolean myVisited = false;
 
                 @Override
                 public BigDecimal get() {
-                    if (myNumber.compareTo(VERY_POSITIVE) == 0) {
-                        return ZERO;
-                    }
-                    return myNumber;
+                    return myVisited ? myNumber : ZERO;
                 }
 
                 @Override
@@ -216,11 +217,13 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 @Override
                 public void invoke(final BigDecimal anArg) {
                     myNumber = myNumber.min(anArg);
+                    myVisited = true;
                 }
 
                 @Override
                 public AggregatorFunction<BigDecimal> reset() {
                     myNumber = VERY_POSITIVE;
+                    myVisited = false;
                     return this;
                 }
 
@@ -369,13 +372,11 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
             return new BigAggregatorFunction() {
 
                 private BigDecimal myNumber = VERY_POSITIVE;
+                private boolean myVisited = false;
 
                 @Override
                 public BigDecimal get() {
-                    if (myNumber.compareTo(VERY_POSITIVE) == 0) {
-                        return ZERO;
-                    }
-                    return myNumber;
+                    return myVisited ? myNumber : ZERO;
                 }
 
                 @Override
@@ -387,12 +388,14 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 public void invoke(final BigDecimal anArg) {
                     if (anArg.signum() != 0) {
                         myNumber = BigMath.MIN.invoke(myNumber, BigMath.ABS.invoke(anArg));
+                        myVisited = true;
                     }
                 }
 
                 @Override
                 public AggregatorFunction<BigDecimal> reset() {
                     myNumber = VERY_POSITIVE;
+                    myVisited = false;
                     return this;
                 }
 

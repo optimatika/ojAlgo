@@ -44,9 +44,9 @@ public class TestBasicMIQP extends OptimisationIntegerTests implements TestBasic
 
     /**
      * Minimise weight * (x'Qx / 2 + c'x) with 5 integer variables in [0, 5] and one knapsack constraint. The
-     * integer optimum, verified by enumeration, is x = (2, 1, 0, 1, 0) with x'Qx / 2 + c'x = -8.735 regardless
-     * of the weight. The weight changes the objective's adjustment (scaling) factor, which must not affect the
-     * node values the branch-and-bound compares.
+     * integer optimum, verified by enumeration, is x = (2, 1, 0, 1, 0) with x'Qx / 2 + c'x = -8.735
+     * regardless of the weight. The weight changes the objective's adjustment (scaling) factor, which must
+     * not affect the node values the branch-and-bound compares.
      */
     static OptimisationCase caseWeightedIntegerQP(final double weight) {
 

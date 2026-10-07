@@ -68,32 +68,62 @@ public abstract class OperationVoid implements ArrayOperation {
     }
 
     public static void invoke(final byte[] data, final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
-        for (int i = first; i < limit; i += step) {
-            visitor.invoke(data[i]);
+        if (step == 1) {
+            for (int i = first; i < limit; i++) {
+                visitor.invoke(data[i]);
+            }
+        } else {
+            for (int i = first; i < limit; i += step) {
+                visitor.invoke(data[i]);
+            }
         }
     }
 
     public static void invoke(final double[] data, final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
-        for (int i = first; i < limit; i += step) {
-            visitor.invoke(data[i]);
+        if (step == 1) {
+            for (int i = first; i < limit; i++) {
+                visitor.invoke(data[i]);
+            }
+        } else {
+            for (int i = first; i < limit; i += step) {
+                visitor.invoke(data[i]);
+            }
         }
     }
 
     public static void invoke(final float[] data, final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
-        for (int i = first; i < limit; i += step) {
-            visitor.invoke(data[i]);
+        if (step == 1) {
+            for (int i = first; i < limit; i++) {
+                visitor.invoke(data[i]);
+            }
+        } else {
+            for (int i = first; i < limit; i += step) {
+                visitor.invoke(data[i]);
+            }
         }
     }
 
     public static void invoke(final int[] data, final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
-        for (int i = first; i < limit; i += step) {
-            visitor.invoke(data[i]);
+        if (step == 1) {
+            for (int i = first; i < limit; i++) {
+                visitor.invoke(data[i]);
+            }
+        } else {
+            for (int i = first; i < limit; i += step) {
+                visitor.invoke(data[i]);
+            }
         }
     }
 
     public static void invoke(final long[] data, final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
-        for (int i = first; i < limit; i += step) {
-            visitor.invoke(data[i]);
+        if (step == 1) {
+            for (int i = first; i < limit; i++) {
+                visitor.invoke(data[i]);
+            }
+        } else {
+            for (int i = first; i < limit; i += step) {
+                visitor.invoke(data[i]);
+            }
         }
     }
 
@@ -104,8 +134,14 @@ public abstract class OperationVoid implements ArrayOperation {
     }
 
     public static void invoke(final short[] data, final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
-        for (int i = first; i < limit; i += step) {
-            visitor.invoke(data[i]);
+        if (step == 1) {
+            for (int i = first; i < limit; i++) {
+                visitor.invoke(data[i]);
+            }
+        } else {
+            for (int i = first; i < limit; i += step) {
+                visitor.invoke(data[i]);
+            }
         }
     }
 

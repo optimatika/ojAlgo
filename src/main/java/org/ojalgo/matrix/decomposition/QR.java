@@ -42,8 +42,8 @@ import org.ojalgo.type.context.NumberContext;
  * </ul>
  * Note: Either Q or R will be square. The interface does not specify which.
  * <p>
- * You create instances of (some subclass of) this class by using one of the factories:
- * {@linkplain #R064}, {@linkplain #R128}, {@linkplain #C128}, {@linkplain #H256} or {@linkplain #Q128}
+ * You create instances of (some subclass of) this class by using one of the factories: {@linkplain #R064},
+ * {@linkplain #R128}, {@linkplain #C128}, {@linkplain #H256} or {@linkplain #Q128}
  * <p>
  * The QR decompostion always exists, even if the matrix does not have full column rank, so the compute method
  * will never fail. The primary use of the QR decomposition is in the least squares solution of overdetermined

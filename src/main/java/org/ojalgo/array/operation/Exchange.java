@@ -45,91 +45,136 @@ public abstract class Exchange implements ArrayOperation {
 
     public static void exchange(final byte[] data, final int firstA, final int firstB, final int step, final int count) {
 
-        int indexA = firstA;
-        int indexB = firstB;
-
         byte tmpVal;
 
-        for (int i = 0; i < count; i++) {
+        if (step == 1) {
 
-            tmpVal = data[indexA];
-            data[indexA] = data[indexB];
-            data[indexB] = tmpVal;
+            for (int i = 0; i < count; i++) {
+                tmpVal = data[firstA + i];
+                data[firstA + i] = data[firstB + i];
+                data[firstB + i] = tmpVal;
+            }
 
-            indexA += step;
-            indexB += step;
+        } else {
+
+            int indexA = firstA;
+            int indexB = firstB;
+
+            for (int i = 0; i < count; i++) {
+                tmpVal = data[indexA];
+                data[indexA] = data[indexB];
+                data[indexB] = tmpVal;
+                indexA += step;
+                indexB += step;
+            }
         }
     }
 
     public static void exchange(final double[] data, final int firstA, final int firstB, final int step, final int count) {
 
-        int indexA = firstA;
-        int indexB = firstB;
-
         double tmpVal;
 
-        for (int i = 0; i < count; i++) {
+        if (step == 1) {
 
-            tmpVal = data[indexA];
-            data[indexA] = data[indexB];
-            data[indexB] = tmpVal;
+            for (int i = 0; i < count; i++) {
+                tmpVal = data[firstA + i];
+                data[firstA + i] = data[firstB + i];
+                data[firstB + i] = tmpVal;
+            }
 
-            indexA += step;
-            indexB += step;
+        } else {
+
+            int indexA = firstA;
+            int indexB = firstB;
+
+            for (int i = 0; i < count; i++) {
+                tmpVal = data[indexA];
+                data[indexA] = data[indexB];
+                data[indexB] = tmpVal;
+                indexA += step;
+                indexB += step;
+            }
         }
     }
 
     public static void exchange(final float[] data, final int firstA, final int firstB, final int step, final int count) {
 
-        int indexA = firstA;
-        int indexB = firstB;
-
         float tmpVal;
 
-        for (int i = 0; i < count; i++) {
+        if (step == 1) {
 
-            tmpVal = data[indexA];
-            data[indexA] = data[indexB];
-            data[indexB] = tmpVal;
+            for (int i = 0; i < count; i++) {
+                tmpVal = data[firstA + i];
+                data[firstA + i] = data[firstB + i];
+                data[firstB + i] = tmpVal;
+            }
 
-            indexA += step;
-            indexB += step;
+        } else {
+
+            int indexA = firstA;
+            int indexB = firstB;
+
+            for (int i = 0; i < count; i++) {
+                tmpVal = data[indexA];
+                data[indexA] = data[indexB];
+                data[indexB] = tmpVal;
+                indexA += step;
+                indexB += step;
+            }
         }
     }
 
     public static void exchange(final int[] data, final int firstA, final int firstB, final int step, final int count) {
 
-        int indexA = firstA;
-        int indexB = firstB;
-
         int tmpVal;
 
-        for (int i = 0; i < count; i++) {
+        if (step == 1) {
 
-            tmpVal = data[indexA];
-            data[indexA] = data[indexB];
-            data[indexB] = tmpVal;
+            for (int i = 0; i < count; i++) {
+                tmpVal = data[firstA + i];
+                data[firstA + i] = data[firstB + i];
+                data[firstB + i] = tmpVal;
+            }
 
-            indexA += step;
-            indexB += step;
+        } else {
+
+            int indexA = firstA;
+            int indexB = firstB;
+
+            for (int i = 0; i < count; i++) {
+                tmpVal = data[indexA];
+                data[indexA] = data[indexB];
+                data[indexB] = tmpVal;
+                indexA += step;
+                indexB += step;
+            }
         }
     }
 
     public static void exchange(final long[] data, final int firstA, final int firstB, final int step, final int count) {
 
-        int indexA = firstA;
-        int indexB = firstB;
-
         long tmpVal;
 
-        for (int i = 0; i < count; i++) {
+        if (step == 1) {
 
-            tmpVal = data[indexA];
-            data[indexA] = data[indexB];
-            data[indexB] = tmpVal;
+            for (int i = 0; i < count; i++) {
+                tmpVal = data[firstA + i];
+                data[firstA + i] = data[firstB + i];
+                data[firstB + i] = tmpVal;
+            }
 
-            indexA += step;
-            indexB += step;
+        } else {
+
+            int indexA = firstA;
+            int indexB = firstB;
+
+            for (int i = 0; i < count; i++) {
+                tmpVal = data[indexA];
+                data[indexA] = data[indexB];
+                data[indexB] = tmpVal;
+                indexA += step;
+                indexB += step;
+            }
         }
     }
 
@@ -153,19 +198,28 @@ public abstract class Exchange implements ArrayOperation {
 
     public static void exchange(final short[] data, final int firstA, final int firstB, final int step, final int count) {
 
-        int indexA = firstA;
-        int indexB = firstB;
-
         short tmpVal;
 
-        for (int i = 0; i < count; i++) {
+        if (step == 1) {
 
-            tmpVal = data[indexA];
-            data[indexA] = data[indexB];
-            data[indexB] = tmpVal;
+            for (int i = 0; i < count; i++) {
+                tmpVal = data[firstA + i];
+                data[firstA + i] = data[firstB + i];
+                data[firstB + i] = tmpVal;
+            }
 
-            indexA += step;
-            indexB += step;
+        } else {
+
+            int indexA = firstA;
+            int indexB = firstB;
+
+            for (int i = 0; i < count; i++) {
+                tmpVal = data[indexA];
+                data[indexA] = data[indexB];
+                data[indexB] = tmpVal;
+                indexA += step;
+                indexB += step;
+            }
         }
     }
 

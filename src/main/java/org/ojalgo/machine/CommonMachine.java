@@ -63,9 +63,8 @@ abstract class CommonMachine extends BasicMachine {
     }
 
     /**
-     * {@code new MemoryThreads[] { SYSTEM, L3, L2, L1 }} or
-     * {@code new MemoryThreads[] { SYSTEM, L2, L1 }} or in worst case
-     * {@code new MemoryThreads[] { SYSTEM, L1 }}
+     * {@code new MemoryThreads[] { SYSTEM, L3, L2, L1 }} or {@code new MemoryThreads[] { SYSTEM, L2, L1 }} or
+     * in worst case {@code new MemoryThreads[] { SYSTEM, L1 }}
      */
     CommonMachine(final Hardware.Architecture arch, final BasicMachine[] levels) {
 

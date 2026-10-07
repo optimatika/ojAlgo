@@ -89,7 +89,11 @@ public class ArrayR064 extends PrimitiveArray {
 
     @Override
     public void axpy(final double a, final Mutate1D.Modifiable<?> y) {
-        AXPY.invoke(y, a, data);
+        if (y instanceof ArrayR064) {
+            AXPY.invoke(((ArrayR064) y).data, 0, a, data, 0, 0, data.length);
+        } else {
+            AXPY.invoke(y, a, data);
+        }
     }
 
     @Override

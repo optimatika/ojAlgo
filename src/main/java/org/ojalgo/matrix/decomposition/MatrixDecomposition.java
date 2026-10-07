@@ -89,8 +89,8 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
     /**
      * Several matrix decompositions can be expressed "economy sized" - some rows or columns of the decomposed
      * matrix parts are not needed for the most releveant use cases, and can therefore be left out. By default
-     * these matrix decompositions should be "economy sized". Passing {@code fullSize = true} to a factory, e.g.
-     * {@link QR.Factory#make(Structure2D, boolean)}, switches to "full sized".
+     * these matrix decompositions should be "economy sized". Passing {@code fullSize = true} to a factory,
+     * e.g. {@link QR.Factory#make(Structure2D, boolean)}, switches to "full sized".
      *
      * @author apete
      */
@@ -367,8 +367,8 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
         /**
          * Implementing this method is optional.
          * <p>
-         * Exactly how a specific implementation makes use of {@code preallocated} is not specified by
-         * this interface. It must be documented for each implementation.
+         * Exactly how a specific implementation makes use of {@code preallocated} is not specified by this
+         * interface. It must be documented for each implementation.
          * <p>
          * Should produce the same results as calling {@link #getInverse()}.
          *
@@ -391,8 +391,8 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
         /**
          * Implementing this method is optional.
          * <p>
-         * Exactly how a specific implementation makes use of {@code preallocated} is not specified by
-         * this interface. It must be documented for each implementation.
+         * Exactly how a specific implementation makes use of {@code preallocated} is not specified by this
+         * interface. It must be documented for each implementation.
          * <p>
          * Should produce the same results as calling {@link #getSolution(Collectable)}.
          *

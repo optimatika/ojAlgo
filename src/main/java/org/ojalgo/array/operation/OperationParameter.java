@@ -36,36 +36,66 @@ public abstract class OperationParameter implements ArrayOperation {
 
     public static void invoke(final byte[] data, final int first, final int limit, final int step, final byte[] values,
             final ParameterFunction<Double> function, final int param) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = function.invoke(values[i], param);
+        if (step == 1) {
+            for (int i = first; i < limit; i++) {
+                data[i] = function.invoke(values[i], param);
+            }
+        } else {
+            for (int i = first; i < limit; i += step) {
+                data[i] = function.invoke(values[i], param);
+            }
         }
     }
 
     public static void invoke(final double[] data, final int first, final int limit, final int step, final double[] values,
             final ParameterFunction<Double> function, final int param) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = function.invoke(values[i], param);
+        if (step == 1) {
+            for (int i = first; i < limit; i++) {
+                data[i] = function.invoke(values[i], param);
+            }
+        } else {
+            for (int i = first; i < limit; i += step) {
+                data[i] = function.invoke(values[i], param);
+            }
         }
     }
 
     public static void invoke(final float[] data, final int first, final int limit, final int step, final float[] values,
             final ParameterFunction<Double> function, final int param) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = function.invoke(values[i], param);
+        if (step == 1) {
+            for (int i = first; i < limit; i++) {
+                data[i] = function.invoke(values[i], param);
+            }
+        } else {
+            for (int i = first; i < limit; i += step) {
+                data[i] = function.invoke(values[i], param);
+            }
         }
     }
 
     public static void invoke(final int[] data, final int first, final int limit, final int step, final int[] values, final ParameterFunction<Double> function,
             final int param) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = function.invoke(values[i], param);
+        if (step == 1) {
+            for (int i = first; i < limit; i++) {
+                data[i] = function.invoke(values[i], param);
+            }
+        } else {
+            for (int i = first; i < limit; i += step) {
+                data[i] = function.invoke(values[i], param);
+            }
         }
     }
 
     public static void invoke(final long[] data, final int first, final int limit, final int step, final long[] values,
             final ParameterFunction<Double> function, final int param) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = function.invoke(values[i], param);
+        if (step == 1) {
+            for (int i = first; i < limit; i++) {
+                data[i] = function.invoke(values[i], param);
+            }
+        } else {
+            for (int i = first; i < limit; i += step) {
+                data[i] = function.invoke(values[i], param);
+            }
         }
     }
 
@@ -78,8 +108,14 @@ public abstract class OperationParameter implements ArrayOperation {
 
     public static void invoke(final short[] data, final int first, final int limit, final int step, final short[] values,
             final ParameterFunction<Double> function, final int param) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = function.invoke(values[i], param);
+        if (step == 1) {
+            for (int i = first; i < limit; i++) {
+                data[i] = function.invoke(values[i], param);
+            }
+        } else {
+            for (int i = first; i < limit; i += step) {
+                data[i] = function.invoke(values[i], param);
+            }
         }
     }
 

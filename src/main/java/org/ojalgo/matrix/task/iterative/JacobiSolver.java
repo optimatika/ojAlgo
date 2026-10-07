@@ -76,8 +76,10 @@ public final class JacobiSolver extends IterativeSolverTask {
         // Compute ||b|| once outside the loop
         double normRHS = ZERO;
         for (int r = 0; r < m; r++) {
-            normRHS = HYPOT.invoke(normRHS, equations.get(r).getRHS());
+            double rhs = equations.get(r).getRHS();
+            normRHS += rhs * rhs;
         }
+        normRHS = Math.sqrt(normRHS);
 
         // Scratch vector for simultaneous Jacobi updates (delta x)
         R064Store increment = myIncrement = IterativeSolverTask.worker(myIncrement, n);
@@ -94,11 +96,12 @@ public final class JacobiSolver extends IterativeSolverTask {
             for (int r = 0; r < m; r++) {
                 Equation row = equations.get(r);
                 double ri = row.getRHS() - row.dot(solution); // residual component
-                normErr = HYPOT.invoke(normErr, ri);
+                normErr += ri * ri;
                 // Jacobi increment: delta_i = r_i / a_ii
                 double pivot = row.getPivot();
                 increment.set(row.index, ri / pivot);
             }
+            normErr = Math.sqrt(normErr);
 
             // Optional relaxation: x += omega * D^{-1} * r
             increment.axpy(relaxation, solution);

@@ -158,8 +158,8 @@ public abstract class MissingMath {
     }
 
     /**
-     * {@code 13!} does not fit in an {@code int}, and {@code 21!} does not fit in a
-     * {@code long} - that's why this method returns a {@code double}.
+     * {@code 13!} does not fit in an {@code int}, and {@code 21!} does not fit in a {@code long} - that's why
+     * this method returns a {@code double}.
      */
     public static double factorial(final int arg) {
         if (arg < 0) {

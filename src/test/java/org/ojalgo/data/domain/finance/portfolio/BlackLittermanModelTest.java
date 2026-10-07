@@ -39,8 +39,8 @@ import org.ojalgo.type.context.NumberContext;
  * <p>
  * Prior (equilibrium) returns: [Pi] = lambda [C][w]
  * <p>
- * Posterior returns: [mu] = [Pi] + tau [C][P]<sup>T</sup>(tau [P][C][P]<sup>T</sup> + [Omega])<sup>-1</sup>([Q] -
- * [P][Pi])
+ * Posterior returns: [mu] = [Pi] + tau [C][P]<sup>T</sup>(tau [P][C][P]<sup>T</sup> +
+ * [Omega])<sup>-1</sup>([Q] - [P][Pi])
  * <p>
  * Weights: [w] = (lambda [C])<sup>-1</sup>[mu]
  * <p>
@@ -117,8 +117,9 @@ public class BlackLittermanModelTest extends FinancePortfolioTests {
     }
 
     /**
-     * MARKET mode reference, the precision form: [K] = ([C]<sup>-1</sup> + tau [P]<sup>T</sup>[Omega]<sup>-1</sup>[P])<sup>-1</sup>
-     * and [mu] = [K]([C]<sup>-1</sup>[Pi] + tau [P]<sup>T</sup>[Omega]<sup>-1</sup>[Q])
+     * MARKET mode reference, the precision form: [K] = ([C]<sup>-1</sup> + tau
+     * [P]<sup>T</sup>[Omega]<sup>-1</sup>[P])<sup>-1</sup> and [mu] = [K]([C]<sup>-1</sup>[Pi] + tau
+     * [P]<sup>T</sup>[Omega]<sup>-1</sup>[Q])
      */
     private static void assertMatchesMarketReference(final BlackLittermanModel model, final Case data, final double[] omega, final double tau) {
 
@@ -164,7 +165,8 @@ public class BlackLittermanModelTest extends FinancePortfolioTests {
     }
 
     /**
-     * FULL mode reference, the precision form: [C] + ((tau [C])<sup>-1</sup> + [P]<sup>T</sup>[Omega]<sup>-1</sup>[P])<sup>-1</sup>
+     * FULL mode reference, the precision form: [C] + ((tau [C])<sup>-1</sup> +
+     * [P]<sup>T</sup>[Omega]<sup>-1</sup>[P])<sup>-1</sup>
      */
     private static MatrixR064 referenceFullCovariances(final Case data, final double[] omega, final double tau) {
 
@@ -235,8 +237,8 @@ public class BlackLittermanModelTest extends FinancePortfolioTests {
     }
 
     /**
-     * Balanced confidence: [Omega]<sub>kk</sub> = tau [p<sub>k</sub>][C][p<sub>k</sub>]<sup>T</sup> - with both
-     * the default and an explicitly set tau
+     * Balanced confidence: [Omega]<sub>kk</sub> = tau [p<sub>k</sub>][C][p<sub>k</sub>]<sup>T</sup> - with
+     * both the default and an explicitly set tau
      */
     @Test
     public void testBalancedViews() {
@@ -488,8 +490,8 @@ public class BlackLittermanModelTest extends FinancePortfolioTests {
     }
 
     /**
-     * He and Litterman: The optimal FULL mode weights are the original weights scaled by 1 / (1 + tau) plus
-     * a combination of the view portfolios.
+     * He and Litterman: The optimal FULL mode weights are the original weights scaled by 1 / (1 + tau) plus a
+     * combination of the view portfolios.
      */
     @Test
     public void testFullModeHeLitterman() {
@@ -532,8 +534,8 @@ public class BlackLittermanModelTest extends FinancePortfolioTests {
     }
 
     /**
-     * MARKET mode (Meucci): The conditional distribution of the returns given the views. With the default
-     * tau (1.0) and with an explicitly set tau. The expected returns are the same as in RETURNS mode, the
+     * MARKET mode (Meucci): The conditional distribution of the returns given the views. With the default tau
+     * (1.0) and with an explicitly set tau. The expected returns are the same as in RETURNS mode, the
      * covariances are smaller - the variance of each view portfolio is reduced.
      */
     @Test
@@ -662,7 +664,8 @@ public class BlackLittermanModelTest extends FinancePortfolioTests {
     }
 
     /**
-     * Scaled confidence: [Omega]<sub>kk</sub> = scale<sub>k</sub> [p<sub>k</sub>][C][p<sub>k</sub>]<sup>T</sup>
+     * Scaled confidence: [Omega]<sub>kk</sub> = scale<sub>k</sub>
+     * [p<sub>k</sub>][C][p<sub>k</sub>]<sup>T</sup>
      */
     @Test
     public void testScaledViews() {

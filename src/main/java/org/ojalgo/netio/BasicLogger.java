@@ -43,9 +43,9 @@ import org.ojalgo.type.context.NumberContext;
  * that meant we had to create something a little better than plain {@link System#out} for internal use.
  * <ul>
  * <li>If you want to redirect whatever ojAlgo outputs then set {@link BasicLogger#DEBUG} and
- * {@link BasicLogger#ERROR} to something suitable. {@linkplain BasicLogger} is an interface so it
- * should be possible to create some implementation that wraps your logging system. ojAlgo supplies 3
- * implementations of that interface.
+ * {@link BasicLogger#ERROR} to something suitable. {@linkplain BasicLogger} is an interface so it should be
+ * possible to create some implementation that wraps your logging system. ojAlgo supplies 3 implementations of
+ * that interface.
  * <li>ojAlgo typically doesn't do much logging. There's really not much to redirect. The main/only area where
  * BasicLogger is used is for debugging the various optimisation solvers. This is not intended to be "on" in
  * production.

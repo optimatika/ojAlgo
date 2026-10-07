@@ -778,8 +778,8 @@ final class RevisedStore extends SimplexStore {
     }
 
     /**
-     * A view of the pivot row {@link #myRowDirection} (the non-basic part of the tableau row), valid until the next
-     * {@link #priceRow(int)}. The caller,
+     * A view of the pivot row {@link #myRowDirection} (the non-basic part of the tableau row), valid until
+     * the next {@link #priceRow(int)}. The caller,
      * {@link SimplexStore#generateCutCandidates(boolean[], NumberContext, double)}, consumes it before asking
      * for the next row.
      */

@@ -34,8 +34,14 @@ public abstract class ASUM implements ArrayOperation {
 
     public static double invoke(final double[] data, final int first, final int limit, final int step) {
         double retVal = 0D;
-        for (int i = first; i < limit; i += step) {
-            retVal += PrimitiveMath.ABS.invoke(data[i]);
+        if (step == 1) {
+            for (int i = first; i < limit; i++) {
+                retVal += PrimitiveMath.ABS.invoke(data[i]);
+            }
+        } else {
+            for (int i = first; i < limit; i += step) {
+                retVal += PrimitiveMath.ABS.invoke(data[i]);
+            }
         }
         return retVal;
     }

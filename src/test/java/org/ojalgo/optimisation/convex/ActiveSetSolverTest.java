@@ -34,9 +34,10 @@ public class ActiveSetSolverTest extends OptimisationConvexTests {
     private static final NumberContext ACCURACY = NumberContext.of(7);
 
     /**
-     * min 1/2 x0<sup>2</sup> + 1/2 q x1<sup>2</sup> - x0 - x1, with x1 <= 1E6 (active) - the solution is x0 = 1,
-     * x1 = 1E6. The active set solver starts from the LP solution x0 = 0, x1 = 1E6. The step to x0 = 1 used to
-     * be ignored as "too small" because it was compared to the largest component of the solution (1E6).
+     * min 1/2 x0<sup>2</sup> + 1/2 q x1<sup>2</sup> - x0 - x1, with x1 <= 1E6 (active) - the solution is x0 =
+     * 1, x1 = 1E6. The active set solver starts from the LP solution x0 = 0, x1 = 1E6. The step to x0 = 1
+     * used to be ignored as "too small" because it was compared to the largest component of the solution
+     * (1E6).
      */
     @Test
     public void testStepInSmallVariableWhenOtherIsLarge() {

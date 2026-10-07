@@ -53,6 +53,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.array
 
 - `DensityTrackingArray.countNonzeros()` and `density()` count the listed positions, which may include values that have become zero (set to zero, or cancelled when adding), until the next `reset()`, `reindex()` or `tighten(double)`. Previously setting a value to zero made the next call rescan, so the count was exact.
+- Element-wise operations on primitive arrays (and the dense matrix stores built on them) are faster for contiguous ranges. The internal kernels take a step parameter, and a step that is only known at runtime stops the JIT compiler from unrolling and vectorising the loop – they now have a separate loop for step 1. Results are unchanged.
+- `ArrayR064.axpy` into another `ArrayR064` (incl. `R064Store`) runs the primitive array kernel rather than adding element by element through the interface, and element-wise `MAX`/`MIN` (e.g. `MAX.second(0.0)`) have primitive kernels like `ADD`, `DIVIDE`, `MULTIPLY` and `SUBTRACT`. Results are unchanged.
 
 #### org.ojalgo.data.domain.finance
 
@@ -68,11 +70,27 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - An unbounded optimisation gives zero weights, as other failures do.
 - `CharacteristicLine` is reimplemented – an instance is the line of one asset against the market, created with `assumingCAPM(...)`, `of(...)` or `estimate(...)`. The previous, unfinished, API is removed.
 
+#### org.ojalgo.function.aggregator
+
+- `MAXIMUM`, `MINIMUM`, `LARGEST` and `SMALLEST` give 0 when nothing was aggregated, for all number types. Previously `MAXIMUM` gave negative infinity (`BigDecimal`: -9223372036854775808). `MINIMUM` and `SMALLEST` gave 0 also when the actual result was infinite – now that infinity is returned. Other results are unchanged.
+
 #### org.ojalgo.matrix.decomposition
 
 - `SparseLU` is rewritten. Simplex bases are factorised with a triangular (singleton) pass followed by Markowitz pivoting, the sparse solves are hyper-sparse when the right hand side and the result are sparse enough, and Forrest-Tomlin updates reuse the partial results of the preceding solves.
 - `MinimumDegree` computes the same ordering as before, by a counting sort on the degrees, in linear instead of quadratic time.
 - `MatrixDecomposition.Updatable.updateColumn(...)` is an optional operation – a default method that returns false.
+- The non-symmetric eigenvalue decomposition (`RawEigenvalue`) and `RawQR.getQ()` work row by row instead of down the columns of their row-major arrays, so the inner loops are contiguous and vectorised. Results are unchanged.
+- `RawSingularValue` (the default SVD up to 1024 columns) computes its Householder column/row norms by scaling with the largest element (as `RawQR` does) rather than by repeated `hypot` – almost 2x faster for tall, skinny matrices. Results change in the last bits.
+- The single-column backward triangular solves used by `ftran`/`btran` (dense LU, Cholesky, LDL and QR) are faster: a column sweep for upper triangular bodies, and for the transposed case each dot product is summed from the far end, so that consecutive rows no longer wait for each other. Per backward solve from about the same speed (n = 10) to 2x (transposed) or 4x (upper) at n = 100. Results change in the last bits.
+
+#### org.ojalgo.matrix.store
+
+- `R064Store.aggregateAll` computes `LARGEST`, `MAXIMUM`, `MINIMUM`, `NORM1`, `NORM2`, `SUM` and `SUM2` directly on the array, without a function call per element. Results are unchanged.
+
+#### org.ojalgo.matrix.task.iterative
+
+- `ConjugateGradientSolver`, `MINRESSolver`, `JacobiSolver`, `GaussSeidelSolver` and `ParallelGaussSeidelSolver` compute residual norms as a sum of squares rather than by repeated `hypot`. Per solve up to 1.8x faster (CG, MINRES), with the same number of iterations on the test problems.
+- `QMRSolver` computes its transposed product (A<sup>T</sup>q) from the nonzeros of each (sparse) row rather than by scanning every element – on a sparse 2500x2500 system a solve went from about 0.9s to 7ms. Results are unchanged.
 
 #### org.ojalgo.optimisation
 
@@ -117,6 +135,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Fixed
 
+#### org.ojalgo.array
+
+- `SparseArray`, when accessed through a wrapping `Array1D` (or other stepped access): `indexOfLargest()` returned the position among the stored nonzeros rather than the index, and visiting/aggregating included elements already removed or cleared by `reset()`.
+
 #### org.ojalgo.data.domain.finance.portfolio
 
 - `getAssetVolatilities()` of the equilibrium models (including Markowitz and Black-Litterman) returned the correlations.
@@ -129,6 +151,16 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.matrix.decomposition
 
 - `SparseQDLDL.getSolution(...)` for a 1x1 matrix solved only the first of several right hand sides.
+
+#### org.ojalgo.matrix.store
+
+- In a region from `regionByTransposing()`, `fillRow(...)` (with a value or a supplier) filled a diagonal of the underlying matrix, and `fillDiagonal(...)` with a supplier filled a row, instead of the transposed column and diagonal.
+- `RawStore.transformLeft(Householder, int)` and `transformRight(Householder, int)` left the first column/row untransformed.
+- `R032Store.substituteForwards(boolean, boolean, double[])` and `substituteBackwards(boolean, boolean, double[])` ignored `conjugated` – they solved with the body as stored, not transposed. The `R064Store` versions were correct.
+
+#### org.ojalgo.matrix.task.iterative
+
+- `MINRESSolver` threw a `ClassCastException` when the (preallocated) solution was not an `R064Store`.
 
 #### org.ojalgo.optimisation
 

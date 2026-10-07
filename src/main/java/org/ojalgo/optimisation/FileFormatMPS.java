@@ -405,11 +405,11 @@ final class FileFormatMPS {
     }
 
     /**
-     * MPS names are limited to 8 characters (the fixed-format fields are 8 wide, and longer names run into the
-     * following field). Names that fit are used as they are; longer (or duplicate/empty) ones are replaced by a
-     * deterministic 8-character alias: the prefix ('V' for variables, 'E' for expressions) followed by 7
-     * base-36 digits derived from the original name's hash. A hash collision is resolved by re-hashing, so the
-     * result is still deterministic for a given model.
+     * MPS names are limited to 8 characters (the fixed-format fields are 8 wide, and longer names run into
+     * the following field). Names that fit are used as they are; longer (or duplicate/empty) ones are
+     * replaced by a deterministic 8-character alias: the prefix ('V' for variables, 'E' for expressions)
+     * followed by 7 base-36 digits derived from the original name's hash. A hash collision is resolved by
+     * re-hashing, so the result is still deterministic for a given model.
      */
     private static String mpsName(final String original, final char prefix, final Map<String, String> aliases, final java.util.Set<String> used) {
 

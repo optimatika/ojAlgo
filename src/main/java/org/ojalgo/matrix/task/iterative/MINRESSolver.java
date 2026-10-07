@@ -64,14 +64,6 @@ public final class MINRESSolver extends IterativeSolverTask {
         x.axpy(alpha, y);
     }
 
-    private static double norm2(final R064Store a) {
-        double n = ZERO;
-        for (int i = 0; i < a.getRowDim(); i++) {
-            n = HYPOT.invoke(n, a.doubleValue(i));
-        }
-        return n;
-    }
-
     private static void scaleCopy(final R064Store src, final double alpha, final R064Store dst) {
         for (int i = 0; i < src.getRowDim(); i++) {
             dst.set(i, alpha * src.doubleValue(i));
@@ -122,11 +114,13 @@ public final class MINRESSolver extends IterativeSolverTask {
         for (int i = 0; i < m; i++) {
             final Equation row = equations.get(i);
             final double bi = row.getRHS();
-            normRHS = HYPOT.invoke(normRHS, bi);
+            normRHS += bi * bi;
             final double ri = bi - row.dot(x);
             r1.set(row.index, ri);
-            normErr = HYPOT.invoke(normErr, ri);
+            normErr += ri * ri;
         }
+        normRHS = Math.sqrt(normRHS);
+        normErr = Math.sqrt(normErr);
 
         if (normRHS == ZERO) {
             x.fillAll(ZERO);
@@ -254,7 +248,7 @@ public final class MINRESSolver extends IterativeSolverTask {
 
             // Stopping tests – following standard MINRES stopping criteria
             final double Anorm = Math.sqrt(tnorm2);
-            final double ynorm = norm2((R064Store) x);
+            final double ynorm = IterativeSolverTask.norm2(x);
             final double epsx = Anorm * ynorm * MACHINE_EPSILON;
             final double qrnormNow = phibar;
             final double rnorm = qrnormNow;
@@ -290,8 +284,9 @@ public final class MINRESSolver extends IterativeSolverTask {
             final double bi = row.getRHS();
             final double axi = row.dot(x);
             final double ri = bi - axi;
-            normErr = HYPOT.invoke(normErr, ri);
+            normErr += ri * ri;
         }
+        normErr = Math.sqrt(normErr);
 
         if (this.isDebugPrinterSet()) {
             this.debug(itn, (accuracy.isZero(normRHS) ? normErr : normErr / normRHS), x);

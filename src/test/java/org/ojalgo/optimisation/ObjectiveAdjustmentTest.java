@@ -32,8 +32,8 @@ import org.ojalgo.type.context.NumberContext;
  * Covers the objective-adjustment plumbing that lets {@link ExpressionsBasedModel.Integration} integrations
  * (in particular the LP simplex builders) report a correct objective value even when the solver only sees a
  * reduced problem. Two contributions get stashed on the model and added back in
- * {@link ExpressionsBasedModel.Integration#expandFreeToFull(Result, ExpressionsBasedModel,
- * org.ojalgo.array.DenseArray.Factory, java.util.Optional, Optimisation.Sense) expandFreeToFull}:
+ * {@link ExpressionsBasedModel.Integration#expandFreeToFull(Result, ExpressionsBasedModel, org.ojalgo.array.DenseArray.Factory, java.util.Optional, Optimisation.Sense)
+ * expandFreeToFull}:
  * <ol>
  * <li>The model's {@linkplain ExpressionsBasedModel#getObjectiveConstant() objective constant} (e.g. an
  * MPS-loaded objective offset).
@@ -86,9 +86,9 @@ public class ObjectiveAdjustmentTest extends OptimisationTests {
     }
 
     /**
-     * Combination case: MPS-style {@code objectiveConstant} <em>and</em> a presolve-fixed objective
-     * variable. Exercises the slow path in {@link Expression#compensate(java.util.Set) compensate}, where
-     * the adjustment is the sum of both contributions.
+     * Combination case: MPS-style {@code objectiveConstant} <em>and</em> a presolve-fixed objective variable.
+     * Exercises the slow path in {@link Expression#compensate(java.util.Set) compensate}, where the
+     * adjustment is the sum of both contributions.
      */
     @Test
     public void testObjectiveConstantAndFixedVariable() {
@@ -105,8 +105,8 @@ public class ObjectiveAdjustmentTest extends OptimisationTests {
 
     /**
      * MPS-style {@code objectiveConstant} with no fixed variables — exercises the fast-path branch in
-     * {@link Expression#compensate(java.util.Set) compensate} which now has to write the model's
-     * objective adjustment.
+     * {@link Expression#compensate(java.util.Set) compensate} which now has to write the model's objective
+     * adjustment.
      */
     @Test
     public void testObjectiveConstantOnlyMinimise() {
@@ -128,8 +128,8 @@ public class ObjectiveAdjustmentTest extends OptimisationTests {
 
     /**
      * Maximisation variant — tests that the model-sense adjustment is added <em>after</em>
-     * {@code expandFreeToFull}'s {@code withNegatedValue()} sign flip, so the answer comes out in model
-     * sense regardless of solver direction.
+     * {@code expandFreeToFull}'s {@code withNegatedValue()} sign flip, so the answer comes out in model sense
+     * regardless of solver direction.
      */
     @Test
     public void testSingleVarObjectiveFixedByPresolveMaximise() {
@@ -145,8 +145,7 @@ public class ObjectiveAdjustmentTest extends OptimisationTests {
     /**
      * Core scenario for the LP-relaxation-in-choco use case: the objective is just one variable, the
      * presolver fixes that variable via constraint propagation, the simplex sees an objective ≡ 0 on the
-     * remaining free variables, yet the model-level objective value must come back as the fixed value
-     * itself.
+     * remaining free variables, yet the model-level objective value must come back as the fixed value itself.
      */
     @Test
     public void testSingleVarObjectiveFixedByPresolveMinimise() {

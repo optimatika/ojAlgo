@@ -29,10 +29,9 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 
 /**
- * The slack of a row with integer coefficients on integer variables is integer valued only if the row's
- * limit is an integer too. Getting this wrong makes the GMI cut generator treat a continuous slack as
- * integer and produce invalid cuts (an objective cutoff row {@code c'x <= 34.000001} was the original
- * case).
+ * The slack of a row with integer coefficients on integer variables is integer valued only if the row's limit
+ * is an integer too. Getting this wrong makes the GMI cut generator treat a continuous slack as integer and
+ * produce invalid cuts (an objective cutoff row {@code c'x <= 34.000001} was the original case).
  */
 public class SlackIntegralityTest extends OptimisationLinearTests {
 

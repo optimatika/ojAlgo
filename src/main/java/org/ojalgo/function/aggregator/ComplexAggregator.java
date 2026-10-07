@@ -197,13 +197,11 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
             return new ComplexAggregatorFunction() {
 
                 private ComplexNumber myNumber = ComplexNumber.INFINITY;
+                private boolean myVisited = false;
 
                 @Override
                 public ComplexNumber get() {
-                    if (ComplexNumber.isInfinite(myNumber)) {
-                        return ComplexNumber.ZERO;
-                    }
-                    return myNumber;
+                    return myVisited ? myNumber : ComplexNumber.ZERO;
                 }
 
                 @Override
@@ -214,11 +212,13 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
                 @Override
                 public void invoke(final ComplexNumber anArg) {
                     myNumber = ComplexMath.MIN.invoke(myNumber, anArg);
+                    myVisited = true;
                 }
 
                 @Override
                 public AggregatorFunction<ComplexNumber> reset() {
                     myNumber = ComplexNumber.INFINITY;
+                    myVisited = false;
                     return this;
                 }
 
@@ -368,13 +368,11 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
             return new ComplexAggregatorFunction() {
 
                 private ComplexNumber myNumber = ComplexNumber.INFINITY;
+                private boolean myVisited = false;
 
                 @Override
                 public ComplexNumber get() {
-                    if (ComplexNumber.isInfinite(myNumber)) {
-                        return ComplexNumber.ZERO;
-                    }
-                    return myNumber;
+                    return myVisited ? myNumber : ComplexNumber.ZERO;
                 }
 
                 @Override
@@ -386,12 +384,14 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
                 public void invoke(final ComplexNumber anArg) {
                     if (!ComplexNumber.isSmall(PrimitiveMath.ONE, anArg)) {
                         myNumber = ComplexMath.MIN.invoke(myNumber, ComplexMath.ABS.invoke(anArg));
+                        myVisited = true;
                     }
                 }
 
                 @Override
                 public AggregatorFunction<ComplexNumber> reset() {
                     myNumber = ComplexNumber.INFINITY;
+                    myVisited = false;
                     return this;
                 }
 

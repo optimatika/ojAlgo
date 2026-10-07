@@ -350,8 +350,8 @@ public final class BatchNode<T> {
 
     /**
      * Calls {@link #processCombineable(Supplier, Consumer)} with the
-     * {@link TwoStepMapper.Combineable#combine(TwoStepMapper.Combineable)} method of a global {@link TwoStepMapper.Combineable}
-     * instance as the {@code consumer}.
+     * {@link TwoStepMapper.Combineable#combine(TwoStepMapper.Combineable)} method of a global
+     * {@link TwoStepMapper.Combineable} instance as the {@code consumer}.
      */
     public <R, A extends TwoStepMapper.Combineable<T, R, A>> R reduceByCombining(final Supplier<A> aggregatorFactory) {
 
@@ -381,8 +381,8 @@ public final class BatchNode<T> {
      * using {@link TwoStepMapper.Mergeable#merge(Object)}.
      * <P>
      * Create a class that implements {@link TwoStepMapper} and make sure to also implement
-     * {@link TwoStepMapper.Mergeable#merge(Object)} - you can only use this if merging partial (sub)results is
-     * possible. Use a constructor or factory method that produce instances of that type as the argument to
+     * {@link TwoStepMapper.Mergeable#merge(Object)} - you can only use this if merging partial (sub)results
+     * is possible. Use a constructor or factory method that produce instances of that type as the argument to
      * this method.
      *
      * @deprecated v54 Use {@link #reduceByMerging(Supplier)} instead

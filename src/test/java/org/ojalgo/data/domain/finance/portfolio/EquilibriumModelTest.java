@@ -33,9 +33,9 @@ public class EquilibriumModelTest extends FinancePortfolioTests {
     private static final NumberContext ACCURACY = NumberContext.of(12);
 
     /**
-     * A subclass may override the covariances. The volatilities, correlations and portfolio variances
-     * follow, and are recalculated after a reset. The mapping between weights and returns, the equilibrium,
-     * is not affected.
+     * A subclass may override the covariances. The volatilities, correlations and portfolio variances follow,
+     * and are recalculated after a reset. The mapping between weights and returns, the equilibrium, is not
+     * affected.
      */
     @Test
     public void testCovariancesOverride() {

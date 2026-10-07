@@ -104,10 +104,11 @@ public final class ConjugateGradientSolver extends IterativeSolverTask {
         for (int r = 0; r < m; r++) {
             Equation row = equations.get(r);
             double bi = row.getRHS();
-            normRHS = HYPOT.invoke(normRHS, bi);
+            normRHS += bi * bi;
             double ri = bi - row.dot(solution);
             residual.set(row.index, ri);
         }
+        normRHS = Math.sqrt(normRHS);
         // z0 = M^{-1} r0
         preconditioner.apply(residual, preconditioned);
 
@@ -138,12 +139,7 @@ public final class ConjugateGradientSolver extends IterativeSolverTask {
             }
 
             // Compute normErr = ||r|| and apply preconditioner: z = M^{-1} r
-            normErr = ZERO;
-            for (int r = 0; r < m; r++) {
-                Equation row = equations.get(r);
-                double ri = residual.doubleValue(row.index);
-                normErr = HYPOT.invoke(normErr, ri);
-            }
+            normErr = IterativeSolverTask.norm2(residual);
             preconditioner.apply(residual, preconditioned);
 
             zr1 = preconditioned.dot(residual); // (r_{k+1}, z_{k+1})

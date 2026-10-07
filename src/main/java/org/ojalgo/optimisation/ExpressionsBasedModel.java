@@ -380,17 +380,17 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         /**
          * Reconstructs a model-level reduced cost from first principles, using the gradient of the objective
          * function at {@code modelSolution} and the constraint multipliers reported on {@code solverState}
-         * (see {@link Result#getDualValues()} for their sign convention): {@code rc_v = ∂f/∂x_v - Σ a_iv · λ_i}
-         * over the LOWER constraints, {@code + Σ a_iv · λ_i} over the UPPER and EQUALITY constraints, with
-         * {@code f} in the minimisation form (negated for MAX models). Useful for variables that the solver
-         * doesn't see (eliminated by presolve), and for solver paths whose internal index space prevents
-         * direct pass-through of the rc.
+         * (see {@link Result#getDualValues()} for their sign convention):
+         * {@code rc_v = ∂f/∂x_v - Σ a_iv · λ_i} over the LOWER constraints, {@code + Σ a_iv · λ_i} over the
+         * UPPER and EQUALITY constraints, with {@code f} in the minimisation form (negated for MAX models).
+         * Useful for variables that the solver doesn't see (eliminated by presolve), and for solver paths
+         * whose internal index space prevents direct pass-through of the rc.
          * <p>
-         * Returned value is in the minimisation form, the solver's usual internal sense. Callers should negate
-         * for MAX models.
+         * Returned value is in the minimisation form, the solver's usual internal sense. Callers should
+         * negate for MAX models.
          *
-         * @param modelSolution The solution in model space (all variables, including the fixed ones), where the
-         *                      gradient of a quadratic objective is evaluated
+         * @param modelSolution The solution in model space (all variables, including the fixed ones), where
+         *                      the gradient of a quadratic objective is evaluated
          */
         protected static double computeReducedCostFromMultipliers(final ExpressionsBasedModel model, final int variableIndex, final Result solverState,
                 final Access1D<?> modelSolution) {
@@ -508,8 +508,8 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         /**
          * @deprecated v58 Use
          *             {@link #expandFreeToFull(Optimisation.Result, ExpressionsBasedModel, DenseArray.Factory, Optional, Optimisation.Sense)}
-         *             instead. This version assumes the solver minimises, so the value and reduced gradient of a
-         *             solver that maximises natively would be negated.
+         *             instead. This version assumes the solver minimises, so the value and reduced gradient
+         *             of a solver that maximises natively would be negated.
          */
         @Deprecated
         protected static Result expandFreeToFull(final Result solverState, final ExpressionsBasedModel model, final DenseArray.Factory<?, ?> factory,
@@ -518,18 +518,19 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         }
 
         /**
-         * Maps the result of a solver that only works with the free (not presolve-fixed) variables to the full
-         * model: the solution, the objective function value (adding {@link #getObjectiveAdjustment(ExpressionsBasedModel)},
-         * the objective constant and the contribution of the fixed variables) and the reduced gradient
-         * (reconstructing it for the fixed variables). The solver's value and reduced gradient must already be
-         * in model units, with any objective scaling undone.
+         * Maps the result of a solver that only works with the free (not presolve-fixed) variables to the
+         * full model: the solution, the objective function value (adding
+         * {@link #getObjectiveAdjustment(ExpressionsBasedModel)}, the objective constant and the contribution
+         * of the fixed variables) and the reduced gradient (reconstructing it for the fixed variables). The
+         * solver's value and reduced gradient must already be in model units, with any objective scaling
+         * undone.
          *
          * @param solverSense the {@link Optimisation.Sense} the solver internally optimises in (usually fixed
          *                    per solver — most simplex/QP solvers minimise), or null if it optimises in the
          *                    model's own sense. If this differs from the model's
-         *                    {@link ExpressionsBasedModel#getOptimisationSense() optimisation sense}, the value
-         *                    and the reduced gradient are negated when mapped back to the model so that callers
-         *                    always see them in the model's sense.
+         *                    {@link ExpressionsBasedModel#getOptimisationSense() optimisation sense}, the
+         *                    value and the reduced gradient are negated when mapped back to the model so that
+         *                    callers always see them in the model's sense.
          */
         protected static Result expandFreeToFull(final Result solverState, final ExpressionsBasedModel model, final DenseArray.Factory<?, ?> factory,
                 final Optional<Supplier<Access1D<?>>> reducedGradient, final Optimisation.Sense solverSense) {
@@ -596,11 +597,11 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         }
 
         /**
-         * The objective constant plus the contribution of the presolve-fixed variables, in model units and the
-         * model's sense, as stashed when the model's objective is compensated for the fixed variables (see
-         * {@link Expression#compensate(Set)}). This is what an integration that only passes the free variables
-         * to its solver needs to add to the solver's objective function value. Returns 0 if nothing has been
-         * stashed.
+         * The objective constant plus the contribution of the presolve-fixed variables, in model units and
+         * the model's sense, as stashed when the model's objective is compensated for the fixed variables
+         * (see {@link Expression#compensate(Set)}). This is what an integration that only passes the free
+         * variables to its solver needs to add to the solver's objective function value. Returns 0 if nothing
+         * has been stashed.
          */
         protected static double getObjectiveAdjustment(final ExpressionsBasedModel model) {
             return model.getObjectiveAdjustment().doubleValue();
@@ -1346,8 +1347,8 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      * Calling this method will create 2 things:
      * <ol>
      * <li>A simple expression measuring the sum of the (binary) variable values (the number of binary
-     * variables that are "ON"). The upper, and optionally lower, limits are set as defined by the
-     * {@code max} and {@code min} parameter values.
+     * variables that are "ON"). The upper, and optionally lower, limits are set as defined by the {@code max}
+     * and {@code min} parameter values.
      * <li>A custom presolver (specific to this SOS) to be used by the MIP solver. This presolver helps to
      * keep track of which combinations of variable values are feasible, and is the only thing that enforces
      * the order.

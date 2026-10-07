@@ -117,8 +117,8 @@ public class NumberContextTest {
     }
 
     /**
-     * Equal precision, rounding mode and scale make equal contexts – whether or not they are the same instance,
-     * and whatever their formats.
+     * Equal precision, rounding mode and scale make equal contexts – whether or not they are the same
+     * instance, and whatever their formats.
      */
     @Test
     public void testEqualsAndHashCode() {

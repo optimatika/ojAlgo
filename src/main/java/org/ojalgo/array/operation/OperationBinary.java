@@ -183,8 +183,14 @@ public abstract class OperationBinary implements ArrayOperation {
         if (left instanceof ArrayZ008 && right instanceof ArrayZ008) {
             OperationBinary.invoke(data, first, limit, step, ((ArrayZ008) left).data, function, ((ArrayZ008) right).data);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left.byteValue(i), right.byteValue(i));
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left.byteValue(i), right.byteValue(i));
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left.byteValue(i), right.byteValue(i));
+                }
             }
         }
     }
@@ -194,8 +200,14 @@ public abstract class OperationBinary implements ArrayOperation {
         if (left instanceof ArrayZ008) {
             OperationBinary.invoke(data, first, limit, step, ((ArrayZ008) left).data, function, right);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left.byteValue(i), right);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left.byteValue(i), right);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left.byteValue(i), right);
+                }
             }
         }
     }
@@ -205,8 +217,14 @@ public abstract class OperationBinary implements ArrayOperation {
         if (right instanceof ArrayZ008) {
             OperationBinary.invoke(data, first, limit, step, left, function, ((ArrayZ008) right).data);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left, right.byteValue(i));
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left, right.byteValue(i));
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left, right.byteValue(i));
+                }
             }
         }
     }
@@ -222,8 +240,14 @@ public abstract class OperationBinary implements ArrayOperation {
         } else if (function == PrimitiveMath.SUBTRACT) {
             CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left, right[i]);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left, right[i]);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left, right[i]);
+                }
             }
         }
     }
@@ -239,8 +263,14 @@ public abstract class OperationBinary implements ArrayOperation {
         } else if (function == PrimitiveMath.SUBTRACT) {
             CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left[i], right);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left[i], right);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left[i], right);
+                }
             }
         }
     }
@@ -256,8 +286,14 @@ public abstract class OperationBinary implements ArrayOperation {
         } else if (function == PrimitiveMath.SUBTRACT) {
             CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left[i], right[i]);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left[i], right[i]);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left[i], right[i]);
+                }
             }
         }
     }
@@ -267,8 +303,14 @@ public abstract class OperationBinary implements ArrayOperation {
         if (left instanceof ArrayR064 && right instanceof ArrayR064) {
             OperationBinary.invoke(data, first, limit, step, ((ArrayR064) left).data, function, ((ArrayR064) right).data);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left.doubleValue(i), right.doubleValue(i));
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left.doubleValue(i), right.doubleValue(i));
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left.doubleValue(i), right.doubleValue(i));
+                }
             }
         }
     }
@@ -278,8 +320,14 @@ public abstract class OperationBinary implements ArrayOperation {
         if (left instanceof ArrayR064) {
             OperationBinary.invoke(data, first, limit, step, ((ArrayR064) left).data, function, right);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left.doubleValue(i), right);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left.doubleValue(i), right);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left.doubleValue(i), right);
+                }
             }
         }
     }
@@ -289,8 +337,14 @@ public abstract class OperationBinary implements ArrayOperation {
         if (right instanceof ArrayR064) {
             OperationBinary.invoke(data, first, limit, step, left, function, ((ArrayR064) right).data);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left, right.doubleValue(i));
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left, right.doubleValue(i));
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left, right.doubleValue(i));
+                }
             }
         }
     }
@@ -301,13 +355,23 @@ public abstract class OperationBinary implements ArrayOperation {
             CorePrimitiveOperation.add(data, first, limit, step, left, right);
         } else if (function == PrimitiveMath.DIVIDE) {
             CorePrimitiveOperation.divide(data, first, limit, step, left, right);
+        } else if (function == PrimitiveMath.MAX) {
+            CorePrimitiveOperation.max(data, first, limit, step, left, right);
+        } else if (function == PrimitiveMath.MIN) {
+            CorePrimitiveOperation.min(data, first, limit, step, left, right);
         } else if (function == PrimitiveMath.MULTIPLY) {
             CorePrimitiveOperation.multiply(data, first, limit, step, left, right);
         } else if (function == PrimitiveMath.SUBTRACT) {
             CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left, right[i]);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left, right[i]);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left, right[i]);
+                }
             }
         }
     }
@@ -318,13 +382,23 @@ public abstract class OperationBinary implements ArrayOperation {
             CorePrimitiveOperation.add(data, first, limit, step, left, right);
         } else if (function == PrimitiveMath.DIVIDE) {
             CorePrimitiveOperation.divide(data, first, limit, step, left, right);
+        } else if (function == PrimitiveMath.MAX) {
+            CorePrimitiveOperation.max(data, first, limit, step, left, right);
+        } else if (function == PrimitiveMath.MIN) {
+            CorePrimitiveOperation.min(data, first, limit, step, left, right);
         } else if (function == PrimitiveMath.MULTIPLY) {
             CorePrimitiveOperation.multiply(data, first, limit, step, left, right);
         } else if (function == PrimitiveMath.SUBTRACT) {
             CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left[i], right);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left[i], right);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left[i], right);
+                }
             }
         }
     }
@@ -335,13 +409,23 @@ public abstract class OperationBinary implements ArrayOperation {
             CorePrimitiveOperation.add(data, first, limit, step, left, right);
         } else if (function == PrimitiveMath.DIVIDE) {
             CorePrimitiveOperation.divide(data, first, limit, step, left, right);
+        } else if (function == PrimitiveMath.MAX) {
+            CorePrimitiveOperation.max(data, first, limit, step, left, right);
+        } else if (function == PrimitiveMath.MIN) {
+            CorePrimitiveOperation.min(data, first, limit, step, left, right);
         } else if (function == PrimitiveMath.MULTIPLY) {
             CorePrimitiveOperation.multiply(data, first, limit, step, left, right);
         } else if (function == PrimitiveMath.SUBTRACT) {
             CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left[i], right[i]);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left[i], right[i]);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left[i], right[i]);
+                }
             }
         }
     }
@@ -351,8 +435,14 @@ public abstract class OperationBinary implements ArrayOperation {
         if (left instanceof ArrayR032 && right instanceof ArrayR032) {
             OperationBinary.invoke(data, first, limit, step, ((ArrayR032) left).data, function, ((ArrayR032) right).data);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left.floatValue(i), right.floatValue(i));
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left.floatValue(i), right.floatValue(i));
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left.floatValue(i), right.floatValue(i));
+                }
             }
         }
     }
@@ -362,8 +452,14 @@ public abstract class OperationBinary implements ArrayOperation {
         if (left instanceof ArrayR032) {
             OperationBinary.invoke(data, first, limit, step, ((ArrayR032) left).data, function, right);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left.floatValue(i), right);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left.floatValue(i), right);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left.floatValue(i), right);
+                }
             }
         }
     }
@@ -373,8 +469,14 @@ public abstract class OperationBinary implements ArrayOperation {
         if (right instanceof ArrayR032) {
             OperationBinary.invoke(data, first, limit, step, left, function, ((ArrayR032) right).data);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left, right.floatValue(i));
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left, right.floatValue(i));
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left, right.floatValue(i));
+                }
             }
         }
     }
@@ -390,8 +492,14 @@ public abstract class OperationBinary implements ArrayOperation {
         } else if (function == PrimitiveMath.SUBTRACT) {
             CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left, right[i]);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left, right[i]);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left, right[i]);
+                }
             }
         }
     }
@@ -407,8 +515,14 @@ public abstract class OperationBinary implements ArrayOperation {
         } else if (function == PrimitiveMath.SUBTRACT) {
             CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left[i], right);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left[i], right);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left[i], right);
+                }
             }
         }
     }
@@ -424,8 +538,14 @@ public abstract class OperationBinary implements ArrayOperation {
         } else if (function == PrimitiveMath.SUBTRACT) {
             CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left[i], right[i]);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left[i], right[i]);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left[i], right[i]);
+                }
             }
         }
     }
@@ -435,8 +555,14 @@ public abstract class OperationBinary implements ArrayOperation {
         if (left instanceof ArrayZ032 && right instanceof ArrayZ032) {
             OperationBinary.invoke(data, first, limit, step, ((ArrayZ032) left).data, function, ((ArrayZ032) right).data);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left.intValue(i), right.intValue(i));
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left.intValue(i), right.intValue(i));
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left.intValue(i), right.intValue(i));
+                }
             }
         }
     }
@@ -446,8 +572,14 @@ public abstract class OperationBinary implements ArrayOperation {
         if (left instanceof ArrayZ032) {
             OperationBinary.invoke(data, first, limit, step, ((ArrayZ032) left).data, function, right);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left.intValue(i), right);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left.intValue(i), right);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left.intValue(i), right);
+                }
             }
         }
     }
@@ -457,8 +589,14 @@ public abstract class OperationBinary implements ArrayOperation {
         if (right instanceof ArrayZ032) {
             OperationBinary.invoke(data, first, limit, step, left, function, ((ArrayZ032) right).data);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left, right.intValue(i));
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left, right.intValue(i));
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left, right.intValue(i));
+                }
             }
         }
     }
@@ -474,8 +612,14 @@ public abstract class OperationBinary implements ArrayOperation {
         } else if (function == PrimitiveMath.SUBTRACT) {
             CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left, right[i]);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left, right[i]);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left, right[i]);
+                }
             }
         }
     }
@@ -491,8 +635,14 @@ public abstract class OperationBinary implements ArrayOperation {
         } else if (function == PrimitiveMath.SUBTRACT) {
             CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left[i], right);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left[i], right);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left[i], right);
+                }
             }
         }
     }
@@ -508,8 +658,14 @@ public abstract class OperationBinary implements ArrayOperation {
         } else if (function == PrimitiveMath.SUBTRACT) {
             CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left[i], right[i]);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left[i], right[i]);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left[i], right[i]);
+                }
             }
         }
     }
@@ -519,8 +675,14 @@ public abstract class OperationBinary implements ArrayOperation {
         if (left instanceof ArrayZ064 && right instanceof ArrayZ064) {
             OperationBinary.invoke(data, first, limit, step, ((ArrayZ064) left).data, function, ((ArrayZ064) right).data);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left.longValue(i), right.longValue(i));
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left.longValue(i), right.longValue(i));
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left.longValue(i), right.longValue(i));
+                }
             }
         }
     }
@@ -530,8 +692,14 @@ public abstract class OperationBinary implements ArrayOperation {
         if (left instanceof ArrayZ064) {
             OperationBinary.invoke(data, first, limit, step, ((ArrayZ064) left).data, function, right);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left.longValue(i), right);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left.longValue(i), right);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left.longValue(i), right);
+                }
             }
         }
     }
@@ -541,8 +709,14 @@ public abstract class OperationBinary implements ArrayOperation {
         if (right instanceof ArrayZ064) {
             OperationBinary.invoke(data, first, limit, step, left, function, ((ArrayZ064) right).data);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left, right.longValue(i));
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left, right.longValue(i));
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left, right.longValue(i));
+                }
             }
         }
     }
@@ -558,8 +732,14 @@ public abstract class OperationBinary implements ArrayOperation {
         } else if (function == PrimitiveMath.SUBTRACT) {
             CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left, right[i]);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left, right[i]);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left, right[i]);
+                }
             }
         }
     }
@@ -575,8 +755,14 @@ public abstract class OperationBinary implements ArrayOperation {
         } else if (function == PrimitiveMath.SUBTRACT) {
             CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left[i], right);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left[i], right);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left[i], right);
+                }
             }
         }
     }
@@ -592,8 +778,14 @@ public abstract class OperationBinary implements ArrayOperation {
         } else if (function == PrimitiveMath.SUBTRACT) {
             CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left[i], right[i]);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left[i], right[i]);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left[i], right[i]);
+                }
             }
         }
     }
@@ -624,8 +816,14 @@ public abstract class OperationBinary implements ArrayOperation {
         if (left instanceof ArrayZ016 && right instanceof ArrayZ016) {
             OperationBinary.invoke(data, first, limit, step, ((ArrayZ016) left).data, function, ((ArrayZ016) right).data);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left.shortValue(i), right.shortValue(i));
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left.shortValue(i), right.shortValue(i));
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left.shortValue(i), right.shortValue(i));
+                }
             }
         }
     }
@@ -635,8 +833,14 @@ public abstract class OperationBinary implements ArrayOperation {
         if (left instanceof ArrayZ016) {
             OperationBinary.invoke(data, first, limit, step, ((ArrayZ016) left).data, function, right);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left.shortValue(i), right);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left.shortValue(i), right);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left.shortValue(i), right);
+                }
             }
         }
     }
@@ -646,8 +850,14 @@ public abstract class OperationBinary implements ArrayOperation {
         if (right instanceof ArrayZ016) {
             OperationBinary.invoke(data, first, limit, step, left, function, ((ArrayZ016) right).data);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left, right.shortValue(i));
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left, right.shortValue(i));
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left, right.shortValue(i));
+                }
             }
         }
     }
@@ -663,8 +873,14 @@ public abstract class OperationBinary implements ArrayOperation {
         } else if (function == PrimitiveMath.SUBTRACT) {
             CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left, right[i]);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left, right[i]);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left, right[i]);
+                }
             }
         }
     }
@@ -680,8 +896,14 @@ public abstract class OperationBinary implements ArrayOperation {
         } else if (function == PrimitiveMath.SUBTRACT) {
             CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left[i], right);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left[i], right);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left[i], right);
+                }
             }
         }
     }
@@ -697,8 +919,14 @@ public abstract class OperationBinary implements ArrayOperation {
         } else if (function == PrimitiveMath.SUBTRACT) {
             CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left[i], right[i]);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(left[i], right[i]);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(left[i], right[i]);
+                }
             }
         }
     }

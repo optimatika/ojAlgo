@@ -51,8 +51,8 @@ package org.ojalgo.algebra;
 public interface VectorSpace<T, N extends Comparable<N>> extends Group.Additive<T>, ScalarOperation.Multiplication<T, N> {
 
     /**
-     * This method will (most likely) be moved to some other interface in the future! Just have to figure
-     * out where it fits...
+     * This method will (most likely) be moved to some other interface in the future! Just have to figure out
+     * where it fits...
      * <p>
      * The conjugate transpose of a matrix and/or the conjugate of a scalar/field like ComplexNumber or
      * Quaternion.

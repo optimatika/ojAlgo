@@ -1005,13 +1005,13 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> im
         double tmpLargest = PrimitiveMath.ZERO;
         double tmpValue;
 
-        for (int i = 0; i < myIndices.length; i++) {
+        for (int i = 0; i < myActualLength; i++) {
             int tmpIndex = myIndices[i];
             if (tmpIndex >= first && tmpIndex < limit && (tmpIndex - first) % step == 0L) {
                 tmpValue = PrimitiveMath.ABS.invoke(myValues.doubleValue(i));
                 if (tmpValue > tmpLargest) {
                     tmpLargest = tmpValue;
-                    retVal = i;
+                    retVal = tmpIndex;
                 }
             }
         }
@@ -1029,7 +1029,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> im
             throw new IllegalArgumentException("SparseArray zero modification!");
         }
 
-        for (int i = 0; i < myIndices.length; i++) {
+        for (int i = 0; i < myActualLength; i++) {
             int tmpIndex = myIndices[i];
             if (tmpIndex >= first && tmpIndex < limit && (tmpIndex - first) % step == 0L) {
                 myValues.modify(tmpIndex, i, left, function);
@@ -1046,7 +1046,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> im
 
             throw new IllegalArgumentException("SparseArray zero modification!");
         }
-        for (int i = 0; i < myIndices.length; i++) {
+        for (int i = 0; i < myActualLength; i++) {
             long tmpIndex = myIndices[i];
             if (tmpIndex >= first && tmpIndex < limit && (tmpIndex - first) % step == 0L) {
                 myValues.modify((int) tmpIndex, i, function, right);
@@ -1073,15 +1073,18 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> im
 
     @Override
     protected void visit(final long first, final long limit, final long step, final VoidFunction<N> visitor) {
-        boolean tmpOnlyOnce = true;
-        for (int i = 0; i < myIndices.length; i++) {
+
+        long nbVisited = 0L;
+        for (int i = 0; i < myActualLength; i++) {
             int tmpIndex = myIndices[i];
             if (tmpIndex >= first && tmpIndex < limit && (tmpIndex - first) % step == 0L) {
                 myValues.visitOne(i, visitor);
-            } else if (tmpOnlyOnce) {
-                visitor.invoke(PrimitiveMath.ZERO);
-                tmpOnlyOnce = false;
+                nbVisited++;
             }
+        }
+
+        if (nbVisited < (limit - first + step - 1L) / step) {
+            visitor.invoke(PrimitiveMath.ZERO);
         }
     }
 

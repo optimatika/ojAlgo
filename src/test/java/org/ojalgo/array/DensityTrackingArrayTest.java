@@ -135,57 +135,57 @@ public class DensityTrackingArrayTest extends ArrayTests {
             double value = random.nextInt(3) - 1 + 0.5 * random.nextInt(2);
 
             switch (random.nextInt(9)) {
-            case 0:
-            case 1:
-                array.add(i, value);
-                expected[i] += value;
-                break;
-            case 2:
-                array.set(i, value);
-                expected[i] = value;
-                break;
-            case 3:
-                array.tighten(0.75);
-                for (int k = 0; k < dim; k++) {
-                    if (Math.abs(expected[k]) <= 0.75) {
-                        expected[k] = 0.0;
-                    }
-                }
-                break;
-            case 4:
-                if (random.nextInt(10) == 0) {
-                    array.reset();
-                    Arrays.fill(expected, 0.0);
-                }
-                break;
-            case 5:
-                array.values[i] = value;
-                expected[i] = value;
-                array.invalidateIndex();
-                break;
-            case 6:
-                array.reindex();
-                break;
-            case 7:
-                int[] indices = array.indices();
-                int count = array.countNonzeros();
-                boolean listed = false;
-                for (int k = 0; k < count; k++) {
-                    listed |= indices[k] == i;
-                }
-                if (!listed && value != 0.0) {
-                    array.values[i] = value;
-                    indices[count] = i;
-                    array.setNonzeroCount(count + 1);
+                case 0:
+                case 1:
+                    array.add(i, value);
+                    expected[i] += value;
+                    break;
+                case 2:
+                    array.set(i, value);
                     expected[i] = value;
-                }
-                break;
-            default:
-                DensityTrackingArray copy = new DensityTrackingArray(dim);
-                array.supplyTo(copy);
-                TestUtils.assertEquals(expected, copy.values);
-                DensityTrackingArrayTest.assertIndexComplete(copy);
-                break;
+                    break;
+                case 3:
+                    array.tighten(0.75);
+                    for (int k = 0; k < dim; k++) {
+                        if (Math.abs(expected[k]) <= 0.75) {
+                            expected[k] = 0.0;
+                        }
+                    }
+                    break;
+                case 4:
+                    if (random.nextInt(10) == 0) {
+                        array.reset();
+                        Arrays.fill(expected, 0.0);
+                    }
+                    break;
+                case 5:
+                    array.values[i] = value;
+                    expected[i] = value;
+                    array.invalidateIndex();
+                    break;
+                case 6:
+                    array.reindex();
+                    break;
+                case 7:
+                    int[] indices = array.indices();
+                    int count = array.countNonzeros();
+                    boolean listed = false;
+                    for (int k = 0; k < count; k++) {
+                        listed |= indices[k] == i;
+                    }
+                    if (!listed && value != 0.0) {
+                        array.values[i] = value;
+                        indices[count] = i;
+                        array.setNonzeroCount(count + 1);
+                        expected[i] = value;
+                    }
+                    break;
+                default:
+                    DensityTrackingArray copy = new DensityTrackingArray(dim);
+                    array.supplyTo(copy);
+                    TestUtils.assertEquals(expected, copy.values);
+                    DensityTrackingArrayTest.assertIndexComplete(copy);
+                    break;
             }
 
             TestUtils.assertEquals(expected, array.values);

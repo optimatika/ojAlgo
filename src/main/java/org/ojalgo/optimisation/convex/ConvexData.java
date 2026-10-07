@@ -182,9 +182,9 @@ public final class ConvexData<N extends Comparable<N>> implements ExpressionsBas
 
     /**
      * Adds the multiplier terms, {@code [AE]'λE + [AI]'λI}, of all constraint rows except those that are
-     * variable bounds. Added to the objective's gradient, {@code [Q][X] - [C]}, this gives the reduced gradient
-     * in the bounded-variable sense: at an optimum it is non-zero only for variables at an active bound. (The
-     * bound multipliers are also reported as dual values, with the variables.)
+     * variable bounds. Added to the objective's gradient, {@code [Q][X] - [C]}, this gives the reduced
+     * gradient in the bounded-variable sense: at an optimum it is non-zero only for variables at an active
+     * bound. (The bound multipliers are also reported as dual values, with the variables.)
      *
      * @param gradient    The gradient to add the terms to
      * @param multipliers The multipliers, [λE; λI], indexed as the constraints
@@ -286,9 +286,9 @@ public final class ConvexData<N extends Comparable<N>> implements ExpressionsBas
     }
 
     /**
-     * The objective's adjustment factor (10^exponent), the scaling applied to the objective when the data
-     * was copied from a model. The multipliers and the reduced gradient come out of the solver scaled by
-     * this factor; divide by it to map back to model space (the dual values are un-scaled via
+     * The objective's adjustment factor (10^exponent), the scaling applied to the objective when the data was
+     * copied from a model. The multipliers and the reduced gradient come out of the solver scaled by this
+     * factor; divide by it to map back to model space (the dual values are un-scaled via
      * {@link ConstraintsMetaData#getMultiplierScale()}). 1.0 means no scaling.
      */
     double getObjectiveAdjustmentFactor() {

@@ -60,8 +60,14 @@ public abstract class OperationUnary implements ArrayOperation {
         if (values instanceof ArrayZ008) {
             OperationUnary.invoke(data, first, limit, step, ((ArrayZ008) values).data, function);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(values.byteValue(i));
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(values.byteValue(i));
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(values.byteValue(i));
+                }
             }
         }
     }
@@ -79,8 +85,14 @@ public abstract class OperationUnary implements ArrayOperation {
             FixedParameter<Double> tmpFunc = (FixedParameter<Double>) function;
             OperationParameter.invoke(data, first, limit, step, values, tmpFunc.getFunction(), tmpFunc.getParameter());
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(values[i]);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(values[i]);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(values[i]);
+                }
             }
         }
     }
@@ -90,8 +102,14 @@ public abstract class OperationUnary implements ArrayOperation {
         if (values instanceof ArrayR064) {
             OperationUnary.invoke(data, first, limit, step, ((ArrayR064) values).data, function);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(values.doubleValue(i));
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(values.doubleValue(i));
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(values.doubleValue(i));
+                }
             }
         }
     }
@@ -110,8 +128,14 @@ public abstract class OperationUnary implements ArrayOperation {
             FixedParameter<Double> tmpFunc = (FixedParameter<Double>) function;
             OperationParameter.invoke(data, first, limit, step, values, tmpFunc.getFunction(), tmpFunc.getParameter());
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(values[i]);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(values[i]);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(values[i]);
+                }
             }
         }
     }
@@ -121,8 +145,14 @@ public abstract class OperationUnary implements ArrayOperation {
         if (values instanceof ArrayR032) {
             OperationUnary.invoke(data, first, limit, step, ((ArrayR032) values).data, function);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(values.floatValue(i));
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(values.floatValue(i));
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(values.floatValue(i));
+                }
             }
         }
     }
@@ -141,8 +171,14 @@ public abstract class OperationUnary implements ArrayOperation {
             FixedParameter<Double> tmpFunc = (FixedParameter<Double>) function;
             OperationParameter.invoke(data, first, limit, step, values, tmpFunc.getFunction(), tmpFunc.getParameter());
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(values[i]);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(values[i]);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(values[i]);
+                }
             }
         }
     }
@@ -152,8 +188,14 @@ public abstract class OperationUnary implements ArrayOperation {
         if (values instanceof ArrayZ032) {
             OperationUnary.invoke(data, first, limit, step, ((ArrayZ032) values).data, function);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(values.intValue(i));
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(values.intValue(i));
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(values.intValue(i));
+                }
             }
         }
     }
@@ -171,8 +213,14 @@ public abstract class OperationUnary implements ArrayOperation {
             FixedParameter<Double> tmpFunc = (FixedParameter<Double>) function;
             OperationParameter.invoke(data, first, limit, step, values, tmpFunc.getFunction(), tmpFunc.getParameter());
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(values[i]);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(values[i]);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(values[i]);
+                }
             }
         }
     }
@@ -182,8 +230,14 @@ public abstract class OperationUnary implements ArrayOperation {
         if (values instanceof ArrayZ064) {
             OperationUnary.invoke(data, first, limit, step, ((ArrayZ064) values).data, function);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(values.longValue(i));
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(values.longValue(i));
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(values.longValue(i));
+                }
             }
         }
     }
@@ -201,8 +255,14 @@ public abstract class OperationUnary implements ArrayOperation {
             FixedParameter<Double> tmpFunc = (FixedParameter<Double>) function;
             OperationParameter.invoke(data, first, limit, step, values, tmpFunc.getFunction(), tmpFunc.getParameter());
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(values[i]);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(values[i]);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(values[i]);
+                }
             }
         }
     }
@@ -219,8 +279,14 @@ public abstract class OperationUnary implements ArrayOperation {
         if (values instanceof ArrayZ016) {
             OperationUnary.invoke(data, first, limit, step, ((ArrayZ016) values).data, function);
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(values.shortValue(i));
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(values.shortValue(i));
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(values.shortValue(i));
+                }
             }
         }
     }
@@ -239,8 +305,14 @@ public abstract class OperationUnary implements ArrayOperation {
             FixedParameter<Double> tmpFunc = (FixedParameter<Double>) function;
             OperationParameter.invoke(data, first, limit, step, values, tmpFunc.getFunction(), tmpFunc.getParameter());
         } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(values[i]);
+            if (step == 1) {
+                for (int i = first; i < limit; i++) {
+                    data[i] = function.invoke(values[i]);
+                }
+            } else {
+                for (int i = first; i < limit; i += step) {
+                    data[i] = function.invoke(values[i]);
+                }
             }
         }
     }

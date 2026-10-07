@@ -653,13 +653,12 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         /**
          * Maps a solver reduced-gradient (indexed by the simplex split-variable layout [positives | negatives
          * | slacks/artificials]) back to a model-indexed reduced gradient. For variables present in both
-         * positives and negatives (x = x+ - x-) the two parts' reduced costs are each other's negation, and the
-         * model rc is the positive part's; a variable with only a negative part (x = -x-) gets the negation of
-         * that part's. Variables eliminated by presolve
-         * aren't present in the solver layout; their rc is reconstructed from the model's objective (at
-         * {@code modelSolution}) and the solver's constraint multipliers. If {@code negate} is true (MAX model —
-         * the solver minimises a negated objective), the result is negated so callers see rc in the model's
-         * optimisation sense.
+         * positives and negatives (x = x+ - x-) the two parts' reduced costs are each other's negation, and
+         * the model rc is the positive part's; a variable with only a negative part (x = -x-) gets the
+         * negation of that part's. Variables eliminated by presolve aren't present in the solver layout;
+         * their rc is reconstructed from the model's objective (at {@code modelSolution}) and the solver's
+         * constraint multipliers. If {@code negate} is true (MAX model — the solver minimises a negated
+         * objective), the result is negated so callers see rc in the model's optimisation sense.
          */
         private static double[] toModelReducedGradient(final Access1D<?> solverRg, final ExpressionsBasedModel model, final boolean negate,
                 final Result solverState, final Access1D<?> modelSolution) {

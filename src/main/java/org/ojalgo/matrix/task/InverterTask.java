@@ -199,8 +199,8 @@ public interface InverterTask<N extends Comparable<N>> extends MatrixTask<N> {
     }
 
     /**
-     * Exactly how (if at all) a specific implementation makes use of {@code preallocated} is not
-     * specified by this interface. It must be documented for each implementation.
+     * Exactly how (if at all) a specific implementation makes use of {@code preallocated} is not specified by
+     * this interface. It must be documented for each implementation.
      * <p>
      * Should produce the same results as calling {@link #invert(Access2D)}.
      * <p>

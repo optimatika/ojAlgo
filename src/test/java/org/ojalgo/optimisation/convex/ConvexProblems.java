@@ -1725,10 +1725,10 @@ public class ConvexProblems extends OptimisationConvexTests {
     /**
      * Test for https://github.com/optimatika/ojAlgo/issues/280.
      * <p>
-     * 2020-09-24: No multipliers was returned by org.ojalgo.optimisation.convex classes :
-     * Test from 'Numerical Optimization', 2ed, (2006), Jorge Nocedal and Stephen J. Wright. QP Example 16.2
-     * p453 minimize function F(x1,x2,x3) = 3*x1*x1 + 2*x1*x2 + x1*x3 + 2.5*x2*x2 + 2*x2*x3 + 2*x3*x3 - 8*x1 -
-     * 3*x2 - 3*x3 constraints x1 + x3 = 3, x2 + x3 = 0 result: x = [2, -1, 1]' multipliers = [3, -2]'
+     * 2020-09-24: No multipliers was returned by org.ojalgo.optimisation.convex classes : Test from
+     * 'Numerical Optimization', 2ed, (2006), Jorge Nocedal and Stephen J. Wright. QP Example 16.2 p453
+     * minimize function F(x1,x2,x3) = 3*x1*x1 + 2*x1*x2 + x1*x3 + 2.5*x2*x2 + 2*x2*x3 + 2*x3*x3 - 8*x1 - 3*x2
+     * - 3*x3 constraints x1 + x3 = 3, x2 + x3 = 0 result: x = [2, -1, 1]' multipliers = [3, -2]'
      */
     @Test
     public void testP20200924() {

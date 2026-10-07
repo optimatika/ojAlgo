@@ -185,8 +185,8 @@ public final class ConstraintsMetaData implements Structure1D {
     /**
      * For solvers that can change a row's limits after it is built (a variable's bound row, updated with
      * {@link UpdatableSolver#updateRange(int, double, double)}): the metadata with the type of row i matching
-     * the new limits. If the type changes, a modified copy is returned, and this instance is left unchanged as
-     * results already returned may refer to it.
+     * the new limits. If the type changes, a modified copy is returned, and this instance is left unchanged
+     * as results already returned may refer to it.
      */
     public ConstraintsMetaData withLimits(final int i, final double lower, final double upper) {
 

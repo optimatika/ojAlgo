@@ -68,9 +68,8 @@ public final class MultiviewSet<T> {
         }
 
         /**
-         * Highest-priority item without removing it, or {@code null} if empty. May briefly return an
-         * entry already polled through another view; callers needing only a conservative bound can
-         * tolerate that.
+         * Highest-priority item without removing it, or {@code null} if empty. May briefly return an entry
+         * already polled through another view; callers needing only a conservative bound can tolerate that.
          */
         public T peek() {
             return myQueue.peek();

@@ -37,8 +37,8 @@ import org.ojalgo.optimisation.Variable;
  * <p>
  * Valid solutions to this inequality systems would be x=21, y=-1 or x=201, y=-10.
  * <p>
- * Obviously, this seems to be a rounding issue. Is there anything that can be done about it?
- * Cheers, Uli * http://bugzilla.optimatika.se/show_bug.cgi?id=224
+ * Obviously, this seems to be a rounding issue. Is there anything that can be done about it? Cheers, Uli *
+ * http://bugzilla.optimatika.se/show_bug.cgi?id=224
  */
 public class P20150127a {
 

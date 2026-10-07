@@ -283,8 +283,8 @@ class FileFormatTest extends OptimisationTests {
     @Test
     void testLPReadQuadraticUpperBoundOnly() {
 
-        String lpContent = "Minimize\n" + " obj: 0 x1 + 0 x2 + [ 2 x1 ^2 - 2 x1 * x2 + 2 x2 ^2 ] / 2\n" + "Subject To\n" + " e1: x1 + x2 = 1\n"
-                + "Bounds\n" + " x1 <= 1\n" + " x2 <= 1\n" + "End\n";
+        String lpContent = "Minimize\n" + " obj: 0 x1 + 0 x2 + [ 2 x1 ^2 - 2 x1 * x2 + 2 x2 ^2 ] / 2\n" + "Subject To\n" + " e1: x1 + x2 = 1\n" + "Bounds\n"
+                + " x1 <= 1\n" + " x2 <= 1\n" + "End\n";
 
         ExpressionsBasedModel model = ExpressionsBasedModel.parse(new ByteArrayInputStream(lpContent.getBytes()), FileFormat.LP);
 

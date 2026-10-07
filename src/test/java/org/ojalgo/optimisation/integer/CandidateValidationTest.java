@@ -30,9 +30,9 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * An integer candidate carrying LP noise (integer variables at 1 + 1e-11, rows off their limits by 1e-11) must
- * not be discarded by the feasibility validation. With cut rounds at every node the LP noise grows, and on
- * 22433 the optimal candidate (LP value 21477) was rejected, the node closed, and 21561 returned.
+ * An integer candidate carrying LP noise (integer variables at 1 + 1e-11, rows off their limits by 1e-11)
+ * must not be discarded by the feasibility validation. With cut rounds at every node the LP noise grows, and
+ * on 22433 the optimal candidate (LP value 21477) was rejected, the node closed, and 21561 returned.
  */
 public class CandidateValidationTest extends OptimisationIntegerTests {
 

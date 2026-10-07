@@ -40,13 +40,13 @@ import com.sun.management.OperatingSystemMXBean;
  * cache. (Do not worry about how many cache units there are - describe one unit.)
  * <li>The array must have at least 2 elements. You must describe the total system resources and the L1 cache.
  * It is strongly recommended to also describe the L2 cache. The L3 cache, if it exists, is less important to
- * describe. The derived attributes {@code processors}, {@code cores} and {@code units} may be
- * incorrectly calculated if you fail to specify the caches. Known issue: If you have more than one processor,
- * nut no L3 cache; the {@code processors} attribute will be incorrectly set 1. A workaround that
- * currently works is to define an L3 cache anyway and set the memory/size of that cache to 0bytes. This
- * Workaround may stop working in the future.
- * <li>{@code new MemoryThreads[] { SYSTEM, L3, L2, L1 }} or
- * {@code new MemoryThreads[] { SYSTEM, L2, L1 }} or {@code new MemoryThreads[] { SYSTEM, L1 }}
+ * describe. The derived attributes {@code processors}, {@code cores} and {@code units} may be incorrectly
+ * calculated if you fail to specify the caches. Known issue: If you have more than one processor, nut no L3
+ * cache; the {@code processors} attribute will be incorrectly set 1. A workaround that currently works is to
+ * define an L3 cache anyway and set the memory/size of that cache to 0bytes. This Workaround may stop working
+ * in the future.
+ * <li>{@code new MemoryThreads[] { SYSTEM, L3, L2, L1 }} or {@code new MemoryThreads[] { SYSTEM, L2, L1 }} or
+ * {@code new MemoryThreads[] { SYSTEM, L1 }}
  * </ul>
  *
  * @author apete
@@ -541,8 +541,8 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
     private final BasicMachine[] myLevels;
 
     /**
-     * {@code new BasicMachine[] { SYSTEM, L3, L2, L1 }},
-     * {@code new MemoryThreads[] { SYSTEM, L2, L1 }} or {@code new MemoryThreads[] { SYSTEM, L1 }}
+     * {@code new BasicMachine[] { SYSTEM, L3, L2, L1 }}, {@code new MemoryThreads[] { SYSTEM, L2, L1 }} or
+     * {@code new MemoryThreads[] { SYSTEM, L1 }}
      */
     public Hardware(final Architecture arch, final BasicMachine[] levels) {
 

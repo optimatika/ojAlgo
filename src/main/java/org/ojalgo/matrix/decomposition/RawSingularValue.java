@@ -29,6 +29,8 @@ import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.DOT;
+import org.ojalgo.array.operation.NRM2;
+import org.ojalgo.array.operation.NRMINF;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.decomposition.function.NegateColumn;
 import org.ojalgo.matrix.decomposition.function.RotateRight;
@@ -583,9 +585,9 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                 // place the k-th diagonal in s[k].
 
                 // Compute 2-norm of k-th column without under/overflow.
-                nrm = ZERO;
-                for (int i = k; i < m; i++) {
-                    nrm = HYPOT.invoke(nrm, tmpArr[i]);
+                nrm = NRMINF.invoke(tmpArr, k, m);
+                if (nrm != ZERO) {
+                    nrm = NRM2.invoke(tmpArr, nrm, k, m);
                 }
 
                 // Form k-th Householder column-vector.
@@ -626,9 +628,9 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                 // k-th super-diagonal in e[k].
 
                 // Compute 2-norm without under/overflow.
-                nrm = ZERO;
-                for (int i = k + 1; i < n; i++) {
-                    nrm = HYPOT.invoke(nrm, e[i]);
+                nrm = NRMINF.invoke(e, k + 1, n);
+                if (nrm != ZERO) {
+                    nrm = NRM2.invoke(e, nrm, k + 1, n);
                 }
 
                 if (nrm != ZERO) {
