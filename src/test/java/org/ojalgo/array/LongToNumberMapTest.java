@@ -51,7 +51,6 @@ public class LongToNumberMapTest extends ArrayTests {
     public void testCompareWithTreeMap() {
 
         final LongToNumberMap<Double> primit64Map = LongToNumberMap.factory(ArrayR064.FACTORY).make();
-        final LongToNumberMap<Double> direct64Map = LongToNumberMap.factory(BufferArray.R064).make();
 
         final SortedMap<Long, Double> expectedMap = new TreeMap<>();
 
@@ -60,7 +59,6 @@ public class LongToNumberMapTest extends ArrayTests {
             final Double value = RANDOM.nextDouble();
 
             primit64Map.put(index, value);
-            direct64Map.put(index, value);
             expectedMap.put(index, value);
         }
 
@@ -70,7 +68,6 @@ public class LongToNumberMapTest extends ArrayTests {
             final Double value = RANDOM.nextDouble();
 
             primit64Map.put(index, value);
-            direct64Map.put(index, value);
             expectedMap.put(index, value);
         }
 
@@ -79,25 +76,20 @@ public class LongToNumberMapTest extends ArrayTests {
             final Long index = Long.valueOf(RANDOM.nextInt(1_000));
 
             primit64Map.remove(index);
-            direct64Map.remove(index);
             expectedMap.remove(index);
         }
 
         for (long index = 0L; index < 100; index++) {
             primit64Map.remove(index);
-            direct64Map.remove(index);
             expectedMap.remove(index);
         }
 
         TestUtils.assertEquals(expectedMap.size(), primit64Map.size());
-        TestUtils.assertEquals(expectedMap.size(), direct64Map.size());
 
         for (final Entry<Long, Double> entry : expectedMap.entrySet()) {
             final double expectedValue = entry.getValue().doubleValue();
             TestUtils.assertEquals(expectedValue, primit64Map.get(entry.getKey()).doubleValue());
             TestUtils.assertEquals(expectedValue, primit64Map.doubleValue(entry.getKey()));
-            TestUtils.assertEquals(expectedValue, direct64Map.get(entry.getKey()).doubleValue());
-            TestUtils.assertEquals(expectedValue, direct64Map.doubleValue(entry.getKey()));
         }
 
     }

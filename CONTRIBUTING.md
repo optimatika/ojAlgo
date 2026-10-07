@@ -17,7 +17,7 @@ ojAlgo is a pure Java library for mathematics, linear algebra, and optimisation 
 All source lives under `org.ojalgo` with these key packages:
 
 - **`structure`** — Foundational interfaces (`Access1D/2D/AnyD`, `Mutate1D/2D`, `Structure1D/2D/AnyD`, `Factory1D/2D`) that define how data is accessed, mutated, and structured. Nearly everything implements these.
-- **`array`** — Concrete 1D array implementations: dense (`ArrayR064`, `ArrayR032`), sparse (`SparseArray`), off-heap (`OffHeapR064`), and buffer-backed. Naming convention: `R064` = double, `R032` = float, `C128` = complex, `Q128` = rational, `H256` = quaternion, `Z0xx` = integer types.
+- **`array`** — Concrete 1D array implementations: dense (`ArrayR064`, `ArrayR032`), sparse (`SparseArray`), and off-heap (`OffHeapR064`, allocated or memory mapped files). Naming convention: `R064` = double, `R032` = float, `C128` = complex, `Q128` = rational, `H256` = quaternion, `Z0xx` = integer types.
 - **`matrix`** — Matrix types and operations:
   - `MatrixR064`, `MatrixR032`, `MatrixC128`, etc. — user-facing immutable matrix types
   - `store/` — mutable matrix storage (`R064Store`, `GenericStore`, `SparseStore`, `RawStore`) plus logical/virtual stores (transposed, conjugated, sliced, composed)

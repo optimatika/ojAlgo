@@ -21,18 +21,22 @@
  */
 package org.ojalgo.array;
 
+import static java.lang.foreign.ValueLayout.JAVA_BYTE;
+
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.type.NativeMemory;
 
 final class OffHeapZ008 extends OffHeapArray {
 
-    private final long myPointer;
+    private final MemorySegment mySegment;
 
-    OffHeapZ008(final long count) {
+    OffHeapZ008(final MemorySegment segment, final Arena arena) {
 
-        super(OffHeapArray.Z008, count);
+        super(OffHeapArray.Z008, segment, arena);
 
-        myPointer = NativeMemory.allocateByteArray(this, count);
+        mySegment = segment;
     }
 
     @Override
@@ -42,37 +46,37 @@ final class OffHeapZ008 extends OffHeapArray {
 
     @Override
     public byte byteValue(final int index) {
-        return NativeMemory.getByte(myPointer, index);
+        return mySegment.getAtIndex(JAVA_BYTE, index);
     }
 
     @Override
     public byte byteValue(final long index) {
-        return NativeMemory.getByte(myPointer, index);
+        return mySegment.getAtIndex(JAVA_BYTE, index);
     }
 
     @Override
     public double doubleValue(final int index) {
-        return NativeMemory.getByte(myPointer, index);
+        return mySegment.getAtIndex(JAVA_BYTE, index);
     }
 
     @Override
     public double doubleValue(final long index) {
-        return NativeMemory.getByte(myPointer, index);
+        return mySegment.getAtIndex(JAVA_BYTE, index);
     }
 
     @Override
     public void reset() {
-        NativeMemory.initialiseByteArray(myPointer, this.count());
+        mySegment.fill((byte) 0);
     }
 
     @Override
     public void set(final int index, final double value) {
-        NativeMemory.setByte(myPointer, index, (byte) Math.toIntExact(Math.round(value)));
+        mySegment.setAtIndex(JAVA_BYTE, index, (byte) Math.toIntExact(Math.round(value)));
     }
 
     @Override
     public void set(final long index, final byte value) {
-        NativeMemory.setByte(myPointer, index, value);
+        mySegment.setAtIndex(JAVA_BYTE, index, value);
     }
 
     @Override
@@ -82,12 +86,12 @@ final class OffHeapZ008 extends OffHeapArray {
 
     @Override
     public void set(final long index, final double value) {
-        NativeMemory.setByte(myPointer, index, (byte) Math.toIntExact(Math.round(value)));
+        mySegment.setAtIndex(JAVA_BYTE, index, (byte) Math.toIntExact(Math.round(value)));
     }
 
     @Override
     public void set(final long index, final float value) {
-        NativeMemory.setByte(myPointer, index, (byte) Math.round(value));
+        mySegment.setAtIndex(JAVA_BYTE, index, (byte) Math.round(value));
     }
 
 }

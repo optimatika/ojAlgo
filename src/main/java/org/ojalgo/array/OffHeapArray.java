@@ -21,7 +21,15 @@
  */
 package org.ojalgo.array;
 
-import java.util.function.LongFunction;
+import java.io.File;
+import java.io.IOException;
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
+import java.lang.ref.Cleaner;
+import java.nio.channels.FileChannel;
+import java.nio.file.StandardOpenOption;
+import java.util.function.BiFunction;
 
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -30,56 +38,91 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.math.MathType;
 
 /**
- * Off heap memory array.
+ * Off heap memory array, backed by a {@link MemorySegment}. The memory is either allocated by
+ * {@link Factory#make(long)}, or a memory mapped file from {@link Factory#newMapped(File, long)}. Values are
+ * stored in native byte order.
  * <p>
- * When just instantiated these array classes contain uninitialized memory – memory is allocated but not
- * initialized. To initialize call {@link #reset()}. Explicit initialization is only necessary if your code
- * depends on having zeros as the default/initial value.
+ * Allocated memory is zero initialised, and released by the garbage collector. A memory mapped file is
+ * unmapped when the array is closed, or when it is garbage collected if it was never closed. Accessing the
+ * values of a closed array throws an {@link IllegalStateException}.
  *
  * @author apete
  */
-public abstract class OffHeapArray extends DenseArray<Double> {
+public abstract class OffHeapArray extends DenseArray<Double> implements AutoCloseable {
 
     public static final class Factory extends DenseArray.Factory<Double, OffHeapArray> {
 
-        private final LongFunction<OffHeapArray> myConstructor;
+        private final BiFunction<MemorySegment, Arena, OffHeapArray> myConstructor;
+        private final ValueLayout myLayout;
 
-        Factory(final MathType mathType, final LongFunction<OffHeapArray> constructor) {
+        Factory(final MathType mathType, final ValueLayout layout, final BiFunction<MemorySegment, Arena, OffHeapArray> constructor) {
             super(mathType);
+            myLayout = layout;
             myConstructor = constructor;
         }
 
         @Override
         public OffHeapArray make(final int size) {
-            return myConstructor.apply(size);
+            return this.make((long) size);
         }
 
         @Override
         public OffHeapArray make(final long size) {
-            return myConstructor.apply(size);
+            return myConstructor.apply(Arena.ofAuto().allocate(myLayout, size), null);
+        }
+
+        /**
+         * Memory map a file, creating it if it does not exist and growing it if it holds fewer than
+         * {@code size} elements. Existing values are kept. Close the array to unmap the file.
+         */
+        public OffHeapArray newMapped(final File file, final long size) {
+
+            Arena arena = Arena.ofShared();
+
+            MemorySegment segment;
+            try (FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.READ, StandardOpenOption.WRITE)) {
+                segment = channel.map(FileChannel.MapMode.READ_WRITE, 0L, size * myLayout.byteSize(), arena);
+            } catch (IOException cause) {
+                arena.close();
+                throw new RuntimeException(cause);
+            }
+
+            return myConstructor.apply(segment, arena);
         }
 
         @Override
         long getCapacityLimit() {
-            return Long.MAX_VALUE;
+            return Long.MAX_VALUE / myLayout.byteSize();
         }
 
     }
 
-    public static final OffHeapArray.Factory R032 = new OffHeapArray.Factory(MathType.R032, OffHeapR032::new);
-    public static final OffHeapArray.Factory R064 = new OffHeapArray.Factory(MathType.R064, OffHeapR064::new);
-    public static final OffHeapArray.Factory Z008 = new OffHeapArray.Factory(MathType.Z008, OffHeapZ008::new);
-    public static final OffHeapArray.Factory Z016 = new OffHeapArray.Factory(MathType.Z016, OffHeapZ016::new);
-    public static final OffHeapArray.Factory Z032 = new OffHeapArray.Factory(MathType.Z032, OffHeapZ032::new);
-    public static final OffHeapArray.Factory Z064 = new OffHeapArray.Factory(MathType.Z064, OffHeapZ064::new);
+    public static final OffHeapArray.Factory R032 = new OffHeapArray.Factory(MathType.R032, ValueLayout.JAVA_FLOAT, OffHeapR032::new);
+    public static final OffHeapArray.Factory R064 = new OffHeapArray.Factory(MathType.R064, ValueLayout.JAVA_DOUBLE, OffHeapR064::new);
+    public static final OffHeapArray.Factory Z008 = new OffHeapArray.Factory(MathType.Z008, ValueLayout.JAVA_BYTE, OffHeapZ008::new);
+    public static final OffHeapArray.Factory Z016 = new OffHeapArray.Factory(MathType.Z016, ValueLayout.JAVA_SHORT, OffHeapZ016::new);
+    public static final OffHeapArray.Factory Z032 = new OffHeapArray.Factory(MathType.Z032, ValueLayout.JAVA_INT, OffHeapZ032::new);
+    public static final OffHeapArray.Factory Z064 = new OffHeapArray.Factory(MathType.Z064, ValueLayout.JAVA_LONG, OffHeapZ064::new);
 
+    private static final Cleaner CLEANER = Cleaner.create();
+
+    /**
+     * Closes the arena of a memory mapped file – null when the memory is released by the garbage collector.
+     */
+    private final Cleaner.Cleanable myCleanable;
     private final long myCount;
 
-    protected OffHeapArray(final OffHeapArray.Factory factory, final long count) {
+    /**
+     * @param segment The memory holding the values
+     * @param arena The arena to close when this array is closed, or null if the garbage collector releases
+     *        the memory
+     */
+    protected OffHeapArray(final OffHeapArray.Factory factory, final MemorySegment segment, final Arena arena) {
 
         super(factory);
 
-        myCount = count;
+        myCount = segment.byteSize() / factory.getElementSize();
+        myCleanable = arena != null ? CLEANER.register(this, arena::close) : null;
     }
 
     @Override
@@ -115,6 +158,16 @@ public abstract class OffHeapArray extends DenseArray<Double> {
     @Override
     public final void add(final long index, final short addend) {
         this.set(index, this.shortValue(index) + addend);
+    }
+
+    /**
+     * Unmaps a memory mapped file. Does nothing for allocated memory, which the garbage collector releases.
+     */
+    @Override
+    public void close() {
+        if (myCleanable != null) {
+            myCleanable.clean();
+        }
     }
 
     @Override

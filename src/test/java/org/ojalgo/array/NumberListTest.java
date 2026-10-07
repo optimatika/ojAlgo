@@ -44,7 +44,7 @@ public class NumberListTest extends ArrayTests {
     public void testCompareWithArrayList() {
 
         NumberList<Double> primit64List = NumberList.factory(ArrayR064.FACTORY).make();
-        NumberList<Double> direct64List = NumberList.factory(BufferArray.R064).make();
+        NumberList<Double> offHeap64List = NumberList.factory(OffHeapArray.R064).make();
 
         List<Double> expectedList = new ArrayList<>();
 
@@ -53,7 +53,7 @@ public class NumberListTest extends ArrayTests {
             Double value = RANDOM.nextDouble();
 
             primit64List.add(value);
-            direct64List.add(value);
+            offHeap64List.add(value);
             expectedList.add(value);
         }
 
@@ -63,7 +63,7 @@ public class NumberListTest extends ArrayTests {
             Double value = RANDOM.nextDouble();
 
             primit64List.add(index, value);
-            direct64List.add(index, value);
+            offHeap64List.add(index, value);
             expectedList.add(index, value);
         }
 
@@ -73,7 +73,7 @@ public class NumberListTest extends ArrayTests {
             Double value = RANDOM.nextDouble();
 
             primit64List.set(index, value);
-            direct64List.set(index, value);
+            offHeap64List.set(index, value);
             expectedList.set(index, value);
         }
 
@@ -82,7 +82,7 @@ public class NumberListTest extends ArrayTests {
             int index = RANDOM.nextInt(10_000);
 
             primit64List.remove(index);
-            direct64List.remove(index);
+            offHeap64List.remove(index);
             expectedList.remove(index);
         }
 
@@ -93,20 +93,20 @@ public class NumberListTest extends ArrayTests {
             toRemove.add(RANDOM.nextDouble());
         }
         primit64List.addAll(toAdd);
-        direct64List.addAll(toAdd);
+        offHeap64List.addAll(toAdd);
         expectedList.addAll(toAdd);
         primit64List.removeAll(toRemove);
-        direct64List.removeAll(toRemove);
+        offHeap64List.removeAll(toRemove);
         expectedList.removeAll(toRemove);
 
         TestUtils.assertEquals(expectedList.size(), primit64List.size());
-        TestUtils.assertEquals(expectedList.size(), direct64List.size());
+        TestUtils.assertEquals(expectedList.size(), offHeap64List.size());
 
         for (int i = 0; i < expectedList.size(); i++) {
             TestUtils.assertEquals(expectedList.get(i).doubleValue(), primit64List.get(i).doubleValue());
             TestUtils.assertEquals(expectedList.get(i).doubleValue(), primit64List.doubleValue(i));
-            TestUtils.assertEquals(expectedList.get(i).doubleValue(), direct64List.get(i).doubleValue());
-            TestUtils.assertEquals(expectedList.get(i).doubleValue(), direct64List.doubleValue(i));
+            TestUtils.assertEquals(expectedList.get(i).doubleValue(), offHeap64List.get(i).doubleValue());
+            TestUtils.assertEquals(expectedList.get(i).doubleValue(), offHeap64List.doubleValue(i));
         }
 
     }
