@@ -149,6 +149,14 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - `PortfolioMixer` applied asset and component constraints to the wrong variables.
 - `BlackLittermanModel` without views threw an exception, `NormalisedPortfolio` could have a negative volatility, and the `SimplePortfolio` simulator's covariances were slightly off.
 
+#### org.ojalgo.function.special
+
+- `MissingMath.norm(double...)` (the varargs version) ignored negative values, returning a too small max-abs norm – 0 if the first value was 0 and the others negative.
+
+#### org.ojalgo.matrix
+
+- `MatrixR064` and `MatrixR032`: `solve(...)` and `invert()` of a singular matrix, up to 5x5, returned NaN, Infinity or huge (finite) values. They now fall back to the SVD, giving "one possible solution" and the "best possible inverse" as documented.
+
 #### org.ojalgo.matrix.decomposition
 
 - `SparseQDLDL.getSolution(...)` for a 1x1 matrix solved only the first of several right hand sides.
@@ -159,6 +167,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - In a region from `regionByTransposing()`, `fillRow(...)` (with a value or a supplier) filled a diagonal of the underlying matrix, and `fillDiagonal(...)` with a supplier filled a row, instead of the transposed column and diagonal.
 - `RawStore.transformLeft(Householder, int)` and `transformRight(Householder, int)` left the first column/row untransformed.
 - `R032Store.substituteForwards(boolean, boolean, double[])` and `substituteBackwards(boolean, boolean, double[])` ignored `conjugated` – they solved with the body as stored, not transposed. The `R064Store` versions were correct.
+
+#### org.ojalgo.matrix.task
+
+- The closed-form R064 `InverterTask` and `SolverTask` implementations, used for matrices up to 5x5, never threw `RecoverableCondition` – a singular matrix gave NaN, Infinity or huge values. Now they check the determinant (of the matrix scaled to max-abs 1). The solvers also returned NaN for a zero right hand side.
 
 #### org.ojalgo.matrix.task.iterative
 

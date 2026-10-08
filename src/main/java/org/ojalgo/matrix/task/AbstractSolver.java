@@ -21,8 +21,9 @@
  */
 package org.ojalgo.matrix.task;
 
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+
 import org.ojalgo.RecoverableCondition;
-import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
@@ -131,11 +132,15 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     };
 
-    static void full1X1(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) {
-        solution.set(0L, rhs.doubleValue(0L) / body.doubleValue(0L));
+    static void full1X1(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) throws RecoverableCondition {
+        double tmp00 = body.doubleValue(0L);
+        if ((Math.abs(tmp00) <= ZERO)) {
+            throw RecoverableCondition.newMatrixNotInvertible();
+        }
+        solution.set(0L, rhs.doubleValue(0L) / tmp00);
     }
 
-    static void full2X2(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) {
+    static void full2X2(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) throws RecoverableCondition {
 
         double tmp00 = body.doubleValue(0L);
         double tmp10 = body.doubleValue(1L);
@@ -146,7 +151,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
         double tmp0 = rhs.doubleValue(0L);
         double tmp1 = rhs.doubleValue(1L);
 
-        final double tmpScale = MissingMath.norm(tmp0, tmp1);
+        double tmpScale = Math.max(Math.max(Math.abs(tmp00), Math.abs(tmp01)), Math.max(Math.abs(tmp10), Math.abs(tmp11)));
 
         tmp00 /= tmpScale;
         tmp10 /= tmpScale;
@@ -157,13 +162,16 @@ abstract class AbstractSolver implements SolverTask<Double> {
         tmp0 /= tmpScale;
         tmp1 /= tmpScale;
 
-        final double tmpDet = AbstractDeterminator.calculate(tmp00, tmp10, tmp01, tmp11);
+        double tmpDet = AbstractDeterminator.calculate(tmp00, tmp10, tmp01, tmp11);
+        if ((Math.abs(tmpDet) <= AbstractDeterminator.TOLERANCE_2X2)) {
+            throw RecoverableCondition.newMatrixNotInvertible();
+        }
 
         solution.set(0L, AbstractDeterminator.calculate(tmp0, tmp1, tmp01, tmp11) / tmpDet);
         solution.set(1L, AbstractDeterminator.calculate(tmp00, tmp10, tmp0, tmp1) / tmpDet);
     }
 
-    static void full3X3(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) {
+    static void full3X3(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) throws RecoverableCondition {
 
         double tmp00 = body.doubleValue(0L);
         double tmp10 = body.doubleValue(1L);
@@ -181,7 +189,8 @@ abstract class AbstractSolver implements SolverTask<Double> {
         double tmp1 = rhs.doubleValue(1L);
         double tmp2 = rhs.doubleValue(2L);
 
-        final double tmpScale = MissingMath.norm(tmp0, tmp1, tmp2);
+        double tmpScale = Math.max(Math.max(Math.max(Math.max(Math.abs(tmp00), Math.abs(tmp01)), Math.abs(tmp02)), Math.max(Math.abs(tmp10), Math.abs(tmp11))),
+                Math.max(Math.max(Math.abs(tmp12), Math.abs(tmp20)), Math.max(Math.abs(tmp21), Math.abs(tmp22))));
 
         tmp00 /= tmpScale;
         tmp10 /= tmpScale;
@@ -199,26 +208,29 @@ abstract class AbstractSolver implements SolverTask<Double> {
         tmp1 /= tmpScale;
         tmp2 /= tmpScale;
 
-        final double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp12, tmp22);
-        final double tmpMin10 = AbstractDeterminator.calculate(tmp01, tmp21, tmp02, tmp22);
-        final double tmpMin20 = AbstractDeterminator.calculate(tmp01, tmp11, tmp02, tmp12);
+        double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp12, tmp22);
+        double tmpMin10 = AbstractDeterminator.calculate(tmp01, tmp21, tmp02, tmp22);
+        double tmpMin20 = AbstractDeterminator.calculate(tmp01, tmp11, tmp02, tmp12);
 
-        final double tmpMin01 = AbstractDeterminator.calculate(tmp10, tmp20, tmp12, tmp22);
-        final double tmpMin11 = AbstractDeterminator.calculate(tmp00, tmp20, tmp02, tmp22);
-        final double tmpMin21 = AbstractDeterminator.calculate(tmp00, tmp10, tmp02, tmp12);
+        double tmpMin01 = AbstractDeterminator.calculate(tmp10, tmp20, tmp12, tmp22);
+        double tmpMin11 = AbstractDeterminator.calculate(tmp00, tmp20, tmp02, tmp22);
+        double tmpMin21 = AbstractDeterminator.calculate(tmp00, tmp10, tmp02, tmp12);
 
-        final double tmpMin02 = AbstractDeterminator.calculate(tmp10, tmp20, tmp11, tmp21);
-        final double tmpMin12 = AbstractDeterminator.calculate(tmp00, tmp20, tmp01, tmp21);
-        final double tmpMin22 = AbstractDeterminator.calculate(tmp00, tmp10, tmp01, tmp11);
+        double tmpMin02 = AbstractDeterminator.calculate(tmp10, tmp20, tmp11, tmp21);
+        double tmpMin12 = AbstractDeterminator.calculate(tmp00, tmp20, tmp01, tmp21);
+        double tmpMin22 = AbstractDeterminator.calculate(tmp00, tmp10, tmp01, tmp11);
 
-        final double tmpDet = tmp00 * tmpMin00 - tmp10 * tmpMin10 + tmp20 * tmpMin20;
+        double tmpDet = tmp00 * tmpMin00 - tmp10 * tmpMin10 + tmp20 * tmpMin20;
+        if ((Math.abs(tmpDet) <= AbstractDeterminator.TOLERANCE_3X3)) {
+            throw RecoverableCondition.newMatrixNotInvertible();
+        }
 
         solution.set(0L, (tmp0 * tmpMin00 - tmp1 * tmpMin10 + tmp2 * tmpMin20) / tmpDet);
         solution.set(1L, -(tmp0 * tmpMin01 - tmp1 * tmpMin11 + tmp2 * tmpMin21) / tmpDet);
         solution.set(2L, (tmp0 * tmpMin02 - tmp1 * tmpMin12 + tmp2 * tmpMin22) / tmpDet);
     }
 
-    static void full4X4(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) {
+    static void full4X4(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) throws RecoverableCondition {
 
         double tmp00 = body.doubleValue(0L);
         double tmp10 = body.doubleValue(1L);
@@ -245,7 +257,11 @@ abstract class AbstractSolver implements SolverTask<Double> {
         double tmp2 = rhs.doubleValue(2L);
         double tmp3 = rhs.doubleValue(3L);
 
-        final double tmpScale = MissingMath.norm(tmp0, tmp1, tmp2, tmp3);
+        double tmpScale = Math.max(
+                Math.max(Math.max(Math.max(Math.abs(tmp00), Math.abs(tmp01)), Math.max(Math.abs(tmp02), Math.abs(tmp03))),
+                        Math.max(Math.max(Math.abs(tmp10), Math.abs(tmp11)), Math.max(Math.abs(tmp12), Math.abs(tmp13)))),
+                Math.max(Math.max(Math.max(Math.abs(tmp20), Math.abs(tmp21)), Math.max(Math.abs(tmp22), Math.abs(tmp23))),
+                        Math.max(Math.max(Math.abs(tmp30), Math.abs(tmp31)), Math.max(Math.abs(tmp32), Math.abs(tmp33)))));
 
         tmp00 /= tmpScale;
         tmp10 /= tmpScale;
@@ -272,27 +288,30 @@ abstract class AbstractSolver implements SolverTask<Double> {
         tmp2 /= tmpScale;
         tmp3 /= tmpScale;
 
-        final double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp31, tmp12, tmp22, tmp32, tmp13, tmp23, tmp33);
-        final double tmpMin10 = AbstractDeterminator.calculate(tmp01, tmp21, tmp31, tmp02, tmp22, tmp32, tmp03, tmp23, tmp33);
-        final double tmpMin20 = AbstractDeterminator.calculate(tmp01, tmp11, tmp31, tmp02, tmp12, tmp32, tmp03, tmp13, tmp33);
-        final double tmpMin30 = AbstractDeterminator.calculate(tmp01, tmp11, tmp21, tmp02, tmp12, tmp22, tmp03, tmp13, tmp23);
+        double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp31, tmp12, tmp22, tmp32, tmp13, tmp23, tmp33);
+        double tmpMin10 = AbstractDeterminator.calculate(tmp01, tmp21, tmp31, tmp02, tmp22, tmp32, tmp03, tmp23, tmp33);
+        double tmpMin20 = AbstractDeterminator.calculate(tmp01, tmp11, tmp31, tmp02, tmp12, tmp32, tmp03, tmp13, tmp33);
+        double tmpMin30 = AbstractDeterminator.calculate(tmp01, tmp11, tmp21, tmp02, tmp12, tmp22, tmp03, tmp13, tmp23);
 
-        final double tmpMin01 = AbstractDeterminator.calculate(tmp10, tmp20, tmp30, tmp12, tmp22, tmp32, tmp13, tmp23, tmp33);
-        final double tmpMin11 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp02, tmp22, tmp32, tmp03, tmp23, tmp33);
-        final double tmpMin21 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp02, tmp12, tmp32, tmp03, tmp13, tmp33);
-        final double tmpMin31 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp02, tmp12, tmp22, tmp03, tmp13, tmp23);
+        double tmpMin01 = AbstractDeterminator.calculate(tmp10, tmp20, tmp30, tmp12, tmp22, tmp32, tmp13, tmp23, tmp33);
+        double tmpMin11 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp02, tmp22, tmp32, tmp03, tmp23, tmp33);
+        double tmpMin21 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp02, tmp12, tmp32, tmp03, tmp13, tmp33);
+        double tmpMin31 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp02, tmp12, tmp22, tmp03, tmp13, tmp23);
 
-        final double tmpMin02 = AbstractDeterminator.calculate(tmp10, tmp20, tmp30, tmp11, tmp21, tmp31, tmp13, tmp23, tmp33);
-        final double tmpMin12 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp01, tmp21, tmp31, tmp03, tmp23, tmp33);
-        final double tmpMin22 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp01, tmp11, tmp31, tmp03, tmp13, tmp33);
-        final double tmpMin32 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp01, tmp11, tmp21, tmp03, tmp13, tmp23);
+        double tmpMin02 = AbstractDeterminator.calculate(tmp10, tmp20, tmp30, tmp11, tmp21, tmp31, tmp13, tmp23, tmp33);
+        double tmpMin12 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp01, tmp21, tmp31, tmp03, tmp23, tmp33);
+        double tmpMin22 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp01, tmp11, tmp31, tmp03, tmp13, tmp33);
+        double tmpMin32 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp01, tmp11, tmp21, tmp03, tmp13, tmp23);
 
-        final double tmpMin03 = AbstractDeterminator.calculate(tmp10, tmp20, tmp30, tmp11, tmp21, tmp31, tmp12, tmp22, tmp32);
-        final double tmpMin13 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp01, tmp21, tmp31, tmp02, tmp22, tmp32);
-        final double tmpMin23 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp01, tmp11, tmp31, tmp02, tmp12, tmp32);
-        final double tmpMin33 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp01, tmp11, tmp21, tmp02, tmp12, tmp22);
+        double tmpMin03 = AbstractDeterminator.calculate(tmp10, tmp20, tmp30, tmp11, tmp21, tmp31, tmp12, tmp22, tmp32);
+        double tmpMin13 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp01, tmp21, tmp31, tmp02, tmp22, tmp32);
+        double tmpMin23 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp01, tmp11, tmp31, tmp02, tmp12, tmp32);
+        double tmpMin33 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp01, tmp11, tmp21, tmp02, tmp12, tmp22);
 
-        final double tmpDet = tmp00 * tmpMin00 - tmp10 * tmpMin10 + tmp20 * tmpMin20 - tmp30 * tmpMin30;
+        double tmpDet = tmp00 * tmpMin00 - tmp10 * tmpMin10 + tmp20 * tmpMin20 - tmp30 * tmpMin30;
+        if ((Math.abs(tmpDet) <= AbstractDeterminator.TOLERANCE_4X4)) {
+            throw RecoverableCondition.newMatrixNotInvertible();
+        }
 
         solution.set(0L, (tmp0 * tmpMin00 - tmp1 * tmpMin10 + tmp2 * tmpMin20 - tmp3 * tmpMin30) / tmpDet);
         solution.set(1L, -(tmp0 * tmpMin01 - tmp1 * tmpMin11 + tmp2 * tmpMin21 - tmp3 * tmpMin31) / tmpDet);
@@ -300,7 +319,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
         solution.set(3L, -(tmp0 * tmpMin03 - tmp1 * tmpMin13 + tmp2 * tmpMin23 - tmp3 * tmpMin33) / tmpDet);
     }
 
-    static void full5X5(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) {
+    static void full5X5(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) throws RecoverableCondition {
 
         double tmp00 = body.doubleValue(0L);
         double tmp10 = body.doubleValue(1L);
@@ -338,7 +357,17 @@ abstract class AbstractSolver implements SolverTask<Double> {
         double tmp3 = rhs.doubleValue(3L);
         double tmp4 = rhs.doubleValue(4L);
 
-        final double tmpScale = MissingMath.norm(tmp0, tmp1, tmp2, tmp3, tmp4);
+        double tmpScale = Math.max(
+                Math.max(
+                        Math.max(Math.max(Math.max(Math.abs(tmp00), Math.abs(tmp01)), Math.max(Math.abs(tmp02), Math.abs(tmp03))),
+                                Math.max(Math.max(Math.abs(tmp04), Math.abs(tmp10)), Math.abs(tmp11))),
+                        Math.max(Math.max(Math.max(Math.abs(tmp12), Math.abs(tmp13)), Math.abs(tmp14)),
+                                Math.max(Math.max(Math.abs(tmp20), Math.abs(tmp21)), Math.abs(tmp22)))),
+                Math.max(
+                        Math.max(Math.max(Math.max(Math.abs(tmp23), Math.abs(tmp24)), Math.abs(tmp30)),
+                                Math.max(Math.max(Math.abs(tmp31), Math.abs(tmp32)), Math.abs(tmp33))),
+                        Math.max(Math.max(Math.max(Math.abs(tmp34), Math.abs(tmp40)), Math.abs(tmp41)),
+                                Math.max(Math.max(Math.abs(tmp42), Math.abs(tmp43)), Math.abs(tmp44)))));
 
         tmp00 /= tmpScale;
         tmp10 /= tmpScale;
@@ -376,62 +405,65 @@ abstract class AbstractSolver implements SolverTask<Double> {
         tmp3 /= tmpScale;
         tmp4 /= tmpScale;
 
-        final double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp31, tmp41, tmp12, tmp22, tmp32, tmp42, tmp13, tmp23, tmp33, tmp43, tmp14, tmp24,
+        double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp31, tmp41, tmp12, tmp22, tmp32, tmp42, tmp13, tmp23, tmp33, tmp43, tmp14, tmp24,
                 tmp34, tmp44);
-        final double tmpMin10 = AbstractDeterminator.calculate(tmp01, tmp21, tmp31, tmp41, tmp02, tmp22, tmp32, tmp42, tmp03, tmp23, tmp33, tmp43, tmp04, tmp24,
+        double tmpMin10 = AbstractDeterminator.calculate(tmp01, tmp21, tmp31, tmp41, tmp02, tmp22, tmp32, tmp42, tmp03, tmp23, tmp33, tmp43, tmp04, tmp24,
                 tmp34, tmp44);
-        final double tmpMin20 = AbstractDeterminator.calculate(tmp01, tmp11, tmp31, tmp41, tmp02, tmp12, tmp32, tmp42, tmp03, tmp13, tmp33, tmp43, tmp04, tmp14,
+        double tmpMin20 = AbstractDeterminator.calculate(tmp01, tmp11, tmp31, tmp41, tmp02, tmp12, tmp32, tmp42, tmp03, tmp13, tmp33, tmp43, tmp04, tmp14,
                 tmp34, tmp44);
-        final double tmpMin30 = AbstractDeterminator.calculate(tmp01, tmp11, tmp21, tmp41, tmp02, tmp12, tmp22, tmp42, tmp03, tmp13, tmp23, tmp43, tmp04, tmp14,
+        double tmpMin30 = AbstractDeterminator.calculate(tmp01, tmp11, tmp21, tmp41, tmp02, tmp12, tmp22, tmp42, tmp03, tmp13, tmp23, tmp43, tmp04, tmp14,
                 tmp24, tmp44);
-        final double tmpMin40 = AbstractDeterminator.calculate(tmp01, tmp11, tmp21, tmp31, tmp02, tmp12, tmp22, tmp32, tmp03, tmp13, tmp23, tmp33, tmp04, tmp14,
+        double tmpMin40 = AbstractDeterminator.calculate(tmp01, tmp11, tmp21, tmp31, tmp02, tmp12, tmp22, tmp32, tmp03, tmp13, tmp23, tmp33, tmp04, tmp14,
                 tmp24, tmp34);
 
-        final double tmpMin01 = AbstractDeterminator.calculate(tmp10, tmp20, tmp30, tmp40, tmp12, tmp22, tmp32, tmp42, tmp13, tmp23, tmp33, tmp43, tmp14, tmp24,
+        double tmpMin01 = AbstractDeterminator.calculate(tmp10, tmp20, tmp30, tmp40, tmp12, tmp22, tmp32, tmp42, tmp13, tmp23, tmp33, tmp43, tmp14, tmp24,
                 tmp34, tmp44);
-        final double tmpMin11 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp40, tmp02, tmp22, tmp32, tmp42, tmp03, tmp23, tmp33, tmp43, tmp04, tmp24,
+        double tmpMin11 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp40, tmp02, tmp22, tmp32, tmp42, tmp03, tmp23, tmp33, tmp43, tmp04, tmp24,
                 tmp34, tmp44);
-        final double tmpMin21 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp40, tmp02, tmp12, tmp32, tmp42, tmp03, tmp13, tmp33, tmp43, tmp04, tmp14,
+        double tmpMin21 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp40, tmp02, tmp12, tmp32, tmp42, tmp03, tmp13, tmp33, tmp43, tmp04, tmp14,
                 tmp34, tmp44);
-        final double tmpMin31 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp02, tmp12, tmp22, tmp42, tmp03, tmp13, tmp23, tmp43, tmp04, tmp14,
+        double tmpMin31 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp02, tmp12, tmp22, tmp42, tmp03, tmp13, tmp23, tmp43, tmp04, tmp14,
                 tmp24, tmp44);
-        final double tmpMin41 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp02, tmp12, tmp22, tmp32, tmp03, tmp13, tmp23, tmp33, tmp04, tmp14,
+        double tmpMin41 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp02, tmp12, tmp22, tmp32, tmp03, tmp13, tmp23, tmp33, tmp04, tmp14,
                 tmp24, tmp34);
 
-        final double tmpMin02 = AbstractDeterminator.calculate(tmp10, tmp20, tmp30, tmp40, tmp11, tmp21, tmp31, tmp41, tmp13, tmp23, tmp33, tmp43, tmp14, tmp24,
+        double tmpMin02 = AbstractDeterminator.calculate(tmp10, tmp20, tmp30, tmp40, tmp11, tmp21, tmp31, tmp41, tmp13, tmp23, tmp33, tmp43, tmp14, tmp24,
                 tmp34, tmp44);
-        final double tmpMin12 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp40, tmp01, tmp21, tmp31, tmp41, tmp03, tmp23, tmp33, tmp43, tmp04, tmp24,
+        double tmpMin12 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp40, tmp01, tmp21, tmp31, tmp41, tmp03, tmp23, tmp33, tmp43, tmp04, tmp24,
                 tmp34, tmp44);
-        final double tmpMin22 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp40, tmp01, tmp11, tmp31, tmp41, tmp03, tmp13, tmp33, tmp43, tmp04, tmp14,
+        double tmpMin22 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp40, tmp01, tmp11, tmp31, tmp41, tmp03, tmp13, tmp33, tmp43, tmp04, tmp14,
                 tmp34, tmp44);
-        final double tmpMin32 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp01, tmp11, tmp21, tmp41, tmp03, tmp13, tmp23, tmp43, tmp04, tmp14,
+        double tmpMin32 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp01, tmp11, tmp21, tmp41, tmp03, tmp13, tmp23, tmp43, tmp04, tmp14,
                 tmp24, tmp44);
-        final double tmpMin42 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp01, tmp11, tmp21, tmp31, tmp03, tmp13, tmp23, tmp33, tmp04, tmp14,
+        double tmpMin42 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp01, tmp11, tmp21, tmp31, tmp03, tmp13, tmp23, tmp33, tmp04, tmp14,
                 tmp24, tmp34);
 
-        final double tmpMin03 = AbstractDeterminator.calculate(tmp10, tmp20, tmp30, tmp40, tmp11, tmp21, tmp31, tmp41, tmp12, tmp22, tmp32, tmp42, tmp14, tmp24,
+        double tmpMin03 = AbstractDeterminator.calculate(tmp10, tmp20, tmp30, tmp40, tmp11, tmp21, tmp31, tmp41, tmp12, tmp22, tmp32, tmp42, tmp14, tmp24,
                 tmp34, tmp44);
-        final double tmpMin13 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp40, tmp01, tmp21, tmp31, tmp41, tmp02, tmp22, tmp32, tmp42, tmp04, tmp24,
+        double tmpMin13 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp40, tmp01, tmp21, tmp31, tmp41, tmp02, tmp22, tmp32, tmp42, tmp04, tmp24,
                 tmp34, tmp44);
-        final double tmpMin23 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp40, tmp01, tmp11, tmp31, tmp41, tmp02, tmp12, tmp32, tmp42, tmp04, tmp14,
+        double tmpMin23 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp40, tmp01, tmp11, tmp31, tmp41, tmp02, tmp12, tmp32, tmp42, tmp04, tmp14,
                 tmp34, tmp44);
-        final double tmpMin33 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp01, tmp11, tmp21, tmp41, tmp02, tmp12, tmp22, tmp42, tmp04, tmp14,
+        double tmpMin33 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp01, tmp11, tmp21, tmp41, tmp02, tmp12, tmp22, tmp42, tmp04, tmp14,
                 tmp24, tmp44);
-        final double tmpMin43 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp01, tmp11, tmp21, tmp31, tmp02, tmp12, tmp22, tmp32, tmp04, tmp14,
+        double tmpMin43 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp01, tmp11, tmp21, tmp31, tmp02, tmp12, tmp22, tmp32, tmp04, tmp14,
                 tmp24, tmp34);
 
-        final double tmpMin04 = AbstractDeterminator.calculate(tmp10, tmp20, tmp30, tmp40, tmp11, tmp21, tmp31, tmp41, tmp12, tmp22, tmp32, tmp42, tmp13, tmp23,
+        double tmpMin04 = AbstractDeterminator.calculate(tmp10, tmp20, tmp30, tmp40, tmp11, tmp21, tmp31, tmp41, tmp12, tmp22, tmp32, tmp42, tmp13, tmp23,
                 tmp33, tmp43);
-        final double tmpMin14 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp40, tmp01, tmp21, tmp31, tmp41, tmp02, tmp22, tmp32, tmp42, tmp03, tmp23,
+        double tmpMin14 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp40, tmp01, tmp21, tmp31, tmp41, tmp02, tmp22, tmp32, tmp42, tmp03, tmp23,
                 tmp33, tmp43);
-        final double tmpMin24 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp40, tmp01, tmp11, tmp31, tmp41, tmp02, tmp12, tmp32, tmp42, tmp03, tmp13,
+        double tmpMin24 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp40, tmp01, tmp11, tmp31, tmp41, tmp02, tmp12, tmp32, tmp42, tmp03, tmp13,
                 tmp33, tmp43);
-        final double tmpMin34 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp01, tmp11, tmp21, tmp41, tmp02, tmp12, tmp22, tmp42, tmp03, tmp13,
+        double tmpMin34 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp01, tmp11, tmp21, tmp41, tmp02, tmp12, tmp22, tmp42, tmp03, tmp13,
                 tmp23, tmp43);
-        final double tmpMin44 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp01, tmp11, tmp21, tmp31, tmp02, tmp12, tmp22, tmp32, tmp03, tmp13,
+        double tmpMin44 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp01, tmp11, tmp21, tmp31, tmp02, tmp12, tmp22, tmp32, tmp03, tmp13,
                 tmp23, tmp33);
 
-        final double tmpDet = tmp00 * tmpMin00 - tmp10 * tmpMin10 + tmp20 * tmpMin20 - tmp30 * tmpMin30 + tmp40 * tmpMin40;
+        double tmpDet = tmp00 * tmpMin00 - tmp10 * tmpMin10 + tmp20 * tmpMin20 - tmp30 * tmpMin30 + tmp40 * tmpMin40;
+        if ((Math.abs(tmpDet) <= AbstractDeterminator.TOLERANCE_5X5)) {
+            throw RecoverableCondition.newMatrixNotInvertible();
+        }
 
         solution.set(0L, (tmp0 * tmpMin00 - tmp1 * tmpMin10 + tmp2 * tmpMin20 - tmp3 * tmpMin30 + tmp4 * tmpMin40) / tmpDet);
         solution.set(1L, -(tmp0 * tmpMin01 - tmp1 * tmpMin11 + tmp2 * tmpMin21 - tmp3 * tmpMin31 + tmp4 * tmpMin41) / tmpDet);
@@ -440,16 +472,16 @@ abstract class AbstractSolver implements SolverTask<Double> {
         solution.set(4L, (tmp0 * tmpMin04 - tmp1 * tmpMin14 + tmp2 * tmpMin24 - tmp3 * tmpMin34 + tmp4 * tmpMin44) / tmpDet);
     }
 
-    static void leastSquares(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) {
+    static void leastSquares(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) throws RecoverableCondition {
 
-        final R064Store tmpTranspBody = R064Store.FACTORY.transpose(body);
+        R064Store tmpTranspBody = R064Store.FACTORY.transpose(body);
 
-        final int tmpCountRows = (int) tmpTranspBody.countRows();
+        int tmpCountRows = (int) tmpTranspBody.countRows();
 
-        final R064Store tmpBody = R064Store.FACTORY.make(tmpCountRows, tmpCountRows);
+        R064Store tmpBody = R064Store.FACTORY.make(tmpCountRows, tmpCountRows);
         tmpTranspBody.multiply(tmpTranspBody.transpose(), tmpBody);
 
-        final R064Store tmpRHS = R064Store.FACTORY.make(tmpCountRows, solution.countColumns());
+        R064Store tmpRHS = R064Store.FACTORY.make(tmpCountRows, solution.countColumns());
         tmpTranspBody.multiply((Access1D<Double>) rhs, tmpRHS);
 
         switch (tmpCountRows) {
@@ -474,7 +506,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     }
 
-    static void symmetric2X2(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) {
+    static void symmetric2X2(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) throws RecoverableCondition {
 
         double tmp00 = body.doubleValue(0L);
         double tmp10 = body.doubleValue(1L);
@@ -484,7 +516,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
         double tmp0 = rhs.doubleValue(0L);
         double tmp1 = rhs.doubleValue(1L);
 
-        final double tmpScale = MissingMath.norm(tmp0, tmp1);
+        double tmpScale = Math.max(Math.max(Math.abs(tmp00), Math.abs(tmp10)), Math.abs(tmp11));
 
         tmp00 /= tmpScale;
         tmp10 /= tmpScale;
@@ -494,13 +526,16 @@ abstract class AbstractSolver implements SolverTask<Double> {
         tmp0 /= tmpScale;
         tmp1 /= tmpScale;
 
-        final double tmpDet = AbstractDeterminator.calculate(tmp00, tmp10, tmp10, tmp11);
+        double tmpDet = AbstractDeterminator.calculate(tmp00, tmp10, tmp10, tmp11);
+        if ((Math.abs(tmpDet) <= AbstractDeterminator.TOLERANCE_2X2)) {
+            throw RecoverableCondition.newMatrixNotInvertible();
+        }
 
         solution.set(0L, AbstractDeterminator.calculate(tmp0, tmp1, tmp10, tmp11) / tmpDet);
         solution.set(1L, AbstractDeterminator.calculate(tmp00, tmp10, tmp0, tmp1) / tmpDet);
     }
 
-    static void symmetric3X3(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) {
+    static void symmetric3X3(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) throws RecoverableCondition {
 
         double tmp00 = body.doubleValue(0L);
         double tmp10 = body.doubleValue(1L);
@@ -515,7 +550,8 @@ abstract class AbstractSolver implements SolverTask<Double> {
         double tmp1 = rhs.doubleValue(1L);
         double tmp2 = rhs.doubleValue(2L);
 
-        final double tmpScale = MissingMath.norm(tmp0, tmp1, tmp2);
+        double tmpScale = Math.max(Math.max(Math.max(Math.abs(tmp00), Math.abs(tmp10)), Math.abs(tmp11)),
+                Math.max(Math.max(Math.abs(tmp20), Math.abs(tmp21)), Math.abs(tmp22)));
 
         tmp00 /= tmpScale;
         tmp10 /= tmpScale;
@@ -530,23 +566,26 @@ abstract class AbstractSolver implements SolverTask<Double> {
         tmp1 /= tmpScale;
         tmp2 /= tmpScale;
 
-        final double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp21, tmp22);
-        final double tmpMin10 = AbstractDeterminator.calculate(tmp10, tmp21, tmp20, tmp22);
-        final double tmpMin20 = AbstractDeterminator.calculate(tmp10, tmp11, tmp20, tmp21);
+        double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp21, tmp22);
+        double tmpMin10 = AbstractDeterminator.calculate(tmp10, tmp21, tmp20, tmp22);
+        double tmpMin20 = AbstractDeterminator.calculate(tmp10, tmp11, tmp20, tmp21);
 
-        final double tmpMin11 = AbstractDeterminator.calculate(tmp00, tmp20, tmp20, tmp22);
-        final double tmpMin21 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp21);
+        double tmpMin11 = AbstractDeterminator.calculate(tmp00, tmp20, tmp20, tmp22);
+        double tmpMin21 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp21);
 
-        final double tmpMin22 = AbstractDeterminator.calculate(tmp00, tmp10, tmp10, tmp11);
+        double tmpMin22 = AbstractDeterminator.calculate(tmp00, tmp10, tmp10, tmp11);
 
-        final double tmpDet = tmp00 * tmpMin00 - tmp10 * tmpMin10 + tmp20 * tmpMin20;
+        double tmpDet = tmp00 * tmpMin00 - tmp10 * tmpMin10 + tmp20 * tmpMin20;
+        if ((Math.abs(tmpDet) <= AbstractDeterminator.TOLERANCE_3X3)) {
+            throw RecoverableCondition.newMatrixNotInvertible();
+        }
 
         solution.set(0L, (tmp0 * tmpMin00 - tmp1 * tmpMin10 + tmp2 * tmpMin20) / tmpDet);
         solution.set(1L, -(tmp0 * tmpMin10 - tmp1 * tmpMin11 + tmp2 * tmpMin21) / tmpDet);
         solution.set(2L, (tmp0 * tmpMin20 - tmp1 * tmpMin21 + tmp2 * tmpMin22) / tmpDet);
     }
 
-    static void symmetric4X4(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) {
+    static void symmetric4X4(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) throws RecoverableCondition {
 
         double tmp00 = body.doubleValue(0L);
         double tmp10 = body.doubleValue(1L);
@@ -567,7 +606,8 @@ abstract class AbstractSolver implements SolverTask<Double> {
         double tmp2 = rhs.doubleValue(2L);
         double tmp3 = rhs.doubleValue(3L);
 
-        final double tmpScale = MissingMath.norm(tmp0, tmp1, tmp2, tmp3);
+        double tmpScale = Math.max(Math.max(Math.max(Math.max(Math.abs(tmp00), Math.abs(tmp10)), Math.abs(tmp11)), Math.max(Math.abs(tmp20), Math.abs(tmp21))),
+                Math.max(Math.max(Math.max(Math.abs(tmp22), Math.abs(tmp30)), Math.abs(tmp31)), Math.max(Math.abs(tmp32), Math.abs(tmp33))));
 
         tmp00 /= tmpScale;
         tmp10 /= tmpScale;
@@ -588,21 +628,24 @@ abstract class AbstractSolver implements SolverTask<Double> {
         tmp2 /= tmpScale;
         tmp3 /= tmpScale;
 
-        final double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp31, tmp21, tmp22, tmp32, tmp31, tmp32, tmp33);
-        final double tmpMin10 = AbstractDeterminator.calculate(tmp10, tmp21, tmp31, tmp20, tmp22, tmp32, tmp30, tmp32, tmp33);
-        final double tmpMin20 = AbstractDeterminator.calculate(tmp10, tmp11, tmp31, tmp20, tmp21, tmp32, tmp30, tmp31, tmp33);
-        final double tmpMin30 = AbstractDeterminator.calculate(tmp10, tmp11, tmp21, tmp20, tmp21, tmp22, tmp30, tmp31, tmp32);
+        double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp31, tmp21, tmp22, tmp32, tmp31, tmp32, tmp33);
+        double tmpMin10 = AbstractDeterminator.calculate(tmp10, tmp21, tmp31, tmp20, tmp22, tmp32, tmp30, tmp32, tmp33);
+        double tmpMin20 = AbstractDeterminator.calculate(tmp10, tmp11, tmp31, tmp20, tmp21, tmp32, tmp30, tmp31, tmp33);
+        double tmpMin30 = AbstractDeterminator.calculate(tmp10, tmp11, tmp21, tmp20, tmp21, tmp22, tmp30, tmp31, tmp32);
 
-        final double tmpMin11 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp20, tmp22, tmp32, tmp30, tmp32, tmp33);
-        final double tmpMin21 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp20, tmp21, tmp32, tmp30, tmp31, tmp33);
-        final double tmpMin31 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp20, tmp21, tmp22, tmp30, tmp31, tmp32);
+        double tmpMin11 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp20, tmp22, tmp32, tmp30, tmp32, tmp33);
+        double tmpMin21 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp20, tmp21, tmp32, tmp30, tmp31, tmp33);
+        double tmpMin31 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp20, tmp21, tmp22, tmp30, tmp31, tmp32);
 
-        final double tmpMin22 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp10, tmp11, tmp31, tmp30, tmp31, tmp33);
-        final double tmpMin32 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp10, tmp11, tmp21, tmp30, tmp31, tmp32);
+        double tmpMin22 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp10, tmp11, tmp31, tmp30, tmp31, tmp33);
+        double tmpMin32 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp10, tmp11, tmp21, tmp30, tmp31, tmp32);
 
-        final double tmpMin33 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp10, tmp11, tmp21, tmp20, tmp21, tmp22);
+        double tmpMin33 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp10, tmp11, tmp21, tmp20, tmp21, tmp22);
 
-        final double tmpDet = tmp00 * tmpMin00 - tmp10 * tmpMin10 + tmp20 * tmpMin20 - tmp30 * tmpMin30;
+        double tmpDet = tmp00 * tmpMin00 - tmp10 * tmpMin10 + tmp20 * tmpMin20 - tmp30 * tmpMin30;
+        if ((Math.abs(tmpDet) <= AbstractDeterminator.TOLERANCE_4X4)) {
+            throw RecoverableCondition.newMatrixNotInvertible();
+        }
 
         solution.set(0L, (tmp0 * tmpMin00 - tmp1 * tmpMin10 + tmp2 * tmpMin20 - tmp3 * tmpMin30) / tmpDet);
         solution.set(1L, -(tmp0 * tmpMin10 - tmp1 * tmpMin11 + tmp2 * tmpMin21 - tmp3 * tmpMin31) / tmpDet);
@@ -610,7 +653,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
         solution.set(3L, -(tmp0 * tmpMin30 - tmp1 * tmpMin31 + tmp2 * tmpMin32 - tmp3 * tmpMin33) / tmpDet);
     }
 
-    static void symmetric5X5(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) {
+    static void symmetric5X5(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) throws RecoverableCondition {
 
         double tmp00 = body.doubleValue(0L);
         double tmp10 = body.doubleValue(1L);
@@ -638,7 +681,11 @@ abstract class AbstractSolver implements SolverTask<Double> {
         double tmp3 = rhs.doubleValue(3L);
         double tmp4 = rhs.doubleValue(4L);
 
-        final double tmpScale = MissingMath.norm(tmp0, tmp1, tmp2, tmp3, tmp4);
+        double tmpScale = Math.max(
+                Math.max(Math.max(Math.max(Math.abs(tmp00), Math.abs(tmp10)), Math.max(Math.abs(tmp11), Math.abs(tmp20))),
+                        Math.max(Math.max(Math.abs(tmp21), Math.abs(tmp22)), Math.max(Math.abs(tmp30), Math.abs(tmp31)))),
+                Math.max(Math.max(Math.max(Math.abs(tmp32), Math.abs(tmp33)), Math.max(Math.abs(tmp40), Math.abs(tmp41))),
+                        Math.max(Math.max(Math.abs(tmp42), Math.abs(tmp43)), Math.abs(tmp44))));
 
         tmp00 /= tmpScale;
         tmp10 /= tmpScale;
@@ -666,42 +713,45 @@ abstract class AbstractSolver implements SolverTask<Double> {
         tmp3 /= tmpScale;
         tmp4 /= tmpScale;
 
-        final double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp31, tmp41, tmp21, tmp22, tmp32, tmp42, tmp31, tmp32, tmp33, tmp43, tmp41, tmp42,
+        double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp31, tmp41, tmp21, tmp22, tmp32, tmp42, tmp31, tmp32, tmp33, tmp43, tmp41, tmp42,
                 tmp43, tmp44);
-        final double tmpMin10 = AbstractDeterminator.calculate(tmp10, tmp21, tmp31, tmp41, tmp20, tmp22, tmp32, tmp42, tmp30, tmp32, tmp33, tmp43, tmp40, tmp42,
+        double tmpMin10 = AbstractDeterminator.calculate(tmp10, tmp21, tmp31, tmp41, tmp20, tmp22, tmp32, tmp42, tmp30, tmp32, tmp33, tmp43, tmp40, tmp42,
                 tmp43, tmp44);
-        final double tmpMin20 = AbstractDeterminator.calculate(tmp10, tmp11, tmp31, tmp41, tmp20, tmp21, tmp32, tmp42, tmp30, tmp31, tmp33, tmp43, tmp40, tmp41,
+        double tmpMin20 = AbstractDeterminator.calculate(tmp10, tmp11, tmp31, tmp41, tmp20, tmp21, tmp32, tmp42, tmp30, tmp31, tmp33, tmp43, tmp40, tmp41,
                 tmp43, tmp44);
-        final double tmpMin30 = AbstractDeterminator.calculate(tmp10, tmp11, tmp21, tmp41, tmp20, tmp21, tmp22, tmp42, tmp30, tmp31, tmp32, tmp43, tmp40, tmp41,
+        double tmpMin30 = AbstractDeterminator.calculate(tmp10, tmp11, tmp21, tmp41, tmp20, tmp21, tmp22, tmp42, tmp30, tmp31, tmp32, tmp43, tmp40, tmp41,
                 tmp42, tmp44);
-        final double tmpMin40 = AbstractDeterminator.calculate(tmp10, tmp11, tmp21, tmp31, tmp20, tmp21, tmp22, tmp32, tmp30, tmp31, tmp32, tmp33, tmp40, tmp41,
+        double tmpMin40 = AbstractDeterminator.calculate(tmp10, tmp11, tmp21, tmp31, tmp20, tmp21, tmp22, tmp32, tmp30, tmp31, tmp32, tmp33, tmp40, tmp41,
                 tmp42, tmp43);
 
-        final double tmpMin11 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp40, tmp20, tmp22, tmp32, tmp42, tmp30, tmp32, tmp33, tmp43, tmp40, tmp42,
+        double tmpMin11 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp40, tmp20, tmp22, tmp32, tmp42, tmp30, tmp32, tmp33, tmp43, tmp40, tmp42,
                 tmp43, tmp44);
-        final double tmpMin21 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp40, tmp20, tmp21, tmp32, tmp42, tmp30, tmp31, tmp33, tmp43, tmp40, tmp41,
+        double tmpMin21 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp40, tmp20, tmp21, tmp32, tmp42, tmp30, tmp31, tmp33, tmp43, tmp40, tmp41,
                 tmp43, tmp44);
-        final double tmpMin31 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp20, tmp21, tmp22, tmp42, tmp30, tmp31, tmp32, tmp43, tmp40, tmp41,
+        double tmpMin31 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp20, tmp21, tmp22, tmp42, tmp30, tmp31, tmp32, tmp43, tmp40, tmp41,
                 tmp42, tmp44);
-        final double tmpMin41 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp20, tmp21, tmp22, tmp32, tmp30, tmp31, tmp32, tmp33, tmp40, tmp41,
+        double tmpMin41 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp20, tmp21, tmp22, tmp32, tmp30, tmp31, tmp32, tmp33, tmp40, tmp41,
                 tmp42, tmp43);
 
-        final double tmpMin22 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp40, tmp10, tmp11, tmp31, tmp41, tmp30, tmp31, tmp33, tmp43, tmp40, tmp41,
+        double tmpMin22 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp40, tmp10, tmp11, tmp31, tmp41, tmp30, tmp31, tmp33, tmp43, tmp40, tmp41,
                 tmp43, tmp44);
-        final double tmpMin32 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp10, tmp11, tmp21, tmp41, tmp30, tmp31, tmp32, tmp43, tmp40, tmp41,
+        double tmpMin32 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp10, tmp11, tmp21, tmp41, tmp30, tmp31, tmp32, tmp43, tmp40, tmp41,
                 tmp42, tmp44);
-        final double tmpMin42 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp10, tmp11, tmp21, tmp31, tmp30, tmp31, tmp32, tmp33, tmp40, tmp41,
+        double tmpMin42 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp10, tmp11, tmp21, tmp31, tmp30, tmp31, tmp32, tmp33, tmp40, tmp41,
                 tmp42, tmp43);
 
-        final double tmpMin33 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp10, tmp11, tmp21, tmp41, tmp20, tmp21, tmp22, tmp42, tmp40, tmp41,
+        double tmpMin33 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp10, tmp11, tmp21, tmp41, tmp20, tmp21, tmp22, tmp42, tmp40, tmp41,
                 tmp42, tmp44);
-        final double tmpMin43 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp10, tmp11, tmp21, tmp31, tmp20, tmp21, tmp22, tmp32, tmp40, tmp41,
+        double tmpMin43 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp10, tmp11, tmp21, tmp31, tmp20, tmp21, tmp22, tmp32, tmp40, tmp41,
                 tmp42, tmp43);
 
-        final double tmpMin44 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp10, tmp11, tmp21, tmp31, tmp20, tmp21, tmp22, tmp32, tmp30, tmp31,
+        double tmpMin44 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp10, tmp11, tmp21, tmp31, tmp20, tmp21, tmp22, tmp32, tmp30, tmp31,
                 tmp32, tmp33);
 
-        final double tmpDet = tmp00 * tmpMin00 - tmp10 * tmpMin10 + tmp20 * tmpMin20 - tmp30 * tmpMin30 + tmp40 * tmpMin40;
+        double tmpDet = tmp00 * tmpMin00 - tmp10 * tmpMin10 + tmp20 * tmpMin20 - tmp30 * tmpMin30 + tmp40 * tmpMin40;
+        if ((Math.abs(tmpDet) <= AbstractDeterminator.TOLERANCE_5X5)) {
+            throw RecoverableCondition.newMatrixNotInvertible();
+        }
 
         solution.set(0L, (tmp0 * tmpMin00 - tmp1 * tmpMin10 + tmp2 * tmpMin20 - tmp3 * tmpMin30 + tmp4 * tmpMin40) / tmpDet);
         solution.set(1L, -(tmp0 * tmpMin10 - tmp1 * tmpMin11 + tmp2 * tmpMin21 - tmp3 * tmpMin31 + tmp4 * tmpMin41) / tmpDet);
@@ -715,7 +765,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
     }
 
     @Override
-    public final PhysicalStore<Double> preallocate(final int nbEquations, final int nbVariables, final int nbSolutions) {
+    public PhysicalStore<Double> preallocate(final int nbEquations, final int nbVariables, final int nbSolutions) {
         return R064Store.FACTORY.make(nbVariables, nbSolutions);
     }
 

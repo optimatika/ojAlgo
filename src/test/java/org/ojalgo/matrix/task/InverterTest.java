@@ -54,6 +54,32 @@ public class InverterTest extends MatrixTaskTests {
     }
 
     @Test
+    public void testSingularFull() {
+
+        List<InverterTask<Double>> tasks = List.of(AbstractInverter.FULL_1X1, AbstractInverter.FULL_2X2, AbstractInverter.FULL_3X3, AbstractInverter.FULL_4X4,
+                AbstractInverter.FULL_5X5);
+
+        for (int dim = 1; dim <= tasks.size(); dim++) {
+            InverterTask<Double> task = tasks.get(dim - 1);
+            MatrixStore<Double> singular = MatrixTaskTests.makeRankDeficient(dim, dim);
+            TestUtils.assertThrows(RecoverableCondition.class, () -> task.invert(singular));
+        }
+    }
+
+    @Test
+    public void testSingularSymmetric() {
+
+        List<InverterTask<Double>> tasks = List.of(AbstractInverter.FULL_1X1, AbstractInverter.SYMMETRIC_2X2, AbstractInverter.SYMMETRIC_3X3,
+                AbstractInverter.SYMMETRIC_4X4, AbstractInverter.SYMMETRIC_5X5);
+
+        for (int dim = 1; dim <= tasks.size(); dim++) {
+            InverterTask<Double> task = tasks.get(dim - 1);
+            MatrixStore<Double> singular = MatrixTaskTests.makeSingularSymmetric(dim);
+            TestUtils.assertThrows(RecoverableCondition.class, () -> task.invert(singular));
+        }
+    }
+
+    @Test
     public void testSymmetric1X1() {
         this.doCompare(AbstractInverter.FULL_1X1, 1);
     }

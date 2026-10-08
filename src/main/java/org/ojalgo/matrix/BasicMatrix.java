@@ -432,6 +432,13 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
      * [pseudoinverse] given, and equal to [inverse].
      * </ul>
      * </ul>
+     * <p>
+     * This is best effort. A fast decomposition (typically LU) is tried first, and only if that reports the
+     * matrix as singular is the {@link SingularValue} decomposition used. For larger matrices that
+     * singularity test is not fully reliable – a matrix that is singular apart from rounding errors may give
+     * an "inverse" with huge meaningless values. For full control use
+     * {@link MatrixStore}/{@link PhysicalStore} and the {@link MatrixDecomposition} implementations directly,
+     * choosing the decomposition yourself.
      *
      * @return The "best possible" inverse....
      */
@@ -688,6 +695,12 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
      * </ul>
      * <p>
      * Remember that: [X][this]=[rhs] is equivalent to [this]<sup>T</sup>[X]<sup>T</sup>=[rhs]<sup>T</sup>
+     * <p>
+     * This is best effort. A fast decomposition (typically LU) is tried first, and only if that reports the
+     * system as unsolvable is the {@link SingularValue} decomposition used. For larger square matrices that
+     * test is not fully reliable – a matrix that is singular apart from rounding errors may give a solution
+     * with huge meaningless values. For full control use {@link MatrixStore}/{@link PhysicalStore} and the
+     * {@link MatrixDecomposition} implementations directly, choosing the decomposition yourself.
      *
      * @param rhs The right hand side of the equation.
      * @return The solution, [X].

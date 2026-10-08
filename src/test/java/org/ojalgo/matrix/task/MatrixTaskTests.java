@@ -28,6 +28,9 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.MatrixDecompositionTests;
+import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.random.Uniform;
 
 /**
  * @author apete
@@ -64,6 +67,38 @@ public abstract class MatrixTaskTests {
         Collections.addAll(retVal, MatrixDecompositionTests.getPrimitiveQR());
 
         return retVal;
+    }
+
+    /**
+     * A random matrix with rank one less than its smallest dimension. Rounding makes the determinant (of the
+     * square case) tiny rather than exactly 0, which is the case that used to produce huge but finite values.
+     */
+    static MatrixStore<Double> makeRankDeficient(final int nbRows, final int nbCols) {
+
+        int rank = Math.min(nbRows, nbCols) - 1;
+
+        if (rank == 0) {
+            return R064Store.FACTORY.make(nbRows, nbCols);
+        }
+
+        R064Store left = R064Store.FACTORY.makeFilled(nbRows, rank, new Uniform(-1, 2));
+        R064Store right = R064Store.FACTORY.makeFilled(rank, nbCols, new Uniform(-1, 2));
+
+        return left.multiply(right);
+    }
+
+    /**
+     * A random symmetric matrix with rank dim - 1
+     */
+    static MatrixStore<Double> makeSingularSymmetric(final int dim) {
+
+        if (dim == 1) {
+            return R064Store.FACTORY.make(1, 1);
+        }
+
+        R064Store factor = R064Store.FACTORY.makeFilled(dim, dim - 1, new Uniform(-1, 2));
+
+        return factor.multiply(factor.transpose());
     }
 
     @BeforeEach

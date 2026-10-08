@@ -489,7 +489,7 @@ public abstract class MissingMath {
     public static double norm(final double... values) {
         double retVal = Math.abs(values[0]);
         for (int i = values.length; i-- != 1;) {
-            retVal = values[i] > retVal ? Math.abs(values[i]) : retVal;
+            retVal = Math.max(retVal, Math.abs(values[i]));
         }
         return retVal;
     }

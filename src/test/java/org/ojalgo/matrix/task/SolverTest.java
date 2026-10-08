@@ -109,6 +109,44 @@ public class SolverTest extends MatrixTaskTests {
     }
 
     @Test
+    public void testSingularFull() {
+
+        List<SolverTask<Double>> tasks = List.of(AbstractSolver.FULL_1X1, AbstractSolver.FULL_2X2, AbstractSolver.FULL_3X3, AbstractSolver.FULL_4X4,
+                AbstractSolver.FULL_5X5);
+
+        for (int dim = 1; dim <= tasks.size(); dim++) {
+            SolverTask<Double> task = tasks.get(dim - 1);
+            MatrixStore<Double> body = MatrixTaskTests.makeRankDeficient(dim, dim);
+            MatrixStore<Double> rhs = R064Store.FACTORY.makeFilled(dim, 1L, new Uniform());
+            TestUtils.assertThrows(RecoverableCondition.class, () -> task.solve(body, rhs));
+        }
+    }
+
+    @Test
+    public void testSingularLeastSquares() {
+
+        for (int nbCols = 1; nbCols <= 5; nbCols++) {
+            MatrixStore<Double> body = MatrixTaskTests.makeRankDeficient(nbCols + 2, nbCols);
+            MatrixStore<Double> rhs = R064Store.FACTORY.makeFilled(nbCols + 2, 1L, new Uniform());
+            TestUtils.assertThrows(RecoverableCondition.class, () -> AbstractSolver.LEAST_SQUARES.solve(body, rhs));
+        }
+    }
+
+    @Test
+    public void testSingularSymmetric() {
+
+        List<SolverTask<Double>> tasks = List.of(AbstractSolver.FULL_1X1, AbstractSolver.SYMMETRIC_2X2, AbstractSolver.SYMMETRIC_3X3,
+                AbstractSolver.SYMMETRIC_4X4, AbstractSolver.SYMMETRIC_5X5);
+
+        for (int dim = 1; dim <= tasks.size(); dim++) {
+            SolverTask<Double> task = tasks.get(dim - 1);
+            MatrixStore<Double> body = MatrixTaskTests.makeSingularSymmetric(dim);
+            MatrixStore<Double> rhs = R064Store.FACTORY.makeFilled(dim, 1L, new Uniform());
+            TestUtils.assertThrows(RecoverableCondition.class, () -> task.solve(body, rhs));
+        }
+    }
+
+    @Test
     public void testSymmetric1X1() {
         this.doCompare(AbstractSolver.FULL_1X1, 1);
     }
@@ -165,6 +203,33 @@ public class SolverTest extends MatrixTaskTests {
 
         ConjugateGradientSolver tmpConjugateGradientSolver = new ConjugateGradientSolver();
         TestUtils.assertEquals(expected, tmpConjugateGradientSolver.solve(body, rhs).get());
+    }
+
+    /**
+     * The closed-form solvers used to scale by the norm of the RHS, so a zero RHS gave NaN.
+     */
+    @Test
+    public void testZeroRHS() {
+
+        List<SolverTask<Double>> full = List.of(AbstractSolver.FULL_1X1, AbstractSolver.FULL_2X2, AbstractSolver.FULL_3X3, AbstractSolver.FULL_4X4,
+                AbstractSolver.FULL_5X5);
+        List<SolverTask<Double>> symmetric = List.of(AbstractSolver.FULL_1X1, AbstractSolver.SYMMETRIC_2X2, AbstractSolver.SYMMETRIC_3X3,
+                AbstractSolver.SYMMETRIC_4X4, AbstractSolver.SYMMETRIC_5X5);
+
+        try {
+
+            for (int dim = 1; dim <= 5; dim++) {
+
+                MatrixStore<Double> body = R064Store.FACTORY.makeSPD(dim);
+                MatrixStore<Double> zero = R064Store.FACTORY.make(dim, 1);
+
+                TestUtils.assertEquals(zero, full.get(dim - 1).solve(body, zero));
+                TestUtils.assertEquals(zero, symmetric.get(dim - 1).solve(body, zero));
+            }
+
+        } catch (RecoverableCondition exception) {
+            TestUtils.fail(exception.getMessage());
+        }
     }
 
     private void doCompare(final SolverTask<Double> fixed, final int dimension) {

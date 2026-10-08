@@ -210,7 +210,7 @@ public interface InverterTask<N extends Comparable<N>> extends MatrixTask<N> {
      *                     assume this is modified, but you cannot assume it will contain the
      *                     full/final/correct solution.
      * @return The inverse
-     * @throws RecoverableCondition TODO
+     * @throws RecoverableCondition If the matrix is not invertible (as far as this implementation can tell)
      */
     MatrixStore<N> invert(Access2D<?> original, PhysicalStore<N> preallocated) throws RecoverableCondition;
 

@@ -48,6 +48,11 @@ import org.ojalgo.type.context.NumberContext;
  * The LU decomposition always exists - the compute method should always succeed - even for non-square and/or
  * singular matrices. The primary use of the LU decomposition is in the solution of systems of simultaneous
  * linear equations. That will, however, only work for square non-singular matrices.
+ * <p>
+ * Singularity, {@link #isSolvable()} and the rank, is judged from the size of the pivots – the smallest
+ * relative to the largest. With partial pivoting that is not a reliable test: a matrix that is singular apart
+ * from rounding errors may still be reported as solvable, and then solutions and inverses contain huge
+ * meaningless values. If that's a concern, check the condition number or use {@link SingularValue}.
  *
  * @author apete
  */
@@ -74,10 +79,6 @@ public interface LU<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition
 
     Factory<Quadruple> R128 = typical -> new DenseLU.R128();
 
-    static LU<Double> newSparseR064() {
-        return new SparseLU();
-    }
-
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final LU<N> decomposition, final NumberContext context) {
 
         MatrixStore<N> tmpL = decomposition.getL();
@@ -85,6 +86,10 @@ public interface LU<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition
         int[] tmpPivotOrder = decomposition.getPivotOrder();
 
         return Access2D.equals(matrix.rows(tmpPivotOrder), tmpL.multiply(tmpU), context);
+    }
+
+    static LU<Double> newSparseR064() {
+        return new SparseLU();
     }
 
     MatrixStore<N> getL();
