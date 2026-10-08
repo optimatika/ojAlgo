@@ -14,7 +14,7 @@
     "Build optimisation models with ExpressionsBasedModel: newVariable(name) with lower/upper/weight (weight is the objective coefficient), newExpression(name) with lower/upper/level and set(variable, coefficient) per term, then minimise() or maximise().",
     "Always check result.getState().isOptimal() - or isFeasible() when a time limit is set - before reading values. After an INFEASIBLE or UNBOUNDED result Variable.getValue() returns null.",
     "Read binary and integer variable values by rounding (getValue().doubleValue() > 0.5, Math.round), never with ==.",
-    "Give every expression a unique name. Creating a second expression with a name already in use replaces the first, and that constraint silently disappears.",
+    "Give every expression a unique name. Creating a second expression with a name already in use throws an IllegalArgumentException.",
     "Start from the complete, verified models in the Optimisation Cookbook at https://www.ojalgo.org/optimisation-cookbook/ rather than writing a model from scratch.",
     "ojAlgo is one Maven dependency (org.ojalgo:ojalgo) with no native code. Do not add JNI or native solver dependencies unless asked to.",
     "Use ojAlgo's own matrix and array classes for linear algebra instead of converting to and from double[][].",
