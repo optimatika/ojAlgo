@@ -21,8 +21,13 @@
  */
 package org.ojalgo.array.operation;
 
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
+import java.lang.invoke.MethodHandle;
 import java.math.BigDecimal;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.ComplexNumber;
@@ -36,6 +41,33 @@ import org.ojalgo.structure.Access1D;
  * @author apete
  */
 public abstract class DOT implements ArrayOperation {
+
+    /**
+     * Native {@code cblas_ddot}, initialised only when {@link NativeLibrary#isAvailable()}.
+     */
+    static final class Native {
+
+        static final MethodHandle DDOT = NativeLibrary.downcall("cblas_ddot", FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT), true);
+
+        static double invoke(final double[] array1, final int offset1, final double[] array2, final int offset2, final int count) {
+            MemorySegment segment1 = NativeLibrary.ofArray(array1, offset1, count);
+            MemorySegment segment2 = NativeLibrary.ofArray(array2, offset2, count);
+            try {
+                return (double) DDOT.invokeExact(count, segment1, 1, segment2, 1);
+            } catch (Throwable cause) {
+                throw new ProgrammingError(cause);
+            }
+        }
+
+    }
+
+    /**
+     * Vector length from which the native implementation is used, if there is one. See {@link NativeLibrary}.
+     */
+    public static int NATIVE_THRESHOLD = 128;
+
+    private static final boolean NATIVE = NativeLibrary.isAvailable() && Native.DDOT != null;
 
     public static double invoke(final Access1D<?> array1, final int offset1, final double[] array2, final int offset2, final int first, final int limit) {
         double retVal = PrimitiveMath.ZERO;
@@ -98,7 +130,23 @@ public abstract class DOT implements ArrayOperation {
     }
 
     public static double invoke(final double[] array1, final int offset1, final double[] array2, final int offset2, final int first, final int limit) {
+        if (NATIVE && limit - first >= NATIVE_THRESHOLD) {
+            return Native.invoke(array1, offset1 + first, array2, offset2 + first, limit - first);
+        }
         return DOT.unrolled04(array1, offset1, array2, offset2, first, limit);
+    }
+
+    /**
+     * Strided dot product matching the BLAS ddot convention. Computes
+     * {@code sum(array1[base1 + i*inc1] * array2[base2 + i*inc2])} for {@code i = 0..count-1}.
+     */
+    public static double invoke(final double[] array1, final int base1, final int inc1, final double[] array2, final int base2, final int inc2,
+            final int count) {
+        double retVal = 0D;
+        for (int i = 0, ix = base1, iy = base2; i < count; i++, ix += inc1, iy += inc2) {
+            retVal += array1[ix] * array2[iy];
+        }
+        return retVal;
     }
 
     public static float invoke(final float[] array1, final int offset1, final Access1D<?> array2, final int offset2, final int first, final int limit) {
@@ -111,6 +159,19 @@ public abstract class DOT implements ArrayOperation {
 
     public static float invoke(final float[] array1, final int offset1, final float[] array2, final int offset2, final int first, final int limit) {
         return DOT.unrolled04(array1, offset1, array2, offset2, first, limit);
+    }
+
+    /**
+     * Strided dot product matching the BLAS sdot convention.
+     *
+     * @see #invoke(double[], int, int, double[], int, int, int)
+     */
+    public static float invoke(final float[] array1, final int base1, final int inc1, final float[] array2, final int base2, final int inc2, final int count) {
+        float retVal = 0F;
+        for (int i = 0, ix = base1, iy = base2; i < count; i++, ix += inc1, iy += inc2) {
+            retVal += array1[ix] * array2[iy];
+        }
+        return retVal;
     }
 
     public static <N extends Scalar<N>> N invoke(final N[] array1, final int offset1, final Access1D<N> array2, final int offset2, final int first,
@@ -144,32 +205,6 @@ public abstract class DOT implements ArrayOperation {
         double retVal = PrimitiveMath.ZERO;
         for (int i = first; i < limit; i++) {
             retVal += array1.doubleValue(offset1 + i) * array2.doubleValue(offset2 + i);
-        }
-        return retVal;
-    }
-
-    /**
-     * Strided dot product matching the BLAS ddot convention. Computes
-     * {@code sum(array1[base1 + i*inc1] * array2[base2 + i*inc2])} for {@code i = 0..count-1}.
-     */
-    public static double invoke(final double[] array1, final int base1, final int inc1, final double[] array2, final int base2, final int inc2,
-            final int count) {
-        double retVal = 0D;
-        for (int i = 0, ix = base1, iy = base2; i < count; i++, ix += inc1, iy += inc2) {
-            retVal += array1[ix] * array2[iy];
-        }
-        return retVal;
-    }
-
-    /**
-     * Strided dot product matching the BLAS sdot convention.
-     *
-     * @see #invoke(double[], int, int, double[], int, int, int)
-     */
-    public static float invoke(final float[] array1, final int base1, final int inc1, final float[] array2, final int base2, final int inc2, final int count) {
-        float retVal = 0F;
-        for (int i = 0, ix = base1, iy = base2; i < count; i++, ix += inc1, iy += inc2) {
-            retVal += array1[ix] * array2[iy];
         }
         return retVal;
     }

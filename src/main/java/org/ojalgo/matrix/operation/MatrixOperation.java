@@ -94,6 +94,7 @@ public interface MatrixOperation extends ArrayOperation {
         ApplyLU.THRESHOLD = Math.min(max, ApplyLU.THRESHOLD);
         FillMatchingDual.THRESHOLD = Math.min(max, FillMatchingDual.THRESHOLD);
         FillMatchingSingle.THRESHOLD = Math.min(max, FillMatchingSingle.THRESHOLD);
+        GEMM.THRESHOLD = Math.min(max, GEMM.THRESHOLD);
         GenerateApplyAndCopyHouseholderColumn.THRESHOLD = Math.min(max, GenerateApplyAndCopyHouseholderColumn.THRESHOLD);
         GenerateApplyAndCopyHouseholderRow.THRESHOLD = Math.min(max, GenerateApplyAndCopyHouseholderRow.THRESHOLD);
         HermitianRank2Update.THRESHOLD = Math.min(max, HermitianRank2Update.THRESHOLD);
@@ -123,6 +124,7 @@ public interface MatrixOperation extends ArrayOperation {
         ApplyLU.THRESHOLD = Math.max(min, ApplyLU.THRESHOLD);
         FillMatchingDual.THRESHOLD = Math.max(min, FillMatchingDual.THRESHOLD);
         FillMatchingSingle.THRESHOLD = Math.max(min, FillMatchingSingle.THRESHOLD);
+        GEMM.THRESHOLD = Math.max(min, GEMM.THRESHOLD);
         GenerateApplyAndCopyHouseholderColumn.THRESHOLD = Math.max(min, GenerateApplyAndCopyHouseholderColumn.THRESHOLD);
         GenerateApplyAndCopyHouseholderRow.THRESHOLD = Math.max(min, GenerateApplyAndCopyHouseholderRow.THRESHOLD);
         HermitianRank2Update.THRESHOLD = Math.max(min, HermitianRank2Update.THRESHOLD);

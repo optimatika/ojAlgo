@@ -113,6 +113,9 @@ public class MultiplyNeither implements MatrixOperation {
     }
 
     public static MultiplyNeither.Primitive64 newPrimitive64(final long rows, final long columns) {
+        if (GEMM.NATIVE && rows >= GEMM.NATIVE_THRESHOLD && columns >= GEMM.NATIVE_THRESHOLD) {
+            return MultiplyNeither::fillMxN_native;
+        }
         if (rows > THRESHOLD && columns > THRESHOLD) {
             return MultiplyNeither::fillMxN_MT;
         }
@@ -220,17 +223,6 @@ public class MultiplyNeither implements MatrixOperation {
         }
     }
 
-    static void addMxC(final double[] product, final int firstColumn, final int columnLimit, final double[] left, final int complexity, final double[] right) {
-
-        int nbRows = left.length / complexity;
-
-        for (int j = firstColumn; j < columnLimit; j++) {
-            for (int c = 0; c < complexity; c++) {
-                AXPY.invoke(product, j * nbRows, right[c + j * complexity], left, c * nbRows, 0, nbRows);
-            }
-        }
-    }
-
     static void addMxC(final float[] product, final int firstColumn, final int columnLimit, final float[] left, final int complexity, final float[] right) {
 
         int nbRows = left.length / complexity;
@@ -255,7 +247,9 @@ public class MultiplyNeither implements MatrixOperation {
     }
 
     static void addMxN_MT(final double[] product, final double[] left, final int complexity, final double[] right) {
-        MultiplyNeither.divide(0, right.length / complexity, (f, l) -> MultiplyNeither.addMxC(product, f, l, left, complexity, right));
+        int nbRows = left.length / complexity;
+        MultiplyNeither.divide(0, right.length / complexity, (f, l) -> GEMM.invokeNN(nbRows, f, l, complexity, PrimitiveMath.ONE, left, 0, nbRows, right, 0,
+                complexity, PrimitiveMath.ONE, product, 0, nbRows));
     }
 
     static void addMxN_MT(final float[] product, final float[] left, final int complexity, final float[] right) {
@@ -791,7 +785,9 @@ public class MultiplyNeither implements MatrixOperation {
 
         Arrays.fill(product, 0D);
 
-        MultiplyNeither.addMxC(product, 0, right.length / complexity, left, complexity, right);
+        int nbRows = left.length / complexity;
+        GEMM.invokeNN(nbRows, 0, right.length / complexity, complexity, PrimitiveMath.ONE, left, 0, nbRows, right, 0, complexity, PrimitiveMath.ONE,
+                product, 0, nbRows);
     }
 
     static void fillMxN(final float[] product, final float[] left, final int complexity, final float[] right) {
@@ -809,10 +805,9 @@ public class MultiplyNeither implements MatrixOperation {
     }
 
     static void fillMxN_MT(final double[] product, final double[] left, final int complexity, final double[] right) {
-
-        Arrays.fill(product, 0D);
-
-        MultiplyNeither.addMxN_MT(product, left, complexity, right);
+        int nbRows = left.length / complexity;
+        MultiplyNeither.divide(0, right.length / complexity, (f, l) -> GEMM.invokeNN(nbRows, f, l, complexity, PrimitiveMath.ONE, left, 0, nbRows, right, 0,
+                complexity, PrimitiveMath.ZERO, product, 0, nbRows));
     }
 
     static void fillMxN_MT(final float[] product, final float[] left, final int complexity, final float[] right) {
@@ -827,6 +822,17 @@ public class MultiplyNeither implements MatrixOperation {
         Arrays.fill(product, scalar.zero().get());
 
         MultiplyNeither.addMxN_MT(product, left, complexity, right);
+    }
+
+    static void fillMxN_native(final double[] product, final double[] left, final int complexity, final double[] right) {
+        if (complexity >= GEMM.NATIVE_THRESHOLD) {
+            int nbRows = left.length / complexity;
+            int nbCols = right.length / complexity;
+            GEMM.Native.invoke(false, false, nbRows, nbCols, complexity, PrimitiveMath.ONE, left, 0, nbRows, right, 0, complexity, PrimitiveMath.ZERO, product,
+                    0, nbRows);
+        } else {
+            MultiplyNeither.fillMxN_MT(product, left, complexity, right);
+        }
     }
 
 }

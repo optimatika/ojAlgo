@@ -1,6 +1,6 @@
 # Contributing to ojAlgo
 
-ojAlgo is a pure Java library for mathematics, linear algebra, and optimisation (LP, QP, MIP). Zero external dependencies. Targets Java 11+. Published to Maven Central as `org.ojalgo:ojalgo`.
+ojAlgo is a pure Java library for mathematics, linear algebra, and optimisation (LP, QP, MIP). Zero external dependencies. Targets Java 22+. Published to Maven Central as `org.ojalgo:ojalgo`.
 
 ## Build Commands
 
@@ -32,6 +32,29 @@ All source lives under `org.ojalgo` with these key packages:
 - **`function`** — Mathematical functions, aggregators, constants (`PrimitiveMath`)
 - **`concurrent`** — Threading utilities used internally
 - **`data`** — Data science utilities (clustering, ANN)
+
+## BLAS/LAPACK Operations
+
+The low-level operations in `org.ojalgo.array.operation` and `org.ojalgo.matrix.operation` are moving towards the standard BLAS/LAPACK API. Each routine has a pure Java implementation and, optionally, a native one (FFM) used when available. The design assumes all of BLAS and the LAPACK routines ojAlgo needs; they are added incrementally, `double` first, other precisions as overloads later.
+
+- One class per routine, named after it without the precision prefix: `GEMM`, `TRSM`, `DOT`, `GETRF`… Level 1 (vectors) belongs in `org.ojalgo.array.operation`; levels 2 and 3 and LAPACK – anything 2D – in `org.ojalgo.matrix.operation`.
+- The canonical entry point is `invoke(...)` with the CBLAS argument order and BLAS names (`m`, `n`, `k`, `alpha`, `beta`, `lda`, `incX`), except:
+  - always column-major, no layout argument;
+  - each pointer becomes an array followed by an offset (`a, offsetA, lda`);
+  - options are booleans (`transposeA`, `left`, `upper`, `unitDiagonal`), converted to the `CBLAS` constants (in `org.ojalgo.matrix.operation`) only when calling native code;
+  - precision is chosen by overloading on the array type.
+- Semantics follow reference BLAS: argument checks (`ArrayOperation.checkArgument`, `IllegalArgumentException`), the same quick returns, beta 0 means C is not read, alpha 0 means A and B are not read, and a negative increment walks the vector backwards with the offset still the lowest index accessed.
+- `invoke` checks the arguments, quick-returns, and dispatches to `Native.invoke` (when available and above `NATIVE_THRESHOLD`) or to the package-private `invokeJava`. The pure Java implementation covers the full semantics and holds the general kernels (for `GEMM` one per transpose combination, each over a range of columns of C), multi-threaded above the routine's `THRESHOLD`.
+- The call direction is from the ojAlgo-specific operations to the standard routines, never the reverse. `MultiplyNeither`, `SubstituteForwards`, `HouseholderLeft`… keep their special-case kernels (fixed small sizes, other number types) and call the standard routine's kernels for the general case. Such a change must not make their pure Java paths slower – check with JMH, and keep results bit-identical where possible.
+
+Native code is used only when the JVM grants ojAlgo native access (`--enable-native-access=ojalgo` on the module path, `--enable-native-access=ALL-UNNAMED` on the class path), a working library is found, and the problem size passes the operation's `NATIVE_THRESHOLD`. Without native access ojAlgo never touches FFM.
+
+- `org.ojalgo.array.operation.NativeLibrary` finds the library (`-Dojalgo.native.library=<file>[<path separator><file>]`, or auto-discovery: Accelerate on macOS, OpenBLAS/FlexiBLAS/MKL/BLIS/reference BLAS on Linux, OpenBLAS/MKL on Windows; `none` disables native code), checks it, and creates the downcall handles.
+- Each routine class keeps its handle in a nested `Native` holder class, guarded by a `static final boolean NATIVE`, so FFM classes are never loaded unless used, and the disabled check folds away.
+- BLAS is called through CBLAS with 32-bit integers (LP64). On macOS Accelerate's `$NEWLAPACK` symbols are preferred.
+- Functions are linked as critical and passed the Java arrays in place (heap segments): zero-copy. The bounds are checked first (`NativeLibrary.ofArray`, `CBLAS.ofMatrix`), since native code would not notice. The JVM can't reach a safepoint during a critical call, so a long level 3 call delays garbage collection until it returns; that is accepted.
+- Threading is left to the library's defaults.
+- Thresholds are measured with JMH against the Java implementation.
 
 ## Coding Conventions
 

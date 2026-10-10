@@ -58,7 +58,7 @@
     </repositories>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.java>11</version.java>
+        <version.java>22</version.java>
         <version.org.junit.jupiter>5.14.4</version.org.junit.jupiter>
     </properties>
     <dependencies>

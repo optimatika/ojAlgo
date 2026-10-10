@@ -131,7 +131,7 @@ The [Optimatika subscription](https://www.optimatika.se/subscription/) gives you
 
 ## Building from Source
 
-ojAlgo requires Java 11+ and uses the Maven Wrapper, so no separate Maven install is needed.
+ojAlgo requires Java 22+ and uses the Maven Wrapper, so no separate Maven install is needed.
 
 ```bash
 git clone https://github.com/optimatika/ojAlgo.git
