@@ -11,6 +11,13 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Fixed
+
+#### org.ojalgo.matrix.decomposition
+
+- `LU.R064` (up to 512 columns): `getInverse(PhysicalStore)` and `invert(Access2D, PhysicalStore)` returned a wrong inverse when the decomposition pivoted and the preallocated store was not all zeros, e.g. when reused. This also affected `InverterTask.R064.make(dim, false)` from dim 6.
+- `SingularValue` and symmetric/Hermitian `Eigenvalue`: `getInverse(PhysicalStore)` no longer caches the caller's preallocated store as the decomposition's inverse. Later `getInverse(..)` and `getSolution(..)` calls used whatever had since been written to that store.
+
 ## [57.4.0] – 2026-10-08
 
 ### Added

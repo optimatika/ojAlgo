@@ -371,17 +371,17 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         return aggregator.get();
     }
 
-    @Override
-    public MatrixStore<Double> getInverse(final PhysicalStore<Double> preallocated) {
-        return this.doGetInverse((R064Store) preallocated);
-    }
-
     /**
      * [A]=[Q][R]
      */
     @Override
     public List<InvertibleFactor<Double>> getFactors() {
         return List.of(this.getFactorQ(), this.getFactorR());
+    }
+
+    @Override
+    public MatrixStore<Double> getInverse(final PhysicalStore<Double> preallocated) {
+        return this.doGetInverse((R064Store) preallocated);
     }
 
     @Override
@@ -515,7 +515,8 @@ final class RawQR extends RawDecomposition implements QR<Double> {
     }
 
     /**
-     * Makes no use of {@code preallocated} at all. Simply delegates to {@link #getInverse()}.
+     * Overwrites {@code preallocated} (m x m) with the identity and solves in place. The returned (pseudo)
+     * inverse is a view of its first n rows.
      */
     private MatrixStore<Double> doGetInverse(final R064Store preallocated) {
 

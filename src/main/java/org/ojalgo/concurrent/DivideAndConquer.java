@@ -121,11 +121,11 @@ public abstract class DivideAndConquer {
                 Throwable cause = ee.getCause();
                 if (cause instanceof RuntimeException) {
                     throw (RuntimeException) cause;
-                }
-                if (cause instanceof Error) {
+                } else if (cause instanceof Error) {
                     throw (Error) cause;
+                } else {
+                    throw new RuntimeException(cause != null ? cause : ee);
                 }
-                throw new RuntimeException(cause != null ? cause : ee);
             }
 
         } else {

@@ -32,7 +32,8 @@ import java.util.concurrent.atomic.AtomicReference;
  * <pre>{@code
  * Thread t = DaemonPoolExecutor.newProcessAwareThreadFactory("ojAlgo-proc").newThread(() -> {
  *     Process p = new ProcessBuilder("sleep", "10").start();
- *     if (Thread.currentThread() instanceof ProcessAwareThread pat) pat.setProcess(p);
+ *     if (Thread.currentThread() instanceof ProcessAwareThread pat)
+ *         pat.setProcess(p);
  *     p.waitFor();
  * });
  * t.start();

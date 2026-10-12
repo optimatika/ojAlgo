@@ -29,9 +29,42 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver;
 import org.ojalgo.matrix.decomposition.MatrixDecompositionTests;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.random.Uniform;
 
 public class InverterTest extends MatrixTaskTests {
+
+    /**
+     * The same preallocated store reused, and filled with junk before each call. Covers the fixed size
+     * implementations as well as the decompositions used for larger matrices (RawLU used to assume a
+     * zero-filled store when pivoting).
+     */
+    @Test
+    public void testDirtyPreallocated() throws RecoverableCondition {
+
+        for (int dim = 1; dim <= 8; dim++) {
+
+            MatrixStore<Double> expected = R064Store.FACTORY.makeIdentity(dim);
+
+            for (boolean spd : new boolean[] { false, true }) {
+
+                InverterTask<Double> task = InverterTask.R064.make(dim, spd);
+                String name = task.getClass().getName() + " " + dim;
+
+                PhysicalStore<Double> preallocated = task.preallocate(expected);
+
+                for (int r = 0; r < 3; r++) {
+
+                    MatrixStore<Double> matrix = MatrixDecompositionTests.makePivotingSPD(dim);
+
+                    preallocated.fillAll(Uniform.standard());
+                    MatrixStore<Double> inverse = task.invert(matrix, preallocated);
+                    TestUtils.assertEquals(name, expected, matrix.multiply(inverse));
+                }
+            }
+        }
+    }
 
     @Test
     public void testFull2X2() {
@@ -51,6 +84,32 @@ public class InverterTest extends MatrixTaskTests {
     @Test
     public void testFull5X5() {
         this.doCompare(AbstractInverter.FULL_5X5, 5);
+    }
+
+    /**
+     * Whichever implementation the factory picks (fixed size, LU, or raw or dense Cholesky), the inverse is
+     * read from the returned store – with Cholesky that is a hermitian view of the preallocated store's lower
+     * triangle. The preallocated store is filled with junk first.
+     */
+    @Test
+    public void testReturnedInverse() throws RecoverableCondition {
+
+        for (int dim : new int[] { 1, 2, 3, 4, 5, 6, 32, 33, 64 }) {
+
+            MatrixStore<Double> expected = R064Store.FACTORY.makeIdentity(dim);
+            MatrixStore<Double> matrix = R064Store.FACTORY.makeSPD(dim);
+
+            for (boolean spd : new boolean[] { false, true }) {
+
+                InverterTask<Double> task = InverterTask.R064.make(dim, spd);
+                String name = task.getClass().getName() + " " + dim;
+
+                PhysicalStore<Double> preallocated = task.preallocate(expected);
+                preallocated.fillAll(Uniform.standard());
+
+                TestUtils.assertEquals(name, expected, matrix.multiply(task.invert(matrix, preallocated)));
+            }
+        }
     }
 
     @Test

@@ -192,19 +192,6 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
 
         @Override
-        public List<InvertibleFactor<Double>> getFactors() {
-            double[][] vt = this.getTransposedV();
-            if (vt == null) {
-                return List.of(this);
-            }
-            double[] eigenvalues = this.getRealParts();
-            int rank = this.getRank();
-            int dim = eigenvalues.length;
-            return List.of(new RawSingularValue.FactorUT(vt, rank, dim), new RawSingularValue.FactorSinv(eigenvalues, rank, dim),
-                    new RawSingularValue.FactorV(vt, rank, dim));
-        }
-
-        @Override
         public MatrixStore<Double> getCovariance() {
 
             MatrixStore<Double> v = this.getV();
@@ -217,6 +204,19 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             MatrixStore<Double> tmp = v.limits(-1, rank).onColumns(divide, values).collect(v.physical());
 
             return tmp.multiply(tmp.transpose());
+        }
+
+        @Override
+        public List<InvertibleFactor<Double>> getFactors() {
+            double[][] vt = this.getTransposedV();
+            if (vt == null) {
+                return List.of(this);
+            }
+            double[] eigenvalues = this.getRealParts();
+            int rank = this.getRank();
+            int dim = eigenvalues.length;
+            return List.of(new RawSingularValue.FactorUT(vt, rank, dim), new RawSingularValue.FactorSinv(eigenvalues, rank, dim),
+                    new RawSingularValue.FactorV(vt, rank, dim));
         }
 
         @Override
@@ -250,11 +250,12 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         @Override
         public MatrixStore<Double> getInverse(final PhysicalStore<Double> preallocated) {
 
-            if (myInverse == null) {
-                myInverse = SingularValue.invert(this, preallocated);
+            if (myInverse != null) {
+                return myInverse;
             }
 
-            return myInverse;
+            // Not cached – preallocated belongs to the caller, and may be reused for something else
+            return SingularValue.invert(this, preallocated);
         }
 
         @Override

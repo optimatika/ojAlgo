@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.ojalgo.TestUtils;
+import org.ojalgo.matrix.store.R064Store;
 
 /**
  * @author apete
@@ -242,6 +243,25 @@ public abstract class MatrixDecompositionTests {
 
     public static Tridiagonal<Double>[] getPrimitiveTridiagonal() {
         return (Tridiagonal<Double>[]) new Tridiagonal<?>[] { new DeferredTridiagonal.R064(), new SimultaneousTridiagonal() };
+    }
+
+    /**
+     * SPD, but not diagonally dominant like
+     * {@link org.ojalgo.matrix.store.PhysicalStore.Factory#makeSPD(int)}. From dim 3 the largest element of
+     * the first column is in the last row, and the largest diagonal element is the last one, so that LU
+     * (partial) and LDL (diagonal) pivoting actually pivot.
+     */
+    public static R064Store makePivotingSPD(final int dim) {
+
+        R064Store retVal = R064Store.FACTORY.makeSPD(dim);
+
+        for (int j = 0; j < dim; j++) {
+            for (int i = 0; i < dim; i++) {
+                retVal.add(i, j, (i + 1.0) * (j + 1.0));
+            }
+        }
+
+        return retVal;
     }
 
     @BeforeEach

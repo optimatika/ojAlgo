@@ -290,21 +290,6 @@ abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> 
     }
 
     @Override
-    public List<InvertibleFactor<N>> getFactors() {
-        if (this.isValuesOnly()) {
-            return List.of(this);
-        }
-        MatrixStore<N> mV = this.getV();
-        if (mV == null) {
-            return List.of(this);
-        }
-        int rank = this.getRank();
-        int dim = d.length;
-        return List.of(new DenseSingularValue.FactorUT<>(mV, rank, dim), new DenseSingularValue.FactorSinv<>(d, rank, dim),
-                new DenseSingularValue.FactorV<>(mV, rank, dim));
-    }
-
-    @Override
     public double getCondition() {
         double largest = Math.abs(d[0]);
         double smallest = Math.abs(d[d.length - 1]);
@@ -349,6 +334,21 @@ abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> 
     }
 
     @Override
+    public List<InvertibleFactor<N>> getFactors() {
+        if (this.isValuesOnly()) {
+            return List.of(this);
+        }
+        MatrixStore<N> mV = this.getV();
+        if (mV == null) {
+            return List.of(this);
+        }
+        int rank = this.getRank();
+        int dim = d.length;
+        return List.of(new DenseSingularValue.FactorUT<>(mV, rank, dim), new DenseSingularValue.FactorSinv<>(d, rank, dim),
+                new DenseSingularValue.FactorV<>(mV, rank, dim));
+    }
+
+    @Override
     public double getFrobeniusNorm() {
 
         double retVal = ZERO;
@@ -377,11 +377,12 @@ abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> 
     @Override
     public MatrixStore<N> getInverse(final PhysicalStore<N> preallocated) {
 
-        if (myInverse == null) {
-            myInverse = SingularValue.invert(this, preallocated);
+        if (myInverse != null) {
+            return myInverse;
         }
 
-        return myInverse;
+        // Not cached – preallocated belongs to the caller, and may be reused for something else
+        return SingularValue.invert(this, preallocated);
     }
 
     @Override

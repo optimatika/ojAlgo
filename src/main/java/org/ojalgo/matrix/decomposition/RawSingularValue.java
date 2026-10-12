@@ -59,6 +59,55 @@ import org.ojalgo.structure.Access2D.Collectable;
 final class RawSingularValue extends RawDecomposition implements SingularValue<Double> {
 
     /**
+     * [A]=[U][S][V]<sup>T</sup> — scale by [S]<sup>-1</sup> (reciprocal singular values).
+     * <p>
+     * ftran: y[i] /= s[i] for i < rank
+     * <p>
+     * btran: same as ftran (diagonal is symmetric)
+     */
+    static final class FactorSinv extends AbstractDecomposition.PrimitiveFactor {
+
+        private final int myDim;
+        private final int myRank;
+        private final double[] mySingularValues;
+
+        FactorSinv(final double[] singularValues, final int rank, final int dim) {
+            super();
+            mySingularValues = singularValues;
+            myRank = rank;
+            myDim = dim;
+        }
+
+        @Override
+        public void btran(final double[] arg) {
+            this.ftran(arg);
+        }
+
+        @Override
+        public void ftran(final double[] arg) {
+            for (int i = 0; i < myRank; i++) {
+                arg[i] /= mySingularValues[i];
+            }
+        }
+
+        @Override
+        public MatrixStore<Double> get() {
+            return null;
+        }
+
+        @Override
+        public int getColDim() {
+            return myDim;
+        }
+
+        @Override
+        public int getRowDim() {
+            return myDim;
+        }
+
+    }
+
+    /**
      * [A]=[U][S][V]<sup>T</sup> — multiply by [U]<sup>T</sup>.
      * <p>
      * ftran: y = [U]<sup>T</sup> b (project onto left singular vectors)
@@ -67,9 +116,9 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
      */
     static final class FactorUT extends AbstractDecomposition.PrimitiveFactor {
 
-        private final double[][] myRows;
-        private final int myRank;
         private final int myDim;
+        private final int myRank;
+        private final double[][] myRows;
 
         FactorUT(final double[][] rows, final int rank, final int dim) {
             super();
@@ -117,55 +166,6 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     /**
-     * [A]=[U][S][V]<sup>T</sup> — scale by [S]<sup>-1</sup> (reciprocal singular values).
-     * <p>
-     * ftran: y[i] /= s[i] for i < rank
-     * <p>
-     * btran: same as ftran (diagonal is symmetric)
-     */
-    static final class FactorSinv extends AbstractDecomposition.PrimitiveFactor {
-
-        private final double[] mySingularValues;
-        private final int myRank;
-        private final int myDim;
-
-        FactorSinv(final double[] singularValues, final int rank, final int dim) {
-            super();
-            mySingularValues = singularValues;
-            myRank = rank;
-            myDim = dim;
-        }
-
-        @Override
-        public void btran(final double[] arg) {
-            this.ftran(arg);
-        }
-
-        @Override
-        public void ftran(final double[] arg) {
-            for (int i = 0; i < myRank; i++) {
-                arg[i] /= mySingularValues[i];
-            }
-        }
-
-        @Override
-        public MatrixStore<Double> get() {
-            return null;
-        }
-
-        @Override
-        public int getColDim() {
-            return myDim;
-        }
-
-        @Override
-        public int getRowDim() {
-            return myDim;
-        }
-
-    }
-
-    /**
      * [A]=[U][S][V]<sup>T</sup> — multiply by [V] (stored as [V]<sup>T</sup> rows).
      * <p>
      * ftran: x = [V] y (expand from right singular vector coordinates)
@@ -174,9 +174,9 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
      */
     static final class FactorV extends AbstractDecomposition.PrimitiveFactor {
 
-        private final double[][] myRows;
-        private final int myRank;
         private final int myDim;
+        private final int myRank;
+        private final double[][] myRows;
 
         FactorV(final double[][] rows, final int rank, final int dim) {
             super();
@@ -326,18 +326,6 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     @Override
-    public List<InvertibleFactor<Double>> getFactors() {
-        if (myUt == null || myVt == null) {
-            return List.of(this);
-        }
-        int rank = this.getRank();
-        int dim = n;
-        double[][] ut = myTransposed ? myVt : myUt;
-        double[][] vt = myTransposed ? myUt : myVt;
-        return List.of(new FactorUT(ut, rank, dim), new FactorSinv(s, rank, dim), new FactorV(vt, rank, dim));
-    }
-
-    @Override
     public MatrixStore<Double> getCovariance() {
 
         MatrixStore<Double> v = this.getV();
@@ -357,6 +345,18 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     @Override
     public MatrixStore<Double> getD() {
         return this.getS();
+    }
+
+    @Override
+    public List<InvertibleFactor<Double>> getFactors() {
+        if (myUt == null || myVt == null) {
+            return List.of(this);
+        }
+        int rank = this.getRank();
+        int dim = n;
+        double[][] ut = myTransposed ? myVt : myUt;
+        double[][] vt = myTransposed ? myUt : myVt;
+        return List.of(new FactorUT(ut, rank, dim), new FactorSinv(s, rank, dim), new FactorV(vt, rank, dim));
     }
 
     @Override
@@ -389,11 +389,12 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     @Override
     public MatrixStore<Double> getInverse(final PhysicalStore<Double> preallocated) {
 
-        if (myInverse == null) {
-            myInverse = SingularValue.invert(this, preallocated);
+        if (myInverse != null) {
+            return myInverse;
         }
 
-        return myInverse;
+        // Not cached – preallocated belongs to the caller, and may be reused for something else
+        return SingularValue.invert(this, preallocated);
     }
 
     @Override

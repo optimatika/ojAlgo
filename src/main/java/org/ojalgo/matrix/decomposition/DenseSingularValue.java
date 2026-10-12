@@ -727,11 +727,12 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
     @Override
     public MatrixStore<N> getInverse(final PhysicalStore<N> preallocated) {
 
-        if (myInverse == null) {
-            myInverse = SingularValue.invert(this, preallocated);
+        if (myInverse != null) {
+            return myInverse;
         }
 
-        return myInverse;
+        // Not cached – preallocated belongs to the caller, and may be reused for something else
+        return SingularValue.invert(this, preallocated);
     }
 
     @Override
@@ -921,34 +922,6 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
             return this.getSolution(this.wrap(rhs), preallocated);
         }
         throw RecoverableCondition.newEquationSystemNotSolvable();
-    }
-
-    private MatrixStore<N> getInverseOldVersion(final PhysicalStore<N> preallocated) {
-
-        if (myInverse == null) {
-
-            final MatrixStore<N> tmpQ1 = this.getU();
-            final Array1D<Double> tmpSingulars = this.getSingularValues();
-            final MatrixStore<N> tmpQ2 = this.getV();
-
-            final int tmpRowDim = (int) tmpSingulars.count();
-            final int tmpColDim = (int) tmpQ1.countRows();
-            final PhysicalStore<N> tmpMtrx = this.makeZero(tmpRowDim, tmpColDim);
-
-            double tmpValue;
-            final int rank = this.getRank();
-            for (int i = 0; i < rank; i++) {
-                tmpValue = tmpSingulars.doubleValue(i);
-                for (int j = 0; j < tmpColDim; j++) {
-                    tmpMtrx.set(i, j, tmpQ1.toScalar(j, i).conjugate().divide(tmpValue).get());
-                }
-            }
-
-            preallocated.fillByMultiplying(tmpQ2, tmpMtrx);
-            myInverse = preallocated;
-        }
-
-        return myInverse;
     }
 
     @Override
