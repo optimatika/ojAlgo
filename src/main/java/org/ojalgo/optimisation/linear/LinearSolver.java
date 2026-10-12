@@ -893,27 +893,16 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         return LinearSolver.newBuilder(objective);
     }
 
+    /**
+     * Solves the linear part of a convex problem: the primal problem, with {@link SimplexSolver}.
+     *
+     * @param zeroC Disregard the objective (use 0) – only a feasible solution is needed, such as the initial
+     *              solution for the active set solvers
+     */
     public static Optimisation.Result solve(final ConvexData convex, final Optimisation.Options options, final boolean zeroC) {
-
-        boolean store = false;
-
-        if (store) {
-
-            int dualSize = SimplexSolver.sizeOfDual(convex);
-            int primSize = SimplexSolver.sizeOfPrimal(convex);
-            boolean dual = dualSize <= primSize;
-
-            return dual ? SimplexSolver.doSolveConvexAsDual(convex, options, zeroC) : SimplexSolver.doSolveConvexAsPrimal(convex, options, zeroC);
-
-        } else {
-
-            int dualSize = SimplexTableauSolver.sizeOfDual(convex);
-            int primSize = SimplexTableauSolver.sizeOfPrimal(convex);
-            boolean dual = dualSize <= primSize;
-
-            return dual ? SimplexTableauSolver.doSolveConvexAsDual(convex, options, zeroC) : SimplexTableauSolver.doSolveConvexAsPrimal(convex, options, zeroC);
-        }
+        return SimplexSolver.doSolveConvexAsPrimal(convex, options, zeroC);
     }
+
 
     static LinearFunction<Double> toObjectiveFunction(final MatrixStore<Double> mtrxC) {
 

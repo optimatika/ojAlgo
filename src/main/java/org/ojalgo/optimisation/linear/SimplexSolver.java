@@ -478,111 +478,6 @@ abstract class SimplexSolver extends LinearSolver {
         return simplex;
     }
 
-    static Optimisation.Result doSolveConvexAsDual(final ConvexData<Double> convex, final Optimisation.Options options, final boolean zeroC) {
-
-        int nbCvxVars = convex.countVariables();
-        int nbCvxEqus = convex.countEqualityConstraints();
-        int nbCvxInes = convex.countInequalityConstraints();
-
-        MatrixStore<Double> cvxC = convex.getObjective().getLinearFactors(true);
-        MatrixStore<Double> cvxBE = convex.getBE();
-        MatrixStore<Double> cvxBI = convex.getBI();
-
-        LinearStructure structure = new LinearStructure(false, 0, nbCvxVars, nbCvxEqus + nbCvxInes, 0, 0, 0);
-
-        SimplexStore store = SimplexStore.newStoreFactory(options).apply(structure);
-
-        double[] lb = store.getLowerBounds();
-        double[] ub = store.getUpperBounds();
-        for (int j = 0; j < nbCvxEqus; j++) {
-            lb[j] = NEGATIVE_INFINITY;
-            ub[j] = POSITIVE_INFINITY;
-        }
-        for (int j = 0; j < nbCvxInes; j++) {
-            lb[nbCvxEqus + j] = ZERO;
-            ub[nbCvxEqus + j] = POSITIVE_INFINITY;
-        }
-
-        Mutate2D constrBody = store.constraintsBody();
-        Mutate1D constrRHS = store.constraintsRHS();
-        Mutate1D objective = store.objective();
-
-        for (int i = 0; i < nbCvxVars; i++) {
-            constrRHS.set(i, zeroC ? ZERO : cvxC.doubleValue(i));
-        }
-
-        for (RowView<Double> rowAE : convex.getRowsAE()) {
-            objective.set(rowAE.row(), cvxBE.doubleValue(rowAE.row()));
-            rowAE.nonzeros().forEach(nz -> constrBody.set(nz.index(), rowAE.row(), nz.doubleValue()));
-        }
-
-        for (RowView<Double> rowAI : convex.getRowsAI()) {
-            objective.set(nbCvxEqus + rowAI.row(), cvxBI.doubleValue(rowAI.row()));
-            rowAI.nonzeros().forEach(nz -> constrBody.set(nz.index(), nbCvxEqus + rowAI.row(), nz.doubleValue()));
-        }
-
-        for (int i = 0; i < nbCvxVars; i++) {
-            constrBody.set(i, nbCvxEqus + nbCvxInes + i, ONE);
-        }
-
-        LinearSolver solver = store.newPhasedSimplexSolver(options);
-
-        Result result = solver.solve();
-        Access1D<?> multiplierNumbers = result.getDualSolution().map(Supplier::get).get();
-
-        State retState = result.getState();
-        if (retState == State.UNBOUNDED) {
-            retState = State.INFEASIBLE;
-        } else if (!retState.isFeasible()) {
-            retState = State.UNBOUNDED;
-        }
-
-        double retValue = -result.getValue();
-
-        Primitive1D retSolution = new Primitive1D() {
-
-            @Override
-            public double doubleValue(final int index) {
-                return -multiplierNumbers.doubleValue(index);
-            }
-
-            @Override
-            public void set(final int index, final double value) {
-                throw new IllegalArgumentException();
-            }
-
-            @Override
-            public int size() {
-                return multiplierNumbers.size();
-            }
-
-        };
-
-        Primitive1D retMultipliers = new Primitive1D() {
-
-            @Override
-            public double doubleValue(final int index) {
-
-                return result.doubleValue(index);
-
-            }
-
-            @Override
-            public void set(final int index, final double value) {
-                throw new IllegalArgumentException();
-            }
-
-            @Override
-            public int size() {
-                return nbCvxEqus + nbCvxInes;
-            }
-
-        };
-
-        Optimisation.Result retVal = new Optimisation.Result(retState, retValue, retSolution);
-        retVal.withDualSolution(() -> retMultipliers);
-        return retVal;
-    }
 
     static Optimisation.Result doSolveConvexAsPrimal(final ConvexData<Double> convex, final Optimisation.Options options, final boolean zeroC) {
 
@@ -694,29 +589,7 @@ abstract class SimplexSolver extends LinearSolver {
         return retVal;
     }
 
-    static int sizeOfDual(final ConvexData<?> convex) {
 
-        int nbCvxVars = convex.countVariables();
-        int nbCvxEqus = convex.countEqualityConstraints();
-        int nbCvxInes = convex.countInequalityConstraints();
-
-        int nbLinEqus = nbCvxVars;
-        int nbLinVars = nbCvxEqus + nbCvxInes + nbLinEqus;
-
-        return (nbLinEqus + 2) * (nbLinVars + 1);
-    }
-
-    static int sizeOfPrimal(final ConvexData<?> convex) {
-
-        int nbCvxVars = convex.countVariables();
-        int nbCvxEqus = convex.countEqualityConstraints();
-        int nbCvxInes = convex.countInequalityConstraints();
-
-        int nbLinEqus = nbCvxEqus + nbCvxInes;
-        int nbLinVars = nbCvxVars + nbLinEqus;
-
-        return (nbLinEqus + 2) * (nbLinVars + 1);
-    }
 
     /**
      * Set by {@link #testDualEnterRatio}: there were candidates, but {@link #PIVOT_GROWTH} rejected them all.

@@ -93,11 +93,11 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * The results from the primal and dual variants should be exactly the same, in every aspect. Further
-     * there solutions should be the same as for the model. The objective function value as well as the
-     * multipliers may be different from the model.
+     * The LP that the convex solvers delegate to ({@link LinearSolver#solve(ConvexData, Optimisation.Options, boolean)}
+     * – the primal problem solved with {@link SimplexSolver}) should give the same state and solution as the
+     * model.
      */
-    static void comparePrimalAndDualSolvers(final ExpressionsBasedModel model, final Optimisation.Sense sense) {
+    static void compareWithConvexSolver(final ExpressionsBasedModel model, final Optimisation.Sense sense) {
 
         ExpressionsBasedModel.clearPresolvers();
 
@@ -105,10 +105,7 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
 
         ConvexData<Double> convexData = ConvexSolver.copy(model, R064Store.FACTORY);
 
-        Result primTablResult = SimplexTableauSolver.doSolveConvexAsPrimal(convexData, model.options, false);
-        Result dualTablResult = SimplexTableauSolver.doSolveConvexAsDual(convexData, model.options, false);
-        Result dualStoreResult = SimplexSolver.doSolveConvexAsDual(convexData, model.options, false);
-        Result primStoreResult = SimplexSolver.doSolveConvexAsPrimal(convexData, model.options, false);
+        Result convexResult = LinearSolver.solve(convexData, model.options, false);
 
         if (DEBUG) {
 
@@ -117,27 +114,13 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
 
             BasicLogger.debug(model);
 
-            BasicLogger.debug("Model         : {}", modResult);
-            BasicLogger.debug("Primal Tableau: {}", primTablResult);
-            BasicLogger.debug("Dual   Tableau: {}", dualTablResult);
-            BasicLogger.debug("Primal   Store: {}", primStoreResult);
-            BasicLogger.debug("Dual     Store: {}", dualStoreResult);
+            BasicLogger.debug("Model : {}", modResult);
+            BasicLogger.debug("Convex: {}", convexResult);
 
-            BasicLogger.debug("Primal Tableau multipliers: {}", primTablResult.getDualSolution().map(Supplier::get).get());
-            BasicLogger.debug("Dual   Tableau multipliers: {}", dualTablResult.getDualSolution().map(Supplier::get).get());
-            BasicLogger.debug("Primal   Store multipliers: {}", primStoreResult.getDualSolution().map(Supplier::get).get());
-            BasicLogger.debug("Dual     Store multipliers: {}", dualStoreResult.getDualSolution().map(Supplier::get).get());
+            BasicLogger.debug("Convex multipliers: {}", convexResult.getDualSolution().map(Supplier::get).get());
         }
 
-        TestUtils.assertStateAndSolution(modResult, primTablResult);
-        TestUtils.assertStateAndSolution(modResult, dualTablResult);
-        TestUtils.assertStateAndSolution(modResult, primStoreResult);
-        TestUtils.assertStateAndSolution(modResult, dualStoreResult);
-
-        TestUtils.assertResult(primTablResult, dualTablResult);
-        TestUtils.assertResult(primStoreResult, dualStoreResult);
-        TestUtils.assertResult(primTablResult, primStoreResult);
-        TestUtils.assertResult(dualTablResult, dualStoreResult);
+        TestUtils.assertStateAndSolution(modResult, convexResult);
     }
 
     @AfterEach
@@ -180,9 +163,9 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
 
         PrimalDualTest.assertResultAndFullSolution(dualModel, Sense.MIN, dualExpected, optimalSolution);
 
-        PrimalDualTest.comparePrimalAndDualSolvers(primModel, Sense.MAX);
+        PrimalDualTest.compareWithConvexSolver(primModel, Sense.MAX);
 
-        PrimalDualTest.comparePrimalAndDualSolvers(dualModel, Sense.MIN);
+        PrimalDualTest.compareWithConvexSolver(dualModel, Sense.MIN);
 
         LinearSolver.Builder primBuilder = LinearSolver.newBuilder(-2.0, -3.0); // Negated, since max
         primBuilder.inequality(12.0, 4.0, 8.0);
@@ -249,9 +232,9 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
 
         PrimalDualTest.assertResultAndFullSolution(dualModel, Sense.MIN, dualExpected, optimalSolution);
 
-        PrimalDualTest.comparePrimalAndDualSolvers(primModel, Sense.MAX);
+        PrimalDualTest.compareWithConvexSolver(primModel, Sense.MAX);
 
-        PrimalDualTest.comparePrimalAndDualSolvers(dualModel, Sense.MIN);
+        PrimalDualTest.compareWithConvexSolver(dualModel, Sense.MIN);
 
         LinearSolver.Builder primBuilder = LinearSolver.newBuilder(-4.0, -3.0); // Negated, since max
         primBuilder.inequality(30.0, 2.0, 3.0);
@@ -323,9 +306,9 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
 
         PrimalDualTest.assertResultAndFullSolution(dualModel, Sense.MIN, dualExpected, optimalSolution);
 
-        PrimalDualTest.comparePrimalAndDualSolvers(primModel, Sense.MAX);
+        PrimalDualTest.compareWithConvexSolver(primModel, Sense.MAX);
 
-        PrimalDualTest.comparePrimalAndDualSolvers(dualModel, Sense.MIN);
+        PrimalDualTest.compareWithConvexSolver(dualModel, Sense.MIN);
 
         LinearSolver.Builder primBuilder = LinearSolver.newBuilder(-6.0, -14.0, -13.0); // Negated, since max
         primBuilder.inequality(24.0, 0.5, 2.0, 1.0);
@@ -393,9 +376,9 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
 
         PrimalDualTest.assertResultAndFullSolution(dualModel, Sense.MIN, dualExpected, optimalSolution);
 
-        PrimalDualTest.comparePrimalAndDualSolvers(primModel, Sense.MAX);
+        PrimalDualTest.compareWithConvexSolver(primModel, Sense.MAX);
 
-        PrimalDualTest.comparePrimalAndDualSolvers(dualModel, Sense.MIN);
+        PrimalDualTest.compareWithConvexSolver(dualModel, Sense.MIN);
 
         LinearSolver.Builder primBuilder = LinearSolver.newBuilder(-3.0, -4.0); // Negated, since max
         primBuilder.equality(7.0, 5.0, 6.0);

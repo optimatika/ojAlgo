@@ -255,6 +255,12 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
      * constraint that is linearly dependent on the active constraints does not change its slack, other than
      * by noise, and including it would make the KKT system unsolvable. Constraints found to be dependent (and
      * the one to ignore) are skipped, unless the slack change is significant compared to the step.
+     * <p>
+     * A constraint is at its boundary (limits the step length to 0) if its slack is negligible compared to
+     * the slack change, and also compared to the size of the constraint – its RHS and its terms at the current
+     * solution. With a very long step, a slack that is negligible compared to the slack change can still be
+     * far from 0, and including that constraint without moving would make the active set inconsistent with
+     * the current solution.
      *
      * @param ignore An inequality constraint to ignore, or -1
      */
@@ -264,6 +270,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         this.setConstraintToInclude(-1);
 
         double stepNorm = Math.sqrt(step.dot(step));
+        double solutionNorm = this.getSolutionX().aggregateAll(Aggregator.LARGEST).doubleValue();
 
         int nbIneqs = this.countInequalityConstraints();
         int testThisLast = Math.min(this.getLastIncluded(), this.getLastExcluded());
@@ -286,9 +293,11 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             }
 
             double currentSlack = slack.doubleValue(i);
+            double constraintSize = Math.max(Math.abs(this.getMatrixBI(i)), this.getRowNormAI(i) * solutionNorm);
+            boolean atBoundary = SLACK.isSmall(slackChange, currentSlack) && SLACK.isSmall(constraintSize, currentSlack);
             // If the current slack is negative something has already gone wrong.
             // Taking the max value is to handle small negative values due to rounding errors
-            double fraction = SLACK.isSmall(slackChange, currentSlack) ? ZERO : Math.max(currentSlack, ZERO) / slackChange;
+            double fraction = atBoundary ? ZERO : Math.max(currentSlack, ZERO) / slackChange;
 
             if (fraction < stepLength) {
                 stepLength = fraction;
