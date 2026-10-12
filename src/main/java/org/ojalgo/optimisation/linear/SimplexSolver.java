@@ -353,6 +353,13 @@ abstract class SimplexSolver extends LinearSolver {
      * infeasibility.
      */
     private static final NumberContext INFEASIBILITY = NumberContext.of(10);
+    /**
+     * Elements of the pivot row (dual simplex) or column (primal simplex) this small are not pivots. In the
+     * dual simplex such an element is still a candidate, used only if there are no others, when its product
+     * with the range of the variable is not this small. That product does not depend on how the column is
+     * scaled, and through it a variable with a wide range can still remove the infeasibility: without it a
+     * badly scaled column could never enter, and infeasibility would be concluded where there is none.
+     */
     private static final NumberContext PIVOT = NumberContext.of(6);
     /**
      * A pivot must also be large relative to the largest element of the pivot row (dual simplex) or column
@@ -1110,6 +1117,7 @@ abstract class SimplexSolver extends LinearSolver {
         // ratio, trueRatio, state), where the relaxed ratio is (gap + tolerance) / |denom|.
         int cachedCount = 0;
         double largest = ZERO;
+        boolean regular = false;
 
         for (int k = 0; k < nbCandidates; k++) {
             int je = candidates != null ? candidates[k] : k;
@@ -1121,8 +1129,12 @@ abstract class SimplexSolver extends LinearSolver {
             double denom = mySimplex.getCurrentElement(exit, je);
             double scale = Math.abs(denom);
             largest = Math.max(largest, scale);
-            if (PIVOT.isZero(denom)) {
-                continue;
+            boolean small = PIVOT.isZero(denom);
+            if (small) {
+                double range = mySimplex.getRange(j);
+                if (!Double.isFinite(range) || PIVOT.isZero(scale * range)) {
+                    continue;
+                }
             }
 
             ColumnState columnState = mySimplex.getColumnState(j);
@@ -1167,6 +1179,7 @@ abstract class SimplexSolver extends LinearSolver {
                 this.log(1, "{}({}) relaxed = {}", j, je, relaxed);
             }
 
+            regular |= !small;
             myRatioCacheIdx[cachedCount] = je;
             myRatioCacheRelaxed[cachedCount] = relaxed;
             myRatioCacheScale[cachedCount] = scale;
@@ -1176,12 +1189,14 @@ abstract class SimplexSolver extends LinearSolver {
         }
 
         // Keep the cached candidates that pass the growth limit (relative to the largest element of the row),
-        // and compute the relaxed minimum theta_max over them.
+        // and compute the relaxed minimum theta_max over them. Candidates below PIVOT only if there are no
+        // others.
         double thetaMax = MACHINE_LARGEST;
         int nbKept = 0;
 
         for (int k = 0; k < cachedCount; k++) {
-            if (PIVOT_GROWTH.isSmall(largest, myRatioCacheScale[k])) {
+            double scale = myRatioCacheScale[k];
+            if (regular && PIVOT.isZero(scale) || PIVOT_GROWTH.isSmall(largest, scale)) {
                 continue;
             }
             double relaxed = myRatioCacheRelaxed[k];
@@ -1194,7 +1209,7 @@ abstract class SimplexSolver extends LinearSolver {
             myRatioCacheState[nbKept] = myRatioCacheState[k];
             nbKept++;
         }
-        myGrowthLimited = cachedCount > 0 && nbKept == 0;
+        myGrowthLimited = regular && nbKept == 0;
         cachedCount = nbKept;
 
         if (cachedCount == 0) {
