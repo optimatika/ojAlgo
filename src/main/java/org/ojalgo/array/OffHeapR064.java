@@ -21,18 +21,22 @@
  */
 package org.ojalgo.array;
 
+import static java.lang.foreign.ValueLayout.JAVA_DOUBLE;
+
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.type.NativeMemory;
 
 final class OffHeapR064 extends OffHeapArray {
 
-    private final long myPointer;
+    private final MemorySegment mySegment;
 
-    OffHeapR064(final long count) {
+    OffHeapR064(final MemorySegment segment, final Arena arena) {
 
-        super(OffHeapArray.R064, count);
+        super(OffHeapArray.R064, segment, arena);
 
-        myPointer = NativeMemory.allocateDoubleArray(this, count);
+        mySegment = segment;
     }
 
     @Override
@@ -42,32 +46,32 @@ final class OffHeapR064 extends OffHeapArray {
 
     @Override
     public double doubleValue(final int index) {
-        return NativeMemory.getDouble(myPointer, index);
+        return mySegment.getAtIndex(JAVA_DOUBLE, index);
     }
 
     @Override
     public double doubleValue(final long index) {
-        return NativeMemory.getDouble(myPointer, index);
+        return mySegment.getAtIndex(JAVA_DOUBLE, index);
     }
 
     @Override
     public float floatValue(final int index) {
-        return (float) NativeMemory.getDouble(myPointer, index);
+        return (float) mySegment.getAtIndex(JAVA_DOUBLE, index);
     }
 
     @Override
     public float floatValue(final long index) {
-        return (float) NativeMemory.getDouble(myPointer, index);
+        return (float) mySegment.getAtIndex(JAVA_DOUBLE, index);
     }
 
     @Override
     public void reset() {
-        NativeMemory.initialiseDoubleArray(myPointer, this.count());
+        mySegment.fill((byte) 0);
     }
 
     @Override
     public void set(final int index, final double value) {
-        NativeMemory.setDouble(myPointer, index, value);
+        mySegment.setAtIndex(JAVA_DOUBLE, index, value);
     }
 
     @Override
@@ -77,12 +81,12 @@ final class OffHeapR064 extends OffHeapArray {
 
     @Override
     public void set(final long index, final double value) {
-        NativeMemory.setDouble(myPointer, index, value);
+        mySegment.setAtIndex(JAVA_DOUBLE, index, value);
     }
 
     @Override
     public void set(final long index, final float value) {
-        NativeMemory.setDouble(myPointer, index, value);
+        mySegment.setAtIndex(JAVA_DOUBLE, index, value);
     }
 
 }

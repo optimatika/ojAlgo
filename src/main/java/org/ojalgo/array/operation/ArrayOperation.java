@@ -26,4 +26,18 @@ package org.ojalgo.array.operation;
  */
 public interface ArrayOperation {
 
+    /**
+     * Argument check for the BLAS/LAPACK operations, where the reference implementation calls XERBLA.
+     *
+     * @param routine   The routine's name, such as {@code "GEMM"}
+     * @param parameter The parameter's name, such as {@code "lda"}
+     * @param valid     Whether the argument is valid
+     * @throws IllegalArgumentException if the argument is not valid
+     */
+    static void checkArgument(final String routine, final String parameter, final boolean valid) {
+        if (!valid) {
+            throw new IllegalArgumentException("On entry to " + routine + " parameter " + parameter + " had an illegal value");
+        }
+    }
+
 }

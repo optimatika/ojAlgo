@@ -48,15 +48,16 @@ public class MultiplyBoth implements MatrixOperation {
 
     }
 
-    public static IntSupplier PARALLELISM = Parallelism.THREADS;
-    public static int THRESHOLD = 8;
+    static IntSupplier PARALLELISM = Parallelism.THREADS;
+    /**
+     * The general case is multi-threaded, splitting the rows of the product, when m*n*k is larger than this
+     * cubed. See {@link MatrixOperation#chunk(int, double)}.
+     */
+    static int THRESHOLD = 28;
 
     private static final DivideAndConquer.Divider DIVIDER = ProcessingService.INSTANCE.newDivider();
 
     public static <N extends Scalar<N>> MultiplyBoth.Generic<N> newGeneric(final int rows, final int columns) {
-        if (rows > THRESHOLD && columns > THRESHOLD) {
-            return MultiplyBoth::fillMxN_MT_G;
-        }
         if (columns == 1) {
             return MultiplyBoth::fillMx1_G;
         }
@@ -71,9 +72,6 @@ public class MultiplyBoth implements MatrixOperation {
     }
 
     public static MultiplyBoth.Primitive newPrimitive64(final int rows, final int columns) {
-        if (rows > THRESHOLD && columns > THRESHOLD) {
-            return MultiplyBoth::fillMxN_MT_P64;
-        }
         if (rows == 5 && columns == 5) {
             return MultiplyBoth::fill5x5_P64;
         }
@@ -131,8 +129,8 @@ public class MultiplyBoth implements MatrixOperation {
         }
     }
 
-    static void divide(final int first, final int limit, final Conquerer conquerer) {
-        DIVIDER.parallelism(PARALLELISM).threshold(THRESHOLD).divide(first, limit, conquerer);
+    static void divide(final int first, final int limit, final int chunk, final Conquerer conquerer) {
+        DIVIDER.parallelism(PARALLELISM).threshold(chunk).divide(first, limit, conquerer);
     }
 
     static void fill0xN_P64(final TransformableRegion<Double> product, final Access1D<Double> left, final int complexity, final Access1D<Double> right) {
@@ -722,20 +720,27 @@ public class MultiplyBoth implements MatrixOperation {
     }
 
     static <N extends Scalar<N>> void fillMxN_G(final TransformableRegion<N> product, final Access1D<N> left, final int complexity, final Access1D<N> right) {
-        MultiplyBoth.fillRxN_G(product, 0, product.getRowDim(), left, complexity, right);
-    }
 
-    static <N extends Scalar<N>> void fillMxN_MT_G(final TransformableRegion<N> product, final Access1D<N> left, final int complexity,
-            final Access1D<N> right) {
-        MultiplyBoth.divide(0, product.getRowDim(), (f, l) -> MultiplyBoth.fillRxN_G(product, f, l, left, complexity, right));
-    }
+        int nbRows = product.getRowDim();
+        int chunk = MatrixOperation.chunk(THRESHOLD, product.getColDim(), complexity);
 
-    static void fillMxN_MT_P64(final TransformableRegion<Double> product, final Access1D<Double> left, final int complexity, final Access1D<Double> right) {
-        MultiplyBoth.divide(0, product.getRowDim(), (f, l) -> MultiplyBoth.fillRxN_P64(product, f, l, left, complexity, right));
+        if (nbRows > chunk) {
+            MultiplyBoth.divide(0, nbRows, chunk, (f, l) -> MultiplyBoth.fillRxN_G(product, f, l, left, complexity, right));
+        } else {
+            MultiplyBoth.fillRxN_G(product, 0, nbRows, left, complexity, right);
+        }
     }
 
     static void fillMxN_P64(final TransformableRegion<Double> product, final Access1D<Double> left, final int complexity, final Access1D<Double> right) {
-        MultiplyBoth.fillRxN_P64(product, 0, product.getRowDim(), left, complexity, right);
+
+        int nbRows = product.getRowDim();
+        int chunk = MatrixOperation.chunk(THRESHOLD, product.getColDim(), complexity);
+
+        if (nbRows > chunk) {
+            MultiplyBoth.divide(0, nbRows, chunk, (f, l) -> MultiplyBoth.fillRxN_P64(product, f, l, left, complexity, right));
+        } else {
+            MultiplyBoth.fillRxN_P64(product, 0, nbRows, left, complexity, right);
+        }
     }
 
     static <N extends Scalar<N>> void fillRxN_G(final TransformableRegion<N> product, final int firstRow, final int rowLimit, final Access1D<N> left,

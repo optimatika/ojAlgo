@@ -73,9 +73,8 @@ public abstract class SubstituteForwards implements MatrixOperation {
     }
 
     /**
-     * Single-RHS forward substitution operating directly on raw column-major body data. Uses AXPY-style
-     * column sweep: each solved element immediately updates all subsequent elements, reading body columns
-     * contiguously for optimal cache locality.
+     * Single-RHS forward substitution operating directly on raw column-major body data: L*x = b, or
+     * U<sup>T</sup>*x = b when conjugated, solved by {@link TRSV}.
      *
      * @param data          Single-column RHS, overwritten with the solution
      * @param bodyData      Column-major body data (lower triangular, or upper when conjugated)
@@ -84,35 +83,7 @@ public abstract class SubstituteForwards implements MatrixOperation {
      * @param conjugated    Body is transposed: lower part stored in upper columns
      */
     public static void invoke(final double[] data, final double[] bodyData, final int bodyStructure, final boolean unitDiagonal, final boolean conjugated) {
-
-        int n = data.length;
-
-        if (conjugated) {
-
-            for (int j = 0; j < n; j++) {
-
-                double solved = data[j] - DOT.invoke(bodyData, j * bodyStructure, 1, data, 0, 1, j);
-
-                if (!unitDiagonal) {
-                    solved /= bodyData[j + j * bodyStructure];
-                }
-
-                data[j] = solved;
-            }
-
-        } else {
-
-            for (int j = 0; j < n; j++) {
-
-                double solved = data[j] - DOT.invoke(bodyData, j, bodyStructure, data, 0, 1, j);
-
-                if (!unitDiagonal) {
-                    solved /= bodyData[j + j * bodyStructure];
-                }
-
-                data[j] = solved;
-            }
-        }
+        TRSV.invoke(conjugated, conjugated, unitDiagonal, data.length, bodyData, 0, Math.max(1, bodyStructure), data, 0, 1);
     }
 
     /**
@@ -248,35 +219,7 @@ public abstract class SubstituteForwards implements MatrixOperation {
      * @see #invoke(double[], double[], int, boolean, boolean)
      */
     public static void invoke(final float[] data, final float[] bodyData, final int bodyStructure, final boolean unitDiagonal, final boolean conjugated) {
-
-        int n = data.length;
-
-        if (conjugated) {
-
-            for (int j = 0; j < n; j++) {
-
-                float solved = data[j] - DOT.invoke(bodyData, j * bodyStructure, 1, data, 0, 1, j);
-
-                if (!unitDiagonal) {
-                    solved /= bodyData[j + j * bodyStructure];
-                }
-
-                data[j] = solved;
-            }
-
-        } else {
-
-            for (int j = 0; j < n; j++) {
-
-                float solved = data[j] - DOT.invoke(bodyData, j, bodyStructure, data, 0, 1, j);
-
-                if (!unitDiagonal) {
-                    solved /= bodyData[j + j * bodyStructure];
-                }
-
-                data[j] = solved;
-            }
-        }
+        TRSV.invoke(conjugated, conjugated, unitDiagonal, data.length, bodyData, 0, Math.max(1, bodyStructure), data, 0, 1);
     }
 
     public static void invoke(final float[] data, final int structure, final int first, final int limit, final Access2D<?> body, final boolean unitDiagonal,

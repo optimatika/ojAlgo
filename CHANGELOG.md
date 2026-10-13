@@ -9,6 +9,46 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ## [Unreleased]
 
+> Corresponds to changes in the `blas` branch, not yet merged to `develop`
+
+### Added
+
+#### org.ojalgo
+
+- `OjAlgoUtils.getNativeLibrary()`: the native BLAS library that ojAlgo uses, if any.
+
+#### org.ojalgo.array
+
+- `OffHeapArray.Factory.newMapped(File, long)`: a memory mapped file as an off-heap array. The file is created if it does not exist, and grown if it holds fewer elements. Close the array to unmap the file.
+
+#### org.ojalgo.matrix
+
+- Optional native BLAS, through Java's Foreign Function & Memory API. When the JVM grants ojAlgo native access (`--enable-native-access=ojalgo` on the module path, `--enable-native-access=ALL-UNNAMED` on the class path) and a working library is found, large enough matrix multiplications, matrix-vector products, triangular solves and vector operations call it. ojAlgo looks for Accelerate on macOS; OpenBLAS, FlexiBLAS, MKL, BLIS or the reference BLAS on Linux; OpenBLAS or MKL on Windows. The system property `ojalgo.native.library` names the library file(s) to use instead, or switches native code off with `none`. Every operation still has a pure Java implementation, and without native access no native code is used. See the README.
+
+### Changed
+
+ojAlgo now requires Java 22 or later. The Foreign Function & Memory API, used for the optional native BLAS and for off-heap arrays, is final from Java 22. ojAlgo no longer requires the `jdk.unsupported` module.
+
+#### org.ojalgo.array
+
+- `OffHeapArray` is backed by a `MemorySegment` (the Foreign Function & Memory API) rather than `sun.misc.Unsafe`. Allocated memory is zero initialised – previously it was uninitialised until `reset()` – and released by the garbage collector. It is `AutoCloseable`: closing a memory mapped array unmaps the file, and accessing a closed array throws `IllegalStateException`.
+
+#### org.ojalgo.matrix
+
+- Dense `double` matrix multiplication is faster: new kernels, using fused multiply-add when the hardware has it, cache blocking for large matrices, and multi-threading decided by the amount of work rather than by fixed sizes. Results can differ from earlier versions in the last digits.
+
+### Removed
+
+#### org.ojalgo.array
+
+- `BufferArray` and its subclasses `BufferR032`, `BufferR064`, `BufferZ008`, `BufferZ016`, `BufferZ032` and `BufferZ064`. Use `OffHeapArray` instead, and `OffHeapArray.Factory.newMapped(File, long)` for memory mapped files.
+
+#### org.ojalgo.type
+
+- `NativeMemory`. `OffHeapArray` uses the Foreign Function & Memory API directly.
+
+## [Unreleased]
+
 > Corresponds to changes in the `develop` branch since the last release
 
 ## [57.5.0] – 2026-10-16
