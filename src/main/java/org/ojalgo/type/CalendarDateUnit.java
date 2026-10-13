@@ -23,6 +23,8 @@ package org.ojalgo.type;
 
 import java.time.DayOfWeek;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalTime;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
@@ -36,9 +38,16 @@ import java.util.concurrent.TimeUnit;
 import org.ojalgo.function.constant.PrimitiveMath;
 
 /**
- * Designed to complement {@linkplain CalendarDate}. It is essentially equivalent to {@linkplain ChronoUnit},
- * but with a slightly smaller set of members (and the additional {@linkplain #QUARTER}). It has been
- * retrofitted to implement the {@linkplain TemporalUnit} interface.
+ * Time units from nanoseconds to millennia: the {@link ChronoUnit}s from {@link ChronoUnit#NANOS} to
+ * {@link ChronoUnit#MILLENNIA} (except half-days), plus {@link #QUARTER}. Each unit has a fixed length. From
+ * {@link #MONTH} up these are average lengths, based on a year of 365.2425 days, equal to
+ * {@link ChronoUnit#getDuration()}.
+ * <ul>
+ * <li>On a {@link CalendarDate} the fixed lengths are used.
+ * <li>On other temporals the corresponding {@link ChronoUnit} is used, with {@link #QUARTER} as 3 months.
+ * <li>As a {@link CalendarDate.Resolution} a unit divides the time-line into intervals of its length, also
+ * working directly on epoch-millisecond longs.
+ * </ul>
  *
  * @see CalendarDate
  * @see CalendarDateDuration
@@ -47,66 +56,74 @@ import org.ojalgo.function.constant.PrimitiveMath;
 public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution {
 
     /**
-     *
+     * A nanosecond, shorter than the millisecond precision of {@link CalendarDate}.
      */
     NANOS(ChronoUnit.NANOS, TimeUnit.NANOSECONDS, "ns"),
     /**
-     *
+     * A microsecond, shorter than the millisecond precision of {@link CalendarDate}.
      */
     MICROS(ChronoUnit.MICROS, TimeUnit.MICROSECONDS, "µs"),
     /**
-     *
+     * A millisecond.
      */
     MILLIS(ChronoUnit.MILLIS, TimeUnit.MILLISECONDS, "ms"),
     /**
-     *
+     * A second.
      */
     SECOND(ChronoUnit.SECONDS, TimeUnit.SECONDS, "s"),
     /**
-     *
+     * 60 seconds.
      */
     MINUTE(ChronoUnit.MINUTES, TimeUnit.MINUTES, "min"),
     /**
-     *
+     * 60 minutes.
      */
     HOUR(ChronoUnit.HOURS, TimeUnit.HOURS, "h"),
     /**
-     *
+     * 24 hours.
      */
     DAY(ChronoUnit.DAYS, TimeUnit.DAYS, "days"),
     /**
-     *
+     * 7 days.
      */
     WEEK(ChronoUnit.WEEKS, 7L * 24L * TypeUtils.MILLIS_PER_HOUR, "weeks"),
     /**
-     *
+     * 1/12 year, 30.436875 days on average.
      */
     MONTH(ChronoUnit.MONTHS, TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR / 1200L, "months"),
     /**
-     *
+     * 3 months, 91.310625 days on average.
      */
     QUARTER(null, TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR / 400L, "quarters"),
     /**
-     *
+     * 365.2425 days on average.
      */
     YEAR(ChronoUnit.YEARS, TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR / 100L, "years"),
     /**
-     *
+     * 10 years.
      */
     DECADE(ChronoUnit.DECADES, TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR / 10L, "decades"),
     /**
-     *
+     * 100 years.
      */
     CENTURY(ChronoUnit.CENTURIES, TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR, "centuries"),
     /**
-     *
+     * 1000 years.
      */
     MILLENIUM(ChronoUnit.MILLENNIA, 10L * TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR, "millennia");
+
+    /**
+     * The last day of the period of the given number of years, starting with a year divisible by that number,
+     * that contains the temporal.
+     */
+    private static Temporal lastDayOfPeriod(final Temporal temporal, final long years) {
+        long lastYear = Math.floorDiv(temporal.getLong(ChronoField.YEAR), years) * years + years - 1L;
+        return temporal.with(ChronoField.YEAR, lastYear).with(TemporalAdjusters.lastDayOfYear());
+    }
 
     private final ChronoUnit myChronoUnit;
     private final long myDurationInMillis;
     private final long myDurationInNanos;
-    private final long myHalf;
     private final String myLabel;
     private final TimeUnit myTimeUnit;
 
@@ -114,8 +131,7 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution {
         myChronoUnit = chronoUnit;
         myTimeUnit = null;
         myDurationInMillis = millis;
-        myHalf = myDurationInMillis / 2L;
-        myDurationInNanos = millis * CalendarDate.NANOS_PER_MILLIS;
+        myDurationInNanos = TimeUnit.MILLISECONDS.toNanos(millis);
         myLabel = label;
     }
 
@@ -123,16 +139,19 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution {
         myChronoUnit = chronoUnit;
         myTimeUnit = timeUnit;
         myDurationInMillis = timeUnit.toMillis(1L);
-        myHalf = myDurationInMillis / 2L;
         myDurationInNanos = timeUnit.toNanos(1L);
         myLabel = label;
     }
 
+    /**
+     * On a {@link CalendarDate} adds amount times the fixed length, rounded down to whole milliseconds for
+     * {@link #NANOS} and {@link #MICROS}. On other temporals adds the corresponding {@link ChronoUnit}.
+     */
     @Override
     @SuppressWarnings({ "unchecked" })
     public <R extends Temporal> R addTo(final R temporal, final long amount) {
         if (temporal instanceof CalendarDate) {
-            return (R) new CalendarDate(((CalendarDate) temporal).millis + amount * myDurationInMillis);
+            return (R) new CalendarDate(this.addTo(((CalendarDate) temporal).millis, amount));
         } else if (myChronoUnit != null) {
             return myChronoUnit.addTo(temporal, amount);
         } else { // QUARTER
@@ -140,16 +159,20 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution {
         }
     }
 
-    @Override
-    public CalendarDate adjustInto(final CalendarDate temporal) {
-        return new CalendarDate(this.adjustInto(temporal.millis));
-    }
-
-    @Override
-    public long adjustInto(final long epochMilli) {
-        return Math.floorDiv(epochMilli, myDurationInMillis) * myDurationInMillis + myHalf;
-    }
-
+    /**
+     * Maps the temporal to a single representative point in time of the period, of this unit, that contains
+     * it.
+     * <ul>
+     * <li>{@link CalendarDate}: the middle of a fixed-length interval, see {@link #adjustInto(long)}.
+     * {@link Instant} is handled the same way, at millisecond precision.
+     * <li>Other temporals: units shorter than a day truncate the time of day to the start of the unit (NANOS,
+     * MICROS and MILLIS change nothing). DAY and longer set the time of day to noon, and WEEK and longer also
+     * set the date to the last day of the period: the Friday ending a Saturday to Friday week, or the last
+     * day of the month, quarter, year, decade, century or millennium. Decades, centuries and millennia start
+     * with years divisible by 10, 100 and 1000. Temporals without a time of day, such as
+     * {@link java.time.LocalDate}, only have their date adjusted.
+     * </ul>
+     */
     @Override
     public Temporal adjustInto(final Temporal temporal) {
 
@@ -157,91 +180,76 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution {
 
             return this.adjustInto((CalendarDate) temporal);
 
+        } else if (temporal instanceof Instant) {
+
+            return Instant.ofEpochMilli(this.adjustInto(((Instant) temporal).toEpochMilli()));
+
         } else {
 
             Temporal retVal = temporal;
 
-            if (CalendarDateUnit.MILLIS.toDurationInMillis() < myDurationInMillis) {
-
-                retVal = retVal.with(ChronoField.MILLI_OF_SECOND, 0L);
-
-                if (CalendarDateUnit.SECOND.toDurationInMillis() < myDurationInMillis) {
-
-                    retVal = retVal.with(ChronoField.SECOND_OF_MINUTE, 0L);
-
-                    if (CalendarDateUnit.MINUTE.toDurationInMillis() < myDurationInMillis) {
-
-                        retVal = retVal.with(ChronoField.MINUTE_OF_HOUR, 0L);
-
-                        if (CalendarDateUnit.HOUR.toDurationInMillis() < myDurationInMillis) {
-
-                            retVal = retVal.with(ChronoField.HOUR_OF_DAY, 12L);
-
-                            if (CalendarDateUnit.DAY.toDurationInMillis() < myDurationInMillis) {
-
-                                if (CalendarDateUnit.WEEK.toDurationInMillis() == myDurationInMillis) {
-
-                                    retVal = retVal.minus(2L, ChronoUnit.DAYS).with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
-
-                                } else if (CalendarDateUnit.MONTH.toDurationInMillis() == myDurationInMillis) {
-
-                                    retVal = retVal.with(TemporalAdjusters.lastDayOfMonth());
-
-                                } else if (CalendarDateUnit.QUARTER.toDurationInMillis() == myDurationInMillis) {
-
-                                    int nextMonth = 3 + 3 * (retVal.get(ChronoField.MONTH_OF_YEAR) / 3);
-                                    retVal = retVal.with(ChronoField.MONTH_OF_YEAR, nextMonth).with(ChronoField.DAY_OF_MONTH, 1L).minus(1L, ChronoUnit.DAYS);
-
-                                } else if (CalendarDateUnit.YEAR.toDurationInMillis() == myDurationInMillis) {
-
-                                    retVal = retVal.with(TemporalAdjusters.lastDayOfYear());
-
-                                } else if (CalendarDateUnit.DECADE.toDurationInMillis() == myDurationInMillis) {
-
-                                    int nextYear = 10 + 10 * (retVal.get(ChronoField.YEAR) / 10);
-                                    retVal = retVal.with(ChronoField.YEAR, nextYear).with(TemporalAdjusters.firstDayOfYear()).minus(1L, ChronoUnit.DAYS);
-
-                                } else if (CalendarDateUnit.CENTURY.toDurationInMillis() == myDurationInMillis) {
-
-                                    int nextYear = 100 + 100 * (retVal.get(ChronoField.YEAR) / 100);
-                                    retVal = retVal.with(ChronoField.YEAR, nextYear).with(TemporalAdjusters.firstDayOfYear()).minus(1L, ChronoUnit.DAYS);
-
-                                } else if (CalendarDateUnit.MILLENIUM.toDurationInMillis() == myDurationInMillis) {
-
-                                    int nextYear = 1000 + 1000 * (retVal.get(ChronoField.YEAR) / 1000);
-                                    retVal = retVal.with(ChronoField.YEAR, nextYear).with(TemporalAdjusters.firstDayOfYear()).minus(1L, ChronoUnit.DAYS);
-                                }
-                            }
-                        }
-                    }
+            if (retVal.isSupported(ChronoField.NANO_OF_DAY)) {
+                if (CalendarDateUnit.HOUR.toDurationInMillis() < myDurationInMillis) {
+                    retVal = retVal.with(LocalTime.NOON);
+                } else if (CalendarDateUnit.MILLIS.toDurationInMillis() < myDurationInMillis) {
+                    long nanoOfDay = retVal.getLong(ChronoField.NANO_OF_DAY);
+                    retVal = retVal.with(ChronoField.NANO_OF_DAY, nanoOfDay - nanoOfDay % myDurationInNanos);
                 }
             }
 
-            return retVal;
+            return switch (this) {
+                case WEEK      -> retVal.minus(2L, ChronoUnit.DAYS).with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
+                case MONTH     -> retVal.with(TemporalAdjusters.lastDayOfMonth());
+                case QUARTER   -> {
+                    int lastMonth = 3 + 3 * ((retVal.get(ChronoField.MONTH_OF_YEAR) - 1) / 3);
+                    yield retVal.with(ChronoField.MONTH_OF_YEAR, lastMonth).with(TemporalAdjusters.lastDayOfMonth());
+                }
+                case YEAR      -> retVal.with(TemporalAdjusters.lastDayOfYear());
+                case DECADE    -> CalendarDateUnit.lastDayOfPeriod(retVal, 10L);
+                case CENTURY   -> CalendarDateUnit.lastDayOfPeriod(retVal, 100L);
+                case MILLENIUM -> CalendarDateUnit.lastDayOfPeriod(retVal, 1000L);
+                default        -> retVal;
+            };
         }
     }
 
+    /**
+     * The number of complete units between the two temporals, negative if the second is before the first.
+     * With a {@link CalendarDate} as the first argument the fixed length is used, otherwise the corresponding
+     * {@link ChronoUnit}.
+     */
     @Override
     public long between(final Temporal temporal1Inclusive, final Temporal temporal2Exclusive) {
-        if (myChronoUnit != null) {
+        if (temporal1Inclusive instanceof CalendarDate) {
+            return this.between(((CalendarDate) temporal1Inclusive).millis, CalendarDate.millis(temporal2Exclusive));
+        } else if (myChronoUnit != null) {
             return myChronoUnit.between(temporal1Inclusive, temporal2Exclusive);
         } else { // QUARTER
             return ChronoUnit.MONTHS.between(temporal1Inclusive, temporal2Exclusive) / 3L;
         }
     }
 
+    /**
+     * Same as {@link CalendarDateDuration#convertTo(CalendarDateUnit)}.
+     */
     public CalendarDateDuration convert(final CalendarDateDuration sourceDuration) {
         return sourceDuration.convertTo(this);
     }
 
+    /**
+     * The number of this unit in one source unit. For example {@code HOUR.convert(DAY)} is 24.0.
+     */
     public double convert(final CalendarDateUnit aSourceDurationUnit) {
         return this.convert(PrimitiveMath.ONE, aSourceDurationUnit);
     }
 
+    /**
+     * Converts a measure of the source unit to this unit, using the fixed lengths.
+     */
     public double convert(final double sourceDurationMeasure, final CalendarDateUnit sourceDurationUnit) {
 
-        double sourceDurationInNanos = sourceDurationUnit.toDurationInNanos();
-        double destinationDurationInNanos = myDurationInNanos;
+        double sourceDurationInNanos = sourceDurationUnit.toDurationInNanosAsDouble();
+        double destinationDurationInNanos = this.toDurationInNanosAsDouble();
 
         if (sourceDurationInNanos > destinationDurationInNanos) {
 
@@ -261,6 +269,11 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution {
         }
     }
 
+    /**
+     * Converts a measure of the source unit to this unit. Between units that have a {@link TimeUnit},
+     * {@link #NANOS} to {@link #DAY}, the result is truncated and saturated as by
+     * {@link TimeUnit#convert(long, TimeUnit)}. Otherwise it is rounded.
+     */
     public long convert(final long sourceMeassure, final CalendarDateUnit sourceUnit) {
         Optional<TimeUnit> tmpTimeUnit = sourceUnit.getTimeUnit();
         if (myTimeUnit != null && tmpTimeUnit.isPresent()) {
@@ -270,10 +283,9 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution {
         }
     }
 
-    public long count(final long aFromValue, final long aToValue) {
-        return Math.floorDiv(myHalf + this.adjustInto(aToValue) - this.adjustInto(aFromValue), myDurationInMillis);
-    }
-
+    /**
+     * The length in milliseconds if the argument is this unit, otherwise 0.
+     */
     public long get(final TemporalUnit unit) {
         if (unit == this) {
             return myDurationInMillis;
@@ -282,6 +294,9 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution {
         }
     }
 
+    /**
+     * The corresponding {@link ChronoUnit}, empty for {@link #QUARTER}.
+     */
     public Optional<ChronoUnit> getChronoUnit() {
         return Optional.ofNullable(myChronoUnit);
     }
@@ -295,18 +310,30 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution {
         }
     }
 
+    /**
+     * A short label such as "ms", "h" or "days", used by {@link CalendarDateDuration#toString()}.
+     */
     public String getLabel() {
         return myLabel;
     }
 
+    /**
+     * The corresponding {@link TimeUnit}, present for {@link #NANOS} to {@link #DAY}.
+     */
     public Optional<TimeUnit> getTimeUnit() {
         return Optional.ofNullable(myTimeUnit);
     }
 
+    /**
+     * A list containing only this unit.
+     */
     public List<TemporalUnit> getUnits() {
         return Collections.singletonList(this);
     }
 
+    /**
+     * Whether this is {@link #DAY} or longer.
+     */
     public boolean isCalendarUnit() {
         return DAY.toDurationInMillis() <= this.toDurationInMillis();
     }
@@ -338,6 +365,9 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution {
         }
     }
 
+    /**
+     * A duration of the measure in this unit.
+     */
     public CalendarDateDuration newDuration(final double meassure) {
         return new CalendarDateDuration(meassure, this);
     }
@@ -350,6 +380,17 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution {
     @Override
     public long toDurationInNanos() {
         return myDurationInNanos;
+    }
+
+    /**
+     * The duration in nanoseconds, not saturated like {@link #toDurationInNanos()}.
+     */
+    private double toDurationInNanosAsDouble() {
+        if (myDurationInMillis == 0L) {
+            return myDurationInNanos;
+        } else {
+            return myDurationInMillis * (double) CalendarDate.NANOS_PER_MILLIS;
+        }
     }
 
 }

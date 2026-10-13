@@ -21,9 +21,7 @@
  */
 package org.ojalgo.matrix.operation;
 
-import static org.ojalgo.function.constant.PrimitiveMath.MACHINE_EPSILON;
-import static org.ojalgo.function.constant.PrimitiveMath.ONE;
-import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.array.operation.ArrayOperation;
 
@@ -46,7 +44,9 @@ import org.ojalgo.array.operation.ArrayOperation;
 public abstract class TREVC implements LAPACK {
 
     /**
-     * The pure Java implementation.
+     * The pure Java implementation. Everything it calls is pure Java as well – the {@code JVM}
+     * implementations of other operations, never their dispatching {@code invoke} methods (that may call
+     * native code).
      * <p>
      * X is upper triangular, and Z*X is formed by {@link TRMM}.
      */

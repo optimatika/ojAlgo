@@ -31,22 +31,31 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.structure.Structure1D.IndexMapper;
 
 /**
- * Originally, long before Java 8 and its new Date and Time API, this class was designed to provide an
- * immutable complement to the existing {@linkplain Date} and {@linkplain Calendar} classes and to have
- * easy/direct access to the underlying epoch millisecond value.
+ * An immutable instant on the time-line, stored as a single long: {@link #millis}, the number of milliseconds
+ * since 1970-01-01T00:00Z. It corresponds to an {@link Instant} truncated to milliseconds, and converts to
+ * and from {@link Date}, {@link Calendar} and the java.time types.
  * <p>
- * In terms of the newer API it most closely corresponds to an {@linkplain Instant}, but does not have its
- * nanosecond granularity. At one point the plan was to remove and replace this class with
- * {@linkplain Instant}, but working with a single long as an "instant" representation is very practical and
- * efficient.
+ * As a {@link Temporal} it supports:
+ * <ul>
+ * <li>the fields {@link ChronoField#INSTANT_SECONDS}, {@link ChronoField#MILLI_OF_SECOND},
+ * {@link ChronoField#MICRO_OF_SECOND} and {@link ChronoField#NANO_OF_SECOND}
+ * <li>the time-based {@link ChronoUnit}s and {@link ChronoUnit#DAYS}
+ * <li>all {@link CalendarDateUnit}s, each with a fixed length
+ * </ul>
+ * Anything finer than a millisecond, such as an added number of nanoseconds, is rounded down to whole
+ * milliseconds.
  * <p>
- * It has been retrofitted to implement the {@linkplain Temporal} interface.
+ * A {@link Resolution}, such as a {@link CalendarDateUnit} or a {@link CalendarDateDuration}, divides the
+ * time-line into fixed-length intervals, see {@link #filter(CalendarDateUnit)} and
+ * {@link #make(long, CalendarDate.Resolution)}. Its operations also work directly on epoch-millisecond longs,
+ * without creating any objects.
  *
  * @see CalendarDateDuration
  * @see CalendarDateUnit
@@ -55,40 +64,124 @@ import org.ojalgo.structure.Structure1D.IndexMapper;
 public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
 
     /**
-     * Extends {@link TemporalAdjuster} but also loosely corresponds to a {@link TemporalUnit} and/or
-     * {@link TemporalAmount}.
+     * A time-line resolution: a fixed length that divides the time-line into intervals aligned with
+     * 1970-01-01T00:00Z, each represented by its middle instant.
+     * <p>
+     * All operations are available on plain epoch-millisecond longs, without creating any objects:
+     * {@link #truncate(long)}, {@link #adjustInto(long)}, {@link #addTo(long, long)},
+     * {@link #between(long, long)} and {@link #count(long, long)}.
+     * <p>
+     * As an {@link IndexMapper} the index of a {@link CalendarDate} is the {@link #millis} of that middle
+     * instant. Implemented by {@link CalendarDateUnit} and {@link CalendarDateDuration}, and obtained from a
+     * {@link Duration} or a {@link TemporalUnit} with {@link #of(Duration)} and {@link #of(TemporalUnit)}.
      *
      * @author apete
      */
     public interface Resolution extends TemporalAdjuster, IndexMapper<CalendarDate> {
 
         /**
-         * Will increment the input epochMilli by the size/duration of this timeline resolution.
+         * Intervals of the duration's length, see {@link CalendarDateDuration#valueOf(Duration)}.
          */
-        default long addTo(final long epochMilli) {
-            return epochMilli + this.toDurationInMillis();
+        static Resolution of(final Duration duration) {
+            return CalendarDateDuration.valueOf(duration);
         }
 
+        /**
+         * The {@link CalendarDateUnit} corresponding to the unit, a {@link ChronoUnit} or
+         * {@link IsoFields#QUARTER_YEARS}. Any other unit gives intervals of its
+         * {@link TemporalUnit#getDuration()}.
+         */
+        static Resolution of(final TemporalUnit unit) {
+            if (unit instanceof CalendarDateUnit) {
+                return (CalendarDateUnit) unit;
+            } else if (unit == IsoFields.QUARTER_YEARS) {
+                return CalendarDateUnit.QUARTER;
+            } else {
+                for (CalendarDateUnit candidate : CalendarDateUnit.values()) {
+                    if (candidate.getChronoUnit().orElse(null) == unit) {
+                        return candidate;
+                    }
+                }
+                return CalendarDateDuration.valueOf(unit.getDuration());
+            }
+        }
+
+        /**
+         * Same as {@link #addTo(long, long)} with an amount of 1.
+         */
+        default long addTo(final long epochMilli) {
+            return this.addTo(epochMilli, 1L);
+        }
+
+        /**
+         * Returns epochMilli plus amount lengths. A length shorter than a millisecond is added in
+         * nanoseconds, and the result rounded down to whole milliseconds.
+         */
+        default long addTo(final long epochMilli, final long amount) {
+            long duration = this.toDurationInMillis();
+            if (duration == 0L) {
+                return epochMilli + Math.floorDiv(amount * this.toDurationInNanos(), NANOS_PER_MILLIS);
+            } else {
+                return epochMilli + amount * duration;
+            }
+        }
+
+        /**
+         * The middle instant of the interval that contains the temporal, see {@link #adjustInto(long)}.
+         */
         default CalendarDate adjustInto(final CalendarDate temporal) {
             return new CalendarDate(this.adjustInto(temporal.millis));
         }
 
         /**
-         * Maps a range of instances in time to a single instance.
+         * Maps epochMilli to the middle of the interval, of length d = {@link #toDurationInMillis()} and
+         * aligned with the epoch, that contains it: {@code truncate(epochMilli) + d / 2}. If d is 0,
+         * epochMilli is returned unchanged.
          */
         default long adjustInto(final long epochMilli) {
-            long duration = this.toDurationInMillis();
-            long half = duration / 2L;
-            return Math.floorDiv(epochMilli, duration) * duration + half;
+            return this.truncate(epochMilli) + this.toDurationInMillis() / 2L;
         }
 
         /**
-         * The size/duration of a timeline resolution "unit".
+         * The number of complete lengths from one epoch millisecond value to the other, negative if
+         * toEpochMilli is before fromEpochMilli.
+         */
+        default long between(final long fromEpochMilli, final long toEpochMilli) {
+            long duration = this.toDurationInMillis();
+            if (duration == 0L) {
+                return (toEpochMilli - fromEpochMilli) * NANOS_PER_MILLIS / this.toDurationInNanos();
+            } else {
+                return (toEpochMilli - fromEpochMilli) / duration;
+            }
+        }
+
+        /**
+         * The number of interval boundaries, see {@link #truncate(long)}, crossed going from one epoch
+         * millisecond value to the other. Negative if toEpochMilli is before fromEpochMilli. Unlike
+         * {@link #between(long, long)} this counts boundaries, not complete lengths: from 23:59Z to 00:01Z is
+         * one {@link CalendarDateUnit#DAY}. For lengths shorter than a millisecond it is the same as
+         * {@link #between(long, long)}.
+         */
+        default long count(final long fromEpochMilli, final long toEpochMilli) {
+            long duration = this.toDurationInMillis();
+            if (duration == 0L) {
+                return this.between(fromEpochMilli, toEpochMilli);
+            } else {
+                return Math.floorDiv(toEpochMilli, duration) - Math.floorDiv(fromEpochMilli, duration);
+            }
+        }
+
+        /**
+         * The length in whole milliseconds. It is 0 for {@link CalendarDateUnit#NANOS} and
+         * {@link CalendarDateUnit#MICROS}.
          */
         long toDurationInMillis();
 
+        /**
+         * The length in nanoseconds, saturated at {@link Long#MAX_VALUE} (about 292 years).
+         */
         default long toDurationInNanos() {
-            return this.toDurationInMillis() * NANOS_PER_MILLIS;
+            return TimeUnit.MILLISECONDS.toNanos(this.toDurationInMillis());
         }
 
         @Override
@@ -101,13 +194,34 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
             return new CalendarDate(index);
         }
 
+        /**
+         * The start of the interval, of length d = {@link #toDurationInMillis()} and aligned with the epoch,
+         * that contains epochMilli: {@code floorDiv(epochMilli, d) * d}. If d is 0, epochMilli is returned
+         * unchanged.
+         */
+        default long truncate(final long epochMilli) {
+            long duration = this.toDurationInMillis();
+            if (duration == 0L) {
+                return epochMilli;
+            } else {
+                return Math.floorDiv(epochMilli, duration) * duration;
+            }
+        }
+
     }
 
+    static final int MICROS_PER_MILLIS = 1_000;
     static final long MILLIS_PER_SECOND = 1_000L;
     static final int NANOS_PER_MILLIS = 1_000_000;
     static final int NANOS_PER_SECOND = 1_000_000_000;
     static final long SECONDS_PER_DAY = 24L * 60L * 60L;
 
+    /**
+     * Obtains an instance from a temporal that supports {@link ChronoField#INSTANT_SECONDS} and
+     * {@link ChronoField#MILLI_OF_SECOND}. Anything finer than a millisecond is dropped.
+     *
+     * @throws DateTimeException If the temporal does not support those fields
+     */
     public static CalendarDate from(final TemporalAccessor temporal) {
         ProgrammingError.throwIfNull(temporal, "temporal");
         if (temporal instanceof CalendarDate) {
@@ -126,6 +240,10 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
         }
     }
 
+    /**
+     * The middle instant of the resolution interval that contains the given instant, or now if none is given.
+     * See {@link CalendarDate.Resolution#adjustInto(long)}.
+     */
     public static CalendarDate make(final Calendar calendar, final CalendarDate.Resolution resolution) {
         return new CalendarDate(resolution.adjustInto(calendar.getTimeInMillis()));
     }
@@ -197,6 +315,10 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
         return OffsetDateTime.ofInstant(instant, zone);
     }
 
+    /**
+     * The instant at the offset the zone has at zoneToOffsetConversionInstant, rather than at the instant
+     * itself.
+     */
     public static OffsetDateTime toOffsetDateTime(final Instant instant, final ZoneId zone, final Instant zoneToOffsetConversionInstant) {
         return OffsetDateTime.ofInstant(instant, zone).withOffsetSameInstant(OffsetDateTime.ofInstant(zoneToOffsetConversionInstant, zone).getOffset());
     }
@@ -238,7 +360,7 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
     }
 
     /**
-     * An "instant" with ms precision. Equivalent to what is returned by {@link Instant#toEpochMilli()} and/or
+     * The number of milliseconds since 1970-01-01T00:00Z, as returned by {@link Instant#toEpochMilli()} and
      * {@link System#currentTimeMillis()}.
      */
     public final long millis;
@@ -272,8 +394,11 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
     }
 
     /**
+     * Parses an SQL date "yyyy-MM-dd", time "HH:mm:ss" or date-time "yyyy-MM-dd HH:mm:ss", in the default
+     * time zone. A time without a date is on 1970-01-01.
+     *
      * @param sqlString The String to parse
-     * @throws RecoverableCondition When(if parsing the String fails
+     * @throws RecoverableCondition If parsing the String fails
      */
     public CalendarDate(final String sqlString) throws RecoverableCondition {
 
@@ -294,16 +419,27 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
         }
     }
 
+    /**
+     * A new {@link GregorianCalendar}, in the default time zone and locale, set to this instant. The argument
+     * is not used.
+     */
     public Calendar adjustInto(final Calendar temporal) {
         GregorianCalendar retVal = new GregorianCalendar();
         retVal.setTimeInMillis(millis);
         return retVal;
     }
 
+    /**
+     * A new {@link Date} of this instant. The argument is not used.
+     */
     public Date adjustInto(final Date temporal) {
         return new Date(millis);
     }
 
+    /**
+     * Sets the temporal's {@link ChronoField#INSTANT_SECONDS} and {@link ChronoField#NANO_OF_SECOND} to this
+     * instant, as {@link Instant#adjustInto(Temporal)} does.
+     */
     @SuppressWarnings("unchecked")
     public <T extends Temporal> T adjustInto(final T temporal) {
         if (temporal instanceof CalendarDate) {
@@ -325,22 +461,18 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
         if (this == obj) {
             return true;
         }
-        if (obj == null || !(obj instanceof CalendarDate)) {
-            return false;
-        }
-        CalendarDate other = (CalendarDate) obj;
-        if (millis != other.millis) {
+        if (obj == null || !(obj instanceof CalendarDate other) || (millis != other.millis)) {
             return false;
         }
         return true;
     }
 
+    /**
+     * The middle instant of the resolution interval that contains this instant, see
+     * {@link CalendarDate.Resolution#adjustInto(long)}.
+     */
     public CalendarDate filter(final CalendarDateUnit resolution) {
-        if (resolution.isCalendarUnit()) {
-            return resolution.adjustInto(this);
-        } else {
-            return new CalendarDate(resolution.adjustInto(millis));
-        }
+        return resolution.adjustInto(this);
     }
 
     @Override
@@ -350,6 +482,8 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
                 return Math.floorDiv(millis, MILLIS_PER_SECOND);
             } else if (field == ChronoField.MILLI_OF_SECOND) {
                 return Math.floorMod(millis, MILLIS_PER_SECOND);
+            } else if (field == ChronoField.MICRO_OF_SECOND) {
+                return Math.floorMod(millis, MILLIS_PER_SECOND) * MICROS_PER_MILLIS;
             } else if (field == ChronoField.NANO_OF_SECOND) {
                 return Math.floorMod(millis, MILLIS_PER_SECOND) * NANOS_PER_MILLIS;
             } else {
@@ -368,7 +502,8 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
     @Override
     public boolean isSupported(final TemporalField field) {
         if (field instanceof ChronoField) {
-            return field == ChronoField.INSTANT_SECONDS || field == ChronoField.MILLI_OF_SECOND || field == ChronoField.NANO_OF_SECOND;
+            return field == ChronoField.INSTANT_SECONDS || field == ChronoField.MILLI_OF_SECOND || field == ChronoField.MICRO_OF_SECOND
+                    || field == ChronoField.NANO_OF_SECOND;
         } else {
             return field.isSupportedBy(this);
         }
@@ -389,28 +524,43 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
 
     @Override
     public CalendarDate plus(final long amountToAdd, final TemporalUnit unit) {
-        if (unit instanceof CalendarDateUnit) {
-            return new CalendarDate(millis + amountToAdd * ((CalendarDateUnit) unit).toDurationInMillis());
-        } else if (unit instanceof ChronoUnit) {
+        if (unit instanceof ChronoUnit) {
             return CalendarDate.valueOf(this.toInstant().plus(amountToAdd, unit));
         } else {
             return unit.addTo(this, amountToAdd);
         }
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public <R> R query(final TemporalQuery<R> query) {
+        if (query == TemporalQueries.precision()) {
+            return (R) ChronoUnit.MILLIS;
+        } else {
+            return Temporal.super.query(query);
+        }
+    }
+
     /**
-     * Only steps with the int part of {@linkplain CalendarDateDuration#measure} .
+     * Same as {@link #step(int, CalendarDateUnit)} with the duration's measure truncated to an int. Use
+     * {@link #plus(TemporalAmount)} to add a fractional duration.
      */
     public CalendarDate step(final CalendarDateDuration aStepDuration) {
         return this.step((int) aStepDuration.measure, aStepDuration.unit);
     }
 
+    /**
+     * Same as {@link #step(int, CalendarDateUnit)} with a step count of 1.
+     */
     public CalendarDate step(final CalendarDateUnit aStepUnit) {
         return this.step(1, aStepUnit);
     }
 
+    /**
+     * Same as {@link #plus(long, TemporalUnit)}.
+     */
     public CalendarDate step(final int aStepCount, final CalendarDateUnit aStepUnit) {
-        return new CalendarDate(millis + aStepCount * aStepUnit.toDurationInMillis());
+        return aStepUnit.addTo(this, aStepCount);
     }
 
     public Calendar toCalendar() {
@@ -471,6 +621,9 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
         return OffsetDateTime.of(this.toLocalDateTime(offset), offset);
     }
 
+    /**
+     * Formatted as "yyyy-MM-dd HH:mm:ss" in the default time zone.
+     */
     @Override
     public String toString() {
         return StandardType.SQL_DATETIME.format(this.toDate());
@@ -482,12 +635,10 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
 
     @Override
     public long until(final Temporal endExclusive, final TemporalUnit unit) {
-        if (unit instanceof CalendarDateUnit) {
-            return ((CalendarDateUnit) unit).count(millis, CalendarDate.millis(endExclusive));
-        } else if (unit instanceof ChronoUnit) {
+        if (unit instanceof ChronoUnit) {
             return this.toInstant().until(endExclusive, unit);
         } else {
-            return unit.between(this, endExclusive);
+            return unit.between(this, CalendarDate.from(endExclusive));
         }
     }
 
@@ -506,6 +657,10 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
                 ChronoField.MILLI_OF_SECOND.checkValidValue(newValue);
                 long tmpSeconds = Math.floorDiv(millis, MILLIS_PER_SECOND);
                 return new CalendarDate(tmpSeconds * MILLIS_PER_SECOND + newValue);
+            } else if (field == ChronoField.MICRO_OF_SECOND) {
+                ChronoField.MICRO_OF_SECOND.checkValidValue(newValue);
+                long tmpSeconds = Math.floorDiv(millis, MILLIS_PER_SECOND);
+                return new CalendarDate(tmpSeconds * MILLIS_PER_SECOND + newValue / MICROS_PER_MILLIS);
             } else if (field == ChronoField.NANO_OF_SECOND) {
                 ChronoField.NANO_OF_SECOND.checkValidValue(newValue);
                 long tmpSeconds = Math.floorDiv(millis, MILLIS_PER_SECOND);

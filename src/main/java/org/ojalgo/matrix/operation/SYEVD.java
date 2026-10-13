@@ -21,11 +21,19 @@
  */
 package org.ojalgo.matrix.operation;
 
+import static java.lang.foreign.ValueLayout.*;
 import static org.ojalgo.function.constant.PrimitiveMath.ONE;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.MemorySegment;
+import java.lang.invoke.MethodHandle;
 import java.util.Arrays;
+import java.util.Objects;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.operation.ArrayOperation;
+import org.ojalgo.array.operation.NativeLibrary;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -36,15 +44,20 @@ import org.ojalgo.scalar.Scalar;
  * A = Z * diag(w) * Z ^ T
  * }</pre>
  *
- * Z is orthogonal, and the eigenvalues w are in ascending order. Only the lower triangle of A is read. A is
- * reduced to tridiagonal form ({@link SYTRD}), Q is formed ({@link ORGTR}) and the tridiagonal matrix is
- * diagonalised by the implicit QL method ({@link STEQR}). For other number types A is Hermitian and Z
- * unitary.
+ * Z is orthogonal, and the eigenvalues w are in ascending order. Only the lower triangle of A is read. The
+ * native implementation is divide and conquer. The pure Java implementation reduces A to tridiagonal form
+ * ({@link SYTRD}), forms Q ({@link ORGTR}) and diagonalises the tridiagonal matrix by the implicit QL method
+ * ({@link STEQR}). For other number types A is Hermitian and Z unitary; there is only a pure Java
+ * implementation for those.
+ *
+ * @see NativeLibrary
  */
 public abstract class SYEVD implements LAPACK {
 
     /**
-     * The pure Java implementations.
+     * The pure Java implementations. Everything they call is pure Java as well – the {@code JVM}
+     * implementations of other operations, never their dispatching {@code invoke} methods (that may call
+     * native code).
      */
     static final class JVM {
 
@@ -237,6 +250,88 @@ public abstract class SYEVD implements LAPACK {
     }
 
     /**
+     * Native {@code dsyevd}, initialised only when {@link NativeLibrary#isAvailable()}. All arguments are
+     * passed by reference, as to any Fortran routine, followed by the lengths of the character arguments. It
+     * is not linked as critical: it is passed a copy of the matrix in native memory, and the JVM can reach
+     * safepoints (and collect garbage) during the call.
+     */
+    static final class Native {
+
+        static final MethodHandle DSYEVD_OFF_HEAP = NativeLibrary.downcall("dsyevd_", FunctionDescriptor.ofVoid(ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS,
+                ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, JAVA_LONG, JAVA_LONG), false);
+
+        /**
+         * Copies A to native memory, asks {@link #DSYEVD_OFF_HEAP} for the optimal workspace sizes, calls it,
+         * and copies the eigenvalues, and the eigenvectors if computed, back. Requires n > 0.
+         */
+        static int invoke(final boolean vectors, final int n, final double[] a, final int offsetA, final int lda, final double[] w, final int offsetW) {
+            return Native.invoke(vectors, n, a, offsetA, lda, w, offsetW, a, offsetA, lda);
+        }
+
+        /**
+         * As {@link #invoke(boolean, int, double[], int, int, double[], int)}, with the eigenvectors, if
+         * computed, copied to Z instead of back to A.
+         */
+        static int invoke(final boolean vectors, final int n, final double[] a, final int offsetA, final int lda, final double[] w, final int offsetW,
+                final double[] z, final int offsetZ, final int ldz) {
+
+            Objects.checkFromIndexSize(offsetW, n, w.length);
+
+            try (Arena arena = Arena.ofConfined()) {
+
+                int copyLDA = CBLAS.leadingDimensionOfCopy(n);
+
+                MemorySegment segmentJobz = arena.allocateFrom(JAVA_BYTE, (byte) (vectors ? 'V' : 'N'));
+                MemorySegment segmentUplo = arena.allocateFrom(JAVA_BYTE, (byte) 'L');
+                MemorySegment segmentN = arena.allocateFrom(JAVA_INT, n);
+                MemorySegment segmentA = CBLAS.copyOfMatrix(arena, a, offsetA, n, n, lda, copyLDA);
+                MemorySegment segmentLDA = arena.allocateFrom(JAVA_INT, copyLDA);
+                MemorySegment segmentW = arena.allocate(JAVA_DOUBLE, n);
+                MemorySegment segmentInfo = arena.allocate(JAVA_INT);
+
+                MemorySegment query = arena.allocate(JAVA_DOUBLE);
+                MemorySegment queryInt = arena.allocate(JAVA_INT);
+                MemorySegment minusOne = arena.allocateFrom(JAVA_INT, -1);
+                DSYEVD_OFF_HEAP.invokeExact(segmentJobz, segmentUplo, segmentN, segmentA, segmentLDA, segmentW, query, minusOne, queryInt, minusOne,
+                        segmentInfo, 1L, 1L);
+                int lwork = Math.max(1, (int) query.get(JAVA_DOUBLE, 0L));
+                int liwork = Math.max(1, queryInt.get(JAVA_INT, 0L));
+
+                DSYEVD_OFF_HEAP.invokeExact(segmentJobz, segmentUplo, segmentN, segmentA, segmentLDA, segmentW, arena.allocate(JAVA_DOUBLE, lwork),
+                        arena.allocateFrom(JAVA_INT, lwork), arena.allocate(JAVA_INT, liwork), arena.allocateFrom(JAVA_INT, liwork), segmentInfo, 1L, 1L);
+
+                int info = segmentInfo.get(JAVA_INT, 0L);
+
+                if (vectors) {
+                    CBLAS.copyBackMatrix(segmentA, copyLDA, z, offsetZ, n, n, ldz);
+                }
+                MemorySegment.copy(segmentW, JAVA_DOUBLE, 0L, w, offsetW, n);
+
+                return info;
+
+            } catch (RuntimeException | Error cause) {
+                throw cause;
+            } catch (Throwable cause) {
+                throw new ProgrammingError(cause);
+            }
+        }
+
+    }
+
+    /**
+     * The native implementation is used, if there is one, when n*n*n is larger than this and the eigenvectors
+     * are computed.
+     */
+    private static final double NATIVE_THRESHOLD = 750_000;
+    /**
+     * The native implementation is used, if there is one, when n*n*n is larger than this and only the
+     * eigenvalues are computed.
+     */
+    private static final double NATIVE_THRESHOLD_VALUES = 300_000_000;
+
+    static final boolean NATIVE = NativeLibrary.isAvailable() && Native.DSYEVD_OFF_HEAP != null;
+
+    /**
      * {@code dsyevd} with UPLO = 'L'
      * <p>
      * A is column-major, stored in its array from an offset with a leading dimension; its upper triangle is
@@ -257,7 +352,11 @@ public abstract class SYEVD implements LAPACK {
             return 0;
         }
 
-        return JVM.invoke(vectors, n, a, offsetA, lda, w, offsetW);
+        if (SYEVD.isNative(vectors, n)) {
+            return Native.invoke(vectors, n, a, offsetA, lda, w, offsetW);
+        } else {
+            return JVM.invoke(vectors, n, a, offsetA, lda, w, offsetW);
+        }
     }
 
     /**
@@ -274,6 +373,10 @@ public abstract class SYEVD implements LAPACK {
 
         if (n == 0) {
             return 0;
+        }
+
+        if (SYEVD.isNative(vectors, n)) {
+            return Native.invoke(vectors, n, a, offsetA, lda, w, offsetW, z, offsetZ, ldz);
         }
 
         if (z != a || offsetZ != offsetA || ldz != lda) {
@@ -300,6 +403,15 @@ public abstract class SYEVD implements LAPACK {
         }
 
         return JVM.invoke(vectors, n, a, offsetA, lda, w, offsetW, scalar);
+    }
+
+    /**
+     * Whether to use the native implementation: there is one, and n*n*n is larger than
+     * {@link #NATIVE_THRESHOLD} when the eigenvectors are computed, {@link #NATIVE_THRESHOLD_VALUES} when
+     * only the eigenvalues are.
+     */
+    public static boolean isNative(final boolean vectors, final double n) {
+        return NATIVE && n * n * n > (vectors ? NATIVE_THRESHOLD : NATIVE_THRESHOLD_VALUES);
     }
 
 }

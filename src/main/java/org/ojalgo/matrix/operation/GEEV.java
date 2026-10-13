@@ -21,10 +21,19 @@
  */
 package org.ojalgo.matrix.operation;
 
+import static java.lang.foreign.ValueLayout.*;
 import static org.ojalgo.function.constant.PrimitiveMath.ONE;
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.MemorySegment;
+import java.lang.invoke.MethodHandle;
+import java.util.Objects;
+
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.operation.ArrayOperation;
+import org.ojalgo.array.operation.NativeLibrary;
 import org.ojalgo.array.operation.SCAL;
 
 /**
@@ -42,13 +51,18 @@ import org.ojalgo.array.operation.SCAL;
  * real eigenvalues, and [wr(j), wi(j); -wi(j), wr(j)] for each complex pair. Each eigenvector has Euclidean
  * norm 1, and its largest component is real.
  * <p>
- * A is reduced to Hessenberg form ({@link GEHRD}, {@link ORGHR}), and the Schur form ({@link HSEQR}) and
- * the eigenvectors ({@link TREVC}) are computed, without balancing.
+ * The native implementation balances A first. The pure Java implementation reduces A to Hessenberg form
+ * ({@link GEHRD}, {@link ORGHR}), and computes the Schur form ({@link HSEQR}) and the eigenvectors
+ * ({@link TREVC}), without balancing. The order of the eigenvalues can differ between them.
+ *
+ * @see NativeLibrary
  */
 public abstract class GEEV implements LAPACK {
 
     /**
-     * The pure Java implementation.
+     * The pure Java implementation. Everything it calls is pure Java as well – the {@code JVM}
+     * implementations of other operations, never their dispatching {@code invoke} methods (that may call
+     * native code).
      */
     static final class JVM {
 
@@ -168,6 +182,80 @@ public abstract class GEEV implements LAPACK {
     }
 
     /**
+     * Native {@code dgeev}, initialised only when {@link NativeLibrary#isAvailable()}. All arguments are
+     * passed by reference, as to any Fortran routine, followed by the lengths of the character arguments. It
+     * is not linked as critical: it is passed a copy of the matrix in native memory, and the JVM can reach
+     * safepoints (and collect garbage) during the call.
+     */
+    static final class Native {
+
+        static final MethodHandle DGEEV_OFF_HEAP = NativeLibrary.downcall("dgeev_", FunctionDescriptor.ofVoid(ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS,
+                ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, JAVA_LONG, JAVA_LONG), false);
+
+        /**
+         * Copies A to native memory, asks {@link #DGEEV_OFF_HEAP} for the optimal workspace size, calls it,
+         * and copies the eigenvalues, and the eigenvectors if computed, back. A is not changed. Requires n >
+         * 0.
+         */
+        static int invoke(final boolean vectors, final int n, final double[] a, final int offsetA, final int lda, final double[] wr, final int offsetWr,
+                final double[] wi, final int offsetWi, final double[] vr, final int offsetVr, final int ldvr) {
+
+            Objects.checkFromIndexSize(offsetWr, n, wr.length);
+            Objects.checkFromIndexSize(offsetWi, n, wi.length);
+
+            try (Arena arena = Arena.ofConfined()) {
+
+                int copyLDA = CBLAS.leadingDimensionOfCopy(n);
+
+                MemorySegment segmentJobVL = arena.allocateFrom(JAVA_BYTE, (byte) 'N');
+                MemorySegment segmentJobVR = arena.allocateFrom(JAVA_BYTE, (byte) (vectors ? 'V' : 'N'));
+                MemorySegment segmentN = arena.allocateFrom(JAVA_INT, n);
+                MemorySegment segmentA = CBLAS.copyOfMatrix(arena, a, offsetA, n, n, lda, copyLDA);
+                MemorySegment segmentLDA = arena.allocateFrom(JAVA_INT, copyLDA);
+                MemorySegment segmentWR = arena.allocate(JAVA_DOUBLE, n);
+                MemorySegment segmentWI = arena.allocate(JAVA_DOUBLE, n);
+                MemorySegment segmentVL = arena.allocate(JAVA_DOUBLE);
+                MemorySegment segmentOne = arena.allocateFrom(JAVA_INT, 1);
+                MemorySegment segmentVR = vectors ? CBLAS.allocateMatrix(arena, n, n, copyLDA) : arena.allocate(JAVA_DOUBLE);
+                MemorySegment segmentLDVR = vectors ? segmentLDA : segmentOne;
+                MemorySegment segmentInfo = arena.allocate(JAVA_INT);
+
+                MemorySegment query = arena.allocate(JAVA_DOUBLE);
+                DGEEV_OFF_HEAP.invokeExact(segmentJobVL, segmentJobVR, segmentN, segmentA, segmentLDA, segmentWR, segmentWI, segmentVL, segmentOne, segmentVR,
+                        segmentLDVR, query, arena.allocateFrom(JAVA_INT, -1), segmentInfo, 1L, 1L);
+                int lwork = Math.max((vectors ? 4 : 3) * n, (int) query.get(JAVA_DOUBLE, 0L));
+
+                DGEEV_OFF_HEAP.invokeExact(segmentJobVL, segmentJobVR, segmentN, segmentA, segmentLDA, segmentWR, segmentWI, segmentVL, segmentOne, segmentVR,
+                        segmentLDVR, arena.allocate(JAVA_DOUBLE, lwork), arena.allocateFrom(JAVA_INT, lwork), segmentInfo, 1L, 1L);
+
+                int info = segmentInfo.get(JAVA_INT, 0L);
+
+                MemorySegment.copy(segmentWR, JAVA_DOUBLE, 0L, wr, offsetWr, n);
+                MemorySegment.copy(segmentWI, JAVA_DOUBLE, 0L, wi, offsetWi, n);
+                if (vectors) {
+                    CBLAS.copyBackMatrix(segmentVR, copyLDA, vr, offsetVr, n, n, ldvr);
+                }
+
+                return info;
+
+            } catch (RuntimeException | Error cause) {
+                throw cause;
+            } catch (Throwable cause) {
+                throw new ProgrammingError(cause);
+            }
+        }
+
+    }
+
+    /**
+     * The native implementation is used, if there is one, when n*n*n is larger than this – the same with or
+     * without the eigenvectors.
+     */
+    private static final double NATIVE_THRESHOLD = 3_000_000;
+
+    static final boolean NATIVE = NativeLibrary.isAvailable() && Native.DGEEV_OFF_HEAP != null;
+
+    /**
      * {@code dgeev} with JOBVL = 'N': the eigenvalues, and the right eigenvectors if specified
      * <p>
      * A, and VR, are column-major, stored in their arrays from an offset with a leading dimension. wr(i) and
@@ -191,7 +279,19 @@ public abstract class GEEV implements LAPACK {
             return 0;
         }
 
-        return JVM.invoke(vectors, n, a, offsetA, lda, wr, offsetWr, wi, offsetWi, vr, offsetVr, ldvr);
+        if (GEEV.isNative(n)) {
+            return Native.invoke(vectors, n, a, offsetA, lda, wr, offsetWr, wi, offsetWi, vr, offsetVr, ldvr);
+        } else {
+            return JVM.invoke(vectors, n, a, offsetA, lda, wr, offsetWr, wi, offsetWi, vr, offsetVr, ldvr);
+        }
+    }
+
+    /**
+     * Whether to use the native implementation: there is one, and n*n*n is larger than
+     * {@link #NATIVE_THRESHOLD}.
+     */
+    static boolean isNative(final double n) {
+        return NATIVE && n * n * n > NATIVE_THRESHOLD;
     }
 
 }

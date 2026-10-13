@@ -80,6 +80,7 @@ import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
  * <li>Add expressions via {@link #newExpression(String)} with coefficients, bounds, and/or weights
  * <li>Solve with {@link #minimise()} or {@link #maximise()}
  * </ol>
+ * {@snippet class = org.ojalgo.optimisation.ExpressionsBasedModelSnippets region = introduction}
  * <p>
  * The model automatically selects and configures a suitable solver, applies presolve simplifications, and
  * scales parameters for numerical stability.

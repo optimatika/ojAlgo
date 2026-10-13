@@ -25,7 +25,7 @@ ojAlgo is available at [The Central (Maven) Repository](https://mvnrepository.co
 | Java | Released | ojAlgo |
 |------|----------|--------|
 | 22+ | Future | on the `develop` branch |
-| 11 | 2026-10-28 | 57.6.1 |
+| 11 | 2026-10-28 | 57.6.2 |
 | 8 | 2022-08-26 | 51.4.1 |
 | 7 | 2015-08-21 | 37.1.1 |
 | 6 | 2011-12-05 | 31.0 |
@@ -155,13 +155,14 @@ The [Optimatika subscription](https://www.optimatika.se/subscription/) gives you
 
 ## Building from Source
 
-ojAlgo requires Java 11+ and uses the Maven Wrapper, so no separate Maven install is needed.
+ojAlgo requires Java 22+ and uses the Maven Wrapper, so no separate Maven install is needed.
 
 ```bash
 git clone https://github.com/optimatika/ojAlgo.git
 cd ojAlgo
 ./mvnw compile              # Compile
-./mvnw test                 # Run tests
+./mvnw test                 # Run tests (pure Java)
+./mvnw test -DargLine=--enable-native-access=ojalgo,ALL-UNNAMED  # Run tests with native BLAS/LAPACK
 ./mvnw package -DskipTests  # Build JAR without tests
 ```
 

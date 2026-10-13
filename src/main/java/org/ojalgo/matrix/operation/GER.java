@@ -21,18 +21,29 @@
  */
 package org.ojalgo.matrix.operation;
 
+import static java.lang.foreign.ValueLayout.*;
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.MemorySegment;
+import java.lang.invoke.MethodHandle;
+
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.ArrayOperation;
+import org.ojalgo.array.operation.NativeLibrary;
 
 /**
  * BLAS level 2 {@code ?ger}: A := alpha*x*y<sup>T</sup> + A, a rank-1 update of the m-by-n matrix A.
+ *
+ * @see NativeLibrary
  */
 public abstract class GER implements BLAS2 {
 
     /**
-     * The pure Java implementation.
+     * The pure Java implementation. Everything it calls is pure Java as well – the {@code JVM}
+     * implementations of other operations, never their dispatching {@code invoke} methods (that may call
+     * native code).
      */
     static final class JVM {
 
@@ -64,6 +75,39 @@ public abstract class GER implements BLAS2 {
     }
 
     /**
+     * Native {@code cblas_dger}, initialised only when {@link NativeLibrary#isAvailable()}. Linked as a
+     * critical function so the Java arrays are used in place, without copying.
+     */
+    static final class Native {
+
+        static final MethodHandle DGER_CRITICAL = NativeLibrary.downcall("cblas_dger",
+                FunctionDescriptor.ofVoid(JAVA_INT, JAVA_INT, JAVA_INT, JAVA_DOUBLE, ADDRESS, JAVA_INT, ADDRESS, JAVA_INT, ADDRESS, JAVA_INT), true);
+
+        static void invoke(final int m, final int n, final double alpha, final double[] x, final int offsetX, final int incX, final double[] y,
+                final int offsetY, final int incY, final double[] a, final int offsetA, final int lda) {
+
+            MemorySegment segmentX = NativeLibrary.ofVector(x, offsetX, m, incX);
+            MemorySegment segmentY = NativeLibrary.ofVector(y, offsetY, n, incY);
+            MemorySegment segmentA = CBLAS.ofMatrix(a, offsetA, m, n, lda);
+
+            try {
+                DGER_CRITICAL.invokeExact(CBLAS.COLUMN_MAJOR, m, n, alpha, segmentX, incX, segmentY, incY, segmentA, lda);
+            } catch (Throwable cause) {
+                throw new ProgrammingError(cause);
+            }
+        }
+
+    }
+
+    /**
+     * The native implementation is used, if there is one, when m*n (the number of multiply-adds) is larger
+     * than this.
+     */
+    private static final double NATIVE_THRESHOLD = 120;
+
+    static final boolean NATIVE = NativeLibrary.isAvailable() && Native.DGER_CRITICAL != null;
+
+    /**
      * {@code dger}: A := alpha*x*y<sup>T</sup> + A
      * <p>
      * A is column-major, stored in its array from an offset with a leading dimension. The vectors are stored
@@ -86,7 +130,19 @@ public abstract class GER implements BLAS2 {
             return;
         }
 
-        JVM.invoke(m, n, alpha, x, offsetX, incX, y, offsetY, incY, a, offsetA, lda);
+        if (GER.isNative(m, n)) {
+            Native.invoke(m, n, alpha, x, offsetX, incX, y, offsetY, incY, a, offsetA, lda);
+        } else {
+            JVM.invoke(m, n, alpha, x, offsetX, incX, y, offsetY, incY, a, offsetA, lda);
+        }
+    }
+
+    /**
+     * Whether to use the native implementation: there is one, and m*n is larger than
+     * {@link #NATIVE_THRESHOLD}.
+     */
+    static boolean isNative(final double m, final double n) {
+        return NATIVE && m * n > NATIVE_THRESHOLD;
     }
 
 }

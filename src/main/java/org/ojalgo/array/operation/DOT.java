@@ -21,8 +21,13 @@
  */
 package org.ojalgo.array.operation;
 
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
+import java.lang.invoke.MethodHandle;
 import java.math.BigDecimal;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.ComplexNumber;
@@ -32,13 +37,22 @@ import org.ojalgo.structure.Access1D;
 /**
  * The ?dot routines perform a vector-vector reduction operation defined as Equation where xi and yi are
  * elements of vectors x and y.
+ * <p>
+ * {@link #invoke(double[], int, double[], int, int, int)} and
+ * {@link #invoke(int, double[], int, int, double[], int, int)} may call native code, see
+ * {@link NativeLibrary}. That pays off for a single large call. Code that calls them repeatedly, such as the
+ * inner loops of a decomposition, is usually better off with the pure Java implementation,
+ * {@link JVM#invoke(int, double[], int, int, double[], int, int)}: each native call has a fixed cost, and
+ * some libraries add much more.
  *
  * @author apete
  */
 public abstract class DOT implements BLAS1 {
 
     /**
-     * The pure Java implementation.
+     * The pure Java implementation. Everything it calls is pure Java as well – the {@code JVM}
+     * implementations of other operations, never their dispatching {@code invoke} methods (that may call
+     * native code).
      */
     public static final class JVM {
 
@@ -62,6 +76,34 @@ public abstract class DOT implements BLAS1 {
         }
 
     }
+
+    /**
+     * Native {@code cblas_ddot}, initialised only when {@link NativeLibrary#isAvailable()}.
+     */
+    static final class Native {
+
+        static final MethodHandle DDOT_CRITICAL = NativeLibrary.downcall("cblas_ddot", FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT), true);
+
+        static double invoke(final int n, final double[] x, final int offsetX, final int incX, final double[] y, final int offsetY, final int incY) {
+            MemorySegment segmentX = NativeLibrary.ofVector(x, offsetX, n, incX);
+            MemorySegment segmentY = NativeLibrary.ofVector(y, offsetY, n, incY);
+            try {
+                return (double) DDOT_CRITICAL.invokeExact(n, segmentX, incX, segmentY, incY);
+            } catch (Throwable cause) {
+                throw new ProgrammingError(cause);
+            }
+        }
+
+    }
+
+    /**
+     * The native implementation is used, if there is one, when the vector length (the number of operations)
+     * is larger than this. See {@link NativeLibrary}.
+     */
+    private static final double NATIVE_THRESHOLD = 72;
+
+    static final boolean NATIVE = NativeLibrary.isAvailable() && Native.DDOT_CRITICAL != null;
 
     public static double invoke(final Access1D<?> array1, final int offset1, final double[] array2, final int offset2, final int first, final int limit) {
         double retVal = PrimitiveMath.ZERO;
@@ -131,6 +173,9 @@ public abstract class DOT implements BLAS1 {
     }
 
     public static double invoke(final double[] array1, final int offset1, final double[] array2, final int offset2, final int first, final int limit) {
+        if (DOT.isNative(limit - first)) {
+            return Native.invoke(limit - first, array1, offset1 + first, 1, array2, offset2 + first, 1);
+        }
         return DOT.unrolled04(array1, offset1, array2, offset2, first, limit);
     }
 
@@ -155,6 +200,9 @@ public abstract class DOT implements BLAS1 {
     public static double invoke(final int n, final double[] x, final int offsetX, final int incX, final double[] y, final int offsetY, final int incY) {
         if (n <= 0) {
             return PrimitiveMath.ZERO;
+        }
+        if (DOT.isNative(n)) {
+            return Native.invoke(n, x, offsetX, incX, y, offsetY, incY);
         }
         return JVM.invoke(n, x, offsetX, incX, y, offsetY, incY);
     }
@@ -216,6 +264,14 @@ public abstract class DOT implements BLAS1 {
             retVal += array1.doubleValue(offset1 + i) * array2.doubleValue(offset2 + i);
         }
         return retVal;
+    }
+
+    /**
+     * Whether to use the native implementation: there is one, and the vector length is larger than
+     * {@link #NATIVE_THRESHOLD}.
+     */
+    static boolean isNative(final double n) {
+        return NATIVE && n > NATIVE_THRESHOLD;
     }
 
     static double plain(final double[] array1, final int offset1, final double[] array2, final int offset2, final int first, final int limit) {

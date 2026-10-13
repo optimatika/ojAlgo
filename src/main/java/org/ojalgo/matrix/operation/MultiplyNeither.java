@@ -1120,13 +1120,13 @@ public class MultiplyNeither implements MatrixOperation {
     }
 
     /**
-     * The general case: {@link GEMM}, possibly multi-threaded or cache blocked. Products with 5 to 10 rows
-     * use row-specialised kernels when the complexity is less than {@link #ROWS_COMPLEXITY} or there are
-     * fewer than 4 columns, unless {@link GEMM} would be multi-threaded; with a transposed operand only
-     * products with 5 to 7 rows do, and with the left operand transposed only when the complexity is less
-     * than {@link #ROWS_COMPLEXITY_TRANSPOSED}. Otherwise, when the left operand is not transposed, the
-     * product is cleared once and accumulated into with beta 1, which is faster at small sizes than clearing
-     * column by column.
+     * The general case: {@link GEMM}, native or Java (and then possibly multi-threaded or cache blocked). In
+     * Java, products with 5 to 10 rows use row-specialised kernels when the complexity is less than
+     * {@link #ROWS_COMPLEXITY} or there are fewer than 4 columns, unless {@link GEMM} would be
+     * multi-threaded; with a transposed operand only products with 5 to 7 rows do, and with the left operand
+     * transposed only when the complexity is less than {@link #ROWS_COMPLEXITY_TRANSPOSED}. Otherwise, when
+     * the left operand is not transposed, the product is cleared once and accumulated into with beta 1, which
+     * is faster at small sizes than clearing column by column.
      */
     static void fillMxN(final double[] product, final double[] left, final boolean transpL, final int complexity, final double[] right, final boolean transpR) {
 
@@ -1137,26 +1137,17 @@ public class MultiplyNeither implements MatrixOperation {
 
         boolean rows = nbRows >= 5 && nbCols <= MatrixOperation.chunk(GEMM.THRESHOLD, nbRows, complexity);
 
-        if (rows && !transpL && !transpR && nbRows <= 10 && (complexity < ROWS_COMPLEXITY || nbCols < 4)) {
+        if (GEMM.isNative(nbRows, nbCols, complexity)) {
+            // Through GEMM's dispatch, that also decides between a critical and an off-heap native call
+            GEMM.invoke(transpL, transpR, nbRows, nbCols, complexity, PrimitiveMath.ONE, left, 0, lda, right, 0, ldb, PrimitiveMath.ZERO, product, 0, nbRows);
+        } else if (rows && !transpL && !transpR && nbRows <= 10 && (complexity < ROWS_COMPLEXITY || nbCols < 4)) {
             switch (nbRows) {
-                case 5:
-                    MultiplyNeither.fill5xN(product, left, complexity, right);
-                    break;
-                case 6:
-                    MultiplyNeither.fill6xN(product, left, complexity, right);
-                    break;
-                case 7:
-                    MultiplyNeither.fill7xN(product, left, complexity, right);
-                    break;
-                case 8:
-                    MultiplyNeither.fill8xN(product, left, complexity, right);
-                    break;
-                case 9:
-                    MultiplyNeither.fill9xN(product, left, complexity, right);
-                    break;
-                default:
-                    MultiplyNeither.fill0xN(product, left, complexity, right);
-                    break;
+                case 5  -> MultiplyNeither.fill5xN(product, left, complexity, right);
+                case 6  -> MultiplyNeither.fill6xN(product, left, complexity, right);
+                case 7  -> MultiplyNeither.fill7xN(product, left, complexity, right);
+                case 8  -> MultiplyNeither.fill8xN(product, left, complexity, right);
+                case 9  -> MultiplyNeither.fill9xN(product, left, complexity, right);
+                default -> MultiplyNeither.fill0xN(product, left, complexity, right);
             }
         } else if (rows && nbRows <= 7 && (transpL ? complexity < ROWS_COMPLEXITY_TRANSPOSED : complexity < ROWS_COMPLEXITY || nbCols < 4)) {
             int sAi = transpL ? complexity : 1;
@@ -1164,15 +1155,9 @@ public class MultiplyNeither implements MatrixOperation {
             int sBc = transpR ? nbCols : 1;
             int sBj = transpR ? 1 : complexity;
             switch (nbRows) {
-                case 5:
-                    MultiplyNeither.fill5xN(product, left, sAi, sAc, complexity, right, sBc, sBj);
-                    break;
-                case 6:
-                    MultiplyNeither.fill6xN(product, left, sAi, sAc, complexity, right, sBc, sBj);
-                    break;
-                default:
-                    MultiplyNeither.fill7xN(product, left, sAi, sAc, complexity, right, sBc, sBj);
-                    break;
+                case 5  -> MultiplyNeither.fill5xN(product, left, sAi, sAc, complexity, right, sBc, sBj);
+                case 6  -> MultiplyNeither.fill6xN(product, left, sAi, sAc, complexity, right, sBc, sBj);
+                default -> MultiplyNeither.fill7xN(product, left, sAi, sAc, complexity, right, sBc, sBj);
             }
         } else if (transpL) {
             GEMM.JVM.invoke(transpL, transpR, nbRows, nbCols, complexity, PrimitiveMath.ONE, left, 0, lda, right, 0, ldb, PrimitiveMath.ZERO, product, 0,

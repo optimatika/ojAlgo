@@ -1,12 +1,13 @@
 # Contributing to ojAlgo
 
-ojAlgo is a pure Java library for mathematics, linear algebra, and optimisation (LP, QP, MIP). Zero external dependencies. Targets Java 11+. Published to Maven Central as `org.ojalgo:ojalgo`.
+ojAlgo is a pure Java library for mathematics, linear algebra, and optimisation (LP, QP, MIP). Zero external dependencies; it can optionally call a native BLAS library (opt-in, see [BLAS/LAPACK Operations](#blaslapack-operations)). Targets Java 22+. Published to Maven Central as `org.ojalgo:ojalgo`.
 
 ## Build Commands
 
 ```bash
 ./mvnw compile                  # Compile
-./mvnw test                     # Run tests (excludes @Tag("slow"), @Tag("unstable"), @Tag("network"))
+./mvnw test                     # Run tests (excludes @Tag("slow"), @Tag("unstable"), @Tag("network")), pure Java
+./mvnw test -DargLine=--enable-native-access=ojalgo,ALL-UNNAMED  # Run tests with native BLAS, if a library is found
 ./mvnw test -Dtest=ClassName    # Run a single test class
 ./mvnw test -Dtest=ClassName#methodName  # Run a single test method
 ./mvnw package -DskipTests      # Build JAR without tests
@@ -17,7 +18,7 @@ ojAlgo is a pure Java library for mathematics, linear algebra, and optimisation 
 All source lives under `org.ojalgo` with these key packages:
 
 - **`structure`** — Foundational interfaces (`Access1D/2D/AnyD`, `Mutate1D/2D`, `Structure1D/2D/AnyD`, `Factory1D/2D`) that define how data is accessed, mutated, and structured. Nearly everything implements these.
-- **`array`** — Concrete 1D array implementations: dense (`ArrayR064`, `ArrayR032`), sparse (`SparseArray`), off-heap (`OffHeapR064`), and buffer-backed. Naming convention: `R064` = double, `R032` = float, `C128` = complex, `Q128` = rational, `H256` = quaternion, `Z0xx` = integer types.
+- **`array`** — Concrete 1D array implementations: dense (`ArrayR064`, `ArrayR032`), sparse (`SparseArray`), and off-heap (`OffHeapR064`, allocated or memory mapped files). Naming convention: `R064` = double, `R032` = float, `C128` = complex, `Q128` = rational, `H256` = quaternion, `Z0xx` = integer types.
 - **`matrix`** — Matrix types and operations:
   - `MatrixR064`, `MatrixR032`, `MatrixC128`, etc. — user-facing immutable matrix types
   - `store/` — mutable matrix storage (`R064Store`, `GenericStore`, `SparseStore`, `RawStore`) plus logical/virtual stores (transposed, conjugated, sliced, composed)
@@ -35,26 +36,43 @@ All source lives under `org.ojalgo` with these key packages:
 
 ## BLAS/LAPACK Operations
 
-The low-level operations in `org.ojalgo.array.operation` and `org.ojalgo.matrix.operation` are moving towards the standard BLAS/LAPACK API. The design assumes all of BLAS and the LAPACK routines ojAlgo needs; they are added incrementally, `double` first, other precisions as overloads later.
+The low-level operations in `org.ojalgo.array.operation` and `org.ojalgo.matrix.operation` are moving towards the standard BLAS/LAPACK API. Each routine has a pure Java implementation and, optionally, a native one (FFM). The design assumes all of BLAS and the LAPACK routines ojAlgo needs; they are added incrementally, `double` first, other precisions as overloads later.
 
 - One class per routine, named after it without the precision prefix: `GEMM`, `TRSM`, `DOT`, `GETRF`… Level 1 (vectors) belongs in `org.ojalgo.array.operation`; levels 2 and 3 and LAPACK – anything 2D – in `org.ojalgo.matrix.operation`.
 - The package-private tag interfaces `BLAS1`, `BLAS2`, `BLAS3` and `LAPACK` organise the routine classes. A class gets its tag once its API matches the BLAS/LAPACK signature. Older operations with BLAS-like names (`AMAX`, `ASUM`, `COPY`, `NRM2`, `SWAP`…) stay untagged until they are aligned.
 - The canonical entry point is `invoke(...)` with the CBLAS argument order and BLAS names (`m`, `n`, `k`, `alpha`, `beta`, `lda`, `incX`), except:
   - always column-major, no layout argument;
   - each pointer becomes an array followed by an offset (`a, offsetA, lda`);
-  - options are booleans (`transposeA`, `left`, `upper`, `unitDiagonal`);
+  - options are booleans (`transposeA`, `left`, `upper`, `unitDiagonal`), converted to the `CBLAS` constants (in `org.ojalgo.matrix.operation`) only when calling native code;
   - precision is chosen by overloading on the array type.
 - Semantics follow reference BLAS: argument checks (`ArrayOperation.checkArgument`, `IllegalArgumentException`), the same quick returns, beta 0 means C is not read, alpha 0 means A and B are not read, and a negative increment walks the vector backwards with the offset still the lowest index accessed.
-- Each routine class has a nested class `JVM` – the pure Java implementation, `JVM.invoke(...)`, with its kernels. It covers the full semantics and is multi-threaded above the routine's `THRESHOLD`. It calls other routines' `JVM.invoke`, never a dispatching `invoke`.
-- The outer class holds the API, the argument checks and quick returns, any special cases, and all thresholds. Other code calls the outer `invoke(...)`.
+- Each routine class has two nested classes:
+  - `JVM` – the pure Java implementation, `JVM.invoke(...)`, with its kernels. It covers the full semantics and is multi-threaded above the routine's `THRESHOLD`. Everything it calls is pure Java as well: other routines' `JVM.invoke`, never a dispatching `invoke`.
+  - `Native` – the downcall handle(s) and `Native.invoke(...)`, guarded by a `static final boolean NATIVE`, so FFM classes are never loaded unless used, and the disabled check folds away. Handles are named after how they are linked: `DDOT_CRITICAL`, `DGETRF_OFF_HEAP`. A routine linked both ways has both handles, and `Native.invoke(...)` chooses between its private `invokeCritical(...)` and `invokeOffHeap(...)`.
+- The outer class holds the API, the argument checks and quick returns, the switch between `Native` and `JVM` (and other special cases), and all thresholds. With alpha 0 it never calls native code, since A and B must not be read. Other code calls the outer `invoke(...)`, not `Native` directly.
 - The call direction is from the ojAlgo-specific operations to the standard routines, never the reverse. `MultiplyNeither`, `SubstituteForwards`, `HouseholderLeft`… keep their special-case kernels (fixed small sizes, other number types) and call the standard routines for the general case. Such a change must not make their pure Java paths slower – check with JMH, and keep results bit-identical where possible.
 
 ### Thresholds
 
-- The default is single-threaded. Thresholds decide when to switch to multi-threading.
+- The default is pure Java, single-threaded. Thresholds decide when to switch to native code and/or multi-threading. There is one set of thresholds, for all native libraries.
+- Native: a `private static final double NATIVE_THRESHOLD` on the amount of work (multiply-adds, or elements for level 1), tested by a package-private `isNative(...)`.
+- Off-heap, for the routines linked both ways: package-private `static double OFF_HEAP_THRESHOLD` (work) and `OFF_HEAP_DIMENSION` (smallest dimension), tested by `isOffHeap(...)` from `Native.invoke(...)`. They are not final so that the tests can force either path.
 - Multi-threading: a package-private `static int THRESHOLD`, an equivalent matrix dimension (the work is compared with its cube), changed with `MatrixOperation.setThresholds*`. `MatrixOperation.chunk(...)` turns it into the part size for the `DivideAndConquer.Divider`.
 - Comparisons use `>` only, and the values don't sit on common benchmark sizes (powers of 2, the 1-2-5 series), so it is never ambiguous which side of a threshold a benchmark size is on.
-- Prefer simple, rough rules to finely tuned ones. Measure with JMH.
+- Prefer simple, rough rules to finely tuned ones. Measure with JMH against the Java implementation.
+
+### Native Code
+
+- Native code is used only when the JVM grants ojAlgo native access (`--enable-native-access=ojalgo` on the module path, `--enable-native-access=ALL-UNNAMED` on the class path), a working library is found, and the problem size passes the operation's thresholds. Without native access ojAlgo never touches FFM.
+- `org.ojalgo.array.operation.NativeLibrary` finds the library (`-Dojalgo.native.library=<file>[<path separator><file>]`, or auto-discovery: Accelerate on macOS, OpenBLAS/FlexiBLAS/MKL/BLIS/reference BLAS on Linux, OpenBLAS/MKL on Windows; `none` disables native code), checks it, and creates the downcall handles. `OjAlgoUtils.getNativeLibrary()` reports it.
+- BLAS is called through CBLAS with 32-bit integers (LP64); the check rejects a library with 64-bit integers (ILP64). On macOS Accelerate's `$NEWLAPACK` symbols are preferred, and the check calls the same symbols as the operations do.
+- Critical or off-heap:
+  - BLAS levels 1 and 2 are linked as critical functions and passed the Java arrays in place (heap segments): zero-copy. The bounds are checked first (`NativeLibrary.ofArray`/`ofVector`, `CBLAS.ofMatrix`), since native code would not notice. The JVM can't reach a safepoint during a critical call, so garbage collection in the whole JVM waits until it returns.
+  - BLAS level 3, and the LAPACK solves (`GETRS`, `POTRS`, `TRTRS`) with many right-hand sides, are critical too, unless the call is long and compute-intensive: work above `OFF_HEAP_THRESHOLD` and the smallest dimension above `OFF_HEAP_DIMENSION`. Then the non-critical handle is called with copies of the matrices in native memory. Solves with few right-hand sides go column by column through `TRSV`.
+  - The LAPACK factorisations (`GETRF`, `GEQRF`, `ORGQR`, `POTRF`) are always off-heap.
+  - Off-heap copies: each call site gets the copy's leading dimension from `CBLAS.leadingDimensionOfCopy(rows)` once, and passes that same value to `CBLAS.copyOfMatrix`/`allocateMatrix`, to the native function, and to `CBLAS.copyBackMatrix`/`copyBackTriangle`. Only the output's own elements are copied back.
+- Threading is left to the library's defaults.
+- Native results can differ from the Java ones in the last digits.
 
 ## Coding Conventions
 
@@ -86,7 +104,9 @@ The low-level operations in `org.ojalgo.array.operation` and `org.ojalgo.matrix.
 - Use `TestUtils` (not JUnit `Assertions`) for test assertions.
 - Prefer deterministic tests. For numerics, use tolerances via `TestUtils` and avoid brittle equality checks.
 - Keep tests fast and focused.
-- The BLAS and LAPACK tests (`BLASLevel1Test`, `BLASLevel2Test`, `BLASLevel3Test`, `LAPACKTest`) run every case through `JVM.invoke(...)` and through the dispatching `invoke(...)`.
+- `./mvnw test` runs pure Java (no native access). With `-DargLine=--enable-native-access=ojalgo,ALL-UNNAMED` the tests use a native library if one is found, or the one named with `-Dojalgo.native.library=<file>`. The Eclipse launch configurations `ojAlgo on JVM`, `ojAlgo on Accelerate` and `ojAlgo on OpenBLAS` cover the three cases (on macOS).
+- The BLAS and LAPACK tests (`BLASLevel1Test`, `BLASLevel2Test`, `BLASLevel3Test`, `LAPACKTest`) run every case through the Java, the dispatching and, when there is a library, the native implementation. For the routines linked both ways, `BLASLevel3Test.OffHeapLimits` sets the off-heap thresholds so that `Native.invoke(...)` takes the critical or the off-heap path at any size. `CBLASTest` covers the layout of the off-heap copies.
+- CI runs a pure Java job (Java 22) and a native job (Java 27 with OpenBLAS). It sets `OJALGO_NATIVE_EXPECTED`, which makes `NativeLibraryTest` fail if native code is, or is not, in use as expected.
 - `MIPLIBTheEasySet` mirrors the MIPLIB benchmark, where every solver runs with its default settings: no per-model configuration there. A test that the defaults do not solve reliably is tagged `slow` or `unstable` (both excluded from the default run). Tests on user-supplied models (`IntegerUserFiles`) use whatever configuration solves the model best.
 
 ### Diagnosing flaky solver tests

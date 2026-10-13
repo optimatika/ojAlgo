@@ -63,7 +63,12 @@ import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.type.math.MathType;
 
 /**
- * A {@code double} implementation of {@linkplain PhysicalStore}.
+ * A {@code double} implementation of {@linkplain PhysicalStore}: a dense, mutable matrix stored column by
+ * column in a {@code double[]}. Create instances with {@link #FACTORY}, and declare variables with the
+ * interfaces {@link PhysicalStore} (mutable) or {@link MatrixStore} (read access).
+ * {@snippet class = org.ojalgo.matrix.store.R064StoreSnippets region = introduction}
+ * The decompositions are in {@link org.ojalgo.matrix.decomposition}. For an immutable matrix that chooses and
+ * caches decompositions itself, see {@link org.ojalgo.matrix.MatrixR064}.
  *
  * @author apete
  */
@@ -209,8 +214,8 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
      * If the matrix is the transpose of an {@link R064Store}, that store, otherwise null.
      */
     static R064Store transposed(final Access1D<?> matrix) {
-        if (matrix instanceof TransjugatedStore<?> && ((TransjugatedStore<?>) matrix).getOriginal() instanceof R064Store) {
-            return (R064Store) ((TransjugatedStore<?>) matrix).getOriginal();
+        if (matrix instanceof TransjugatedStore<?> transjugated && transjugated.getOriginal() instanceof R064Store original) {
+            return original;
         }
         return null;
     }

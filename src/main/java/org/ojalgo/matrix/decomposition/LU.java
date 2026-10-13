@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.array.PlainArray;
+import org.ojalgo.matrix.operation.GETRF;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -51,10 +52,12 @@ import org.ojalgo.type.context.NumberContext;
  * {@link #compute(Access2D.Collectable) compute(..)} decomposes and then checks {@link #isSolvable()
  * isSolvable()}, so it returns false for any other matrix.
  * <p>
- * Singularity, {@link #isSolvable()} and the rank, is judged from the size of the pivots – the smallest
- * relative to the largest. With partial pivoting that is not a reliable test: a matrix that is singular apart
- * from rounding errors may still be reported as solvable, and then solutions and inverses contain huge
- * meaningless values. If that's a concern, check the condition number or use {@link SingularValue}.
+ * Singularity, {@link #isSolvable() isSolvable()} and the rank, is judged from the size of the pivots – the
+ * smallest relative to the largest. With partial pivoting that is not a reliable test: a matrix that is
+ * singular apart from rounding errors may still be reported as solvable, and then solutions and inverses
+ * contain huge meaningless values. If that's a concern, check the condition number or use
+ * {@link SingularValue}.
+ * {@snippet class = org.ojalgo.matrix.decomposition.MatrixDecompositionSnippets region = lu}
  *
  * @author apete
  */
@@ -72,7 +75,7 @@ public interface LU<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition
 
     Factory<Double> R064 = typical -> {
 
-        if (60 < typical.getColDim() && typical.count() <= PlainArray.MAX_SIZE) {
+        if ((60 < typical.getColDim() || GETRF.isNative(typical.getRowDim(), typical.getColDim())) && typical.count() <= PlainArray.MAX_SIZE) {
             return new DenseLU.R064();
         } else {
             return new RawLU();
