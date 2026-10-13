@@ -22,7 +22,9 @@
 package org.ojalgo;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
+import org.ojalgo.array.operation.NativeLibrary;
 import org.ojalgo.machine.Hardware;
 import org.ojalgo.machine.VirtualMachine;
 import org.ojalgo.matrix.operation.MatrixOperation;
@@ -66,6 +68,19 @@ public abstract class OjAlgoUtils {
         String manifestValue = OjAlgoUtils.class.getPackage().getSpecificationVersion();
 
         return manifestValue != null ? manifestValue : LocalDate.now().toString();
+    }
+
+    /**
+     * The native BLAS/LAPACK library that ojAlgo uses, if any: the library file(s). Native code is used only
+     * when the JVM grants ojAlgo native access ({@code --enable-native-access=ojalgo} on the module path, or
+     * {@code --enable-native-access=ALL-UNNAMED} on the class path) and a working library is found –
+     * Accelerate on macOS, OpenBLAS or another standard implementation elsewhere, or the file(s) named by the
+     * system property {@code ojalgo.native.library} – and then only for operations large enough to gain from
+     * it. Otherwise everything is pure Java, and this is empty. The outcome is also logged, with
+     * {@link BasicLogger#debug(String, Object...)}, when the library is first looked for.
+     */
+    public static Optional<String> getNativeLibrary() {
+        return Optional.ofNullable(NativeLibrary.describe());
     }
 
     /**

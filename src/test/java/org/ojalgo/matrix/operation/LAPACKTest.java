@@ -27,6 +27,7 @@ import java.util.Random;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.operation.BLASLevel3Test.Implementation;
+import org.ojalgo.matrix.operation.BLASLevel3Test.OffHeapLimits;
 import org.ojalgo.matrix.operation.BLASLevel3Test.Storage;
 
 /**
@@ -40,9 +41,11 @@ import org.ojalgo.matrix.operation.BLASLevel3Test.Storage;
  * (and P of the latter), is formed in the test by applying the reflectors to the identity, and compared with
  * what {@link ORGQR}, {@link ORGTR}, {@link ORGHR} or {@link ORGBR} generates and with how {@link ORMQR}
  * multiplies. Matrices with offsets and padding as well as matrices filling their arrays exactly. Each case
- * is run through the pure Java implementation and the dispatching {@code invoke}. Elements outside the
- * matrices, and outside the range of the pivots, must be left untouched, and inputs must not change. For the
- * symmetric positive definite matrices, the triangle that is not referenced is filled with NaN.
+ * is run through the pure Java implementation, the dispatching {@code invoke}, and the native
+ * implementation(s) when there is one (run with {@code --enable-native-access=ojalgo,ALL-UNNAMED} to include
+ * it). Elements outside the matrices, and outside the range of the pivots, must be left untouched, and inputs
+ * must not change. For the symmetric positive definite matrices, the triangle that is not referenced is
+ * filled with NaN.
  */
 public class LAPACKTest {
 
@@ -50,21 +53,25 @@ public class LAPACKTest {
     private static final int OFFSET = 2;
     private static final int SENTINEL = -7;
     /**
-     * m, n – the largest makes the Java implementation multi-threaded.
+     * m, n – the larger ones pass the native threshold, and the largest makes the Java implementation
+     * multi-threaded.
      */
     private static final int[][] SIZES = { { 1, 1 }, { 1, 6 }, { 6, 1 }, { 3, 3 }, { 7, 4 }, { 4, 7 }, { 17, 17 }, { 30, 25 }, { 25, 30 }, { 60, 45 },
             { 45, 60 }, { 80, 80 }, { 270, 260 } };
     /**
-     * m, n with m >= n, for GEBRD and ORGBR – the largest makes the Java implementations multi-threaded.
+     * m, n with m >= n, for GEBRD and ORGBR – the larger ones pass the native thresholds, and the largest
+     * makes the Java implementations multi-threaded.
      */
     private static final int[][] SIZES_GEBRD = { { 1, 1 }, { 6, 1 }, { 3, 3 }, { 7, 4 }, { 17, 17 }, { 30, 25 }, { 60, 45 }, { 80, 80 }, { 150, 120 },
             { 350, 340 } };
     /**
-     * n, for GEEV, HSEQR and TREVC – the largest makes the Java implementations multi-threaded.
+     * n, for GEEV, HSEQR and TREVC – the largest passes the native thresholds, and makes the Java
+     * implementations multi-threaded.
      */
     private static final int[] SIZES_GEEV = { 1, 2, 3, 7, 17, 40, 150 };
     /**
-     * n, for GETRS with B = I – the largest makes the Java implementation multi-threaded.
+     * n, for GETRS with B = I – the larger ones pass the native threshold, and the largest makes the Java
+     * implementation multi-threaded.
      */
     private static final int[] SIZES_IDENTITY = { 1, 2, 7, 17, 40, 80 };
     /**
@@ -73,15 +80,18 @@ public class LAPACKTest {
     private static final int[][] SIZES_ORMQR = { { 1, 1, 1 }, { 5, 0, 3 }, { 3, 3, 1 }, { 6, 4, 4 }, { 17, 17, 1 }, { 17, 10, 5 }, { 40, 40, 1 },
             { 40, 33, 33 }, { 80, 80, 70 } };
     /**
-     * n, nrhs, for GETRS – the largest makes the Java implementation multi-threaded.
+     * n, nrhs, for GETRS – the larger ones pass the native threshold, and the largest makes the Java
+     * implementation multi-threaded.
      */
     private static final int[][] SIZES_SOLVE = { { 1, 1 }, { 3, 1 }, { 6, 4 }, { 17, 1 }, { 17, 5 }, { 40, 1 }, { 40, 33 }, { 80, 70 } };
     /**
-     * n, for POTRF – the largest makes the Java implementation multi-threaded.
+     * n, for POTRF – the larger ones pass the native threshold, and the largest makes the Java implementation
+     * multi-threaded.
      */
     private static final int[] SIZES_SPD = { 1, 2, 7, 17, 40, 150 };
     /**
-     * n, for SYTRD, ORGTR, GEHRD and ORGHR – the largest makes the Java implementations multi-threaded.
+     * n, for SYTRD, ORGTR, GEHRD and ORGHR – the larger ones pass the native thresholds, and the largest
+     * makes the Java implementations multi-threaded.
      */
     private static final int[] SIZES_SYTRD = { 1, 2, 3, 7, 17, 40, 150, 340 };
 
@@ -355,22 +365,29 @@ public class LAPACKTest {
 
     private static void invokeGEQRF(final Implementation implementation, final int m, final int n, final Storage a, final double[] tau, final int offsetTau) {
         switch (implementation) {
-            case JAVA:
-                GEQRF.JVM.invoke(m, n, a.data, a.offset, a.ld, tau, offsetTau);
-                break;
-            default:
-                GEQRF.invoke(m, n, a.data, a.offset, a.ld, tau, offsetTau);
-                break;
+            case JAVA   -> GEQRF.JVM.invoke(m, n, a.data, a.offset, a.ld, tau, offsetTau);
+            case NATIVE -> GEQRF.Native.invoke(m, n, a.data, a.offset, a.ld, tau, offsetTau);
+            default     -> GEQRF.invoke(m, n, a.data, a.offset, a.ld, tau, offsetTau);
         }
     }
 
     private static int invokeGETRF(final Implementation implementation, final int m, final int n, final Storage a, final int[] ipiv, final int offsetIpiv) {
-        switch (implementation) {
-            case JAVA:
-                return GETRF.JVM.invoke(m, n, a.data, a.offset, a.ld, ipiv, offsetIpiv);
-            default:
-                return GETRF.invoke(m, n, a.data, a.offset, a.ld, ipiv, offsetIpiv);
-        }
+        return switch (implementation) {
+            case JAVA   -> GETRF.JVM.invoke(m, n, a.data, a.offset, a.ld, ipiv, offsetIpiv);
+            case NATIVE -> GETRF.Native.invoke(m, n, a.data, a.offset, a.ld, ipiv, offsetIpiv);
+            default     -> GETRF.invoke(m, n, a.data, a.offset, a.ld, ipiv, offsetIpiv);
+        };
+    }
+
+    /**
+     * @param offHeap Whether the native implementation has an off-heap variant
+     */
+    private static boolean isAvailable(final Implementation implementation, final boolean nativeAvailable, final boolean offHeap) {
+        return switch (implementation) {
+            case NATIVE   -> nativeAvailable;
+            case OFF_HEAP -> nativeAvailable && offHeap;
+            default       -> true;
+        };
     }
 
     private static int[] newPivots(final int count, final boolean tight) {
@@ -456,12 +473,9 @@ public class LAPACKTest {
         double[] taup = LAPACKTest.newTau(n, tight);
 
         switch (implementation) {
-            case JAVA:
-                GEBRD.JVM.invoke(m, n, a.data, a.offset, a.ld, d, offset, e, offset, tauq, offset, taup, offset);
-                break;
-            default:
-                GEBRD.invoke(m, n, a.data, a.offset, a.ld, d, offset, e, offset, tauq, offset, taup, offset);
-                break;
+            case JAVA   -> GEBRD.JVM.invoke(m, n, a.data, a.offset, a.ld, d, offset, e, offset, tauq, offset, taup, offset);
+            case NATIVE -> GEBRD.Native.invoke(m, n, a.data, a.offset, a.ld, d, offset, e, offset, tauq, offset, taup, offset);
+            default     -> GEBRD.invoke(m, n, a.data, a.offset, a.ld, d, offset, e, offset, tauq, offset, taup, offset);
         }
 
         String message = "GEBRD " + implementation + " tight=" + tight + " " + m + "x" + n;
@@ -563,15 +577,11 @@ public class LAPACKTest {
         Storage vr = new Storage(random, n, n, tight);
         double[] beforeVR = vr.data.clone();
 
-        int info;
-        switch (implementation) {
-            case JAVA:
-                info = GEEV.JVM.invoke(true, n, a.data, a.offset, a.ld, wr, offset, wi, offset, vr.data, vr.offset, vr.ld);
-                break;
-            default:
-                info = GEEV.invoke(true, n, a.data, a.offset, a.ld, wr, offset, wi, offset, vr.data, vr.offset, vr.ld);
-                break;
-        }
+        int info = switch (implementation) {
+            case JAVA   -> GEEV.JVM.invoke(true, n, a.data, a.offset, a.ld, wr, offset, wi, offset, vr.data, vr.offset, vr.ld);
+            case NATIVE -> GEEV.Native.invoke(true, n, a.data, a.offset, a.ld, wr, offset, wi, offset, vr.data, vr.offset, vr.ld);
+            default     -> GEEV.invoke(true, n, a.data, a.offset, a.ld, wr, offset, wi, offset, vr.data, vr.offset, vr.ld);
+        };
 
         String message = "GEEV " + implementation + " tight=" + tight + " " + n;
         TestUtils.assertEquals(message + " info", 0, info);
@@ -632,15 +642,11 @@ public class LAPACKTest {
         double[] valuesR = LAPACKTest.newTau(n, tight);
         double[] valuesI = LAPACKTest.newTau(n, tight);
 
-        int infoValues;
-        switch (implementation) {
-            case JAVA:
-                infoValues = GEEV.JVM.invoke(false, n, b.data, b.offset, b.ld, valuesR, offset, valuesI, offset, null, 0, 1);
-                break;
-            default:
-                infoValues = GEEV.invoke(false, n, b.data, b.offset, b.ld, valuesR, offset, valuesI, offset, null, 0, 1);
-                break;
-        }
+        int infoValues = switch (implementation) {
+            case JAVA   -> GEEV.JVM.invoke(false, n, b.data, b.offset, b.ld, valuesR, offset, valuesI, offset, null, 0, 1);
+            case NATIVE -> GEEV.Native.invoke(false, n, b.data, b.offset, b.ld, valuesR, offset, valuesI, offset, null, 0, 1);
+            default     -> GEEV.invoke(false, n, b.data, b.offset, b.ld, valuesR, offset, valuesI, offset, null, 0, 1);
+        };
 
         TestUtils.assertEquals(message + " info, values only", 0, infoValues);
         LAPACKTest.assertSameEigenvalues(message + ", values only", wr, wi, valuesR, valuesI, offset, n);
@@ -654,12 +660,9 @@ public class LAPACKTest {
         double[] tau = LAPACKTest.newTau(Math.max(0, n - 1), tight);
 
         switch (implementation) {
-            case JAVA:
-                GEHRD.JVM.invoke(n, a.data, a.offset, a.ld, tau, offset);
-                break;
-            default:
-                GEHRD.invoke(n, a.data, a.offset, a.ld, tau, offset);
-                break;
+            case JAVA   -> GEHRD.JVM.invoke(n, a.data, a.offset, a.ld, tau, offset);
+            case NATIVE -> GEHRD.Native.invoke(n, a.data, a.offset, a.ld, tau, offset);
+            default     -> GEHRD.invoke(n, a.data, a.offset, a.ld, tau, offset);
         }
 
         String message = "GEHRD " + implementation + " tight=" + tight + " " + n;
@@ -737,15 +740,11 @@ public class LAPACKTest {
         double[] beforeU = u.data.clone();
         double[] beforeV = v.data.clone();
 
-        int info;
-        switch (implementation) {
-            case JAVA:
-                info = GESDD.JVM.invoke(vectors, fullSize, m, n, a.data, a.offset, a.ld, s, offset, u.data, u.offset, u.ld, v.data, v.offset, v.ld);
-                break;
-            default:
-                info = GESDD.invoke(vectors, fullSize, m, n, a.data, a.offset, a.ld, s, offset, u.data, u.offset, u.ld, v.data, v.offset, v.ld);
-                break;
-        }
+        int info = switch (implementation) {
+            case JAVA   -> GESDD.JVM.invoke(vectors, fullSize, m, n, a.data, a.offset, a.ld, s, offset, u.data, u.offset, u.ld, v.data, v.offset, v.ld);
+            case NATIVE -> GESDD.Native.invoke(vectors, fullSize, m, n, a.data, a.offset, a.ld, s, offset, u.data, u.offset, u.ld, v.data, v.offset, v.ld);
+            default     -> GESDD.invoke(vectors, fullSize, m, n, a.data, a.offset, a.ld, s, offset, u.data, u.offset, u.ld, v.data, v.offset, v.ld);
+        };
 
         String message = "GESDD " + implementation + " tight=" + tight + " vectors=" + vectors + " fullSize=" + fullSize + " " + m + "x" + n;
         TestUtils.assertEquals(message + " info", 0, info);
@@ -833,12 +832,13 @@ public class LAPACKTest {
         double[] rhs = b.data.clone();
 
         switch (implementation) {
-            case JAVA:
-                GETRS.JVM.invoke(transpose, n, nrhs, a.data, a.offset, a.ld, ipiv, offsetIpiv, b.data, b.offset, b.ld);
-                break;
-            default:
-                GETRS.invoke(transpose, n, nrhs, a.data, a.offset, a.ld, ipiv, offsetIpiv, b.data, b.offset, b.ld);
-                break;
+            case JAVA             -> GETRS.JVM.invoke(transpose, n, nrhs, a.data, a.offset, a.ld, ipiv, offsetIpiv, b.data, b.offset, b.ld);
+            case NATIVE, OFF_HEAP -> {
+                try (OffHeapLimits limits = OffHeapLimits.of(implementation)) {
+                    GETRS.Native.invoke(transpose, n, nrhs, a.data, a.offset, a.ld, ipiv, offsetIpiv, b.data, b.offset, b.ld);
+                }
+            }
+            default               -> GETRS.invoke(transpose, n, nrhs, a.data, a.offset, a.ld, ipiv, offsetIpiv, b.data, b.offset, b.ld);
         }
 
         String message = "GETRS " + implementation + " tight=" + tight + " trans=" + transpose + " " + n + "x" + nrhs;
@@ -1022,12 +1022,9 @@ public class LAPACKTest {
         int k = q ? n : m;
 
         switch (implementation) {
-            case JAVA:
-                ORGBR.JVM.invoke(q, rows, columns, k, a.data, a.offset, a.ld, tau, offset);
-                break;
-            default:
-                ORGBR.invoke(q, rows, columns, k, a.data, a.offset, a.ld, tau, offset);
-                break;
+            case JAVA   -> ORGBR.JVM.invoke(q, rows, columns, k, a.data, a.offset, a.ld, tau, offset);
+            case NATIVE -> ORGBR.Native.invoke(q, rows, columns, k, a.data, a.offset, a.ld, tau, offset);
+            default     -> ORGBR.invoke(q, rows, columns, k, a.data, a.offset, a.ld, tau, offset);
         }
 
         String message = "ORGBR " + implementation + " tight=" + tight + " q=" + q + " full=" + full + " " + m + "x" + n;
@@ -1056,12 +1053,9 @@ public class LAPACKTest {
         double[][] q = LAPACKTest.explicitQ(a, tau, offset, n, n - 1, 1);
 
         switch (implementation) {
-            case JAVA:
-                ORGHR.JVM.invoke(n, a.data, a.offset, a.ld, tau, offset);
-                break;
-            default:
-                ORGHR.invoke(n, a.data, a.offset, a.ld, tau, offset);
-                break;
+            case JAVA   -> ORGHR.JVM.invoke(n, a.data, a.offset, a.ld, tau, offset);
+            case NATIVE -> ORGHR.Native.invoke(n, a.data, a.offset, a.ld, tau, offset);
+            default     -> ORGHR.invoke(n, a.data, a.offset, a.ld, tau, offset);
         }
 
         String message = "ORGHR " + implementation + " tight=" + tight + " " + n;
@@ -1092,12 +1086,9 @@ public class LAPACKTest {
         double[][] q = LAPACKTest.explicitQ(a, tau, offsetTau, m, k);
 
         switch (implementation) {
-            case JAVA:
-                ORGQR.JVM.invoke(m, n, k, a.data, a.offset, a.ld, tau, offsetTau);
-                break;
-            default:
-                ORGQR.invoke(m, n, k, a.data, a.offset, a.ld, tau, offsetTau);
-                break;
+            case JAVA   -> ORGQR.JVM.invoke(m, n, k, a.data, a.offset, a.ld, tau, offsetTau);
+            case NATIVE -> ORGQR.Native.invoke(m, n, k, a.data, a.offset, a.ld, tau, offsetTau);
+            default     -> ORGQR.invoke(m, n, k, a.data, a.offset, a.ld, tau, offsetTau);
         }
 
         String message = "ORGQR " + implementation + " tight=" + tight + " " + m + "x" + n + " k=" + k;
@@ -1172,12 +1163,9 @@ public class LAPACKTest {
         double[][] q = LAPACKTest.explicitQ(a, tau, offset, n, n - 1, 1);
 
         switch (implementation) {
-            case JAVA:
-                ORGTR.JVM.invoke(n, a.data, a.offset, a.ld, tau, offset);
-                break;
-            default:
-                ORGTR.invoke(n, a.data, a.offset, a.ld, tau, offset);
-                break;
+            case JAVA   -> ORGTR.JVM.invoke(n, a.data, a.offset, a.ld, tau, offset);
+            case NATIVE -> ORGTR.Native.invoke(n, a.data, a.offset, a.ld, tau, offset);
+            default     -> ORGTR.invoke(n, a.data, a.offset, a.ld, tau, offset);
         }
 
         String message = "ORGTR " + implementation + " tight=" + tight + " " + n;
@@ -1200,15 +1188,11 @@ public class LAPACKTest {
         Storage a = LAPACKTest.newSPD(new Random(n), n, upper, tight);
         double[] original = a.data.clone();
 
-        int info;
-        switch (implementation) {
-            case JAVA:
-                info = POTRF.JVM.invoke(upper, n, a.data, a.offset, a.ld);
-                break;
-            default:
-                info = POTRF.invoke(upper, n, a.data, a.offset, a.ld);
-                break;
-        }
+        int info = switch (implementation) {
+            case JAVA   -> POTRF.JVM.invoke(upper, n, a.data, a.offset, a.ld);
+            case NATIVE -> POTRF.Native.invoke(upper, n, a.data, a.offset, a.ld);
+            default     -> POTRF.invoke(upper, n, a.data, a.offset, a.ld);
+        };
 
         String message = "POTRF " + implementation + " tight=" + tight + " upper=" + upper + " " + n;
         TestUtils.assertEquals(message + " info", 0, info);
@@ -1243,12 +1227,13 @@ public class LAPACKTest {
         double[] rhs = b.data.clone();
 
         switch (implementation) {
-            case JAVA:
-                POTRS.JVM.invoke(upper, n, nrhs, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
-                break;
-            default:
-                POTRS.invoke(upper, n, nrhs, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
-                break;
+            case JAVA             -> POTRS.JVM.invoke(upper, n, nrhs, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
+            case NATIVE, OFF_HEAP -> {
+                try (OffHeapLimits limits = OffHeapLimits.of(implementation)) {
+                    POTRS.Native.invoke(upper, n, nrhs, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
+                }
+            }
+            default               -> POTRS.invoke(upper, n, nrhs, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
         }
 
         String message = "POTRS " + implementation + " tight=" + tight + " upper=" + upper + " " + n + "x" + nrhs;
@@ -1332,16 +1317,16 @@ public class LAPACKTest {
 
         int info;
         if (separate) {
-            info = SYEVD.invoke(vectors, n, a.data, a.offset, a.ld, w, offset, z.data, z.offset, z.ld);
+            info = switch (implementation) {
+                case NATIVE -> SYEVD.Native.invoke(vectors, n, a.data, a.offset, a.ld, w, offset, z.data, z.offset, z.ld);
+                default     -> SYEVD.invoke(vectors, n, a.data, a.offset, a.ld, w, offset, z.data, z.offset, z.ld);
+            };
         } else {
-            switch (implementation) {
-                case JAVA:
-                    info = SYEVD.JVM.invoke(vectors, n, a.data, a.offset, a.ld, w, offset);
-                    break;
-                default:
-                    info = SYEVD.invoke(vectors, n, a.data, a.offset, a.ld, w, offset);
-                    break;
-            }
+            info = switch (implementation) {
+                case JAVA   -> SYEVD.JVM.invoke(vectors, n, a.data, a.offset, a.ld, w, offset);
+                case NATIVE -> SYEVD.Native.invoke(vectors, n, a.data, a.offset, a.ld, w, offset);
+                default     -> SYEVD.invoke(vectors, n, a.data, a.offset, a.ld, w, offset);
+            };
         }
 
         String message = "SYEVD " + implementation + " tight=" + tight + " vectors=" + vectors + " separate=" + separate + " " + n;
@@ -1413,12 +1398,9 @@ public class LAPACKTest {
         double[] tau = LAPACKTest.newTau(Math.max(0, n - 1), tight);
 
         switch (implementation) {
-            case JAVA:
-                SYTRD.JVM.invoke(n, a.data, a.offset, a.ld, d, offset, e, offset, tau, offset);
-                break;
-            default:
-                SYTRD.invoke(n, a.data, a.offset, a.ld, d, offset, e, offset, tau, offset);
-                break;
+            case JAVA   -> SYTRD.JVM.invoke(n, a.data, a.offset, a.ld, d, offset, e, offset, tau, offset);
+            case NATIVE -> SYTRD.Native.invoke(n, a.data, a.offset, a.ld, d, offset, e, offset, tau, offset);
+            default     -> SYTRD.invoke(n, a.data, a.offset, a.ld, d, offset, e, offset, tau, offset);
         }
 
         String message = "SYTRD " + implementation + " tight=" + tight + " " + n;
@@ -1526,15 +1508,15 @@ public class LAPACKTest {
         Storage b = new Storage(random, n, nrhs, tight);
         double[] rhs = b.data.clone();
 
-        int info;
-        switch (implementation) {
-            case JAVA:
-                info = TRTRS.JVM.invoke(upper, transpose, unit, n, nrhs, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
-                break;
-            default:
-                info = TRTRS.invoke(upper, transpose, unit, n, nrhs, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
-                break;
-        }
+        int info = switch (implementation) {
+            case JAVA             -> TRTRS.JVM.invoke(upper, transpose, unit, n, nrhs, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
+            case NATIVE, OFF_HEAP -> {
+                try (OffHeapLimits limits = OffHeapLimits.of(implementation)) {
+                    yield TRTRS.Native.invoke(upper, transpose, unit, n, nrhs, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
+                }
+            }
+            default               -> TRTRS.invoke(upper, transpose, unit, n, nrhs, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
+        };
 
         String message = "TRTRS " + implementation + " tight=" + tight + " upper=" + upper + " trans=" + transpose + " unit=" + unit + " " + n + "x" + nrhs;
         TestUtils.assertEquals(message + " info", 0, info);
@@ -1559,9 +1541,11 @@ public class LAPACKTest {
     @Test
     public void testGEBRD() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (int[] size : SIZES_GEBRD) {
-                    LAPACKTest.doTestGEBRD(implementation, tight, size[0], size[1]);
+            if (LAPACKTest.isAvailable(implementation, GEBRD.NATIVE, false)) {
+                for (boolean tight : BOOLEANS) {
+                    for (int[] size : SIZES_GEBRD) {
+                        LAPACKTest.doTestGEBRD(implementation, tight, size[0], size[1]);
+                    }
                 }
             }
         }
@@ -1579,14 +1563,36 @@ public class LAPACKTest {
 
         // Nothing to reduce, nothing is accessed
         GEBRD.invoke(0, 0, new double[0], 0, 1, new double[0], 0, new double[0], 0, new double[0], 0, new double[0], 0);
+
+        if (GEBRD.NATIVE) {
+
+            Storage a = new Storage(new Random(4), 4, 4, true);
+            double[] before = a.data.clone();
+
+            // Detected before the native function is called
+            TestUtils.assertThrows(IndexOutOfBoundsException.class,
+                    () -> GEBRD.Native.invoke(4, 4, a.data, 0, 4, new double[3], 0, vector, 0, vector, 0, vector, 0));
+            TestUtils.assertThrows(IndexOutOfBoundsException.class,
+                    () -> GEBRD.Native.invoke(4, 4, a.data, 0, 4, vector, 0, new double[2], 0, vector, 0, vector, 0));
+            TestUtils.assertThrows(IndexOutOfBoundsException.class,
+                    () -> GEBRD.Native.invoke(4, 4, a.data, 0, 4, vector, 0, vector, 0, new double[3], 0, vector, 0));
+            TestUtils.assertThrows(IndexOutOfBoundsException.class,
+                    () -> GEBRD.Native.invoke(4, 4, a.data, 0, 4, vector, 0, vector, 0, vector, 0, new double[3], 0));
+            TestUtils.assertThrows(IndexOutOfBoundsException.class,
+                    () -> GEBRD.Native.invoke(4, 4, new double[15], 0, 4, vector, 0, vector, 0, vector, 0, vector, 0));
+
+            TestUtils.assertTrue("A changed", Arrays.equals(before, a.data));
+        }
     }
 
     @Test
     public void testGEEV() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (int n : SIZES_GEEV) {
-                    LAPACKTest.doTestGEEV(implementation, tight, n);
+            if (LAPACKTest.isAvailable(implementation, GEEV.NATIVE, false)) {
+                for (boolean tight : BOOLEANS) {
+                    for (int n : SIZES_GEEV) {
+                        LAPACKTest.doTestGEEV(implementation, tight, n);
+                    }
                 }
             }
         }
@@ -1604,14 +1610,29 @@ public class LAPACKTest {
 
         // Nothing to compute, nothing is accessed
         GEEV.invoke(true, 0, new double[0], 0, 1, new double[0], 0, new double[0], 0, new double[0], 0, 1);
+
+        if (GEEV.NATIVE) {
+
+            Storage a = new Storage(new Random(4), 4, 4, true);
+            double[] before = a.data.clone();
+
+            // Detected before the native function is called
+            TestUtils.assertThrows(IndexOutOfBoundsException.class,
+                    () -> GEEV.Native.invoke(true, 4, a.data, 0, 4, new double[3], 0, w, 0, new double[16], 0, 4));
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> GEEV.Native.invoke(true, 4, new double[15], 0, 4, w, 0, w, 0, new double[16], 0, 4));
+
+            TestUtils.assertTrue("A changed", Arrays.equals(before, a.data));
+        }
     }
 
     @Test
     public void testGEHRD() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (int n : SIZES_SYTRD) {
-                    LAPACKTest.doTestGEHRD(implementation, tight, n);
+            if (LAPACKTest.isAvailable(implementation, GEHRD.NATIVE, false)) {
+                for (boolean tight : BOOLEANS) {
+                    for (int n : SIZES_SYTRD) {
+                        LAPACKTest.doTestGEHRD(implementation, tight, n);
+                    }
                 }
             }
         }
@@ -1628,14 +1649,28 @@ public class LAPACKTest {
 
         // Nothing to reduce, nothing is accessed
         GEHRD.invoke(0, new double[0], 0, 1, new double[0], 0);
+
+        if (GEHRD.NATIVE) {
+
+            Storage a = new Storage(new Random(4), 4, 4, true);
+            double[] before = a.data.clone();
+
+            // Detected before the native function is called
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> GEHRD.Native.invoke(4, a.data, 0, 4, new double[2], 0));
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> GEHRD.Native.invoke(4, new double[15], 0, 4, tau, 0));
+
+            TestUtils.assertTrue("A changed", Arrays.equals(before, a.data));
+        }
     }
 
     @Test
     public void testGEQRF() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (int[] size : SIZES) {
-                    LAPACKTest.doTestGEQRF(implementation, tight, size[0], size[1]);
+            if (LAPACKTest.isAvailable(implementation, GEQRF.NATIVE, false)) {
+                for (boolean tight : BOOLEANS) {
+                    for (int[] size : SIZES) {
+                        LAPACKTest.doTestGEQRF(implementation, tight, size[0], size[1]);
+                    }
                 }
             }
         }
@@ -1655,6 +1690,18 @@ public class LAPACKTest {
         // Nothing to factorise, nothing is accessed
         GEQRF.invoke(0, 4, new double[0], 0, 1, new double[0], 0);
         GEQRF.invoke(4, 0, new double[0], 0, 4, new double[0], 0);
+
+        if (GEQRF.NATIVE) {
+
+            Storage a = new Storage(new Random(4), 4, 4, true);
+            double[] before = a.data.clone();
+
+            // Detected before the native function is called
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> GEQRF.Native.invoke(4, 4, a.data, 0, 4, new double[3], 0));
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> GEQRF.Native.invoke(4, 4, new double[15], 0, 4, tau, 0));
+
+            TestUtils.assertTrue("A changed", Arrays.equals(before, a.data));
+        }
     }
 
     /**
@@ -1663,23 +1710,25 @@ public class LAPACKTest {
     @Test
     public void testGEQRFZeroColumn() {
         for (Implementation implementation : Implementation.values()) {
-            for (int[] size : new int[][] { { 12, 12 }, { 60, 50 } }) {
+            if (LAPACKTest.isAvailable(implementation, GEQRF.NATIVE, false)) {
+                for (int[] size : new int[][] { { 12, 12 }, { 60, 50 } }) {
 
-                int m = size[0];
-                int n = size[1];
-                String message = "GEQRF zero column " + implementation + " " + m + "x" + n;
+                    int m = size[0];
+                    int n = size[1];
+                    String message = "GEQRF zero column " + implementation + " " + m + "x" + n;
 
-                Storage a = new Storage(new Random(m), m, n, false);
-                for (int i = 0; i < m; i++) {
-                    a.set(i, 3, 0.0);
+                    Storage a = new Storage(new Random(m), m, n, false);
+                    for (int i = 0; i < m; i++) {
+                        a.set(i, 3, 0.0);
+                    }
+                    double[] original = a.data.clone();
+                    double[] tau = LAPACKTest.newTau(Math.min(m, n), false);
+
+                    LAPACKTest.invokeGEQRF(implementation, m, n, a, tau, OFFSET);
+
+                    TestUtils.assertTrue(message + " tau", tau[OFFSET + 3] == 0.0);
+                    LAPACKTest.assertQR(message, original, a, m, n, tau, OFFSET);
                 }
-                double[] original = a.data.clone();
-                double[] tau = LAPACKTest.newTau(Math.min(m, n), false);
-
-                LAPACKTest.invokeGEQRF(implementation, m, n, a, tau, OFFSET);
-
-                TestUtils.assertTrue(message + " tau", tau[OFFSET + 3] == 0.0);
-                LAPACKTest.assertQR(message, original, a, m, n, tau, OFFSET);
             }
         }
     }
@@ -1687,12 +1736,14 @@ public class LAPACKTest {
     @Test
     public void testGESDD() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (boolean vectors : BOOLEANS) {
-                    for (boolean fullSize : BOOLEANS) {
-                        if (vectors || !fullSize) {
-                            for (int[] size : SIZES) {
-                                LAPACKTest.doTestGESDD(implementation, tight, vectors, fullSize, size[0], size[1]);
+            if (LAPACKTest.isAvailable(implementation, GESDD.NATIVE, false)) {
+                for (boolean tight : BOOLEANS) {
+                    for (boolean vectors : BOOLEANS) {
+                        for (boolean fullSize : BOOLEANS) {
+                            if (vectors || !fullSize) {
+                                for (int[] size : SIZES) {
+                                    LAPACKTest.doTestGESDD(implementation, tight, vectors, fullSize, size[0], size[1]);
+                                }
                             }
                         }
                     }
@@ -1718,14 +1769,37 @@ public class LAPACKTest {
 
         // Nothing to decompose, nothing is accessed
         TestUtils.assertEquals(0, GESDD.invoke(true, false, 0, 4, new double[0], 0, 1, new double[0], 0, new double[0], 0, 1, new double[0], 0, 4));
+
+        if (GESDD.NATIVE) {
+
+            Storage a = new Storage(new Random(4), 4, 4, true);
+            double[] before = a.data.clone();
+            double[] matrix = new double[16];
+
+            // Detected before the native function is called
+            TestUtils.assertThrows(IndexOutOfBoundsException.class,
+                    () -> GESDD.Native.invoke(true, false, 4, 4, a.data, 0, 4, new double[3], 0, matrix, 0, 4, matrix, 0, 4));
+            TestUtils.assertThrows(IndexOutOfBoundsException.class,
+                    () -> GESDD.Native.invoke(true, false, 4, 4, a.data, 0, 4, vector, 0, new double[15], 0, 4, matrix, 0, 4));
+            TestUtils.assertThrows(IndexOutOfBoundsException.class,
+                    () -> GESDD.Native.invoke(true, false, 4, 4, a.data, 0, 4, vector, 0, matrix, 0, 4, new double[15], 0, 4));
+            TestUtils.assertThrows(IndexOutOfBoundsException.class,
+                    () -> GESDD.Native.invoke(true, false, 4, 4, new double[15], 0, 4, vector, 0, matrix, 0, 4, matrix, 0, 4));
+            TestUtils.assertThrows(IndexOutOfBoundsException.class,
+                    () -> GESDD.Native.invoke(true, false, 3, 5, new double[14], 0, 3, new double[3], 0, matrix, 0, 3, matrix, 0, 5));
+
+            TestUtils.assertTrue("A changed", Arrays.equals(before, a.data));
+        }
     }
 
     @Test
     public void testGETRF() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (int[] size : SIZES) {
-                    LAPACKTest.doTestGETRF(implementation, tight, size[0], size[1]);
+            if (LAPACKTest.isAvailable(implementation, GETRF.NATIVE, false)) {
+                for (boolean tight : BOOLEANS) {
+                    for (int[] size : SIZES) {
+                        LAPACKTest.doTestGETRF(implementation, tight, size[0], size[1]);
+                    }
                 }
             }
         }
@@ -1745,6 +1819,19 @@ public class LAPACKTest {
         // Nothing to factorise, nothing is accessed
         TestUtils.assertEquals(0, GETRF.invoke(0, 4, new double[0], 0, 1, new int[0], 0));
         TestUtils.assertEquals(0, GETRF.invoke(4, 0, new double[0], 0, 4, new int[0], 0));
+
+        if (GETRF.NATIVE) {
+
+            Storage a = new Storage(new Random(4), 4, 4, true);
+            double[] before = a.data.clone();
+            int[] tooShort = new int[3];
+
+            // Detected before the native function is called
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> GETRF.Native.invoke(4, 4, a.data, 0, 4, tooShort, 0));
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> GETRF.Native.invoke(4, 4, new double[15], 0, 4, ipiv, 0));
+
+            TestUtils.assertTrue("A changed", Arrays.equals(before, a.data));
+        }
     }
 
     /**
@@ -1753,33 +1840,35 @@ public class LAPACKTest {
     @Test
     public void testGETRFSingular() {
         for (Implementation implementation : Implementation.values()) {
-            for (int[] size : new int[][] { { 12, 12 }, { 60, 50 } }) {
+            if (LAPACKTest.isAvailable(implementation, GETRF.NATIVE, false)) {
+                for (int[] size : new int[][] { { 12, 12 }, { 60, 50 } }) {
 
-                int m = size[0];
-                int n = size[1];
-                String message = "GETRF singular " + implementation + " " + m + "x" + n;
+                    int m = size[0];
+                    int n = size[1];
+                    String message = "GETRF singular " + implementation + " " + m + "x" + n;
 
-                Storage a = new Storage(new Random(m), m, n, false);
-                for (int i = 0; i < m; i++) {
-                    a.set(i, 3, 0.0);
-                }
-                double[] original = a.data.clone();
-                int[] ipiv = LAPACKTest.newPivots(Math.min(m, n), false);
-
-                TestUtils.assertEquals(message + " info", 4, LAPACKTest.invokeGETRF(implementation, m, n, a, ipiv, OFFSET));
-                LAPACKTest.assertFactorisation(message, original, a, m, n, ipiv, OFFSET);
-
-                Storage zero = new Storage(new Random(n), m, n, false);
-                for (int j = 0; j < n; j++) {
+                    Storage a = new Storage(new Random(m), m, n, false);
                     for (int i = 0; i < m; i++) {
-                        zero.set(i, j, 0.0);
+                        a.set(i, 3, 0.0);
                     }
-                }
-                original = zero.data.clone();
-                ipiv = LAPACKTest.newPivots(Math.min(m, n), false);
+                    double[] original = a.data.clone();
+                    int[] ipiv = LAPACKTest.newPivots(Math.min(m, n), false);
 
-                TestUtils.assertEquals(message + " zero info", 1, LAPACKTest.invokeGETRF(implementation, m, n, zero, ipiv, OFFSET));
-                LAPACKTest.assertFactorisation(message + " zero", original, zero, m, n, ipiv, OFFSET);
+                    TestUtils.assertEquals(message + " info", 4, LAPACKTest.invokeGETRF(implementation, m, n, a, ipiv, OFFSET));
+                    LAPACKTest.assertFactorisation(message, original, a, m, n, ipiv, OFFSET);
+
+                    Storage zero = new Storage(new Random(n), m, n, false);
+                    for (int j = 0; j < n; j++) {
+                        for (int i = 0; i < m; i++) {
+                            zero.set(i, j, 0.0);
+                        }
+                    }
+                    original = zero.data.clone();
+                    ipiv = LAPACKTest.newPivots(Math.min(m, n), false);
+
+                    TestUtils.assertEquals(message + " zero info", 1, LAPACKTest.invokeGETRF(implementation, m, n, zero, ipiv, OFFSET));
+                    LAPACKTest.assertFactorisation(message + " zero", original, zero, m, n, ipiv, OFFSET);
+                }
             }
         }
     }
@@ -1831,10 +1920,12 @@ public class LAPACKTest {
     @Test
     public void testGETRS() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (boolean transpose : BOOLEANS) {
-                    for (int[] size : SIZES_SOLVE) {
-                        LAPACKTest.doTestGETRS(implementation, tight, transpose, size[0], size[1]);
+            if (LAPACKTest.isAvailable(implementation, GETRS.NATIVE, true)) {
+                for (boolean tight : BOOLEANS) {
+                    for (boolean transpose : BOOLEANS) {
+                        for (int[] size : SIZES_SOLVE) {
+                            LAPACKTest.doTestGETRS(implementation, tight, transpose, size[0], size[1]);
+                        }
                     }
                 }
             }
@@ -1860,17 +1951,38 @@ public class LAPACKTest {
         GETRS.invoke(false, 0, 3, new double[0], 0, 1, new int[0], 0, new double[0], 0, 1);
         GETRS.invoke(true, 4, 0, new double[0], 0, 4, new int[0], 0, new double[0], 0, 4);
         GETRS.invokeIdentity(0, new double[0], 0, 1, new int[0], 0, new double[0], 0, 1);
+
+        if (GETRS.NATIVE) {
+
+            double[] b = { 1.0, 2.0, 3.0, 4.0 };
+
+            // Detected before the native function is called
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> GETRS.Native.invoke(false, 4, 1, data, 0, 4, new int[3], 0, b, 0, 4));
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> GETRS.Native.invoke(false, 4, 2, data, 0, 4, ipiv, 0, b, 0, 4));
+            try (OffHeapLimits limits = OffHeapLimits.of(Implementation.OFF_HEAP)) {
+                TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> GETRS.Native.invoke(false, 4, 1, data, 0, 4, new int[3], 0, b, 0, 4));
+                TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> GETRS.Native.invoke(false, 4, 2, data, 0, 4, ipiv, 0, b, 0, 4));
+            }
+
+            TestUtils.assertTrue("B changed", Arrays.equals(new double[] { 1.0, 2.0, 3.0, 4.0 }, b));
+
+            // The native implementation, reached through the dispatch, with too few pivots
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> GETRS.invokeIdentity(8, new double[64], 0, 8, new int[7], 0, new double[64], 0, 8));
+        }
     }
 
     /**
-     * The inverse, written to a separate matrix.
+     * The inverse, written to a separate matrix. The native implementation is reached through the dispatch,
+     * for n larger than 7.
      */
     @Test
     public void testGETRSIdentity() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (int n : SIZES_IDENTITY) {
-                    LAPACKTest.doTestGETRSIdentity(implementation, tight, n);
+            if (LAPACKTest.isAvailable(implementation, false, false)) {
+                for (boolean tight : BOOLEANS) {
+                    for (int n : SIZES_IDENTITY) {
+                        LAPACKTest.doTestGETRSIdentity(implementation, tight, n);
+                    }
                 }
             }
         }
@@ -1907,11 +2019,13 @@ public class LAPACKTest {
     @Test
     public void testORGBR() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (int[] size : SIZES_GEBRD) {
-                    LAPACKTest.doTestORGBR(implementation, tight, true, false, size[0], size[1]);
-                    LAPACKTest.doTestORGBR(implementation, tight, true, true, size[0], size[1]);
-                    LAPACKTest.doTestORGBR(implementation, tight, false, false, size[0], size[1]);
+            if (LAPACKTest.isAvailable(implementation, ORGBR.NATIVE, false)) {
+                for (boolean tight : BOOLEANS) {
+                    for (int[] size : SIZES_GEBRD) {
+                        LAPACKTest.doTestORGBR(implementation, tight, true, false, size[0], size[1]);
+                        LAPACKTest.doTestORGBR(implementation, tight, true, true, size[0], size[1]);
+                        LAPACKTest.doTestORGBR(implementation, tight, false, false, size[0], size[1]);
+                    }
                 }
             }
         }
@@ -1932,14 +2046,29 @@ public class LAPACKTest {
 
         // Nothing to generate, nothing is accessed
         ORGBR.invoke(true, 0, 0, 0, new double[0], 0, 1, new double[0], 0);
+
+        if (ORGBR.NATIVE) {
+
+            Storage a = new Storage(new Random(4), 4, 4, true);
+            double[] before = a.data.clone();
+
+            // Detected before the native function is called
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> ORGBR.Native.invoke(true, 4, 4, 4, a.data, 0, 4, new double[3], 0));
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> ORGBR.Native.invoke(false, 4, 4, 4, a.data, 0, 4, new double[3], 0));
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> ORGBR.Native.invoke(true, 4, 4, 4, new double[15], 0, 4, tau, 0));
+
+            TestUtils.assertTrue("A changed", Arrays.equals(before, a.data));
+        }
     }
 
     @Test
     public void testORGHR() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (int n : SIZES_SYTRD) {
-                    LAPACKTest.doTestORGHR(implementation, tight, n);
+            if (LAPACKTest.isAvailable(implementation, ORGHR.NATIVE, false)) {
+                for (boolean tight : BOOLEANS) {
+                    for (int n : SIZES_SYTRD) {
+                        LAPACKTest.doTestORGHR(implementation, tight, n);
+                    }
                 }
             }
         }
@@ -1956,19 +2085,33 @@ public class LAPACKTest {
 
         // Nothing to generate, nothing is accessed
         ORGHR.invoke(0, new double[0], 0, 1, new double[0], 0);
+
+        if (ORGHR.NATIVE) {
+
+            Storage a = new Storage(new Random(4), 4, 4, true);
+            double[] before = a.data.clone();
+
+            // Detected before the native function is called
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> ORGHR.Native.invoke(4, a.data, 0, 4, new double[2], 0));
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> ORGHR.Native.invoke(4, new double[15], 0, 4, tau, 0));
+
+            TestUtils.assertTrue("A changed", Arrays.equals(before, a.data));
+        }
     }
 
     @Test
     public void testORGQR() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (int[] size : SIZES) {
-                    int m = size[0];
-                    int k = Math.min(m, size[1]);
-                    LAPACKTest.doTestORGQR(implementation, tight, m, k, k);
-                    LAPACKTest.doTestORGQR(implementation, tight, m, m, k);
+            if (LAPACKTest.isAvailable(implementation, ORGQR.NATIVE, false)) {
+                for (boolean tight : BOOLEANS) {
+                    for (int[] size : SIZES) {
+                        int m = size[0];
+                        int k = Math.min(m, size[1]);
+                        LAPACKTest.doTestORGQR(implementation, tight, m, k, k);
+                        LAPACKTest.doTestORGQR(implementation, tight, m, m, k);
+                    }
+                    LAPACKTest.doTestORGQR(implementation, tight, 5, 3, 0);
                 }
-                LAPACKTest.doTestORGQR(implementation, tight, 5, 3, 0);
             }
         }
     }
@@ -1988,15 +2131,29 @@ public class LAPACKTest {
         // Nothing to generate, nothing is accessed
         ORGQR.invoke(4, 0, 0, new double[0], 0, 4, new double[0], 0);
         ORGQR.invoke(0, 0, 0, new double[0], 0, 1, new double[0], 0);
+
+        if (ORGQR.NATIVE) {
+
+            Storage a = new Storage(new Random(4), 4, 4, true);
+            double[] before = a.data.clone();
+
+            // Detected before the native function is called
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> ORGQR.Native.invoke(4, 4, 4, a.data, 0, 4, new double[3], 0));
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> ORGQR.Native.invoke(4, 4, 4, new double[15], 0, 4, tau, 0));
+
+            TestUtils.assertTrue("A changed", Arrays.equals(before, a.data));
+        }
     }
 
     @Test
     public void testORMQR() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (boolean transpose : BOOLEANS) {
-                    for (int[] size : SIZES_ORMQR) {
-                        LAPACKTest.doTestORMQR(implementation, tight, transpose, size[0], size[1], size[2]);
+            if (LAPACKTest.isAvailable(implementation, false, false)) {
+                for (boolean tight : BOOLEANS) {
+                    for (boolean transpose : BOOLEANS) {
+                        for (int[] size : SIZES_ORMQR) {
+                            LAPACKTest.doTestORMQR(implementation, tight, transpose, size[0], size[1], size[2]);
+                        }
                     }
                 }
             }
@@ -2024,9 +2181,11 @@ public class LAPACKTest {
     @Test
     public void testORGTR() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (int n : SIZES_SYTRD) {
-                    LAPACKTest.doTestORGTR(implementation, tight, n);
+            if (LAPACKTest.isAvailable(implementation, ORGTR.NATIVE, false)) {
+                for (boolean tight : BOOLEANS) {
+                    for (int n : SIZES_SYTRD) {
+                        LAPACKTest.doTestORGTR(implementation, tight, n);
+                    }
                 }
             }
         }
@@ -2043,15 +2202,29 @@ public class LAPACKTest {
 
         // Nothing to generate, nothing is accessed
         ORGTR.invoke(0, new double[0], 0, 1, new double[0], 0);
+
+        if (ORGTR.NATIVE) {
+
+            Storage a = new Storage(new Random(4), 4, 4, true);
+            double[] before = a.data.clone();
+
+            // Detected before the native function is called
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> ORGTR.Native.invoke(4, a.data, 0, 4, new double[2], 0));
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> ORGTR.Native.invoke(4, new double[15], 0, 4, tau, 0));
+
+            TestUtils.assertTrue("A changed", Arrays.equals(before, a.data));
+        }
     }
 
     @Test
     public void testPOTRF() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (boolean upper : BOOLEANS) {
-                    for (int n : SIZES_SPD) {
-                        LAPACKTest.doTestPOTRF(implementation, tight, upper, n);
+            if (LAPACKTest.isAvailable(implementation, POTRF.NATIVE, false)) {
+                for (boolean tight : BOOLEANS) {
+                    for (boolean upper : BOOLEANS) {
+                        for (int n : SIZES_SPD) {
+                            LAPACKTest.doTestPOTRF(implementation, tight, upper, n);
+                        }
                     }
                 }
             }
@@ -2068,6 +2241,11 @@ public class LAPACKTest {
 
         // Nothing to factorise, nothing is accessed
         TestUtils.assertEquals(0, POTRF.invoke(false, 0, new double[0], 0, 1));
+
+        if (POTRF.NATIVE) {
+            // Detected before the native function is called
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> POTRF.Native.invoke(false, 4, new double[15], 0, 4));
+        }
     }
 
     /**
@@ -2076,23 +2254,21 @@ public class LAPACKTest {
     @Test
     public void testPOTRFNotPositiveDefinite() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean upper : BOOLEANS) {
-                for (int n : new int[] { 12, 60 }) {
+            if (LAPACKTest.isAvailable(implementation, POTRF.NATIVE, false)) {
+                for (boolean upper : BOOLEANS) {
+                    for (int n : new int[] { 12, 60 }) {
 
-                    Storage a = LAPACKTest.newSPD(new Random(n), n, upper, false);
-                    a.set(3, 3, -n * n);
+                        Storage a = LAPACKTest.newSPD(new Random(n), n, upper, false);
+                        a.set(3, 3, -n * n);
 
-                    int info;
-                    switch (implementation) {
-                        case JAVA:
-                            info = POTRF.JVM.invoke(upper, n, a.data, a.offset, a.ld);
-                            break;
-                        default:
-                            info = POTRF.invoke(upper, n, a.data, a.offset, a.ld);
-                            break;
+                        int info = switch (implementation) {
+                            case JAVA   -> POTRF.JVM.invoke(upper, n, a.data, a.offset, a.ld);
+                            case NATIVE -> POTRF.Native.invoke(upper, n, a.data, a.offset, a.ld);
+                            default     -> POTRF.invoke(upper, n, a.data, a.offset, a.ld);
+                        };
+
+                        TestUtils.assertEquals("POTRF " + implementation + " upper=" + upper + " " + n, 4, info);
                     }
-
-                    TestUtils.assertEquals("POTRF " + implementation + " upper=" + upper + " " + n, 4, info);
                 }
             }
         }
@@ -2101,10 +2277,12 @@ public class LAPACKTest {
     @Test
     public void testPOTRS() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (boolean upper : BOOLEANS) {
-                    for (int[] size : SIZES_SOLVE) {
-                        LAPACKTest.doTestPOTRS(implementation, tight, upper, size[0], size[1]);
+            if (LAPACKTest.isAvailable(implementation, POTRS.NATIVE, true)) {
+                for (boolean tight : BOOLEANS) {
+                    for (boolean upper : BOOLEANS) {
+                        for (int[] size : SIZES_SOLVE) {
+                            LAPACKTest.doTestPOTRS(implementation, tight, upper, size[0], size[1]);
+                        }
                     }
                 }
             }
@@ -2129,18 +2307,36 @@ public class LAPACKTest {
         POTRS.invoke(false, 0, 3, new double[0], 0, 1, new double[0], 0, 1);
         POTRS.invoke(true, 4, 0, new double[0], 0, 4, new double[0], 0, 4);
         POTRS.invokeIdentity(false, 0, new double[0], 0, 1, new double[0], 0, 1);
+
+        if (POTRS.NATIVE) {
+
+            double[] b = { 1.0, 2.0, 3.0, 4.0 };
+
+            // Detected before the native function is called
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> POTRS.Native.invoke(false, 4, 2, data, 0, 4, b, 0, 4));
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> POTRS.Native.invoke(false, 4, 1, new double[15], 0, 4, b, 0, 4));
+            try (OffHeapLimits limits = OffHeapLimits.of(Implementation.OFF_HEAP)) {
+                TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> POTRS.Native.invoke(false, 4, 2, data, 0, 4, b, 0, 4));
+                TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> POTRS.Native.invoke(false, 4, 1, new double[15], 0, 4, b, 0, 4));
+            }
+
+            TestUtils.assertTrue("B changed", Arrays.equals(new double[] { 1.0, 2.0, 3.0, 4.0 }, b));
+        }
     }
 
     /**
-     * The inverse, written to a separate matrix, exactly symmetric.
+     * The inverse, written to a separate matrix, exactly symmetric. The native implementation is reached
+     * through the dispatch, for n larger than 3.
      */
     @Test
     public void testPOTRSIdentity() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (boolean upper : BOOLEANS) {
-                    for (int n : SIZES_IDENTITY) {
-                        LAPACKTest.doTestPOTRSIdentity(implementation, tight, upper, n);
+            if (LAPACKTest.isAvailable(implementation, false, false)) {
+                for (boolean tight : BOOLEANS) {
+                    for (boolean upper : BOOLEANS) {
+                        for (int n : SIZES_IDENTITY) {
+                            LAPACKTest.doTestPOTRSIdentity(implementation, tight, upper, n);
+                        }
                     }
                 }
             }
@@ -2150,12 +2346,14 @@ public class LAPACKTest {
     @Test
     public void testSYEVD() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (boolean vectors : BOOLEANS) {
-                    for (int n : SIZES_SYTRD) {
-                        LAPACKTest.doTestSYEVD(implementation, tight, vectors, false, n);
-                        if (implementation != Implementation.JAVA) {
-                            LAPACKTest.doTestSYEVD(implementation, tight, vectors, true, n);
+            if (LAPACKTest.isAvailable(implementation, SYEVD.NATIVE, false)) {
+                for (boolean tight : BOOLEANS) {
+                    for (boolean vectors : BOOLEANS) {
+                        for (int n : SIZES_SYTRD) {
+                            LAPACKTest.doTestSYEVD(implementation, tight, vectors, false, n);
+                            if (implementation != Implementation.JAVA) {
+                                LAPACKTest.doTestSYEVD(implementation, tight, vectors, true, n);
+                            }
                         }
                     }
                 }
@@ -2174,14 +2372,28 @@ public class LAPACKTest {
 
         // Nothing to decompose, nothing is accessed
         TestUtils.assertEquals(0, SYEVD.invoke(true, 0, new double[0], 0, 1, new double[0], 0));
+
+        if (SYEVD.NATIVE) {
+
+            Storage a = new Storage(new Random(4), 4, 4, true);
+            double[] before = a.data.clone();
+
+            // Detected before the native function is called
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> SYEVD.Native.invoke(true, 4, a.data, 0, 4, new double[3], 0));
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> SYEVD.Native.invoke(true, 4, new double[15], 0, 4, vector, 0));
+
+            TestUtils.assertTrue("A changed", Arrays.equals(before, a.data));
+        }
     }
 
     @Test
     public void testSYTRD() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (int n : SIZES_SYTRD) {
-                    LAPACKTest.doTestSYTRD(implementation, tight, n);
+            if (LAPACKTest.isAvailable(implementation, SYTRD.NATIVE, false)) {
+                for (boolean tight : BOOLEANS) {
+                    for (int n : SIZES_SYTRD) {
+                        LAPACKTest.doTestSYTRD(implementation, tight, n);
+                    }
                 }
             }
         }
@@ -2198,6 +2410,20 @@ public class LAPACKTest {
 
         // Nothing to reduce, nothing is accessed
         SYTRD.invoke(0, new double[0], 0, 1, new double[0], 0, new double[0], 0, new double[0], 0);
+
+        if (SYTRD.NATIVE) {
+
+            Storage a = new Storage(new Random(4), 4, 4, true);
+            double[] before = a.data.clone();
+
+            // Detected before the native function is called
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> SYTRD.Native.invoke(4, a.data, 0, 4, new double[3], 0, vector, 0, vector, 0));
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> SYTRD.Native.invoke(4, a.data, 0, 4, vector, 0, new double[2], 0, vector, 0));
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> SYTRD.Native.invoke(4, a.data, 0, 4, vector, 0, vector, 0, new double[2], 0));
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> SYTRD.Native.invoke(4, new double[15], 0, 4, vector, 0, vector, 0, vector, 0));
+
+            TestUtils.assertTrue("A changed", Arrays.equals(before, a.data));
+        }
     }
 
     @Test
@@ -2226,12 +2452,14 @@ public class LAPACKTest {
     @Test
     public void testTRTRS() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (boolean upper : BOOLEANS) {
-                    for (boolean transpose : BOOLEANS) {
-                        for (boolean unit : BOOLEANS) {
-                            for (int[] size : SIZES_SOLVE) {
-                                LAPACKTest.doTestTRTRS(implementation, tight, upper, transpose, unit, size[0], size[1]);
+            if (LAPACKTest.isAvailable(implementation, TRTRS.NATIVE, true)) {
+                for (boolean tight : BOOLEANS) {
+                    for (boolean upper : BOOLEANS) {
+                        for (boolean transpose : BOOLEANS) {
+                            for (boolean unit : BOOLEANS) {
+                                for (int[] size : SIZES_SOLVE) {
+                                    LAPACKTest.doTestTRTRS(implementation, tight, upper, transpose, unit, size[0], size[1]);
+                                }
                             }
                         }
                     }
@@ -2252,6 +2480,25 @@ public class LAPACKTest {
 
         // Nothing to solve, nothing is accessed
         TestUtils.assertEquals(0, TRTRS.invoke(true, false, false, 0, 3, new double[0], 0, 1, new double[0], 0, 1));
+
+        if (TRTRS.NATIVE) {
+
+            double[] a = new double[16];
+            for (int i = 0; i < 4; i++) {
+                a[i + i * 4] = 1.0;
+            }
+            double[] b = { 1.0, 2.0, 3.0, 4.0 };
+
+            // Detected before the native function is called
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> TRTRS.Native.invoke(true, false, false, 4, 2, a, 0, 4, b, 0, 4));
+            TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> TRTRS.Native.invoke(true, false, false, 4, 1, new double[15], 0, 4, b, 0, 4));
+            try (OffHeapLimits limits = OffHeapLimits.of(Implementation.OFF_HEAP)) {
+                TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> TRTRS.Native.invoke(true, false, false, 4, 2, a, 0, 4, b, 0, 4));
+                TestUtils.assertThrows(IndexOutOfBoundsException.class, () -> TRTRS.Native.invoke(true, false, false, 4, 1, new double[15], 0, 4, b, 0, 4));
+            }
+
+            TestUtils.assertTrue("B changed", Arrays.equals(new double[] { 1.0, 2.0, 3.0, 4.0 }, b));
+        }
     }
 
     /**
@@ -2261,35 +2508,37 @@ public class LAPACKTest {
     @Test
     public void testTRTRSSingular() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean upper : BOOLEANS) {
-                for (int nrhs : new int[] { 1, 5 }) {
+            if (LAPACKTest.isAvailable(implementation, TRTRS.NATIVE, true)) {
+                for (boolean upper : BOOLEANS) {
+                    for (int nrhs : new int[] { 1, 5 }) {
 
-                    int n = 12;
-                    String message = "TRTRS singular " + implementation + " upper=" + upper + " " + n + "x" + nrhs;
+                        int n = 12;
+                        String message = "TRTRS singular " + implementation + " upper=" + upper + " " + n + "x" + nrhs;
 
-                    Storage a = LAPACKTest.newTriangular(new Random(n), n, upper, false, false);
-                    a.set(4, 4, 0.0);
-                    a.set(7, 7, 0.0);
+                        Storage a = LAPACKTest.newTriangular(new Random(n), n, upper, false, false);
+                        a.set(4, 4, 0.0);
+                        a.set(7, 7, 0.0);
 
-                    Storage b = new Storage(new Random(nrhs), n, nrhs, false);
-                    double[] rhs = b.data.clone();
+                        Storage b = new Storage(new Random(nrhs), n, nrhs, false);
+                        double[] rhs = b.data.clone();
 
-                    int info;
-                    switch (implementation) {
-                        case JAVA:
-                            info = TRTRS.JVM.invoke(upper, false, false, n, nrhs, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
-                            break;
-                        default:
-                            info = TRTRS.invoke(upper, false, false, n, nrhs, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
-                            break;
-                    }
+                        int info = switch (implementation) {
+                            case JAVA             -> TRTRS.JVM.invoke(upper, false, false, n, nrhs, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
+                            case NATIVE, OFF_HEAP -> {
+                                try (OffHeapLimits limits = OffHeapLimits.of(implementation)) {
+                                    yield TRTRS.Native.invoke(upper, false, false, n, nrhs, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
+                                }
+                            }
+                            default               -> TRTRS.invoke(upper, false, false, n, nrhs, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
+                        };
 
-                    TestUtils.assertEquals(message + " info", 5, info);
-                    TestUtils.assertTrue(message + " B changed", Arrays.equals(rhs, b.data));
+                        TestUtils.assertEquals(message + " info", 5, info);
+                        TestUtils.assertTrue(message + " B changed", Arrays.equals(rhs, b.data));
 
-                    if (implementation == Implementation.DISPATCH) {
-                        TestUtils.assertEquals(message + " unit info", 0,
-                                TRTRS.invoke(upper, false, true, n, nrhs, a.data, a.offset, a.ld, b.data, b.offset, b.ld));
+                        if (implementation == Implementation.DISPATCH) {
+                            TestUtils.assertEquals(message + " unit info", 0,
+                                    TRTRS.invoke(upper, false, true, n, nrhs, a.data, a.offset, a.ld, b.data, b.offset, b.ld));
+                        }
                     }
                 }
             }

@@ -21,13 +21,21 @@
  */
 package org.ojalgo.matrix.operation;
 
+import static java.lang.foreign.ValueLayout.*;
 import static org.ojalgo.function.constant.PrimitiveMath.ONE;
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.MemorySegment;
+import java.lang.invoke.MethodHandle;
 import java.util.Arrays;
+import java.util.Objects;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.ArrayOperation;
+import org.ojalgo.array.operation.NativeLibrary;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.concurrent.Parallelism;
 import org.ojalgo.scalar.Scalar;
@@ -60,11 +68,15 @@ import org.ojalgo.scalar.Scalar;
  * implementation for those.
  * <p>
  * {@link ORGBR} forms Q and P explicitly.
+ *
+ * @see NativeLibrary
  */
 public abstract class GEBRD implements LAPACK {
 
     /**
-     * The pure Java implementation.
+     * The pure Java implementation. Everything it calls is pure Java as well – the {@code JVM}
+     * implementations of other operations, never their dispatching {@code invoke} methods (that may call
+     * native code).
      * <p>
      * Unblocked: for each column, the reflector H(i) that zeroes the elements below the diagonal is generated
      * and applied from the left to the columns to the right (as by {@link GEQRF}); then the reflector G(i)
@@ -304,6 +316,72 @@ public abstract class GEBRD implements LAPACK {
     }
 
     /**
+     * Native {@code dgebrd}, initialised only when {@link NativeLibrary#isAvailable()}. All arguments are
+     * passed by reference, as to any Fortran routine. It is not linked as critical: it is passed a copy of
+     * the matrix in native memory, and the JVM can reach safepoints (and collect garbage) during the call.
+     */
+    static final class Native {
+
+        static final MethodHandle DGEBRD_OFF_HEAP = NativeLibrary.downcall("dgebrd_",
+                FunctionDescriptor.ofVoid(ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS), false);
+
+        /**
+         * Copies A to native memory, asks {@link #DGEBRD_OFF_HEAP} for the optimal workspace size, calls it
+         * and copies A, d, e, tauq and taup back. Requires m >= n > 0.
+         */
+        static void invoke(final int m, final int n, final double[] a, final int offsetA, final int lda, final double[] d, final int offsetD, final double[] e,
+                final int offsetE, final double[] tauq, final int offsetTauq, final double[] taup, final int offsetTaup) {
+
+            Objects.checkFromIndexSize(offsetD, n, d.length);
+            Objects.checkFromIndexSize(offsetE, n - 1, e.length);
+            Objects.checkFromIndexSize(offsetTauq, n, tauq.length);
+            Objects.checkFromIndexSize(offsetTaup, n, taup.length);
+
+            try (Arena arena = Arena.ofConfined()) {
+
+                int copyLDA = CBLAS.leadingDimensionOfCopy(m);
+
+                MemorySegment segmentA = CBLAS.copyOfMatrix(arena, a, offsetA, m, n, lda, copyLDA);
+                MemorySegment segmentD = arena.allocate(JAVA_DOUBLE, n);
+                MemorySegment segmentE = arena.allocate(JAVA_DOUBLE, Math.max(1, n - 1));
+                MemorySegment segmentTauq = arena.allocate(JAVA_DOUBLE, n);
+                MemorySegment segmentTaup = arena.allocate(JAVA_DOUBLE, n);
+                MemorySegment segmentInfo = arena.allocate(JAVA_INT);
+                MemorySegment segmentM = arena.allocateFrom(JAVA_INT, m);
+                MemorySegment segmentN = arena.allocateFrom(JAVA_INT, n);
+                MemorySegment segmentLDA = arena.allocateFrom(JAVA_INT, copyLDA);
+
+                MemorySegment query = arena.allocate(JAVA_DOUBLE);
+                DGEBRD_OFF_HEAP.invokeExact(segmentM, segmentN, segmentA, segmentLDA, segmentD, segmentE, segmentTauq, segmentTaup, query,
+                        arena.allocateFrom(JAVA_INT, -1), segmentInfo);
+                int lwork = Math.max(m, (int) query.get(JAVA_DOUBLE, 0L));
+
+                DGEBRD_OFF_HEAP.invokeExact(segmentM, segmentN, segmentA, segmentLDA, segmentD, segmentE, segmentTauq, segmentTaup,
+                        arena.allocate(JAVA_DOUBLE, lwork), arena.allocateFrom(JAVA_INT, lwork), segmentInfo);
+
+                CBLAS.copyBackMatrix(segmentA, copyLDA, a, offsetA, m, n, lda);
+                MemorySegment.copy(segmentD, JAVA_DOUBLE, 0L, d, offsetD, n);
+                MemorySegment.copy(segmentE, JAVA_DOUBLE, 0L, e, offsetE, n - 1);
+                MemorySegment.copy(segmentTauq, JAVA_DOUBLE, 0L, tauq, offsetTauq, n);
+                MemorySegment.copy(segmentTaup, JAVA_DOUBLE, 0L, taup, offsetTaup, n);
+
+            } catch (RuntimeException | Error cause) {
+                throw cause;
+            } catch (Throwable cause) {
+                throw new ProgrammingError(cause);
+            }
+        }
+
+    }
+
+    /**
+     * The native implementation is used, if there is one, when m*n*n is larger than this.
+     */
+    private static final double NATIVE_THRESHOLD = 1_500_000;
+
+    static final boolean NATIVE = NativeLibrary.isAvailable() && Native.DGEBRD_OFF_HEAP != null;
+
+    /**
      * The Java implementation splits A*u (by rows) and the update from the right (by columns) over several
      * threads when they are larger than this cubed (in multiply-adds). Each part then gets more than half of
      * that. The application of the reflectors from the left is split as by {@link GEQRF}.
@@ -332,7 +410,11 @@ public abstract class GEBRD implements LAPACK {
             return;
         }
 
-        JVM.invoke(m, n, a, offsetA, lda, d, offsetD, e, offsetE, tauq, offsetTauq, taup, offsetTaup);
+        if (GEBRD.isNative(m, n)) {
+            Native.invoke(m, n, a, offsetA, lda, d, offsetD, e, offsetE, tauq, offsetTauq, taup, offsetTaup);
+        } else {
+            JVM.invoke(m, n, a, offsetA, lda, d, offsetD, e, offsetE, tauq, offsetTauq, taup, offsetTaup);
+        }
     }
 
     /**
@@ -354,6 +436,14 @@ public abstract class GEBRD implements LAPACK {
         }
 
         JVM.invoke(m, n, a, offsetA, lda, d, offsetD, e, offsetE, tauq, offsetTauq, taup, offsetTaup, scalar);
+    }
+
+    /**
+     * Whether to use the native implementation: there is one, and m*n*n is larger than
+     * {@link #NATIVE_THRESHOLD}.
+     */
+    static boolean isNative(final double m, final double n) {
+        return NATIVE && m * n * n > NATIVE_THRESHOLD;
     }
 
 }

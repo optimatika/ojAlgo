@@ -43,7 +43,14 @@ import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.machine.MemoryEstimator;
-import org.ojalgo.matrix.operation.*;
+import org.ojalgo.matrix.operation.HouseholderLeft;
+import org.ojalgo.matrix.operation.HouseholderRight;
+import org.ojalgo.matrix.operation.MultiplyBoth;
+import org.ojalgo.matrix.operation.MultiplyNeither;
+import org.ojalgo.matrix.operation.RotateLeft;
+import org.ojalgo.matrix.operation.RotateRight;
+import org.ojalgo.matrix.operation.SubstituteBackwards;
+import org.ojalgo.matrix.operation.SubstituteForwards;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
@@ -202,8 +209,8 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
      * If the matrix is the transpose of an {@link R064Store}, that store, otherwise null.
      */
     static R064Store transposed(final Access1D<?> matrix) {
-        if (matrix instanceof TransjugatedStore<?> && ((TransjugatedStore<?>) matrix).getOriginal() instanceof R064Store) {
-            return (R064Store) ((TransjugatedStore<?>) matrix).getOriginal();
+        if (matrix instanceof TransjugatedStore<?> transjugated && transjugated.getOriginal() instanceof R064Store original) {
+            return original;
         }
         return null;
     }

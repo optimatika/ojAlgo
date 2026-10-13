@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.array.PlainArray;
+import org.ojalgo.matrix.operation.GEQRF;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.scalar.ComplexNumber;
@@ -78,7 +79,8 @@ public interface QR<N extends Comparable<N>> extends MatrixDecomposition.Updatab
     Factory<RationalNumber> Q128 = (typical, fullSize) -> new DenseQR.Q128(fullSize);
 
     Factory<Double> R064 = (typical, fullSize) -> {
-        if (fullSize || typical.isFat() || 64 >= typical.getColDim() && typical.count() <= PlainArray.MAX_SIZE) {
+        if (fullSize || typical.isFat()
+                || (64 >= typical.getColDim() || GEQRF.isNative(typical.getRowDim(), typical.getColDim())) && typical.count() <= PlainArray.MAX_SIZE) {
             return new DenseQR.R064(fullSize);
         } else {
             return new RawQR();

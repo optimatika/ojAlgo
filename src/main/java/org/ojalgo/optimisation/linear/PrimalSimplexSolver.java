@@ -22,6 +22,8 @@
 package org.ojalgo.optimisation.linear;
 
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.Optimisation.Options;
+import org.ojalgo.optimisation.linear.SimplexSolver.IterDescr;
 
 /**
  * Pure primal simplex — runs only primal iterations (no phase-1).

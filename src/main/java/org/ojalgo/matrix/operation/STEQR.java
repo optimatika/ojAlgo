@@ -21,9 +21,7 @@
  */
 package org.ojalgo.matrix.operation;
 
-import static org.ojalgo.function.constant.PrimitiveMath.MACHINE_EPSILON;
-import static org.ojalgo.function.constant.PrimitiveMath.ONE;
-import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.array.operation.ArrayOperation;
 import org.ojalgo.function.special.MissingMath;

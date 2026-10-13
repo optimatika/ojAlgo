@@ -33,6 +33,7 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.PlainArray;
 import org.ojalgo.matrix.Provider2D;
 import org.ojalgo.matrix.operation.ExchangeColumns;
+import org.ojalgo.matrix.operation.SYEVD;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -331,7 +332,7 @@ public interface Eigenvalue<N extends Comparable<N>>
 
         @Override
         public Eigenvalue<Double> make(final Structure2D typical) {
-            if (8192L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
+            if ((8192L < typical.countColumns() || SYEVD.isNative(true, typical.countColumns())) && typical.count() <= PlainArray.MAX_SIZE) {
                 return new DynamicEvD.R064();
             } else {
                 return new RawEigenvalue.Dynamic();
@@ -341,7 +342,7 @@ public interface Eigenvalue<N extends Comparable<N>>
         @Override
         public Eigenvalue<Double> make(final Structure2D typical, final boolean hermitian) {
             if (hermitian) {
-                if (8192L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
+                if ((8192L < typical.countColumns() || SYEVD.isNative(true, typical.countColumns())) && typical.count() <= PlainArray.MAX_SIZE) {
                     return new HermitianEvD.R064();
                 } else {
                     return new RawEigenvalue.Symmetric();

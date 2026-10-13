@@ -186,11 +186,8 @@ public class MultiplyBoth implements MatrixOperation {
      */
     @SuppressWarnings("unchecked")
     private static <N extends Comparable<N>> Access2D<N> matrix(final Access1D<N> operand, final int nbRows, final int nbCols) {
-        if (operand instanceof Access2D<?>) {
-            Access2D<N> matrix = (Access2D<N>) operand;
-            if (matrix.countRows() == nbRows && matrix.countColumns() == nbCols) {
-                return matrix;
-            }
+        if (operand instanceof Access2D<?> matrix && matrix.countRows() == nbRows && matrix.countColumns() == nbCols) {
+            return (Access2D<N>) matrix;
         }
         return null;
     }
@@ -300,7 +297,7 @@ public class MultiplyBoth implements MatrixOperation {
             int limit = mtrxR != null ? Structure2D.limitOfColumn(mtrxR, j, limitL) : limitL;
             Scalar<N> sum = zero;
             for (int c = first; c < limit; c++) {
-                sum = sum.add(row[c].multiply(mtrxR != null ? mtrxR.get(c, j) : right.get(c + j * complexity)));
+                sum = sum.add(row[c].multiply(mtrxR != null ? mtrxR.get(c, j) : right.get(c + (long) j * complexity)));
             }
             product.set(0, j, sum.get());
         }
@@ -322,7 +319,7 @@ public class MultiplyBoth implements MatrixOperation {
             row[c] = left.doubleValue(c);
         }
 
-        double[] dataR = right instanceof R064Store ? ((R064Store) right).data : null;
+        double[] dataR = right instanceof R064Store store ? store.data : null;
         Access2D<Double> mtrxR = MultiplyBoth.matrix(right, complexity, nbCols);
 
         for (int j = 0; j < nbCols; j++) {
@@ -1066,8 +1063,8 @@ public class MultiplyBoth implements MatrixOperation {
         int[] limitL = new int[complexity];
         N[] dataL;
 
-        if (left instanceof GenericStore<?>) {
-            dataL = (N[]) ((GenericStore<?>) left).data;
+        if (left instanceof GenericStore<?> store) {
+            dataL = (N[]) store.data;
             Arrays.fill(limitL, nbRows);
         } else {
             dataL = MultiplyBoth.newZeros(zero, nbRows * complexity);
@@ -1084,8 +1081,8 @@ public class MultiplyBoth implements MatrixOperation {
             }
         }
 
-        N[] dataR = right instanceof GenericStore<?> ? (N[]) ((GenericStore<?>) right).data : null;
-        N[] dataP = product instanceof GenericStore<?> ? (N[]) ((GenericStore<?>) product).data : null;
+        N[] dataR = right instanceof GenericStore<?> store ? (N[]) store.data : null;
+        N[] dataP = product instanceof GenericStore<?> store ? (N[]) store.data : null;
 
         int chunk = MatrixOperation.chunk(THRESHOLD, nbRows, complexity);
 
@@ -1118,39 +1115,21 @@ public class MultiplyBoth implements MatrixOperation {
 
         if (nbRows <= 10 && nbCols <= chunk && mtrxL != null && mtrxR != null) {
             switch (nbRows) {
-                case 2:
-                    MultiplyBoth.fill2xN_P64(product, mtrxL, complexity, mtrxR);
-                    break;
-                case 3:
-                    MultiplyBoth.fill3xN_P64(product, mtrxL, complexity, mtrxR);
-                    break;
-                case 4:
-                    MultiplyBoth.fill4xN_P64(product, mtrxL, complexity, mtrxR);
-                    break;
-                case 5:
-                    MultiplyBoth.fill5xN_P64(product, mtrxL, complexity, mtrxR);
-                    break;
-                case 6:
-                    MultiplyBoth.fill6xN_P64(product, mtrxL, complexity, mtrxR);
-                    break;
-                case 7:
-                    MultiplyBoth.fill7xN_P64(product, mtrxL, complexity, mtrxR);
-                    break;
-                case 8:
-                    MultiplyBoth.fill8xN_P64(product, mtrxL, complexity, mtrxR);
-                    break;
-                case 9:
-                    MultiplyBoth.fill9xN_P64(product, mtrxL, complexity, mtrxR);
-                    break;
-                default:
-                    MultiplyBoth.fill0xN_P64(product, mtrxL, complexity, mtrxR);
-                    break;
+                case 2  -> MultiplyBoth.fill2xN_P64(product, mtrxL, complexity, mtrxR);
+                case 3  -> MultiplyBoth.fill3xN_P64(product, mtrxL, complexity, mtrxR);
+                case 4  -> MultiplyBoth.fill4xN_P64(product, mtrxL, complexity, mtrxR);
+                case 5  -> MultiplyBoth.fill5xN_P64(product, mtrxL, complexity, mtrxR);
+                case 6  -> MultiplyBoth.fill6xN_P64(product, mtrxL, complexity, mtrxR);
+                case 7  -> MultiplyBoth.fill7xN_P64(product, mtrxL, complexity, mtrxR);
+                case 8  -> MultiplyBoth.fill8xN_P64(product, mtrxL, complexity, mtrxR);
+                case 9  -> MultiplyBoth.fill9xN_P64(product, mtrxL, complexity, mtrxR);
+                default -> MultiplyBoth.fill0xN_P64(product, mtrxL, complexity, mtrxR);
             }
             return;
         }
 
-        if (nbCols == 1 && left instanceof R064Store && product instanceof R064Store) {
-            MultiplyBoth.fillMx1_P64(((R064Store) product).data, ((R064Store) left).data, complexity, right, mtrxR);
+        if (nbCols == 1 && left instanceof R064Store storeL && product instanceof R064Store storeP) {
+            MultiplyBoth.fillMx1_P64(storeP.data, storeL.data, complexity, right, mtrxR);
             return;
         }
 
@@ -1158,8 +1137,8 @@ public class MultiplyBoth implements MatrixOperation {
         int[] limitL = new int[complexity];
         double[] dataL;
 
-        if (left instanceof R064Store) {
-            dataL = ((R064Store) left).data;
+        if (left instanceof R064Store store) {
+            dataL = store.data;
             Arrays.fill(limitL, nbRows);
         } else {
             dataL = new double[nbRows * complexity];
@@ -1175,8 +1154,8 @@ public class MultiplyBoth implements MatrixOperation {
             }
         }
 
-        double[] dataR = right instanceof R064Store ? ((R064Store) right).data : null;
-        double[] dataP = product instanceof R064Store ? ((R064Store) product).data : null;
+        double[] dataR = right instanceof R064Store store ? store.data : null;
+        double[] dataP = product instanceof R064Store store ? store.data : null;
 
         if (nbCols > chunk) {
             DIVIDER.threshold(chunk).divide(0, nbCols,

@@ -59,18 +59,17 @@ class GeneralisedEvD<N extends Comparable<N>, M extends PhysicalStore<N>> extend
         @Override
         MatrixStore<Double> recover(final MatrixStore<Double> reduced, final Cholesky<Double> cholesky, final Eigenvalue.Generalisation type) {
 
-            R064Store factor = cholesky instanceof DenseCholesky.R064 ? ((DenseCholesky.R064) cholesky).getInPlace() : null;
-
-            if (factor == null || factor.getRowDim() != reduced.getRowDim()) {
+            if (!(cholesky instanceof DenseCholesky.R064 dense) || dense.getInPlace().getRowDim() != reduced.getRowDim()) {
                 return super.recover(reduced, cholesky, type);
             }
 
+            R064Store factor = dense.getInPlace();
             int n = factor.getRowDim();
             int nbVectors = reduced.getColDim();
 
             R064Store vectors;
-            if (type != Eigenvalue.Generalisation.BA && reduced instanceof R064Store) {
-                vectors = (R064Store) reduced;
+            if (type != Eigenvalue.Generalisation.BA && reduced instanceof R064Store inPlace) {
+                vectors = inPlace;
             } else {
                 if (myV == null || myV.getRowDim() != n || myV.getColDim() != nbVectors) {
                     myV = R064Store.FACTORY.make(n, nbVectors);
@@ -94,12 +93,12 @@ class GeneralisedEvD<N extends Comparable<N>, M extends PhysicalStore<N>> extend
         PhysicalStore<Double> reduce(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> original, final Cholesky<Double> cholesky,
                 final Eigenvalue.Generalisation type) {
 
-            R064Store factor = cholesky instanceof DenseCholesky.R064 ? ((DenseCholesky.R064) cholesky).getInPlace() : null;
-
-            if (factor == null || factor.getRowDim() != original.countRows() || factor.getColDim() != original.countColumns()) {
+            if (!(cholesky instanceof DenseCholesky.R064 dense) || dense.getInPlace().getRowDim() != original.countRows()
+                    || dense.getInPlace().getColDim() != original.countColumns()) {
                 return super.reduce(original, cholesky, type);
             }
 
+            R064Store factor = dense.getInPlace();
             int n = factor.getRowDim();
 
             if (myC == null || myC.getRowDim() != n || myC.getColDim() != n) {
