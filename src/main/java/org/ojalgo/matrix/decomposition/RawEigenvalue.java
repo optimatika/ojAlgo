@@ -25,7 +25,9 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.ArrayC128;
@@ -205,6 +207,33 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             MatrixStore<Double> tmp = v.onColumns(divide, values).collect(v.physical());
 
             return tmp.multiply(tmp.transpose());
+        }
+
+        /**
+         * The eigenvalues are real, and sorted as doubles: in the order of
+         * {@link Eigenvalue#DESCENDING_NORM}, but without making {@link ComplexNumber} instances to compare.
+         */
+        @Override
+        public void getEigenvalues(final double[] realParts, final Optional<double[]> imaginaryParts) {
+
+            ProgrammingError.throwIfNull(realParts, imaginaryParts);
+
+            double[] sorted = this.getRealParts().clone();
+            Arrays.sort(sorted);
+
+            // The largest magnitude is at either end: merge from both ends, the positive first on a tie
+            int length = realParts.length;
+            for (int i = 0, low = 0, high = sorted.length - 1; i < length; i++) {
+                if (Math.abs(sorted[low]) > Math.abs(sorted[high])) {
+                    realParts[i] = sorted[low++];
+                } else {
+                    realParts[i] = sorted[high--];
+                }
+            }
+
+            if (imaginaryParts.isPresent()) {
+                Arrays.fill(imaginaryParts.get(), 0, length, ZERO);
+            }
         }
 
         @Override
@@ -638,7 +667,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
     protected MatrixStore<Double> makeD(final double[] d, final double[] e) {
         int n = this.getRowDim();
-        RawStore fullD = this.newRawStore(n, n);
+        RawStore fullD = RawDecomposition.newRawStore(n, n);
         double[][] D = fullD.data;
         for (int i = 0; i < n; i++) {
             D[i][i] = d[i];

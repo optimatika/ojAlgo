@@ -21,9 +21,7 @@
  */
 package org.ojalgo.matrix.operation;
 
-import static org.ojalgo.function.constant.PrimitiveMath.MACHINE_EPSILON;
-import static org.ojalgo.function.constant.PrimitiveMath.ONE;
-import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.array.operation.ArrayOperation;
 import org.ojalgo.function.special.MissingMath;
@@ -44,8 +42,117 @@ public abstract class STEQR implements LAPACK {
 
     /**
      * The pure Java implementation.
+     * <p>
+     * A 2-by-2 block that splits off is diagonalised in closed form, as by LAPACK's {@code ?laev2}, rather
+     * than iterated on. The plane rotations, and the shifts, use sqrt(x<sup>2</sup>+y<sup>2</sup>) directly
+     * when neither square can overflow or underflow, as LAPACK's {@code ?lartg} does, and only otherwise
+     * {@link MissingMath#hypot(double, double)} (scaled, with a division more on the critical path).
      */
     static final class JVM {
+
+        /**
+         * sqrt(2<sup>1021</sup>), a square below it can't overflow, nor a sum of two such squares
+         */
+        private static final double ROOT_LARGEST = Math.sqrt(ONE / MACHINE_SMALLEST / TWO);
+        /**
+         * sqrt(2<sup>-1022</sup>), a square above it is a normal number
+         */
+        private static final double ROOT_SMALLEST = Math.sqrt(MACHINE_SMALLEST);
+
+        /**
+         * sqrt(x<sup>2</sup>+y<sup>2</sup>), directly when both are within the safe range, otherwise scaled.
+         */
+        private static double hypot(final double x, final double y) {
+            double absX = Math.abs(x);
+            double absY = Math.abs(y);
+            if (absX > ROOT_SMALLEST && absX < ROOT_LARGEST && absY > ROOT_SMALLEST && absY < ROOT_LARGEST) {
+                return Math.sqrt(x * x + y * y);
+            }
+            return MissingMath.hypot(x, y);
+        }
+
+        /**
+         * LAPACK {@code ?laev2}: the eigenvalues of the 2-by-2 block [d(l), e(l); e(l), d(l+1)] overwrite
+         * d(l) and d(l+1), the larger in absolute value first, and the rotation that diagonalises it is
+         * reported for the columns l and l+1.
+         */
+        private static void solve2x2(final double[] d, final double[] e, final int l, final RotateColumns rotations) {
+
+            double a = d[l];
+            double b = e[l];
+            double c = d[l + 1];
+
+            double sum = a + c;
+            double difference = a - c;
+            double absDifference = Math.abs(difference);
+            double twoB = b + b;
+            double absTwoB = Math.abs(twoB);
+
+            double larger, smaller;
+            if (Math.abs(a) > Math.abs(c)) {
+                larger = a;
+                smaller = c;
+            } else {
+                larger = c;
+                smaller = a;
+            }
+
+            double root;
+            if (absDifference > absTwoB) {
+                double ratio = absTwoB / absDifference;
+                root = absDifference * Math.sqrt(ONE + ratio * ratio);
+            } else if (absDifference < absTwoB) {
+                double ratio = absDifference / absTwoB;
+                root = absTwoB * Math.sqrt(ONE + ratio * ratio);
+            } else {
+                root = absTwoB * SQRT_TWO;
+            }
+
+            double first, second;
+            boolean negative;
+            if (sum < ZERO) {
+                first = HALF * (sum - root);
+                // The smaller one from the determinant, to avoid cancellation
+                second = larger / first * smaller - b / first * b;
+                negative = true;
+            } else if (sum > ZERO) {
+                first = HALF * (sum + root);
+                second = larger / first * smaller - b / first * b;
+                negative = false;
+            } else {
+                first = HALF * root;
+                second = -HALF * root;
+                negative = false;
+            }
+
+            // The eigenvector (cos, sin) of the first eigenvalue
+            double cos, sin;
+            double tmp = difference >= ZERO ? difference + root : difference - root;
+            if (Math.abs(tmp) > absTwoB) {
+                double cot = -twoB / tmp;
+                sin = ONE / Math.sqrt(ONE + cot * cot);
+                cos = cot * sin;
+            } else if (absTwoB == ZERO) {
+                cos = ONE;
+                sin = ZERO;
+            } else {
+                double tan = -tmp / twoB;
+                cos = ONE / Math.sqrt(ONE + tan * tan);
+                sin = tan * cos;
+            }
+            if (negative != (difference >= ZERO)) {
+                tmp = cos;
+                cos = -sin;
+                sin = tmp;
+            }
+
+            d[l] = first;
+            d[l + 1] = second;
+            e[l] = ZERO;
+
+            // z(l) := cos * z(l) + sin * z(l+1), z(l+1) := -sin * z(l) + cos * z(l+1)
+            rotations.rotateColumns(l, l + 1, cos, -sin);
+        }
 
         /**
          * The pure Java implementation of {@link STEQR#invoke(double[], double[], RotateColumns)}, without
@@ -80,14 +187,18 @@ public abstract class STEQR implements LAPACK {
                     m++;
                 }
 
-                // If m == l, d[l] is an eigenvalue, otherwise, iterate.
-                if (l < m) {
+                // If m == l, d[l] is an eigenvalue, if m == l + 1, solve the 2-by-2 block, otherwise iterate.
+                if (m == l + 1) {
+
+                    JVM.solve2x2(d, e, l, rotations);
+
+                } else if (l < m) {
                     do {
 
                         // Compute implicit shift
 
                         double p = (d[l + 1] - d_l) / (e_l + e_l);
-                        double r = MissingMath.hypot(p, ONE);
+                        double r = JVM.hypot(p, ONE);
                         if (p < ZERO) {
                             r = -r;
                         }
@@ -109,7 +220,7 @@ public abstract class STEQR implements LAPACK {
                             d_i = d[i];
                             e_i = e[i];
 
-                            r = MissingMath.hypot(p, e_i);
+                            r = JVM.hypot(p, e_i);
 
                             e[i + 1] = sin1 * r;
 

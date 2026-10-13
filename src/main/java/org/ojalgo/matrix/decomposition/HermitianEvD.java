@@ -126,8 +126,8 @@ abstract class HermitianEvD<N extends Comparable<N>, M extends PhysicalStore<N>>
         int compute(final Collectable<Double, ? super TransformableRegion<Double>> matrix, final R064Store inPlace, final double[] values,
                 final boolean valuesOnly) {
             int n = inPlace.getRowDim();
-            if (matrix instanceof R064Store) {
-                return SYEVD.invoke(!valuesOnly, n, ((R064Store) matrix).data, 0, Math.max(1, n), values, 0, inPlace.data, 0, Math.max(1, n));
+            if (matrix instanceof R064Store source) {
+                return SYEVD.invoke(!valuesOnly, n, source.data, 0, Math.max(1, n), values, 0, inPlace.data, 0, Math.max(1, n));
             }
             matrix.supplyTo(inPlace);
             return SYEVD.invoke(!valuesOnly, n, inPlace.data, 0, Math.max(1, n), values, 0);

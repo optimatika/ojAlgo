@@ -21,7 +21,16 @@
  */
 package org.ojalgo.matrix.operation;
 
+import static java.lang.foreign.ValueLayout.*;
+
+import java.lang.foreign.Arena;
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.MemorySegment;
+import java.lang.invoke.MethodHandle;
+
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.operation.ArrayOperation;
+import org.ojalgo.array.operation.NativeLibrary;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -35,11 +44,15 @@ import org.ojalgo.scalar.Scalar;
  * The first row and column of Q are those of the identity, and the rest is the Q of {@link ORGQR} for the
  * (shifted) reflectors. For other number types Q is unitary; there is only a pure Java implementation for
  * those.
+ *
+ * @see NativeLibrary
  */
 public abstract class ORGHR implements LAPACK {
 
     /**
-     * The pure Java implementations.
+     * The pure Java implementations. Everything they call is pure Java as well – the {@code JVM}
+     * implementations of other operations, never their dispatching {@code invoke} methods (that may call
+     * native code).
      * <p>
      * The reflectors are stored as by {@link SYTRD}, and Q is formed as by {@link ORGTR}.
      */
@@ -66,6 +79,61 @@ public abstract class ORGHR implements LAPACK {
     }
 
     /**
+     * Native {@code dorghr}, initialised only when {@link NativeLibrary#isAvailable()}. All arguments are
+     * passed by reference, as to any Fortran routine. It is not linked as critical: it is passed a copy of
+     * the matrix in native memory, and the JVM can reach safepoints (and collect garbage) during the call.
+     */
+    static final class Native {
+
+        static final MethodHandle DORGHR_OFF_HEAP = NativeLibrary.downcall("dorghr_",
+                FunctionDescriptor.ofVoid(ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS), false);
+
+        /**
+         * Copies A and tau to native memory, asks {@link #DORGHR_OFF_HEAP} for the optimal workspace size,
+         * calls it and copies Q back. Requires n > 0.
+         */
+        static void invoke(final int n, final double[] a, final int offsetA, final int lda, final double[] tau, final int offsetTau) {
+
+            try (Arena arena = Arena.ofConfined()) {
+
+                int copyLDA = CBLAS.leadingDimensionOfCopy(n);
+
+                MemorySegment segmentN = arena.allocateFrom(JAVA_INT, n);
+                MemorySegment segmentILO = arena.allocateFrom(JAVA_INT, 1);
+                MemorySegment segmentA = CBLAS.copyOfMatrix(arena, a, offsetA, n, n, lda, copyLDA);
+                MemorySegment segmentLDA = arena.allocateFrom(JAVA_INT, copyLDA);
+                MemorySegment segmentTau = n > 1
+                        ? arena.allocateFrom(JAVA_DOUBLE, MemorySegment.ofArray(tau), JAVA_DOUBLE, JAVA_DOUBLE.byteSize() * offsetTau, n - 1)
+                        : arena.allocate(JAVA_DOUBLE);
+                MemorySegment segmentInfo = arena.allocate(JAVA_INT);
+
+                MemorySegment query = arena.allocate(JAVA_DOUBLE);
+                DORGHR_OFF_HEAP.invokeExact(segmentN, segmentILO, segmentN, segmentA, segmentLDA, segmentTau, query, arena.allocateFrom(JAVA_INT, -1),
+                        segmentInfo);
+                int lwork = Math.max(Math.max(1, n - 1), (int) query.get(JAVA_DOUBLE, 0L));
+
+                DORGHR_OFF_HEAP.invokeExact(segmentN, segmentILO, segmentN, segmentA, segmentLDA, segmentTau, arena.allocate(JAVA_DOUBLE, lwork),
+                        arena.allocateFrom(JAVA_INT, lwork), segmentInfo);
+
+                CBLAS.copyBackMatrix(segmentA, copyLDA, a, offsetA, n, n, lda);
+
+            } catch (RuntimeException | Error cause) {
+                throw cause;
+            } catch (Throwable cause) {
+                throw new ProgrammingError(cause);
+            }
+        }
+
+    }
+
+    /**
+     * The native implementation is used, if there is one, when n*n*n is larger than this.
+     */
+    private static final double NATIVE_THRESHOLD = 750_000;
+
+    static final boolean NATIVE = NativeLibrary.isAvailable() && Native.DORGHR_OFF_HEAP != null;
+
+    /**
      * {@code dorghr} with ILO = 1 and IHI = n: Q overwrites A
      * <p>
      * A is column-major, stored in its array from an offset with a leading dimension. On entry, the elements
@@ -83,7 +151,11 @@ public abstract class ORGHR implements LAPACK {
             return;
         }
 
-        JVM.invoke(n, a, offsetA, lda, tau, offsetTau);
+        if (ORGHR.isNative(n)) {
+            Native.invoke(n, a, offsetA, lda, tau, offsetTau);
+        } else {
+            JVM.invoke(n, a, offsetA, lda, tau, offsetTau);
+        }
     }
 
     /**
@@ -101,6 +173,14 @@ public abstract class ORGHR implements LAPACK {
         }
 
         JVM.invoke(n, a, offsetA, lda, tau, offsetTau, scalar);
+    }
+
+    /**
+     * Whether to use the native implementation: there is one, and n*n*n is larger than
+     * {@link #NATIVE_THRESHOLD}.
+     */
+    static boolean isNative(final double n) {
+        return NATIVE && n * n * n > NATIVE_THRESHOLD;
     }
 
 }

@@ -21,12 +21,21 @@
  */
 package org.ojalgo.matrix.operation;
 
+import static java.lang.foreign.ValueLayout.*;
 import static org.ojalgo.function.constant.PrimitiveMath.ONE;
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.MemorySegment;
+import java.lang.invoke.MethodHandle;
+import java.util.Objects;
+
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.ArrayOperation;
 import org.ojalgo.array.operation.DOT;
+import org.ojalgo.array.operation.NativeLibrary;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.concurrent.Parallelism;
 import org.ojalgo.scalar.Scalar;
@@ -50,11 +59,15 @@ import org.ojalgo.scalar.Scalar;
  * tau(i) = 0, H(i) is the identity.
  * <p>
  * {@link ORGQR} forms Q explicitly, and {@link ORMQR} multiplies a matrix by Q or Q<sup>T</sup>.
+ *
+ * @see NativeLibrary
  */
 public abstract class GEQRF implements LAPACK {
 
     /**
-     * The pure Java implementation.
+     * The pure Java implementation. Everything it calls is pure Java as well – the {@code JVM}
+     * implementations of other operations, never their dispatching {@code invoke} methods (that may call
+     * native code).
      * <p>
      * Unblocked: for each column, the reflector that zeroes the elements below the diagonal is generated and
      * applied to the columns to the right, split over several threads when that is large, see
@@ -285,6 +298,62 @@ public abstract class GEQRF implements LAPACK {
     }
 
     /**
+     * Native {@code dgeqrf}, initialised only when {@link NativeLibrary#isAvailable()}. All arguments are
+     * passed by reference, as to any Fortran routine. It is not linked as critical: it is passed a copy of
+     * the matrix in native memory, and the JVM can reach safepoints (and collect garbage) during the call.
+     */
+    static final class Native {
+
+        static final MethodHandle DGEQRF_OFF_HEAP = NativeLibrary.downcall("dgeqrf_",
+                FunctionDescriptor.ofVoid(ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS), false);
+
+        /**
+         * Copies A to native memory, asks {@link #DGEQRF_OFF_HEAP} for the optimal workspace size, calls it
+         * and copies the factors and tau back. Requires m, n > 0.
+         */
+        static void invoke(final int m, final int n, final double[] a, final int offsetA, final int lda, final double[] tau, final int offsetTau) {
+
+            int minDim = Math.min(m, n);
+            Objects.checkFromIndexSize(offsetTau, minDim, tau.length);
+
+            try (Arena arena = Arena.ofConfined()) {
+
+                int copyLDA = CBLAS.leadingDimensionOfCopy(m);
+
+                MemorySegment segmentA = CBLAS.copyOfMatrix(arena, a, offsetA, m, n, lda, copyLDA);
+                MemorySegment segmentTau = arena.allocate(JAVA_DOUBLE, minDim);
+                MemorySegment segmentInfo = arena.allocate(JAVA_INT);
+                MemorySegment segmentM = arena.allocateFrom(JAVA_INT, m);
+                MemorySegment segmentLDA = arena.allocateFrom(JAVA_INT, copyLDA);
+                MemorySegment segmentN = arena.allocateFrom(JAVA_INT, n);
+
+                MemorySegment query = arena.allocate(JAVA_DOUBLE);
+                DGEQRF_OFF_HEAP.invokeExact(segmentM, segmentN, segmentA, segmentLDA, segmentTau, query, arena.allocateFrom(JAVA_INT, -1), segmentInfo);
+                int lwork = Math.max(n, (int) query.get(JAVA_DOUBLE, 0L));
+
+                DGEQRF_OFF_HEAP.invokeExact(segmentM, segmentN, segmentA, segmentLDA, segmentTau, arena.allocate(JAVA_DOUBLE, lwork),
+                        arena.allocateFrom(JAVA_INT, lwork), segmentInfo);
+
+                CBLAS.copyBackMatrix(segmentA, copyLDA, a, offsetA, m, n, lda);
+                MemorySegment.copy(segmentTau, JAVA_DOUBLE, 0L, tau, offsetTau, minDim);
+
+            } catch (RuntimeException | Error cause) {
+                throw cause;
+            } catch (Throwable cause) {
+                throw new ProgrammingError(cause);
+            }
+        }
+
+    }
+
+    /**
+     * The native implementation is used, if there is one, when m*n*min(m,n) is larger than this.
+     */
+    private static final double NATIVE_THRESHOLD = 300_000;
+
+    static final boolean NATIVE = NativeLibrary.isAvailable() && Native.DGEQRF_OFF_HEAP != null;
+
+    /**
      * The Java implementation splits the application of a reflector to the columns to its right over several
      * threads when that is larger than this cubed (in multiply-adds). Each part then gets more than half of
      * that. Also used by {@link ORGQR}.
@@ -310,7 +379,11 @@ public abstract class GEQRF implements LAPACK {
             return;
         }
 
-        JVM.invoke(m, n, a, offsetA, lda, tau, offsetTau);
+        if (GEQRF.isNative(m, n)) {
+            Native.invoke(m, n, a, offsetA, lda, tau, offsetTau);
+        } else {
+            JVM.invoke(m, n, a, offsetA, lda, tau, offsetTau);
+        }
     }
 
     /**
@@ -330,6 +403,14 @@ public abstract class GEQRF implements LAPACK {
         }
 
         JVM.invoke(m, n, a, offsetA, lda, tau, offsetTau, scalar);
+    }
+
+    /**
+     * Whether to use the native implementation: there is one, and m*n*min(m,n) is larger than
+     * {@link #NATIVE_THRESHOLD}.
+     */
+    public static boolean isNative(final double m, final double n) {
+        return NATIVE && m * n * Math.min(m, n) > NATIVE_THRESHOLD;
     }
 
 }
