@@ -2,6 +2,7 @@ module ojalgo {
 
     requires java.management;
     requires jdk.management;
+    requires jdk.incubator.vector;
 
     requires transitive java.desktop;
     requires transitive java.net.http;

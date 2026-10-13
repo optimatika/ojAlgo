@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ojalgo</groupId>
     <artifactId>ojalgo</artifactId>
-    <version>58.0.0</version>
+    <version>99.0.0-SNAPSHOT</version>
     <name>ojAlgo</name>
     <description>oj! Algorithms - ojAlgo - is a pure Java library, with zero dependencies, for mathematical optimisation and linear algebra: LP, QP and MIP solvers, dense and sparse matrices with the standard decompositions, and arrays, statistics and time series to go with them.</description>
     <packaging>jar</packaging>
@@ -59,7 +59,7 @@
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
         <project.build.outputTimestamp>${maven.build.timestamp}</project.build.outputTimestamp>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.java>22</version.java>
+        <version.java>27</version.java>
         <version.org.junit.jupiter>5.14.4</version.org.junit.jupiter>
     </properties>
     <dependencies>

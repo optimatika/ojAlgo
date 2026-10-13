@@ -23,8 +23,6 @@ package org.ojalgo.matrix.operation;
 
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.DOT;
-import org.ojalgo.concurrent.DivideAndConquer;
-import org.ojalgo.concurrent.Parallelism;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.scalar.Scalar;
@@ -33,15 +31,6 @@ import org.ojalgo.structure.Access2D;
 public abstract class SubstituteForwards implements MatrixOperation {
 
     public static int THRESHOLD = 64;
-
-    /**
-     * The single right-hand-side kernel for a row-major body sums each row with a single accumulator up to
-     * this order. A row uses the element solved just before only in its last term, so consecutive rows
-     * overlap, and that is faster than {@link DOT} (1.4 times for n = 10) until the rows get long.
-     */
-    private static final int SINGLE_ACCUMULATOR_THRESHOLD = 80;
-
-    private static final DivideAndConquer.Divider DIVIDER = Parallelism.THREADS.newDivider();
 
     public static void invoke(final double[] data, final Access2D<?> body, final boolean unitDiagonal, final boolean conjugated, final double[] work) {
 
@@ -100,9 +89,6 @@ public abstract class SubstituteForwards implements MatrixOperation {
     /**
      * Single-RHS forward substitution for row-major (double[][]) body data. Each row of the body array
      * corresponds to a matrix row.
-     * <p>
-     * Not conjugated, each row is summed with a single accumulator up to order
-     * {@link #SINGLE_ACCUMULATOR_THRESHOLD}, and with {@link DOT} above that.
      *
      * @param data         Single-column RHS, overwritten with the solution
      * @param bodyRows     Row-major body data (bodyRows[i][j] = body element at row i, col j)
@@ -127,7 +113,7 @@ public abstract class SubstituteForwards implements MatrixOperation {
                 }
             }
 
-        } else if (n > SINGLE_ACCUMULATOR_THRESHOLD) {
+        } else {
 
             for (int j = 0; j < n; j++) {
 
@@ -139,53 +125,58 @@ public abstract class SubstituteForwards implements MatrixOperation {
 
                 data[j] = solved;
             }
-
-        } else {
-
-            for (int j = 0; j < n; j++) {
-
-                double[] row = bodyRows[j];
-
-                double sum = PrimitiveMath.ZERO;
-                for (int i = 0; i < j; i++) {
-                    sum += row[i] * data[i];
-                }
-
-                double solved = data[j] - sum;
-
-                if (!unitDiagonal) {
-                    solved /= row[j];
-                }
-
-                data[j] = solved;
-            }
         }
     }
 
     /**
      * @param data         RHS data that will be overwritten with the solution
      * @param structure    The structure (number of rows) in data
+     * @param first        The first (incl) column/solution to handle
+     * @param limit        The last (excl) column/solution to handle
      * @param body         The equation system body (assumed to be lower/left triangular)
      * @param unitDiagonal Assume the body has a unit diagonal
      * @param conjugated   Assume the body is conjugated/transposed so that the lower/left part is actually
      *                     stored in the upper/right part.
      * @param identity     Assume the RHS is an identity matrix (disregard the actual elements)
      */
-    public static void invoke(final double[] data, final int structure, final Access2D<?> body, final boolean unitDiagonal, final boolean conjugated,
-            final boolean identity) {
+    public static void invoke(final double[] data, final int structure, final int first, final int limit, final Access2D<?> body, final boolean unitDiagonal,
+            final boolean conjugated, final boolean identity) {
 
-        int nbCols = structure > 0 ? data.length / structure : 0;
+        int diagDim = MissingMath.toMinIntExact(body.countRows(), body.countColumns());
+        double[] bodyRow = new double[diagDim];
+        double tmpVal;
+        int colBaseIndex;
 
-        if (nbCols > THRESHOLD) {
-            DIVIDER.threshold(THRESHOLD).divide(0, nbCols,
-                    (f, l) -> SubstituteForwards.invoke(data, structure, f, l, body, unitDiagonal, conjugated, identity));
-        } else {
-            SubstituteForwards.invoke(data, structure, 0, nbCols, body, unitDiagonal, conjugated, identity);
+        for (int i = 0; i < diagDim; i++) {
+
+            for (int j = 0; j <= i; j++) {
+                bodyRow[j] = conjugated ? body.doubleValue(j, i) : body.doubleValue(i, j);
+            }
+
+            for (int s = first; s < limit; s++) {
+                colBaseIndex = s * structure;
+
+                tmpVal = PrimitiveMath.ZERO;
+                for (int j = identity ? s : 0; j < i; j++) {
+                    tmpVal += bodyRow[j] * data[j + colBaseIndex];
+                }
+                if (identity) {
+                    tmpVal = i == s ? PrimitiveMath.ONE - tmpVal : -tmpVal;
+                } else {
+                    tmpVal = data[i + colBaseIndex] - tmpVal;
+                }
+
+                if (!unitDiagonal) {
+                    tmpVal /= bodyRow[i];
+                }
+
+                data[i + colBaseIndex] = tmpVal;
+            }
         }
     }
 
     /**
-     * @see #invoke(double[], int, Access2D, boolean, boolean, boolean)
+     * @see #invoke(double[], int, int, int, Access2D, boolean, boolean, boolean)
      */
     public static void invoke(final double[][] data, final Access2D<?> body, final boolean unitDiagonal, final boolean conjugated, final boolean identity) {
 
@@ -231,110 +222,7 @@ public abstract class SubstituteForwards implements MatrixOperation {
         TRSV.invoke(conjugated, conjugated, unitDiagonal, data.length, bodyData, 0, Math.max(1, bodyStructure), data, 0, 1);
     }
 
-    public static void invoke(final float[] data, final int structure, final Access2D<?> body, final boolean unitDiagonal, final boolean conjugated,
-            final boolean identity) {
-
-        int nbCols = structure > 0 ? data.length / structure : 0;
-
-        if (nbCols > THRESHOLD) {
-            DIVIDER.threshold(THRESHOLD).divide(0, nbCols,
-                    (f, l) -> SubstituteForwards.invoke(data, structure, f, l, body, unitDiagonal, conjugated, identity));
-        } else {
-            SubstituteForwards.invoke(data, structure, 0, nbCols, body, unitDiagonal, conjugated, identity);
-        }
-    }
-
-    /**
-     * Single-RHS forward substitution for {@link Scalar}-typed data. Handles complex and other generic number
-     * types correctly via conjugate/multiply/divide on the scalar type.
-     *
-     * @param data         Single-column RHS (length n), overwritten with the solution
-     * @param body         Lower triangular body (or upper when conjugated)
-     * @param unitDiagonal Assume the body has a unit diagonal
-     * @param conjugated   Body is conjugate-transposed
-     * @param scalar       Factory for the scalar type
-     */
-    public static <N extends Scalar<N>> void invoke(final N[] data, final Access2D<N> body, final boolean unitDiagonal, final boolean conjugated,
-            final Scalar.Factory<N> scalar) {
-
-        int n = data.length;
-        int diagDim = MissingMath.toMinIntExact(body.countRows(), body.countColumns(), n);
-        N[] bodyRow = scalar.newArrayInstance(diagDim);
-
-        for (int i = 0; i < diagDim; i++) {
-
-            for (int j = 0; j <= i; j++) {
-                bodyRow[j] = conjugated ? body.get(j, i).conjugate().get() : body.get(i, j);
-            }
-
-            Scalar<N> tmpVal = scalar.zero();
-            for (int j = 0; j < i; j++) {
-                tmpVal = tmpVal.add(bodyRow[j].multiply(data[j]));
-            }
-            tmpVal = data[i].subtract(tmpVal);
-
-            if (!unitDiagonal) {
-                // From the left: [body]_ii^-1 * tmpVal
-                tmpVal = tmpVal.conjugate().divide(bodyRow[i].conjugate()).conjugate();
-            }
-
-            data[i] = tmpVal.get();
-        }
-    }
-
-    /**
-     * @see #invoke(double[], int, Access2D, boolean, boolean, boolean)
-     */
-    public static <N extends Scalar<N>> void invoke(final N[] data, final int structure, final Access2D<N> body, final boolean unitDiagonal,
-            final boolean conjugated, final boolean identity, final Scalar.Factory<N> scalar) {
-
-        int nbCols = structure > 0 ? data.length / structure : 0;
-
-        if (nbCols > THRESHOLD) {
-            DIVIDER.threshold(THRESHOLD).divide(0, nbCols,
-                    (f, l) -> SubstituteForwards.invoke(data, structure, f, l, body, unitDiagonal, conjugated, identity, scalar));
-        } else {
-            SubstituteForwards.invoke(data, structure, 0, nbCols, body, unitDiagonal, conjugated, identity, scalar);
-        }
-    }
-
-    private static void invoke(final double[] data, final int structure, final int first, final int limit, final Access2D<?> body, final boolean unitDiagonal,
-            final boolean conjugated, final boolean identity) {
-
-        int diagDim = MissingMath.toMinIntExact(body.countRows(), body.countColumns());
-        double[] bodyRow = new double[diagDim];
-        double tmpVal;
-        int colBaseIndex;
-
-        for (int i = 0; i < diagDim; i++) {
-
-            for (int j = 0; j <= i; j++) {
-                bodyRow[j] = conjugated ? body.doubleValue(j, i) : body.doubleValue(i, j);
-            }
-
-            for (int s = first; s < limit; s++) {
-                colBaseIndex = s * structure;
-
-                tmpVal = PrimitiveMath.ZERO;
-                for (int j = identity ? s : 0; j < i; j++) {
-                    tmpVal += bodyRow[j] * data[j + colBaseIndex];
-                }
-                if (identity) {
-                    tmpVal = i == s ? PrimitiveMath.ONE - tmpVal : -tmpVal;
-                } else {
-                    tmpVal = data[i + colBaseIndex] - tmpVal;
-                }
-
-                if (!unitDiagonal) {
-                    tmpVal /= bodyRow[i];
-                }
-
-                data[i + colBaseIndex] = tmpVal;
-            }
-        }
-    }
-
-    private static void invoke(final float[] data, final int structure, final int first, final int limit, final Access2D<?> body, final boolean unitDiagonal,
+    public static void invoke(final float[] data, final int structure, final int first, final int limit, final Access2D<?> body, final boolean unitDiagonal,
             final boolean conjugated, final boolean identity) {
 
         int diagDim = MissingMath.toMinIntExact(body.countRows(), body.countColumns());
@@ -370,7 +258,47 @@ public abstract class SubstituteForwards implements MatrixOperation {
         }
     }
 
-    private static <N extends Scalar<N>> void invoke(final N[] data, final int structure, final int first, final int limit, final Access2D<N> body,
+    /**
+     * Single-RHS forward substitution for {@link Scalar}-typed data. Handles complex and other generic number
+     * types correctly via conjugate/multiply/divide on the scalar type.
+     *
+     * @param data         Single-column RHS (length n), overwritten with the solution
+     * @param body         Lower triangular body (or upper when conjugated)
+     * @param unitDiagonal Assume the body has a unit diagonal
+     * @param conjugated   Body is conjugate-transposed
+     * @param scalar       Factory for the scalar type
+     */
+    public static <N extends Scalar<N>> void invoke(final N[] data, final Access2D<N> body, final boolean unitDiagonal, final boolean conjugated,
+            final Scalar.Factory<N> scalar) {
+
+        int n = data.length;
+        int diagDim = MissingMath.toMinIntExact(body.countRows(), body.countColumns(), n);
+        N[] bodyRow = scalar.newArrayInstance(diagDim);
+
+        for (int i = 0; i < diagDim; i++) {
+
+            for (int j = 0; j <= i; j++) {
+                bodyRow[j] = conjugated ? body.get(j, i).conjugate().get() : body.get(i, j);
+            }
+
+            Scalar<N> tmpVal = scalar.zero();
+            for (int j = 0; j < i; j++) {
+                tmpVal = tmpVal.add(bodyRow[j].multiply(data[j]));
+            }
+            tmpVal = data[i].subtract(tmpVal);
+
+            if (!unitDiagonal) {
+                tmpVal = tmpVal.divide(bodyRow[i]);
+            }
+
+            data[i] = tmpVal.get();
+        }
+    }
+
+    /**
+     * @see #invoke(double[], int, int, int, Access2D, boolean, boolean, boolean)
+     */
+    public static <N extends Scalar<N>> void invoke(final N[] data, final int structure, final int first, final int limit, final Access2D<N> body,
             final boolean unitDiagonal, final boolean conjugated, final boolean identity, final Scalar.Factory<N> scalar) {
 
         int diagDim = MissingMath.toMinIntExact(body.countRows(), body.countColumns());
@@ -398,8 +326,7 @@ public abstract class SubstituteForwards implements MatrixOperation {
                 }
 
                 if (!unitDiagonal) {
-                    // From the left: [body]_ii^-1 * tmpVal
-                    tmpVal = tmpVal.conjugate().divide(bodyRow[i].conjugate()).conjugate();
+                    tmpVal = tmpVal.divide(bodyRow[i]);
                 }
 
                 data[i + colBaseIndex] = tmpVal.get();
