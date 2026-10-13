@@ -21,11 +21,24 @@
  */
 package org.ojalgo.matrix.operation;
 
+import static java.lang.foreign.ValueLayout.ADDRESS;
+import static java.lang.foreign.ValueLayout.JAVA_BYTE;
+import static java.lang.foreign.ValueLayout.JAVA_DOUBLE;
+import static java.lang.foreign.ValueLayout.JAVA_INT;
+import static java.lang.foreign.ValueLayout.JAVA_LONG;
 import static org.ojalgo.function.constant.PrimitiveMath.ONE;
 import static org.ojalgo.function.constant.PrimitiveMath.TWO;
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.MemorySegment;
+import java.lang.invoke.MethodHandle;
+import java.util.Objects;
+
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.operation.ArrayOperation;
+import org.ojalgo.array.operation.NativeLibrary;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.concurrent.Parallelism;
 import org.ojalgo.scalar.Scalar;
@@ -54,11 +67,15 @@ import org.ojalgo.scalar.Scalar;
  * subdiagonal of T is not necessarily real. There is only a pure Java implementation for those.
  * <p>
  * {@link ORGTR} forms Q explicitly.
+ *
+ * @see NativeLibrary
  */
 public abstract class SYTRD implements LAPACK {
 
     /**
-     * The pure Java implementations.
+     * The pure Java implementations. Everything they call is pure Java as well – the {@code JVM}
+     * implementations of other operations, never their dispatching {@code invoke} methods (that may call
+     * native code).
      * <p>
      * Unblocked: for each column, the reflector that zeroes the elements below the first subdiagonal is
      * generated (as by {@link GEQRF}, from the subdiagonal down) and applied from both sides to the trailing
@@ -288,6 +305,70 @@ public abstract class SYTRD implements LAPACK {
     }
 
     /**
+     * Native {@code dsytrd}, initialised only when {@link NativeLibrary#isAvailable()}. All arguments are
+     * passed by reference, as to any Fortran routine, followed by the length of the character argument. It is
+     * not linked as critical: it is passed a copy of the matrix in native memory, and the JVM can reach
+     * safepoints (and collect garbage) during the call.
+     */
+    static final class Native {
+
+        static final MethodHandle DSYTRD_OFF_HEAP = NativeLibrary.downcall("dsytrd_",
+                FunctionDescriptor.ofVoid(ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, JAVA_LONG), false);
+
+        /**
+         * Copies A to native memory, asks {@link #DSYTRD_OFF_HEAP} for the optimal workspace size, calls it
+         * and copies the lower triangle of A, d, e and tau back. Requires n > 0.
+         */
+        static void invoke(final int n, final double[] a, final int offsetA, final int lda, final double[] d, final int offsetD, final double[] e,
+                final int offsetE, final double[] tau, final int offsetTau) {
+
+            Objects.checkFromIndexSize(offsetD, n, d.length);
+            Objects.checkFromIndexSize(offsetE, n - 1, e.length);
+            Objects.checkFromIndexSize(offsetTau, n - 1, tau.length);
+
+            try (Arena arena = Arena.ofConfined()) {
+
+                int copyLDA = CBLAS.leadingDimensionOfCopy(n);
+
+                MemorySegment segmentUplo = arena.allocateFrom(JAVA_BYTE, (byte) 'L');
+                MemorySegment segmentA = CBLAS.copyOfMatrix(arena, a, offsetA, n, n, lda, copyLDA);
+                MemorySegment segmentD = arena.allocate(JAVA_DOUBLE, n);
+                MemorySegment segmentE = arena.allocate(JAVA_DOUBLE, Math.max(1, n - 1));
+                MemorySegment segmentTau = arena.allocate(JAVA_DOUBLE, Math.max(1, n - 1));
+                MemorySegment segmentInfo = arena.allocate(JAVA_INT);
+                MemorySegment segmentN = arena.allocateFrom(JAVA_INT, n);
+                MemorySegment segmentLDA = arena.allocateFrom(JAVA_INT, copyLDA);
+
+                MemorySegment query = arena.allocate(JAVA_DOUBLE);
+                DSYTRD_OFF_HEAP.invokeExact(segmentUplo, segmentN, segmentA, segmentLDA, segmentD, segmentE, segmentTau, query,
+                        arena.allocateFrom(JAVA_INT, -1), segmentInfo, 1L);
+                int lwork = Math.max(1, (int) query.get(JAVA_DOUBLE, 0L));
+
+                DSYTRD_OFF_HEAP.invokeExact(segmentUplo, segmentN, segmentA, segmentLDA, segmentD, segmentE, segmentTau, arena.allocate(JAVA_DOUBLE, lwork),
+                        arena.allocateFrom(JAVA_INT, lwork), segmentInfo, 1L);
+
+                CBLAS.copyBackTriangle(segmentA, copyLDA, a, offsetA, n, lda, false);
+                MemorySegment.copy(segmentD, JAVA_DOUBLE, 0L, d, offsetD, n);
+                MemorySegment.copy(segmentE, JAVA_DOUBLE, 0L, e, offsetE, n - 1);
+                MemorySegment.copy(segmentTau, JAVA_DOUBLE, 0L, tau, offsetTau, n - 1);
+
+            } catch (RuntimeException | Error cause) {
+                throw cause;
+            } catch (Throwable cause) {
+                throw new ProgrammingError(cause);
+            }
+        }
+
+    }
+
+    /**
+     * The native implementation is used, if there is one, when n*n*n is larger than this.
+     */
+    private static final double NATIVE_THRESHOLD = 2_000_000;
+
+    static final boolean NATIVE = NativeLibrary.isAvailable() && Native.DSYTRD_OFF_HEAP != null;
+
+    /**
      * The Java implementation splits A*v (by rows) and the update of the trailing triangle (by columns) over
      * several threads when they are larger than this cubed (in multiply-adds). Each part then gets more than
      * half of that.
@@ -315,7 +396,11 @@ public abstract class SYTRD implements LAPACK {
             return;
         }
 
-        JVM.invoke(n, a, offsetA, lda, d, offsetD, e, offsetE, tau, offsetTau);
+        if (SYTRD.isNative(n)) {
+            Native.invoke(n, a, offsetA, lda, d, offsetD, e, offsetE, tau, offsetTau);
+        } else {
+            JVM.invoke(n, a, offsetA, lda, d, offsetD, e, offsetE, tau, offsetTau);
+        }
     }
 
     /**
@@ -334,6 +419,14 @@ public abstract class SYTRD implements LAPACK {
         }
 
         JVM.invoke(n, a, offsetA, lda, d, offsetD, e, offsetE, tau, offsetTau, scalar);
+    }
+
+    /**
+     * Whether to use the native implementation: there is one, and n*n*n is larger than
+     * {@link #NATIVE_THRESHOLD}.
+     */
+    static boolean isNative(final double n) {
+        return NATIVE && n * n * n > NATIVE_THRESHOLD;
     }
 
 }

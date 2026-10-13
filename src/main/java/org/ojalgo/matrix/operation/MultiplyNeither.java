@@ -743,17 +743,24 @@ public class MultiplyNeither implements MatrixOperation {
     }
 
     /**
-     * The general case: {@link GEMM}, possibly multi-threaded or cache blocked. The product is cleared once
-     * and accumulated into with beta 1, which is faster at small sizes than clearing column by column.
+     * The general case: {@link GEMM}, native or Java (and then possibly multi-threaded or cache blocked). For
+     * Java, the product is cleared once and accumulated into with beta 1, which is faster at small sizes than
+     * clearing column by column.
      */
     static void fillMxN(final double[] product, final double[] left, final int complexity, final double[] right) {
 
         int nbRows = left.length / complexity;
         int nbCols = right.length / complexity;
 
-        Arrays.fill(product, 0D);
-        GEMM.JVM.invoke(false, false, nbRows, nbCols, complexity, PrimitiveMath.ONE, left, 0, nbRows, right, 0, complexity, PrimitiveMath.ONE, product, 0,
-                nbRows);
+        if (GEMM.isNative(nbRows, nbCols, complexity)) {
+            // Through GEMM's dispatch, that also decides between a critical and an off-heap native call
+            GEMM.invoke(false, false, nbRows, nbCols, complexity, PrimitiveMath.ONE, left, 0, nbRows, right, 0, complexity, PrimitiveMath.ZERO, product, 0,
+                    nbRows);
+        } else {
+            Arrays.fill(product, 0D);
+            GEMM.JVM.invoke(false, false, nbRows, nbCols, complexity, PrimitiveMath.ONE, left, 0, nbRows, right, 0, complexity, PrimitiveMath.ONE, product, 0,
+                    nbRows);
+        }
     }
 
     static void fillMxN(final float[] product, final float[] left, final int complexity, final float[] right) {

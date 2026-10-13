@@ -9,18 +9,32 @@ on:
 jobs:
   build:
 
+    name: ${{ matrix.name }}
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
-        java-version: [ '11', '26' ]
+        include:
+          - name: Java 22, pure Java
+            java-version: '22'
+            maven-args: -Dojalgo.native.library=none
+          - name: Java 27, native BLAS
+            java-version: '27'
+            maven-args: -DargLine=--enable-native-access=ojalgo,ALL-UNNAMED
+            openblas: true
 
     steps:
     - uses: actions/checkout@v7
+    - name: Install OpenBLAS
+      if: matrix.openblas
+      run: sudo apt-get update && sudo apt-get install -y libopenblas0
     - name: Set up JDK ${{ matrix.java-version }}
       uses: actions/setup-java@v6
       with:
         java-version: ${{ matrix.java-version }}
         distribution: 'temurin'
     - name: Build with Maven
-      run: ./mvnw -B package
+      run: ./mvnw -B package ${{ matrix.maven-args }}
+      env:
+        OJALGO_NATIVE_EXPECTED: ${{ matrix.openblas && 'true' || 'false' }}

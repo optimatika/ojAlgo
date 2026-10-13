@@ -21,10 +21,21 @@
  */
 package org.ojalgo.matrix.operation;
 
+import static java.lang.foreign.ValueLayout.ADDRESS;
+import static java.lang.foreign.ValueLayout.JAVA_BYTE;
+import static java.lang.foreign.ValueLayout.JAVA_INT;
+import static java.lang.foreign.ValueLayout.JAVA_LONG;
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.MemorySegment;
+import java.lang.invoke.MethodHandle;
+
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.ArrayOperation;
+import org.ojalgo.array.operation.NativeLibrary;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.concurrent.Parallelism;
 import org.ojalgo.function.FunctionSet;
@@ -40,11 +51,15 @@ import org.ojalgo.scalar.Scalar;
  *
  * where L is lower triangular and U upper triangular. Only the lower (or upper) triangle of A is read, and
  * the factor overwrites it. The other triangle is not referenced.
+ *
+ * @see NativeLibrary
  */
 public abstract class POTRF implements LAPACK {
 
     /**
-     * The pure Java implementation.
+     * The pure Java implementation. Everything it calls is pure Java as well – the {@code JVM}
+     * implementations of other operations, never their dispatching {@code invoke} methods (that may call
+     * native code).
      * <p>
      * Unblocked and right-looking: for each column (of L, or row of U), the square root of the diagonal
      * element is taken, the elements below it (to the right of it) are divided by that, and the trailing
@@ -202,6 +217,55 @@ public abstract class POTRF implements LAPACK {
     }
 
     /**
+     * Native {@code dpotrf}, initialised only when {@link NativeLibrary#isAvailable()}. All arguments are
+     * passed by reference, as to any Fortran routine, followed by the length of the character argument. It is
+     * not linked as critical: it is passed a copy of the matrix in native memory, and the JVM can reach
+     * safepoints (and collect garbage) during the call.
+     */
+    static final class Native {
+
+        static final MethodHandle DPOTRF_OFF_HEAP = NativeLibrary.downcall("dpotrf_",
+                FunctionDescriptor.ofVoid(ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, JAVA_LONG), false);
+
+        /**
+         * Copies A to native memory, calls {@link #DPOTRF_OFF_HEAP} and copies the factor back. Requires n >
+         * 0.
+         */
+        static int invoke(final boolean upper, final int n, final double[] a, final int offsetA, final int lda) {
+
+            try (Arena arena = Arena.ofConfined()) {
+
+                int copyLDA = CBLAS.leadingDimensionOfCopy(n);
+
+                MemorySegment segmentA = CBLAS.copyOfMatrix(arena, a, offsetA, n, n, lda, copyLDA);
+                MemorySegment segmentInfo = arena.allocate(JAVA_INT);
+                MemorySegment segmentN = arena.allocateFrom(JAVA_INT, n);
+                MemorySegment segmentLDA = arena.allocateFrom(JAVA_INT, copyLDA);
+
+                DPOTRF_OFF_HEAP.invokeExact(arena.allocateFrom(JAVA_BYTE, (byte) (upper ? 'U' : 'L')), segmentN, segmentA, segmentLDA, segmentInfo, 1L);
+
+                CBLAS.copyBackTriangle(segmentA, copyLDA, a, offsetA, n, lda, upper);
+
+                return segmentInfo.get(JAVA_INT, 0L);
+
+            } catch (RuntimeException | Error cause) {
+                throw cause;
+            } catch (Throwable cause) {
+                throw new ProgrammingError(cause);
+            }
+        }
+
+    }
+
+    /**
+     * The native implementation is used, if there is one, when n*n*n is larger than this. That is about 6
+     * times the number of multiply-adds.
+     */
+    private static final double NATIVE_THRESHOLD = 10_000;
+
+    static final boolean NATIVE = NativeLibrary.isAvailable() && Native.DPOTRF_OFF_HEAP != null;
+
+    /**
      * The Java implementation splits the update of the trailing triangle over several threads when it is
      * larger than this cubed (in multiply-adds). Each part then gets more than half of that.
      */
@@ -227,7 +291,11 @@ public abstract class POTRF implements LAPACK {
             return 0;
         }
 
-        return JVM.invoke(upper, n, a, offsetA, lda);
+        if (POTRF.isNative(n)) {
+            return Native.invoke(upper, n, a, offsetA, lda);
+        } else {
+            return JVM.invoke(upper, n, a, offsetA, lda);
+        }
     }
 
     /**
@@ -248,6 +316,14 @@ public abstract class POTRF implements LAPACK {
         }
 
         return JVM.invoke(upper, n, a, offsetA, lda, scalar, function);
+    }
+
+    /**
+     * Whether to use the native implementation: there is one, and n*n*n is larger than
+     * {@link #NATIVE_THRESHOLD}.
+     */
+    static boolean isNative(final double n) {
+        return NATIVE && n * n * n > NATIVE_THRESHOLD;
     }
 
 }

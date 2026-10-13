@@ -21,10 +21,18 @@
  */
 package org.ojalgo.matrix.operation;
 
+import static java.lang.foreign.ValueLayout.ADDRESS;
+import static java.lang.foreign.ValueLayout.JAVA_INT;
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.MemorySegment;
+import java.lang.invoke.MethodHandle;
+
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.ArrayOperation;
+import org.ojalgo.array.operation.NativeLibrary;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -41,11 +49,15 @@ import org.ojalgo.scalar.Scalar;
  * used in the last term. Summed the other way, every row has to wait for the previous one before it can
  * start, and the solve becomes latency-bound (more than twice as slow).
  * </ul>
+ *
+ * @see NativeLibrary
  */
 public abstract class TRSV implements BLAS2 {
 
     /**
-     * The pure Java implementation.
+     * The pure Java implementation. Everything it calls is pure Java as well – the {@code JVM}
+     * implementations of other operations, never their dispatching {@code invoke} methods (that may call
+     * native code).
      */
     static final class JVM {
 
@@ -368,6 +380,39 @@ public abstract class TRSV implements BLAS2 {
     }
 
     /**
+     * Native {@code cblas_dtrsv}, initialised only when {@link NativeLibrary#isAvailable()}. Linked as a
+     * critical function so the Java arrays are used in place, without copying.
+     */
+    static final class Native {
+
+        static final MethodHandle DTRSV_CRITICAL = NativeLibrary.downcall("cblas_dtrsv",
+                FunctionDescriptor.ofVoid(JAVA_INT, JAVA_INT, JAVA_INT, JAVA_INT, JAVA_INT, ADDRESS, JAVA_INT, ADDRESS, JAVA_INT), true);
+
+        static void invoke(final boolean upper, final boolean transpose, final boolean unitDiagonal, final int n, final double[] a, final int offsetA,
+                final int lda, final double[] x, final int offsetX, final int incX) {
+
+            MemorySegment segmentA = CBLAS.ofMatrix(a, offsetA, n, n, lda);
+            MemorySegment segmentX = NativeLibrary.ofVector(x, offsetX, n, incX);
+
+            try {
+                DTRSV_CRITICAL.invokeExact(CBLAS.COLUMN_MAJOR, CBLAS.triangle(upper), CBLAS.transpose(transpose), CBLAS.diagonal(unitDiagonal), n, segmentA,
+                        lda, segmentX, incX);
+            } catch (Throwable cause) {
+                throw new ProgrammingError(cause);
+            }
+        }
+
+    }
+
+    /**
+     * The native implementation is used, if there is one, when n*n (twice the number of multiply-adds) is
+     * larger than this.
+     */
+    private static final double NATIVE_THRESHOLD = 70;
+
+    static final boolean NATIVE = NativeLibrary.isAvailable() && Native.DTRSV_CRITICAL != null;
+
+    /**
      * {@code dtrsv}: solves op(A)*x = b, x overwrites b
      * <p>
      * A is column-major, stored in its array from an offset with a leading dimension. Only the upper or lower
@@ -391,7 +436,11 @@ public abstract class TRSV implements BLAS2 {
             return;
         }
 
-        JVM.invoke(upper, transpose, unitDiagonal, n, a, offsetA, lda, x, offsetX, incX);
+        if (TRSV.isNative(n)) {
+            Native.invoke(upper, transpose, unitDiagonal, n, a, offsetA, lda, x, offsetX, incX);
+        } else {
+            JVM.invoke(upper, transpose, unitDiagonal, n, a, offsetA, lda, x, offsetX, incX);
+        }
     }
 
     /**
@@ -432,6 +481,14 @@ public abstract class TRSV implements BLAS2 {
         }
 
         JVM.invoke(upper, transpose, unitDiagonal, n, a, offsetA, lda, x, offsetX, incX, scalar);
+    }
+
+    /**
+     * Whether to use the native implementation: there is one, and n*n is larger than
+     * {@link #NATIVE_THRESHOLD}.
+     */
+    static boolean isNative(final double n) {
+        return NATIVE && n * n > NATIVE_THRESHOLD;
     }
 
 }

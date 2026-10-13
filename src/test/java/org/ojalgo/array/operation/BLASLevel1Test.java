@@ -31,14 +31,16 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * The BLAS form of the level 1 operations ({@link DOT}, {@link AXPY}, {@link SCAL}) against a plain
  * evaluation of their definitions: positive, negative and unit increments (a negative increment walks the
- * vector backwards, with the offset still the lowest index), offsets, and lengths 0, short and long. Each
- * case is run through the pure Java implementation and the dispatching {@code invoke}. Elements that are not
- * part of the vector must be left untouched.
+ * vector backwards, with the offset still the lowest index), offsets, and lengths 0, short and long enough to
+ * pass the native thresholds. Each case is run through the pure Java implementation, the dispatching
+ * {@code invoke}, and the native implementation when there is one (run with
+ * {@code --enable-native-access=ojalgo,ALL-UNNAMED} to include it). Elements that are not part of the vector
+ * must be left untouched.
  */
 public class BLASLevel1Test {
 
     enum Implementation {
-        DISPATCH, JAVA;
+        DISPATCH, JAVA, NATIVE;
     }
 
     private static final NumberContext ACCURACY = NumberContext.of(12);
@@ -64,6 +66,9 @@ public class BLASLevel1Test {
     @Test
     public void testAXPY() {
         for (Implementation implementation : Implementation.values()) {
+            if (implementation == Implementation.NATIVE && !AXPY.NATIVE) {
+                continue;
+            }
             for (int n : LENGTHS) {
                 for (int incX : INCREMENTS) {
                     for (int incY : INCREMENTS) {
@@ -86,6 +91,11 @@ public class BLASLevel1Test {
                                         AXPY.JVM.invoke(n, alpha, x, OFFSET, incX, y, OFFSET, incY);
                                     }
                                     break;
+                                case NATIVE:
+                                    if (n > 0) {
+                                        AXPY.Native.invoke(n, alpha, x, OFFSET, incX, y, OFFSET, incY);
+                                    }
+                                    break;
                                 default:
                                     AXPY.invoke(n, alpha, x, OFFSET, incX, y, OFFSET, incY);
                                     break;
@@ -106,6 +116,9 @@ public class BLASLevel1Test {
     @Test
     public void testDOT() {
         for (Implementation implementation : Implementation.values()) {
+            if (implementation == Implementation.NATIVE && !DOT.NATIVE) {
+                continue;
+            }
             for (int n : LENGTHS) {
                 for (int incX : INCREMENTS) {
                     for (int incY : INCREMENTS) {
@@ -122,15 +135,11 @@ public class BLASLevel1Test {
                             magnitude += Math.abs(term);
                         }
 
-                        double actual;
-                        switch (implementation) {
-                            case JAVA:
-                                actual = n > 0 ? DOT.JVM.invoke(n, x, OFFSET, incX, y, OFFSET, incY) : 0.0;
-                                break;
-                            default:
-                                actual = DOT.invoke(n, x, OFFSET, incX, y, OFFSET, incY);
-                                break;
-                        }
+                        double actual = switch (implementation) {
+                            case JAVA   -> n > 0 ? DOT.JVM.invoke(n, x, OFFSET, incX, y, OFFSET, incY) : 0.0;
+                            case NATIVE -> n > 0 ? DOT.Native.invoke(n, x, OFFSET, incX, y, OFFSET, incY) : 0.0;
+                            default     -> DOT.invoke(n, x, OFFSET, incX, y, OFFSET, incY);
+                        };
                         String message = "DOT " + implementation + " n=" + n + " incX=" + incX + " incY=" + incY;
                         TestUtils.assertTrue(message + ": " + expected + " != " + actual, ACCURACY.isSmall(Math.max(magnitude, 1.0), actual - expected));
                     }
@@ -142,6 +151,9 @@ public class BLASLevel1Test {
     @Test
     public void testSCAL() {
         for (Implementation implementation : Implementation.values()) {
+            if (implementation == Implementation.NATIVE && !SCAL.NATIVE) {
+                continue;
+            }
             for (int n : LENGTHS) {
                 for (int incX : INCREMENTS) {
                     for (double alpha : new double[] { 0.0, 1.0, -0.7 }) {
@@ -160,6 +172,11 @@ public class BLASLevel1Test {
                             case JAVA:
                                 if (n > 0 && incX > 0) {
                                     SCAL.JVM.invoke(n, alpha, x, OFFSET, incX);
+                                }
+                                break;
+                            case NATIVE:
+                                if (n > 0 && incX > 0) {
+                                    SCAL.Native.invoke(n, alpha, x, OFFSET, incX);
                                 }
                                 break;
                             default:

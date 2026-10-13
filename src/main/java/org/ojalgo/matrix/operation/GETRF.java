@@ -21,10 +21,20 @@
  */
 package org.ojalgo.matrix.operation;
 
+import static java.lang.foreign.ValueLayout.ADDRESS;
+import static java.lang.foreign.ValueLayout.JAVA_INT;
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.MemorySegment;
+import java.lang.invoke.MethodHandle;
+import java.util.Objects;
+
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.ArrayOperation;
+import org.ojalgo.array.operation.NativeLibrary;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.concurrent.Parallelism;
 import org.ojalgo.scalar.Scalar;
@@ -40,11 +50,15 @@ import org.ojalgo.scalar.Scalar;
  * P is a permutation matrix, L is lower triangular with unit diagonal elements (lower trapezoidal if m > n)
  * and U is upper triangular (upper trapezoidal if m < n). The factors overwrite A: L below the diagonal (its
  * unit diagonal is not stored) and U on and above it.
+ *
+ * @see NativeLibrary
  */
 public abstract class GETRF implements LAPACK {
 
     /**
-     * The pure Java implementation.
+     * The pure Java implementation. Everything it calls is pure Java as well – the {@code JVM}
+     * implementations of other operations, never their dispatching {@code invoke} methods (that may call
+     * native code).
      * <p>
      * Unblocked and right-looking: for each column, the pivot is the element of largest magnitude on or below
      * the diagonal (the first one if there are several), its row is interchanged with the diagonal row across
@@ -297,6 +311,59 @@ public abstract class GETRF implements LAPACK {
     }
 
     /**
+     * Native {@code dgetrf}, initialised only when {@link NativeLibrary#isAvailable()}. All arguments are
+     * passed by reference, as to any Fortran routine. It is not linked as critical: it is passed a copy of
+     * the matrix in native memory, and the JVM can reach safepoints (and collect garbage) during the call.
+     */
+    static final class Native {
+
+        static final MethodHandle DGETRF_OFF_HEAP = NativeLibrary.downcall("dgetrf_",
+                FunctionDescriptor.ofVoid(ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS), false);
+
+        /**
+         * Copies A to native memory, calls {@link #DGETRF_OFF_HEAP} and copies the factors and the pivots
+         * back. Requires m, n > 0.
+         */
+        static int invoke(final int m, final int n, final double[] a, final int offsetA, final int lda, final int[] ipiv, final int offsetIpiv) {
+
+            int minDim = Math.min(m, n);
+            Objects.checkFromIndexSize(offsetIpiv, minDim, ipiv.length);
+
+            try (Arena arena = Arena.ofConfined()) {
+
+                int copyLDA = CBLAS.leadingDimensionOfCopy(m);
+
+                MemorySegment segmentA = CBLAS.copyOfMatrix(arena, a, offsetA, m, n, lda, copyLDA);
+                MemorySegment segmentIPIV = arena.allocate(JAVA_INT, minDim);
+                MemorySegment segmentInfo = arena.allocate(JAVA_INT);
+                MemorySegment segmentM = arena.allocateFrom(JAVA_INT, m);
+                MemorySegment segmentLDA = arena.allocateFrom(JAVA_INT, copyLDA);
+
+                DGETRF_OFF_HEAP.invokeExact(segmentM, arena.allocateFrom(JAVA_INT, n), segmentA, segmentLDA, segmentIPIV, segmentInfo);
+
+                CBLAS.copyBackMatrix(segmentA, copyLDA, a, offsetA, m, n, lda);
+                MemorySegment.copy(segmentIPIV, JAVA_INT, 0L, ipiv, offsetIpiv, minDim);
+
+                return segmentInfo.get(JAVA_INT, 0L);
+
+            } catch (RuntimeException | Error cause) {
+                throw cause;
+            } catch (Throwable cause) {
+                throw new ProgrammingError(cause);
+            }
+        }
+
+    }
+
+    /**
+     * The native implementation is used, if there is one, when m*n*min(m,n) is larger than this. That is
+     * about 3 times the number of multiply-adds for a square matrix.
+     */
+    private static final double NATIVE_THRESHOLD = 10_000;
+
+    static final boolean NATIVE = NativeLibrary.isAvailable() && Native.DGETRF_OFF_HEAP != null;
+
+    /**
      * The Java implementation splits the update of the columns to the right of the pivot over several threads
      * when it is larger than this cubed (in multiply-adds). Each part then gets more than half of that.
      */
@@ -325,7 +392,11 @@ public abstract class GETRF implements LAPACK {
             return 0;
         }
 
-        return JVM.invoke(m, n, a, offsetA, lda, ipiv, offsetIpiv);
+        if (GETRF.isNative(m, n)) {
+            return Native.invoke(m, n, a, offsetA, lda, ipiv, offsetIpiv);
+        } else {
+            return JVM.invoke(m, n, a, offsetA, lda, ipiv, offsetIpiv);
+        }
     }
 
     /**
@@ -382,6 +453,14 @@ public abstract class GETRF implements LAPACK {
         }
 
         return JVM.invokeWithoutPivoting(m, n, a, offsetA, lda, scalar);
+    }
+
+    /**
+     * Whether to use the native implementation: there is one, and m*n*min(m,n) is larger than
+     * {@link #NATIVE_THRESHOLD}.
+     */
+    public static boolean isNative(final double m, final double n) {
+        return NATIVE && m * n * Math.min(m, n) > NATIVE_THRESHOLD;
     }
 
 }
