@@ -18,6 +18,15 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - `LU.R064` (up to 512 columns): `getInverse(PhysicalStore)` and `invert(Access2D, PhysicalStore)` returned a wrong inverse when the decomposition pivoted and the preallocated store was not all zeros, e.g. when reused. This also affected `InverterTask.R064.make(dim, false)` from dim 6.
 - `SingularValue` and symmetric/Hermitian `Eigenvalue`: `getInverse(PhysicalStore)` no longer caches the caller's preallocated store as the decomposition's inverse. Later `getInverse(..)` and `getSolution(..)` calls used whatever had since been written to that store.
 
+#### org.ojalgo.optimisation.convex
+
+- The active set solvers' initial LP (finding a feasible start) is solved as the primal problem with the revised simplex solver. The dense tableau dual simplex previously used could cycle on degenerate problems and run until the time limit.
+- Active set step length: a constraint is regarded as being at its boundary only if its slack is also negligible compared to the constraint's size. With very long steps, constraints far from their boundary could be added to the active set, and the solver ended up cycling to its iteration limit, returning `FEASIBLE` rather than `OPTIMAL`.
+
+#### org.ojalgo.optimisation.linear
+
+- A warm re-solve, after relaxing variable ranges with `updateRange(..)`, could return `INFEASIBLE` for a feasible problem. The dual simplex ratio test discarded a small pivot element even when it was the only candidate and the variable's range made it significant. (Issue [#699](https://github.com/optimatika/ojAlgo/issues/699))
+
 ## [57.4.0] – 2026-10-08
 
 ### Added
