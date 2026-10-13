@@ -781,6 +781,13 @@ abstract class SimplexStore {
     abstract <T extends Mutate1D & Access1D<Double>> T phase1();
 
     /**
+     * Install a copy of the objective as the phase-1 objective, keeping the basis. Those costs can then be
+     * modified, see {@link #shiftCost(int, double)}, while the original ones are kept. {@link #removePhase1()}
+     * switches back to the original costs.
+     */
+    abstract void phase1FromObjective();
+
+    /**
      * Prepare the store for an iteration sequence. {@code warm == false} (cold solve) does the full prepare —
      * recompute duals and reduced costs and refresh the basic solution. {@code warm == true} (retained
      * optimal basis after a bound-only change) does the lean prepare — duals/reduced costs are unchanged so
@@ -862,6 +869,12 @@ abstract class SimplexStore {
     abstract void setToUpper(int col);
 
     abstract void setupClassicPhase1Objective();
+
+    /**
+     * Shift the phase-1 cost, and so the reduced cost, of the non-basic variable at {@code je} (its position in
+     * {@link #excluded}). Requires a phase-1 objective, see {@link #phase1FromObjective()}.
+     */
+    abstract void shiftCost(int je, double shift);
 
     abstract Primitive1D sliceBodyRow(final int row);
 

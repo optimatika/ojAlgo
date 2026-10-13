@@ -31,6 +31,10 @@ import org.ojalgo.structure.Mutate1D;
  * objective and runs primal simplex iterations (maintaining primal feasibility) to reach optimality. If those
  * leave some basic variables outside their bounds, dual simplex iterations restore primal feasibility.
  * <p>
+ * A warm start, after variable ranges were updated in place, skips phase 1. It runs dual simplex iterations
+ * from the previous basis, which is still dual feasible, and then primal simplex iterations if needed. If the
+ * dual iterations stall, the costs are perturbed until they are done.
+ * <p>
  * This is the most general {@link SimplexSolver} subclass and the one normally instantiated by
  * {@link LinearSolver.Builder} and the {@link LinearSolver.ModelIntegration}. It handles explicit finite
  * lower and upper bounds on variables natively and does not require the initial basis to be feasible.
@@ -53,19 +57,21 @@ final class PhasedSimplexSolver extends SimplexSolver {
 
         IterDescr iteration;
         boolean resetEdgeWeights;
+        boolean perturb;
 
         if (state == State.APPROXIMATE) {
             // Warm start after variable range update
 
             iteration = this.prepareToIterate(false);
             resetEdgeWeights = false;
+            perturb = true;
 
         } else {
             // Normal cold start optimisation
 
             iteration = this.prepareToIterate(true);
 
-            this.doDualIterations(iteration, true);
+            this.doDualIterations(iteration, true, false);
 
             this.switchToPhase2();
 
@@ -79,9 +85,10 @@ final class PhasedSimplexSolver extends SimplexSolver {
             // dual feasible, so continue as after a warm start.
             state = State.APPROXIMATE;
             resetEdgeWeights = true;
+            perturb = false;
         }
 
-        this.doDualIterations(iteration, resetEdgeWeights);
+        this.doDualIterations(iteration, resetEdgeWeights, perturb);
 
         if (state.isFeasible()) {
             if (this.isDualFeasible()) {

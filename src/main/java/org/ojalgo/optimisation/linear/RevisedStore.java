@@ -683,6 +683,14 @@ final class RevisedStore extends SimplexStore {
         return myPhase1Objective;
     }
 
+    /**
+     * The duals and reduced costs are unchanged, the costs are the same.
+     */
+    @Override
+    void phase1FromObjective() {
+        System.arraycopy(myObjective.data, 0, this.phase1().data, 0, n);
+    }
+
     @Override
     void prepareToIterate(final boolean cold) {
 
@@ -775,6 +783,12 @@ final class RevisedStore extends SimplexStore {
             }
             myPhase1Objective.set(j, -sum);
         }
+    }
+
+    @Override
+    void shiftCost(final int je, final double shift) {
+        myPhase1Objective.data[excluded[je]] += shift;
+        d[je] += shift;
     }
 
     /**

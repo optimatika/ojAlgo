@@ -502,6 +502,16 @@ final class DenseTableau extends SimplexTableau {
         };
     }
 
+    @Override
+    void phase1FromObjective() {
+
+        if (myPhase1Row == null) {
+            myPhase1Row = new double[n + 1];
+        }
+
+        System.arraycopy(myTableau[m], 0, myPhase1Row, 0, n + 1);
+    }
+
     void recomputePhase1Objective() {
 
         if (myPhase1Row != null) {
@@ -523,6 +533,11 @@ final class DenseTableau extends SimplexTableau {
     @Override
     void removePhase1() {
         myPhase1Row = null;
+    }
+
+    @Override
+    void shiftCost(final int je, final double shift) {
+        myPhase1Row[excluded[je]] += shift;
     }
 
 }

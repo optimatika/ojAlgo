@@ -35,15 +35,26 @@ import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * A solver instance is solved, then some variable ranges are relaxed in place with
+ * A solver instance is solved, then some variable ranges are updated in place with
  * {@link LinearSolver#updateRange(int, double, double)}, and it is solved again. This is what a branch and
- * bound search does when it backtracks. The second solve must agree with a solver built from scratch on the
- * relaxed ranges.
+ * bound search does. The last solve must agree with a solver built from scratch on the final ranges, and every
+ * solve must terminate within {@link #ITERATIONS_ABORT} iterations.
  * <p>
- * The problem (579 variables, 70 equalities, 219 inequalities, integer ranges, a single-variable objective to
- * minimise) is the linear relaxation of a constraint-programming model solved by choco-solver. All 55 range
- * updates are relaxations, and all are accepted by the solver.
- * <p>
+ * The problems are linear relaxations of constraint-programming models solved by choco-solver. They have
+ * integer ranges and a single-variable objective to minimise.
+ * <ul>
+ * <li>{@link #STEINER}: a Steiner tree model (579 variables, 70 equalities, 219 inequalities). All 55 range
+ * updates are relaxations, and the final problem is feasible. The second solve returned INFEASIBLE (GitHub
+ * issue 699).
+ * <li>{@link #MULTI_KNAPSACK}: a multi-knapsack model (92 variables, 61 equalities). Of the 40 range updates, 9
+ * fix a variable, and the final problem is infeasible. The second solve never terminated (GitHub issue 700).
+ * <li>{@link #MULTI_KNAPSACK_2}, {@link #MULTI_KNAPSACK_3}: the same model, with 33 and 35 other range updates,
+ * and infeasible final problems. Every reduced cost but one was zero, and the dual iterations of the second solve
+ * cycled (GitHub issue 700, after the first fix).
+ * <li>{@link #HC_PIZZA}: an HCPizza model (877 variables, 21 equalities, 100 inequalities). 1,000 solves, all
+ * optimal, with 27,549 range updates in between. Most solves need only a pivot or two. Recorded to measure the
+ * time of such cheap warm solves (GitHub issue 700), here their values must sum to {@link #HC_PIZZA_SUM}.
+ * </ul>
  * File format, one item per line:
  *
  * <pre>
@@ -56,7 +67,7 @@ import org.ojalgo.type.context.NumberContext;
  * upd J LO UP          range update applied in place to that same solver
  * </pre>
  */
-public class RangeRelaxationWarmStartTest extends OptimisationLinearTests {
+public class RangeUpdateWarmStartTest extends OptimisationLinearTests {
 
     private static final class Scenario {
 
@@ -99,15 +110,33 @@ public class RangeRelaxationWarmStartTest extends OptimisationLinearTests {
     }
 
     private static final NumberContext ACCURACY = NumberContext.of(8);
-    private static final String RESOURCE = "/optimisation/usersupplied/ChocoSteinerRangeRelaxation.txt";
+    private static final String HC_PIZZA = "/optimisation/usersupplied/ChocoHCPizzaRangeUpdate.txt";
+    /**
+     * The sum of the 1,000 optimal values of {@link #HC_PIZZA}, the same with every ojAlgo version since 57.1.0.
+     */
+    private static final double HC_PIZZA_SUM = -84533.0;
+    /**
+     * Each solve needs fewer than 200 iterations. Without a limit, a solve that does not terminate would run
+     * until the default time limit of one day.
+     */
+    private static final int ITERATIONS_ABORT = 1_000;
+    private static final String MULTI_KNAPSACK = "/optimisation/usersupplied/ChocoMultiKnapsackRangeUpdate.txt";
+    private static final String MULTI_KNAPSACK_2 = "/optimisation/usersupplied/ChocoMultiKnapsackRangeUpdate2.txt";
+    private static final String MULTI_KNAPSACK_3 = "/optimisation/usersupplied/ChocoMultiKnapsackRangeUpdate3.txt";
+    private static final String STEINER = "/optimisation/usersupplied/ChocoSteinerRangeRelaxation.txt";
 
-    private static void doTest(final Boolean sparse) {
+    /**
+     * @param state The expected state of the last solve
+     * @return The sum of the values of the optimal solves of the reused instance
+     */
+    private static double doTest(final String resource, final Optimisation.State state, final Boolean sparse) {
 
-        Scenario scenario = RangeRelaxationWarmStartTest.read();
+        Scenario scenario = RangeUpdateWarmStartTest.read(resource);
 
         Optimisation.Options options = new Optimisation.Options();
         options.linear().dual();
         options.sparse = sparse;
+        options.iterations_abort = ITERATIONS_ABORT;
 
         double[] lower = scenario.lower.clone();
         double[] upper = scenario.upper.clone();
@@ -115,10 +144,17 @@ public class RangeRelaxationWarmStartTest extends OptimisationLinearTests {
         LinearSolver warm = scenario.newBuilder(lower, upper).build(options);
 
         Optimisation.Result actual = null;
+        double sum = 0.0;
         for (double[] step : scenario.steps) {
             if (step == null) {
+                if (actual != null) {
+                    // Every solve but the last
+                    TestUtils.assertStateNotLessThanOptimal(actual);
+                }
                 actual = warm.solve();
-                TestUtils.assertStateNotLessThanOptimal(actual);
+                if (actual.getState().isOptimal()) {
+                    sum += actual.getValue();
+                }
             } else {
                 int index = (int) step[0];
                 lower[index] = step[1];
@@ -130,19 +166,26 @@ public class RangeRelaxationWarmStartTest extends OptimisationLinearTests {
         Optimisation.Options reference = new Optimisation.Options();
         reference.linear().dual();
         reference.sparse = Boolean.FALSE;
+        reference.iterations_abort = ITERATIONS_ABORT;
 
         Optimisation.Result expected = scenario.newBuilder(lower, upper).build(reference).solve();
-        TestUtils.assertStateNotLessThanOptimal(expected);
 
-        TestUtils.assertEquals(expected.getValue(), actual.getValue(), ACCURACY);
+        TestUtils.assertEquals(state, expected.getState());
+        TestUtils.assertEquals(state, actual.getState());
+
+        if (state.isOptimal()) {
+            TestUtils.assertEquals(expected.getValue(), actual.getValue(), ACCURACY);
+        }
+
+        return sum;
     }
 
-    private static Scenario read() {
+    private static Scenario read(final String resource) {
 
         Scenario scenario = new Scenario();
 
         try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(RangeRelaxationWarmStartTest.class.getResourceAsStream(RESOURCE), StandardCharsets.UTF_8))) {
+                new InputStreamReader(RangeUpdateWarmStartTest.class.getResourceAsStream(resource), StandardCharsets.UTF_8))) {
 
             String line;
             while ((line = reader.readLine()) != null) {
@@ -205,18 +248,81 @@ public class RangeRelaxationWarmStartTest extends OptimisationLinearTests {
     }
 
     @Test
-    public void testDualDefault() {
-        RangeRelaxationWarmStartTest.doTest(null);
+    public void testHCPizzaDefault() {
+        double sum = RangeUpdateWarmStartTest.doTest(HC_PIZZA, Optimisation.State.OPTIMAL, null);
+        TestUtils.assertEquals(HC_PIZZA_SUM, sum, ACCURACY);
     }
 
     @Test
-    public void testDualDense() {
-        RangeRelaxationWarmStartTest.doTest(Boolean.FALSE);
+    public void testHCPizzaDense() {
+        double sum = RangeUpdateWarmStartTest.doTest(HC_PIZZA, Optimisation.State.OPTIMAL, Boolean.FALSE);
+        TestUtils.assertEquals(HC_PIZZA_SUM, sum, ACCURACY);
     }
 
     @Test
-    public void testDualSparse() {
-        RangeRelaxationWarmStartTest.doTest(Boolean.TRUE);
+    public void testHCPizzaSparse() {
+        double sum = RangeUpdateWarmStartTest.doTest(HC_PIZZA, Optimisation.State.OPTIMAL, Boolean.TRUE);
+        TestUtils.assertEquals(HC_PIZZA_SUM, sum, ACCURACY);
+    }
+
+    @Test
+    public void testMultiKnapsack2Default() {
+        RangeUpdateWarmStartTest.doTest(MULTI_KNAPSACK_2, Optimisation.State.INFEASIBLE, null);
+    }
+
+    @Test
+    public void testMultiKnapsack2Dense() {
+        RangeUpdateWarmStartTest.doTest(MULTI_KNAPSACK_2, Optimisation.State.INFEASIBLE, Boolean.FALSE);
+    }
+
+    @Test
+    public void testMultiKnapsack2Sparse() {
+        RangeUpdateWarmStartTest.doTest(MULTI_KNAPSACK_2, Optimisation.State.INFEASIBLE, Boolean.TRUE);
+    }
+
+    @Test
+    public void testMultiKnapsack3Default() {
+        RangeUpdateWarmStartTest.doTest(MULTI_KNAPSACK_3, Optimisation.State.INFEASIBLE, null);
+    }
+
+    @Test
+    public void testMultiKnapsack3Dense() {
+        RangeUpdateWarmStartTest.doTest(MULTI_KNAPSACK_3, Optimisation.State.INFEASIBLE, Boolean.FALSE);
+    }
+
+    @Test
+    public void testMultiKnapsack3Sparse() {
+        RangeUpdateWarmStartTest.doTest(MULTI_KNAPSACK_3, Optimisation.State.INFEASIBLE, Boolean.TRUE);
+    }
+
+    @Test
+    public void testMultiKnapsackDefault() {
+        RangeUpdateWarmStartTest.doTest(MULTI_KNAPSACK, Optimisation.State.INFEASIBLE, null);
+    }
+
+    @Test
+    public void testMultiKnapsackDense() {
+        RangeUpdateWarmStartTest.doTest(MULTI_KNAPSACK, Optimisation.State.INFEASIBLE, Boolean.FALSE);
+    }
+
+    @Test
+    public void testMultiKnapsackSparse() {
+        RangeUpdateWarmStartTest.doTest(MULTI_KNAPSACK, Optimisation.State.INFEASIBLE, Boolean.TRUE);
+    }
+
+    @Test
+    public void testSteinerDefault() {
+        RangeUpdateWarmStartTest.doTest(STEINER, Optimisation.State.OPTIMAL, null);
+    }
+
+    @Test
+    public void testSteinerDense() {
+        RangeUpdateWarmStartTest.doTest(STEINER, Optimisation.State.OPTIMAL, Boolean.FALSE);
+    }
+
+    @Test
+    public void testSteinerSparse() {
+        RangeUpdateWarmStartTest.doTest(STEINER, Optimisation.State.OPTIMAL, Boolean.TRUE);
     }
 
 }
