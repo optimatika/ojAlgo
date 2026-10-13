@@ -87,20 +87,22 @@ final class ImpliedBoundsSeparator extends NodeSolver.Separator {
     }
 
     /**
+     * @param limit The right hand side of the cut
+     * @param upper true if limit is an upper limit, false if it is a lower limit
      * @return true if the cut was added
      */
     private boolean addCut(final CutRound round, final int targetIndex, final BigDecimal targetCoeff, final int binaryIndex, final BigDecimal binaryCoeff,
-            final BigDecimal upper, final BigDecimal lower) {
+            final BigDecimal limit, final boolean upper) {
 
         Optimisation.Result solution = round.solution;
 
         double lhs = targetCoeff.doubleValue() * solution.doubleValue(targetIndex) + binaryCoeff.doubleValue() * solution.doubleValue(binaryIndex);
 
         double violation;
-        if (upper != null) {
-            violation = lhs - upper.doubleValue();
+        if (upper) {
+            violation = lhs - limit.doubleValue();
         } else {
-            violation = lower.doubleValue() - lhs;
+            violation = limit.doubleValue() - lhs;
         }
 
         if (violation <= 0) {
@@ -110,10 +112,10 @@ final class ImpliedBoundsSeparator extends NodeSolver.Separator {
         Expression cut = this.newCut(round);
         cut.add(targetIndex, targetCoeff);
         cut.add(binaryIndex, binaryCoeff);
-        if (upper != null) {
-            cut.upper(upper);
+        if (upper) {
+            cut.upper(limit);
         } else {
-            cut.lower(lower);
+            cut.lower(limit);
         }
 
         return this.accept(round, cut);
@@ -200,12 +202,11 @@ final class ImpliedBoundsSeparator extends NodeSolver.Separator {
                 BigDecimal ai = coeffs.get(i);
                 BigDecimal lb = target.getLowerLimit();
                 BigDecimal ub = target.getUpperLimit();
+                if (lb == null || ub == null) {
+                    continue;
+                }
 
                 if (ai.signum() > 0) {
-
-                    if (ub == null) {
-                        continue;
-                    }
 
                     BigDecimal implied = lb.add(remaining.divide(ai, CEILING.getMathContext()));
                     if (target.isInteger()) {
@@ -218,20 +219,16 @@ final class ImpliedBoundsSeparator extends NodeSolver.Separator {
                     // x = 1 => y <= u' : y + (u - u') x <= u
                     // x = 0 => y <= u' : y - (u - u') x <= u'
                     if (impliedByOne) {
-                        if (this.addCut(round, targetIndex, BigDecimal.ONE, binaryIndex, gain, ub, null)) {
+                        if (this.addCut(round, targetIndex, BigDecimal.ONE, binaryIndex, gain, ub, true)) {
                             nbAdded++;
                         }
                     } else {
-                        if (this.addCut(round, targetIndex, BigDecimal.ONE, binaryIndex, gain.negate(), implied, null)) {
+                        if (this.addCut(round, targetIndex, BigDecimal.ONE, binaryIndex, gain.negate(), implied, true)) {
                             nbAdded++;
                         }
                     }
 
                 } else {
-
-                    if (lb == null) {
-                        continue;
-                    }
 
                     BigDecimal implied = ub.add(remaining.divide(ai, FLOOR.getMathContext()));
                     if (target.isInteger()) {
@@ -244,11 +241,11 @@ final class ImpliedBoundsSeparator extends NodeSolver.Separator {
                     // x = 1 => y >= l' : y - (l' - l) x >= l
                     // x = 0 => y >= l' : y + (l' - l) x >= l'
                     if (impliedByOne) {
-                        if (this.addCut(round, targetIndex, BigDecimal.ONE, binaryIndex, gain.negate(), null, lb)) {
+                        if (this.addCut(round, targetIndex, BigDecimal.ONE, binaryIndex, gain.negate(), lb, false)) {
                             nbAdded++;
                         }
                     } else {
-                        if (this.addCut(round, targetIndex, BigDecimal.ONE, binaryIndex, gain, null, implied)) {
+                        if (this.addCut(round, targetIndex, BigDecimal.ONE, binaryIndex, gain, implied, false)) {
                             nbAdded++;
                         }
                     }

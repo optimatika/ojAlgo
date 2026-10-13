@@ -50,7 +50,7 @@ final class PhasedSimplexSolver extends SimplexSolver {
     }
 
     @Override
-    public Result solve(final Result kickStarter) {
+    protected Result doSolve(final Result kickStarter) {
 
         if (this.isInfeasibleByCrossedBounds()) {
             return this.extractResult();

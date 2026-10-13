@@ -61,8 +61,8 @@ public interface Scalar<N extends Comparable<N>> extends AccessScalar<N>, Field<
         Scalar<N> convert(double value);
 
         /**
-         * The relative precision of the number type – a bound on the relative rounding error of its arithmetic.
-         * The default is the machine epsilon of {@code double}, 2<sup>-52</sup>.
+         * The relative precision of the number type – a bound on the relative rounding error of its
+         * arithmetic. The default is the machine epsilon of {@code double}, 2<sup>-52</sup>.
          *
          * @return The relative precision
          */

@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.function.Function;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.Array1D;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.MatrixStore;

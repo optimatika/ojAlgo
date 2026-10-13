@@ -27,8 +27,8 @@ import java.util.List;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.ArrayR064;
+import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.operation.BDSQR;
@@ -297,8 +297,10 @@ abstract class DenseSingularValue<N extends Comparable<N>, M extends PhysicalSto
             tmpBidiagonal.supplyMainDiagonalTo(values);
             tmpBidiagonal.supplySuperdiagonalTo(e);
 
-            GenericStore<N> tmpQ1 = u != null ? myBidiagonal.doGetLQ() : null;
-            GenericStore<N> tmpQ2 = v != null ? myBidiagonal.doGetRQ() : null;
+            boolean vectors = u != null;
+
+            GenericStore<N> tmpQ1 = vectors ? myBidiagonal.doGetLQ() : null;
+            GenericStore<N> tmpQ2 = vectors ? myBidiagonal.doGetRQ() : null;
 
             UnaryFunction<N> negate = this.function().negate();
 
@@ -310,7 +312,7 @@ abstract class DenseSingularValue<N extends Comparable<N>, M extends PhysicalSto
 
             BDSQR.invoke(values, e, q1RotR, q2RotR, q1XchgCols, q2XchgCols, q2NegCol);
 
-            if (u != null) {
+            if (vectors) {
                 u.fillMatching(transposed ? tmpQ2 : tmpQ1);
                 v.fillMatching(transposed ? tmpQ1 : tmpQ2);
             }

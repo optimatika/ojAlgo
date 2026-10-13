@@ -481,6 +481,7 @@ abstract class DenseQR<N extends Comparable<N>, M extends PhysicalStore<N>> exte
 
     private final boolean myFullSize;
     private int myNumberOfHouseholderTransformations = 0;
+    private transient MatrixStore<N> myQ = null;
 
     protected DenseQR(final PhysicalStore.Factory<N, ? extends M> factory, final boolean fullSize) {
         super(factory);
@@ -560,7 +561,10 @@ abstract class DenseQR<N extends Comparable<N>, M extends PhysicalStore<N>> exte
 
     @Override
     public MatrixStore<N> getQ() {
-        return this.getFactorQ().get();
+        if (myQ == null) {
+            myQ = this.getFactorQ().get();
+        }
+        return myQ;
     }
 
     @Override
@@ -648,6 +652,7 @@ abstract class DenseQR<N extends Comparable<N>, M extends PhysicalStore<N>> exte
         super.reset();
 
         myNumberOfHouseholderTransformations = 0;
+        myQ = null;
     }
 
     @Override

@@ -1051,104 +1051,6 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
     }
 
     @Override
-    public Result solve(final Result kickStarter) {
-
-        myCachedReducedGradient = null;
-
-        if (kickStarter != null && kickStarter.getState().isFeasible()) {
-            this.initialisePrimal(kickStarter);
-            kickStarter.getDualSolution().map(Supplier::get).ifPresent(this::initialiseDual);
-        }
-
-        double value = PrimitiveMath.NaN;
-        state = Optimisation.State.UNEXPLORED;
-        boolean approximate = false;
-
-        if (!myKKT.isFactorised()) {
-            state = Optimisation.State.FAILED;
-            return mySolution.compose(value, state, approximate);
-        }
-
-        try {
-
-            this.resetIterationsCount();
-            boolean checkTermination = false;
-            boolean debug = this.isLogDebug();
-
-            if (debug) {
-                this.printHeader();
-                this.printRow(myWork);
-            }
-
-            int maxIterations = Configuration.maxIterations(myData.getRowDim(), myData.getColDim(), options);
-            int maxIterationsExtended = Configuration.maxIterationsExtended(maxIterations, options);
-            int updateInterval = Configuration.updateInterval(maxIterations, options);
-
-            Progress progress = new Progress(maxIterations, maxIterationsExtended, updateInterval);
-
-            for (int iter = 1; iter <= maxIterationsExtended; iter++) {
-                this.incrementIterationsCount();
-
-                this.performIteration();
-
-                checkTermination = (iter == 1 || (iter % updateInterval == 0));
-                if (checkTermination) {
-
-                    if (this.checkTermination(false) || !this.isIterationAllowed() || !progress.isWorthContinuing(iter, myWork.cachedConvergenceRatio)) {
-                        break;
-                    }
-
-                    if (debug && iter % updateInterval == 0) {
-                        this.printRow(myWork);
-                    }
-                }
-
-                if ((iter % updateInterval == 0) && !this.adaptRho()) {
-                    state = State.FAILED;
-                    break;
-                }
-            }
-
-            if (!checkTermination) {
-                this.checkTermination(false);
-            }
-
-            if (!state.isFeasible()) {
-                boolean terminal = this.checkTermination(true);
-                approximate = terminal && state.isOptimal();
-                if (!terminal || approximate) {
-                    state = State.APPROXIMATE;
-                }
-            }
-
-            this.storeSolution(approximate);
-
-            if (debug) {
-                this.printRow(myWork);
-            }
-
-            value = this.calculateObjectiveValue();
-
-        } catch (Exception cause) {
-            BasicLogger.error(cause, "OSQP solve failed!");
-            value = PrimitiveMath.NaN;
-            state = Optimisation.State.FAILED;
-        }
-
-        Optimisation.Result retVal = mySolution.compose(value, state, approximate);
-
-        if (ConvexSolver.isDualMeaningful(state)) {
-            retVal = retVal.withReducedGradient(() -> ArrayR064.wrap(this.computeReducedGradient()));
-        }
-
-        if (myStructure.isEntityMap() && retVal.getDualSolution().isPresent()) {
-            retVal = retVal.withDualValues(myStructure.getConstraintsMetaData(), retVal.getDualSolution().get());
-        }
-
-        return retVal;
-    }
-
-    @Override
     public boolean updateRange(final int index, final double lower, final double upper) {
 
         int row = myStructure.getBoundRow(index);
@@ -1612,6 +1514,108 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
         }
 
         return true;
+    }
+
+    @Override
+    protected Result doSolve(final Result kickStarter) {
+
+        myCachedReducedGradient = null;
+
+        if (kickStarter != null && kickStarter.getState().isFeasible()) {
+            this.initialisePrimal(kickStarter);
+            kickStarter.getDualSolution().map(Supplier::get).ifPresent(this::initialiseDual);
+        }
+
+        double value = PrimitiveMath.NaN;
+        state = Optimisation.State.UNEXPLORED;
+        boolean approximate = false;
+
+        if (!myKKT.isFactorised()) {
+            state = Optimisation.State.FAILED;
+            return mySolution.compose(value, state, approximate);
+        }
+
+        if (!myKKT.hasCorrectInertia()) {
+            state = Optimisation.State.INVALID;
+            return mySolution.compose(value, state, approximate);
+        }
+
+        try {
+
+            boolean checkTermination = false;
+            boolean debug = this.isLogDebug();
+
+            if (debug) {
+                this.printHeader();
+                this.printRow(myWork);
+            }
+
+            int maxIterations = Configuration.maxIterations(myData.getRowDim(), myData.getColDim(), options);
+            int maxIterationsExtended = Configuration.maxIterationsExtended(maxIterations, options);
+            int updateInterval = Configuration.updateInterval(maxIterations, options);
+
+            Progress progress = new Progress(maxIterations, maxIterationsExtended, updateInterval);
+
+            for (int iter = 1; iter <= maxIterationsExtended; iter++) {
+                this.incrementIterationsCount();
+
+                this.performIteration();
+
+                checkTermination = (iter == 1 || (iter % updateInterval == 0));
+                if (checkTermination) {
+
+                    if (this.checkTermination(false) || !this.isIterationAllowed() || !progress.isWorthContinuing(iter, myWork.cachedConvergenceRatio)) {
+                        break;
+                    }
+
+                    if (debug && iter % updateInterval == 0) {
+                        this.printRow(myWork);
+                    }
+                }
+
+                if ((iter % updateInterval == 0) && !this.adaptRho()) {
+                    state = State.FAILED;
+                    break;
+                }
+            }
+
+            if (!checkTermination) {
+                this.checkTermination(false);
+            }
+
+            if (!state.isFeasible()) {
+                boolean terminal = this.checkTermination(true);
+                approximate = terminal && state.isOptimal();
+                if (!terminal || approximate) {
+                    state = State.APPROXIMATE;
+                }
+            }
+
+            this.storeSolution(approximate);
+
+            if (debug) {
+                this.printRow(myWork);
+            }
+
+            value = this.calculateObjectiveValue();
+
+        } catch (Exception cause) {
+            BasicLogger.error(cause, "OSQP solve failed!");
+            value = PrimitiveMath.NaN;
+            state = Optimisation.State.FAILED;
+        }
+
+        Optimisation.Result retVal = mySolution.compose(value, state, approximate);
+
+        if (ConvexSolver.isDualMeaningful(state)) {
+            retVal = retVal.withReducedGradient(() -> ArrayR064.wrap(this.computeReducedGradient()));
+        }
+
+        if (myStructure.isEntityMap() && retVal.getDualSolution().isPresent()) {
+            retVal = retVal.withDualValues(myStructure.getConstraintsMetaData(), retVal.getDualSolution().get());
+        }
+
+        return retVal;
     }
 
     /**

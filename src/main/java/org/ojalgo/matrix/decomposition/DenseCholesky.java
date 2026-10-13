@@ -227,8 +227,8 @@ abstract class DenseCholesky<N extends Comparable<N>, M extends PhysicalStore<N>
     private double myMaxDiag = ONE;
     private double myMinDiag = ZERO;
     /**
-     * The number of pivots computed – fewer than the dimension if the factorisation stopped at a
-     * non-positive one.
+     * The number of pivots computed – fewer than the dimension if the factorisation stopped at a non-positive
+     * one.
      */
     private int myNbPivots = 0;
     private boolean mySPD = false;
@@ -612,8 +612,7 @@ abstract class DenseCholesky<N extends Comparable<N>, M extends PhysicalStore<N>
     }
 
     /**
-     * The number and range of the pivots – the diagonal elements of [L], squared – of the first
-     * rows/columns.
+     * The number and range of the pivots – the diagonal elements of [L], squared – of the first rows/columns.
      */
     void updateDiagonalRange(final int limit) {
         PhysicalStore<N> inPlace = this.getInPlace();

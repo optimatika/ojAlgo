@@ -431,6 +431,18 @@ final class FactorKKT implements InvertibleFactor<Double> {
     }
 
     /**
+     * Whether the latest numerical factorisation found the inertia of a convex problem: n positive and m
+     * negative eigenvalues, with n the number of variables and m the number of constraints. With the dual
+     * block negative definite, that is the case exactly when P + σI + A<sup>T</sup>WA is positive definite,
+     * which it always is when P is positive semidefinite.
+     *
+     * @return {@code true} if the latest numerical factorisation succeeded and has n positive pivots
+     */
+    boolean hasCorrectInertia() {
+        return myQDLDL.isComputed() && myQDLDL.countPositive() == myKKT.getColDim() - myInvDiagW.length;
+    }
+
+    /**
      * @return {@code true} if the latest numerical factorisation – the initial one, or one after an update –
      *         succeeded
      */

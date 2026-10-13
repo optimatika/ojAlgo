@@ -64,8 +64,8 @@ public interface Tensor<N extends Comparable<N>, T extends Tensor<N, T>> extends
      * <p>
      * For rank 3 and higher, the tensor product u ⊗ v ⊗ w becomes conj(w) ⊗ conj(v) ⊗ conj(u), the same
      * reversal of order as in (AB)<sup>H</sup> = B<sup>H</sup>A<sup>H</sup>. It is not the adjoint of the
-     * tensor seen as a linear map between tensor spaces, as that depends on which indices are inputs and which
-     * are outputs.
+     * tensor seen as a linear map between tensor spaces, as that depends on which indices are inputs and
+     * which are outputs.
      */
     @Override
     T conjugate();

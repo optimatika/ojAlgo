@@ -21,6 +21,8 @@
  */
 package org.ojalgo.optimisation.convex;
 
+import java.util.function.Supplier;
+
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
@@ -53,7 +55,7 @@ final class IterativeRefinementForAlternatingDirectionSolver extends ConvexSolve
     }
 
     @Override
-    public Result solve(final Result kickStarter) {
+    protected Result doSolve(final Result kickStarter) {
 
         MatrixStore<Quadruple> probP = myData.getP();
         MatrixStore<Quadruple> probQ = myData.getQ();
@@ -89,10 +91,7 @@ final class IterativeRefinementForAlternatingDirectionSolver extends ConvexSolve
         double lastDualError = PrimitiveMath.MACHINE_LARGEST;
         boolean didImprove = true;
 
-        int iteration = 0;
         do {
-
-            ++iteration;
 
             boolean zoomed = !zoom.equals(QuadrupleMath.ONE);
 
@@ -107,19 +106,19 @@ final class IterativeRefinementForAlternatingDirectionSolver extends ConvexSolve
 
             if (this.isLogDebug()) {
                 this.log();
-                this.log("I.R. Iteration {} with zoom factor {}", iteration, zoom);
+                this.log("I.R. Iteration {} with zoom factor {}", 1 + this.countIterations(), zoom);
             }
 
             Result iterationResult = iterSolver.solve();
 
             iterState = iterationResult.getState();
 
-            if (!iterState.isFeasible() || iterationResult.getMultipliers().isEmpty()) {
+            if (!iterState.isFeasible() || iterationResult.getDualSolution().map(Supplier::get).isEmpty()) {
                 didImprove = false;
                 break;
             }
 
-            Access1D<?> multipliers = iterationResult.getMultipliers().get();
+            Access1D<?> multipliers = iterationResult.getDualSolution().map(Supplier::get).get();
 
             for (int j = 0; j < n; j++) {
                 iterX.set(j, iterationResult.doubleValue(j));
@@ -191,7 +190,9 @@ final class IterativeRefinementForAlternatingDirectionSolver extends ConvexSolve
                 didImprove = false;
             }
 
-        } while (didImprove && iteration < 8 && this.isIterationAllowed());
+            this.incrementIterationsCount();
+
+        } while (didImprove && this.countIterations() < 8 && this.isIterationAllowed());
 
         if (iterState.isOptimal()) {
             state = Optimisation.State.OPTIMAL;

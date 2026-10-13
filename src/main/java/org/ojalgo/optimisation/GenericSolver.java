@@ -25,6 +25,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.ProgrammingError;
@@ -150,6 +151,102 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return myNumberOfVariables;
         }
 
+        /**
+         * Appends the equality constraints {@code [mtrxAE][X] == [mtrxBE]} (one row each).
+         */
+        public final B equalities(final Access2D<?> mtrxAE, final Access1D<?> mtrxBE) {
+            ProgrammingError.throwIfNull(mtrxAE, mtrxBE);
+            ProgrammingError.throwIfNotEqualRowDimensions(mtrxAE, mtrxBE);
+            this.mergeEqualities(Builder.toRowsSupplier(mtrxAE), mtrxBE);
+            return (B) this;
+        }
+
+        /**
+         * Appends {@code rhs.length} equality constraints with the given right-hand side; returns a
+         * {@link Mutate2D} for filling in the (initially empty) constraint bodies.
+         */
+        public final Mutate2D equalities(final double[] rhs) {
+            RowsSupplier<Double> block = FACTORY.makeRowsSupplier(this.countVariables());
+            block.addRows(rhs.length);
+            this.mergeEqualities(block, R064Store.wrap(rhs));
+            return block;
+        }
+
+        /**
+         * Appends a single equality constraint with the given right-hand side; returns a {@link Mutate1D} for
+         * filling in the (initially empty) constraint body.
+         */
+        public final Mutate1D equality(final double rhs) {
+            RowsSupplier<Double> block = FACTORY.makeRowsSupplier(this.countVariables());
+            SparseArray<Double> row = block.addRow();
+            this.mergeEqualities(block, FACTORY.makeSingle(rhs));
+            return row;
+        }
+
+        /**
+         * Appends the single equality constraint {@code [factors][X] == rhs}.
+         */
+        public final B equality(final double rhs, final double... factors) {
+
+            RowsSupplier<Double> block = FACTORY.makeRowsSupplier(this.countVariables());
+            SparseArray<Double> row = block.addRow();
+            for (int i = 0, limit = Math.min(factors.length, this.countVariables()); i < limit; i++) {
+                row.set(i, factors[i]);
+            }
+
+            this.mergeEqualities(block, FACTORY.makeSingle(rhs));
+
+            return (B) this;
+        }
+
+        /**
+         * Appends the inequality constraints {@code [mtrxAI][X] <= [mtrxBI]} (one row each).
+         */
+        public final B inequalities(final Access2D<?> mtrxAI, final Access1D<?> mtrxBI) {
+            ProgrammingError.throwIfNull(mtrxAI, mtrxBI);
+            ProgrammingError.throwIfNotEqualRowDimensions(mtrxAI, mtrxBI);
+            this.mergeInequalities(Builder.toRowsSupplier(mtrxAI), mtrxBI);
+            return (B) this;
+        }
+
+        /**
+         * Appends {@code rhs.length} inequality constraints with the given right-hand side; returns a
+         * {@link Mutate2D} for filling in the (initially empty) constraint bodies.
+         */
+        public final Mutate2D inequalities(final double[] rhs) {
+            RowsSupplier<Double> block = FACTORY.makeRowsSupplier(this.countVariables());
+            block.addRows(rhs.length);
+            this.mergeInequalities(block, R064Store.wrap(rhs));
+            return block;
+        }
+
+        /**
+         * Appends a single inequality constraint with the given right-hand side; returns a {@link Mutate1D}
+         * for filling in the (initially empty) constraint body.
+         */
+        public final Mutate1D inequality(final double rhs) {
+            RowsSupplier<Double> block = FACTORY.makeRowsSupplier(this.countVariables());
+            SparseArray<Double> row = block.addRow();
+            this.mergeInequalities(block, FACTORY.makeSingle(rhs));
+            return row;
+        }
+
+        /**
+         * Appends the single inequality constraint {@code [factors][X] <= rhs}.
+         */
+        public final B inequality(final double rhs, final double... factors) {
+
+            RowsSupplier<Double> block = FACTORY.makeRowsSupplier(this.countVariables());
+            SparseArray<Double> row = block.addRow();
+            for (int i = 0, limit = Math.min(factors.length, this.countVariables()); i < limit; i++) {
+                row.set(i, factors[i]);
+            }
+
+            this.mergeInequalities(block, FACTORY.makeSingle(rhs));
+
+            return (B) this;
+        }
+
         public void reset() {
 
             if (myAdditionalConstraints != null) {
@@ -217,54 +314,6 @@ public abstract class GenericSolver implements Optimisation.Solver {
             }
 
             throw new ProgrammingError("Cannot deduce the number of variables!");
-        }
-
-        /**
-         * Appends the equality constraints {@code [mtrxAE][X] == [mtrxBE]} (one row each).
-         */
-        public final B equalities(final Access2D<?> mtrxAE, final Access1D<?> mtrxBE) {
-            ProgrammingError.throwIfNull(mtrxAE, mtrxBE);
-            ProgrammingError.throwIfNotEqualRowDimensions(mtrxAE, mtrxBE);
-            this.mergeEqualities(Builder.toRowsSupplier(mtrxAE), mtrxBE);
-            return (B) this;
-        }
-
-        /**
-         * Appends {@code rhs.length} equality constraints with the given right-hand side; returns a
-         * {@link Mutate2D} for filling in the (initially empty) constraint bodies.
-         */
-        public final Mutate2D equalities(final double[] rhs) {
-            RowsSupplier<Double> block = FACTORY.makeRowsSupplier(this.countVariables());
-            block.addRows(rhs.length);
-            this.mergeEqualities(block, R064Store.wrap(rhs));
-            return block;
-        }
-
-        /**
-         * Appends a single equality constraint with the given right-hand side; returns a {@link Mutate1D} for
-         * filling in the (initially empty) constraint body.
-         */
-        public final Mutate1D equality(final double rhs) {
-            RowsSupplier<Double> block = FACTORY.makeRowsSupplier(this.countVariables());
-            SparseArray<Double> row = block.addRow();
-            this.mergeEqualities(block, FACTORY.makeSingle(rhs));
-            return row;
-        }
-
-        /**
-         * Appends the single equality constraint {@code [factors][X] == rhs}.
-         */
-        public final B equality(final double rhs, final double... factors) {
-
-            RowsSupplier<Double> block = FACTORY.makeRowsSupplier(this.countVariables());
-            SparseArray<Double> row = block.addRow();
-            for (int i = 0, limit = Math.min(factors.length, this.countVariables()); i < limit; i++) {
-                row.set(i, factors[i]);
-            }
-
-            this.mergeEqualities(block, FACTORY.makeSingle(rhs));
-
-            return (B) this;
         }
 
         /**
@@ -374,54 +423,6 @@ public abstract class GenericSolver implements Optimisation.Solver {
                 myUpperBounds.fillAll(defaultValue);
             }
             return myUpperBounds;
-        }
-
-        /**
-         * Appends the inequality constraints {@code [mtrxAI][X] <= [mtrxBI]} (one row each).
-         */
-        public final B inequalities(final Access2D<?> mtrxAI, final Access1D<?> mtrxBI) {
-            ProgrammingError.throwIfNull(mtrxAI, mtrxBI);
-            ProgrammingError.throwIfNotEqualRowDimensions(mtrxAI, mtrxBI);
-            this.mergeInequalities(Builder.toRowsSupplier(mtrxAI), mtrxBI);
-            return (B) this;
-        }
-
-        /**
-         * Appends {@code rhs.length} inequality constraints with the given right-hand side; returns a
-         * {@link Mutate2D} for filling in the (initially empty) constraint bodies.
-         */
-        public final Mutate2D inequalities(final double[] rhs) {
-            RowsSupplier<Double> block = FACTORY.makeRowsSupplier(this.countVariables());
-            block.addRows(rhs.length);
-            this.mergeInequalities(block, R064Store.wrap(rhs));
-            return block;
-        }
-
-        /**
-         * Appends a single inequality constraint with the given right-hand side; returns a {@link Mutate1D}
-         * for filling in the (initially empty) constraint body.
-         */
-        public final Mutate1D inequality(final double rhs) {
-            RowsSupplier<Double> block = FACTORY.makeRowsSupplier(this.countVariables());
-            SparseArray<Double> row = block.addRow();
-            this.mergeInequalities(block, FACTORY.makeSingle(rhs));
-            return row;
-        }
-
-        /**
-         * Appends the single inequality constraint {@code [factors][X] <= rhs}.
-         */
-        public final B inequality(final double rhs, final double... factors) {
-
-            RowsSupplier<Double> block = FACTORY.makeRowsSupplier(this.countVariables());
-            SparseArray<Double> row = block.addRow();
-            for (int i = 0, limit = Math.min(factors.length, this.countVariables()); i < limit; i++) {
-                row.set(i, factors[i]);
-            }
-
-            this.mergeInequalities(block, FACTORY.makeSingle(rhs));
-
-            return (B) this;
         }
 
         protected void setNumberOfVariables(final int numberOfVariables) {
@@ -536,6 +537,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
     private transient String myClassSimpleName = null;
 
+    private volatile long myFrozenNanos = -1L;
     private final AtomicInteger myIterationsCount = new AtomicInteger(0);
     private final Stopwatch myStopwatch = new Stopwatch();
 
@@ -550,16 +552,75 @@ public abstract class GenericSolver implements Optimisation.Solver {
         options = optimisationOptions;
     }
 
-    protected final int countIterations() {
+    /**
+     * The number of iterations completed by the latest, or ongoing, call to
+     * {@link #solve(Optimisation.Result)}. What constitutes an iteration is solver specific. A solver that
+     * solves a sequence of sub-problems, using other solvers, counts each of those as one iteration.
+     */
+    public final int countIterations() {
         return myIterationsCount.get();
     }
 
     /**
-     * The number of ms since solver instantiated or iterations count reset.
+     * The time spent in the latest, or ongoing, call to {@link #solve(Optimisation.Result)}. If it has not
+     * yet been called, the time elapsed since the solver was instantiated.
+     */
+    public final double countTime(final CalendarDateUnit unit) {
+        double nanos = this.countNanos();
+        return unit.convert(nanos, CalendarDateUnit.NANOS);
+    }
+
+    @Override
+    public final Optimisation.Result solve() {
+
+        myIterationsCount.set(0);
+        myFrozenNanos = -1L;
+        myStopwatch.reset();
+
+        try {
+            return this.doSolve(null);
+        } finally {
+            myFrozenNanos = myStopwatch.countNanos();
+        }
+    }
+
+    /**
+     * Resets the iterations count and the time, calls {@link #doSolve(Optimisation.Result)}, and stops the
+     * time when that returns.
+     */
+    @Override
+    public final Optimisation.Result solve(final Optimisation.Result kickStarter) {
+
+        // Objects.requireNonNull(kickStarter);
+
+        myIterationsCount.set(0);
+        myFrozenNanos = -1L;
+        myStopwatch.reset();
+
+        try {
+            return this.doSolve(kickStarter);
+        } finally {
+            myFrozenNanos = myStopwatch.countNanos();
+        }
+    }
+
+    private long countNanos() {
+        long frozen = myFrozenNanos;
+        return frozen >= 0L ? frozen : myStopwatch.countNanos();
+    }
+
+    /**
+     * The number of ms, see {@link #countTime(CalendarDateUnit)}.
      */
     protected final long countTime() {
-        return myStopwatch.countMillis();
+        return TimeUnit.NANOSECONDS.toMillis(this.countNanos());
     }
+
+    /**
+     * Called by {@link #solve(Optimisation.Result)} with the iterations count and time reset. Implementations
+     * call {@link #incrementIterationsCount()} after each completed iteration.
+     */
+    protected abstract Optimisation.Result doSolve(Optimisation.Result kickStarter);
 
     protected final void error(final String messagePattern, final Object... arguments) {
         BasicLogger.error(messagePattern, arguments);
@@ -573,14 +634,14 @@ public abstract class GenericSolver implements Optimisation.Solver {
     }
 
     /**
-     * The number of s since solver instantiated or iterations count reset.
+     * The number of s, see {@link #countTime(CalendarDateUnit)}.
      */
     protected final CalendarDateDuration getDuration() {
         return this.getDuration(CalendarDateUnit.SECOND);
     }
 
     protected final CalendarDateDuration getDuration(final CalendarDateUnit unit) {
-        return myStopwatch.stop(unit);
+        return new CalendarDateDuration(this.countTime(unit), unit);
     }
 
     /**
@@ -670,11 +731,6 @@ public abstract class GenericSolver implements Optimisation.Solver {
         if (options.logger_appender != null) {
             options.logger_appender.printf(format, args);
         }
-    }
-
-    protected final void resetIterationsCount() {
-        myIterationsCount.set(0);
-        myStopwatch.reset();
     }
 
 }

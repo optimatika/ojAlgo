@@ -80,7 +80,7 @@ public final class GomorySolver extends GenericSolver {
     }
 
     @Override
-    public Result solve(final Result kickStarter) {
+    protected Result doSolve(final Result kickStarter) {
 
         ModelStrategy strategy = IntegerStrategy.DEFAULT.withCutConfiguration(GMI_CUT_CONFIGURATION).newModelStrategy(myIntegerModel);
         CutStatistics statistics = new CutStatistics(myIntegerModel.getOptimisationSense());

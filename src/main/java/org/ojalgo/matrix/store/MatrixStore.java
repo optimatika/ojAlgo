@@ -40,7 +40,6 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Structure1D;
 import org.ojalgo.structure.Structure2D;
-import org.ojalgo.structure.Structure2D.Logical;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 

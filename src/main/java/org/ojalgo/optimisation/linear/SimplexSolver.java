@@ -1955,8 +1955,6 @@ abstract class SimplexSolver extends LinearSolver {
 
         mySimplex.prepareToIterate(cold);
 
-        this.resetIterationsCount();
-
         if (this.isLogDebug()) {
             this.logCurrentState();
         }

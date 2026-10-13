@@ -300,7 +300,7 @@ public class MultiplyBoth implements MatrixOperation {
             int limit = mtrxR != null ? Structure2D.limitOfColumn(mtrxR, j, limitL) : limitL;
             Scalar<N> sum = zero;
             for (int c = first; c < limit; c++) {
-                sum = sum.add(row[c].multiply(mtrxR != null ? mtrxR.get(c, j) : right.get(c + j * complexity)));
+                sum = sum.add(row[c].multiply(mtrxR != null ? mtrxR.get(c, j) : right.get(c + (long) j * complexity)));
             }
             product.set(0, j, sum.get());
         }

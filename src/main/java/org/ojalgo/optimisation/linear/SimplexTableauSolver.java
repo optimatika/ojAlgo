@@ -561,37 +561,6 @@ final class SimplexTableauSolver extends LinearSolver {
     }
 
     @Override
-    public Result solve(final Result kickStarter) {
-
-        this.invalidateCache();
-
-        if (this.isLogDebug() && this.isTableauPrintable()) {
-            this.logDebugTableau("Initial Tableau");
-        }
-
-        this.resetIterationsCount();
-
-        while (this.isIterationAllowed() && this.needsAnotherIteration()) {
-
-            this.performIteration(myPoint);
-
-            this.incrementIterationsCount();
-
-            if (this.isLogDebug() && this.isTableauPrintable()) {
-                this.logDebugTableau("Tableau Iteration");
-            }
-        }
-
-        if (this.isLogDebug() && this.isTableauPrintable()) {
-            this.logDebugTableau("Final Tableau");
-        }
-
-        // BasicLogger.debug("Total iters: {}", this.countIterations());
-
-        return this.buildResult();
-    }
-
-    @Override
     public boolean updateRange(final int index, final double lower, final double upper) {
 
         if (lower == upper) {
@@ -746,6 +715,35 @@ final class SimplexTableauSolver extends LinearSolver {
         } else {
             return result.withDualSolution(this::extractMultipliers);
         }
+    }
+
+    @Override
+    protected Result doSolve(final Result kickStarter) {
+
+        this.invalidateCache();
+
+        if (this.isLogDebug() && this.isTableauPrintable()) {
+            this.logDebugTableau("Initial Tableau");
+        }
+
+        while (this.isIterationAllowed() && this.needsAnotherIteration()) {
+
+            this.performIteration(myPoint);
+
+            this.incrementIterationsCount();
+
+            if (this.isLogDebug() && this.isTableauPrintable()) {
+                this.logDebugTableau("Tableau Iteration");
+            }
+        }
+
+        if (this.isLogDebug() && this.isTableauPrintable()) {
+            this.logDebugTableau("Final Tableau");
+        }
+
+        // BasicLogger.debug("Total iters: {}", this.countIterations());
+
+        return this.buildResult();
     }
 
     protected double evaluateFunction(final Access1D<?> solution) {

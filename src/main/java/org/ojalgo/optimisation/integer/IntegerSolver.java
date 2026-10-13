@@ -230,129 +230,6 @@ public final class IntegerSolver extends GenericSolver {
     }
 
     @Override
-    public Result solve(final Result kickStarter) {
-
-        Result point = kickStarter != null ? kickStarter : myIntegerModel.getVariableValues();
-
-        myStrategy.initialise();
-
-        // Pre-warm the "objective as constraint" expression on myIntegerModel before workers spawn.
-        // limitObjective(...) is called concurrently from compute() during search (for bound-objective
-        // pruning); the first such call lazily mutates myExpressions, which races with concurrent
-        // model.validate() iterations across other workers. Forcing creation here, single-threaded,
-        // makes those later calls pure updates and removes the race.
-        myIntegerModel.limitObjective(null, null);
-
-        if (point != null && point.getState().isFeasible() && myIntegerModel.validate(point)) {
-            // Must verify that it actually is an integer solution
-            // The kickStarter may be user-supplied
-            this.markInteger(null, point, myStrategy);
-        }
-
-        this.resetIterationsCount();
-
-        NodeKey rootNode = new NodeKey(myIntegerModel);
-        ExpressionsBasedModel rootModel = myIntegerModel.snapshot();
-        rootNode.setNodeState(rootModel, myStrategy);
-
-        RingLogger rootPrinter = this.newPrinter();
-
-        NodeSolver rootSolver = rootModel.prepare(mySense, NodeSolver::new);
-        AtomicBoolean solverNormalExit = new AtomicBoolean(this.processRoot(rootNode, rootSolver, rootPrinter));
-
-        rootNode.dispose();
-
-        Map<Comparator<NodeKey>, MultiviewSet<NodeKey>.PrioritisedView> views = new ConcurrentHashMap<>();
-
-        List<Comparator<NodeKey>> workerPriorities = myStrategy.getWorkerPriorities(options.getParallelism());
-        for (Comparator<NodeKey> workerPriority : workerPriorities) {
-            MultiviewSet<NodeKey>.PrioritisedView view = myDeferredNodes.newView(workerPriority);
-            views.put(workerPriority, view);
-            if (mySense == Optimisation.Sense.MIN && workerPriority == NodeKey.MIN_OBJECTIVE) {
-                myBoundView = view;
-            } else if (mySense == Optimisation.Sense.MAX && workerPriority == NodeKey.MAX_OBJECTIVE) {
-                myBoundView = view;
-            }
-        }
-
-        ProcessingService.INSTANCE.process(workerPriorities, workerPriority -> {
-
-            boolean workerNormalExit = solverNormalExit.get();
-
-            MultiviewSet<NodeKey>.PrioritisedView view = views.computeIfAbsent(workerPriority, myDeferredNodes::newView);
-
-            RingLogger nodePrinter = this.newPrinter();
-
-            Thread worker = Thread.currentThread();
-            Double pessimistic = Double.valueOf(mySense == Optimisation.Sense.MIN ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY);
-
-            NodeKey node = null;
-            try {
-                while (workerNormalExit && solverNormalExit.get() && !myOptimalityProven && !myDeferredNodes.isEmpty()) {
-
-                    // Registered as pessimistic before polling, so that no other worker can prove optimality
-                    // in the window between this node leaving the queue and its bound being recorded.
-                    myCheckedOutBounds.put(worker, pessimistic);
-
-                    if ((node = view.poll()) != null) {
-
-                        myCheckedOutBounds.put(worker, Double.valueOf(node.objective));
-
-                        if (!this.isIterationAllowed()) {
-                            workerNormalExit = false;
-                        } else if (this.isOptimalityProven()) {
-                            myOptimalityProven = true;
-                        } else if (!myStrategy.isGoodEnough(myBestResultSoFar, node.objective)) {
-                            workerNormalExit = myNodeStatistics.abandoned();
-                        } else {
-                            ExpressionsBasedModel nodeModel = myIntegerModel.snapshot();
-                            node.setNodeState(nodeModel, myStrategy);
-                            NodeSolver nodeSolver = nodeModel.prepare(mySense, NodeSolver::new);
-                            workerNormalExit &= this.compute(node, nodeSolver, nodePrinter, myStrategy);
-                        }
-
-                        node.dispose();
-                    }
-
-                    myCheckedOutBounds.remove(worker);
-
-                    if (!workerNormalExit) {
-                        solverNormalExit.set(workerNormalExit);
-                    }
-                }
-            } finally {
-                myCheckedOutBounds.remove(worker);
-            }
-        });
-
-        views.clear();
-        myDeferredNodes.clear();
-
-        if (this.isLogProgress()) {
-            if (myOptimalityProven) {
-                this.log("Incumbent proven optimal within gap tolerance - stopped early.");
-            }
-            this.logProgress(this.countIterations(), this.getClassSimpleName(), this.getDuration());
-        }
-
-        myBoundView = null;
-
-        Optimisation.Result bestSolutionFound = this.getBestResultSoFar();
-
-        if (bestSolutionFound.getState().isFeasible()) {
-            if (solverNormalExit.get()) {
-                return bestSolutionFound.withState(State.OPTIMAL);
-            } else {
-                return bestSolutionFound.withState(State.FEASIBLE);
-            }
-        } else if (solverNormalExit.get()) {
-            return bestSolutionFound.withState(State.INFEASIBLE);
-        } else {
-            return bestSolutionFound.withState(State.FAILED);
-        }
-    }
-
-    @Override
     public String toString() {
         return TypeUtils.format("Solutions={} Nodes/Iterations={} {}", myNodeStatistics.countIntegerSolutions(), this.countIterations(),
                 this.getBestResultSoFar());
@@ -621,6 +498,127 @@ public final class IntegerSolver extends GenericSolver {
         return relaxed;
     }
 
+    @Override
+    protected Result doSolve(final Result kickStarter) {
+
+        Result point = kickStarter != null ? kickStarter : myIntegerModel.getVariableValues();
+
+        myStrategy.initialise();
+
+        // Pre-warm the "objective as constraint" expression on myIntegerModel before workers spawn.
+        // limitObjective(...) is called concurrently from compute() during search (for bound-objective
+        // pruning); the first such call lazily mutates myExpressions, which races with concurrent
+        // model.validate() iterations across other workers. Forcing creation here, single-threaded,
+        // makes those later calls pure updates and removes the race.
+        myIntegerModel.limitObjective(null, null);
+
+        if (point != null && point.getState().isFeasible() && myIntegerModel.validate(point)) {
+            // Must verify that it actually is an integer solution
+            // The kickStarter may be user-supplied
+            this.markInteger(null, point, myStrategy);
+        }
+
+        NodeKey rootNode = new NodeKey(myIntegerModel);
+        ExpressionsBasedModel rootModel = myIntegerModel.snapshot();
+        rootNode.setNodeState(rootModel, myStrategy);
+
+        RingLogger rootPrinter = this.newPrinter();
+
+        NodeSolver rootSolver = rootModel.prepare(mySense, NodeSolver::new);
+        AtomicBoolean solverNormalExit = new AtomicBoolean(this.processRoot(rootNode, rootSolver, rootPrinter));
+
+        rootNode.dispose();
+
+        Map<Comparator<NodeKey>, MultiviewSet<NodeKey>.PrioritisedView> views = new ConcurrentHashMap<>();
+
+        List<Comparator<NodeKey>> workerPriorities = myStrategy.getWorkerPriorities(options.getParallelism());
+        for (Comparator<NodeKey> workerPriority : workerPriorities) {
+            MultiviewSet<NodeKey>.PrioritisedView view = myDeferredNodes.newView(workerPriority);
+            views.put(workerPriority, view);
+            if (mySense == Optimisation.Sense.MIN && workerPriority == NodeKey.MIN_OBJECTIVE) {
+                myBoundView = view;
+            } else if (mySense == Optimisation.Sense.MAX && workerPriority == NodeKey.MAX_OBJECTIVE) {
+                myBoundView = view;
+            }
+        }
+
+        ProcessingService.INSTANCE.process(workerPriorities, workerPriority -> {
+
+            boolean workerNormalExit = solverNormalExit.get();
+
+            MultiviewSet<NodeKey>.PrioritisedView view = views.computeIfAbsent(workerPriority, myDeferredNodes::newView);
+
+            RingLogger nodePrinter = this.newPrinter();
+
+            Thread worker = Thread.currentThread();
+            Double pessimistic = Double.valueOf(mySense == Optimisation.Sense.MIN ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY);
+
+            NodeKey node = null;
+            try {
+                while (workerNormalExit && solverNormalExit.get() && !myOptimalityProven && !myDeferredNodes.isEmpty()) {
+
+                    // Registered as pessimistic before polling, so that no other worker can prove optimality
+                    // in the window between this node leaving the queue and its bound being recorded.
+                    myCheckedOutBounds.put(worker, pessimistic);
+
+                    if ((node = view.poll()) != null) {
+
+                        myCheckedOutBounds.put(worker, Double.valueOf(node.objective));
+
+                        if (!this.isIterationAllowed()) {
+                            workerNormalExit = false;
+                        } else if (this.isOptimalityProven()) {
+                            myOptimalityProven = true;
+                        } else if (!myStrategy.isGoodEnough(myBestResultSoFar, node.objective)) {
+                            workerNormalExit = myNodeStatistics.abandoned();
+                        } else {
+                            ExpressionsBasedModel nodeModel = myIntegerModel.snapshot();
+                            node.setNodeState(nodeModel, myStrategy);
+                            NodeSolver nodeSolver = nodeModel.prepare(mySense, NodeSolver::new);
+                            workerNormalExit &= this.compute(node, nodeSolver, nodePrinter, myStrategy);
+                        }
+
+                        node.dispose();
+                    }
+
+                    myCheckedOutBounds.remove(worker);
+
+                    if (!workerNormalExit) {
+                        solverNormalExit.set(workerNormalExit);
+                    }
+                }
+            } finally {
+                myCheckedOutBounds.remove(worker);
+            }
+        });
+
+        views.clear();
+        myDeferredNodes.clear();
+
+        if (this.isLogProgress()) {
+            if (myOptimalityProven) {
+                this.log("Incumbent proven optimal within gap tolerance - stopped early.");
+            }
+            this.logProgress(this.countIterations(), this.getClassSimpleName(), this.getDuration());
+        }
+
+        myBoundView = null;
+
+        Optimisation.Result bestSolutionFound = this.getBestResultSoFar();
+
+        if (bestSolutionFound.getState().isFeasible()) {
+            if (solverNormalExit.get()) {
+                return bestSolutionFound.withState(State.OPTIMAL);
+            } else {
+                return bestSolutionFound.withState(State.FEASIBLE);
+            }
+        } else if (solverNormalExit.get()) {
+            return bestSolutionFound.withState(State.INFEASIBLE);
+        } else {
+            return bestSolutionFound.withState(State.FAILED);
+        }
+    }
+
     protected Optimisation.Result getBestEstimate() {
         return new Optimisation.Result(Optimisation.State.APPROXIMATE, this.getBestResultSoFar());
     }
@@ -667,10 +665,6 @@ public final class IntegerSolver extends GenericSolver {
                         Double.isFinite(bound) ? bound : "n/a");
             }
         }
-    }
-
-    CutStatistics getCutStatistics() {
-        return myCutStatistics;
     }
 
     protected synchronized void markInteger(final NodeKey key, final Optimisation.Result result, final ModelStrategy strategy) {
@@ -1005,6 +999,10 @@ public final class IntegerSolver extends GenericSolver {
         }
 
         return nodeKey;
+    }
+
+    CutStatistics getCutStatistics() {
+        return myCutStatistics;
     }
 
     /**

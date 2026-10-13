@@ -498,7 +498,7 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
                 .copy(RawStore.wrap(new double[][] { { 10514.489048700269, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4157254.9979421264, 0.0, 0.0, 0.0 },
                         { 0.0, 0.0, 40911.20171773545, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 4157254.9979421264, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 4157254.9979414917 } }));
 
-        Optimisation.Result result = IterativeRefinementSolver.doSolve(Q, C, AE, BE, AI, BI, options);
+        Optimisation.Result result = new IterativeRefinementSolver(options, null).refine(Q, C, AE, BE, AI, BI);
 
         MatrixStore<Double> x = R064Store.FACTORY.column(result);
         MatrixStore<Double> y = R064Store.FACTORY.column(result.getDualSolution().map(Supplier::get).get());
@@ -525,7 +525,7 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
         GenericStore<Quadruple> Q = GenericStore.R128.copy(RawStore.wrap(new double[][] { { 41572.55, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 41572.55, 0.0, 0.0, 0.0 },
                 { 0.0, 0.0, 41572.55, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 41572.55, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 41572.55 } }));
 
-        Optimisation.Result result = IterativeRefinementSolver.doSolve(Q, C, AE, BE, AI, BI, options);
+        Optimisation.Result result = new IterativeRefinementSolver(options, null).refine(Q, C, AE, BE, AI, BI);
 
         MatrixStore<Double> x = R064Store.FACTORY.column(result);
         MatrixStore<Double> y = R064Store.FACTORY.column(result.getDualSolution().map(Supplier::get).get());
@@ -550,7 +550,7 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
         GenericStore<Quadruple> C = GenericStore.R128.copy(RawStore.wrap(new double[][] { { -0.0 }, { -0.0 }, { -1.0 }, { -100000.0 }, { -1000.0 } }));
         GenericStore<Quadruple> Q = GenericStore.R128.copy(RawStore.wrap(new double[][] { { 1.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0, 0.0, 0.0 },
                 { 0.0, 0.0, 1.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 1.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 1.0 } }));
-        Optimisation.Result result = IterativeRefinementSolver.doSolve(Q, C, AE, BE, AI, BI, options);
+        Optimisation.Result result = new IterativeRefinementSolver(options, null).refine(Q, C, AE, BE, AI, BI);
         MatrixStore<Double> x = R064Store.FACTORY.column(result);
         MatrixStore<Double> y = R064Store.FACTORY.column(result.getDualSolution().map(Supplier::get).get());
 
@@ -607,7 +607,7 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
         options.sparse = false;
         options.convex().extendedPrecision(true);
         options.convex().solverSPD(Cholesky.R064::make).solverGeneral(LU.R064::make).iterative(NumberContext.of(16));
-        Optimisation.Result resultQuadruple = IterativeRefinementSolver.doSolve(Q, C, AE, BE, AI, BI, options);
+        Optimisation.Result resultQuadruple = new IterativeRefinementSolver(options, null).refine(Q, C, AE, BE, AI, BI);
 
         MatrixStore<Double> xQ = R064Store.FACTORY.column(resultQuadruple);
         MatrixStore<Double> yQ = R064Store.FACTORY.column(resultQuadruple.getDualSolution().map(Supplier::get).get());

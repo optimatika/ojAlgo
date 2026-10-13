@@ -86,7 +86,7 @@ public class SparseCase extends NonPhysicalTest {
     @Test
     public void testBuilderAndCopy() {
 
-        int dim = 50_000;
+        int dim = 40_000;
 
         Builder<Quadruple> builder = SparseStore.R128.newBuilder(dim, dim);
 

@@ -5,7 +5,6 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import java.util.Arrays;
 
 import org.ojalgo.array.operation.AXPY;
-
 import org.ojalgo.type.context.NumberContext;
 
 abstract class EvD2D {

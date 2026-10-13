@@ -86,6 +86,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
         Builder(final PhysicalStore.Factory<N, ?> physicalFactory, final int rowDim, final int colDim) {
             super();
+            SparseStore.checkSize(rowDim, colDim);
             myPhysicalFactory = physicalFactory;
             myRowDim = rowDim;
             myColDim = colDim;
@@ -212,6 +213,12 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         return new SparseStore.Factory<>(physicalFactory);
     }
 
+    private static void checkSize(final int nbRows, final int nbCols) {
+        if ((long) nbRows * nbCols > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("Too large: " + nbRows + " x " + nbCols + " – rows times columns must not exceed Integer.MAX_VALUE!");
+        }
+    }
+
     private static <N extends Scalar<N>> void doGenericColumnAXPY(final SparseArray<N> elements, final long colX, final long colY, final N a,
             final TransformableRegion<N> y) {
 
@@ -291,6 +298,8 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
     SparseStore(final PhysicalStore.Factory<N, ?> factory, final int nbRows, final int nbCols, final IntBinaryOperator initial) {
 
         super(factory, nbRows, nbCols);
+
+        SparseStore.checkSize(nbRows, nbCols);
 
         myElements = SparseArray.factory(factory.array()).initial(initial.applyAsInt(nbRows, nbCols)).make(this.size());
         myFirsts = new int[nbRows];

@@ -66,7 +66,7 @@ public class SparsePerformance extends MatrixStoreTests {
     @Test
     public void testElementwiseMultiplication() {
 
-        int n = 100_000;
+        int n = 40_000;
 
         SparseStore<Double> mtrxA = SparseStore.R064.make(n, n);
         SparseStore<Double> mtrxB = SparseStore.R064.make(n, n);
@@ -95,7 +95,7 @@ public class SparsePerformance extends MatrixStoreTests {
     @Tag("slow")
     public void testMatrixMultiplication() {
 
-        int n = 100_000;
+        int n = 40_000;
 
         SparseStore<Double> mtrxA = SparseStore.R064.make(n, n);
         SparseStore<Double> mtrxB = SparseStore.R064.make(n, n);
@@ -119,7 +119,7 @@ public class SparsePerformance extends MatrixStoreTests {
     @Test
     public void testMultiplyByOneVector() {
 
-        int n = 100_000;
+        int n = 40_000;
 
         SparseStore<Double> mtrx = SparseStore.R064.make(n, n);
 
@@ -150,7 +150,7 @@ public class SparsePerformance extends MatrixStoreTests {
     @Test
     public void testReduceColumns() {
 
-        int n = 100_000;
+        int n = 40_000;
 
         SparseStore<Double> mtrx = SparseStore.R064.make(n, n);
         R064Store vctr = R064Store.FACTORY.make(1, n);
@@ -175,7 +175,7 @@ public class SparsePerformance extends MatrixStoreTests {
     @Test
     public void testReduceRows() {
 
-        int n = 100_000;
+        int n = 40_000;
 
         SparseStore<Double> mtrx = SparseStore.R064.make(n, n);
         R064Store vctr = R064Store.FACTORY.make(n, 1);
@@ -200,7 +200,7 @@ public class SparsePerformance extends MatrixStoreTests {
     @Test
     public void testReset() {
 
-        int n = 100_000;
+        int n = 40_000;
 
         SparseStore<Double> mtrx = SparseStore.R064.make(n, n);
 

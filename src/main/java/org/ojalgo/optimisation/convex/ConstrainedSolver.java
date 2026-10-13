@@ -116,6 +116,11 @@ abstract class ConstrainedSolver extends BasePrimitiveSolver {
         return gradient;
     }
 
+    @Override
+    PhysicalStore<Double> copyDualSolution() {
+        return mySolutionL.copy();
+    }
+
     /**
      * The number of rows in {@link #getIterationA()} and {@link #getIterationB()} without having to actually
      * create them.
@@ -153,11 +158,6 @@ abstract class ConstrainedSolver extends BasePrimitiveSolver {
         }
 
         return mySlackE;
-    }
-
-    @Override
-    PhysicalStore<Double> copyDualSolution() {
-        return mySolutionL.copy();
     }
 
     R064Store getSolutionL() {

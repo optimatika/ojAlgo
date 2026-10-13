@@ -122,8 +122,64 @@ final class IterativeRefinementSolver extends ConvexSolver {
         IterativeRefinementSolver.updateConvexDoubleData(data, C, Be, Bi);
     }
 
-    static Optimisation.Result doSolve(final MatrixStore<Quadruple> Q, final MatrixStore<Quadruple> C, final MatrixStore<Quadruple> Ae,
-            final MatrixStore<Quadruple> Be, final MatrixStore<Quadruple> Ai, final MatrixStore<Quadruple> Bi, final Optimisation.Options options) {
+    static ConvexData<Quadruple> newInstance(final int nbVars, final int nbEqus, final int nbIneq) {
+        return new ConvexData<>(false, GenericStore.R128, nbVars, nbEqus, nbIneq);
+    }
+
+    private final ConvexData<Quadruple> myData;
+
+    IterativeRefinementSolver(final Optimisation.Options optimisationOptions, final ConvexData<Quadruple> convexData) {
+        super(optimisationOptions);
+        myData = convexData;
+    }
+
+    @Override
+    protected Result doSolve(final Result kickStarter) {
+
+        ConvexObjectiveFunction<Quadruple> objective = myData.getObjective();
+        MatrixStore<Quadruple> mtrxQ = objective.quadratic();
+        MatrixStore<Quadruple> mtrxC = objective.linear();
+
+        MatrixStore<Quadruple> mtrxAE = myData.getAE();
+        MatrixStore<Quadruple> mtrxBE = myData.getBE();
+
+        MatrixStore<Quadruple> mtrxAI = myData.getAI();
+        MatrixStore<Quadruple> mtrxBI = myData.getBI();
+
+        Result result = this.refine(mtrxQ, mtrxC, mtrxAE, mtrxBE, mtrxAI, mtrxBI);
+
+        double objectiveScale = myData.getObjectiveAdjustmentFactor();
+
+        Result retVal = result.withValue(result.getValue() / objectiveScale);
+
+        Optional<Supplier<Access1D<?>>> dualSolution = result.getDualSolution();
+        if (result.getState().isFeasible() && result.getState().isSuccess() && dualSolution.isPresent()) {
+
+            Access1D<?> multipliers = dualSolution.get().get();
+
+            int nbVars = myData.countVariables();
+            MatrixStore<Quadruple> mtrxQx = mtrxQ.multiply(GenericStore.R128.column(result));
+            double[] reducedGradient = new double[nbVars];
+            for (int j = 0; j < nbVars; j++) {
+                reducedGradient[j] = mtrxQx.doubleValue(j) - mtrxC.doubleValue(j);
+            }
+            myData.addMultiplierTerms(reducedGradient, multipliers);
+            for (int j = 0; j < nbVars; j++) {
+                reducedGradient[j] /= objectiveScale;
+            }
+
+            retVal = retVal.withReducedGradient(() -> ArrayR064.wrap(reducedGradient));
+
+            if (myData.isEntityMap()) {
+                retVal = retVal.withDualValues(myData.getConstraintsMetaData(), () -> multipliers);
+            }
+        }
+
+        return retVal;
+    }
+
+    Optimisation.Result refine(final MatrixStore<Quadruple> Q, final MatrixStore<Quadruple> C, final MatrixStore<Quadruple> Ae, final MatrixStore<Quadruple> Be,
+            final MatrixStore<Quadruple> Ai, final MatrixStore<Quadruple> Bi) {
 
         // Required threshold for final residuals
         double threshold = options.solution.epsilon();
@@ -154,6 +210,7 @@ final class IterativeRefinementSolver extends ConvexSolver {
         data = IterativeRefinementSolver.getDoubleConvexData(data, Q, C, Ae, Be, Ai, Bi);
 
         Optimisation.Result x_y_double = BasePrimitiveSolver.newSolver(data, options).solve();
+        this.incrementIterationsCount();
         if (x_y_double.getState() == Optimisation.State.INFEASIBLE || x_y_double.getState() == Optimisation.State.UNBOUNDED) {
             //         trust solver and abort if infeasible or unbounded.
             return x_y_double;
@@ -171,7 +228,6 @@ final class IterativeRefinementSolver extends ConvexSolver {
         //  Set initial values
         double scaleP0 = 1;
         double scaleD0 = 1;
-        int iteration = 0;
         State exitState = State.FEASIBLE;
 
         refinement: while (x_y_double.getState().isFeasible()) {
@@ -180,7 +236,6 @@ final class IterativeRefinementSolver extends ConvexSolver {
              * system of linear equations (KKT) using high precision and return this answer if it is a
              * success, after checking inequality multipliers.
              */
-            iteration++;
 
             // Compute residuals in Quadruple precision
             MatrixStore<Quadruple> residual_Be = Be.subtract(Ae.multiply(x0));
@@ -207,7 +262,7 @@ final class IterativeRefinementSolver extends ConvexSolver {
                 exitState = State.OPTIMAL;
                 break refinement;
             }
-            if (iteration > maxRefinementIterations) {
+            if (this.countIterations() > maxRefinementIterations) {
                 if (maxPrimalResidual < Math.sqrt(epsPrimal) && relativeGradientResidual < Math.sqrt(epsDual)
                         && relativeComplementarySlackness < Math.sqrt(epsSlack)) {
                     exitState = State.APPROXIMATE;
@@ -292,66 +347,12 @@ final class IterativeRefinementSolver extends ConvexSolver {
             scaleD0 = scaleD1;
             x0 = x1;
             y0 = y1;
+
+            this.incrementIterationsCount();
         }
         Result result = IterativeRefinementSolver.buildResult(Q, C, x0, y0, exitState);
         double improvement = (initialSolutionValue - result.getValue()) / initialSolutionValue;
         return result;
-    }
-
-    static ConvexData<Quadruple> newInstance(final int nbVars, final int nbEqus, final int nbIneq) {
-        return new ConvexData<>(false, GenericStore.R128, nbVars, nbEqus, nbIneq);
-    }
-
-    private final ConvexData<Quadruple> myData;
-
-    IterativeRefinementSolver(final Optimisation.Options optimisationOptions, final ConvexData<Quadruple> convexData) {
-        super(optimisationOptions);
-        myData = convexData;
-    }
-
-    @Override
-    public Result solve(final Result kickStarter) {
-
-        ConvexObjectiveFunction<Quadruple> objective = myData.getObjective();
-        MatrixStore<Quadruple> mtrxQ = objective.quadratic();
-        MatrixStore<Quadruple> mtrxC = objective.linear();
-
-        MatrixStore<Quadruple> mtrxAE = myData.getAE();
-        MatrixStore<Quadruple> mtrxBE = myData.getBE();
-
-        MatrixStore<Quadruple> mtrxAI = myData.getAI();
-        MatrixStore<Quadruple> mtrxBI = myData.getBI();
-
-        Result result = IterativeRefinementSolver.doSolve(mtrxQ, mtrxC, mtrxAE, mtrxBE, mtrxAI, mtrxBI, options);
-
-        double objectiveScale = myData.getObjectiveAdjustmentFactor();
-
-        Result retVal = result.withValue(result.getValue() / objectiveScale);
-
-        Optional<Supplier<Access1D<?>>> dualSolution = result.getDualSolution();
-        if (result.getState().isFeasible() && result.getState().isSuccess() && dualSolution.isPresent()) {
-
-            Access1D<?> multipliers = dualSolution.get().get();
-
-            int nbVars = myData.countVariables();
-            MatrixStore<Quadruple> mtrxQx = mtrxQ.multiply(GenericStore.R128.column(result));
-            double[] reducedGradient = new double[nbVars];
-            for (int j = 0; j < nbVars; j++) {
-                reducedGradient[j] = mtrxQx.doubleValue(j) - mtrxC.doubleValue(j);
-            }
-            myData.addMultiplierTerms(reducedGradient, multipliers);
-            for (int j = 0; j < nbVars; j++) {
-                reducedGradient[j] /= objectiveScale;
-            }
-
-            retVal = retVal.withReducedGradient(() -> ArrayR064.wrap(reducedGradient));
-
-            if (myData.isEntityMap()) {
-                retVal = retVal.withDualValues(myData.getConstraintsMetaData(), () -> multipliers);
-            }
-        }
-
-        return retVal;
     }
 
 }

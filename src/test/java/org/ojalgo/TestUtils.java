@@ -21,7 +21,6 @@
  */
 package org.ojalgo;
 
-import java.io.File;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.MathContext;

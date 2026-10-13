@@ -38,7 +38,6 @@ import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.matrix.transformation.InvertibleFactor;
-import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
@@ -46,8 +45,9 @@ import org.ojalgo.structure.Structure1D;
 
 /**
  * A sparse, primitive double based, LU decomposition with support for Forrest-Tomlin updates (column
- * replacement). It is designed specifically to be used with the {@link LinearSolver} but also implements the
- * standard {@link MatrixDecomposition} interfaces.
+ * replacement). It is designed specifically to be used with the
+ * {@link org.ojalgo.optimisation.linear.LinearSolver} but also implements the standard
+ * {@link MatrixDecomposition} interfaces.
  * <p>
  * There are two ways to factorise:
  * <ul>

@@ -73,6 +73,13 @@ final class IterativeASS extends ActiveSetSolver {
             myIterationRows = new Equation[myFullDim];
         }
 
+        @Override
+        public double resolve(final PhysicalStore<Double> solution) {
+            // In exact arithmetic CG converges in (at most) as many iterations as there are rows
+            this.getDelegate().configurator().iterations(CG_ITERATIONS_OFFSET + CG_ITERATIONS_FACTOR * IterativeASS.this.countIterationConstraints());
+            return super.resolve(solution);
+        }
+
         void add(final int j, final Access1D<Double> column, final double rhs) {
 
             int[] incl = IterativeASS.this.getIncluded();
@@ -113,13 +120,6 @@ final class IterativeASS extends ActiveSetSolver {
 
         double[] getRHS() {
             return this.equations().mapToDouble(Equation::getRHS).toArray();
-        }
-
-        @Override
-        public double resolve(final PhysicalStore<Double> solution) {
-            // In exact arithmetic CG converges in (at most) as many iterations as there are rows
-            this.getDelegate().configurator().iterations(CG_ITERATIONS_OFFSET + CG_ITERATIONS_FACTOR * IterativeASS.this.countIterationConstraints());
-            return super.resolve(solution);
         }
 
         void remove(final int i) {

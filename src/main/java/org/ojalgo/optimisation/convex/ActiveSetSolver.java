@@ -63,6 +63,24 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     private static final NumberContext SLACK = NumberContext.of(6, 10).withMode(RoundingMode.HALF_DOWN);
     private static final NumberContext SOLUTION = NumberContext.of(6).withMode(RoundingMode.HALF_DOWN);
 
+    /**
+     * The step is negligible if every component is small compared to the corresponding component of the
+     * current solution. Comparing with the largest component (of the solution) would ignore steps in small
+     * variables whenever some other variable is large.
+     */
+    private static boolean isNegligible(final Access1D<Double> current, final Access1D<Double> step) {
+        for (int i = 0, limit = current.size(); i < limit; i++) {
+            if (!SOLUTION.isSmall(Math.abs(current.doubleValue(i)), step.doubleValue(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static double norm(final SparseArray<Double> row) {
+        return Math.max(Math.sqrt(row.dot(row)), MACHINE_EPSILON);
+    }
+
     private final IndexSelector myActivator;
     private final int myIterationsLimit;
     /**
@@ -98,21 +116,111 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     }
 
     /**
-     * The step is negligible if every component is small compared to the corresponding component of the
-     * current solution. Comparing with the largest component (of the solution) would ignore steps in small
-     * variables whenever some other variable is large.
+     * The step should not change the slack of any of the active constraints (equalities and included
+     * inequalities). How much it does anyway is a measure of the numerical noise in the step – the largest
+     * change in the distance to an active constraint.
      */
-    private static boolean isNegligible(final Access1D<Double> current, final Access1D<Double> step) {
-        for (int i = 0, limit = current.size(); i < limit; i++) {
-            if (!SOLUTION.isSmall(Math.abs(current.doubleValue(i)), step.doubleValue(i))) {
-                return false;
-            }
+    private double estimateNoise(final Access1D<Double> step) {
+
+        double noise = ZERO;
+
+        for (int i = 0, limit = this.countEqualityConstraints(); i < limit; i++) {
+            noise = Math.max(noise, Math.abs(this.getMatrixAE(i).dot(step)) / this.getRowNormAE(i));
         }
-        return true;
+
+        for (int i : this.getIncluded()) {
+            noise = Math.max(noise, Math.abs(this.getMatrixAI(i).dot(step)) / this.getRowNormAI(i));
+        }
+
+        return noise;
     }
 
-    private static double norm(final SparseArray<Double> row) {
-        return Math.max(Math.sqrt(row.dot(row)), MACHINE_EPSILON);
+    /**
+     * Ratio test: the largest step length, not more than 1, that keeps all currently excluded inequalities
+     * satisfied. The constraint limiting the step length, if any, is set to be included next.
+     * <p>
+     * A slack change (distance to the constraint boundary) that is not larger than the numerical noise,
+     * scaled with the size of the constraint row, is not considered to be moving towards the boundary. A
+     * constraint that is linearly dependent on the active constraints does not change its slack, other than
+     * by noise, and including it would make the KKT system unsolvable. Constraints found to be dependent (and
+     * the one to ignore) are skipped, unless the slack change is significant compared to the step.
+     * <p>
+     * A constraint is at its boundary (limits the step length to 0) if its slack is negligible compared to
+     * the slack change, and also compared to the size of the constraint – its RHS and its terms at the
+     * current solution. With a very long step, a slack that is negligible compared to the slack change can
+     * still be far from 0, and including that constraint without moving would make the active set
+     * inconsistent with the current solution.
+     *
+     * @param ignore An inequality constraint to ignore, or -1
+     */
+    private double findStepLength(final Access1D<Double> step, final Access1D<Double> slack, final double noise, final int ignore) {
+
+        double stepLength = ONE;
+        this.setConstraintToInclude(-1);
+
+        double stepNorm = Math.sqrt(step.dot(step));
+        double solutionNorm = this.getSolutionX().aggregateAll(Aggregator.LARGEST).doubleValue();
+
+        int nbIneqs = this.countInequalityConstraints();
+        int testThisLast = Math.min(this.getLastIncluded(), this.getLastExcluded());
+        int base = Math.max(0, testThisLast + 1);
+        for (int ii = 0; ii < nbIneqs; ii++) {
+            int i = (base + ii) % nbIneqs; // Wrap around to handle cyclically
+
+            if (myActivator.isIncluded(i)) {
+                continue; // Skip currently included rows
+            }
+
+            double slackChange = this.getMatrixAI(i).dot(step);
+
+            if (slackChange <= ZERO || SLACK.isZero(slackChange) || slackChange <= NOISE_FACTOR * noise * this.getRowNormAI(i)) {
+                continue; // Not moving towards the boundary
+            }
+
+            if ((i == ignore || myDependent.get(i)) && slackChange <= DEPENDENT * this.getRowNormAI(i) * stepNorm) {
+                continue; // Linearly dependent on the active constraints, and the slack change is negligible
+            }
+
+            double currentSlack = slack.doubleValue(i);
+            double constraintSize = Math.max(Math.abs(this.getMatrixBI(i)), this.getRowNormAI(i) * solutionNorm);
+            boolean atBoundary = SLACK.isSmall(slackChange, currentSlack) && SLACK.isSmall(constraintSize, currentSlack);
+            // If the current slack is negative something has already gone wrong.
+            // Taking the max value is to handle small negative values due to rounding errors
+            double fraction = atBoundary ? ZERO : Math.max(currentSlack, ZERO) / slackChange;
+
+            if (fraction < stepLength) {
+                stepLength = fraction;
+                this.setConstraintToInclude(i);
+                if (this.isLogDebug()) {
+                    this.log(1, "Best so far: {} @ {} ––– {} / {}.", stepLength, i, currentSlack, slackChange);
+                }
+                if (stepLength == ZERO) {
+                    break;
+                }
+            }
+        }
+
+        return stepLength;
+    }
+
+    private double getRowNormAE(final int row) {
+        if (myRowNormsAE == null) {
+            myRowNormsAE = new double[this.countEqualityConstraints()];
+            for (int i = 0; i < myRowNormsAE.length; i++) {
+                myRowNormsAE[i] = ActiveSetSolver.norm(this.getMatrixAE(i));
+            }
+        }
+        return myRowNormsAE[row];
+    }
+
+    private double getRowNormAI(final int row) {
+        if (myRowNormsAI == null) {
+            myRowNormsAI = new double[this.countInequalityConstraints()];
+            for (int i = 0; i < myRowNormsAI.length; i++) {
+                myRowNormsAI[i] = ActiveSetSolver.norm(this.getMatrixAI(i));
+            }
+        }
+        return myRowNormsAI[row];
     }
 
     private void handleIterationSolution(final R064Store iterX, final int[] excluded) {
@@ -226,114 +334,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         }
     }
 
-    /**
-     * The step should not change the slack of any of the active constraints (equalities and included
-     * inequalities). How much it does anyway is a measure of the numerical noise in the step – the largest
-     * change in the distance to an active constraint.
-     */
-    private double estimateNoise(final Access1D<Double> step) {
-
-        double noise = ZERO;
-
-        for (int i = 0, limit = this.countEqualityConstraints(); i < limit; i++) {
-            noise = Math.max(noise, Math.abs(this.getMatrixAE(i).dot(step)) / this.getRowNormAE(i));
-        }
-
-        for (int i : this.getIncluded()) {
-            noise = Math.max(noise, Math.abs(this.getMatrixAI(i).dot(step)) / this.getRowNormAI(i));
-        }
-
-        return noise;
-    }
-
-    /**
-     * Ratio test: the largest step length, not more than 1, that keeps all currently excluded inequalities
-     * satisfied. The constraint limiting the step length, if any, is set to be included next.
-     * <p>
-     * A slack change (distance to the constraint boundary) that is not larger than the numerical noise,
-     * scaled with the size of the constraint row, is not considered to be moving towards the boundary. A
-     * constraint that is linearly dependent on the active constraints does not change its slack, other than
-     * by noise, and including it would make the KKT system unsolvable. Constraints found to be dependent (and
-     * the one to ignore) are skipped, unless the slack change is significant compared to the step.
-     * <p>
-     * A constraint is at its boundary (limits the step length to 0) if its slack is negligible compared to
-     * the slack change, and also compared to the size of the constraint – its RHS and its terms at the
-     * current solution. With a very long step, a slack that is negligible compared to the slack change can
-     * still be far from 0, and including that constraint without moving would make the active set
-     * inconsistent with the current solution.
-     *
-     * @param ignore An inequality constraint to ignore, or -1
-     */
-    private double findStepLength(final Access1D<Double> step, final Access1D<Double> slack, final double noise, final int ignore) {
-
-        double stepLength = ONE;
-        this.setConstraintToInclude(-1);
-
-        double stepNorm = Math.sqrt(step.dot(step));
-        double solutionNorm = this.getSolutionX().aggregateAll(Aggregator.LARGEST).doubleValue();
-
-        int nbIneqs = this.countInequalityConstraints();
-        int testThisLast = Math.min(this.getLastIncluded(), this.getLastExcluded());
-        int base = Math.max(0, testThisLast + 1);
-        for (int ii = 0; ii < nbIneqs; ii++) {
-            int i = (base + ii) % nbIneqs; // Wrap around to handle cyclically
-
-            if (myActivator.isIncluded(i)) {
-                continue; // Skip currently included rows
-            }
-
-            double slackChange = this.getMatrixAI(i).dot(step);
-
-            if (slackChange <= ZERO || SLACK.isZero(slackChange) || slackChange <= NOISE_FACTOR * noise * this.getRowNormAI(i)) {
-                continue; // Not moving towards the boundary
-            }
-
-            if ((i == ignore || myDependent.get(i)) && slackChange <= DEPENDENT * this.getRowNormAI(i) * stepNorm) {
-                continue; // Linearly dependent on the active constraints, and the slack change is negligible
-            }
-
-            double currentSlack = slack.doubleValue(i);
-            double constraintSize = Math.max(Math.abs(this.getMatrixBI(i)), this.getRowNormAI(i) * solutionNorm);
-            boolean atBoundary = SLACK.isSmall(slackChange, currentSlack) && SLACK.isSmall(constraintSize, currentSlack);
-            // If the current slack is negative something has already gone wrong.
-            // Taking the max value is to handle small negative values due to rounding errors
-            double fraction = atBoundary ? ZERO : Math.max(currentSlack, ZERO) / slackChange;
-
-            if (fraction < stepLength) {
-                stepLength = fraction;
-                this.setConstraintToInclude(i);
-                if (this.isLogDebug()) {
-                    this.log(1, "Best so far: {} @ {} ––– {} / {}.", stepLength, i, currentSlack, slackChange);
-                }
-                if (stepLength == ZERO) {
-                    break;
-                }
-            }
-        }
-
-        return stepLength;
-    }
-
-    private double getRowNormAE(final int row) {
-        if (myRowNormsAE == null) {
-            myRowNormsAE = new double[this.countEqualityConstraints()];
-            for (int i = 0; i < myRowNormsAE.length; i++) {
-                myRowNormsAE[i] = ActiveSetSolver.norm(this.getMatrixAE(i));
-            }
-        }
-        return myRowNormsAE[row];
-    }
-
-    private double getRowNormAI(final int row) {
-        if (myRowNormsAI == null) {
-            myRowNormsAI = new double[this.countInequalityConstraints()];
-            for (int i = 0; i < myRowNormsAI.length; i++) {
-                myRowNormsAI[i] = ActiveSetSolver.norm(this.getMatrixAI(i));
-            }
-        }
-        return myRowNormsAI[row];
-    }
-
     private void shrink() {
 
         int toExclude = -1;
@@ -414,30 +414,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         }
 
         return toExclude;
-    }
-
-    /**
-     * Checks that the solution satisfies the active constraints (the equality constraints and the included
-     * inequality constraints), as equalities, to within the feasibility tolerance.
-     */
-    protected final boolean isActiveConstraintsSatisfied(final Access1D<Double> solution) {
-
-        MatrixStore<Double> mtrxBE = this.getMatrixBE();
-        for (int i = 0, limit = this.countEqualityConstraints(); i < limit; i++) {
-            double rhs = mtrxBE.doubleValue(i);
-            if (Math.abs(this.getMatrixAE(i).dot(solution) - rhs) > FEASIBILITY.error(rhs)) {
-                return false;
-            }
-        }
-
-        for (int i : this.getIncluded()) {
-            double rhs = this.getMatrixBI(i);
-            if (Math.abs(this.getMatrixAI(i).dot(solution) - rhs) > FEASIBILITY.error(rhs)) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     protected final int countExcluded() {
@@ -540,6 +516,30 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         }
 
         return ok && state.isFeasible();
+    }
+
+    /**
+     * Checks that the solution satisfies the active constraints (the equality constraints and the included
+     * inequality constraints), as equalities, to within the feasibility tolerance.
+     */
+    protected final boolean isActiveConstraintsSatisfied(final Access1D<Double> solution) {
+
+        MatrixStore<Double> mtrxBE = this.getMatrixBE();
+        for (int i = 0, limit = this.countEqualityConstraints(); i < limit; i++) {
+            double rhs = mtrxBE.doubleValue(i);
+            if (Math.abs(this.getMatrixAE(i).dot(solution) - rhs) > FEASIBILITY.error(rhs)) {
+                return false;
+            }
+        }
+
+        for (int i : this.getIncluded()) {
+            double rhs = this.getMatrixBI(i);
+            if (Math.abs(this.getMatrixAI(i).dot(solution) - rhs) > FEASIBILITY.error(rhs)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override

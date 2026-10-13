@@ -28,6 +28,7 @@ import java.math.MathContext;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -749,6 +750,63 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         RawStore matrix = CaseLDL.newSpecialSchnabelEskow();
 
         CaseEigenvalue.doTestEigenvalues(matrix, NumberContext.of(2), 8242.869, -0.378, -0.343, -0.248);
+    }
+
+    /**
+     * RawEigenvalue.Symmetric sorts the eigenvalues as doubles: in the same order as
+     * {@link Eigenvalue#getEigenvalues()}, by descending magnitude and the positive first on a tie.
+     */
+    @Test
+    public void testSymmetricEigenvaluesAsDoubles() {
+
+        RawEigenvalue.Symmetric decomp = new RawEigenvalue.Symmetric();
+
+        // Exact ties, from a diagonal matrix
+        double[] diagonal = { -2.0, 1.0, 2.0, 0.0, -1.0, 0.5 };
+        decomp.computeValuesOnly(R064Store.FACTORY.makeDiagonal(ArrayR064.wrap(diagonal)).get());
+        double[] actual = new double[diagonal.length];
+        decomp.getEigenvalues(actual, Optional.empty());
+        TestUtils.assertEquals(new double[] { 2.0, -2.0, 1.0, -1.0, 0.5, 0.0 }, actual);
+
+        // Only as many as there is room for
+        double[] largest = new double[2];
+        double[] imaginary = { Double.NaN, Double.NaN, Double.NaN };
+        decomp.getEigenvalues(largest, Optional.of(imaginary));
+        TestUtils.assertEquals(new double[] { 2.0, -2.0 }, largest);
+        TestUtils.assertEquals(0.0, imaginary[0]);
+        TestUtils.assertEquals(0.0, imaginary[1]);
+        TestUtils.assertTrue(Double.isNaN(imaginary[2]));
+
+        for (int dim = 1; dim <= 12; dim++) {
+
+            // Pairs of (almost) equal magnitude and opposite sign
+            double[] eigenvalues = new double[dim];
+            for (int i = 0; i < dim; i++) {
+                eigenvalues[i] = (i % 2 == 0 ? 1.0 : -1.0) * (1 + i / 2);
+            }
+
+            for (MatrixStore<Double> matrix : List.of(R064Store.FACTORY.makeSPD(dim), CaseEigenvalue.newRandom(eigenvalues))) {
+                for (boolean valuesOnly : new boolean[] { false, true }) {
+
+                    if (valuesOnly) {
+                        decomp.computeValuesOnly(matrix);
+                    } else {
+                        decomp.decompose(matrix);
+                    }
+
+                    Array1D<ComplexNumber> expected = decomp.getEigenvalues();
+                    double[] realParts = new double[dim];
+                    double[] imaginaryParts = new double[dim];
+                    java.util.Arrays.fill(imaginaryParts, Double.NaN);
+                    decomp.getEigenvalues(realParts, Optional.of(imaginaryParts));
+
+                    for (int i = 0; i < dim; i++) {
+                        TestUtils.assertEquals(dim + " " + valuesOnly + " at " + i, expected.get(i).getReal(), realParts[i]);
+                        TestUtils.assertEquals(dim + " " + valuesOnly + " at " + i, 0.0, imaginaryParts[i]);
+                    }
+                }
+            }
+        }
     }
 
 }

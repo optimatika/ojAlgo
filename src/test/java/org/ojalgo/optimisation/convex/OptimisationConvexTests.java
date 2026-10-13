@@ -33,6 +33,7 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver.Algorithm;
+import org.ojalgo.optimisation.convex.OptimisationConvexTests.ConfiguredIntegration;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.context.NumberContext;

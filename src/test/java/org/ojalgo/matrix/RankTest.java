@@ -31,8 +31,8 @@ import org.ojalgo.random.Normal;
 
 /**
  * {@link BasicMatrix#getRank()} uses the cached decomposition, if it is rank revealing, otherwise a new
- * singular value decomposition. What is cached depends on what was done with the matrix before – it may be
- * an LU, QR, singular value or eigenvalue decomposition, or nothing at all.
+ * singular value decomposition. What is cached depends on what was done with the matrix before – it may be an
+ * LU, QR, singular value or eigenvalue decomposition, or nothing at all.
  * <p>
  * The test matrices are products of random factors. The rank deficient ones are singular apart from rounding
  * errors. The singular values (or eigenvalues) reveal the rank of those reliably, but the LU or QR pivots do

@@ -11,6 +11,36 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [57.6.2] – 2026-10-31
+
+### Added
+
+#### org.ojalgo.optimisation
+
+- `GenericSolver.countTime(CalendarDateUnit)` – the time spent in the latest, or ongoing, call to `solve(..)`.
+
+### Changed
+
+#### org.ojalgo.matrix
+
+- The `QR` decompositions compute `getQ()` once per decomposition, and return the same instance on later calls. Previously it was recomputed on every call.
+- The symmetric `Eigenvalue.R064` decompositions diagonalise a 2×2 block that splits off the tridiagonal matrix in closed form, rather than iterating on it, and compute the plane rotations without scaling when nothing can overflow or underflow. The results can differ in the last digits.
+
+#### org.ojalgo.optimisation
+
+- `GenericSolver.countIterations()` is public. The iterations count and the time refer to the latest, or ongoing, call to `solve(..)`, and are reset when it starts. `solve(Optimisation.Result)` is final and calls `doSolve(Optimisation.Result)`, which subclasses implement instead. `resetIterationsCount()` is removed.
+- `ConvexSolver` with the ADMM algorithm returns state `INVALID`, without iterating, when the first factorisation of the KKT system does not have the inertia of a convex problem: n positive and m negative eigenvalues, which means P + σI + A<sup>T</sup>WA is not positive definite. Previously it iterated, and could report a stationary point of a non-convex problem as `OPTIMAL` – e.g. minimising -x<sup>2</sup> - y<sup>2</sup> + 0.1x + 0.1y subject to x + y <= 1.5 and 0 <= x, y <= 1 gave `OPTIMAL` 0.005 at (0.05, 0.05), while the minimum is about -1.1. Not every non-convex problem is detected: negative curvature that the constraints compensate for is not.
+
+### Fixed
+
+#### org.ojalgo.matrix
+
+- `SparseStore`, and its `Builder`, throw `IllegalArgumentException` when the number of rows times the number of columns exceeds `Integer.MAX_VALUE`. Previously the element positions overflowed and the matrix was corrupt – e.g. `SparseLU` threw `ArrayIndexOutOfBoundsException` for a 46341x46341 tridiagonal matrix.
+
+#### org.ojalgo.optimisation
+
+- `IntegerSolver`: the implied bound cuts could throw `NullPointerException` when a non-binary variable in the constraint had only a lower or only an upper limit. Such variables are now skipped.
+
 ## [57.6.1] – 2026-10-28
 
 ### Added

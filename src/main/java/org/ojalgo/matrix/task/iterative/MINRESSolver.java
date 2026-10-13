@@ -256,22 +256,20 @@ public final class MINRESSolver extends IterativeSolverTask {
             final double rootOverAnorm = (Anorm == 0) ? POSITIVE_INFINITY : root / Anorm;
             final double Acond = gmax / gmin;
 
-            if (istop == 0) {
-                if (1 + rootOverAnorm <= 1)
-                    istop = 2;
-                if (1 + test1 <= 1)
-                    istop = 1;
-                if (itn >= (iterationsLimit > 0 ? iterationsLimit : 5 * n))
-                    istop = 6;
-                if (Acond >= 0.1 / MACHINE_EPSILON)
-                    istop = 4;
-                if (epsx >= beta1)
-                    istop = 3;
-                if (rootOverAnorm <= rtol)
-                    istop = 2;
-                if (test1 <= rtol)
-                    istop = 1;
-            }
+            if (1 + rootOverAnorm <= 1)
+                istop = 2;
+            if (1 + test1 <= 1)
+                istop = 1;
+            if (itn >= (iterationsLimit > 0 ? iterationsLimit : 5 * n))
+                istop = 6;
+            if (Acond >= 0.1 / MACHINE_EPSILON)
+                istop = 4;
+            if (epsx >= beta1)
+                istop = 3;
+            if (rootOverAnorm <= rtol)
+                istop = 2;
+            if (test1 <= rtol)
+                istop = 1;
 
             if (istop != 0)
                 break;
