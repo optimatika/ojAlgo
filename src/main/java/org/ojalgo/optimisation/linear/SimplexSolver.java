@@ -225,6 +225,11 @@ abstract class SimplexSolver extends LinearSolver {
 
         final EnterInfo enter;
         final ExitInfo exit;
+        /**
+         * The step length (true ratio) of the winning candidate in the ratio test, {@link Double#MAX_VALUE}
+         * until a ratio test has chosen one.
+         */
+        double ratio = Double.MAX_VALUE;
 
         IterDescr(final SimplexStore simplex) {
             super();
@@ -313,6 +318,7 @@ abstract class SimplexSolver extends LinearSolver {
         void reset() {
             exit.reset();
             enter.reset();
+            ratio = Double.MAX_VALUE;
         }
 
         int row() {
@@ -344,6 +350,11 @@ abstract class SimplexSolver extends LinearSolver {
      * Reduced costs this small count as zero – dual feasible, not worth entering.
      */
     private static final NumberContext COST = NumberContext.of(7);
+    /**
+     * A basis update with a step, see {@link IterDescr#ratio}, smaller than this is counted as degenerate, see
+     * {@link #countDegeneratePivots()}.
+     */
+    private static final double DEGENERATE_RATIO = 1E-9;
     /**
      * Decides whether a basic variable outside its bounds counts as infeasible. Too loose and a marginally
      * infeasible problem is reported OPTIMAL; too tight and a valid solution's residuals are read as
@@ -650,6 +661,11 @@ abstract class SimplexSolver extends LinearSolver {
     }
 
     /**
+     * The number of degenerate basis updates since {@link #prepareToIterate(boolean)}, see
+     * {@link #DEGENERATE_RATIO}.
+     */
+    private int myDegeneratePivotCount = 0;
+    /**
      * Set by {@link #testDualEnterRatio}, when no regular candidate enters: the number of candidates, regular
      * or with elements that are small only by {@link #PIVOT}, first in the ratio cache, and how far they can
      * move the exit variable together, the sum of their elements times their ranges.
@@ -668,7 +684,7 @@ abstract class SimplexSolver extends LinearSolver {
      */
     private double myFarkasSign = ZERO;
     /**
-     * Set by {@link #walkDualEnter(EnterInfo, int, double, boolean)}: the number of candidates, first in the
+     * Set by {@link #walkDualEnter(IterDescr, int, double, boolean)}: the number of candidates, first in the
      * ratio cache, that switch bounds.
      */
     private int myFlipCount = 0;
@@ -828,7 +844,7 @@ abstract class SimplexSolver extends LinearSolver {
     }
 
     /**
-     * The candidates passed by {@link #walkDualEnter(EnterInfo, int, double, boolean)}, first in the ratio
+     * The candidates passed by {@link #walkDualEnter(IterDescr, int, double, boolean)}, first in the ratio
      * cache, switch to their other bound.
      */
     private void flipBounds() {
@@ -1202,7 +1218,7 @@ abstract class SimplexSolver extends LinearSolver {
     }
 
     /**
-     * The bound flipping ratio test, see {@link #walkDualEnter(EnterInfo, int, double, boolean)}, among the
+     * The bound flipping ratio test, see {@link #walkDualEnter(IterDescr, int, double, boolean)}, among the
      * regular candidates: those with elements that are small neither by {@link #PIVOT} nor by
      * {@link #PIVOT_GROWTH}. If none enters, because there are none or because they can all switch bounds
      * without removing the infeasibility, they are kept together with the candidates with elements that are
@@ -1326,7 +1342,7 @@ abstract class SimplexSolver extends LinearSolver {
 
         double infeasibility = Math.abs(mySimplex.getInfeasibility(exit.index));
 
-        if (this.walkDualEnter(iteration.enter, nbRegular, infeasibility, false)) {
+        if (this.walkDualEnter(iteration, nbRegular, infeasibility, false)) {
             myFallbackCount = 0;
             myFallbackReach = ZERO;
             return true;
@@ -1524,6 +1540,7 @@ abstract class SimplexSolver extends LinearSolver {
             if (myRatioCacheTrueRatio[k] <= thetaMax && scale > bestScale) {
                 bestScale = scale;
                 exit.index = myRatioCacheIdx[k];
+                iteration.ratio = myRatioCacheTrueRatio[k];
                 if (myRatioCacheExitDirection[k]) {
                     exit.direction = Direction.INCREASE;
                     exit.to = ColumnState.UPPER;
@@ -1543,6 +1560,12 @@ abstract class SimplexSolver extends LinearSolver {
         }
 
         return exit.index >= 0 || iteration.isBoundFlip();
+    }
+
+    private void trackDegeneracy(final IterDescr iteration) {
+        if (iteration.isBasisUpdate() && iteration.ratio < DEGENERATE_RATIO) {
+            myDegeneratePivotCount++;
+        }
     }
 
     private void update(final IterDescr iteration) {
@@ -1654,7 +1677,7 @@ abstract class SimplexSolver extends LinearSolver {
      *              variable anyway, false to return false
      * @return true if a candidate enters
      */
-    private boolean walkDualEnter(final EnterInfo enter, final int count, final double infeasibility, final boolean force) {
+    private boolean walkDualEnter(final IterDescr iteration, final int count, final double infeasibility, final boolean force) {
 
         int[] excluded = mySimplex.excluded;
 
@@ -1707,12 +1730,13 @@ abstract class SimplexSolver extends LinearSolver {
             myFlipCount = first;
 
             ColumnState columnState = myRatioCacheState[best];
-            enter.index = myRatioCacheIdx[best];
-            enter.from = columnState;
-            enter.direction = columnState == ColumnState.UPPER ? Direction.DECREASE : Direction.INCREASE;
+            iteration.enter.index = myRatioCacheIdx[best];
+            iteration.enter.from = columnState;
+            iteration.enter.direction = columnState == ColumnState.UPPER ? Direction.DECREASE : Direction.INCREASE;
+            iteration.ratio = myRatioCacheTrueRatio[best];
 
             if (this.isLogDebug()) {
-                this.log("==>> {} (scale {}), switching {}", enter, bestScale, myFlipCount);
+                this.log("==>> {} (scale {}), switching {}", iteration.enter, bestScale, myFlipCount);
             }
 
             return true;
@@ -1725,6 +1749,14 @@ abstract class SimplexSolver extends LinearSolver {
         mySimplex.resetBasis(basis);
         state = State.UNEXPLORED;
         return this;
+    }
+
+    /**
+     * The number of degenerate basis updates, see {@link #DEGENERATE_RATIO}, since the latest
+     * {@link #prepareToIterate(boolean)}.
+     */
+    final int countDegeneratePivots() {
+        return myDegeneratePivotCount;
     }
 
     /**
@@ -1787,7 +1819,7 @@ abstract class SimplexSolver extends LinearSolver {
                         myFarkasSign = iteration.exit.direction == Direction.INCREASE ? ONE : NEG;
                     } else {
                         double infeasibility = Math.abs(mySimplex.getInfeasibility(iteration.exit.index));
-                        pivot = this.walkDualEnter(iteration.enter, myFallbackCount, infeasibility, true);
+                        pivot = this.walkDualEnter(iteration, myFallbackCount, infeasibility, true);
                         if (!pivot) {
                             state = State.FAILED;
                         }
@@ -1826,6 +1858,8 @@ abstract class SimplexSolver extends LinearSolver {
                     }
 
                     this.update(iteration);
+
+                    this.trackDegeneracy(iteration);
 
                     this.incrementIterationsCount();
 
@@ -1906,6 +1940,8 @@ abstract class SimplexSolver extends LinearSolver {
                     }
 
                     this.update(iteration);
+
+                    this.trackDegeneracy(iteration);
 
                     myIncrementallyUpdated = true;
 
@@ -2109,6 +2145,7 @@ abstract class SimplexSolver extends LinearSolver {
         state = State.UNEXPLORED;
         myFarkasRow = -1;
         myIncrementallyUpdated = false;
+        myDegeneratePivotCount = 0;
 
         this.invalidateCache();
 

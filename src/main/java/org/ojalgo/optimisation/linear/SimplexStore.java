@@ -841,6 +841,10 @@ abstract class SimplexStore {
         return this;
     }
 
+    final ClassicSimplexSolver newClassicSimplexSolver(final Optimisation.Options options, final int... basis) {
+        return this.newSolver(ClassicSimplexSolver::new, options, basis);
+    }
+
     final DualSimplexSolver newDualSimplexSolver(final Optimisation.Options options, final int... basis) {
         return this.newSolver(DualSimplexSolver::new, options, basis);
 
