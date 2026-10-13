@@ -49,7 +49,7 @@ final class DualSimplexSolver extends SimplexSolver {
 
         IterDescr iteration = this.prepareToIterate(!state.isSuccess());
 
-        this.doDualIterations(iteration, true);
+        this.doDualIterations(iteration, true, false);
 
         if (state.isFeasible() && this.isDualFeasible()) {
             state = Optimisation.State.OPTIMAL;
