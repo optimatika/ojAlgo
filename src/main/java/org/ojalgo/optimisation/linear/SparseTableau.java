@@ -457,6 +457,11 @@ final class SparseTableau extends SimplexTableau {
     }
 
     @Override
+    boolean isPhase1() {
+        return myPhase1Objective != null;
+    }
+
+    @Override
     Primitive2D newConstraintsBody() {
 
         int base = structure.nbIdty;
@@ -586,6 +591,19 @@ final class SparseTableau extends SimplexTableau {
         };
     }
 
+    @Override
+    void phase1FromObjective() {
+
+        if (myPhase1Objective == null) {
+            myPhase1Objective = SparseTableau.DENSE_FACTORY.make(n);
+        }
+
+        for (int j = 0; j < n; j++) {
+            myPhase1Objective.set(j, myObjective.doubleValue(j));
+        }
+        myPhase1Value = myValue;
+    }
+
     void recomputePhase1Objective() {
 
         if (myPhase1Objective != null) {
@@ -613,6 +631,11 @@ final class SparseTableau extends SimplexTableau {
     @Override
     void removePhase1() {
         myPhase1Objective = null;
+    }
+
+    @Override
+    void shiftCost(final int je, final double shift) {
+        myPhase1Objective.add(excluded[je], shift);
     }
 
 }

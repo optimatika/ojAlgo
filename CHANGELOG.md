@@ -26,6 +26,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.optimisation.linear
 
 - A warm re-solve, after relaxing variable ranges with `updateRange(..)`, could return `INFEASIBLE` for a feasible problem. The dual simplex ratio test discarded a small pivot element even when it was the only candidate and the variable's range made it significant. (Issue [#699](https://github.com/optimatika/ojAlgo/issues/699))
+- A warm re-solve, after fixing or tightening variable ranges with `updateRange(..)`, could run until the time or iteration limit, or need many times more iterations than solving from scratch. Cold solves of problems with many fixed variables were slow too. The dual simplex ratio test let fixed variables enter the basis. They can not move, so each such pivot was degenerate, and the iterations could cycle. Fixed variables are no longer entering candidates. With all reduced costs but one zero (a single-variable objective), a warm re-solve could still cycle. If the dual iterations stall, of a warm start or in phase 1 of a cold solve, the costs are now perturbed until they are done, and a cost is shifted rather than letting the dual step go backwards. This also affects MIP node solves, where branching fixes variables. (Issue [#700](https://github.com/optimatika/ojAlgo/issues/700))
 
 ## [57.4.0] – 2026-10-08
 

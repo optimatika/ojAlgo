@@ -31,6 +31,11 @@ import org.ojalgo.structure.Mutate1D;
  * objective and runs primal simplex iterations (maintaining primal feasibility) to reach optimality. If those
  * leave some basic variables outside their bounds, dual simplex iterations restore primal feasibility.
  * <p>
+ * A warm start, after variable ranges were updated in place, skips phase 1. It runs dual simplex iterations
+ * from the previous basis, which is still dual feasible, and then primal simplex iterations if needed.
+ * <p>
+ * If dual iterations stall, the costs are perturbed until they are done.
+ * <p>
  * This is the most general {@link SimplexSolver} subclass and the one normally instantiated by
  * {@link LinearSolver.Builder} and the {@link LinearSolver.ModelIntegration}. It handles explicit finite
  * lower and upper bounds on variables natively and does not require the initial basis to be feasible.

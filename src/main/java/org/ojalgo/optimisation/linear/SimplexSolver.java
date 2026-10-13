@@ -354,6 +354,11 @@ abstract class SimplexSolver extends LinearSolver {
      */
     private static final NumberContext INFEASIBILITY = NumberContext.of(10);
     /**
+     * Base size of the cost perturbation, see {@link #perturbCosts()}. Relative to the (scaled) reduced cost,
+     * and at least 5 times the {@link #COST} tolerance.
+     */
+    private static final double PERTURBATION = 5E-7;
+    /**
      * Elements of the pivot row (dual simplex) or column (primal simplex) this small are not pivots. In the
      * dual simplex such an element is still a candidate, used only if there are no others, when its product
      * with the range of the variable is not this small. That product does not depend on how the column is
@@ -377,6 +382,33 @@ abstract class SimplexSolver extends LinearSolver {
      * counts as infeasible at all.
      */
     private static final NumberContext RATIO_RELAX = NumberContext.of(9);
+    /**
+     * The dual iterations perturb the costs, see {@link #perturbCosts()}, once this many pivots have not moved
+     * the dual objective forward. Many solves, warm starts in particular, need only a few pivots and are not
+     * perturbed.
+     * <p>
+     * In phase 1 the limit is at least the number of constraints. Those iterations are often short and
+     * degenerate, and the vertex they end at matters – with a zero objective it is the solution, and the
+     * starting point of the convex solver's active set iterations.
+     */
+    private static final int STALLED_PIVOTS = 10;
+
+    /**
+     * Between 1 and 2 times {@link #PERTURBATION} times (1 + |reducedCost|). The factor in [1, 2) is a fixed
+     * pseudo-random function of the column index, so that equal costs become different, but the same problem
+     * is always perturbed the same way.
+     */
+    private static double perturbation(final int column, final double reducedCost) {
+
+        long hash = (column + 1L) * 0x9E3779B97F4A7C15L;
+        hash ^= hash >>> 31;
+        hash *= 0xBF58476D1CE4E5B9L;
+        hash ^= hash >>> 29;
+
+        double factor = ONE + (hash >>> 11) * 0x1.0p-53;
+
+        return PERTURBATION * (ONE + Math.abs(reducedCost)) * factor;
+    }
 
     static <S extends SimplexStore> S build(final ExpressionsBasedModel model, final Function<LinearStructure, S> factory) {
 
@@ -921,6 +953,44 @@ abstract class SimplexSolver extends LinearSolver {
         }
     }
 
+    /**
+     * The basis is dual feasible, but many of its reduced costs may be zero (with a single-variable objective,
+     * or phase-1 costs that are all ±1, for instance). Then the dual steps are zero, nothing measures progress,
+     * and the dual iterations can stall or cycle. Moving the costs of the non-basic variables away from zero, in
+     * the direction that keeps the basis dual feasible, avoids that. Fixed variables are left as they are.
+     * <p>
+     * Phase-1 costs are perturbed in place. Otherwise a copy of the original costs is installed as the phase-1
+     * objective and perturbed, and removing it restores the original costs. The basis may then not be dual
+     * feasible, by about the size of the perturbation, and primal iterations finish the job.
+     *
+     * @return true if a copy of the original costs was installed
+     */
+    private boolean perturbCosts() {
+
+        boolean install = !mySimplex.isPhase1();
+        if (install) {
+            mySimplex.phase1FromObjective();
+        }
+
+        int[] excluded = mySimplex.excluded;
+        for (int je = 0; je < excluded.length; je++) {
+            int j = excluded[je];
+
+            if (mySimplex.isArtificial(j) || !(mySimplex.getRange(j) > ZERO)) {
+                continue;
+            }
+
+            ColumnState columnState = mySimplex.getColumnState(j);
+            if (columnState == ColumnState.LOWER) {
+                mySimplex.shiftCost(je, SimplexSolver.perturbation(j, mySimplex.getReducedCost(je)));
+            } else if (columnState == ColumnState.UPPER) {
+                mySimplex.shiftCost(je, -SimplexSolver.perturbation(j, mySimplex.getReducedCost(je)));
+            }
+        }
+
+        return install;
+    }
+
     private Optimisation.Result solveUnconstrained() {
 
         int nbVars = mySimplex.n;
@@ -995,16 +1065,19 @@ abstract class SimplexSolver extends LinearSolver {
             if (j >= n) {
                 continue;
             }
+            // A fixed variable can not move, and its reduced cost may have either sign. It does not limit the
+            // dual step, and entering it would only be a degenerate pivot.
+            double range = mySimplex.getRange(j);
+            if (!(range > ZERO)) {
+                continue;
+            }
 
             double denom = mySimplex.getCurrentElement(exit, je);
             double scale = Math.abs(denom);
             largest = Math.max(largest, scale);
             boolean small = PIVOT.isZero(denom);
-            if (small) {
-                double range = mySimplex.getRange(j);
-                if (!Double.isFinite(range) || PIVOT.isZero(scale * range)) {
-                    continue;
-                }
+            if (small && (!Double.isFinite(range) || PIVOT.isZero(scale * range))) {
+                continue;
             }
 
             ColumnState columnState = mySimplex.getColumnState(j);
@@ -1365,6 +1438,10 @@ abstract class SimplexSolver extends LinearSolver {
         return this;
     }
 
+    /**
+     * If the iterations stall the costs are perturbed, see {@link #perturbCosts()}. Original costs are back in
+     * place on return, phase-1 costs remain perturbed.
+     */
     final void doDualIterations(final IterDescr iteration, final boolean resetEdgeWeights) {
 
         if (options.validate) {
@@ -1375,8 +1452,18 @@ abstract class SimplexSolver extends LinearSolver {
             mySimplex.resetEdgeWeights();
         }
 
+        boolean perturbed = false;
+        boolean installed = false;
+        int nbStalled = 0;
+        int stallLimit = mySimplex.isPhase1() ? Math.max(STALLED_PIVOTS, mySimplex.m) : STALLED_PIVOTS;
+
         boolean done = false;
         while (this.isIterationAllowed() && !done) {
+
+            if (!perturbed && nbStalled >= stallLimit) {
+                installed = this.perturbCosts();
+                perturbed = true;
+            }
 
             iteration.reset();
 
@@ -1389,6 +1476,22 @@ abstract class SimplexSolver extends LinearSolver {
                 mySimplex.calculateDualDirection(iteration.exit);
 
                 if (this.testDualEnterRatio(iteration)) {
+
+                    // The dual step goes forward if this is positive
+                    double reducedCost = mySimplex.getReducedCost(iteration.enter.index);
+                    ColumnState from = iteration.enter.from;
+                    double gap = from == ColumnState.LOWER ? reducedCost : from == ColumnState.UPPER ? -reducedCost : ZERO;
+
+                    if (!perturbed) {
+                        if (gap <= COST.getAbsoluteError()) {
+                            nbStalled++;
+                        }
+                    } else if (gap < ZERO) {
+                        // The Harris ratio test may choose a variable whose reduced cost has the wrong sign
+                        // (within tolerance). The dual step would then go backwards, and that can undo what
+                        // the perturbation does against cycling. Shift its cost to make the step zero instead.
+                        mySimplex.shiftCost(iteration.enter.index, -reducedCost);
+                    }
 
                     if (iteration.isBasisUpdate()) {
                         mySimplex.calculatePrimalDirection(iteration.enter);
@@ -1436,6 +1539,11 @@ abstract class SimplexSolver extends LinearSolver {
             if (options.validate) {
                 this.verifyDualFeasibility();
             }
+        }
+
+        if (installed) {
+            // Back to the original costs
+            mySimplex.removePhase1();
         }
     }
 

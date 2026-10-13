@@ -412,7 +412,8 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     /**
      * E226 — 224 rows × 282 columns, 2767 non-zeros.
      * <ul>
-     * <li>Optimal value: -1.8751929066E+01.
+     * <li>Optimal value: -1.1638929066E+01, including the objective constant +7.113 (an RHS entry of -7.113 on
+     * the objective row). The README's main table gives the optimum without it, -1.8751929066E+01.
      * </ul>
      */
     @Test
@@ -519,7 +520,8 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * GREENBEA — 2393 rows × 5405 columns, 31499 non-zeros.
      * <ul>
      * <li>Has variable bounds (UP LO FX).
-     * <li>Optimal value: -7.2462405908E+07.
+     * <li>Optimal value: -7.2555248130E+07 (the README's CPLEX reference value, its main table says
+     * -7.2462405908E+07).
      * <li>RHS section is empty in the original SIF.
      * </ul>
      */
@@ -697,7 +699,8 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * PILOT — 1442 rows × 3652 columns, 43220 non-zeros.
      * <ul>
      * <li>Has variable bounds (UP LO FX).
-     * <li>Optimal value: -5.5740430007E+02.
+     * <li>Optimal value: -5.5748972928E+02 (the README's CPLEX reference value, its main table says
+     * -5.5740430007E+02).
      * </ul>
      */
     @Test
