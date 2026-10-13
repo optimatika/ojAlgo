@@ -21,23 +21,34 @@
  */
 package org.ojalgo.matrix.operation;
 
+import static java.lang.foreign.ValueLayout.*;
 import static org.ojalgo.function.constant.PrimitiveMath.ONE;
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.MemorySegment;
+import java.lang.invoke.MethodHandle;
+
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.ArrayOperation;
 import org.ojalgo.array.operation.DOT;
+import org.ojalgo.array.operation.NativeLibrary;
 import org.ojalgo.array.operation.SCAL;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.concurrent.Parallelism;
 
 /**
  * BLAS level 2 {@code ?gemv}: y := alpha*op(A)*x + beta*y, where A is m-by-n and op(A) is A or A<sup>T</sup>.
+ *
+ * @see NativeLibrary
  */
 public abstract class GEMV implements BLAS2 {
 
     /**
-     * The pure Java implementation.
+     * The pure Java implementation. Everything it calls is pure Java as well – the {@code JVM}
+     * implementations of other operations, never their dispatching {@code invoke} methods (that may call
+     * native code).
      */
     static final class JVM {
 
@@ -188,11 +199,43 @@ public abstract class GEMV implements BLAS2 {
     }
 
     /**
+     * Native {@code cblas_dgemv}, initialised only when {@link NativeLibrary#isAvailable()}. Linked as a
+     * critical function so the Java arrays are used in place, without copying.
+     */
+    static final class Native {
+
+        static final MethodHandle DGEMV_CRITICAL = NativeLibrary.downcall("cblas_dgemv", FunctionDescriptor.ofVoid(JAVA_INT, JAVA_INT, JAVA_INT, JAVA_INT,
+                JAVA_DOUBLE, ADDRESS, JAVA_INT, ADDRESS, JAVA_INT, JAVA_DOUBLE, ADDRESS, JAVA_INT), true);
+
+        static void invoke(final boolean transpose, final int m, final int n, final double alpha, final double[] a, final int offsetA, final int lda,
+                final double[] x, final int offsetX, final int incX, final double beta, final double[] y, final int offsetY, final int incY) {
+
+            MemorySegment segmentA = CBLAS.ofMatrix(a, offsetA, m, n, lda);
+            MemorySegment segmentX = NativeLibrary.ofVector(x, offsetX, transpose ? m : n, incX);
+            MemorySegment segmentY = NativeLibrary.ofVector(y, offsetY, transpose ? n : m, incY);
+
+            try {
+                DGEMV_CRITICAL.invokeExact(CBLAS.COLUMN_MAJOR, CBLAS.transpose(transpose), m, n, alpha, segmentA, lda, segmentX, incX, beta, segmentY, incY);
+            } catch (Throwable cause) {
+                throw new ProgrammingError(cause);
+            }
+        }
+
+    }
+
+    /**
+     * The native implementation is used, if there is one, when m*n (the number of multiply-adds) is larger
+     * than this.
+     */
+    private static final double NATIVE_THRESHOLD = 1_500;
+    /**
      * The Java implementation is multi-threaded, splitting the elements of y, when y has increment 1 and more
      * elements than max(this, this squared divided by the other dimension of A). The divider splits in
      * halves, so each part gets more than half of that.
      */
     static int THRESHOLD = 320;
+
+    static final boolean NATIVE = NativeLibrary.isAvailable() && Native.DGEMV_CRITICAL != null;
 
     /**
      * {@code dgemv}: y := alpha*op(A)*x + beta*y
@@ -218,7 +261,20 @@ public abstract class GEMV implements BLAS2 {
             return;
         }
 
-        JVM.invoke(transpose, m, n, alpha, a, offsetA, lda, x, offsetX, incX, beta, y, offsetY, incY);
+        // With alpha 0, A and x are not read and the Java implementation does what remains
+        if (alpha != ZERO && GEMV.isNative(m, n)) {
+            Native.invoke(transpose, m, n, alpha, a, offsetA, lda, x, offsetX, incX, beta, y, offsetY, incY);
+        } else {
+            JVM.invoke(transpose, m, n, alpha, a, offsetA, lda, x, offsetX, incX, beta, y, offsetY, incY);
+        }
+    }
+
+    /**
+     * Whether to use the native implementation: there is one, and m*n is larger than
+     * {@link #NATIVE_THRESHOLD}.
+     */
+    static boolean isNative(final double m, final double n) {
+        return NATIVE && m * n > NATIVE_THRESHOLD;
     }
 
 }

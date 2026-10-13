@@ -46,6 +46,31 @@ public class AlternatingDirectionSolverTest extends OptimisationConvexTests {
     }
 
     /**
+     * Minimising -x^2 - y^2 + 0.1x + 0.1y subject to x + y <= 1.5 and 0 <= x, y <= 1 is not a convex problem
+     * (P = -2I). With the initial rho the KKT matrix does not have n positive eigenvalues, and the solver
+     * returns INVALID rather than iterate to a stationary point and report that as OPTIMAL (it did, with x =
+     * y = 0.05, while the minimum is about -1.1).
+     */
+    @Test
+    public void testNonConvexIsInvalid() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x = model.newVariable("x").lower(0).upper(1);
+        Variable y = model.newVariable("y").lower(0).upper(1);
+
+        model.newExpression("objective").weight(1).set(x, x, -1).set(x, 0.1).set(y, y, -1).set(y, 0.1);
+        model.newExpression("constraint").set(x, 1).set(y, 1).upper(1.5);
+
+        AlternatingDirectionSolver.Composer<Double> composer = AlternatingDirectionSolver.build(model, R064Store.FACTORY);
+        AlternatingDirectionSolver solver = new AlternatingDirectionSolver(composer.toProblem(), new Optimisation.Options(), composer.getStructure());
+
+        Result result = solver.solve();
+
+        TestUtils.assertEquals(Optimisation.State.INVALID, result.getState());
+    }
+
+    /**
      * A variable's bound row is registered with the type of its bounds, and the sign of its multiplier is
      * interpreted accordingly. When {@link AlternatingDirectionSolver#updateRange(int, double, double)}
      * changes that type the reported dual values must follow – without changing those of a result already

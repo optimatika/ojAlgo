@@ -306,8 +306,8 @@ public class SparseQDLDLTest extends MatrixDecompositionTests {
 
     /**
      * Indefinite but well-scaled 2x2 system: D = [1, -3] has no (numerically) zero entry, so the
-     * factorisation completes and can be used to solve – {@link SparseQDLDL#isSolvable()} is {@code true}
-     * and matches {@link SparseQDLDL#getRank()}.
+     * factorisation completes and can be used to solve – {@link SparseQDLDL#isSolvable()} is {@code true} and
+     * matches {@link SparseQDLDL#getRank()}.
      */
     @Test
     public void testIndefiniteTwoByTwoIsSolvable() {

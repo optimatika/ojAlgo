@@ -450,6 +450,57 @@ public class CaseSingularValue extends MatrixDecompositionTests {
         this.testRecreation(tmpOriginal);
     }
 
+    /**
+     * A single right-hand side column, solved directly on the arrays of the factors: the same as the general
+     * solution, for square, tall and fat matrices, of full rank or not, economy and full size, and with the
+     * solution overwriting the right-hand side.
+     */
+    @Test
+    public void testSolveSingleColumn() {
+
+        NumberContext accuracy = NumberContext.of(12);
+
+        int[][] shapes = { { 1, 1 }, { 2, 2 }, { 5, 3 }, { 3, 5 }, { 8, 8 }, { 20, 20 }, { 30, 12 }, { 12, 30 } };
+
+        for (int[] shape : shapes) {
+
+            int m = shape[0];
+            int n = shape[1];
+
+            for (int rank : new int[] { Math.min(m, n), (Math.min(m, n) + 1) / 2 }) {
+
+                R064Store left = R064Store.FACTORY.makeFilled(m, rank, new Normal());
+                R064Store right = R064Store.FACTORY.makeFilled(rank, n, new Normal());
+                MatrixStore<Double> body = left.multiply(right);
+                R064Store rhs = R064Store.FACTORY.makeFilled(m, 1, new Normal());
+
+                for (boolean fullSize : new boolean[] { false, true }) {
+
+                    DenseSingularValue.R064 decomp = new DenseSingularValue.R064(fullSize);
+                    decomp.decompose(body);
+
+                    String message = m + "x" + n + " rank " + rank + " full size " + fullSize;
+                    TestUtils.assertEquals(message + " rank", rank, decomp.getRank());
+
+                    // A view of rhs is not an R064Store: the general solution
+                    MatrixStore<Double> expected = decomp.getSolution(rhs.limits(m, 1), decomp.preallocate(body, rhs)).copy();
+
+                    MatrixStore<Double> actual = decomp.getSolution(rhs, decomp.preallocate(body, rhs));
+                    TestUtils.assertEquals(message, expected, actual, accuracy);
+
+                    if (m == n) {
+                        R064Store inPlace = rhs.copy();
+                        decomp.getSolution(inPlace, inPlace);
+                        TestUtils.assertEquals(message + " in place", expected, inPlace, accuracy);
+                    }
+
+                    // Last, since the inverse is cached and then used for every solution
+                    TestUtils.assertEquals(message + " pseudoinverse", decomp.getInverse().multiply(rhs), actual, accuracy);
+                }
+            }
+        }
+    }
+
     private void testRecreation(final PhysicalStore<Double> aMtrx) {
 
         SingularValue<Double>[] tmpImpls = MatrixDecompositionTests.getPrimitiveSingularValue();

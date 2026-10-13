@@ -10,6 +10,7 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Access2D.ColumnView;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Transformation2D;

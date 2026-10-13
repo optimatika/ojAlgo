@@ -11,6 +11,57 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo
+
+- `OjAlgoUtils.getNativeLibrary()`: the native BLAS library that ojAlgo uses, if any.
+
+#### org.ojalgo.array
+
+- `OffHeapArray.Factory.newMapped(File, long)`: a memory mapped file as an off-heap array. The file is created if it does not exist, and grown if it holds fewer elements. Close the array to unmap the file.
+
+#### org.ojalgo.matrix
+
+- Optional native BLAS and LAPACK, through Java's Foreign Function & Memory API. When the JVM grants ojAlgo native access (`--enable-native-access=ojalgo` on the module path, `--enable-native-access=ALL-UNNAMED` on the class path) and a working library is found, large enough matrix multiplications, matrix-vector products, triangular solves and vector operations call it. ojAlgo looks for Accelerate on macOS; OpenBLAS, FlexiBLAS, MKL, BLIS or the reference BLAS on Linux; OpenBLAS or MKL on Windows. The system property `ojalgo.native.library` names the library file(s) to use instead, or switches native code off with `none`. Every operation still has a pure Java implementation, and without native access no native code is used. See the README.
+- The dense `double` decompositions call the native LAPACK routines, for large enough matrices: `LU` (`dgetrf2`, `dgetrs`), `Cholesky` (`dpotrf`, `dpotrs`), `QR` (`dgeqrf`, `dorgqr`, `dtrtrs`), `Tridiagonal` (`dsytrd`, `dorgtr`), `Hessenberg` (`dgehrd`, `dorghr`), `Bidiagonal` (`dgebrd`, `dorgbr`), `SingularValue` (`dgesdd`), and `Eigenvalue` – Hermitian (`dsyevd`) and general (`dgeev`) matrices, and the generalised problem (`dtrsm`, `dtrmm`, `dpotrf` and `dsyevd`). Routines the library does not have use the Java implementation. The other number types, the `Raw*` implementations and the sparse decompositions are pure Java. For example, with Accelerate the eigenvalue decomposition of a 1000x1000 symmetric matrix is about 10x faster than in pure Java.
+
+### Changed
+
+ojAlgo now requires Java 22 or later. The Foreign Function & Memory API, used for the optional native BLAS and for off-heap arrays, is final from Java 22. ojAlgo no longer requires the `jdk.unsupported` module.
+
+#### org.ojalgo.array
+
+- `OffHeapArray` is backed by a `MemorySegment` (the Foreign Function & Memory API) rather than `sun.misc.Unsafe`. Allocated memory is zero initialised – previously it was uninitialised until `reset()` – and released by the garbage collector. It is `AutoCloseable`: closing a memory mapped array unmaps the file, and accessing a closed array throws `IllegalStateException`.
+
+#### org.ojalgo.matrix
+
+- `Eigenvalue.R064` for general (non-Hermitian) matrices: with a native library, `computeValuesOnly(..)` may give the eigenvalues in a different order than `decompose(..)`.
+- `Eigenvalue.R064` for Hermitian matrices, and `Eigenvalue.R064.make(..)` without the hermitian flag, return the dense implementations also at sizes where they call the native library – from 91 columns. Below that, and without a native library, `RawEigenvalue` is used up to 8192 columns, as before.
+- `LU.R064` and `QR.R064` return the dense implementations also at sizes where they call the native library.
+- `Eigenvalue.R064.makeGeneralised(..)`: the reduction to a standard eigenvalue problem, and the recovery of the eigenvectors, call the native `dtrsm` and `dtrmm` when available.
+- Matrix products where an operand is the transpose of an `R064Store` – `transpose()` or `conjugate()` – call the native BLAS for large enough products, as products of the stores themselves do.
+
+#### org.ojalgo.optimisation
+
+- `ConvexSolver` with the ADMM algorithm returns state `INVALID`, without iterating, when the first factorisation of the KKT system does not have the inertia of a convex problem: n positive and m negative eigenvalues, which means P + σI + A<sup>T</sup>WA is not positive definite. Previously it iterated, and could report a stationary point of a non-convex problem as `OPTIMAL` – e.g. minimising -x<sup>2</sup> - y<sup>2</sup> + 0.1x + 0.1y subject to x + y <= 1.5 and 0 <= x, y <= 1 gave `OPTIMAL` 0.005 at (0.05, 0.05), while the minimum is about -1.1. Not every non-convex problem is detected: negative curvature that the constraints compensate for is not.
+
+### Fixed
+
+#### org.ojalgo.matrix
+
+- `SparseStore`, and its `Builder`, throw `IllegalArgumentException` when the number of rows times the number of columns exceeds `Integer.MAX_VALUE`. Previously the element positions overflowed and the matrix was corrupt – e.g. `SparseLU` threw `ArrayIndexOutOfBoundsException` for a 46341x46341 tridiagonal matrix.
+
+### Removed
+
+#### org.ojalgo.array
+
+- `BufferArray` and its subclasses `BufferR032`, `BufferR064`, `BufferZ008`, `BufferZ016`, `BufferZ032` and `BufferZ064`. Use `OffHeapArray` instead, and `OffHeapArray.Factory.newMapped(File, long)` for memory mapped files.
+
+#### org.ojalgo.type
+
+- `NativeMemory`. `OffHeapArray` uses the Foreign Function & Memory API directly.
+
 ## [57.6.1] – 2026-10-28
 
 ### Added

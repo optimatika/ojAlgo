@@ -61,8 +61,8 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
     private double myMaxDiag = ONE;
     private double myMinDiag = ZERO;
     /**
-     * The number of pivots computed – fewer than the dimension if the factorisation stopped at a
-     * non-positive one.
+     * The number of pivots computed – fewer than the dimension if the factorisation stopped at a non-positive
+     * one.
      */
     private int myNbPivots = 0;
     private boolean mySPD = false;

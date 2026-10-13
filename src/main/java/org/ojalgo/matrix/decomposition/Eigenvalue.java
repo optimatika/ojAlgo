@@ -33,6 +33,7 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.PlainArray;
 import org.ojalgo.matrix.Provider2D;
 import org.ojalgo.matrix.operation.ExchangeColumns;
+import org.ojalgo.matrix.operation.SYEVD;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -63,11 +64,12 @@ import org.ojalgo.type.context.NumberContext;
  * determine the validity of [V][D][V]<sup>-1</sup>.)
  * <p>
  * The eigenvalues (and their corresponding eigenvectors) of a non-symmetric matrix could be complex.
+ * {@snippet class = org.ojalgo.matrix.decomposition.MatrixDecompositionSnippets region = eigenvalue}
  *
  * @author apete
  */
-public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition.Hermitian<N>, MatrixDecomposition.Determinant<N>, MatrixDecomposition.Values<N>,
-        Provider2D.Eigenpairs, Provider2D.Eigenvalues {
+public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition.Hermitian<N>, MatrixDecomposition.Determinant<N>,
+        MatrixDecomposition.Values<N>, Provider2D.Eigenpairs, Provider2D.Eigenvalues {
 
     public static class Eigenpair implements Comparable<Eigenpair> {
 
@@ -331,7 +333,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
 
         @Override
         public Eigenvalue<Double> make(final Structure2D typical) {
-            if (8192L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
+            if ((8192L < typical.countColumns() || SYEVD.isNative(true, typical.countColumns())) && typical.count() <= PlainArray.MAX_SIZE) {
                 return new DynamicEvD.R064();
             } else {
                 return new RawEigenvalue.Dynamic();
@@ -341,7 +343,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
         @Override
         public Eigenvalue<Double> make(final Structure2D typical, final boolean hermitian) {
             if (hermitian) {
-                if (8192L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
+                if ((8192L < typical.countColumns() || SYEVD.isNative(true, typical.countColumns())) && typical.count() <= PlainArray.MAX_SIZE) {
                     return new HermitianEvD.R064();
                 } else {
                     return new RawEigenvalue.Symmetric();

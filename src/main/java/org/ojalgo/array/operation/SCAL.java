@@ -24,7 +24,13 @@ package org.ojalgo.array.operation;
 import static org.ojalgo.function.constant.PrimitiveMath.ONE;
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
+import java.lang.invoke.MethodHandle;
 import java.util.Arrays;
+
+import org.ojalgo.ProgrammingError;
 
 /**
  * BLAS level 1 {@code ?scal}: x := alpha*x
@@ -32,7 +38,9 @@ import java.util.Arrays;
 public abstract class SCAL implements BLAS1 {
 
     /**
-     * The pure Java implementation.
+     * The pure Java implementation. Everything it calls is pure Java as well – the {@code JVM}
+     * implementations of other operations, never their dispatching {@code invoke} methods (that may call
+     * native code).
      */
     public static final class JVM {
 
@@ -56,6 +64,33 @@ public abstract class SCAL implements BLAS1 {
     }
 
     /**
+     * Native {@code cblas_dscal}, initialised only when {@link NativeLibrary#isAvailable()}.
+     */
+    static final class Native {
+
+        static final MethodHandle DSCAL_CRITICAL = NativeLibrary.downcall("cblas_dscal",
+                FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS, ValueLayout.JAVA_INT), true);
+
+        static void invoke(final int n, final double alpha, final double[] x, final int offsetX, final int incX) {
+            MemorySegment segmentX = NativeLibrary.ofVector(x, offsetX, n, incX);
+            try {
+                DSCAL_CRITICAL.invokeExact(n, alpha, segmentX, incX);
+            } catch (Throwable cause) {
+                throw new ProgrammingError(cause);
+            }
+        }
+
+    }
+
+    /**
+     * The native implementation is used, if there is one, when the vector length (the number of operations)
+     * is larger than this. See {@link NativeLibrary}.
+     */
+    private static final double NATIVE_THRESHOLD = 1_400;
+
+    static final boolean NATIVE = NativeLibrary.isAvailable() && Native.DSCAL_CRITICAL != null;
+
+    /**
      * BLAS {@code dscal}: x := alpha*x for the {@code n} elements of {@code x}, from {@code offsetX} with
      * increment {@code incX}. As in the reference implementation, nothing is done unless {@code n} and
      * {@code incX} are positive.
@@ -66,7 +101,11 @@ public abstract class SCAL implements BLAS1 {
             return;
         }
 
-        JVM.invoke(n, alpha, x, offsetX, incX);
+        if (SCAL.isNative(n)) {
+            Native.invoke(n, alpha, x, offsetX, incX);
+        } else {
+            JVM.invoke(n, alpha, x, offsetX, incX);
+        }
     }
 
     /**
@@ -103,6 +142,14 @@ public abstract class SCAL implements BLAS1 {
                 x[ix] *= factor;
             }
         }
+    }
+
+    /**
+     * Whether to use the native implementation: there is one, and the vector length is larger than
+     * {@link #NATIVE_THRESHOLD}.
+     */
+    static boolean isNative(final double n) {
+        return NATIVE && n > NATIVE_THRESHOLD;
     }
 
 }

@@ -53,6 +53,7 @@ import org.ojalgo.type.context.NumberContext;
  * <li>[this] = [U][S][V]<sup>T</sup>
  * </ul>
  * A singular values decomposition always exists.
+ * {@snippet class = org.ojalgo.matrix.decomposition.MatrixDecompositionSnippets region = svd}
  *
  * @author apete
  */

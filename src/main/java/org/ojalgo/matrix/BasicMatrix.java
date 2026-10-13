@@ -66,11 +66,10 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix<N, M>>
-        implements Matrix2D<N, M>, Structure2D.ReducibleTo1D<M>, NumberContext.Enforceable<M>, Access2D.Collectable<N, TransformableRegion<N>>,
-        Provider2D.Inverse<M>, Provider2D.Condition, Provider2D.Rank, Provider2D.Symmetric, Provider2D.Hermitian, Provider2D.Trace<N>,
-        Provider2D.Determinant<N>, Provider2D.Solution<M>, Provider2D.Eigenpairs, Provider2D.Eigenvalues, Provider2D.SingularValues,
-        Structure2D.Logical<Access2D<N>, M>, Operate2D<N, M> {
+public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix<N, M>> implements Matrix2D<N, M>, Structure2D.ReducibleTo1D<M>,
+        NumberContext.Enforceable<M>, Access2D.Collectable<N, TransformableRegion<N>>, Provider2D.Inverse<M>, Provider2D.Condition, Provider2D.Rank,
+        Provider2D.Symmetric, Provider2D.Hermitian, Provider2D.Trace<N>, Provider2D.Determinant<N>, Provider2D.Solution<M>, Provider2D.Eigenpairs,
+        Provider2D.Eigenvalues, Provider2D.SingularValues, Structure2D.Logical<Access2D<N>, M>, Operate2D<N, M> {
 
     private static final NumberContext EQUALS = NumberContext.of(12, 14);
 
@@ -362,9 +361,8 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     /**
-     * The eigenvalues, in descending order. They are complex numbers, also for real matrices. Uses the
-     * cached eigenvalue decomposition if there is one, otherwise computes the eigenvalues only (no
-     * eigenvectors).
+     * The eigenvalues, in descending order. They are complex numbers, also for real matrices. Uses the cached
+     * eigenvalue decomposition if there is one, otherwise computes the eigenvalues only (no eigenvectors).
      *
      * @return The matrix' eigenvalues.
      * @see org.ojalgo.matrix.decomposition.Eigenvalue#getEigenvalues()
@@ -553,10 +551,10 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     /**
-     * The Frobenius norm divided by the square root of the smaller dimension, min(m, n). For a vector (a single
-     * row or column) that is the Frobenius norm itself. The value lies between ||A||<sub>2</sub> / sqrt(min(m, n))
-     * and the 2-norm ||A||<sub>2</sub>, the largest singular value. This definition fits the requirements of
-     * {@linkplain NormedVectorSpace#norm()} and is the norm used by {@link #normalised()}.
+     * The Frobenius norm divided by the square root of the smaller dimension, min(m, n). For a vector (a
+     * single row or column) that is the Frobenius norm itself. The value lies between ||A||<sub>2</sub> /
+     * sqrt(min(m, n)) and the 2-norm ||A||<sub>2</sub>, the largest singular value. This definition fits the
+     * requirements of {@linkplain NormedVectorSpace#norm()} and is the norm used by {@link #normalised()}.
      *
      * @return The matrix' Frobenius norm divided by the square root of min(m, n)
      * @see #calculateFrobeniusNorm(BasicMatrix)

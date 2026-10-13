@@ -250,27 +250,6 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
     }
 
     @Override
-    public Optimisation.Result solve(final Optimisation.Result kickStarter) {
-
-        myCachedReducedGradient = null;
-
-        if (this.initialise(kickStarter)) {
-
-            this.iterate();
-
-            if (myDiagonalPatch > ZERO && state.isFeasible() && state != State.UNBOUNDED) {
-                if (this.isUnbounded()) {
-                    state = State.UNBOUNDED;
-                } else if (this.isBiased()) {
-                    this.correctBias();
-                }
-            }
-        }
-
-        return this.buildResult();
-    }
-
-    @Override
     public String toString() {
         return myMatrices.toString();
     }
@@ -395,8 +374,6 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
 
     private void iterate() {
 
-        this.resetIterationsCount();
-
         if (this.isIteratingPossible()) {
 
             do {
@@ -439,6 +416,27 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
 
     protected int countVariables() {
         return myMatrices.countVariables();
+    }
+
+    @Override
+    protected Optimisation.Result doSolve(final Optimisation.Result kickStarter) {
+
+        myCachedReducedGradient = null;
+
+        if (this.initialise(kickStarter)) {
+
+            this.iterate();
+
+            if (myDiagonalPatch > ZERO && state.isFeasible() && state != State.UNBOUNDED) {
+                if (this.isUnbounded()) {
+                    state = State.UNBOUNDED;
+                } else if (this.isBiased()) {
+                    this.correctBias();
+                }
+            }
+        }
+
+        return this.buildResult();
     }
 
     /**

@@ -56,6 +56,10 @@ import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 import org.ojalgo.type.math.MathType;
 
 /**
+ * A sparse matrix: only the non-zero elements are stored. Create instances with the factories {@link #R064},
+ * {@link #R032}, {@link #R128}, {@link #C128}, {@link #H256} or {@link #Q128}. The number of rows times the
+ * number of columns must not exceed {@link Integer#MAX_VALUE}.
+ * {@snippet class = org.ojalgo.matrix.store.SparseStoreSnippets region = introduction}
  * A sparse matrix (this implementation) is not thread safe. Mutating the matrix (in particular creating
  * new/more non-zero elements) from multiple threads will result in unpredictable behaviour (even if the
  * threads update different elements). To mutate the matrix in a concurrent/multi-threaded environment you
@@ -86,6 +90,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
         Builder(final PhysicalStore.Factory<N, ?> physicalFactory, final int rowDim, final int colDim) {
             super();
+            SparseStore.checkSize(rowDim, colDim);
             myPhysicalFactory = physicalFactory;
             myRowDim = rowDim;
             myColDim = colDim;
@@ -212,6 +217,12 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         return new SparseStore.Factory<>(physicalFactory);
     }
 
+    private static void checkSize(final int nbRows, final int nbCols) {
+        if ((long) nbRows * nbCols > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("Too large: " + nbRows + " x " + nbCols + " – rows times columns must not exceed Integer.MAX_VALUE!");
+        }
+    }
+
     private static <N extends Scalar<N>> void doGenericColumnAXPY(final SparseArray<N> elements, final long colX, final long colY, final N a,
             final TransformableRegion<N> y) {
 
@@ -291,6 +302,8 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
     SparseStore(final PhysicalStore.Factory<N, ?> factory, final int nbRows, final int nbCols, final IntBinaryOperator initial) {
 
         super(factory, nbRows, nbCols);
+
+        SparseStore.checkSize(nbRows, nbCols);
 
         myElements = SparseArray.factory(factory.array()).initial(initial.applyAsInt(nbRows, nbCols)).make(this.size());
         myFirsts = new int[nbRows];

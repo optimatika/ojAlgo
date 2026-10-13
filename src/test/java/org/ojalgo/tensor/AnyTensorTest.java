@@ -33,8 +33,8 @@ import org.ojalgo.scalar.Quaternion;
  * with the same elements – for every operation and every factory method that exists in both forms.
  * <p>
  * The elements are complex (and in one test quaternions) so that conjugation and lost imaginary parts are
- * detected. Comparing the classes with each other is not enough on its own – they could be equally wrong –
- * so the factory results and the conjugates are also checked against their definitions.
+ * detected. Comparing the classes with each other is not enough on its own – they could be equally wrong – so
+ * the factory results and the conjugates are also checked against their definitions.
  */
 public class AnyTensorTest {
 
@@ -86,8 +86,8 @@ public class AnyTensorTest {
 
     /**
      * The conjugate of a tensor product of vectors is the tensor product of the conjugated vectors in reverse
-     * order. With quaternions that only holds if the conjugate reverses the indices (and the factories multiply
-     * in the order of the vectors).
+     * order. With quaternions that only holds if the conjugate reverses the indices (and the factories
+     * multiply in the order of the vectors).
      */
     @Test
     public void testConjugateOfProductH256() {

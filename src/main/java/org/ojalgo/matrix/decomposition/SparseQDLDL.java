@@ -396,8 +396,8 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
      * </ul>
      * Returns false if a diagonal entry D[i] is (numerically) zero – not larger than the largest |D[i]| so
      * far times the dimensional epsilon – and the factorisation stops there. {@link #isSolvable()} is true if
-     * the factorisation completed and all |D[i]| are larger than {@link #getRankThreshold()}, the same test as
-     * {@link #isFullRank()}.
+     * the factorisation completed and all |D[i]| are larger than {@link #getRankThreshold()}, the same test
+     * as {@link #isFullRank()}.
      * <p>
      * This method performs both the symbolic analysis (elimination tree) and numeric factorisation. For
      * repeated factorisations with identical sparsity patterns and updated values, callers may instead use

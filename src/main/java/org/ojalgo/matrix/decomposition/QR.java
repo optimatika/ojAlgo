@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.array.PlainArray;
+import org.ojalgo.matrix.operation.GEQRF;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.scalar.ComplexNumber;
@@ -46,10 +47,12 @@ import org.ojalgo.type.context.NumberContext;
  * You create instances of (some subclass of) this class by using one of the factories: {@linkplain #R064},
  * {@linkplain #R128}, {@linkplain #C128}, {@linkplain #H256} or {@linkplain #Q128}
  * <p>
- * The QR decompostion always exists, even if the matrix does not have full column rank, so the compute method
- * will never fail. The primary use of the QR decomposition is in the least squares solution of overdetermined
- * systems of simultaneous linear equations. This will fail if the matrix does not have full column rank. The
- * rank must be equal to the number of columns.
+ * The QR decomposition always exists, also when the matrix does not have full column rank, and
+ * {@link #decompose(Access2D.Collectable) decompose(..)} always succeeds. Its primary use is the least
+ * squares solution of overdetermined systems of simultaneous linear equations, which requires full column
+ * rank – the rank equal to the number of columns. {@link #compute(Access2D.Collectable) compute(..)}
+ * decomposes and then checks {@link #isSolvable() isSolvable()}, so it returns false when the rank is lower.
+ * {@snippet class = org.ojalgo.matrix.decomposition.MatrixDecompositionSnippets region = qr}
  *
  * @author apete
  */
@@ -78,7 +81,8 @@ public interface QR<N extends Comparable<N>> extends MatrixDecomposition.Updatab
     Factory<RationalNumber> Q128 = (typical, fullSize) -> new DenseQR.Q128(fullSize);
 
     Factory<Double> R064 = (typical, fullSize) -> {
-        if (fullSize || typical.isFat() || 64 >= typical.getColDim() && typical.count() <= PlainArray.MAX_SIZE) {
+        if (fullSize || typical.isFat()
+                || (64 >= typical.getColDim() || GEQRF.isNative(typical.getRowDim(), typical.getColDim())) && typical.count() <= PlainArray.MAX_SIZE) {
             return new DenseQR.R064(fullSize);
         } else {
             return new RawQR();
@@ -107,10 +111,11 @@ public interface QR<N extends Comparable<N>> extends MatrixDecomposition.Updatab
     MatrixStore<N> getR();
 
     /**
-     * The number of significant diagonal elements of [R] – larger than {@link #getRankThreshold()}. There is no
-     * column pivoting. That is the rank only if the matrix has full rank. For a rank deficient matrix it is, in
-     * exact arithmetic, a lower bound on the rank – 0 for a square shift matrix (ones on the superdiagonal, rank
-     * n-1) – and with rounding errors it can also be too high. Use {@link SingularValue} for the numerical rank.
+     * The number of significant diagonal elements of [R] – larger than {@link #getRankThreshold()}. There is
+     * no column pivoting. That is the rank only if the matrix has full rank. For a rank deficient matrix it
+     * is, in exact arithmetic, a lower bound on the rank – 0 for a square shift matrix (ones on the
+     * superdiagonal, rank n-1) – and with rounding errors it can also be too high. Use {@link SingularValue}
+     * for the numerical rank.
      */
     @Override
     default int getRank() {

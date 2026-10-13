@@ -40,7 +40,14 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.matrix.operation.*;
+import org.ojalgo.matrix.operation.HouseholderLeft;
+import org.ojalgo.matrix.operation.HouseholderRight;
+import org.ojalgo.matrix.operation.MultiplyBoth;
+import org.ojalgo.matrix.operation.MultiplyNeither;
+import org.ojalgo.matrix.operation.RotateLeft;
+import org.ojalgo.matrix.operation.RotateRight;
+import org.ojalgo.matrix.operation.SubstituteBackwards;
+import org.ojalgo.matrix.operation.SubstituteForwards;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
@@ -724,8 +731,8 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
      * otherwise null.
      */
     private GenericStore<N> transposed(final Access1D<?> matrix) {
-        if (matrix instanceof TransposedStore<?> && ((TransposedStore<?>) matrix).getOriginal() instanceof GenericStore<?>) {
-            return (GenericStore<N>) ((TransposedStore<?>) matrix).getOriginal();
+        if (matrix instanceof TransposedStore<?> transposed && transposed.getOriginal() instanceof GenericStore<?> original) {
+            return (GenericStore<N>) original;
         }
         return null;
     }

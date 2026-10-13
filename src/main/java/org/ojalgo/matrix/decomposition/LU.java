@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.array.PlainArray;
+import org.ojalgo.matrix.operation.GETRF;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -45,14 +46,18 @@ import org.ojalgo.type.context.NumberContext;
  * <p>
  * Note: The number of columns in [L] and the number of rows in [U] is not specified by this interface.
  * <p>
- * The LU decomposition always exists - the compute method should always succeed - even for non-square and/or
- * singular matrices. The primary use of the LU decomposition is in the solution of systems of simultaneous
- * linear equations. That will, however, only work for square non-singular matrices.
+ * The LU decomposition always exists, also for non-square and singular matrices, and
+ * {@link #decompose(Access2D.Collectable) decompose(..)} always succeeds. Its primary use is the solution of
+ * systems of simultaneous linear equations, which only works for square non-singular matrices.
+ * {@link #compute(Access2D.Collectable) compute(..)} decomposes and then checks {@link #isSolvable()
+ * isSolvable()}, so it returns false for any other matrix.
  * <p>
- * Singularity, {@link #isSolvable()} and the rank, is judged from the size of the pivots – the smallest
- * relative to the largest. With partial pivoting that is not a reliable test: a matrix that is singular apart
- * from rounding errors may still be reported as solvable, and then solutions and inverses contain huge
- * meaningless values. If that's a concern, check the condition number or use {@link SingularValue}.
+ * Singularity, {@link #isSolvable() isSolvable()} and the rank, is judged from the size of the pivots – the
+ * smallest relative to the largest. With partial pivoting that is not a reliable test: a matrix that is
+ * singular apart from rounding errors may still be reported as solvable, and then solutions and inverses
+ * contain huge meaningless values. If that's a concern, check the condition number or use
+ * {@link SingularValue}.
+ * {@snippet class = org.ojalgo.matrix.decomposition.MatrixDecompositionSnippets region = lu}
  *
  * @author apete
  */
@@ -70,7 +75,7 @@ public interface LU<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition
 
     Factory<Double> R064 = typical -> {
 
-        if (60 < typical.getColDim() && typical.count() <= PlainArray.MAX_SIZE) {
+        if ((60 < typical.getColDim() || GETRF.isNative(typical.getRowDim(), typical.getColDim())) && typical.count() <= PlainArray.MAX_SIZE) {
             return new DenseLU.R064();
         } else {
             return new RawLU();
@@ -95,10 +100,11 @@ public interface LU<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition
     MatrixStore<N> getL();
 
     /**
-     * The number of significant pivots – diagonal elements of [U] larger than {@link #getRankThreshold()}. That
-     * is the rank only if the matrix has full rank. For a rank deficient matrix it is, in exact arithmetic, a
-     * lower bound on the rank – 0 for a square shift matrix (ones on the superdiagonal, rank n-1) – and with
-     * rounding errors it can also be too high. Use {@link SingularValue} for the numerical rank.
+     * The number of significant pivots – diagonal elements of [U] larger than {@link #getRankThreshold()}.
+     * That is the rank only if the matrix has full rank. For a rank deficient matrix it is, in exact
+     * arithmetic, a lower bound on the rank – 0 for a square shift matrix (ones on the superdiagonal, rank
+     * n-1) – and with rounding errors it can also be too high. Use {@link SingularValue} for the numerical
+     * rank.
      */
     @Override
     default int getRank() {

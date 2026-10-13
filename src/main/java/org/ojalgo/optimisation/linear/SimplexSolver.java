@@ -106,10 +106,9 @@ abstract class SimplexSolver extends LinearSolver {
             if (this == obj) {
                 return true;
             }
-            if (!(obj instanceof EnterInfo)) {
+            if (!(obj instanceof EnterInfo other)) {
                 return false;
             }
-            EnterInfo other = (EnterInfo) obj;
             if (direction != other.direction || from != other.from || index != other.index) {
                 return false;
             }
@@ -179,10 +178,9 @@ abstract class SimplexSolver extends LinearSolver {
             if (this == obj) {
                 return true;
             }
-            if (!(obj instanceof ExitInfo)) {
+            if (!(obj instanceof ExitInfo other)) {
                 return false;
             }
-            ExitInfo other = (ExitInfo) obj;
             if (direction != other.direction || index != other.index || to != other.to) {
                 return false;
             }
@@ -239,10 +237,9 @@ abstract class SimplexSolver extends LinearSolver {
             if (this == obj) {
                 return true;
             }
-            if (!(obj instanceof IterDescr)) {
+            if (!(obj instanceof IterDescr other)) {
                 return false;
             }
-            IterDescr other = (IterDescr) obj;
             if (enter == null) {
                 if (other.enter != null) {
                     return false;
@@ -1954,8 +1951,6 @@ abstract class SimplexSolver extends LinearSolver {
         }
 
         mySimplex.prepareToIterate(cold);
-
-        this.resetIterationsCount();
 
         if (this.isLogDebug()) {
             this.logCurrentState();

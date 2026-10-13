@@ -84,30 +84,6 @@ final class DirectASS extends ActiveSetSolver {
         myWorkColumn = MATRIX_FACTORY.make(this.countVariables(), 1L);
     }
 
-    private void clearCholesky() {
-        myCholesky.reset();
-        myInCholesky.clear();
-    }
-
-    private int getCholeskySize() {
-        return myCholesky.isComputed() ? myCholesky.getRowDim() : 0;
-    }
-
-    private double getB(final int key) {
-        int nbEqus = this.countEqualityConstraints();
-        return key < nbEqus ? this.getMatrixBE().doubleValue(key) : this.getMatrixBI(key - nbEqus);
-    }
-
-    private double[] getInvQA(final int key) {
-        int nbEqus = this.countEqualityConstraints();
-        return key < nbEqus ? this.getInvQAE(key) : this.getInvQAI(key - nbEqus);
-    }
-
-    private SparseArray<Double> getRow(final int key) {
-        int nbEqus = this.countEqualityConstraints();
-        return key < nbEqus ? this.getMatrixAE(key) : this.getMatrixAI(key - nbEqus);
-    }
-
     /**
      * Adds factor * [Q]<sup>-1</sup>[A]<sup>T</sup>[L] to x, where [A] are the active constraints (in the
      * order of the Cholesky decomposition).
@@ -157,6 +133,49 @@ final class DirectASS extends ActiveSetSolver {
         return true;
     }
 
+    private void clearCholesky() {
+        myCholesky.reset();
+        myInCholesky.clear();
+    }
+
+    private double getB(final int key) {
+        int nbEqus = this.countEqualityConstraints();
+        return key < nbEqus ? this.getMatrixBE().doubleValue(key) : this.getMatrixBI(key - nbEqus);
+    }
+
+    private int getCholeskySize() {
+        return myCholesky.isComputed() ? myCholesky.getRowDim() : 0;
+    }
+
+    private double[] getInvQA(final int key) {
+        int nbEqus = this.countEqualityConstraints();
+        return key < nbEqus ? this.getInvQAE(key) : this.getInvQAI(key - nbEqus);
+    }
+
+    private double[] getInvQAE(final int row) {
+        if (myInvQAE[row] == null) {
+            myInvQAE[row] = this.solveQ(this.getMatrixAE(row));
+        }
+        return myInvQAE[row];
+    }
+
+    private double[] getInvQAI(final int row) {
+        if (myInvQAI[row] == null) {
+            myInvQAI[row] = this.solveQ(this.getMatrixAI(row));
+        }
+        return myInvQAI[row];
+    }
+
+    private SparseArray<Double> getRow(final int key) {
+        int nbEqus = this.countEqualityConstraints();
+        return key < nbEqus ? this.getMatrixAE(key) : this.getMatrixAI(key - nbEqus);
+    }
+
+    private double[] solveQ(final SparseArray<Double> row) {
+        this.getSolutionQ(Access2D.newPrimitiveColumnCollectable(row), myWorkColumn);
+        return myWorkColumn.toRawCopy1D();
+    }
+
     /**
      * Makes sure the Cholesky decomposition of the Schur complement matches the current set of active
      * constraints: removes those no longer active and adds new ones.
@@ -188,31 +207,6 @@ final class DirectASS extends ActiveSetSolver {
         }
 
         return true;
-    }
-
-    private double[] getInvQAE(final int row) {
-        if (myInvQAE[row] == null) {
-            myInvQAE[row] = this.solveQ(this.getMatrixAE(row));
-        }
-        return myInvQAE[row];
-    }
-
-    private double[] getInvQAI(final int row) {
-        if (myInvQAI[row] == null) {
-            myInvQAI[row] = this.solveQ(this.getMatrixAI(row));
-        }
-        return myInvQAI[row];
-    }
-
-    private double[] solveQ(final SparseArray<Double> row) {
-        this.getSolutionQ(Access2D.newPrimitiveColumnCollectable(row), myWorkColumn);
-        return myWorkColumn.toRawCopy1D();
-    }
-
-    @Override
-    void resetActivator() {
-        super.resetActivator();
-        this.clearCholesky();
     }
 
     @Override
@@ -322,6 +316,12 @@ final class DirectASS extends ActiveSetSolver {
         }
 
         this.handleIterationResults(solved, iterX, incl, excl);
+    }
+
+    @Override
+    void resetActivator() {
+        super.resetActivator();
+        this.clearCholesky();
     }
 
 }

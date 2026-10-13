@@ -239,6 +239,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
      */
     private double[] myDiagonalR;
     private int myNumberOfHouseholderTransformations = 0;
+    private transient RawStore myQ = null;
 
     /**
      * Not recommended to use this constructor directly. Consider using the static factory method
@@ -395,7 +396,10 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
     @Override
     public RawStore getQ() {
-        return (RawStore) this.getFactorQ().get();
+        if (myQ == null) {
+            myQ = (RawStore) this.getFactorQ().get();
+        }
+        return myQ;
     }
 
     @Override
@@ -460,6 +464,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         super.reset();
 
         myNumberOfHouseholderTransformations = 0;
+        myQ = null;
     }
 
     @Override
