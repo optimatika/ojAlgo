@@ -93,9 +93,9 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
     }
 
     /**
-     * The LP that the convex solvers delegate to ({@link LinearSolver#solve(ConvexData, Optimisation.Options, boolean)}
-     * – the primal problem solved with {@link SimplexSolver}) should give the same state and solution as the
-     * model.
+     * The LP that the convex solvers delegate to
+     * ({@link LinearSolver#solve(ConvexData, Optimisation.Options, boolean)} – the primal problem solved with
+     * {@link SimplexSolver}) should give the same state and solution as the model.
      */
     static void compareWithConvexSolver(final ExpressionsBasedModel model, final Optimisation.Sense sense) {
 

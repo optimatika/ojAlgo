@@ -465,8 +465,6 @@ final class SimplexTableauSolver extends LinearSolver {
         return retVal;
     }
 
-
-
     static void set(final ExpressionsBasedModel model, final Primitive2D constraintsBdy, final int indCnstr, final int basePosVars, final int baseNegVars,
             final IntIndex key, final double factor) {
 
@@ -494,8 +492,6 @@ final class SimplexTableauSolver extends LinearSolver {
             constraintsBdy.set(indCnstr, baseNegVars + tmpNegInd, -factor);
         }
     }
-
-
 
     private LongToNumberMap<Double> myFixedVariables = null;
     private final SimplexTableauSolver.IterationPoint myPoint;

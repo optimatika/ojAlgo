@@ -478,7 +478,6 @@ abstract class SimplexSolver extends LinearSolver {
         return simplex;
     }
 
-
     static Optimisation.Result doSolveConvexAsPrimal(final ConvexData<Double> convex, final Optimisation.Options options, final boolean zeroC) {
 
         int nbCvxVars = convex.countVariables();
@@ -588,8 +587,6 @@ abstract class SimplexSolver extends LinearSolver {
         retVal.withDualSolution(() -> retMultipliers);
         return retVal;
     }
-
-
 
     /**
      * Set by {@link #testDualEnterRatio}: there were candidates, but {@link #PIVOT_GROWTH} rejected them all.

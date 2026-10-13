@@ -257,10 +257,10 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
      * the one to ignore) are skipped, unless the slack change is significant compared to the step.
      * <p>
      * A constraint is at its boundary (limits the step length to 0) if its slack is negligible compared to
-     * the slack change, and also compared to the size of the constraint – its RHS and its terms at the current
-     * solution. With a very long step, a slack that is negligible compared to the slack change can still be
-     * far from 0, and including that constraint without moving would make the active set inconsistent with
-     * the current solution.
+     * the slack change, and also compared to the size of the constraint – its RHS and its terms at the
+     * current solution. With a very long step, a slack that is negligible compared to the slack change can
+     * still be far from 0, and including that constraint without moving would make the active set
+     * inconsistent with the current solution.
      *
      * @param ignore An inequality constraint to ignore, or -1
      */

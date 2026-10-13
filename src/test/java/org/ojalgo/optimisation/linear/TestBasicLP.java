@@ -1,7 +1,5 @@
 package org.ojalgo.optimisation.linear;
 
-import java.util.List;
-
 import org.junit.jupiter.api.Test;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -11,7 +9,6 @@ import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.OptimisationCase;
 import org.ojalgo.optimisation.TestBasic;
 import org.ojalgo.optimisation.Variable;
-import org.ojalgo.type.keyvalue.KeyValue;
 
 /**
  * A set of basic LP test models to test things any/all LP solver should be able to handle. Just small models
@@ -61,6 +58,24 @@ public class TestBasicLP extends OptimisationLinearTests implements TestBasic {
      * LP with mixed equalities and bounds: minimize x + 2y subject to x - y = 0, 3x + 2y <= 4, with bounds x
      * ∈ [0, 2], y ∈ [-1, 1]. The optimal solution is at x = y = 0 with objective value 0.
      */
+    /**
+     * Minimise y + z subject to y = z and z >= -200000, with y free. The optimum, y = z = -200000, is far
+     * from the origin.
+     */
+    static OptimisationCase caseLargeMagnitudeSolution() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable y = model.addVariable("y").weight(1.0);
+        Variable z = model.addVariable("z").lower(-200_000.0).weight(1.0);
+
+        model.addExpression("equal").set(y, 1.0).set(z, -1.0).level(0.0);
+
+        Optimisation.Result result = Optimisation.Result.of(-400_000.0, State.OPTIMAL, -200_000.0, -200_000.0);
+
+        return OptimisationCase.of(model, Optimisation.Sense.MIN, result);
+    }
+
     static OptimisationCase caseMixedEqualitiesAndBounds() {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
@@ -97,6 +112,28 @@ public class TestBasicLP extends OptimisationLinearTests implements TestBasic {
      * Simple LP: minimize x + 2y subject to x + y >= 1, x >= 0, y >= 0. The unique optimal solution is at x =
      * 1, y = 0 with objective value 1.
      */
+    /**
+     * Linearly dependent (redundant) equality constraints - the third is the sum of the other two: minimise x
+     * + 2y + 3z subject to x + y = 4, y + z = 6 and x + 2y + z = 10, with 0 <= x, y, z <= 10. With x = 4 - y
+     * and z = 6 - y the objective is 22 - 2y, minimised at y = 4.
+     */
+    static OptimisationCase caseRedundantEqualities() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x = model.addVariable("x").lower(0.0).upper(10.0).weight(1.0);
+        Variable y = model.addVariable("y").lower(0.0).upper(10.0).weight(2.0);
+        Variable z = model.addVariable("z").lower(0.0).upper(10.0).weight(3.0);
+
+        model.addExpression("e1").set(x, 1.0).set(y, 1.0).level(4.0);
+        model.addExpression("e2").set(y, 1.0).set(z, 1.0).level(6.0);
+        model.addExpression("e3").set(x, 1.0).set(y, 2.0).set(z, 1.0).level(10.0);
+
+        Optimisation.Result result = Optimisation.Result.of(14.0, State.OPTIMAL, 0.0, 4.0, 2.0);
+
+        return OptimisationCase.of(model, Optimisation.Sense.MIN, result);
+    }
+
     static OptimisationCase caseSimpleLP() {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
@@ -160,6 +197,14 @@ public class TestBasicLP extends OptimisationLinearTests implements TestBasic {
     }
 
     @Test
+    public void testLargeMagnitudeSolution() {
+        OptimisationCase testCase = TestBasicLP.caseLargeMagnitudeSolution();
+        for (Integration<?> integration : this.integrations()) {
+            testCase.assertResult(integration);
+        }
+    }
+
+    @Test
     public void testMixedEqualitiesAndBounds() {
         OptimisationCase testCase = TestBasicLP.caseMixedEqualitiesAndBounds();
         for (Integration<?> integration : this.integrations()) {
@@ -170,6 +215,14 @@ public class TestBasicLP extends OptimisationLinearTests implements TestBasic {
     @Test
     public void testPureBoundedLP() {
         OptimisationCase testCase = TestBasicLP.casePureBoundedLP();
+        for (Integration<?> integration : this.integrations()) {
+            testCase.assertResult(integration);
+        }
+    }
+
+    @Test
+    public void testRedundantEqualities() {
+        OptimisationCase testCase = TestBasicLP.caseRedundantEqualities();
         for (Integration<?> integration : this.integrations()) {
             testCase.assertResult(integration);
         }
@@ -197,10 +250,6 @@ public class TestBasicLP extends OptimisationLinearTests implements TestBasic {
         for (Integration<?> integration : this.integrations()) {
             testCase.assertResult(integration);
         }
-    }
-
-    protected List<ExpressionsBasedModel.Integration<?>> integrations() {
-        return List.of(INTEGRATIONS.stream().map(KeyValue::getValue).toArray(ExpressionsBasedModel.Integration<?>[]::new));
     }
 
 }

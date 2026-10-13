@@ -62,4 +62,8 @@ abstract class OptimisationLinearTests {
 
     static final List<Function<LinearStructure, SimplexTableau>> TABLEAU_FACTORIES = List.of(DenseTableau::new, SparseTableau::new);
 
+    protected List<ExpressionsBasedModel.Integration<?>> integrations() {
+        return List.of(INTEGRATIONS.stream().map(KeyValue::getValue).toArray(ExpressionsBasedModel.Integration<?>[]::new));
+    }
+
 }

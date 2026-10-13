@@ -36,6 +36,7 @@ import org.ojalgo.optimisation.Optimisation.Sense;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 import org.ojalgo.type.keyvalue.KeyValue;
 
 /**
@@ -94,7 +95,7 @@ public class ReducedCostsTest extends OptimisationLinearTests {
         TestUtils.assertStateNotLessThanOptimal(result);
         TestUtils.assertEquals(id + " value", value, result.getValue(), ACCURACY);
 
-        double actualDual = result.getDualValues().stream().filter(kp -> kp.getKey().left() == constraint).mapToDouble(kp -> kp.doubleValue()).findFirst()
+        double actualDual = result.getDualValues().stream().filter(kp -> kp.getKey().left() == constraint).mapToDouble(KeyedPrimitive::doubleValue).findFirst()
                 .orElseThrow();
         TestUtils.assertEquals(id + " dual", dual, actualDual, ACCURACY);
 
@@ -517,7 +518,6 @@ public class ReducedCostsTest extends OptimisationLinearTests {
      * integrations.
      */
     protected List<KeyValue<String, ExpressionsBasedModel.Integration<LinearSolver>>> getAllIntegrations() {
-
         return OptimisationLinearTests.INTEGRATIONS;
     }
 

@@ -36,7 +36,6 @@ import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.type.context.NumberContext;
-import org.ojalgo.type.keyvalue.KeyValue;
 
 /**
  * A small collection of datasets found here: http://people.sc.fsu.edu/~jburkardt/datasets/mps/
@@ -46,48 +45,6 @@ import org.ojalgo.type.keyvalue.KeyValue;
 public class BurkardtDatasetsMps extends OptimisationLinearTests implements ModelFileTest {
 
     private static final NumberContext ACCURACY = NumberContext.of(11, 9);
-
-    private static ExpressionsBasedModel doTest(final String modelName, final String expMinValString, final String expMaxValString) {
-
-        ExpressionsBasedModel model = ModelFileTest.makeModel("burkardt", modelName, false);
-
-        for (KeyValue<String, Integration<LinearSolver>> entry : INTEGRATIONS) {
-
-            String key = entry.getKey();
-            Integration<LinearSolver> integration = entry.getValue();
-
-            if (DEBUG) {
-                BasicLogger.debug();
-                BasicLogger.debug("########################################################################################");
-                BasicLogger.debug(key);
-                BasicLogger.debug("########################################################################################");
-            }
-
-            ExpressionsBasedModel.clearIntegrations();
-            ExpressionsBasedModel.addIntegration(integration);
-
-            if (DEBUG) {
-                // model.options.debug(Optimisation.Solver.class);
-                // model.options.debug(IntegerSolver.class);
-                // model.options.debug(ConvexSolver.class);
-                model.options.debug(LinearSolver.class);
-                // model.options.progress(IntegerSolver.class);
-                // model.options.validate = false;
-                // model.options.mip_defer = 0.25;
-                // model.options.mip_gap = 1.0E-5;
-            }
-
-            ModelFileTest.assertValues(model, expMinValString, expMaxValString, BurkardtDatasetsMps.ACCURACY);
-            ExpressionsBasedModel.clearIntegrations();
-
-            if (DEBUG) {
-                BasicLogger.debug(model);
-                BasicLogger.debug();
-            }
-        }
-
-        return model;
-    }
 
     /**
      * Defines a problem of 57 rows and 97 columns. Seems to be the same model as adlittle at netlib. Netlib
@@ -107,7 +64,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
      */
     @Test
     public void testMPSadlittle() {
-        BurkardtDatasetsMps.doTest("adlittle.mps", "225494.96316238446", null);
+        this.doTest("adlittle.mps", "225494.96316238446", null);
     }
 
     /**
@@ -118,7 +75,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
      */
     @Test
     public void testMPSafiro() {
-        BurkardtDatasetsMps.doTest("afiro.mps", "-.46475314286e+3", null);
+        this.doTest("afiro.mps", "-.46475314286e+3", null);
     }
 
     /**
@@ -127,7 +84,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
      */
     @Test
     public void testMPSempstest() {
-        BurkardtDatasetsMps.doTest("empstest.mps", null, null);
+        this.doTest("empstest.mps", null, null);
     }
 
     /**
@@ -139,7 +96,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
      */
     @Test
     public void testMPSmaros() {
-        BurkardtDatasetsMps.doTest("maros.mps", BigMath.DIVIDE.invoke(new BigDecimal("385"), THREE).toString(), "197.5");
+        this.doTest("maros.mps", BigMath.DIVIDE.invoke(new BigDecimal("385"), THREE).toString(), "197.5");
     }
 
     /**
@@ -174,7 +131,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
      */
     @Test
     public void testMPSmarosCorrected() {
-        BurkardtDatasetsMps.doTest("maros_corrected.mps", BigMath.DIVIDE.invoke(new BigDecimal("385"), THREE).toString(), "177.24137931034483");
+        this.doTest("maros_corrected.mps", BigMath.DIVIDE.invoke(new BigDecimal("385"), THREE).toString(), "177.24137931034483");
     }
 
     /**
@@ -183,7 +140,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
      */
     @Test
     public void testMPSnazareth() {
-        BurkardtDatasetsMps.doTest("nazareth.mps", null, BigMath.DIVIDE.invoke(HUNDRED.add(TEN), THREE).toString());
+        this.doTest("nazareth.mps", null, BigMath.DIVIDE.invoke(HUNDRED.add(TEN), THREE).toString());
     }
 
     /**
@@ -194,7 +151,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
     @Test
     public void testMPStestprob() {
 
-        ExpressionsBasedModel parsedModel = BurkardtDatasetsMps.doTest("testprob.mps", "54", "80");
+        ExpressionsBasedModel parsedModel = this.doTest("testprob.mps", "54", "80");
 
         ExpressionsBasedModel reimplementedModel = new ExpressionsBasedModel();
 
@@ -247,4 +204,44 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
             TestUtils.fail("Solution not valid!");
         }
     }
+
+    private ExpressionsBasedModel doTest(final String modelName, final String expMinValString, final String expMaxValString) {
+
+        ExpressionsBasedModel model = ModelFileTest.makeModel("burkardt", modelName, false);
+
+        for (Integration<?> integration : this.integrations()) {
+
+            if (DEBUG) {
+                BasicLogger.debug();
+                BasicLogger.debug("########################################################################################");
+                BasicLogger.debug(integration);
+                BasicLogger.debug("########################################################################################");
+            }
+
+            ExpressionsBasedModel.clearIntegrations();
+            ExpressionsBasedModel.addIntegration(integration);
+
+            if (DEBUG) {
+                // model.options.debug(Optimisation.Solver.class);
+                // model.options.debug(IntegerSolver.class);
+                // model.options.debug(ConvexSolver.class);
+                model.options.debug(LinearSolver.class);
+                // model.options.progress(IntegerSolver.class);
+                // model.options.validate = false;
+                // model.options.mip_defer = 0.25;
+                // model.options.mip_gap = 1.0E-5;
+            }
+
+            ModelFileTest.assertValues(model, expMinValString, expMaxValString, BurkardtDatasetsMps.ACCURACY);
+            ExpressionsBasedModel.clearIntegrations();
+
+            if (DEBUG) {
+                BasicLogger.debug(model);
+                BasicLogger.debug();
+            }
+        }
+
+        return model;
+    }
+
 }

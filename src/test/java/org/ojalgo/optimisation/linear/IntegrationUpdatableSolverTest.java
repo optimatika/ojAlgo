@@ -23,6 +23,8 @@ package org.ojalgo.optimisation.linear;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
@@ -38,6 +40,7 @@ import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.keyvalue.EntryPair;
+import org.ojalgo.type.keyvalue.KeyValue;
 
 /**
  * Tests {@link UpdatableSolver} methods ({@code fixVariable}, {@code updateRange}, {@code getDualMultiplier},
@@ -54,6 +57,13 @@ public class IntegrationUpdatableSolverTest extends OptimisationLinearTests {
     private static final NumberContext ACCURACY = NumberContext.of(6);
 
     /**
+     * ojAlgo's own variants that use the classic tableau solver –
+     * {@link LinearSolver.Configuration#primal()}.
+     */
+    private static final Set<Integration<?>> CLASSIC_TABLEAU = INTEGRATIONS.stream().filter(entry -> entry.getKey().startsWith("Primal"))
+            .map(KeyValue::getValue).collect(Collectors.toSet());
+
+    /**
      * Build a solver from the integration and cast to UpdatableSolver; fails the test if the solver does not
      * implement UpdatableSolver.
      */
@@ -61,6 +71,30 @@ public class IntegrationUpdatableSolverTest extends OptimisationLinearTests {
         Optimisation.Solver solver = integration.build(model);
         TestUtils.assertTrue("Solver must implement UpdatableSolver", solver instanceof UpdatableSolver);
         return (UpdatableSolver) solver;
+    }
+
+    /**
+     * <pre>{@code
+     * min  -x - 2y
+     * s.t.  1 <= x + y <= 3    (ranged: both lower and upper, not equality)
+     *            x + 3y <= 6   (upper only)
+     *       x, y in [0, 10]
+     * }</pre>
+     *
+     * Optimal: x=1.5, y=1.5, obj=-4.5. The ranged constraint binds at its upper bound (x+y=3) and the
+     * upper-only constraint also binds (x+3y=6). The lower bound of the ranged constraint does not bind.
+     */
+    private static ExpressionsBasedModel newRangedConstraintModel() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x = model.newVariable("x").lower(0).upper(10).weight(-1);
+        Variable y = model.newVariable("y").lower(0).upper(10).weight(-2);
+
+        model.newExpression("range").set(x, 1).set(y, 1).lower(1).upper(3);
+        model.newExpression("ub").set(x, 1).set(y, 3).upper(6);
+
+        return model;
     }
 
     /**
@@ -85,29 +119,6 @@ public class IntegrationUpdatableSolverTest extends OptimisationLinearTests {
         model.newExpression("eq").set(x0, 2).set(x1, 3).set(x2, 1).set(x3, 2).level(17);
         model.newExpression("iq0").set(x0, 3).set(x1, 1).set(x3, 2).upper(9);
         model.newExpression("iq1").set(x0, 1).set(x2, 2).set(x3, 3).upper(8);
-
-        return model;
-    }
-
-    /**
-     * <pre>{@code
-     * min  -2*x - 3*y
-     * s.t.   x +   y <= 4   (constraint 0)
-     *        x + 3*y <= 6   (constraint 1)
-     *        x, y in [0, 10]
-     * }</pre>
-     *
-     * Optimal: x=3, y=1, obj=-9. Both constraints bind. Duals: 3/2, 1/2. Reduced gradients: 0, 0.
-     */
-    private static ExpressionsBasedModel newTwoConstraintModel() {
-
-        ExpressionsBasedModel model = new ExpressionsBasedModel();
-
-        Variable x = model.newVariable("x").lower(0).upper(10).weight(-2);
-        Variable y = model.newVariable("y").lower(0).upper(10).weight(-3);
-
-        model.newExpression("c0").set(x, 1).set(y, 1).upper(4);
-        model.newExpression("c1").set(x, 1).set(y, 3).upper(6);
 
         return model;
     }
@@ -139,24 +150,23 @@ public class IntegrationUpdatableSolverTest extends OptimisationLinearTests {
 
     /**
      * <pre>{@code
-     * min  -x - 2y
-     * s.t.  1 <= x + y <= 3    (ranged: both lower and upper, not equality)
-     *            x + 3y <= 6   (upper only)
-     *       x, y in [0, 10]
+     * min  -2*x - 3*y
+     * s.t.   x +   y <= 4   (constraint 0)
+     *        x + 3*y <= 6   (constraint 1)
+     *        x, y in [0, 10]
      * }</pre>
      *
-     * Optimal: x=1.5, y=1.5, obj=-4.5. The ranged constraint binds at its upper bound (x+y=3) and the
-     * upper-only constraint also binds (x+3y=6). The lower bound of the ranged constraint does not bind.
+     * Optimal: x=3, y=1, obj=-9. Both constraints bind. Duals: 3/2, 1/2. Reduced gradients: 0, 0.
      */
-    private static ExpressionsBasedModel newRangedConstraintModel() {
+    private static ExpressionsBasedModel newTwoConstraintModel() {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        Variable x = model.newVariable("x").lower(0).upper(10).weight(-1);
-        Variable y = model.newVariable("y").lower(0).upper(10).weight(-2);
+        Variable x = model.newVariable("x").lower(0).upper(10).weight(-2);
+        Variable y = model.newVariable("y").lower(0).upper(10).weight(-3);
 
-        model.newExpression("range").set(x, 1).set(y, 1).lower(1).upper(3);
-        model.newExpression("ub").set(x, 1).set(y, 3).upper(6);
+        model.newExpression("c0").set(x, 1).set(y, 1).upper(4);
+        model.newExpression("c1").set(x, 1).set(y, 3).upper(6);
 
         return model;
     }
@@ -306,67 +316,6 @@ public class IntegrationUpdatableSolverTest extends OptimisationLinearTests {
         }
     }
 
-    @Test
-    public void testReducedGradient() {
-
-        for (Integration<?> integration : this.integrations()) {
-
-            ExpressionsBasedModel model = IntegrationUpdatableSolverTest.newTwoConstraintModel();
-            UpdatableSolver solver = IntegrationUpdatableSolverTest.buildUpdatableSolver(integration, model);
-
-            Result result = solver.solve(null);
-            TestUtils.assertStateNotLessThanOptimal(result);
-
-            String tag = integration.toString();
-
-            TestUtils.assertEquals(tag + " rc0 (basic)", 0.0, solver.getReducedGradient(0), ACCURACY);
-            TestUtils.assertEquals(tag + " rc1 (basic)", 0.0, solver.getReducedGradient(1), ACCURACY);
-        }
-    }
-
-    /**
-     * z is non-basic at its lower bound, so its reduced gradient must be non-zero (|rc_z| = 1.0).
-     */
-    @Test
-    public void testReducedGradientNonZero() {
-
-        for (Integration<?> integration : this.integrations()) {
-
-            ExpressionsBasedModel model = IntegrationUpdatableSolverTest.newThreeVariableModel();
-            UpdatableSolver solver = IntegrationUpdatableSolverTest.buildUpdatableSolver(integration, model);
-
-            Result result = solver.solve(null);
-            TestUtils.assertStateNotLessThanOptimal(result);
-
-            String tag = integration.toString();
-
-            TestUtils.assertEquals(tag + " |rc_z| (non-basic)", 1.0, Math.abs(solver.getReducedGradient(2)), ACCURACY);
-        }
-    }
-
-    @Test
-    public void testUpdateRange() {
-
-        for (Integration<?> integration : this.integrations()) {
-
-            ExpressionsBasedModel model = IntegrationUpdatableSolverTest.newTwoConstraintModel();
-            UpdatableSolver solver = IntegrationUpdatableSolverTest.buildUpdatableSolver(integration, model);
-
-            Result initial = solver.solve(null);
-            TestUtils.assertStateNotLessThanOptimal(initial);
-
-            boolean updated = solver.updateRange(0, 0.0, 1.0);
-            TestUtils.assertTrue(integration + " updateRange should succeed", updated);
-
-            Result result = solver.solve(null);
-            TestUtils.assertStateNotLessThanOptimal(result);
-
-            String tag = integration.toString();
-
-            TestUtils.assertTrue(tag + " x <= 1", result.doubleValue(0) <= 1.0 + 1E-8);
-        }
-    }
-
     /**
      * Verifies that a model with a ranged expression (both lower and upper bounds, not equality) solves
      * correctly, and that the {@link EntityMap} properly accounts for the ranged constraint(s).
@@ -377,7 +326,7 @@ public class IntegrationUpdatableSolverTest extends OptimisationLinearTests {
     @Test
     public void testRangedExpression() {
 
-        for (Integration<?> integration : this.integrations()) {
+        for (Integration<?> integration : this.excludingClassicTableau()) {
 
             ExpressionsBasedModel model = IntegrationUpdatableSolverTest.newRangedConstraintModel();
             UpdatableSolver solver = IntegrationUpdatableSolverTest.buildUpdatableSolver(integration, model);
@@ -476,12 +425,74 @@ public class IntegrationUpdatableSolverTest extends OptimisationLinearTests {
         }
     }
 
+    @Test
+    public void testReducedGradient() {
+
+        for (Integration<?> integration : this.integrations()) {
+
+            ExpressionsBasedModel model = IntegrationUpdatableSolverTest.newTwoConstraintModel();
+            UpdatableSolver solver = IntegrationUpdatableSolverTest.buildUpdatableSolver(integration, model);
+
+            Result result = solver.solve(null);
+            TestUtils.assertStateNotLessThanOptimal(result);
+
+            String tag = integration.toString();
+
+            TestUtils.assertEquals(tag + " rc0 (basic)", 0.0, solver.getReducedGradient(0), ACCURACY);
+            TestUtils.assertEquals(tag + " rc1 (basic)", 0.0, solver.getReducedGradient(1), ACCURACY);
+        }
+    }
+
     /**
-     * Returns the integrations to test. The base class returns the default ojAlgo LinearSolver. Subclasses
-     * override to return external solver integrations.
+     * z is non-basic at its lower bound, so its reduced gradient must be non-zero (|rc_z| = 1.0).
      */
-    protected List<Integration<?>> integrations() {
-        return List.of(LinearSolver.INTEGRATION);
+    @Test
+    public void testReducedGradientNonZero() {
+
+        for (Integration<?> integration : this.integrations()) {
+
+            ExpressionsBasedModel model = IntegrationUpdatableSolverTest.newThreeVariableModel();
+            UpdatableSolver solver = IntegrationUpdatableSolverTest.buildUpdatableSolver(integration, model);
+
+            Result result = solver.solve(null);
+            TestUtils.assertStateNotLessThanOptimal(result);
+
+            String tag = integration.toString();
+
+            TestUtils.assertEquals(tag + " |rc_z| (non-basic)", 1.0, Math.abs(solver.getReducedGradient(2)), ACCURACY);
+        }
+    }
+
+    @Test
+    public void testUpdateRange() {
+
+        for (Integration<?> integration : this.excludingClassicTableau()) {
+
+            ExpressionsBasedModel model = IntegrationUpdatableSolverTest.newTwoConstraintModel();
+            UpdatableSolver solver = IntegrationUpdatableSolverTest.buildUpdatableSolver(integration, model);
+
+            Result initial = solver.solve(null);
+            TestUtils.assertStateNotLessThanOptimal(initial);
+
+            boolean updated = solver.updateRange(0, 0.0, 1.0);
+            TestUtils.assertTrue(integration + " updateRange should succeed", updated);
+
+            Result result = solver.solve(null);
+            TestUtils.assertStateNotLessThanOptimal(result);
+
+            String tag = integration.toString();
+
+            TestUtils.assertTrue(tag + " x <= 1", result.doubleValue(0) <= 1.0 + 1E-8);
+        }
+    }
+
+    /**
+     * {@link #integrations()} without ojAlgo's classic tableau solver variants. That solver models variable
+     * bounds as constraint rows, and only supports {@link UpdatableSolver#updateRange(int, double, double)}
+     * for fixing a variable - both by design. External integrations are not affected.
+     */
+    private List<Integration<?>> excludingClassicTableau() {
+        return this.integrations().stream().filter(integration -> !CLASSIC_TABLEAU.contains(integration)).collect(Collectors.toList());
     }
 
 }

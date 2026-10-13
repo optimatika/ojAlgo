@@ -903,7 +903,6 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         return SimplexSolver.doSolveConvexAsPrimal(convex, options, zeroC);
     }
 
-
     static LinearFunction<Double> toObjectiveFunction(final MatrixStore<Double> mtrxC) {
 
         ProgrammingError.throwIfNull(mtrxC);
