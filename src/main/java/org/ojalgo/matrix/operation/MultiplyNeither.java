@@ -58,14 +58,22 @@ public class MultiplyNeither implements MatrixOperation {
 
     }
 
-    public static IntSupplier PARALLELISM = Parallelism.THREADS;
-    public static int THRESHOLD = 32;
+    static IntSupplier PARALLELISM = Parallelism.THREADS;
+    /**
+     * The general case of the float and generic variants (and the double[][] variants) is multi-threaded,
+     * splitting the columns (rows) of the product, when m*n*k is larger than this cubed. See
+     * {@link MatrixOperation#chunk(int, double)}. The double[] variant is {@link GEMM}, with its own
+     * threshold.
+     */
+    static int THRESHOLD = 44;
 
     private static final DivideAndConquer.Divider DIVIDER = ProcessingService.INSTANCE.newDivider();
 
     public static void add(final double[][] product, final double[][] left, final double[][] right) {
 
-        DIVIDER.divide(product.length, (first, limit) -> {
+        int chunk = MatrixOperation.chunk(THRESHOLD, (double) right.length * (right.length > 0 ? right[0].length : 0));
+
+        MultiplyNeither.divide(0, product.length, chunk, (first, limit) -> {
 
             for (int i = first; i < limit; i++) {
                 MultiplyNeither.doOneRow(product[i], left[i], right);
@@ -75,7 +83,9 @@ public class MultiplyNeither implements MatrixOperation {
 
     public static void fill(final double[][] product, final double[][] left, final double[][] right) {
 
-        DIVIDER.divide(product.length, (first, limit) -> {
+        int chunk = MatrixOperation.chunk(THRESHOLD, (double) right.length * (right.length > 0 ? right[0].length : 0));
+
+        MultiplyNeither.divide(0, product.length, chunk, (first, limit) -> {
 
             for (int i = first; i < limit; i++) {
                 double[] prodRow = product[i];
@@ -87,9 +97,6 @@ public class MultiplyNeither implements MatrixOperation {
     }
 
     public static <N extends Scalar<N>> MultiplyNeither.Generic<N> newGeneric(final long rows, final long columns) {
-        if (rows > THRESHOLD && columns > THRESHOLD) {
-            return MultiplyNeither::fillMxN_MT;
-        }
         if (columns == 1) {
             return MultiplyNeither::fillMx1;
         }
@@ -100,9 +107,6 @@ public class MultiplyNeither implements MatrixOperation {
     }
 
     public static MultiplyNeither.Primitive32 newPrimitive32(final long rows, final long columns) {
-        if (rows > THRESHOLD && columns > THRESHOLD) {
-            return MultiplyNeither::fillMxN_MT;
-        }
         if (columns == 1) {
             return MultiplyNeither::fillMx1;
         }
@@ -113,9 +117,6 @@ public class MultiplyNeither implements MatrixOperation {
     }
 
     public static MultiplyNeither.Primitive64 newPrimitive64(final long rows, final long columns) {
-        if (rows > THRESHOLD && columns > THRESHOLD) {
-            return MultiplyNeither::fillMxN_MT;
-        }
         if (rows == 5 && columns == 5) {
             return MultiplyNeither::fill5x5;
         }
@@ -179,29 +180,6 @@ public class MultiplyNeither implements MatrixOperation {
         }
     }
 
-    static void add1xN(final double[] product, final double[] left, final int complexity, final double[] right) {
-
-        for (int j = 0, nbCols = product.length; j < nbCols; j++) {
-            product[j] += DOT.invoke(left, 0, right, j * complexity, 0, complexity);
-        }
-    }
-
-    static void add1xN(final float[] product, final float[] left, final int complexity, final float[] right) {
-
-        for (int j = 0, nbCols = product.length; j < nbCols; j++) {
-            product[j] += DOT.invoke(left, 0, right, j * complexity, 0, complexity);
-        }
-    }
-
-    static void addMx1(final double[] product, final double[] left, final int complexity, final double[] right) {
-
-        int nbRows = product.length;
-
-        for (int c = 0; c < complexity; c++) {
-            AXPY.invoke(product, 0, right[c], left, c * nbRows, 0, nbRows);
-        }
-    }
-
     static void addMx1(final float[] product, final float[] left, final int complexity, final float[] right) {
 
         int nbRows = product.length;
@@ -217,17 +195,6 @@ public class MultiplyNeither implements MatrixOperation {
 
         for (int c = 0; c < complexity; c++) {
             AXPY.invoke(product, 0, right[c], left, c * nbRows, 0, nbRows);
-        }
-    }
-
-    static void addMxC(final double[] product, final int firstColumn, final int columnLimit, final double[] left, final int complexity, final double[] right) {
-
-        int nbRows = left.length / complexity;
-
-        for (int j = firstColumn; j < columnLimit; j++) {
-            for (int c = 0; c < complexity; c++) {
-                AXPY.invoke(product, j * nbRows, right[c + j * complexity], left, c * nbRows, 0, nbRows);
-            }
         }
     }
 
@@ -254,20 +221,8 @@ public class MultiplyNeither implements MatrixOperation {
         }
     }
 
-    static void addMxN_MT(final double[] product, final double[] left, final int complexity, final double[] right) {
-        MultiplyNeither.divide(0, right.length / complexity, (f, l) -> MultiplyNeither.addMxC(product, f, l, left, complexity, right));
-    }
-
-    static void addMxN_MT(final float[] product, final float[] left, final int complexity, final float[] right) {
-        MultiplyNeither.divide(0, right.length / complexity, (f, l) -> MultiplyNeither.addMxC(product, f, l, left, complexity, right));
-    }
-
-    static <N extends Scalar<N>> void addMxN_MT(final N[] product, final N[] left, final int complexity, final N[] right) {
-        MultiplyNeither.divide(0, right.length / complexity, (f, l) -> MultiplyNeither.addMxC(product, f, l, left, complexity, right));
-    }
-
-    static void divide(final int first, final int limit, final Conquerer conquerer) {
-        DIVIDER.parallelism(PARALLELISM).threshold(THRESHOLD).divide(first, limit, conquerer);
+    static void divide(final int first, final int limit, final int chunk, final Conquerer conquerer) {
+        DIVIDER.parallelism(PARALLELISM).threshold(chunk).divide(first, limit, conquerer);
     }
 
     static void fill0xN(final double[] product, final double[] left, final int complexity, final double[] right) {
@@ -330,9 +285,10 @@ public class MultiplyNeither implements MatrixOperation {
     }
 
     static void fill1xN(final double[] product, final double[] left, final int complexity, final double[] right) {
-
-        for (int j = 0, nbCols = product.length; j < nbCols; j++) {
-            product[j] = DOT.invoke(left, 0, right, j * complexity, 0, complexity);
+        if (complexity == 0) {
+            Arrays.fill(product, 0D);
+        } else {
+            GEMV.invoke(true, complexity, product.length, PrimitiveMath.ONE, right, 0, complexity, left, 0, 1, PrimitiveMath.ZERO, product, 0, 1);
         }
     }
 
@@ -767,10 +723,12 @@ public class MultiplyNeither implements MatrixOperation {
     }
 
     static void fillMx1(final double[] product, final double[] left, final int complexity, final double[] right) {
-
-        Arrays.fill(product, 0D);
-
-        MultiplyNeither.addMx1(product, left, complexity, right);
+        if (complexity == 0) {
+            Arrays.fill(product, 0D);
+        } else {
+            GEMV.invoke(false, product.length, complexity, PrimitiveMath.ONE, left, 0, Math.max(1, product.length), right, 0, 1, PrimitiveMath.ZERO, product, 0,
+                    1);
+        }
     }
 
     static void fillMx1(final float[] product, final float[] left, final int complexity, final float[] right) {
@@ -787,46 +745,55 @@ public class MultiplyNeither implements MatrixOperation {
         MultiplyNeither.addMx1(product, left, complexity, right);
     }
 
+    /**
+     * The general case: {@link GEMM}, native or Java (and then possibly multi-threaded or cache blocked). For
+     * Java, the product is cleared once and accumulated into with beta 1, which is faster at small sizes than
+     * clearing column by column.
+     */
     static void fillMxN(final double[] product, final double[] left, final int complexity, final double[] right) {
 
-        Arrays.fill(product, 0D);
+        int nbRows = left.length / complexity;
+        int nbCols = right.length / complexity;
 
-        MultiplyNeither.addMxC(product, 0, right.length / complexity, left, complexity, right);
+        if (GEMM.isNative(nbRows, nbCols, complexity)) {
+            // Through GEMM's dispatch, that also decides between a critical and an off-heap native call
+            GEMM.invoke(false, false, nbRows, nbCols, complexity, PrimitiveMath.ONE, left, 0, nbRows, right, 0, complexity, PrimitiveMath.ZERO, product, 0,
+                    nbRows);
+        } else {
+            Arrays.fill(product, 0D);
+            GEMM.JVM.invoke(false, false, nbRows, nbCols, complexity, PrimitiveMath.ONE, left, 0, nbRows, right, 0, complexity, PrimitiveMath.ONE, product, 0,
+                    nbRows);
+        }
     }
 
     static void fillMxN(final float[] product, final float[] left, final int complexity, final float[] right) {
 
+        int nbRows = left.length / complexity;
+        int nbCols = right.length / complexity;
+        int chunk = MatrixOperation.chunk(THRESHOLD, nbRows, complexity);
+
         Arrays.fill(product, 0F);
 
-        MultiplyNeither.addMxC(product, 0, right.length / complexity, left, complexity, right);
+        if (nbCols > chunk) {
+            MultiplyNeither.divide(0, nbCols, chunk, (f, l) -> MultiplyNeither.addMxC(product, f, l, left, complexity, right));
+        } else {
+            MultiplyNeither.addMxC(product, 0, nbCols, left, complexity, right);
+        }
     }
 
     static <N extends Scalar<N>> void fillMxN(final N[] product, final N[] left, final int complexity, final N[] right, final Factory<N> scalar) {
 
-        Arrays.fill(product, scalar.zero().get());
-
-        MultiplyNeither.addMxC(product, 0, right.length / complexity, left, complexity, right);
-    }
-
-    static void fillMxN_MT(final double[] product, final double[] left, final int complexity, final double[] right) {
-
-        Arrays.fill(product, 0D);
-
-        MultiplyNeither.addMxN_MT(product, left, complexity, right);
-    }
-
-    static void fillMxN_MT(final float[] product, final float[] left, final int complexity, final float[] right) {
-
-        Arrays.fill(product, 0F);
-
-        MultiplyNeither.addMxN_MT(product, left, complexity, right);
-    }
-
-    static <N extends Scalar<N>> void fillMxN_MT(final N[] product, final N[] left, final int complexity, final N[] right, final Factory<N> scalar) {
+        int nbRows = left.length / complexity;
+        int nbCols = right.length / complexity;
+        int chunk = MatrixOperation.chunk(THRESHOLD, nbRows, complexity);
 
         Arrays.fill(product, scalar.zero().get());
 
-        MultiplyNeither.addMxN_MT(product, left, complexity, right);
+        if (nbCols > chunk) {
+            MultiplyNeither.divide(0, nbCols, chunk, (f, l) -> MultiplyNeither.addMxC(product, f, l, left, complexity, right));
+        } else {
+            MultiplyNeither.addMxC(product, 0, nbCols, left, complexity, right);
+        }
     }
 
 }

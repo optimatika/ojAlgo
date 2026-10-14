@@ -21,18 +21,22 @@
  */
 package org.ojalgo.array;
 
+import static java.lang.foreign.ValueLayout.JAVA_SHORT;
+
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.type.NativeMemory;
 
 final class OffHeapZ016 extends OffHeapArray {
 
-    private final long myPointer;
+    private final MemorySegment mySegment;
 
-    OffHeapZ016(final long count) {
+    OffHeapZ016(final MemorySegment segment, final Arena arena) {
 
-        super(OffHeapArray.Z016, count);
+        super(OffHeapArray.Z016, segment, arena);
 
-        myPointer = NativeMemory.allocateShortArray(this, count);
+        mySegment = segment;
     }
 
     @Override
@@ -42,32 +46,32 @@ final class OffHeapZ016 extends OffHeapArray {
 
     @Override
     public double doubleValue(final int index) {
-        return NativeMemory.getShort(myPointer, index);
+        return mySegment.getAtIndex(JAVA_SHORT, index);
     }
 
     @Override
     public double doubleValue(final long index) {
-        return NativeMemory.getShort(myPointer, index);
+        return mySegment.getAtIndex(JAVA_SHORT, index);
     }
 
     @Override
     public float floatValue(final int index) {
-        return NativeMemory.getShort(myPointer, index);
+        return mySegment.getAtIndex(JAVA_SHORT, index);
     }
 
     @Override
     public float floatValue(final long index) {
-        return NativeMemory.getShort(myPointer, index);
+        return mySegment.getAtIndex(JAVA_SHORT, index);
     }
 
     @Override
     public void reset() {
-        NativeMemory.initialiseShortArray(myPointer, this.count());
+        mySegment.fill((byte) 0);
     }
 
     @Override
     public void set(final int index, final double value) {
-        NativeMemory.setShort(myPointer, index, (short) Math.toIntExact(Math.round(value)));
+        mySegment.setAtIndex(JAVA_SHORT, index, (short) Math.toIntExact(Math.round(value)));
     }
 
     @Override
@@ -77,27 +81,27 @@ final class OffHeapZ016 extends OffHeapArray {
 
     @Override
     public void set(final long index, final double value) {
-        NativeMemory.setShort(myPointer, index, (short) Math.toIntExact(Math.round(value)));
+        mySegment.setAtIndex(JAVA_SHORT, index, (short) Math.toIntExact(Math.round(value)));
     }
 
     @Override
     public void set(final long index, final float value) {
-        NativeMemory.setShort(myPointer, index, (short) Math.round(value));
+        mySegment.setAtIndex(JAVA_SHORT, index, (short) Math.round(value));
     }
 
     @Override
     public void set(final long index, final short value) {
-        NativeMemory.setShort(myPointer, index, value);
+        mySegment.setAtIndex(JAVA_SHORT, index, value);
     }
 
     @Override
     public short shortValue(final int index) {
-        return NativeMemory.getShort(myPointer, index);
+        return mySegment.getAtIndex(JAVA_SHORT, index);
     }
 
     @Override
     public short shortValue(final long index) {
-        return NativeMemory.getShort(myPointer, index);
+        return mySegment.getAtIndex(JAVA_SHORT, index);
     }
 
 }

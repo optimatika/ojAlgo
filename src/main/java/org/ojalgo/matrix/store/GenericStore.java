@@ -352,7 +352,9 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
             ProgrammingError.throwForMultiplicationNotPossible();
         }
 
-        if (left instanceof GenericStore) {
+        if (complexity == 0) {
+            Arrays.fill(data, myFactory.scalar().zero());
+        } else if (left instanceof GenericStore) {
             if (right instanceof GenericStore) {
                 multiplyNeither.invoke(data, this.cast(left).data, complexity, this.cast(right).data, myFactory.scalar());
             } else {
@@ -596,7 +598,11 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
     @Override
     public MatrixStore<N> multiply(final MatrixStore<N> right) {
 
-        final GenericStore<N> retVal = this.physical().make(myRowDim, right.count() / myColDim);
+        final GenericStore<N> retVal = this.physical().make(myRowDim, right.countColumns());
+
+        if (myColDim == 0) {
+            return retVal; // An empty inner dimension: the product is all zeros, as made
+        }
 
         if (right instanceof GenericStore) {
             retVal.multiplyNeither.invoke(retVal.data, data, myColDim, this.cast(right).data, myFactory.scalar());

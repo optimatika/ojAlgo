@@ -21,8 +21,13 @@
  */
 package org.ojalgo.array.operation;
 
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
+import java.lang.invoke.MethodHandle;
 import java.math.BigDecimal;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.scalar.Scalar;
@@ -31,10 +36,75 @@ import org.ojalgo.structure.Mutate1D;
 /**
  * The ?axpy routines perform a vector-vector operation defined as y := a*x + y where: a is a scalar x and y
  * are vectors each with a number of elements that equals n. {@code y[] += a * x[]}
+ * <p>
+ * {@link #invoke(int, double, double[], int, int, double[], int, int)} may call native code, see
+ * {@link NativeLibrary}. That pays off for a single large call. Code that calls it repeatedly, such as the
+ * inner loops of a decomposition, is usually better off with the pure Java alternatives,
+ * {@link JVM#invoke(int, double, double[], int, int, double[], int, int)} or
+ * {@link #invoke(double[], int, double, double[], int, int, int)}: each native call has a fixed cost, and
+ * some libraries add much more.
  *
  * @author apete
  */
-public abstract class AXPY implements ArrayOperation {
+public abstract class AXPY implements BLAS1 {
+
+    /**
+     * The pure Java implementation. Everything it calls is pure Java as well – the {@code JVM}
+     * implementations of other operations, never their dispatching {@code invoke} methods (that may call
+     * native code).
+     */
+    public static final class JVM {
+
+        /**
+         * The pure Java implementation of
+         * {@link AXPY#invoke(int, double, double[], int, int, double[], int, int)}, for {@code n > 0}.
+         */
+        public static void invoke(final int n, final double alpha, final double[] x, final int offsetX, final int incX, final double[] y, final int offsetY,
+                final int incY) {
+
+            if (incX == 1 && incY == 1) {
+                for (int i = 0; i < n; i++) {
+                    y[offsetY + i] += alpha * x[offsetX + i];
+                }
+            } else {
+                int ix = incX < 0 ? offsetX - (n - 1) * incX : offsetX;
+                int iy = incY < 0 ? offsetY - (n - 1) * incY : offsetY;
+                for (int i = 0; i < n; i++, ix += incX, iy += incY) {
+                    y[iy] += alpha * x[ix];
+                }
+            }
+        }
+
+    }
+
+    /**
+     * Native {@code cblas_daxpy}, initialised only when {@link NativeLibrary#isAvailable()}.
+     */
+    static final class Native {
+
+        static final MethodHandle DAXPY = NativeLibrary.downcall("cblas_daxpy", FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT), true);
+
+        static void invoke(final int n, final double alpha, final double[] x, final int offsetX, final int incX, final double[] y, final int offsetY,
+                final int incY) {
+            MemorySegment segmentX = NativeLibrary.ofVector(x, offsetX, n, incX);
+            MemorySegment segmentY = NativeLibrary.ofVector(y, offsetY, n, incY);
+            try {
+                DAXPY.invokeExact(n, alpha, segmentX, incX, segmentY, incY);
+            } catch (Throwable cause) {
+                throw new ProgrammingError(cause);
+            }
+        }
+
+    }
+
+    /**
+     * The native implementation is used, if there is one, when the vector length (the number of operations)
+     * is larger than this. See {@link NativeLibrary}.
+     */
+    private static final double NATIVE_THRESHOLD = 1_400;
+
+    static final boolean NATIVE = NativeLibrary.isAvailable() && Native.DAXPY != null;
 
     public static void invoke(final BigDecimal[] y, final int basey, final BigDecimal a, final BigDecimal[] x, final int basex, final int first,
             final int limit) {
@@ -69,6 +139,24 @@ public abstract class AXPY implements ArrayOperation {
         }
     }
 
+    /**
+     * BLAS {@code daxpy}: y := alpha*x + y for the {@code n} elements of x and y, stored from {@code offsetX}
+     * and {@code offsetY} with increments {@code incX} and {@code incY}. As in BLAS, a negative increment
+     * walks the vector backwards, and the offset is still the lowest index accessed. Nothing is done when n
+     * is not positive or alpha is 0.
+     */
+    public static void invoke(final int n, final double alpha, final double[] x, final int offsetX, final int incX, final double[] y, final int offsetY,
+            final int incY) {
+        if (n <= 0 || alpha == 0.0) {
+            return;
+        }
+        if (AXPY.isNative(n)) {
+            Native.invoke(n, alpha, x, offsetX, incX, y, offsetY, incY);
+        } else {
+            JVM.invoke(n, alpha, x, offsetX, incX, y, offsetY, incY);
+        }
+    }
+
     public static void invoke(final Mutate1D.Modifiable<?> y, final double a, final BigDecimal[] x) {
         BigDecimal tmpA = new BigDecimal(a);
         for (int i = 0; i < x.length; i++) {
@@ -98,6 +186,14 @@ public abstract class AXPY implements ArrayOperation {
         for (int i = first; i < limit; i++) {
             y[basey + i] = y[basey + i].add(a.multiply(x[basex + i])).get();
         }
+    }
+
+    /**
+     * Whether to use the native implementation: there is one, and the vector length is larger than
+     * {@link #NATIVE_THRESHOLD}.
+     */
+    static boolean isNative(final double n) {
+        return NATIVE && n > NATIVE_THRESHOLD;
     }
 
 }

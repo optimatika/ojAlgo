@@ -59,15 +59,16 @@ public class MultiplyLeft implements MatrixOperation {
 
     }
 
-    public static IntSupplier PARALLELISM = Parallelism.THREADS;
-    public static int THRESHOLD = 32;
+    static IntSupplier PARALLELISM = Parallelism.THREADS;
+    /**
+     * The general case is multi-threaded, splitting the rows of the product, when m*n*k is larger than this
+     * cubed. See {@link MatrixOperation#chunk(int, double)}.
+     */
+    static int THRESHOLD = 44;
 
     private static final DivideAndConquer.Divider DIVIDER = ProcessingService.INSTANCE.newDivider();
 
     public static <N extends Scalar<N>> MultiplyLeft.Generic<N> newGeneric(final long rows, final long columns) {
-        if (rows > THRESHOLD && columns > THRESHOLD) {
-            return MultiplyLeft::fillMxN_MT;
-        }
         if (columns == 1) {
             return MultiplyLeft::fillMx1;
         }
@@ -78,9 +79,6 @@ public class MultiplyLeft implements MatrixOperation {
     }
 
     public static MultiplyLeft.Primitive32 newPrimitive32(final long rows, final long columns) {
-        if (rows > THRESHOLD && columns > THRESHOLD) {
-            return MultiplyLeft::fillMxN_MT;
-        }
         if (columns == 1) {
             return MultiplyLeft::fillMx1;
         }
@@ -91,9 +89,6 @@ public class MultiplyLeft implements MatrixOperation {
     }
 
     public static MultiplyLeft.Primitive64 newPrimitive64(final long rows, final long columns) {
-        if (rows > THRESHOLD && columns > THRESHOLD) {
-            return MultiplyLeft::fillMxN_MT;
-        }
         if (rows == 5 && columns == 5) {
             return MultiplyLeft::fill5x5;
         }
@@ -284,20 +279,8 @@ public class MultiplyLeft implements MatrixOperation {
         }
     }
 
-    static void addMxN_MT(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
-        MultiplyLeft.divide(0, right.length / complexity, (f, l) -> MultiplyLeft.addMxC(product, f, l, left, complexity, right));
-    }
-
-    static void addMxN_MT(final float[] product, final Access1D<?> left, final int complexity, final float[] right) {
-        MultiplyLeft.divide(0, right.length / complexity, (f, l) -> MultiplyLeft.addMxC(product, f, l, left, complexity, right));
-    }
-
-    static <N extends Scalar<N>> void addMxN_MT(final N[] product, final Access1D<N> left, final int complexity, final N[] right, final Factory<N> scalar) {
-        MultiplyLeft.divide(0, right.length / complexity, (f, l) -> MultiplyLeft.addMxC(product, f, l, left, complexity, right, scalar));
-    }
-
-    static void divide(final int first, final int limit, final Conquerer conquerer) {
-        DIVIDER.parallelism(PARALLELISM).threshold(THRESHOLD).divide(first, limit, conquerer);
+    static void divide(final int first, final int limit, final int chunk, final Conquerer conquerer) {
+        DIVIDER.parallelism(PARALLELISM).threshold(chunk).divide(first, limit, conquerer);
     }
 
     static void fill0xN(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
@@ -817,35 +800,44 @@ public class MultiplyLeft implements MatrixOperation {
 
     static void fillMxN(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
 
-        Arrays.fill(product, 0D);
+        int nbRows = Math.toIntExact(left.count() / complexity);
+        int nbCols = right.length / complexity;
+        int chunk = MatrixOperation.chunk(THRESHOLD, nbCols, complexity);
 
-        MultiplyLeft.addMxC(product, 0, right.length / complexity, left, complexity, right);
+        if (nbRows > chunk) {
+            MultiplyLeft.divide(0, nbRows, chunk, (f, l) -> MultiplyLeft.fillRxN(product, f, l, left, complexity, right));
+        } else {
+            Arrays.fill(product, 0D);
+            MultiplyLeft.addMxC(product, 0, nbCols, left, complexity, right);
+        }
     }
 
     static void fillMxN(final float[] product, final Access1D<?> left, final int complexity, final float[] right) {
 
-        Arrays.fill(product, 0F);
+        int nbRows = Math.toIntExact(left.count() / complexity);
+        int nbCols = right.length / complexity;
+        int chunk = MatrixOperation.chunk(THRESHOLD, nbCols, complexity);
 
-        MultiplyLeft.addMxC(product, 0, right.length / complexity, left, complexity, right);
+        if (nbRows > chunk) {
+            MultiplyLeft.divide(0, nbRows, chunk, (f, l) -> MultiplyLeft.fillRxN(product, f, l, left, complexity, right));
+        } else {
+            Arrays.fill(product, 0F);
+            MultiplyLeft.addMxC(product, 0, nbCols, left, complexity, right);
+        }
     }
 
     static <N extends Scalar<N>> void fillMxN(final N[] product, final Access1D<N> left, final int complexity, final N[] right, final Factory<N> scalar) {
 
-        Arrays.fill(product, scalar.zero().get());
+        int nbRows = Math.toIntExact(left.count() / complexity);
+        int nbCols = right.length / complexity;
+        int chunk = MatrixOperation.chunk(THRESHOLD, nbCols, complexity);
 
-        MultiplyLeft.addMxC(product, 0, right.length / complexity, left, complexity, right, scalar);
-    }
-
-    static void fillMxN_MT(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
-        MultiplyLeft.divide(0, Math.toIntExact(left.count() / complexity), (f, l) -> MultiplyLeft.fillRxN(product, f, l, left, complexity, right));
-    }
-
-    static void fillMxN_MT(final float[] product, final Access1D<?> left, final int complexity, final float[] right) {
-        MultiplyLeft.divide(0, Math.toIntExact(left.count() / complexity), (f, l) -> MultiplyLeft.fillRxN(product, f, l, left, complexity, right));
-    }
-
-    static <N extends Scalar<N>> void fillMxN_MT(final N[] product, final Access1D<N> left, final int complexity, final N[] right, final Factory<N> scalar) {
-        MultiplyLeft.divide(0, Math.toIntExact(left.count() / complexity), (f, l) -> MultiplyLeft.fillRxN(product, f, l, left, complexity, right, scalar));
+        if (nbRows > chunk) {
+            MultiplyLeft.divide(0, nbRows, chunk, (f, l) -> MultiplyLeft.fillRxN(product, f, l, left, complexity, right, scalar));
+        } else {
+            Arrays.fill(product, scalar.zero().get());
+            MultiplyLeft.addMxC(product, 0, nbCols, left, complexity, right, scalar);
+        }
     }
 
     static void fillRxN(final double[] product, final int firstRow, final int rowLimit, final Access1D<?> left, final int complexity, final double[] right) {
