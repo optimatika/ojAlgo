@@ -177,18 +177,18 @@ public class ReducedCostsTest extends OptimisationLinearTests {
 
     /**
      * A fixed variable, z = 0.5, that is part of a constraint. The fixed z is removed from the constraint
-     * before it reaches the solver, so its rc is reconstructed from the constraint's multiplier (see
-     * {@link Optimisation.Result#getDualValues()} for the sign convention). The dual must be reported with
+     * before it reaches the solver, so its rc is reconstructed from the constraint's dual value (see
+     * {@link Optimisation.Result#getDualSolution()} for the sign convention). The dual must be reported with
      * the model's own constraint instance. Each case has a non-degenerate optimum, where no nonbasic variable
      * is at a bound that presolve would use to imply a bound on the basic one.
      *
      * <pre>{@code
      * min  x + 2y + 3z        s.t. x + y + z >= 2.5       x, y in [0, 10]
-     *      x=2, y=0, value=3.5, lambda=1, rc_z = 3 - lambda = 2
+     *      x=2, y=0, value=3.5, dual=1, rc_z = 3 - dual = 2
      * max  x + 2y + 3z        s.t. x + y + z <= 2.5       x in [0, 10], y in [0, 1]
-     *      x=1, y=1, value=4.5, lambda=1, rc_z = 3 - lambda = 2
+     *      x=1, y=1, value=4.5, dual=1, rc_z = 3 - dual = 2
      * min  x - y + 3w + 3z    s.t. x + y + w + z = 2.5    x in [0, 10], y, w in [0, 1]
-     *      x=1, y=1, w=0, value=1.5, lambda=-1, rc_z = 3 + lambda = 2
+     *      x=1, y=1, w=0, value=1.5, dual=1, rc_z = 3 - dual = 2
      * }</pre>
      */
     @Test
@@ -222,7 +222,7 @@ public class ReducedCostsTest extends OptimisationLinearTests {
             Expression equality = equalityModel.newExpression("c").set(equalityX, 1).set(equalityY, 1).set(equalityW, 1).set(equalityZ, 1).level(2.5);
 
             ReducedCostsTest.assertFixedInConstraint("fixedInConstraint/EQUALITY/" + entry.getKey(), equalityModel.minimise(entry.getValue()), equality, 3, 1.5,
-                    -1.0, 2.0);
+                    1.0, 2.0);
         }
     }
 

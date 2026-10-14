@@ -163,7 +163,9 @@ class NullSpaceProjection {
     }
 
     /**
-     * Maps a solution of the reduced problem back to a solution of the original full problem.
+     * Maps a solution of the reduced problem back to a solution of the original full problem, with dual
+     * values and a reduced gradient only if the state has them, see
+     * {@link ConvexSolver#isDualMeaningful(Optimisation.State)}.
      */
     Optimisation.Result toFullModelState(final Optimisation.Result reducedlState) {
 
@@ -186,9 +188,20 @@ class NullSpaceProjection {
         x.fillMatching(myX0);
         myZ.multiply(ystar).axpy(ONE, x);
 
+        MatrixStore<Double> orgQx = orgQ.multiply(x);
+
+        double objectiveScale = myOriginal.getObjectiveAdjustmentFactor();
+
+        double value = (x.dot(orgQx) / TWO - x.dot(orgC)) / objectiveScale;
+
+        Optimisation.Result retVal = new Optimisation.Result(reducedlState.getState(), value, x);
+
+        if (!ConvexSolver.isDualMeaningful(reducedlState.getState())) {
+            return retVal;
+        }
+
         // Recover multipliers using stationarity: Qx - C + AE^T λE + AI^T λI = 0
         // Build rhsStation = C - Qx - AI^T λI in a few dense/sparse ops for clarity
-        MatrixStore<Double> orgQx = orgQ.multiply(x);
         PhysicalStore<Double> rhsStation = R064Store.FACTORY.make(nbOrgVars, 1);
         rhsStation.fillMatching(orgC);
         rhsStation.modifyMatching(SUBTRACT, orgQx);
@@ -218,10 +231,6 @@ class NullSpaceProjection {
             multipliers.regionByOffsets(nbOrgEqus, 0).fillMatching(lambdaI);
         }
 
-        double objectiveScale = myOriginal.getObjectiveAdjustmentFactor();
-
-        double value = (x.dot(orgQx) / TWO - x.dot(orgC)) / objectiveScale;
-
         double[] reducedGradient = new double[nbOrgVars];
         for (int j = 0; j < nbOrgVars; j++) {
             reducedGradient[j] = orgQx.doubleValue(j) - orgC.doubleValue(j);
@@ -231,7 +240,6 @@ class NullSpaceProjection {
             reducedGradient[j] /= objectiveScale;
         }
 
-        Optimisation.Result retVal = new Optimisation.Result(reducedlState.getState(), value, x);
         return retVal.withDualValues(myOriginal.getConstraintsMetaData(), () -> multipliers).withReducedGradient(() -> ArrayR064.wrap(reducedGradient));
     }
 

@@ -553,6 +553,36 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
         };
     }
 
+    /**
+     * The initial basis (the last {@link #m} columns) is the identity matrix, so its columns in the current
+     * tableau are the basis inverse.
+     */
+    @Override
+    final Primitive1D sliceInverseRow(final int row) {
+
+        Primitive2D body = this.constraintsBody();
+        int base = n - m;
+
+        return new Primitive1D() {
+
+            @Override
+            public double doubleValue(final int index) {
+                return body.doubleValue(row, base + index);
+            }
+
+            @Override
+            public void set(final int index, final double value) {
+                body.set(row, base + index, value);
+            }
+
+            @Override
+            public int size() {
+                return m;
+            }
+
+        };
+    }
+
     final Primitive1D sliceTableauColumn(final int col) {
 
         return new Primitive1D() {

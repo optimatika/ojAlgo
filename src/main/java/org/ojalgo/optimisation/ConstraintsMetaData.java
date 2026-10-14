@@ -51,8 +51,6 @@ public final class ConstraintsMetaData implements Structure1D {
         return ConstraintsMetaData.newInstance(nbConstraints, false);
     }
 
-    private final int mySize;
-    private final BitSet myNegated;
     /**
      * Rows built from the entity's adjusted (scaled) parameters. Only their multipliers are scaled by the
      * entity's adjustment factor.
@@ -60,11 +58,13 @@ public final class ConstraintsMetaData implements Structure1D {
     private final BitSet myAdjusted;
     private final EntryPair<ModelEntity<?>, ConstraintType>[] myDefinitions;
     private double myMultiplierScale = 1D;
+    private final BitSet myNegated;
     /**
      * The multipliers are signed as for two-sided rows, {@code l <= a'x <= u}: positive when the upper limit
-     * is active and negative when the lower limit is (as with an ADMM/OSQP style solver).
+     * is active and negative when the lower limit is.
      */
     private boolean mySignedRows = false;
+    private final int mySize;
 
     private ConstraintsMetaData(final int nbConstraints, final EntryPair<ModelEntity<?>, ConstraintType>[] defs, final BitSet negs) {
         super();
@@ -76,6 +76,10 @@ public final class ConstraintsMetaData implements Structure1D {
 
     public EntryPair<ModelEntity<?>, ConstraintType> getEntry(final int i) {
         return myDefinitions != null ? myDefinitions[i] : null;
+    }
+
+    public double getMultiplierScale() {
+        return myMultiplierScale;
     }
 
     /**
@@ -94,11 +98,11 @@ public final class ConstraintsMetaData implements Structure1D {
     }
 
     /**
-     * Matches the multipliers to the model entities, in model units and with the sign convention described at
-     * {@link Optimisation.Result#getDualValues()}. A row built from a compensated copy of an expression (see
-     * {@link Expression#compensate(java.util.Set)}) is scaled by the copy's adjustment factor, but reported
-     * with the model expression it was derived from. With signed rows (see {@link #setSignedRows(boolean)}) a
-     * two-sided (RANGE) row is reported with the limit that is active.
+     * Matches the multipliers to the model entities, in model units. A row built from a compensated copy of
+     * an expression (see {@link Expression#compensate(java.util.Set)}) is scaled by the copy's adjustment
+     * factor, but reported with the model expression it was derived from. With signed rows (see
+     * {@link #setSignedRows(boolean)}) the multiplier of a LOWER row is negated, and a two-sided (RANGE) row
+     * is reported with the limit that is active and the multiplier's absolute value.
      */
     public List<KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>>> match(final Access1D<?> multipliers) {
 
@@ -169,9 +173,8 @@ public final class ConstraintsMetaData implements Structure1D {
 
     /**
      * Signed rows: the multipliers are signed as for two-sided rows, {@code l <= a'x <= u}, positive when the
-     * upper limit is active and negative when the lower limit is. Without signed rows (the default) the
-     * multipliers of inequality rows are expected to be non-negative, in the sign convention described at
-     * {@link Optimisation.Result#getDualValues()}.
+     * upper limit is active and negative when the lower limit is. Without signed rows (the default)
+     * {@link #match(Access1D)} keeps the signs as they are.
      */
     public void setSignedRows(final boolean signed) {
         mySignedRows = signed;
@@ -221,7 +224,41 @@ public final class ConstraintsMetaData implements Structure1D {
         return retVal;
     }
 
-    public double getMultiplierScale() {
-        return myMultiplierScale;
+    /**
+     * The multipliers ojAlgo's own solvers return, converted to the model's dual values described at
+     * {@link Optimisation.Result#getDualSolution()}. Those solvers minimise, and return the multipliers of
+     * inequality rows non-negative, with the LOWER rows entering the Lagrangian with a minus sign – or, with
+     * signed rows (see {@link #setSignedRows(boolean)}), positive when the upper limit is active. The dual
+     * values have the opposite sign, except for (non-signed) LOWER rows.
+     *
+     * @param negate The solver minimised the negated objective of a maximisation, so its dual values are
+     *               those of the model negated
+     */
+    double[] toModelDuals(final Access1D<?> multipliers, final boolean negate) {
+
+        double[] retVal = new double[mySize];
+
+        for (int i = 0; i < mySize; i++) {
+            boolean lower = !mySignedRows && myDefinitions != null && myDefinitions[i].right() == ConstraintType.LOWER;
+            double value = lower ? multipliers.doubleValue(i) : -multipliers.doubleValue(i);
+            retVal[i] = negate ? -value : value;
+        }
+
+        return retVal;
+    }
+
+    /**
+     * The same metadata, but for multipliers that are not signed rows.
+     */
+    ConstraintsMetaData withoutSignedRows() {
+
+        if (!mySignedRows) {
+            return this;
+        }
+
+        ConstraintsMetaData retVal = new ConstraintsMetaData(mySize, myDefinitions, myNegated);
+        retVal.myAdjusted.or(myAdjusted);
+        retVal.myMultiplierScale = myMultiplierScale;
+        return retVal;
     }
 }

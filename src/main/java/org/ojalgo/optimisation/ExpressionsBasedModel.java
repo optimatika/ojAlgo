@@ -45,8 +45,10 @@ import java.util.stream.Stream;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.netio.BasicJson;
 import org.ojalgo.netio.BasicLogger;
@@ -58,11 +60,13 @@ import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.optimisation.integer.IntegerStrategy;
 import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Primitive1D;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.structure.Structure2D.IntRowColumn;
 import org.ojalgo.type.EnumBitSet;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.keyvalue.EntryPair;
+import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 
 /**
  * Construct optimisation problems by combining {@link Variable}s and {@link Expression}s. Each model entity
@@ -374,56 +378,52 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         @Deprecated
         protected static double computeReducedCostFromMultipliers(final ExpressionsBasedModel model, final int variableIndex, final Result solverState) {
             return ExpressionsBasedModel.Integration.computeReducedCostFromMultipliers(model, variableIndex, solverState,
-                    Access1D.wrap(new double[model.countVariables()]));
+                    Primitive1D.of(new double[model.countVariables()]));
         }
 
         /**
          * Reconstructs a model-level reduced cost from first principles, using the gradient of the objective
-         * function at {@code modelSolution} and the constraint multipliers reported on {@code solverState}
-         * (see {@link Result#getDualValues()} for their sign convention):
-         * {@code rc_v = ∂f/∂x_v - Σ a_iv · λ_i} over the LOWER constraints, {@code + Σ a_iv · λ_i} over the
-         * UPPER and EQUALITY constraints, with {@code f} in the minimisation form (negated for MAX models).
-         * Useful for variables that the solver doesn't see (eliminated by presolve), and for solver paths
-         * whose internal index space prevents direct pass-through of the rc.
-         * <p>
-         * Returned value is in the minimisation form, the solver's usual internal sense. Callers should
-         * negate for MAX models.
+         * function at {@code modelSolution} and the dual values reported on {@code modelState} (see
+         * {@link Result#getDualValues()}): {@code rc_v = ∂f/∂x_v - Σ y_i a_iv}, with {@code f} the objective
+         * as it is stated in the model. The result is in the model's optimisation sense. If the state is
+         * {@link State#INFEASIBLE} the dual values are an infeasibility certificate, and the objective plays
+         * no part. Useful for variables that the solver doesn't see (eliminated by presolve), and for solver
+         * paths whose internal index space prevents direct pass-through of the rc.
          *
+         * @param modelState    Must have the model's dual values, see
+         *                      {@link #toModelDuals(Result, ExpressionsBasedModel, Optimisation.Sense)}
          * @param modelSolution The solution in model space (all variables, including the fixed ones), where
          *                      the gradient of a quadratic objective is evaluated
          */
-        protected static double computeReducedCostFromMultipliers(final ExpressionsBasedModel model, final int variableIndex, final Result solverState,
+        protected static double computeReducedCostFromMultipliers(final ExpressionsBasedModel model, final int variableIndex, final Result modelState,
                 final Access1D<?> modelSolution) {
 
             IntIndex key = new IntIndex(variableIndex);
-            Expression objective = model.objective();
-            double rc = objective.doubleValue(key, false);
-            if (objective.isAnyQuadraticFactorNonZero()) {
-                for (IntRowColumn quadratic : objective.getQuadraticKeySet()) {
-                    double factor = objective.doubleValue(quadratic, false);
-                    if (quadratic.row == variableIndex) {
-                        rc += factor * modelSolution.doubleValue(quadratic.column);
-                    }
-                    if (quadratic.column == variableIndex) {
-                        rc += factor * modelSolution.doubleValue(quadratic.row);
+
+            double rc = PrimitiveMath.ZERO;
+
+            if (modelState.getState() != State.INFEASIBLE) {
+                Expression objective = model.objective();
+                rc = objective.doubleValue(key, false);
+                if (objective.isAnyQuadraticFactorNonZero()) {
+                    for (IntRowColumn quadratic : objective.getQuadraticKeySet()) {
+                        double factor = objective.doubleValue(quadratic, false);
+                        if (quadratic.row == variableIndex) {
+                            rc += factor * modelSolution.doubleValue(quadratic.column);
+                        }
+                        if (quadratic.column == variableIndex) {
+                            rc += factor * modelSolution.doubleValue(quadratic.row);
+                        }
                     }
                 }
             }
-            if (model.getOptimisationSense() == Optimisation.Sense.MAX) {
-                rc = -rc;
-            }
 
-            for (EntryPair.KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>> kp : solverState.getDualValues()) {
+            for (EntryPair.KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>> kp : modelState.getDualValues()) {
                 ModelEntity<?> entity = kp.getKey().getKey();
                 if (entity instanceof Expression) {
                     Expression expression = (Expression) entity;
                     if (expression.getLinearKeySet().contains(key)) {
-                        double contribution = expression.doubleValue(key, false) * kp.doubleValue();
-                        if (kp.getKey().getValue() == ConstraintType.LOWER) {
-                            rc -= contribution;
-                        } else {
-                            rc += contribution;
-                        }
+                        rc -= expression.doubleValue(key, false) * kp.doubleValue();
                     }
                 }
             }
@@ -521,16 +521,18 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
          * Maps the result of a solver that only works with the free (not presolve-fixed) variables to the
          * full model: the solution, the objective function value (adding
          * {@link #getObjectiveAdjustment(ExpressionsBasedModel)}, the objective constant and the contribution
-         * of the fixed variables) and the reduced gradient (reconstructing it for the fixed variables). The
-         * solver's value and reduced gradient must already be in model units, with any objective scaling
-         * undone.
+         * of the fixed variables) and the reduced gradient (reconstructing it, from first principles, for the
+         * fixed variables the solver does not see). The solver's value and reduced gradient must already be
+         * in model units, with any objective scaling undone, and its dual values must already be the model's,
+         * see {@link #toModelDuals(Result, ExpressionsBasedModel, Optimisation.Sense)}.
          *
          * @param solverSense the {@link Optimisation.Sense} the solver internally optimises in (usually fixed
          *                    per solver — most simplex/QP solvers minimise), or null if it optimises in the
          *                    model's own sense. If this differs from the model's
          *                    {@link ExpressionsBasedModel#getOptimisationSense() optimisation sense}, the
          *                    value and the reduced gradient are negated when mapped back to the model so that
-         *                    callers always see them in the model's sense.
+         *                    callers always see them in the model's sense – but not the reduced gradient of
+         *                    an infeasibility certificate.
          */
         protected static Result expandFreeToFull(final Result solverState, final ExpressionsBasedModel model, final DenseArray.Factory<?, ?> factory,
                 final Optional<Supplier<Access1D<?>>> reducedGradient, final Optimisation.Sense solverSense) {
@@ -568,20 +570,18 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
             if (reducedGradient.isPresent()) {
 
+                boolean negateGradient = negate && solverState.getState() != State.INFEASIBLE;
+
                 Supplier<Access1D<?>> gradientSupplier = () -> {
                     DenseArray<?> fullGradient = factory.make(nbModelVars);
                     Access1D<?> freeGradient = reducedGradient.get().get();
                     for (int i = 0; i < nbFreeVars; i++) {
                         double v = freeGradient.doubleValue(i);
-                        fullGradient.set(model.indexOf(freeVariables.get(i)), negate ? -v : v);
+                        fullGradient.set(model.indexOf(freeVariables.get(i)), negateGradient ? -v : v);
                     }
-                    // Variables eliminated by presolve aren't seen by the solver, so their reduced cost
-                    // must be reconstructed from first principles. That is in the minimisation form,
-                    // whatever the solver's sense.
-                    boolean max = modelSense == Optimisation.Sense.MAX;
                     for (IntIndex fixed : fixedVariables) {
-                        double rc = ExpressionsBasedModel.Integration.computeReducedCostFromMultipliers(model, fixed.index, solverState, modelSolution);
-                        fullGradient.set(fixed.index, max ? -rc : rc);
+                        fullGradient.set(fixed.index,
+                                ExpressionsBasedModel.Integration.computeReducedCostFromMultipliers(model, fixed.index, solverState, modelSolution));
                     }
                     return fullGradient;
                 };
@@ -638,6 +638,116 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
         protected final static void setSwitch(final ExpressionsBasedModel model, final IntegrationProperty property, final boolean value) {
             model.setIntegrationSwitch(property, value);
+        }
+
+        /**
+         * Completes an INFEASIBLE result that has the dual values of an infeasibility certificate (see
+         * {@link Result#getDualSolution()}): attaches its reduced gradient, {@code -Σ y ∇g(x)}, after
+         * verifying the certificate against the model. The constraints combined, {@code Σ y g(x)}, are at
+         * least {@code Σ y} times the limits used, and the certificate holds if that is more than the
+         * combination can be within the variable bounds. A combination of a variable's coefficients that is
+         * small, relative to the terms it combines, is taken to be 0 – noise in an approximate certificate.
+         * If the certificate does not hold, or a quadratic constraint is part of it, the result is returned
+         * without dual values.
+         *
+         * @param noise Relative to the magnitude of the terms combined, this small is 0
+         */
+        protected static Result toInfeasibilityCertificate(final Result infeasible, final ExpressionsBasedModel model, final double noise) {
+
+            List<KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>>> duals = infeasible.getDualValues();
+
+            Result withoutCertificate = new Result(State.INFEASIBLE, infeasible);
+
+            double largest = PrimitiveMath.ZERO;
+            for (KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>> dual : duals) {
+                largest = Math.max(largest, Math.abs(dual.doubleValue()));
+            }
+            if (largest <= PrimitiveMath.ZERO) {
+                return withoutCertificate;
+            }
+
+            int nbVars = model.countVariables();
+            double[] combined = new double[nbVars];
+            double[] magnitudes = new double[nbVars];
+
+            double limits = PrimitiveMath.ZERO;
+            double scale = largest;
+
+            for (KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>> dual : duals) {
+
+                ModelEntity<?> entity = dual.getKey().left();
+                double value = dual.doubleValue();
+
+                if (!(entity instanceof Expression) || Math.abs(value) <= noise * largest) {
+                    continue;
+                }
+
+                Expression expression = (Expression) entity;
+                if (expression.isAnyQuadraticFactorNonZero()) {
+                    return withoutCertificate;
+                }
+
+                for (IntIndex key : expression.getLinearKeySet()) {
+                    double term = expression.doubleValue(key, false) * value;
+                    combined[key.index] += term;
+                    magnitudes[key.index] += Math.abs(term);
+                }
+
+                BigDecimal limit = value > PrimitiveMath.ZERO ? expression.getLowerLimit() : expression.getUpperLimit();
+                if (limit == null) {
+                    return withoutCertificate;
+                }
+                limits += value * limit.doubleValue();
+                scale += Math.abs(value * limit.doubleValue());
+            }
+
+            double largestCombination = PrimitiveMath.ZERO;
+
+            for (int j = 0; j < nbVars; j++) {
+
+                if (Math.abs(combined[j]) <= noise * magnitudes[j]) {
+                    combined[j] = PrimitiveMath.ZERO;
+                    continue;
+                }
+
+                Variable variable = model.getVariable(j);
+                BigDecimal bound = combined[j] > PrimitiveMath.ZERO ? variable.getUpperLimit() : variable.getLowerLimit();
+                if (bound == null) {
+                    return withoutCertificate;
+                }
+                largestCombination += combined[j] * bound.doubleValue();
+                scale += Math.abs(combined[j] * bound.doubleValue());
+            }
+
+            if (limits - largestCombination <= noise * scale) {
+                return withoutCertificate;
+            }
+
+            for (int j = 0; j < nbVars; j++) {
+                combined[j] = -combined[j];
+            }
+
+            return infeasible.withReducedGradient(() -> ArrayR064.wrap(combined));
+        }
+
+        /**
+         * Converts the dual values of ojAlgo's own solvers to those of the model, see
+         * {@link Result#getDualSolution()}. Those solvers minimise, and return the multipliers of inequality
+         * constraints non-negative, with LOWER constraints entering the Lagrangian with a minus sign (or as
+         * signed rows, see {@link ConstraintsMetaData#setSignedRows(boolean)}). Changes, and returns,
+         * {@code solverState}.
+         *
+         * @param solverSense The sense the solver optimises in. If it differs from the model's (a
+         *                    maximisation solved as a minimisation of the negated objective), the dual values
+         *                    are negated – but not those of an infeasibility certificate, which does not
+         *                    depend on the sense.
+         */
+        protected static Result toModelDuals(final Result solverState, final ExpressionsBasedModel model, final Optimisation.Sense solverSense) {
+
+            Optimisation.Sense modelSense = model.getOptimisationSense();
+            boolean negate = solverState.getState() != State.INFEASIBLE && solverSense != null && modelSense != null && solverSense != modelSense;
+
+            return solverState.withModelDuals(negate);
         }
 
         /**

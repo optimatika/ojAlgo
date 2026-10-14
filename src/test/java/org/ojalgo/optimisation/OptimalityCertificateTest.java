@@ -48,14 +48,15 @@ import org.ojalgo.type.keyvalue.KeyValue;
  * – presolve may have tightened variable bounds, in place, and the certificate is relative to those derived
  * bounds.
  * <p>
- * In the minimisation form (see {@link Optimisation.Result#getDualValues()} for the sign convention):
+ * With the sign convention described at {@link Optimisation.Result#getDualSolution()}:
  * <ul>
- * <li>The reduced gradient is the objective's gradient plus the multiplier terms of the constraint
- * expressions, so it is non-zero only for variables at an active bound: positive at a lower bound, negative
- * at an upper bound.
- * <li>Inequality multipliers are non-negative, and non-zero only for active constraints.
+ * <li>The reduced gradient is the objective's gradient minus the dual value terms of the constraint
+ * expressions, {@code ∇f(x) - Σ y ∇g(x)}, so it is non-zero only for variables at an active bound. When
+ * minimising it is positive at a lower bound and negative at an upper bound; when maximising the reverse.
+ * <li>Dual values are non-zero only for active constraints. When minimising they are non-negative at a lower
+ * limit and non-positive at an upper limit; when maximising the reverse.
  * <li>Solvers that model variable bounds as constraint rows also report their multipliers, with the
- * variables. Those must equal the bound part of the reduced gradient.
+ * variables. Those must add up to the reduced gradient.
  * </ul>
  * The results are obtained with {@link ExpressionsBasedModel#prepare(Optimisation.Sense, Function)}, not
  * {@link ExpressionsBasedModel#minimise()} or {@link ExpressionsBasedModel#maximise()} (those recompute the
@@ -68,6 +69,12 @@ public class OptimalityCertificateTest extends OptimisationTests {
 
     private static final BigDecimal CONSTANT = BigDecimal.valueOf(1.5);
 
+    /**
+     * Asserts feasibility, the objective function value and, if {@code duals}, the certificate described
+     * above: stationarity, {@code d - ∇f(x) + Σ y ∇g(x) = 0}, the signs of the dual values and the reduced
+     * gradient – negated when maximising, to compare them as when minimising – and complementary slackness. A
+     * range constraint's active limit is the lower one if its dual value is positive (when minimising).
+     */
     private static void assertCertificate(final String id, final ExpressionsBasedModel model, final Optimisation.Result result, final NumberContext accuracy,
             final NumberContext complementarity, final boolean duals) {
 
@@ -105,7 +112,7 @@ public class OptimalityCertificateTest extends OptimisationTests {
                     gradient += factor * x[key.row];
                 }
             }
-            residual[j] = sign * (reducedGradient.doubleValue(j) - gradient);
+            residual[j] = reducedGradient.doubleValue(j) - gradient;
         }
 
         double[] boundPart = new double[nbVars];
@@ -114,11 +121,13 @@ public class OptimalityCertificateTest extends OptimisationTests {
 
             ModelEntity<?> entity = dual.getKey().left();
             ConstraintType type = dual.getKey().right();
-            double multiplier = dual.doubleValue();
-            double direction = type == ConstraintType.LOWER ? -1.0 : 1.0;
+            double value = dual.doubleValue();
+            double minimised = sign * value;
 
-            if (type != ConstraintType.EQUALITY) {
-                TestUtils.assertTrue(id + " non-negative multiplier for " + entity.getName(), multiplier > -accuracy.epsilon());
+            if (type == ConstraintType.LOWER) {
+                TestUtils.assertTrue(id + " dual value at a lower limit " + entity.getName(), minimised > -accuracy.epsilon());
+            } else if (type == ConstraintType.UPPER) {
+                TestUtils.assertTrue(id + " dual value at an upper limit " + entity.getName(), minimised < accuracy.epsilon());
             }
 
             if (entity instanceof Expression) {
@@ -128,28 +137,31 @@ public class OptimalityCertificateTest extends OptimisationTests {
                 for (IntIndex key : expression.getLinearKeySet()) {
                     double factor = expression.doubleValue(key, false);
                     activity += factor * x[key.index];
-                    residual[key.index] -= direction * factor * multiplier;
+                    residual[key.index] += factor * value;
                 }
                 for (IntRowColumn key : expression.getQuadraticKeySet()) {
                     double factor = expression.doubleValue(key, false);
                     activity += factor * x[key.row] * x[key.column];
-                    residual[key.row] -= direction * factor * x[key.column] * multiplier;
-                    residual[key.column] -= direction * factor * x[key.row] * multiplier;
+                    residual[key.row] += factor * x[key.column] * value;
+                    residual[key.column] += factor * x[key.row] * value;
                 }
 
-                if (type == ConstraintType.LOWER) {
+                boolean lower = type == ConstraintType.LOWER || type == ConstraintType.RANGE && minimised > 0.0;
+                boolean upper = type == ConstraintType.UPPER || type == ConstraintType.RANGE && minimised < 0.0;
+
+                if (lower) {
                     TestUtils.assertTrue(id + " lower limit of " + entity.getName(), expression.isLowerLimitSet());
                     double slack = activity - expression.getLowerLimit().doubleValue();
-                    TestUtils.assertEquals(id + " complementary slackness " + entity.getName(), 0.0, multiplier * slack, complementarity);
-                } else if (type == ConstraintType.UPPER) {
+                    TestUtils.assertEquals(id + " complementary slackness " + entity.getName(), 0.0, value * slack, complementarity);
+                } else if (upper) {
                     TestUtils.assertTrue(id + " upper limit of " + entity.getName(), expression.isUpperLimitSet());
                     double slack = expression.getUpperLimit().doubleValue() - activity;
-                    TestUtils.assertEquals(id + " complementary slackness " + entity.getName(), 0.0, multiplier * slack, complementarity);
+                    TestUtils.assertEquals(id + " complementary slackness " + entity.getName(), 0.0, value * slack, complementarity);
                 }
 
             } else if (entity instanceof Variable) {
 
-                boundPart[((Variable) entity).getIndex().index] -= direction * multiplier;
+                boundPart[((Variable) entity).getIndex().index] += value;
             }
         }
 
@@ -160,7 +172,8 @@ public class OptimalityCertificateTest extends OptimisationTests {
                 continue;
             }
 
-            double rc = sign * reducedGradient.doubleValue(j);
+            double rc = reducedGradient.doubleValue(j);
+            double minimised = sign * rc;
 
             TestUtils.assertEquals(id + " stationarity " + variable.getName(), 0.0, residual[j], accuracy);
 
@@ -168,12 +181,12 @@ public class OptimalityCertificateTest extends OptimisationTests {
                 TestUtils.assertEquals(id + " bound multiplier " + variable.getName(), boundPart[j], rc, accuracy);
             }
 
-            if (rc > accuracy.epsilon()) {
-                TestUtils.assertTrue(id + " positive rc with a lower bound " + variable.getName(), variable.isLowerLimitSet());
+            if (minimised > accuracy.epsilon()) {
+                TestUtils.assertTrue(id + " positive (minimising) rc with a lower bound " + variable.getName(), variable.isLowerLimitSet());
                 double slack = x[j] - variable.getLowerLimit().doubleValue();
                 TestUtils.assertEquals(id + " complementary slackness " + variable.getName(), 0.0, rc * slack, complementarity);
-            } else if (rc < -accuracy.epsilon()) {
-                TestUtils.assertTrue(id + " negative rc with an upper bound " + variable.getName(), variable.isUpperLimitSet());
+            } else if (minimised < -accuracy.epsilon()) {
+                TestUtils.assertTrue(id + " negative (minimising) rc with an upper bound " + variable.getName(), variable.isUpperLimitSet());
                 double slack = variable.getUpperLimit().doubleValue() - x[j];
                 TestUtils.assertEquals(id + " complementary slackness " + variable.getName(), 0.0, rc * slack, complementarity);
             }
@@ -181,8 +194,29 @@ public class OptimalityCertificateTest extends OptimisationTests {
     }
 
     /**
-     * Presolve fixes y at 5 (the bound y <= 5 and the constraint y >= 5).
+     * Asserts that the result of an infeasible problem has no feasible solution. Unless it has an approximate
+     * solution, there must then be neither dual values nor a reduced gradient – or they must be a valid
+     * infeasibility certificate, see {@link Optimisation.Result#getDualSolution()}.
      */
+    private static void assertInfeasible(final String id, final ExpressionsBasedModel model, final Optimisation.Result result, final NumberContext accuracy) {
+
+        Optimisation.State state = result.getState();
+
+        TestUtils.assertFalse(id + " " + state, state.isFeasible());
+
+        if (state.isApproximate()) {
+            return;
+        }
+
+        if (state == Optimisation.State.INFEASIBLE && result.getDualSolution().isPresent()) {
+            DualConventionTest.assertInfeasibilityCertificate(id, model, result, accuracy);
+        } else {
+            TestUtils.assertFalse(id + " dual solution", result.getDualSolution().isPresent());
+            TestUtils.assertFalse(id + " reduced gradient", result.getReducedGradient().isPresent());
+            TestUtils.assertTrue(id + " dual values", result.getDualValues().isEmpty());
+        }
+    }
+
     /**
      * Minimise x subject to x² + y² <= 1. The solution is (-1, 0), and the multiplier 0.5.
      */
@@ -238,11 +272,6 @@ public class OptimalityCertificateTest extends OptimisationTests {
     }
 
     /**
-     * An integer and a continuous variable, and coefficients far from 1 (so that the adjustment factors are
-     * not – constraints with only integer variables and coefficients are never adjusted). The optimum is x =
-     * 4 and y = 0, with c2 active.
-     */
-    /**
      * The quadratic constraint is not active at the unconstrained optimum (0.5, 0) of x² + y² - x, so its
      * multiplier is 0.
      */
@@ -255,6 +284,24 @@ public class OptimalityCertificateTest extends OptimisationTests {
         return model;
     }
 
+    /**
+     * Infeasible: x + y + z <= 1 and x + y + z >= 3, with x, y and z in [0, 10]. Presolve does not detect it.
+     */
+    private static ExpressionsBasedModel makeInfeasible(final double sign) {
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+        Variable x = model.newVariable("x").lower(0).upper(10).weight(sign);
+        Variable y = model.newVariable("y").lower(0).upper(10).weight(2 * sign);
+        Variable z = model.newVariable("z").lower(0).upper(10).weight(3 * sign);
+        model.newExpression("upper").set(x, 1).set(y, 1).set(z, 1).upper(1);
+        model.newExpression("lower").set(x, 1).set(y, 1).set(z, 1).lower(3);
+        return model;
+    }
+
+    /**
+     * An integer and a continuous variable, and coefficients far from 1 (so that the adjustment factors are
+     * not – constraints with only integer variables and coefficients are never adjusted). The optimum is x =
+     * 4 and y = 0, with c2 active.
+     */
     private static ExpressionsBasedModel makeInteger(final double sign) {
         ExpressionsBasedModel model = new ExpressionsBasedModel();
         Variable x = model.newVariable("x").integer().lower(0).upper(10).weight(0.003 * sign);
@@ -319,11 +366,6 @@ public class OptimalityCertificateTest extends OptimisationTests {
     }
 
     /**
-     * Solves the way {@link ExpressionsBasedModel#minimise()} and {@link ExpressionsBasedModel#maximise()}
-     * do, including presolve, but with the given integration and without recomputing the objective function
-     * value from the solution.
-     */
-    /**
      * The expected return of a long-only portfolio, with a cap on its variance: linear and quadratic
      * constraints as well as variable bounds.
      */
@@ -362,6 +404,11 @@ public class OptimalityCertificateTest extends OptimisationTests {
                 (Function<Double, ExpressionsBasedModel>) OptimalityCertificateTest::makeVarianceCap };
     }
 
+    /**
+     * Solves the way {@link ExpressionsBasedModel#minimise()} and {@link ExpressionsBasedModel#maximise()}
+     * do, including presolve, but with the given integration and without recomputing the objective function
+     * value from the solution.
+     */
     private static Optimisation.Result solve(final ExpressionsBasedModel model, final Optimisation.Sense sense,
             final ExpressionsBasedModel.Integration<?> integration) {
 
@@ -398,11 +445,21 @@ public class OptimalityCertificateTest extends OptimisationTests {
     }
 
     @Test
+    public void testIntegerInfeasible() {
+        this.doTestInfeasible("MIP", this.getIntegerIntegrations(), false, true);
+    }
+
+    @Test
     public void testLinear() {
         Function<Double, ExpressionsBasedModel>[] makers = OptimalityCertificateTest.makers();
         for (int c = 0; c < makers.length; c++) {
             this.doTest("LP", this.getLinearIntegrations(), false, "case " + c, makers[c], this.getAccuracy(), this.getComplementarityAccuracy());
         }
+    }
+
+    @Test
+    public void testLinearInfeasible() {
+        this.doTestInfeasible("LP", this.getLinearIntegrations(), false, false);
     }
 
     @Test
@@ -426,6 +483,11 @@ public class OptimalityCertificateTest extends OptimisationTests {
             this.doTest("QCQP", this.getQuadraticConstraintIntegrations(), false, "case " + c, makers[c], this.getQuadraticConstraintAccuracy(),
                     this.getQuadraticConstraintAccuracy());
         }
+    }
+
+    @Test
+    public void testQuadraticInfeasible() {
+        this.doTestInfeasible("QP", this.getQuadraticIntegrations(), true, false);
     }
 
     @Test
@@ -463,10 +525,50 @@ public class OptimalityCertificateTest extends OptimisationTests {
     }
 
     /**
+     * Solves the infeasible model, in both senses, with each of the integrations. A quadratic objective is
+     * made by adding (x² + y² + z²) / 4, and an integer model by making all the variables integer.
+     */
+    private void doTestInfeasible(final String type, final List<KeyValue<String, ExpressionsBasedModel.Integration<?>>> integrations, final boolean quadratic,
+            final boolean integer) {
+
+        for (KeyValue<String, ExpressionsBasedModel.Integration<?>> integration : integrations) {
+            for (Optimisation.Sense sense : Optimisation.Sense.values()) {
+                double sign = sense == Optimisation.Sense.MAX ? -1.0 : 1.0;
+
+                ExpressionsBasedModel model = OptimalityCertificateTest.makeInfeasible(sign);
+                if (quadratic) {
+                    Expression expression = model.addExpression("quadratic").weight(sign);
+                    for (Variable variable : model.getVariables()) {
+                        expression.set(variable, variable, 0.25);
+                    }
+                }
+                if (integer) {
+                    for (Variable variable : model.getVariables()) {
+                        variable.integer(true);
+                    }
+                }
+
+                Optimisation.Result result = OptimalityCertificateTest.solve(model, sense, integration.getValue());
+
+                OptimalityCertificateTest.assertInfeasible(type + " " + integration.getKey() + " " + sense + " infeasible", model, result,
+                        this.getCertificateAccuracy());
+            }
+        }
+    }
+
+    /**
      * The accuracy of the checks. Override for solvers that solve to a lower accuracy.
      */
     protected NumberContext getAccuracy() {
         return NumberContext.of(8);
+    }
+
+    /**
+     * The accuracy of the infeasibility certificate checks. Override for solvers with approximate
+     * certificates.
+     */
+    protected NumberContext getCertificateAccuracy() {
+        return this.getAccuracy();
     }
 
     /**

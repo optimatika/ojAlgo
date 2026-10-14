@@ -856,6 +856,14 @@ public abstract class ConvexSolver extends GenericSolver {
         return INTEGRATION.build(model);
     }
 
+    /**
+     * Whether a result with this state may have dual values and a reduced gradient: only with a (possibly
+     * approximate) solution, not when the state is INFEASIBLE, UNBOUNDED or a failure.
+     */
+    static boolean isDualMeaningful(final Optimisation.State state) {
+        return state.isSuccess() && state.isApproximate();
+    }
+
     protected ConvexSolver(final Optimisation.Options optimisationOptions) {
         super(optimisationOptions);
     }

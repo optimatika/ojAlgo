@@ -383,13 +383,8 @@ abstract class SimplexSolver extends LinearSolver {
      */
     private static final NumberContext RATIO_RELAX = NumberContext.of(9);
     /**
-     * The dual iterations perturb the costs, see {@link #perturbCosts()}, once this many pivots have not moved
-     * the dual objective forward. Many solves, warm starts in particular, need only a few pivots and are not
-     * perturbed.
-     * <p>
-     * In phase 1 the limit is at least the number of constraints. Those iterations are often short and
-     * degenerate, and the vertex they end at matters – with a zero objective it is the solution, and the
-     * starting point of the convex solver's active set iterations.
+     * The dual iterations perturb the costs, see {@link #perturbCosts()}, once this many pivots have not
+     * moved the dual objective forward. In phase 1 the limit is at least the number of constraints.
      */
     private static final int STALLED_PIVOTS = 10;
 
@@ -620,6 +615,17 @@ abstract class SimplexSolver extends LinearSolver {
         return retVal;
     }
 
+    /**
+     * Where the dual simplex concluded INFEASIBLE: the basis position (row) of a basic variable outside its
+     * bounds that no non-basic variable can bring back, or -1. That row of the basis inverse is a dual ray,
+     * an infeasibility certificate, see {@link #extractDualMultipliers()}.
+     */
+    private int myFarkasRow = -1;
+    /**
+     * +1 if the basic variable at {@link #myFarkasRow} is below its lower bound, -1 if it is above its upper
+     * bound.
+     */
+    private double myFarkasSign = ZERO;
     /**
      * Set by {@link #testDualEnterRatio}: there were candidates, but {@link #PIVOT_GROWTH} rejected them all.
      * Set by {@link #testPrimalExitRatio}: the step is unbounded only because {@link #PIVOT_GROWTH} rejected
@@ -954,14 +960,12 @@ abstract class SimplexSolver extends LinearSolver {
     }
 
     /**
-     * The basis is dual feasible, but many of its reduced costs may be zero (with a single-variable objective,
-     * or phase-1 costs that are all ±1, for instance). Then the dual steps are zero, nothing measures progress,
-     * and the dual iterations can stall or cycle. Moving the costs of the non-basic variables away from zero, in
-     * the direction that keeps the basis dual feasible, avoids that. Fixed variables are left as they are.
+     * Moves the costs of the non-basic variables away from zero, in the direction that keeps the basis dual
+     * feasible, so that the dual steps are non-zero. Fixed variables are left as they are.
      * <p>
-     * Phase-1 costs are perturbed in place. Otherwise a copy of the original costs is installed as the phase-1
-     * objective and perturbed, and removing it restores the original costs. The basis may then not be dual
-     * feasible, by about the size of the perturbation, and primal iterations finish the job.
+     * Phase-1 costs are perturbed in place. Otherwise a copy of the original costs is installed as the
+     * phase-1 objective and perturbed, and removing it restores the original costs. The basis may then not be
+     * dual feasible, by about the size of the perturbation, and primal iterations finish the job.
      *
      * @return true if a copy of the original costs was installed
      */
@@ -976,7 +980,7 @@ abstract class SimplexSolver extends LinearSolver {
         for (int je = 0; je < excluded.length; je++) {
             int j = excluded[je];
 
-            if (mySimplex.isArtificial(j) || !(mySimplex.getRange(j) > ZERO)) {
+            if (mySimplex.isArtificial(j) || (mySimplex.getRange(j) <= ZERO)) {
                 continue;
             }
 
@@ -1065,10 +1069,9 @@ abstract class SimplexSolver extends LinearSolver {
             if (j >= n) {
                 continue;
             }
-            // A fixed variable can not move, and its reduced cost may have either sign. It does not limit the
-            // dual step, and entering it would only be a degenerate pivot.
+            // A fixed variable can not move, so it does not limit the dual step
             double range = mySimplex.getRange(j);
-            if (!(range > ZERO)) {
+            if ((range <= ZERO)) {
                 continue;
             }
 
@@ -1439,8 +1442,8 @@ abstract class SimplexSolver extends LinearSolver {
     }
 
     /**
-     * If the iterations stall the costs are perturbed, see {@link #perturbCosts()}. Original costs are back in
-     * place on return, phase-1 costs remain perturbed.
+     * If the iterations stall the costs are perturbed, see {@link #perturbCosts()}. Original costs are back
+     * in place on return, phase-1 costs remain perturbed.
      */
     final void doDualIterations(final IterDescr iteration, final boolean resetEdgeWeights) {
 
@@ -1487,9 +1490,8 @@ abstract class SimplexSolver extends LinearSolver {
                             nbStalled++;
                         }
                     } else if (gap < ZERO) {
-                        // The Harris ratio test may choose a variable whose reduced cost has the wrong sign
-                        // (within tolerance). The dual step would then go backwards, and that can undo what
-                        // the perturbation does against cycling. Shift its cost to make the step zero instead.
+                        // A reduced cost of the wrong sign, within tolerance, is shifted to zero, so that the
+                        // dual step is zero rather than negative
                         mySimplex.shiftCost(iteration.enter.index, -reducedCost);
                     }
 
@@ -1523,6 +1525,8 @@ abstract class SimplexSolver extends LinearSolver {
                         done = true;
                     } else {
                         state = State.INFEASIBLE;
+                        myFarkasRow = iteration.exit.index;
+                        myFarkasSign = iteration.exit.direction == Direction.INCREASE ? ONE : NEG;
                     }
                 }
 
@@ -1607,10 +1611,27 @@ abstract class SimplexSolver extends LinearSolver {
         }
     }
 
+    /**
+     * When the dual simplex concluded INFEASIBLE, a dual ray instead: the direction in which the dual
+     * multipliers can move without bound, staying dual feasible while the dual objective grows without bound.
+     * It does not depend on the objective. Along it the reduced gradients change in the direction of
+     * {@link #extractReducedGradients()}, and those are 0 for every variable whose bounds play no part in the
+     * infeasibility. All NaN when INFEASIBLE was concluded some other way (crossing bounds).
+     */
     @Override
     double[] extractDualMultipliers() {
         double[] duals = new double[mySimplex.m];
-        mySimplex.extractDualValues(duals);
+        if (state != State.INFEASIBLE) {
+            mySimplex.extractDualValues(duals);
+        } else if (myFarkasRow >= 0) {
+            mySimplex.extractInverseRow(myFarkasRow, duals);
+            for (int i = 0; i < duals.length; i++) {
+                duals[i] *= myFarkasSign;
+            }
+        } else {
+            Arrays.fill(duals, NaN);
+            return duals;
+        }
         for (int i = 0; i < duals.length; i++) {
             if (mySimplex.structure.isConstraintNegated(i)) {
                 duals[i] = -duals[i];
@@ -1620,10 +1641,24 @@ abstract class SimplexSolver extends LinearSolver {
         return duals;
     }
 
+    /**
+     * When the dual simplex concluded INFEASIBLE, the direction in which the reduced gradients change along
+     * the dual ray of {@link #extractDualMultipliers()} instead.
+     */
     @Override
     double[] extractReducedGradients() {
         double[] gradients = new double[mySimplex.n];
-        mySimplex.extractReducedCosts(gradients);
+        if (state != State.INFEASIBLE) {
+            mySimplex.extractReducedCosts(gradients);
+        } else if (myFarkasRow >= 0) {
+            mySimplex.extractTableauRow(myFarkasRow, gradients);
+            for (int j = 0; j < gradients.length; j++) {
+                gradients[j] *= myFarkasSign;
+            }
+        } else {
+            Arrays.fill(gradients, NaN);
+            return gradients;
+        }
         mySimplex.unscaleReducedCosts(gradients);
         // Map reduced costs back to model space: the objective was scaled by the adjustment factor when the
         // simplex was built, so the reduced costs come out scaled by the same factor.
@@ -1636,6 +1671,10 @@ abstract class SimplexSolver extends LinearSolver {
         return gradients;
     }
 
+    /**
+     * With state INFEASIBLE the reduced gradient and the dual multipliers are those of the infeasibility
+     * certificate, and without a certificate there are none.
+     */
     final Result extractResult() {
 
         // The objective was scaled by the adjustment factor at build time, so extractValue() is in scaled
@@ -1646,9 +1685,7 @@ abstract class SimplexSolver extends LinearSolver {
         double[] solution = this.extractSolution();
         mySimplex.unscaleSolution(solution);
 
-        Supplier<Access1D<?>> reducedGradient = () -> ArrayR064.wrap(this.extractReducedGradients());
-
-        Result result = Optimisation.Result.of(value, state, solution).withReducedGradient(reducedGradient);
+        Result result = Optimisation.Result.of(value, state, solution);
 
         if (this.isLogDebug()) {
             this.log();
@@ -1657,6 +1694,12 @@ abstract class SimplexSolver extends LinearSolver {
             this.log(" X: {}", solution);
             this.log("UB: {}", this.getUpperBounds());
         }
+
+        if (state == State.INFEASIBLE && myFarkasRow < 0) {
+            return result;
+        }
+
+        result = result.withReducedGradient(() -> ArrayR064.wrap(this.extractReducedGradients()));
 
         if (mySimplex.structure.isEntityMap()) {
             return result.withDualValues(mySimplex.structure.constraints, this::extractMultipliers);
@@ -1677,6 +1720,7 @@ abstract class SimplexSolver extends LinearSolver {
     final boolean isInfeasibleByCrossedBounds() {
         if (mySimplex.isAnyBoundCrossed()) {
             state = State.INFEASIBLE;
+            myFarkasRow = -1;
             return true;
         }
         return false;
@@ -1689,6 +1733,7 @@ abstract class SimplexSolver extends LinearSolver {
     final IterDescr prepareToIterate(final boolean cold) {
 
         state = State.UNEXPLORED;
+        myFarkasRow = -1;
 
         this.invalidateCache();
 

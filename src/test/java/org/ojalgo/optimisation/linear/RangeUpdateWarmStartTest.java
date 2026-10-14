@@ -37,8 +37,9 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * A solver instance is solved, then some variable ranges are updated in place with
  * {@link LinearSolver#updateRange(int, double, double)}, and it is solved again. This is what a branch and
- * bound search does. The last solve must agree with a solver built from scratch on the final ranges, and every
- * solve must terminate within {@link #ITERATIONS_ABORT} iterations.
+ * bound search does. The last solve must agree with a solver built from scratch on the final ranges, and
+ * every solve must terminate within {@link #ITERATIONS_ABORT} iterations. When the last solve is INFEASIBLE,
+ * both must come with an infeasibility certificate (GitHub issue 701).
  * <p>
  * The problems are linear relaxations of constraint-programming models solved by choco-solver. They have
  * integer ranges and a single-variable objective to minimise.
@@ -46,23 +47,24 @@ import org.ojalgo.type.context.NumberContext;
  * <li>{@link #STEINER}: a Steiner tree model (579 variables, 70 equalities, 219 inequalities). All 55 range
  * updates are relaxations, and the final problem is feasible. The second solve returned INFEASIBLE (GitHub
  * issue 699).
- * <li>{@link #MULTI_KNAPSACK}: a multi-knapsack model (92 variables, 61 equalities). Of the 40 range updates, 9
- * fix a variable, and the final problem is infeasible. The second solve never terminated (GitHub issue 700).
- * <li>{@link #MULTI_KNAPSACK_2}, {@link #MULTI_KNAPSACK_3}: the same model, with 33 and 35 other range updates,
- * and infeasible final problems. Every reduced cost but one was zero, and the dual iterations of the second solve
- * cycled (GitHub issue 700, after the first fix).
+ * <li>{@link #MULTI_KNAPSACK}: a multi-knapsack model (92 variables, 61 equalities). Of the 40 range updates,
+ * 9 fix a variable, and the final problem is infeasible. The second solve never terminated (GitHub issue
+ * 700).
+ * <li>{@link #MULTI_KNAPSACK_2}, {@link #MULTI_KNAPSACK_3}: the same model, with 33 and 35 other range
+ * updates, and infeasible final problems. Every reduced cost but one was zero, and the dual iterations of the
+ * second solve cycled (GitHub issue 700, after the first fix).
  * <li>{@link #HC_PIZZA}: an HCPizza model (877 variables, 21 equalities, 100 inequalities). 1,000 solves, all
- * optimal, with 27,549 range updates in between. Most solves need only a pivot or two. Recorded to measure the
- * time of such cheap warm solves (GitHub issue 700), here their values must sum to {@link #HC_PIZZA_SUM}.
- * <li>{@link #COINS_GRID}: a CoinsGrid model (507 variables, 67 equalities), with 164 range updates. The second
- * solve needed 30 times more iterations than 57.1.0 did (GitHub issue 700).
+ * optimal, with 27,549 range updates in between. Most solves need only a pivot or two. Recorded to measure
+ * the time of such cheap warm solves (GitHub issue 700), here their values must sum to {@link #HC_PIZZA_SUM}.
+ * <li>{@link #COINS_GRID}: a CoinsGrid model (507 variables, 67 equalities), with 164 range updates. The
+ * second solve needed 30 times more iterations than 57.1.0 did (GitHub issue 700).
  * <li>{@link #COINS_GRID_COLD}, {@link #COINS_GRID_COLD_2}, {@link #COINS_GRID_COLD_3}: the same model, other
- * ranges, a single solve of a fresh instance. Most dual pivots of phase 1 were degenerate, and the solves needed
- * up to 15,000 iterations (GitHub issue 700).
+ * ranges, a single solve of a fresh instance. Most dual pivots of phase 1 were degenerate, and the solves
+ * needed up to 15,000 iterations (GitHub issue 700).
  * </ul>
  * File format, one item per line:
  *
- * <pre>
+ * <pre>{@code
  * n N                  number of variables
  * obj J C              objective: minimise C * x[J]
  * eq RHS J:A J:A ...   sum A * x[J] == RHS
@@ -70,7 +72,7 @@ import org.ojalgo.type.context.NumberContext;
  * bnd J LO UP          initial range LO <= x[J] <= UP
  * solve                solve with the solver built from the lines above
  * upd J LO UP          range update applied in place to that same solver
- * </pre>
+ * }</pre>
  */
 public class RangeUpdateWarmStartTest extends OptimisationLinearTests {
 
@@ -112,6 +114,40 @@ public class RangeUpdateWarmStartTest extends OptimisationLinearTests {
             }
             return builder;
         }
+
+        /**
+         * In the solver's order: the inequalities first, then the equalities.
+         */
+        double[] rhs() {
+            int nbInequalities = leRHS.size();
+            double[] rhs = new double[nbInequalities + eqRHS.size()];
+            for (int i = 0; i < nbInequalities; i++) {
+                rhs[i] = leRHS.get(i).doubleValue();
+            }
+            for (int i = 0; i < eqRHS.size(); i++) {
+                rhs[nbInequalities + i] = eqRHS.get(i).doubleValue();
+            }
+            return rhs;
+        }
+
+        /**
+         * In the solver's order: the inequalities first, then the equalities.
+         */
+        double[][] rows() {
+            int nbInequalities = leRHS.size();
+            double[][] rows = new double[nbInequalities + eqRHS.size()][nbVariables];
+            for (int i = 0; i < nbInequalities; i++) {
+                for (int k = 0; k < leIndices.get(i).length; k++) {
+                    rows[i][leIndices.get(i)[k]] = leFactors.get(i)[k];
+                }
+            }
+            for (int i = 0; i < eqRHS.size(); i++) {
+                for (int k = 0; k < eqIndices.get(i).length; k++) {
+                    rows[nbInequalities + i][eqIndices.get(i)[k]] = eqFactors.get(i)[k];
+                }
+            }
+            return rows;
+        }
     }
 
     private static final NumberContext ACCURACY = NumberContext.of(8);
@@ -121,13 +157,14 @@ public class RangeUpdateWarmStartTest extends OptimisationLinearTests {
     private static final String COINS_GRID_COLD_3 = "/optimisation/usersupplied/ChocoCoinsGridCold3.txt";
     private static final String HC_PIZZA = "/optimisation/usersupplied/ChocoHCPizzaRangeUpdate.txt";
     /**
-     * The sum of the 1,000 optimal values of {@link #HC_PIZZA}, the same with every ojAlgo version since 57.1.0.
+     * The sum of the 1,000 optimal values of {@link #HC_PIZZA}, the same with every ojAlgo version since
+     * 57.1.0.
      */
     private static final double HC_PIZZA_SUM = -84533.0;
     /**
-     * Each solve needs fewer than 1,000 iterations, but some needed more than 5,000 before the fixes for GitHub
-     * issue 700. Without a limit, a solve that does not terminate would run until the default time limit of one
-     * day.
+     * Each solve needs fewer than 1,000 iterations, but some needed more than 5,000 before the fixes for
+     * GitHub issue 700. Without a limit, a solve that does not terminate would run until the default time
+     * limit of one day.
      */
     private static final int ITERATIONS_ABORT = 5_000;
     private static final String MULTI_KNAPSACK = "/optimisation/usersupplied/ChocoMultiKnapsackRangeUpdate.txt";
@@ -178,13 +215,20 @@ public class RangeUpdateWarmStartTest extends OptimisationLinearTests {
         reference.sparse = Boolean.FALSE;
         reference.iterations_abort = ITERATIONS_ABORT;
 
-        Optimisation.Result expected = scenario.newBuilder(lower, upper).build(reference).solve();
+        LinearSolver cold = scenario.newBuilder(lower, upper).build(reference);
+        Optimisation.Result expected = cold.solve();
 
         TestUtils.assertEquals(state, expected.getState());
         TestUtils.assertEquals(state, actual.getState());
 
         if (state.isOptimal()) {
             TestUtils.assertEquals(expected.getValue(), actual.getValue(), ACCURACY);
+        } else if (state == Optimisation.State.INFEASIBLE) {
+            double[][] rows = scenario.rows();
+            double[] rhs = scenario.rhs();
+            int nbInequalities = scenario.leRHS.size();
+            InfeasibilityCertificateTest.assertCertificate(rows, rhs, nbInequalities, lower, upper, expected, cold);
+            InfeasibilityCertificateTest.assertCertificate(rows, rhs, nbInequalities, lower, upper, actual, warm);
         }
 
         return sum;

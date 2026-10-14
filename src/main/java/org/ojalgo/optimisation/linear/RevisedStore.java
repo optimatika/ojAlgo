@@ -861,6 +861,12 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
+    Primitive1D sliceInverseRow(final int row) {
+        myInvBasis.btranUnit(row, myInverseRow);
+        return myInverseRow;
+    }
+
+    @Override
     void updateDualEdgeWeights(final IterDescr iteration) {
 
         int p = iteration.exit.index;

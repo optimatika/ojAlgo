@@ -424,6 +424,19 @@ abstract class SimplexStore {
     }
 
     /**
+     * Extract row {@code i} of the basis inverse into the given array, of length {@link #m}. If the basic
+     * variable at {@code i} is outside its bounds, and no non-basic variable can bring it back (the dual
+     * simplex concludes infeasibility), this is a dual ray: up to sign, the direction in which the dual
+     * values of {@link #extractDualValues(double[])} can move without bound.
+     */
+    final void extractInverseRow(final int i, final double[] target) {
+        Primitive1D row = this.sliceInverseRow(i);
+        for (int k = 0; k < m; k++) {
+            target[k] = row.doubleValue(k);
+        }
+    }
+
+    /**
      * Extract the reduced costs for all variables into the given array. The array must have length
      * {@link #n}. Basic variables get 0; non-basic variables get their reduced cost from the excluded array.
      */
@@ -437,6 +450,25 @@ abstract class SimplexStore {
     }
 
     abstract double[] extractSolution();
+
+    /**
+     * Extract row {@code i} of the tableau, the basis inverse times the constraints body, into the given
+     * array, of length {@link #n}. The basic variable at {@code i} gets 1, and the other basic variables 0.
+     * The artificial variables, fixed at 0, also get 0. Along the dual ray of
+     * {@link #extractInverseRow(int, double[])} the reduced costs of {@link #extractReducedCosts(double[])}
+     * change in this direction, with the same sign.
+     */
+    final void extractTableauRow(final int i, final double[] target) {
+        Primitive1D row = this.sliceBodyRow(i);
+        for (int ji = 0; ji < included.length; ji++) {
+            target[included[ji]] = ZERO;
+        }
+        for (int je = 0; je < excluded.length; je++) {
+            int j = excluded[je];
+            target[j] = this.isArtificial(j) ? ZERO : row.doubleValue(j);
+        }
+        target[included[i]] = ONE;
+    }
 
     abstract double extractValue();
 
@@ -787,8 +819,8 @@ abstract class SimplexStore {
 
     /**
      * Install a copy of the objective as the phase-1 objective, keeping the basis. Those costs can then be
-     * modified, see {@link #shiftCost(int, double)}, while the original ones are kept. {@link #removePhase1()}
-     * switches back to the original costs.
+     * modified, see {@link #shiftCost(int, double)}, while the original ones are kept.
+     * {@link #removePhase1()} switches back to the original costs.
      */
     abstract void phase1FromObjective();
 
@@ -876,14 +908,19 @@ abstract class SimplexStore {
     abstract void setupClassicPhase1Objective();
 
     /**
-     * Shift the phase-1 cost, and so the reduced cost, of the non-basic variable at {@code je} (its position in
-     * {@link #excluded}). Requires a phase-1 objective, see {@link #phase1FromObjective()}.
+     * Shift the phase-1 cost, and so the reduced cost, of the non-basic variable at {@code je} (its position
+     * in {@link #excluded}). Requires a phase-1 objective, see {@link #phase1FromObjective()}.
      */
     abstract void shiftCost(int je, double shift);
 
     abstract Primitive1D sliceBodyRow(final int row);
 
     abstract Primitive1D sliceDualValues();
+
+    /**
+     * Row {@code row} of the basis inverse, of length {@link #m}.
+     */
+    abstract Primitive1D sliceInverseRow(int row);
 
     final SimplexStore unbounded(final int index) {
         myPartition.update(index, ColumnState.UNBOUNDED);

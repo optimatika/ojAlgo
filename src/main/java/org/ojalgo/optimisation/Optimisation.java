@@ -44,7 +44,6 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.ArrayR256;
 import org.ojalgo.concurrent.Parallelism;
-import org.ojalgo.concurrent.ParallelismSupplier;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
 import org.ojalgo.optimisation.convex.ConvexSolver;
@@ -423,7 +422,7 @@ public interface Optimisation {
          * the model's variables, and the objective function value, the dual values and the reduced gradient
          * in model units (any scaling of the objective or the constraints undone) and in the model's
          * optimisation sense. The objective function value includes any objective constant. See
-         * {@link Result#getDualValues()} and {@link Result#getReducedGradient()}.
+         * {@link Result#getDualSolution()} and {@link Result#getReducedGradient()}.
          * <p>
          * The required behaviour here depends on how {@link #build(Optimisation.Model)} is implemented, and
          * is the reverse mapping of {@link #toSolverState(Optimisation.Result, Optimisation.Model)}.
@@ -871,7 +870,27 @@ public interface Optimisation {
         }
 
         /**
-         * The dual variable values (Lagrange multipliers) associated with the constraints.
+         * The dual variable values (Lagrange multipliers) associated with the constraints, in the order and
+         * the units of the solver's constraints.
+         * <p>
+         * With an {@link ExpressionsBasedModel} result a dual value {@code y} is the shadow price of the
+         * constraint's active limit: the rate of change of the optimal objective function value per unit
+         * increase of that limit, in the model's optimisation sense. When minimising it is therefore
+         * non-negative at a lower limit and non-positive at an upper limit; when maximising the reverse. With
+         * the reduced gradient {@code d} (see {@link #getReducedGradient()}) they satisfy
+         * {@code ∇f(x) - Σ y ∇g(x) = d}, summing over the constraints {@code g(x)} and with the objective
+         * function {@code f(x)} as it is stated in the model. A solver used directly, built with its builder,
+         * documents what its dual values are, see for instance
+         * {@link org.ojalgo.optimisation.linear.LinearSolver#getDualMultiplier(int)}.
+         * <p>
+         * If the state is {@link State#INFEASIBLE} the dual values may instead be an infeasibility
+         * certificate (a Farkas ray): a combination of the constraints that no point within the variable
+         * bounds satisfies, see {@link #getReducedGradient()}. With an {@link ExpressionsBasedModel} result
+         * it is the same whether the model was minimised or maximised: non-negative where a constraint's
+         * lower limit is used and non-positive where its upper limit is (as when minimising), so that for
+         * linear constraints {@code Σ y g(x)} is at least {@code Σ y} times the limits used. The scale is
+         * arbitrary, and the certificate is only as exact as the solver's tolerances. Without a certificate
+         * there are neither dual values nor a reduced gradient.
          * <p>
          * If the {@link Optional} is empty the underlying {@link Solver} or {@link Integration} does not
          * provide the dual variables.
@@ -884,15 +903,8 @@ public interface Optimisation {
         }
 
         /**
-         * The dual variable values or Lagrange multipliers, matched to their respective constraints (model
-         * entity and constraint type pairs).
-         * <p>
-         * The multipliers are those of the minimisation form of the problem (the objective is negated for
-         * MAX), with the Lagrangian {@code L = f(x) + Σ λ (a'x - u) + Σ λ (l - a'x) + Σ λ (a'x - b)} summing
-         * over the UPPER, LOWER and EQUALITY constraints respectively. For inequality constraints they are
-         * non-negative. When minimising, the optimal value changes by {@code -λ} per unit increase of an
-         * UPPER or EQUALITY limit, and by {@code +λ} per unit increase of a LOWER limit; when maximising the
-         * signs are reversed.
+         * The values of {@link #getDualSolution()} matched to their respective constraints (model entity and
+         * constraint type pairs), in model units.
          */
         public List<KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>>> getDualValues() {
 
@@ -927,14 +939,19 @@ public interface Optimisation {
         }
 
         /**
-         * The reduced gradient of the solution. This is the rate of change of the objective if a variable
-         * were to move from its current bound, accounting for the dual variables.
+         * The reduced gradient of the solution: {@code ∇f(x) - Σ y ∇g(x)}, with the dual values {@code y} of
+         * {@link #getDualSolution()} – the constraints' terms, not the variable bounds'. It is the rate of
+         * change of the optimal objective function value per unit increase of a variable's active bound, in
+         * the model's optimisation sense, and at an optimum it is non-zero only for variables at an active
+         * bound. When minimising it is non-negative at a lower bound and non-positive at an upper bound; when
+         * maximising the reverse. Solvers that model the variable bounds as constraint rows also report those
+         * multipliers as dual values, with the variables, and they then add up to the reduced gradient.
          * <p>
-         * It is the gradient of the objective function plus the multiplier terms of the constraints (not the
-         * variable bounds), in the model's optimisation sense: at an optimum it is non-zero only for
-         * variables at an active bound. When minimising it is positive at a lower bound and negative at an
-         * upper bound; when maximising the reverse. Solvers that model the variable bounds as constraint rows
-         * also report those multipliers as dual values, with the variables, see {@link #getDualValues()}.
+         * If the dual values are an infeasibility certificate (see {@link #getDualSolution()}) this is its
+         * reduced gradient, {@code d = -Σ y ∇g(x)} – the objective plays no part. Within the variable bounds
+         * {@code Σ y g(x)} can not be as large as {@code Σ y} times the limits used: a variable's bounds play
+         * no part where {@code d} is 0, its lower bound does where {@code d} is positive and its upper bound
+         * where {@code d} is negative.
          * <p>
          * If the {@link Optional} is empty the underlying {@link Solver} or {@link Integration} does not
          * provide the reduced gradient.
@@ -1098,6 +1115,37 @@ public interface Optimisation {
 
         Result multipliers(final List<KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>>> matchedMultipliers) {
             myDualValues = matchedMultipliers;
+            return this;
+        }
+
+        /**
+         * @see ExpressionsBasedModel.Integration#toModelDuals(Result, ExpressionsBasedModel, Sense)
+         */
+        Result withModelDuals(final boolean negate) {
+
+            Supplier<Access1D<?>> solverDuals = myDualSolution;
+
+            if (solverDuals != null) {
+
+                ConstraintsMetaData constraintsMap = myConstraintsMap;
+
+                if (constraintsMap != null) {
+                    myDualSolution = () -> ArrayR064.wrap(constraintsMap.toModelDuals(solverDuals.get(), negate));
+                    myConstraintsMap = constraintsMap.withoutSignedRows();
+                } else {
+                    myDualSolution = () -> {
+                        Access1D<?> multipliers = solverDuals.get();
+                        double[] duals = new double[multipliers.size()];
+                        for (int i = 0; i < duals.length; i++) {
+                            duals[i] = negate ? multipliers.doubleValue(i) : -multipliers.doubleValue(i);
+                        }
+                        return ArrayR064.wrap(duals);
+                    };
+                }
+
+                myDualValues = null;
+            }
+
             return this;
         }
 

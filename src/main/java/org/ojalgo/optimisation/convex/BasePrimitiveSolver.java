@@ -93,14 +93,20 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
             return !model.isAnyVariableInteger() && model.isAnyObjectiveQuadratic() && !model.isAnyConstraintQuadratic();
         }
 
+        /**
+         * No infeasibility certificate: an INFEASIBLE result has neither dual values nor a reduced gradient.
+         */
         @Override
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
 
+            Result modelDuals = solverState.getState() == State.INFEASIBLE ? new Result(State.INFEASIBLE, solverState)
+                    : ExpressionsBasedModel.Integration.toModelDuals(solverState, model, this.getSolverSense());
+
             if (model.options.convex().isExtendedPrecision()) {
-                return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR256.FACTORY, solverState.getReducedGradient(),
+                return ExpressionsBasedModel.Integration.expandFreeToFull(modelDuals, model, ArrayR256.FACTORY, modelDuals.getReducedGradient(),
                         this.getSolverSense());
             } else {
-                return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR064.FACTORY, solverState.getReducedGradient(),
+                return ExpressionsBasedModel.Integration.expandFreeToFull(modelDuals, model, ArrayR064.FACTORY, modelDuals.getReducedGradient(),
                         this.getSolverSense());
             }
         }
@@ -401,14 +407,22 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
         }
     }
 
+    /**
+     * The reduced gradient only if the state has dual values, see
+     * {@link ConvexSolver#isDualMeaningful(Optimisation.State)}.
+     */
     protected Optimisation.Result buildResult() {
 
         Access1D<?> solution = this.extractSolution();
         double value = this.evaluateFunction(solution) / myMatrices.getObjectiveAdjustmentFactor();
 
-        Supplier<Access1D<?>> reducedGradient = () -> ArrayR064.wrap(this.extractReducedGradient());
+        Optimisation.Result result = new Optimisation.Result(state, value, solution);
 
-        return new Optimisation.Result(state, value, solution).withReducedGradient(reducedGradient);
+        if (ConvexSolver.isDualMeaningful(state)) {
+            result = result.withReducedGradient(() -> ArrayR064.wrap(this.extractReducedGradient()));
+        }
+
+        return result;
     }
 
     protected boolean computeGeneral(final Collectable<Double, ? super TransformableRegion<Double>> matrix) {

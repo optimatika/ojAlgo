@@ -49,10 +49,18 @@ abstract class ConstrainedSolver extends BasePrimitiveSolver {
         return mySolutionL.doubleValue(index);
     }
 
+    /**
+     * The dual values only if the state has them, see
+     * {@link ConvexSolver#isDualMeaningful(Optimisation.State)}.
+     */
     @Override
     protected Result buildResult() {
 
         Result result = super.buildResult();
+
+        if (!ConvexSolver.isDualMeaningful(result.getState())) {
+            return result;
+        }
 
         if (this.getEntityMap().isPresent()) {
             return result.withDualValues(this.getConstraintsMetaData(), () -> mySolutionL);

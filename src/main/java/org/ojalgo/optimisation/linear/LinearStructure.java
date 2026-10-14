@@ -36,6 +36,11 @@ import org.ojalgo.type.keyvalue.EntryPair;
  */
 final class LinearStructure implements ExpressionsBasedModel.EntityMap {
 
+    /**
+     * For a problem from {@link LinearSolver.Builder}: the row of each of its constraints, the inequalities
+     * first and then the equalities, each in the order they were added. Null otherwise.
+     */
+    int[] builderRows = null;
     final ConstraintsMetaData constraints;
     /**
      * The number of artificial variables

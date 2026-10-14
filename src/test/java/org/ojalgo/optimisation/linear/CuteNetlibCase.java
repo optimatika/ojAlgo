@@ -412,8 +412,8 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     /**
      * E226 — 224 rows × 282 columns, 2767 non-zeros.
      * <ul>
-     * <li>Optimal value: -1.1638929066E+01, including the objective constant +7.113 (an RHS entry of -7.113 on
-     * the objective row). The README's main table gives the optimum without it, -1.8751929066E+01.
+     * <li>Optimal value: -1.1638929066E+01, including the objective constant +7.113 (an RHS entry of -7.113
+     * on the objective row). The README's main table gives the optimum without it, -1.8751929066E+01.
      * </ul>
      */
     @Test

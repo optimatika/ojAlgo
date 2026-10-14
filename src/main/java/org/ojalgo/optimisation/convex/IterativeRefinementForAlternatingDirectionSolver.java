@@ -203,9 +203,13 @@ final class IterativeRefinementForAlternatingDirectionSolver extends ConvexSolve
         MatrixStore<Quadruple> probPx = probP.multiply(retX);
         double retValue = (retX.dot(probPx) / 2.0 + retX.dot(probQ)) / objectiveScale;
 
-        Optimisation.Result retVal = new Optimisation.Result(state, retValue, retX).withDualSolution(() -> retY);
+        Optimisation.Result retVal = new Optimisation.Result(state, retValue, retX);
 
-        if (state.isFeasible()) {
+        if (ConvexSolver.isDualMeaningful(state)) {
+            retVal = retVal.withDualSolution(() -> retY);
+        }
+
+        if (state.isFeasible() && state.isSuccess()) {
 
             boolean[] boundRows = new boolean[m];
             for (int j = 0; j < n; j++) {

@@ -347,17 +347,21 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
 
         /**
          * An approximate solution - not converged, but the relaxed tolerances are met - is accepted as
-         * optimal if it validates against the model.
+         * optimal if it validates against the model. No infeasibility certificate: an INFEASIBLE result has
+         * neither dual values nor a reduced gradient.
          */
         @Override
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
 
+            Result modelDuals = solverState.getState() == State.INFEASIBLE ? new Result(State.INFEASIBLE, solverState)
+                    : ExpressionsBasedModel.Integration.toModelDuals(solverState, model, this.getSolverSense());
+
             Result modelState;
             if (model.options.convex().isExtendedPrecision()) {
-                modelState = ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR256.FACTORY, solverState.getReducedGradient(),
+                modelState = ExpressionsBasedModel.Integration.expandFreeToFull(modelDuals, model, ArrayR256.FACTORY, modelDuals.getReducedGradient(),
                         this.getSolverSense());
             } else {
-                modelState = ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR064.FACTORY, solverState.getReducedGradient(),
+                modelState = ExpressionsBasedModel.Integration.expandFreeToFull(modelDuals, model, ArrayR064.FACTORY, modelDuals.getReducedGradient(),
                         this.getSolverSense());
             }
 
@@ -559,7 +563,7 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
 
             Optimisation.Result result = Optimisation.Result.of(value, state, x);
 
-            if ((state.isFeasible() || approximate) && y != null && y.length > 0) {
+            if ((state.isFeasible() || approximate) && ConvexSolver.isDualMeaningful(state) && y != null && y.length > 0) {
                 result = result.withDualSolution(() -> ArrayR064.wrap(y));
             }
 
@@ -1085,13 +1089,7 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
                 checkTermination = (iter == 1 || (iter % updateInterval == 0));
                 if (checkTermination) {
 
-                    if (this.checkTermination(false)) {
-                        break;
-                    }
-                    if (!this.isIterationAllowed()) {
-                        break;
-                    }
-                    if (!progress.isWorthContinuing(iter, myWork.cachedConvergenceRatio)) {
+                    if (this.checkTermination(false) || !this.isIterationAllowed() || !progress.isWorthContinuing(iter, myWork.cachedConvergenceRatio)) {
                         break;
                     }
 
@@ -1132,9 +1130,11 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
             state = Optimisation.State.FAILED;
         }
 
-        Supplier<Access1D<?>> reducedGradient = () -> ArrayR064.wrap(this.computeReducedGradient());
+        Optimisation.Result retVal = mySolution.compose(value, state, approximate);
 
-        Optimisation.Result retVal = mySolution.compose(value, state, approximate).withReducedGradient(reducedGradient);
+        if (ConvexSolver.isDualMeaningful(state)) {
+            retVal = retVal.withReducedGradient(() -> ArrayR064.wrap(this.computeReducedGradient()));
+        }
 
         if (myStructure.isEntityMap() && retVal.getDualSolution().isPresent()) {
             retVal = retVal.withDualValues(myStructure.getConstraintsMetaData(), retVal.getDualSolution().get());

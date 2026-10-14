@@ -24,11 +24,13 @@ package org.ojalgo.optimisation.linear;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -211,6 +213,44 @@ public class UpdatableSolverTest extends OptimisationLinearTests {
                     TestUtils.assertEquals(tag + " dual" + i + " (slack)", 0.0, yi, ACCURACY);
                 }
             }
+        }
+    }
+
+    /**
+     * An inequality with a negative right-hand side, added before one with a positive right-hand side. The
+     * tableau solver keeps those in separate blocks of rows, and the dual multipliers must still be in the
+     * order the constraints were added.
+     *
+     * <pre>{@code
+     * min    x1 + 2*x2
+     * s.t.  -x1 -   x2 <= -2    (constraint 0)
+     *        x1         <= 1.5  (constraint 1)
+     *        x1, x2 >= 0
+     * }</pre>
+     *
+     * The optimum is x1 = 1.5 and x2 = 0.5, with dual multipliers 2 and 1.
+     */
+    @Test
+    public void testMixedSignInequalities() {
+
+        LinearSolver.Builder builder = LinearSolver.newBuilder(1.0, 2.0);
+        builder.inequality(-2.0, -1.0, -1.0);
+        builder.inequality(1.5, 1.0, 0.0);
+
+        for (NamedSolver ns : UpdatableSolverTest.buildAllSolvers(builder)) {
+            String tag = ns.name;
+            Result result = ns.solver.solve();
+            TestUtils.assertStateNotLessThanOptimal(result);
+
+            TestUtils.assertEquals(tag + " x1", 1.5, result.doubleValue(0), ACCURACY);
+            TestUtils.assertEquals(tag + " x2", 0.5, result.doubleValue(1), ACCURACY);
+
+            TestUtils.assertEquals(tag + " dual0", 2.0, ns.solver.getDualMultiplier(0), ACCURACY);
+            TestUtils.assertEquals(tag + " dual1", 1.0, ns.solver.getDualMultiplier(1), ACCURACY);
+
+            Access1D<?> duals = result.getDualSolution().map(Supplier::get).get();
+            TestUtils.assertEquals(tag + " result dual0", 2.0, duals.doubleValue(0), ACCURACY);
+            TestUtils.assertEquals(tag + " result dual1", 1.0, duals.doubleValue(1), ACCURACY);
         }
     }
 

@@ -188,7 +188,7 @@ public class SingularHessianTest extends OptimisationConvexTests {
             Optimisation.Result result = model.minimise(integration);
             TestUtils.assertStateNotLessThanOptimal(result);
             TestUtils.assertEquals(0.0, result.doubleValue(0), 1E-7);
-            TestUtils.assertEquals(1.0, result.getDualSolution().map(Supplier::get).get().doubleValue(0), accuracy);
+            TestUtils.assertEquals(-1.0, result.getDualSolution().map(Supplier::get).get().doubleValue(0), accuracy);
 
             // All variables have quadratic terms, but [Q] is singular: min 1/2 (x0 + x1)^2 + 1/2 x2^2 - 0.1 x0 s.t. x0 + x2 <= 1E6
             model = new ExpressionsBasedModel();
@@ -200,7 +200,7 @@ public class SingularHessianTest extends OptimisationConvexTests {
             result = model.minimise(integration);
             TestUtils.assertStateNotLessThanOptimal(result);
             TestUtils.assertEquals(-0.1, result.doubleValue(2), accuracy);
-            TestUtils.assertEquals(0.1, result.getDualSolution().map(Supplier::get).get().doubleValue(0), accuracy);
+            TestUtils.assertEquals(-0.1, result.getDualSolution().map(Supplier::get).get().doubleValue(0), accuracy);
 
             // The bound multiplier (reduced gradient) of x1: min 1/2 x0^2 - x0 - x1 with x1 <= 1E6
             model = new ExpressionsBasedModel();

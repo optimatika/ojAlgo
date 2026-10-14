@@ -23,7 +23,9 @@ package org.ojalgo.optimisation.convex;
 
 import static org.ojalgo.matrix.store.R064Store.FACTORY;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
@@ -41,6 +43,8 @@ import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver.Builder;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
+import org.ojalgo.type.keyvalue.KeyValue;
 
 public class LagrangeTest extends OptimisationConvexTests {
 
@@ -56,7 +60,7 @@ public class LagrangeTest extends OptimisationConvexTests {
         TestUtils.assertEquals(x, result.doubleValue(0), accuracy);
         TestUtils.assertEquals(y, result.doubleValue(1), accuracy);
 
-        double actualDual = result.getDualValues().stream().filter(kp -> kp.getKey().left() == constraint).mapToDouble(kp -> kp.doubleValue()).findFirst()
+        double actualDual = result.getDualValues().stream().filter(kp -> kp.getKey().left() == constraint).mapToDouble(KeyedPrimitive::doubleValue).findFirst()
                 .orElseThrow();
         TestUtils.assertEquals(dual, actualDual, accuracy);
 
@@ -65,7 +69,7 @@ public class LagrangeTest extends OptimisationConvexTests {
 
     private static double getDualValue(final Result result, final String name, final Optimisation.ConstraintType type) {
         return result.getDualValues().stream().filter(kp -> name.equals(kp.getKey().left().getName()) && kp.getKey().right() == type)
-                .mapToDouble(kp -> kp.doubleValue()).findFirst().orElseThrow();
+                .mapToDouble(KeyedPrimitive::doubleValue).findFirst().orElseThrow();
     }
 
     /**
@@ -87,9 +91,9 @@ public class LagrangeTest extends OptimisationConvexTests {
 
     /**
      * Optimise (x^2 + z^2) / 2 - 2 * bound * x (negated when maximising) subject to x <= bound and z >=
-     * bound. The solution is x = z = bound, and the multipliers of both bounds are bound. The variables v and
-     * w, and the equality constraint between them, don't change that but make it possible to use the
-     * null-space projection solver.
+     * bound. The solution is x = z = bound, and the dual values of the bounds are -bound and bound when
+     * minimising (the reverse when maximising). The variables v and w, and the equality constraint between
+     * them, don't change that but make it possible to use the null-space projection solver.
      */
     private static Result solveScaledBounds(final double bound, final Boolean projection, final Optimisation.Sense sense) {
 
@@ -110,7 +114,8 @@ public class LagrangeTest extends OptimisationConvexTests {
 
     /**
      * Optimise scale * (x^2 + y^2) / 2 (negated when maximising) subject to x + y >= 2 and x - y = 0. The
-     * solution is x = y = 1, and the multiplier of the "sum" constraint is scale.
+     * solution is x = y = 1, and the dual value of the "sum" constraint is scale when minimising (-scale when
+     * maximising).
      */
     private static Result solveScaledObjective(final double scale, final Boolean projection, final Optimisation.Sense sense) {
 
@@ -125,18 +130,18 @@ public class LagrangeTest extends OptimisationConvexTests {
     /**
      * A fixed variable, z = 0.5, is removed from the constraints before they reach the solver. The dual value
      * must still be reported with the model's own constraint instance, and the reduced gradient of the fixed
-     * variable is reconstructed from it (see {@link Result#getDualValues()} for the sign convention). With
+     * variable is reconstructed from it (see {@link Result#getDualSolution()} for the sign convention). With
      * quadratic terms in z the objective's gradient with respect to z, at the solution, takes the place of
      * its linear coefficient.
      *
      * <pre>{@code
-     * min  (x^2 + y^2) / 2 + 3z             s.t. x + y + z >= 2.5    x=y=1, lambda=1, rc_z = 3 - lambda = 2
-     * min  (x^2 + y^2) / 2 - 3x - 3y + 3z   s.t. x + y + z <= 2.5    x=y=1, lambda=2, rc_z = 3 + lambda = 5
-     * max  -(x^2 + y^2) / 2 + 3z            s.t. x + y + z = 2.5     x=y=1, lambda=-1, rc_z = -(-3 + lambda) = 4
+     * min  (x^2 + y^2) / 2 + 3z             s.t. x + y + z >= 2.5    x=y=1, dual=1, rc_z = 3 - dual = 2
+     * min  (x^2 + y^2) / 2 - 3x - 3y + 3z   s.t. x + y + z <= 2.5    x=y=1, dual=-2, rc_z = 3 - dual = 5
+     * max  -(x^2 + y^2) / 2 + 3z            s.t. x + y + z = 2.5     x=y=1, dual=-1, rc_z = 3 - dual = 4
      * min  f = (x^2 + y^2 + z^2) / 2 + xz + 3z                     s.t. x + y + z >= 2.5
-     *      x=0.75, y=1.25, lambda=1.25, rc_z = (z + x + 3) - lambda = 3
+     *      x=0.75, y=1.25, dual=1.25, rc_z = (z + x + 3) - dual = 3
      * max  -(f - 3x - 3y)                                           s.t. x + y + z <= 2.5
-     *      x=0.75, y=1.25, lambda=1.75, rc_z = -((z + x + 3) + lambda) = -6
+     *      x=0.75, y=1.25, dual=1.75, rc_z = -(z + x + 3) - dual = -6
      * }</pre>
      */
     @Test
@@ -158,7 +163,7 @@ public class LagrangeTest extends OptimisationConvexTests {
         upperModel.addExpression("objective").weight(1).set(upperX, upperX, 0.5).set(upperX, -3).set(upperY, upperY, 0.5).set(upperY, -3).set(upperZ, 3);
         Expression upper = upperModel.addExpression("constraint").set(upperX, 1).set(upperY, 1).set(upperZ, 1).upper(2.5);
 
-        LagrangeTest.assertFixedInConstraint(upperModel.minimise(), upper, 1.0, 1.0, 2.0, 5.0);
+        LagrangeTest.assertFixedInConstraint(upperModel.minimise(), upper, 1.0, 1.0, -2.0, 5.0);
 
         ExpressionsBasedModel equalityModel = new ExpressionsBasedModel();
         Variable equalityX = equalityModel.addVariable("x").lower(-10).upper(10);
@@ -218,7 +223,7 @@ public class LagrangeTest extends OptimisationConvexTests {
         R064Store equalityL = FACTORY.column(3.55, -0.56);
 
         Result equalitySolution = equalityConstrainedSolver.solve();
-        Access1D<?> equalityMultipliers = equalitySolution.getMultipliers().get();
+        Access1D<?> equalityMultipliers = equalitySolution.getDualSolution().map(Supplier::get).get();
 
         TestUtils.assertEquals(equalityX, equalitySolution, accuracy);
         TestUtils.assertEquals(equalityL, equalityMultipliers, accuracy);
@@ -234,7 +239,7 @@ public class LagrangeTest extends OptimisationConvexTests {
         }
 
         Result inequalitySolution = inequalityConstrainedSolver.solve();
-        Access1D<?> inequalityMultipliers = inequalitySolution.getMultipliers().get();
+        Access1D<?> inequalityMultipliers = inequalitySolution.getDualSolution().map(Supplier::get).get();
 
         TestUtils.assertEquals(inequalityX, inequalitySolution, accuracy);
         TestUtils.assertEquals(inequalityL, inequalityMultipliers, accuracy);
@@ -247,7 +252,7 @@ public class LagrangeTest extends OptimisationConvexTests {
                 .inequalities(mtrxAI.row(1), mtrxBI.row(1)).build();
 
         Result mixSolution = mixConstrainedSolver.solve();
-        Access1D<?> mixMultipliers = mixSolution.getMultipliers().get();
+        Access1D<?> mixMultipliers = mixSolution.getDualSolution().map(Supplier::get).get();
 
         TestUtils.assertEquals(inequalityX, mixSolution, accuracy);
         TestUtils.assertEquals(inequalityL, mixMultipliers, accuracy);
@@ -268,6 +273,44 @@ public class LagrangeTest extends OptimisationConvexTests {
      *
      * @throws RecoverableCondition
      */
+    /**
+     * Without an infeasibility certificate an INFEASIBLE result has neither dual values nor a reduced
+     * gradient, whichever solver the builder creates: minimise (x² + y²) / 2 subject to x + y <= 1 and x + y
+     * >= 3. A solver that stops with an approximate solution instead is not checked.
+     */
+    @Test
+    public void testInfeasibleHasNoMultipliers() {
+
+        Optimisation.Options dense = new Optimisation.Options();
+        dense.sparse = Boolean.FALSE;
+        Optimisation.Options sparse = new Optimisation.Options();
+        sparse.sparse = Boolean.TRUE;
+        Optimisation.Options admm = new Optimisation.Options();
+        admm.experimental = true;
+        Optimisation.Options extended = new Optimisation.Options();
+        extended.convex().extendedPrecision(true);
+
+        List<KeyValue<String, Optimisation.Options>> configurations = List.of(KeyValue.of("dense", dense), KeyValue.of("sparse", sparse),
+                KeyValue.of("ADMM", admm), KeyValue.of("extended", extended));
+
+        for (KeyValue<String, Optimisation.Options> configuration : configurations) {
+
+            ConvexSolver solver = ConvexSolver.newBuilder(RawStore.wrap(new double[][] { { 1, 0 }, { 0, 1 } })).linear(0, 0).inequality(1, 1, 1)
+                    .inequality(-3, -1, -1).build(configuration.getValue());
+
+            Result result = solver.solve();
+
+            String id = configuration.getKey() + " " + result.getState();
+
+            TestUtils.assertFalse(id, result.getState().isFeasible());
+
+            if (!result.getState().isApproximate()) {
+                TestUtils.assertFalse(id + " dual solution", result.getDualSolution().isPresent());
+                TestUtils.assertFalse(id + " reduced gradient", result.getReducedGradient().isPresent());
+            }
+        }
+    }
+
     @Test
     public void testNocedalAndWrightExample() throws RecoverableCondition {
 
@@ -306,7 +349,7 @@ public class LagrangeTest extends OptimisationConvexTests {
         MatrixStore<Double> computedC = mtrxQ.multiply(expectedX).add(mtrxAE.transpose().multiply(expectedDual));
         TestUtils.assertEquals(mtrxC, computedC, accuracy);
 
-        Optional<Access1D<?>> multipliers = result.getMultipliers();
+        Optional<Access1D<?>> multipliers = result.getDualSolution().map(Supplier::get);
         TestUtils.assertTrue("No multipliers present", multipliers.isPresent());
         TestUtils.assertEquals("Lagrangian Multipliers differ", expectedDual, multipliers.get(), accuracy);
 
@@ -322,7 +365,7 @@ public class LagrangeTest extends OptimisationConvexTests {
         Result altResult = altBuilder.build(options).solve();
         TestUtils.assertEquals(expectedX, result, accuracy);
 
-        Optional<Access1D<?>> altMultipliers = altResult.getMultipliers();
+        Optional<Access1D<?>> altMultipliers = altResult.getDualSolution().map(Supplier::get);
         TestUtils.assertTrue("No multipliers present", altMultipliers.isPresent());
 
         R064Store expectedInequalityDual = FACTORY.column(0, 2, 3, 0);
@@ -351,8 +394,9 @@ public class LagrangeTest extends OptimisationConvexTests {
                     TestUtils.assertEquals(bound, result.doubleValue(0), accuracy);
                     TestUtils.assertEquals(bound, result.doubleValue(1), accuracy);
 
-                    TestUtils.assertEquals(bound, LagrangeTest.getDualValue(result, "x", Optimisation.ConstraintType.UPPER), accuracy);
-                    TestUtils.assertEquals(bound, LagrangeTest.getDualValue(result, "z", Optimisation.ConstraintType.LOWER), accuracy);
+                    double sign = sense == Optimisation.Sense.MAX ? -1.0 : 1.0;
+                    TestUtils.assertEquals(-sign * bound, LagrangeTest.getDualValue(result, "x", Optimisation.ConstraintType.UPPER), accuracy);
+                    TestUtils.assertEquals(sign * bound, LagrangeTest.getDualValue(result, "z", Optimisation.ConstraintType.LOWER), accuracy);
                 }
             }
         }
@@ -381,7 +425,8 @@ public class LagrangeTest extends OptimisationConvexTests {
                     TestUtils.assertEquals(1.0, result.doubleValue(0), accuracy);
                     TestUtils.assertEquals(1.0, result.doubleValue(1), accuracy);
 
-                    TestUtils.assertEquals(scale, LagrangeTest.getDualValue(result, "sum", Optimisation.ConstraintType.LOWER), accuracy);
+                    double sign = sense == Optimisation.Sense.MAX ? -1.0 : 1.0;
+                    TestUtils.assertEquals(sign * scale, LagrangeTest.getDualValue(result, "sum", Optimisation.ConstraintType.LOWER), accuracy);
 
                     if (reference.getReducedGradient().isPresent()) {
                         Access1D<?> expected = reference.getReducedGradient().get().get();

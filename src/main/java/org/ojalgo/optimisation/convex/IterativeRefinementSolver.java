@@ -47,7 +47,9 @@ final class IterativeRefinementSolver extends ConvexSolver {
             final MatrixStore<Quadruple> y, final State state) {
         Quadruple objectiveValue = Q.multiplyBoth(x).divide(2).subtract(x.transpose().multiply(C).get(0));
         Result result = new Result(state, objectiveValue.doubleValue(), x);
-        result.withDualSolution(() -> y);
+        if (ConvexSolver.isDualMeaningful(state)) {
+            result = result.withDualSolution(() -> y);
+        }
         return result;
     }
 
@@ -327,7 +329,7 @@ final class IterativeRefinementSolver extends ConvexSolver {
         Result retVal = result.withValue(result.getValue() / objectiveScale);
 
         Optional<Supplier<Access1D<?>>> dualSolution = result.getDualSolution();
-        if (result.getState().isFeasible() && dualSolution.isPresent()) {
+        if (result.getState().isFeasible() && result.getState().isSuccess() && dualSolution.isPresent()) {
 
             Access1D<?> multipliers = dualSolution.get().get();
 

@@ -39,7 +39,6 @@ import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.LongToNumberMap;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.equation.Equation;
-import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
@@ -117,6 +116,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
     }
 
+    private static final NumberContext ACC = NumberContext.of(12, 14).withMode(RoundingMode.HALF_DOWN);
     /**
      * Should variable lower/upper bounds be read in their numerically-adjusted form? Variable bounds are
      * encoded as constraint rows in the tableau (no separate "column bounds" exist), with a single
@@ -129,6 +129,7 @@ final class SimplexTableauSolver extends LinearSolver {
      * scaling improves the conditioning of the constraint matrix.
      */
     private static final boolean ADJUSTED_CONSTRAINTS = true;
+
     /**
      * Should the objective's linear coefficients be read in their numerically-adjusted form? Scaling the cost
      * row keeps reduced-cost magnitudes within the simplex's absolute tolerances. The reported value and
@@ -136,8 +137,6 @@ final class SimplexTableauSolver extends LinearSolver {
      * {@code LinearStructure.getObjectiveAdjustmentFactor()}.
      */
     private static final boolean ADJUSTED_OBJECTIVE = true;
-
-    private static final NumberContext ACC = NumberContext.of(12, 14).withMode(RoundingMode.HALF_DOWN);
     private static final NumberContext DEGENERATE = NumberContext.of(12, 8).withMode(RoundingMode.HALF_DOWN);
     private static final NumberContext PHASE1 = NumberContext.of(12, 8).withMode(RoundingMode.HALF_DOWN);
     private static final NumberContext PIVOT = NumberContext.of(12, 8).withMode(RoundingMode.HALF_DOWN);
@@ -655,6 +654,11 @@ final class SimplexTableauSolver extends LinearSolver {
         return myTableau.count() <= 512L;
     }
 
+    private void logDebugTableau(final String message) {
+        this.log(message + "; Basics: " + Arrays.toString(myTableau.included), myTableau);
+        // this.debug("New/alt " + message + "; Basics: " + Arrays.toString(myBasis), myTableau);
+    }
+
     /**
      * The tableau has the variable bounds as constraint rows, so its reduced costs include the bound
      * multipliers (and are 0 at an active bound). This moves them back out, giving the bounded-variable
@@ -707,11 +711,6 @@ final class SimplexTableauSolver extends LinearSolver {
         }
     }
 
-    private void logDebugTableau(final String message) {
-        this.log(message + "; Basics: " + Arrays.toString(myTableau.included), myTableau);
-        // this.debug("New/alt " + message + "; Basics: " + Arrays.toString(myBasis), myTableau);
-    }
-
     private int phase() {
         return myPoint.isPhase2() ? 2 : 1;
     }
@@ -720,6 +719,10 @@ final class SimplexTableauSolver extends LinearSolver {
         return -myTableau.value(false);
     }
 
+    /**
+     * With state INFEASIBLE there are no dual multipliers and no reduced gradient: this solver provides no
+     * infeasibility certificate.
+     */
     protected Result buildResult() {
 
         Access1D<?> solution = this.extractSolution();
@@ -728,9 +731,15 @@ final class SimplexTableauSolver extends LinearSolver {
         // reduced costs and dual multipliers).
         double value = this.evaluateFunction(solution) / myTableau.structure.getObjectiveAdjustmentFactor();
 
+        Result result = new Optimisation.Result(state, value, solution);
+
+        if (state == State.INFEASIBLE) {
+            return result;
+        }
+
         Supplier<Access1D<?>> reducedGradient = () -> ArrayR064.wrap(this.extractReducedGradients());
 
-        Result result = new Optimisation.Result(state, value, solution).withReducedGradient(reducedGradient);
+        result = result.withReducedGradient(reducedGradient);
 
         if (myTableau.structure.isEntityMap()) {
             return result.withDualValues(myTableau.structure.constraints, this::extractMultipliers);
@@ -882,21 +891,44 @@ final class SimplexTableauSolver extends LinearSolver {
         return retVal;
     }
 
+    /**
+     * All NaN if the state is INFEASIBLE: this solver provides no infeasibility certificate. For a problem
+     * from {@link LinearSolver.Builder} they are in the order of its constraints, see
+     * {@link LinearStructure#builderRows}.
+     */
     @Override
     double[] extractDualMultipliers() {
         double[] duals = new double[myTableau.m];
+        if (state == State.INFEASIBLE) {
+            Arrays.fill(duals, NaN);
+            return duals;
+        }
         myTableau.extractDualValues(duals);
         for (int i = 0; i < duals.length; i++) {
             if (myTableau.structure.isConstraintNegated(i)) {
                 duals[i] = -duals[i];
             }
         }
-        return duals;
+        if (myTableau.structure.builderRows == null) {
+            return duals;
+        }
+        double[] retVal = new double[duals.length];
+        for (int i = 0; i < retVal.length; i++) {
+            retVal[i] = duals[myTableau.structure.builderRows[i]];
+        }
+        return retVal;
     }
 
+    /**
+     * All NaN if the state is INFEASIBLE: this solver provides no infeasibility certificate.
+     */
     @Override
     double[] extractReducedGradients() {
         double[] gradients = new double[myTableau.n];
+        if (state == State.INFEASIBLE) {
+            Arrays.fill(gradients, NaN);
+            return gradients;
+        }
         myTableau.extractReducedCosts(gradients);
         myTableau.unscaleReducedCosts(gradients);
         // Map reduced costs back to model space: the objective was scaled by the adjustment factor when the

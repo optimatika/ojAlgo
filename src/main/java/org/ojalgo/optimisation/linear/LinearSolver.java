@@ -410,6 +410,8 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             Primitive1D constraintsRHS = tableau.constraintsRHS();
             Primitive1D objective = tableau.objective();
 
+            structure.builderRows = new int[nbInes + nbEqus];
+
             if (nbInes > 0) {
 
                 int insIdSlack = 0;
@@ -423,6 +425,8 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
                     int row = positive ? insIdSlack : nbIdentSlackVars + insGnSlack;
                     int col = positive ? nbVars + nbOtherSlackVars + insIdSlack++ : nbVars + insGnSlack++;
+
+                    structure.builderRows[i] = row;
 
                     for (NonzeroView<Double> nz : body.nonzeros()) {
                         constraintsBody.set(row, nz.index(), positive ? nz.doubleValue() : -nz.doubleValue());
@@ -447,6 +451,8 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
                     boolean positive = valRHS >= ZERO;
 
                     int row = nbInes + i;
+
+                    structure.builderRows[row] = row;
 
                     for (int j = 0; j < nbVars; j++) {
                         double value = mtrxAE.doubleValue(i, j);
@@ -627,7 +633,8 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
         @Override
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
-            return ExpressionsBasedModel.Integration.expandFreeToFull(solverState, model, ArrayR064.FACTORY, solverState.getReducedGradient(),
+            Result modelDuals = ExpressionsBasedModel.Integration.toModelDuals(solverState, model, this.getSolverSense());
+            return ExpressionsBasedModel.Integration.expandFreeToFull(modelDuals, model, ArrayR064.FACTORY, modelDuals.getReducedGradient(),
                     this.getSolverSense());
         }
 
@@ -655,13 +662,13 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
          * | slacks/artificials]) back to a model-indexed reduced gradient. For variables present in both
          * positives and negatives (x = x+ - x-) the two parts' reduced costs are each other's negation, and
          * the model rc is the positive part's; a variable with only a negative part (x = -x-) gets the
-         * negation of that part's. Variables eliminated by presolve aren't present in the solver layout;
-         * their rc is reconstructed from the model's objective (at {@code modelSolution}) and the solver's
-         * constraint multipliers. If {@code negate} is true (MAX model — the solver minimises a negated
-         * objective), the result is negated so callers see rc in the model's optimisation sense.
+         * negation of that part's. If {@code negate} is true (MAX model — the solver minimises a negated
+         * objective), these are negated so callers see rc in the model's optimisation sense. Variables
+         * eliminated by presolve aren't present in the solver layout; their rc is reconstructed from the
+         * model's objective (at {@code modelSolution}) and the model's dual values on {@code modelState}.
          */
         private static double[] toModelReducedGradient(final Access1D<?> solverRg, final ExpressionsBasedModel model, final boolean negate,
-                final Result solverState, final Access1D<?> modelSolution) {
+                final Result modelState, final Access1D<?> modelSolution) {
 
             double[] modelRg = new double[model.countVariables()];
 
@@ -680,14 +687,14 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
                 }
             }
 
-            for (IntIndex fixed : model.getFixedVariables()) {
-                modelRg[fixed.index] = ExpressionsBasedModel.Integration.computeReducedCostFromMultipliers(model, fixed.index, solverState, modelSolution);
-            }
-
             if (negate) {
                 for (int i = 0; i < modelRg.length; i++) {
                     modelRg[i] = -modelRg[i];
                 }
+            }
+
+            for (IntIndex fixed : model.getFixedVariables()) {
+                modelRg[fixed.index] = ExpressionsBasedModel.Integration.computeReducedCostFromMultipliers(model, fixed.index, modelState, modelSolution);
             }
 
             return modelRg;
@@ -753,7 +760,9 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             Optimisation.Sense modelSense = model.getOptimisationSense();
             boolean negate = solverSense != null && modelSense != null && solverSense != modelSense;
 
-            Result retVal = solverState.withSolution(modelSolution);
+            Result modelDuals = ExpressionsBasedModel.Integration.toModelDuals(solverState, model, solverSense);
+
+            Result retVal = modelDuals.withSolution(modelSolution);
 
             if (negate) {
                 retVal = retVal.withNegatedValue();
@@ -767,7 +776,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             if (solverRg.isPresent()) {
 
                 Supplier<Access1D<?>> mapped = () -> ArrayR064
-                        .wrap(OldIntegration.toModelReducedGradient(solverRg.get().get(), model, negate, solverState, modelSolution));
+                        .wrap(OldIntegration.toModelReducedGradient(solverRg.get().get(), model, negate, modelDuals, modelSolution));
 
                 retVal = retVal.withReducedGradient(mapped);
             }
@@ -925,6 +934,12 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         super(solverOptions);
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * If the state is {@link Optimisation.State#INFEASIBLE} this is instead a multiplier of an infeasibility
+     * certificate, or NaN if there is none, see {@link #getReducedGradient(int)}.
+     */
     @Override
     public final double getDualMultiplier(final int index) {
         if (myCachedDualMultiplier == null) {
@@ -933,6 +948,28 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         return myCachedDualMultiplier[index];
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * If the state is {@link Optimisation.State#INFEASIBLE}, and the (dual) simplex solver found an
+     * infeasibility certificate (a Farkas dual ray), the dual multipliers {@code y} (see
+     * {@link #getDualMultiplier(int)}) and the reduced gradient {@code g} (this method) are that certificate
+     * instead. It is the direction in which the dual solution can move without bound, and the objective plays
+     * no part in it. With a problem built by {@link Builder}, and {@code y} ordered as the constraints in the
+     * solver (the inequalities, then the equalities):
+     * <ul>
+     * <li>{@code g = [AI]'yI + [AE]'yE}: it combines the constraints, and {@code yI >= 0}, so any solution
+     * would have {@code g'x <= [BI]'yI + [BE]'yE}.
+     * <li>The minimum of {@code g'x} within the variable bounds is greater than that, so there is no
+     * solution.
+     * <li>If {@code g}<sub>j</sub> is 0 the bounds of variable j play no part. If it is positive the lower
+     * bound does, if it is negative the upper bound – as with the reduced gradient at an optimum.
+     * </ul>
+     * The scale is arbitrary, and the certificate is only as exact as the solver's tolerances. If there is no
+     * certificate, for instance because the bounds of a variable cross, this method and
+     * {@link #getDualMultiplier(int)} return NaN, and the {@link Optimisation.Result} has neither dual values
+     * nor a reduced gradient.
+     */
     @Override
     public final double getReducedGradient(final int index) {
         if (myCachedReducedGradient == null) {

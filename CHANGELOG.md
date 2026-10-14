@@ -11,6 +11,24 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.optimisation
+
+- An `INFEASIBLE` result from `ExpressionsBasedModel` may have an infeasibility certificate (a Farkas ray) as its dual values, together with that certificate's reduced gradient. This works with `LinearSolver`, and with the 3rd party solver integrations that provide one. The dual values are non-negative where a constraint's lower limit is used and non-positive where its upper limit is, whether the model was minimised or maximised. See `Optimisation.Result.getDualSolution()`. Without a certificate there are neither dual values nor a reduced gradient. (Discussion [#702](https://github.com/optimatika/ojAlgo/discussions/702))
+- For solver integrations: `ExpressionsBasedModel.Integration.toModelDuals(...)` converts the multipliers of ojAlgo's own solvers to the model's dual values, and `toInfeasibilityCertificate(...)` verifies a certificate and adds its reduced gradient.
+
+#### org.ojalgo.optimisation.linear
+
+- When the dual simplex concludes `INFEASIBLE`, `getDualMultiplier(int)` and `getReducedGradient(int)` – and the result's `getDualSolution()` and `getReducedGradient()` – are an infeasibility certificate, the dual ray. The multipliers `y` are non-negative for the inequalities, and `g = A'y` is such that the minimum of `g'x` within the variable bounds is greater than `b'y`. `g_j` is positive if the proof uses the lower bound of `x_j`, negative if it uses the upper bound, and 0 if it uses neither. Without a certificate (crossing bounds, or the primal tableau solver) they are `NaN`, and the result has neither. Previously they were the values at the basis where the solver stopped. (Discussion [#702](https://github.com/optimatika/ojAlgo/discussions/702))
+
+### Changed
+
+#### org.ojalgo.optimisation
+
+- The dual values of a result from `ExpressionsBasedModel` are shadow prices: the rate of change of the optimal objective function value per unit increase of a constraint's active limit, in the model's optimisation sense. When minimising they are non-negative at a lower limit and non-positive at an upper limit; when maximising, the reverse. With the reduced gradient `d` they satisfy `∇f(x) - Σ y ∇g(x) = d`. Previously they were the non-negative multipliers of the minimisation form of the problem, so constraints at an upper limit, and maximisations, now give the opposite sign. The reduced gradient is unchanged, and so are solvers used directly (built with their builders).
+- `ExpressionsBasedModel.Integration.computeReducedCostFromMultipliers(...)` and `expandFreeToFull(...)` expect the model's dual values, see `toModelDuals(...)`.
+
 ### Fixed
 
 #### org.ojalgo.matrix.decomposition
@@ -22,11 +40,13 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - The active set solvers' initial LP (finding a feasible start) is solved as the primal problem with the revised simplex solver. The dense tableau dual simplex previously used could cycle on degenerate problems and run until the time limit.
 - Active set step length: a constraint is regarded as being at its boundary only if its slack is also negligible compared to the constraint's size. With very long steps, constraints far from their boundary could be added to the active set, and the solver ended up cycling to its iteration limit, returning `FEASIBLE` rather than `OPTIMAL`.
+- An `INFEASIBLE`, `UNBOUNDED` or failed result from the convex solvers had dual values and a reduced gradient – whatever the iterations left. They now come only with a (possibly approximate) solution.
 
 #### org.ojalgo.optimisation.linear
 
 - A warm re-solve, after relaxing variable ranges with `updateRange(..)`, could return `INFEASIBLE` for a feasible problem. The dual simplex ratio test discarded a small pivot element even when it was the only candidate and the variable's range made it significant. (Issue [#699](https://github.com/optimatika/ojAlgo/issues/699))
 - A warm re-solve, after fixing or tightening variable ranges with `updateRange(..)`, could run until the time or iteration limit, or need many times more iterations than solving from scratch. Cold solves of problems with many fixed variables were slow too. The dual simplex ratio test let fixed variables enter the basis. They can not move, so each such pivot was degenerate, and the iterations could cycle. Fixed variables are no longer entering candidates. With all reduced costs but one zero (a single-variable objective), a warm re-solve could still cycle. If the dual iterations stall, of a warm start or in phase 1 of a cold solve, the costs are now perturbed until they are done, and a cost is shifted rather than letting the dual step go backwards. This also affects MIP node solves, where branching fixes variables. (Issue [#700](https://github.com/optimatika/ojAlgo/issues/700))
+- `LinearSolver` built with `newBuilder(...)` without variable bounds (solved by the primal tableau solver): the dual multipliers were in the solver's internal row order, with inequalities that have a negative right-hand side after the others. They are now in the order the constraints were added.
 
 ## [57.4.0] – 2026-10-08
 
