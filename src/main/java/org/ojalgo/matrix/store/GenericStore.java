@@ -34,12 +34,16 @@ import org.ojalgo.array.ScalarArray;
 import org.ojalgo.array.operation.FillMatchingDual;
 import org.ojalgo.array.operation.FillMatchingSingle;
 import org.ojalgo.array.operation.ModifyAll;
+import org.ojalgo.array.operation.OperationBinary;
+import org.ojalgo.array.operation.OperationUnary;
+import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.operation.*;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
@@ -85,7 +89,26 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
             GenericStore<N> retVal = this.make(source.getColDim(), source.getRowDim());
 
-            FillMatchingSingle.conjugate(retVal.data, retVal.getRowDim(), source, this.scalar());
+            int tmpRowDim = retVal.getRowDim();
+            int tmpColDim = retVal.getColDim();
+
+            if (tmpColDim > FillMatchingSingle.THRESHOLD) {
+
+                DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int aFirst, final int aLimit) {
+                        FillMatchingSingle.conjugate(retVal.data, tmpRowDim, aFirst, aLimit, source, Factory.this.scalar());
+                    }
+
+                };
+
+                tmpConquerer.invoke(0, tmpColDim, FillMatchingSingle.THRESHOLD);
+
+            } else {
+
+                FillMatchingSingle.conjugate(retVal.data, tmpRowDim, 0, tmpColDim, source, Factory.this.scalar());
+            }
 
             return retVal;
         }
@@ -98,7 +121,23 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
             final GenericStore<N> retVal = this.make(tmpRowDim, tmpColDim);
 
-            FillMatchingSingle.copy(retVal.data, tmpRowDim, source, this.scalar());
+            if (tmpColDim > FillMatchingSingle.THRESHOLD) {
+
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int aFirst, final int aLimit) {
+                        FillMatchingSingle.copy(retVal.data, tmpRowDim, aFirst, aLimit, source, Factory.this.scalar());
+                    }
+
+                };
+
+                tmpConquerer.invoke(0, tmpColDim, FillMatchingSingle.THRESHOLD);
+
+            } else {
+
+                FillMatchingSingle.copy(retVal.data, tmpRowDim, 0, tmpColDim, source, Factory.this.scalar());
+            }
 
             return retVal;
         }
@@ -146,7 +185,26 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
             GenericStore<N> retVal = this.make(source.getColDim(), source.getRowDim());
 
-            FillMatchingSingle.transpose(retVal.data, retVal.getRowDim(), source, this.scalar());
+            int tmpRowDim = retVal.getRowDim();
+            int tmpColDim = retVal.getColDim();
+
+            if (tmpColDim > FillMatchingSingle.THRESHOLD) {
+
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int aFirst, final int aLimit) {
+                        FillMatchingSingle.transpose(retVal.data, tmpRowDim, aFirst, aLimit, source, Factory.this.scalar());
+                    }
+
+                };
+
+                tmpConquerer.invoke(0, tmpColDim, FillMatchingSingle.THRESHOLD);
+
+            } else {
+
+                FillMatchingSingle.transpose(retVal.data, tmpRowDim, 0, tmpColDim, source, Factory.this.scalar());
+            }
 
             return retVal;
         }
@@ -167,7 +225,9 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
     }
 
     private final MultiplyBoth.Generic<N> multiplyBoth;
+    private final MultiplyLeft.Generic<N> multiplyLeft;
     private final MultiplyNeither.Generic<N> multiplyNeither;
+    private final MultiplyRight.Generic<N> multiplyRight;
     private final int myColDim;
     private final GenericStore.Factory<N> myFactory;
     private final int myRowDim;
@@ -185,6 +245,8 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         myUtility = this.wrapInArray2D(myRowDim);
 
         multiplyBoth = MultiplyBoth.newGeneric(myRowDim, myColDim);
+        multiplyLeft = MultiplyLeft.newGeneric(myRowDim, myColDim);
+        multiplyRight = MultiplyRight.newGeneric(myRowDim, myColDim);
         multiplyNeither = MultiplyNeither.newGeneric(myRowDim, myColDim);
     }
 
@@ -290,16 +352,16 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
             ProgrammingError.throwForMultiplicationNotPossible();
         }
 
-        // Plain arrays: a GenericStore, or the transpose (not the conjugate transpose) of one
-        boolean transpL = !(left instanceof GenericStore);
-        boolean transpR = !(right instanceof GenericStore);
-        GenericStore<N> storeL = transpL ? this.transposed(left) : this.cast(left);
-        GenericStore<N> storeR = transpR ? this.transposed(right) : this.cast(right);
-
         if (complexity == 0) {
             Arrays.fill(data, myFactory.scalar().zero());
-        } else if (storeL != null && storeR != null) {
-            multiplyNeither.invoke(data, storeL.data, transpL, complexity, storeR.data, transpR, myFactory.scalar());
+        } else if (left instanceof GenericStore) {
+            if (right instanceof GenericStore) {
+                multiplyNeither.invoke(data, this.cast(left).data, complexity, this.cast(right).data, myFactory.scalar());
+            } else {
+                multiplyRight.invoke(data, this.cast(left).data, complexity, right, myFactory.scalar());
+            }
+        } else if (right instanceof GenericStore) {
+            multiplyLeft.invoke(data, left, complexity, this.cast(right).data, myFactory.scalar());
         } else {
             multiplyBoth.invoke(this, left, complexity, right);
         }
@@ -336,12 +398,44 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         if (values instanceof ConjugatedStore) {
             final TransjugatedStore<?> conjugated = (ConjugatedStore<?>) values;
 
-            FillMatchingSingle.conjugate(data, myRowDim, conjugated.getOriginal(), myFactory.scalar());
+            if (myColDim > FillMatchingSingle.THRESHOLD) {
+
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int first, final int limit) {
+                        FillMatchingSingle.conjugate(data, myRowDim, first, limit, conjugated.getOriginal(), myFactory.scalar());
+                    }
+
+                };
+
+                tmpConquerer.invoke(0, myColDim, FillMatchingSingle.THRESHOLD);
+
+            } else {
+
+                FillMatchingSingle.conjugate(data, myRowDim, 0, myColDim, conjugated.getOriginal(), myFactory.scalar());
+            }
 
         } else if (values instanceof TransposedStore) {
             final TransjugatedStore<?> transposed = (TransposedStore<?>) values;
 
-            FillMatchingSingle.transpose(data, myRowDim, transposed.getOriginal(), myFactory.scalar());
+            if (myColDim > FillMatchingSingle.THRESHOLD) {
+
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int first, final int limit) {
+                        FillMatchingSingle.transpose(data, myRowDim, first, limit, transposed.getOriginal(), myFactory.scalar());
+                    }
+
+                };
+
+                tmpConquerer.invoke(0, myColDim, FillMatchingSingle.THRESHOLD);
+
+            } else {
+
+                FillMatchingSingle.transpose(data, myRowDim, 0, myColDim, transposed.getOriginal(), myFactory.scalar());
+            }
 
         } else {
 
@@ -351,12 +445,50 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
     @Override
     public void fillMatching(final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
-        FillMatchingDual.fillMatching(data, myRowDim, left, function, right);
+
+        int matchingCount = MissingMath.toMinIntExact(this.count(), left.count(), right.count());
+
+        if (myColDim > FillMatchingDual.THRESHOLD) {
+
+            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                @Override
+                protected void conquer(final int first, final int limit) {
+                    OperationBinary.invoke(data, first, limit, 1, left, function, right);
+                }
+
+            };
+
+            tmpConquerer.invoke(0, matchingCount, FillMatchingDual.THRESHOLD * FillMatchingDual.THRESHOLD);
+
+        } else {
+
+            OperationBinary.invoke(data, 0, matchingCount, 1, left, function, right);
+        }
     }
 
     @Override
     public void fillMatching(final UnaryFunction<N> function, final Access1D<N> arguments) {
-        FillMatchingSingle.fillMatching(data, myRowDim, function, arguments);
+
+        int matchingCount = MissingMath.toMinIntExact(this.count(), arguments.count());
+
+        if (myColDim > FillMatchingSingle.THRESHOLD) {
+
+            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                @Override
+                protected void conquer(final int first, final int limit) {
+                    OperationUnary.invoke(data, first, limit, 1, arguments, function);
+                }
+
+            };
+
+            tmpConquerer.invoke(0, matchingCount, FillMatchingSingle.THRESHOLD * FillMatchingSingle.THRESHOLD);
+
+        } else {
+
+            OperationUnary.invoke(data, 0, matchingCount, 1, arguments, function);
+        }
     }
 
     @Override
@@ -415,7 +547,27 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
     @Override
     public void modifyAll(final UnaryFunction<N> modifier) {
-        ModifyAll.modifyAll(data, myRowDim, modifier);
+
+        final int numberOfRows = myRowDim;
+        final int numberOfCols = myColDim;
+
+        if (numberOfCols > ModifyAll.THRESHOLD) {
+
+            final DivideAndConquer conquerer = new DivideAndConquer() {
+
+                @Override
+                public void conquer(final int aFirst, final int aLimit) {
+                    GenericStore.this.modify(numberOfRows * aFirst, numberOfRows * aLimit, 1, modifier);
+                }
+
+            };
+
+            conquerer.invoke(0, numberOfCols, ModifyAll.THRESHOLD);
+
+        } else {
+
+            this.modify(0, numberOfRows * numberOfCols, 1, modifier);
+        }
     }
 
     @Override
@@ -455,7 +607,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         if (right instanceof GenericStore) {
             retVal.multiplyNeither.invoke(retVal.data, data, myColDim, this.cast(right).data, myFactory.scalar());
         } else {
-            retVal.fillByMultiplying(this, right);
+            retVal.multiplyRight.invoke(retVal.data, data, myColDim, right, myFactory.scalar());
         }
 
         return retVal;
@@ -548,7 +700,28 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
     @Override
     public void substituteBackwards(final Access2D<N> body, final boolean unitDiagonal, final boolean conjugated, final boolean hermitian) {
-        SubstituteBackwards.invoke(data, myRowDim, body, unitDiagonal, conjugated, hermitian, myFactory.scalar());
+
+        final int tmpRowDim = myRowDim;
+        final int tmpColDim = myColDim;
+
+        if (tmpColDim > SubstituteBackwards.THRESHOLD) {
+
+            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                @Override
+                public void conquer(final int aFirst, final int aLimit) {
+                    SubstituteBackwards.invoke(GenericStore.this.data, tmpRowDim, aFirst, aLimit, body, unitDiagonal, conjugated, hermitian,
+                            myFactory.scalar());
+                }
+
+            };
+
+            tmpConquerer.invoke(0, tmpColDim, SubstituteBackwards.THRESHOLD);
+
+        } else {
+
+            SubstituteBackwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, hermitian, myFactory.scalar());
+        }
     }
 
     @Override
@@ -578,7 +751,27 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
     @Override
     public void substituteForwards(final Access2D<N> body, final boolean unitDiagonal, final boolean conjugated, final boolean identity) {
-        SubstituteForwards.invoke(data, myRowDim, body, unitDiagonal, conjugated, identity, myFactory.scalar());
+
+        final int tmpRowDim = myRowDim;
+        final int tmpColDim = myColDim;
+
+        if (tmpColDim > SubstituteForwards.THRESHOLD) {
+
+            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                @Override
+                public void conquer(final int aFirst, final int aLimit) {
+                    SubstituteForwards.invoke(GenericStore.this.data, tmpRowDim, aFirst, aLimit, body, unitDiagonal, conjugated, identity, myFactory.scalar());
+                }
+
+            };
+
+            tmpConquerer.invoke(0, tmpColDim, SubstituteForwards.THRESHOLD);
+
+        } else {
+
+            SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, identity, myFactory.scalar());
+        }
     }
 
     @Override
@@ -717,17 +910,6 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
             return (Rotation.Generic<N>) transformation;
         }
         return new Rotation.Generic<>(transformation);
-    }
-
-    /**
-     * If the matrix is the transpose (not the conjugate transpose) of a {@link GenericStore}, that store,
-     * otherwise null.
-     */
-    private GenericStore<N> transposed(final Access1D<?> matrix) {
-        if (matrix instanceof TransposedStore<?> && ((TransposedStore<?>) matrix).getOriginal() instanceof GenericStore<?>) {
-            return (GenericStore<N>) ((TransposedStore<?>) matrix).getOriginal();
-        }
-        return null;
     }
 
 }

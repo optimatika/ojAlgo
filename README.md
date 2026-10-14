@@ -20,7 +20,7 @@ General information about ojAlgo is available at the project web site: https://w
 
 ### Artifacts
 
-ojAlgo is available at [The Central (Maven) Repository](https://mvnrepository.com/artifact/org.ojalgo/ojalgo) to be used with your favourite dependency management tool.
+ojAlgo is available at [The Central (Maven) Repository](https://mvnrepository.com/artifact/org.ojalgo/ojalgo) to be used with your favourite dependency management tool. It requires Java 22 or later.
 
 ```xml
 <!-- https://mvnrepository.com/artifact/org.ojalgo/ojalgo -->
@@ -114,6 +114,25 @@ public class FirstLinearAlgebra {
 
 Matrices are created with the factories and filled in place – there is no need to go through `double[][]`. Declare them with the interfaces `MatrixStore` (read) and `PhysicalStore` (mutable). The decompositions (`LU`, `QR`, `Cholesky`, `SingularValue`, `Eigenvalue` and more) work on any `MatrixStore`. See [Linear Algebra](https://www.ojalgo.org/linear-algebra/).
 
+### Optional Native BLAS
+
+ojAlgo is pure Java and needs nothing else, but it can also call a native BLAS library – Accelerate on macOS, or for example OpenBLAS on Linux and Windows – for the larger matrix operations. This is opt-in: native code is used only when the JVM grants ojAlgo native access,
+
+```bash
+java --enable-native-access=ALL-UNNAMED ...   # ojAlgo on the class path
+java --enable-native-access=ojalgo ...        # ojAlgo on the module path
+```
+
+or with `Enable-Native-Access: ALL-UNNAMED` in the manifest of an executable JAR. Note that granting `ALL-UNNAMED` native access, for whatever reason, turns it on.
+
+- With native access, ojAlgo looks for a library: Accelerate on macOS; OpenBLAS, FlexiBLAS, MKL, BLIS or the reference BLAS on Linux; OpenBLAS or MKL on Windows. The system property `ojalgo.native.library` names the library file(s) to use instead, or switches native code off with `none`.
+- `OjAlgoUtils.getNativeLibrary()` tells which library is used, if any. It is also logged when ojAlgo first looks for it.
+- Native code is used only for operations large enough to gain from it, and every operation also has a pure Java implementation. Results can differ from the pure Java ones in the last digits.
+- Long, compute-heavy calls (large matrix multiplications) work on copies of the matrices in native memory, so they don't hold up garbage collection. Other calls use the Java arrays in place.
+- The library's own threading is used. OpenBLAS, with its default settings, splits even vector operations such as dot products over all cores, from about 10 000 elements, which can make them much slower. Set `OPENBLAS_NUM_THREADS=1` (or a small number) to avoid that.
+- Accelerate's dot product doesn't always give the same last digits from one run to the next.
+- The library must use 32-bit integers (the standard LP64 interface). One with 64-bit integers (ILP64) is detected and not used.
+
 ### Documentation and Support
 
 - [Optimisation Cookbook](https://www.ojalgo.org/optimisation-cookbook/) – complete models to copy and adapt, and the rules every model should follow
@@ -134,13 +153,14 @@ The [Optimatika subscription](https://www.optimatika.se/subscription/) gives you
 
 ## Building from Source
 
-ojAlgo requires Java 11+ and uses the Maven Wrapper, so no separate Maven install is needed.
+ojAlgo requires Java 22+ and uses the Maven Wrapper, so no separate Maven install is needed.
 
 ```bash
 git clone https://github.com/optimatika/ojAlgo.git
 cd ojAlgo
 ./mvnw compile              # Compile
-./mvnw test                 # Run tests
+./mvnw test                 # Run tests (pure Java)
+./mvnw test -DargLine=--enable-native-access=ojalgo,ALL-UNNAMED  # Run tests with native BLAS
 ./mvnw package -DskipTests  # Build JAR without tests
 ```
 

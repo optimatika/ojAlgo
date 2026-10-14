@@ -34,14 +34,15 @@ import org.ojalgo.type.context.NumberContext;
  * and other, matrices with offsets and padding (leading dimension larger than the number of rows) as well as
  * matrices filling their arrays exactly.
  * <p>
- * Each case is run through the pure Java implementation and the dispatching {@code invoke}. Elements outside
- * the result must be left untouched, inputs must not change, a C that need not be set (beta 0) and the
- * triangle or diagonal of A that is not referenced are filled with NaN.
+ * Each case is run through the pure Java implementation, the dispatching {@code invoke}, and the native
+ * implementation when there is one (run with {@code --enable-native-access=ojalgo,ALL-UNNAMED} to include
+ * it). Elements outside the result must be left untouched, inputs must not change, a C that need not be set
+ * (beta 0) and the triangle or diagonal of A that is not referenced are filled with NaN.
  */
 public class BLASLevel3Test {
 
     enum Implementation {
-        DISPATCH, JAVA;
+        DISPATCH, JAVA, NATIVE, OFF_HEAP;
     }
 
     /**
@@ -82,10 +83,14 @@ public class BLASLevel3Test {
     private static final double[] BETAS = { 0.0, 1.0, -0.3 };
     private static final boolean[] BOOLEANS = { false, true };
     /**
-     * m, n, k – including the shapes where GEMM is a level 2 operation (m, n or k is 1), and k leaving 1, 2
-     * and 3 after a multiple of 4.
+     * m, n, k – including the shapes where GEMM is a level 2 operation (m, n or k is 1); the larger ones pass
+     * the native thresholds.
      */
-    private static final int[][] SIZES = { { 1, 1, 1 }, { 1, 9, 6 }, { 7, 1, 5 }, { 6, 8, 1 }, { 3, 4, 2 }, { 13, 10, 11 }, { 17, 19, 18 }, { 40, 33, 37 } };
+    private static final int[][] SIZES = { { 1, 1, 1 }, { 1, 9, 6 }, { 7, 1, 5 }, { 6, 8, 1 }, { 3, 4, 2 }, { 17, 19, 18 }, { 40, 33, 37 } };
+
+    private static boolean isAvailable(final Implementation implementation, final boolean nativeAvailable) {
+        return implementation != Implementation.NATIVE && implementation != Implementation.OFF_HEAP || nativeAvailable;
+    }
 
     /**
      * A symmetric matrix stored in one triangle; the other (strict) triangle is filled with NaN.
@@ -175,12 +180,20 @@ public class BLASLevel3Test {
         double[] bBefore = b.data.clone();
 
         switch (implementation) {
-            case JAVA:
+            case JAVA     ->
                 GEMM.JVM.invoke(transposeA, transposeB, m, n, k, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld, beta, c.data, c.offset, c.ld);
-                break;
-            default:
-                GEMM.invoke(transposeA, transposeB, m, n, k, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld, beta, c.data, c.offset, c.ld);
-                break;
+            case NATIVE   ->
+                GEMM.Native.invoke(transposeA, transposeB, m, n, k, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld, beta, c.data, c.offset, c.ld);
+            case OFF_HEAP -> {
+                // The off-heap variant requires alpha != 0, the dispatch uses the critical one otherwise
+                if (alpha != 0.0) {
+                    GEMM.Native.invokeOffHeap(transposeA, transposeB, m, n, k, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld, beta, c.data, c.offset,
+                            c.ld);
+                } else {
+                    GEMM.Native.invoke(transposeA, transposeB, m, n, k, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld, beta, c.data, c.offset, c.ld);
+                }
+            }
+            default       -> GEMM.invoke(transposeA, transposeB, m, n, k, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld, beta, c.data, c.offset, c.ld);
         }
 
         String message = "GEMM " + implementation + " tight=" + tight + " transA=" + transposeA + " transB=" + transposeB + " " + m + "x" + n + "x" + k
@@ -218,12 +231,17 @@ public class BLASLevel3Test {
         double[] bBefore = b.data.clone();
 
         switch (implementation) {
-            case JAVA:
-                SYMM.JVM.invoke(left, upper, m, n, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld, beta, c.data, c.offset, c.ld);
-                break;
-            default:
-                SYMM.invoke(left, upper, m, n, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld, beta, c.data, c.offset, c.ld);
-                break;
+            case JAVA     -> SYMM.JVM.invoke(left, upper, m, n, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld, beta, c.data, c.offset, c.ld);
+            case NATIVE   -> SYMM.Native.invoke(left, upper, m, n, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld, beta, c.data, c.offset, c.ld);
+            case OFF_HEAP -> {
+                // The off-heap variant requires alpha != 0, the dispatch uses the critical one otherwise
+                if (alpha != 0.0) {
+                    SYMM.Native.invokeOffHeap(left, upper, m, n, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld, beta, c.data, c.offset, c.ld);
+                } else {
+                    SYMM.Native.invoke(left, upper, m, n, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld, beta, c.data, c.offset, c.ld);
+                }
+            }
+            default       -> SYMM.invoke(left, upper, m, n, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld, beta, c.data, c.offset, c.ld);
         }
 
         String message = "SYMM " + implementation + " tight=" + tight + " left=" + left + " upper=" + upper + " " + m + "x" + n + " alpha=" + alpha + " beta="
@@ -264,12 +282,17 @@ public class BLASLevel3Test {
         double[] bBefore = b.data.clone();
 
         switch (implementation) {
-            case JAVA:
-                SYR2K.JVM.invoke(upper, transpose, n, k, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld, beta, c.data, c.offset, c.ld);
-                break;
-            default:
-                SYR2K.invoke(upper, transpose, n, k, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld, beta, c.data, c.offset, c.ld);
-                break;
+            case JAVA     -> SYR2K.JVM.invoke(upper, transpose, n, k, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld, beta, c.data, c.offset, c.ld);
+            case NATIVE   -> SYR2K.Native.invoke(upper, transpose, n, k, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld, beta, c.data, c.offset, c.ld);
+            case OFF_HEAP -> {
+                // The off-heap variant requires alpha != 0, the dispatch uses the critical one otherwise
+                if (alpha != 0.0) {
+                    SYR2K.Native.invokeOffHeap(upper, transpose, n, k, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld, beta, c.data, c.offset, c.ld);
+                } else {
+                    SYR2K.Native.invoke(upper, transpose, n, k, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld, beta, c.data, c.offset, c.ld);
+                }
+            }
+            default       -> SYR2K.invoke(upper, transpose, n, k, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld, beta, c.data, c.offset, c.ld);
         }
 
         String message = "SYR2K " + implementation + " tight=" + tight + " upper=" + upper + " trans=" + transpose + " " + n + "x" + k + " alpha=" + alpha
@@ -304,12 +327,17 @@ public class BLASLevel3Test {
         double[] aBefore = a.data.clone();
 
         switch (implementation) {
-            case JAVA:
-                SYRK.JVM.invoke(upper, transpose, n, k, alpha, a.data, a.offset, a.ld, beta, c.data, c.offset, c.ld);
-                break;
-            default:
-                SYRK.invoke(upper, transpose, n, k, alpha, a.data, a.offset, a.ld, beta, c.data, c.offset, c.ld);
-                break;
+            case JAVA     -> SYRK.JVM.invoke(upper, transpose, n, k, alpha, a.data, a.offset, a.ld, beta, c.data, c.offset, c.ld);
+            case NATIVE   -> SYRK.Native.invoke(upper, transpose, n, k, alpha, a.data, a.offset, a.ld, beta, c.data, c.offset, c.ld);
+            case OFF_HEAP -> {
+                // The off-heap variant requires alpha != 0, the dispatch uses the critical one otherwise
+                if (alpha != 0.0) {
+                    SYRK.Native.invokeOffHeap(upper, transpose, n, k, alpha, a.data, a.offset, a.ld, beta, c.data, c.offset, c.ld);
+                } else {
+                    SYRK.Native.invoke(upper, transpose, n, k, alpha, a.data, a.offset, a.ld, beta, c.data, c.offset, c.ld);
+                }
+            }
+            default       -> SYRK.invoke(upper, transpose, n, k, alpha, a.data, a.offset, a.ld, beta, c.data, c.offset, c.ld);
         }
 
         String message = "SYRK " + implementation + " tight=" + tight + " upper=" + upper + " trans=" + transpose + " " + n + "x" + k + " alpha=" + alpha
@@ -349,12 +377,17 @@ public class BLASLevel3Test {
         double[] aBefore = a.data.clone();
 
         switch (implementation) {
-            case JAVA:
-                TRMM.JVM.invoke(left, upper, transposeA, unitDiagonal, m, n, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
-                break;
-            default:
-                TRMM.invoke(left, upper, transposeA, unitDiagonal, m, n, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
-                break;
+            case JAVA     -> TRMM.JVM.invoke(left, upper, transposeA, unitDiagonal, m, n, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
+            case NATIVE   -> TRMM.Native.invoke(left, upper, transposeA, unitDiagonal, m, n, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
+            case OFF_HEAP -> {
+                // The off-heap variant requires alpha != 0, the dispatch uses the critical one otherwise
+                if (alpha != 0.0) {
+                    TRMM.Native.invokeOffHeap(left, upper, transposeA, unitDiagonal, m, n, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
+                } else {
+                    TRMM.Native.invoke(left, upper, transposeA, unitDiagonal, m, n, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
+                }
+            }
+            default       -> TRMM.invoke(left, upper, transposeA, unitDiagonal, m, n, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
         }
 
         String message = "TRMM " + implementation + " tight=" + tight + " left=" + left + " upper=" + upper + " transA=" + transposeA + " unit=" + unitDiagonal
@@ -387,12 +420,17 @@ public class BLASLevel3Test {
         double[] aBefore = a.data.clone();
 
         switch (implementation) {
-            case JAVA:
-                TRSM.JVM.invoke(left, upper, transposeA, unitDiagonal, m, n, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
-                break;
-            default:
-                TRSM.invoke(left, upper, transposeA, unitDiagonal, m, n, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
-                break;
+            case JAVA     -> TRSM.JVM.invoke(left, upper, transposeA, unitDiagonal, m, n, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
+            case NATIVE   -> TRSM.Native.invoke(left, upper, transposeA, unitDiagonal, m, n, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
+            case OFF_HEAP -> {
+                // The off-heap variant requires alpha != 0, the dispatch uses the critical one otherwise
+                if (alpha != 0.0) {
+                    TRSM.Native.invokeOffHeap(left, upper, transposeA, unitDiagonal, m, n, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
+                } else {
+                    TRSM.Native.invoke(left, upper, transposeA, unitDiagonal, m, n, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
+                }
+            }
+            default       -> TRSM.invoke(left, upper, transposeA, unitDiagonal, m, n, alpha, a.data, a.offset, a.ld, b.data, b.offset, b.ld);
         }
 
         double[] expected = rhs.clone();
@@ -454,8 +492,9 @@ public class BLASLevel3Test {
     }
 
     /**
-     * With alpha 0, A and B are not read: the dispatching invoke must work with empty arrays for them. C is
-     * scaled by beta (and not read when beta is 0); for TRMM and TRSM, B is set to 0 (and not read).
+     * With alpha 0, A and B are not read: the dispatching invoke must work with empty arrays for them, also
+     * at sizes where the native implementation is used otherwise. C is scaled by beta (and not read when beta
+     * is 0); for TRMM and TRSM, B is set to 0 (and not read).
      */
     @Test
     public void testAlphaZero() {
@@ -506,18 +545,26 @@ public class BLASLevel3Test {
         TestUtils.assertThrows(IllegalArgumentException.class, () -> GEMM.invoke(false, false, -1, 2, 2, 1.0, data, 0, 1, data, 0, 2, 0.0, data, 0, 1));
         TestUtils.assertThrows(IllegalArgumentException.class, () -> SYRK.invoke(true, true, 4, 2, 1.0, data, 0, 1, 0.0, data, 0, 4));
         TestUtils.assertThrows(IllegalArgumentException.class, () -> TRSM.invoke(false, true, false, false, 2, 4, 1.0, data, 0, 3, data, 0, 2));
+
+        if (GEMM.NATIVE) {
+            double[] tooShort = new double[7];
+            TestUtils.assertThrows(IndexOutOfBoundsException.class,
+                    () -> GEMM.Native.invoke(false, false, 4, 2, 2, 1.0, data, 0, 4, data, 0, 2, 0.0, tooShort, 0, 4));
+        }
     }
 
     @Test
     public void testGEMM() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (boolean transposeA : BOOLEANS) {
-                    for (boolean transposeB : BOOLEANS) {
-                        for (int[] size : SIZES) {
-                            for (double alpha : ALPHAS) {
-                                for (double beta : BETAS) {
-                                    BLASLevel3Test.doTestGEMM(implementation, tight, transposeA, transposeB, size[0], size[1], size[2], alpha, beta);
+            if (BLASLevel3Test.isAvailable(implementation, GEMM.NATIVE)) {
+                for (boolean tight : BOOLEANS) {
+                    for (boolean transposeA : BOOLEANS) {
+                        for (boolean transposeB : BOOLEANS) {
+                            for (int[] size : SIZES) {
+                                for (double alpha : ALPHAS) {
+                                    for (double beta : BETAS) {
+                                        BLASLevel3Test.doTestGEMM(implementation, tight, transposeA, transposeB, size[0], size[1], size[2], alpha, beta);
+                                    }
                                 }
                             }
                         }
@@ -596,13 +643,15 @@ public class BLASLevel3Test {
     @Test
     public void testSYMM() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (boolean left : BOOLEANS) {
-                    for (boolean upper : BOOLEANS) {
-                        for (int[] size : SIZES) {
-                            for (double alpha : ALPHAS) {
-                                for (double beta : BETAS) {
-                                    BLASLevel3Test.doTestSYMM(implementation, tight, left, upper, size[0], size[1], alpha, beta);
+            if (BLASLevel3Test.isAvailable(implementation, SYMM.NATIVE)) {
+                for (boolean tight : BOOLEANS) {
+                    for (boolean left : BOOLEANS) {
+                        for (boolean upper : BOOLEANS) {
+                            for (int[] size : SIZES) {
+                                for (double alpha : ALPHAS) {
+                                    for (double beta : BETAS) {
+                                        BLASLevel3Test.doTestSYMM(implementation, tight, left, upper, size[0], size[1], alpha, beta);
+                                    }
                                 }
                             }
                         }
@@ -615,13 +664,15 @@ public class BLASLevel3Test {
     @Test
     public void testSYR2K() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (boolean upper : BOOLEANS) {
-                    for (boolean transpose : BOOLEANS) {
-                        for (int[] size : SIZES) {
-                            for (double alpha : ALPHAS) {
-                                for (double beta : BETAS) {
-                                    BLASLevel3Test.doTestSYR2K(implementation, tight, upper, transpose, size[0], size[2], alpha, beta);
+            if (BLASLevel3Test.isAvailable(implementation, SYR2K.NATIVE)) {
+                for (boolean tight : BOOLEANS) {
+                    for (boolean upper : BOOLEANS) {
+                        for (boolean transpose : BOOLEANS) {
+                            for (int[] size : SIZES) {
+                                for (double alpha : ALPHAS) {
+                                    for (double beta : BETAS) {
+                                        BLASLevel3Test.doTestSYR2K(implementation, tight, upper, transpose, size[0], size[2], alpha, beta);
+                                    }
                                 }
                             }
                         }
@@ -634,13 +685,15 @@ public class BLASLevel3Test {
     @Test
     public void testSYRK() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (boolean upper : BOOLEANS) {
-                    for (boolean transpose : BOOLEANS) {
-                        for (int[] size : SIZES) {
-                            for (double alpha : ALPHAS) {
-                                for (double beta : BETAS) {
-                                    BLASLevel3Test.doTestSYRK(implementation, tight, upper, transpose, size[0], size[2], alpha, beta);
+            if (BLASLevel3Test.isAvailable(implementation, SYRK.NATIVE)) {
+                for (boolean tight : BOOLEANS) {
+                    for (boolean upper : BOOLEANS) {
+                        for (boolean transpose : BOOLEANS) {
+                            for (int[] size : SIZES) {
+                                for (double alpha : ALPHAS) {
+                                    for (double beta : BETAS) {
+                                        BLASLevel3Test.doTestSYRK(implementation, tight, upper, transpose, size[0], size[2], alpha, beta);
+                                    }
                                 }
                             }
                         }
@@ -653,14 +706,16 @@ public class BLASLevel3Test {
     @Test
     public void testTRMM() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (boolean left : BOOLEANS) {
-                    for (boolean upper : BOOLEANS) {
-                        for (boolean transposeA : BOOLEANS) {
-                            for (boolean unitDiagonal : BOOLEANS) {
-                                for (int[] size : SIZES) {
-                                    for (double alpha : ALPHAS) {
-                                        BLASLevel3Test.doTestTRMM(implementation, tight, left, upper, transposeA, unitDiagonal, size[0], size[1], alpha);
+            if (BLASLevel3Test.isAvailable(implementation, TRMM.NATIVE)) {
+                for (boolean tight : BOOLEANS) {
+                    for (boolean left : BOOLEANS) {
+                        for (boolean upper : BOOLEANS) {
+                            for (boolean transposeA : BOOLEANS) {
+                                for (boolean unitDiagonal : BOOLEANS) {
+                                    for (int[] size : SIZES) {
+                                        for (double alpha : ALPHAS) {
+                                            BLASLevel3Test.doTestTRMM(implementation, tight, left, upper, transposeA, unitDiagonal, size[0], size[1], alpha);
+                                        }
                                     }
                                 }
                             }
@@ -668,91 +723,22 @@ public class BLASLevel3Test {
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * The blocked Java implementation, with the block size lowered so that several blocks, including a
-     * partial last block, occur at test sizes.
-     */
-    @Test
-    public void testTRMMBlocked() {
-
-        int blockSize = TRMM.BLOCK_SIZE;
-
-        try {
-
-            TRMM.BLOCK_SIZE = 5;
-
-            for (boolean tight : BOOLEANS) {
-                for (boolean left : BOOLEANS) {
-                    for (boolean upper : BOOLEANS) {
-                        for (boolean transposeA : BOOLEANS) {
-                            for (boolean unitDiagonal : BOOLEANS) {
-                                for (int[] size : new int[][] { { 23, 17 }, { 17, 23 }, { 5, 9 }, { 9, 5 } }) {
-                                    for (double alpha : ALPHAS) {
-                                        BLASLevel3Test.doTestTRMM(Implementation.JAVA, tight, left, upper, transposeA, unitDiagonal, size[0], size[1], alpha);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-        } finally {
-            TRMM.BLOCK_SIZE = blockSize;
-        }
-    }
-
-    /**
-     * The multi-threaded Java implementation, with the threshold lowered so that the blocks on the diagonal
-     * are split at test sizes.
-     */
-    @Test
-    public void testTRMMParallel() {
-
-        int blockSize = TRMM.BLOCK_SIZE;
-        int threshold = TRMM.THRESHOLD;
-
-        try {
-
-            TRMM.BLOCK_SIZE = 16;
-            TRMM.THRESHOLD = 2;
-
-            for (boolean tight : BOOLEANS) {
-                for (boolean left : BOOLEANS) {
-                    for (boolean upper : BOOLEANS) {
-                        for (boolean transposeA : BOOLEANS) {
-                            for (boolean unitDiagonal : BOOLEANS) {
-                                for (int[] size : new int[][] { { 70, 45 }, { 45, 70 }, { 9, 60 }, { 60, 9 } }) {
-                                    for (double alpha : ALPHAS) {
-                                        BLASLevel3Test.doTestTRMM(Implementation.JAVA, tight, left, upper, transposeA, unitDiagonal, size[0], size[1], alpha);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-        } finally {
-            TRMM.BLOCK_SIZE = blockSize;
-            TRMM.THRESHOLD = threshold;
         }
     }
 
     @Test
     public void testTRSM() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (boolean left : BOOLEANS) {
-                    for (boolean upper : BOOLEANS) {
-                        for (boolean transposeA : BOOLEANS) {
-                            for (boolean unitDiagonal : BOOLEANS) {
-                                for (int[] size : SIZES) {
-                                    for (double alpha : ALPHAS) {
-                                        BLASLevel3Test.doTestTRSM(implementation, tight, left, upper, transposeA, unitDiagonal, size[0], size[1], alpha);
+            if (BLASLevel3Test.isAvailable(implementation, TRSM.NATIVE)) {
+                for (boolean tight : BOOLEANS) {
+                    for (boolean left : BOOLEANS) {
+                        for (boolean upper : BOOLEANS) {
+                            for (boolean transposeA : BOOLEANS) {
+                                for (boolean unitDiagonal : BOOLEANS) {
+                                    for (int[] size : SIZES) {
+                                        for (double alpha : ALPHAS) {
+                                            BLASLevel3Test.doTestTRSM(implementation, tight, left, upper, transposeA, unitDiagonal, size[0], size[1], alpha);
+                                        }
                                     }
                                 }
                             }
@@ -760,77 +746,6 @@ public class BLASLevel3Test {
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * The blocked Java implementation, with the block size lowered so that several blocks, including a
-     * partial last block, occur at test sizes.
-     */
-    @Test
-    public void testTRSMBlocked() {
-
-        int blockSize = TRSM.BLOCK_SIZE;
-
-        try {
-
-            TRSM.BLOCK_SIZE = 5;
-
-            for (boolean tight : BOOLEANS) {
-                for (boolean left : BOOLEANS) {
-                    for (boolean upper : BOOLEANS) {
-                        for (boolean transposeA : BOOLEANS) {
-                            for (boolean unitDiagonal : BOOLEANS) {
-                                for (int[] size : new int[][] { { 23, 17 }, { 17, 23 }, { 5, 9 }, { 9, 5 } }) {
-                                    for (double alpha : ALPHAS) {
-                                        BLASLevel3Test.doTestTRSM(Implementation.JAVA, tight, left, upper, transposeA, unitDiagonal, size[0], size[1], alpha);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-        } finally {
-            TRSM.BLOCK_SIZE = blockSize;
-        }
-    }
-
-    /**
-     * The multi-threaded Java implementation, with the threshold lowered so that the blocks on the diagonal
-     * are split at test sizes.
-     */
-    @Test
-    public void testTRSMParallel() {
-
-        int blockSize = TRSM.BLOCK_SIZE;
-        int threshold = TRSM.THRESHOLD;
-
-        try {
-
-            TRSM.BLOCK_SIZE = 16;
-            TRSM.THRESHOLD = 2;
-
-            for (boolean tight : BOOLEANS) {
-                for (boolean left : BOOLEANS) {
-                    for (boolean upper : BOOLEANS) {
-                        for (boolean transposeA : BOOLEANS) {
-                            for (boolean unitDiagonal : BOOLEANS) {
-                                for (int[] size : new int[][] { { 70, 45 }, { 45, 70 }, { 9, 60 }, { 60, 9 } }) {
-                                    for (double alpha : ALPHAS) {
-                                        BLASLevel3Test.doTestTRSM(Implementation.JAVA, tight, left, upper, transposeA, unitDiagonal, size[0], size[1], alpha);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-        } finally {
-            TRSM.BLOCK_SIZE = blockSize;
-            TRSM.THRESHOLD = threshold;
         }
     }
 

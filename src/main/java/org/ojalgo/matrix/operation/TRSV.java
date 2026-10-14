@@ -21,11 +21,18 @@
  */
 package org.ojalgo.matrix.operation;
 
+import static java.lang.foreign.ValueLayout.ADDRESS;
+import static java.lang.foreign.ValueLayout.JAVA_INT;
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.MemorySegment;
+import java.lang.invoke.MethodHandle;
+
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.ArrayOperation;
-import org.ojalgo.scalar.Scalar;
+import org.ojalgo.array.operation.NativeLibrary;
 
 /**
  * BLAS level 2 {@code ?trsv}: solves op(A)*x = b for x, where A is n-by-n triangular and op(A) is A or
@@ -34,83 +41,55 @@ import org.ojalgo.scalar.Scalar;
  * The pure Java kernels for contiguous x are the ones ojAlgo's single right-hand-side substitutions (ftran
  * and btran of LU and Cholesky) were tuned with:
  * <ul>
- * <li>U<sup>T</sup>*x = b (forwards) sums each row with a single accumulator. A row uses the element solved
- * just before only in its last term, so consecutive rows overlap.
- * <li>L*x = b (forwards) does the same up to order {@link #COLUMN_SWEEP_THRESHOLD}, and above that it is a
- * column sweep, as U*x = b. A row of the column-major L is strided: those loads can't be vectorised, and with
- * a leading dimension that is a power of 2 they all map to the same few cache sets.
+ * <li>L*x = b and U<sup>T</sup>*x = b (forwards) sum each row with a single accumulator. A row uses the
+ * element solved just before only in its last term, so consecutive rows overlap.
  * <li>U*x = b (backwards) is a column sweep, skipping zero elements.
  * <li>L<sup>T</sup>*x = b (backwards) sums each row from the far end, so the element solved just before is
  * used in the last term. Summed the other way, every row has to wait for the previous one before it can
  * start, and the solve becomes latency-bound (more than twice as slow).
  * </ul>
+ *
+ * @see NativeLibrary
  */
 public abstract class TRSV implements BLAS2 {
 
     /**
-     * The pure Java implementation.
+     * The pure Java implementation. Everything it calls is pure Java as well – the {@code JVM}
+     * implementations of other operations, never their dispatching {@code invoke} methods (that may call
+     * native code).
      */
     static final class JVM {
 
         /**
-         * L*x = b, forwards, each row summed with a single accumulator – or, when n is larger than
-         * {@link TRSV#COLUMN_SWEEP_THRESHOLD}, as a column sweep that skips zero elements of x.
+         * L*x = b, forwards, each row summed with a single accumulator.
          */
         private static void solveL(final boolean unitDiagonal, final int n, final double[] a, final int offsetA, final int lda, final double[] x,
                 final int offsetX) {
-            if (n > COLUMN_SWEEP_THRESHOLD) {
-                for (int j = 0; j < n; j++) {
-                    if (!unitDiagonal) {
-                        x[offsetX + j] /= a[offsetA + j + j * lda];
-                    }
-                    double solved = x[offsetX + j];
-                    if (solved != ZERO) {
-                        AXPY.JVM.invoke(n - 1 - j, -solved, a, offsetA + j + 1 + j * lda, 1, x, offsetX + j + 1, 1);
-                    }
+            for (int j = 0; j < n; j++) {
+                double sum = 0D;
+                for (int i = 0, ia = offsetA + j, ix = offsetX; i < j; i++, ia += lda, ix++) {
+                    sum += a[ia] * x[ix];
                 }
-            } else {
-                for (int j = 0; j < n; j++) {
-                    double sum = 0D;
-                    for (int i = 0, ia = offsetA + j, ix = offsetX; i < j; i++, ia += lda, ix++) {
-                        sum += a[ia] * x[ix];
-                    }
-                    double solved = x[offsetX + j] - sum;
-                    if (!unitDiagonal) {
-                        solved /= a[offsetA + j + j * lda];
-                    }
-                    x[offsetX + j] = solved;
+                double solved = x[offsetX + j] - sum;
+                if (!unitDiagonal) {
+                    solved /= a[offsetA + j + j * lda];
                 }
+                x[offsetX + j] = solved;
             }
         }
 
-        /**
-         * L*x = b, forwards, each row summed with a single accumulator – or, when n is larger than
-         * {@link TRSV#COLUMN_SWEEP_THRESHOLD}, as a column sweep that skips zero elements of x.
-         */
         private static void solveL(final boolean unitDiagonal, final int n, final float[] a, final int offsetA, final int lda, final float[] x,
                 final int offsetX) {
-            if (n > COLUMN_SWEEP_THRESHOLD) {
-                for (int j = 0; j < n; j++) {
-                    if (!unitDiagonal) {
-                        x[offsetX + j] /= a[offsetA + j + j * lda];
-                    }
-                    float solved = x[offsetX + j];
-                    if (solved != 0F) {
-                        AXPY.invoke(x, offsetX, -solved, a, offsetA + j * lda, j + 1, n);
-                    }
+            for (int j = 0; j < n; j++) {
+                float sum = 0F;
+                for (int i = 0, ia = offsetA + j, ix = offsetX; i < j; i++, ia += lda, ix++) {
+                    sum += a[ia] * x[ix];
                 }
-            } else {
-                for (int j = 0; j < n; j++) {
-                    float sum = 0F;
-                    for (int i = 0, ia = offsetA + j, ix = offsetX; i < j; i++, ia += lda, ix++) {
-                        sum += a[ia] * x[ix];
-                    }
-                    float solved = x[offsetX + j] - sum;
-                    if (!unitDiagonal) {
-                        solved /= a[offsetA + j + j * lda];
-                    }
-                    x[offsetX + j] = solved;
+                float solved = x[offsetX + j] - sum;
+                if (!unitDiagonal) {
+                    solved /= a[offsetA + j + j * lda];
                 }
+                x[offsetX + j] = solved;
             }
         }
 
@@ -261,24 +240,26 @@ public abstract class TRSV implements BLAS2 {
                 }
                 double solved = x[offsetX + j];
                 if (solved != ZERO) {
-                    AXPY.JVM.invoke(j, -solved, a, offsetA + j * lda, 1, x, offsetX, 1);
+                    AXPY.invoke(x, offsetX, -solved, a, offsetA + j * lda, 0, j);
                 }
             }
         }
 
         /**
-         * U*x = b, backwards, as a column sweep that skips zero elements of x.
+         * U*x = b, backwards, each row summed in order with a single accumulator.
          */
         private static void solveU(final boolean unitDiagonal, final int n, final float[] a, final int offsetA, final int lda, final float[] x,
                 final int offsetX) {
             for (int j = n - 1; j >= 0; j--) {
+                float sum = 0F;
+                for (int i = j + 1, ia = offsetA + j + (j + 1) * lda; i < n; i++, ia += lda) {
+                    sum += a[ia] * x[offsetX + i];
+                }
+                float solved = x[offsetX + j] - sum;
                 if (!unitDiagonal) {
-                    x[offsetX + j] /= a[offsetA + j + j * lda];
+                    solved /= a[offsetA + j + j * lda];
                 }
-                float solved = x[offsetX + j];
-                if (solved != 0F) {
-                    AXPY.invoke(x, offsetX, -solved, a, offsetA + j * lda, 0, j);
-                }
+                x[offsetX + j] = solved;
             }
         }
 
@@ -361,48 +342,40 @@ public abstract class TRSV implements BLAS2 {
             }
         }
 
-        /**
-         * The pure Java implementation of
-         * {@link TRSV#invoke(boolean, boolean, boolean, int, Scalar[], int, int, Scalar[], int, int, Scalar.Factory)},
-         * without argument checks, for n > 0. Any increment: each element of x is solved for as its element
-         * of b minus a sum, accumulated in order, of products with the element of op(A) on the left, and then
-         * divided from the left by the diagonal element.
-         */
-        static <N extends Scalar<N>> void invoke(final boolean upper, final boolean transpose, final boolean unitDiagonal, final int n, final N[] a,
-                final int offsetA, final int lda, final N[] x, final int offsetX, final int incX, final Scalar.Factory<N> scalar) {
+    }
 
-            int start = incX > 0 ? offsetX : offsetX - (n - 1) * incX;
-            boolean forwards = upper == transpose;
+    /**
+     * Native {@code cblas_dtrsv}, initialised only when {@link NativeLibrary#isAvailable()}. Linked as a
+     * critical function so the Java arrays are used in place, without copying.
+     */
+    static final class Native {
 
-            for (int k = 0; k < n; k++) {
+        static final MethodHandle DTRSV = NativeLibrary.downcall("cblas_dtrsv",
+                FunctionDescriptor.ofVoid(JAVA_INT, JAVA_INT, JAVA_INT, JAVA_INT, JAVA_INT, ADDRESS, JAVA_INT, ADDRESS, JAVA_INT), true);
 
-                int j = forwards ? k : n - 1 - k;
+        static void invoke(final boolean upper, final boolean transpose, final boolean unitDiagonal, final int n, final double[] a, final int offsetA,
+                final int lda, final double[] x, final int offsetX, final int incX) {
 
-                Scalar<N> sum = scalar.zero();
-                for (int i = forwards ? 0 : j + 1, limit = forwards ? j : n; i < limit; i++) {
-                    N element = transpose ? a[offsetA + i + j * lda].conjugate().get() : a[offsetA + j + i * lda];
-                    sum = sum.add(element.multiply(x[start + i * incX]));
-                }
-                Scalar<N> solved = x[start + j * incX].subtract(sum);
+            MemorySegment segmentA = CBLAS.ofMatrix(a, offsetA, n, n, lda);
+            MemorySegment segmentX = NativeLibrary.ofVector(x, offsetX, n, incX);
 
-                if (!unitDiagonal) {
-                    N diagonal = transpose ? a[offsetA + j + j * lda].conjugate().get() : a[offsetA + j + j * lda];
-                    // From the left: diagonal^-1 * solved
-                    solved = solved.conjugate().divide(diagonal.conjugate()).conjugate();
-                }
-
-                x[start + j * incX] = solved.get();
+            try {
+                DTRSV.invokeExact(CBLAS.COLUMN_MAJOR, CBLAS.triangle(upper), CBLAS.transpose(transpose), CBLAS.diagonal(unitDiagonal), n, segmentA, lda,
+                        segmentX, incX);
+            } catch (Throwable cause) {
+                throw new ProgrammingError(cause);
             }
         }
 
     }
 
     /**
-     * The pure Java L*x = b, with contiguous x, sums each row with a single accumulator up to this order, and
-     * is a column sweep above it. The row sums are faster while L is small, the column sweep from n ≈ 50 –
-     * more than 5 times faster for n = 512.
+     * The native implementation is used, if there is one, when n*n (twice the number of multiply-adds) is
+     * larger than this.
      */
-    private static final int COLUMN_SWEEP_THRESHOLD = 40;
+    private static final double NATIVE_THRESHOLD = 70;
+
+    static final boolean NATIVE = NativeLibrary.isAvailable() && Native.DTRSV != null;
 
     /**
      * {@code dtrsv}: solves op(A)*x = b, x overwrites b
@@ -428,7 +401,11 @@ public abstract class TRSV implements BLAS2 {
             return;
         }
 
-        JVM.invoke(upper, transpose, unitDiagonal, n, a, offsetA, lda, x, offsetX, incX);
+        if (TRSV.isNative(n)) {
+            Native.invoke(upper, transpose, unitDiagonal, n, a, offsetA, lda, x, offsetX, incX);
+        } else {
+            JVM.invoke(upper, transpose, unitDiagonal, n, a, offsetA, lda, x, offsetX, incX);
+        }
     }
 
     /**
@@ -451,24 +428,11 @@ public abstract class TRSV implements BLAS2 {
     }
 
     /**
-     * As {@link #invoke(boolean, boolean, boolean, int, double[], int, int, double[], int, int)}, for other
-     * number types: op(A) is A or A<sup>H</sup>, the conjugate transpose, and A is applied from the left.
-     * There is only a pure Java implementation.
-     *
-     * @param transpose op(A) = A<sup>H</sup> if true, otherwise A
+     * Whether to use the native implementation: there is one, and n*n is larger than
+     * {@link #NATIVE_THRESHOLD}.
      */
-    public static <N extends Scalar<N>> void invoke(final boolean upper, final boolean transpose, final boolean unitDiagonal, final int n, final N[] a,
-            final int offsetA, final int lda, final N[] x, final int offsetX, final int incX, final Scalar.Factory<N> scalar) {
-
-        ArrayOperation.checkArgument("TRSV", "n", n >= 0);
-        ArrayOperation.checkArgument("TRSV", "lda", lda >= Math.max(1, n));
-        ArrayOperation.checkArgument("TRSV", "incX", incX != 0);
-
-        if (n == 0) {
-            return;
-        }
-
-        JVM.invoke(upper, transpose, unitDiagonal, n, a, offsetA, lda, x, offsetX, incX, scalar);
+    static boolean isNative(final double n) {
+        return NATIVE && n * n > NATIVE_THRESHOLD;
     }
 
 }

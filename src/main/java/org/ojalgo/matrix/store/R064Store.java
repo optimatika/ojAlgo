@@ -34,6 +34,9 @@ import org.ojalgo.array.operation.FillCompatible;
 import org.ojalgo.array.operation.FillMatchingDual;
 import org.ojalgo.array.operation.FillMatchingSingle;
 import org.ojalgo.array.operation.ModifyAll;
+import org.ojalgo.array.operation.OperationBinary;
+import org.ojalgo.array.operation.OperationUnary;
+import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -41,6 +44,7 @@ import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.matrix.operation.*;
@@ -72,7 +76,23 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
 
             R064Store retVal = this.make(nbRows, nbCols);
 
-            FillMatchingSingle.copy(retVal.data, nbRows, source);
+            if (nbCols > FillMatchingSingle.THRESHOLD) {
+
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int aFirst, final int aLimit) {
+                        FillMatchingSingle.copy(retVal.data, nbRows, aFirst, aLimit, source);
+                    }
+
+                };
+
+                tmpConquerer.invoke(0, nbCols, FillMatchingSingle.THRESHOLD);
+
+            } else {
+
+                FillMatchingSingle.copy(retVal.data, nbRows, 0, nbCols, source);
+            }
 
             return retVal;
         }
@@ -92,7 +112,26 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
 
             R064Store retVal = this.make(source.getColDim(), source.getRowDim());
 
-            FillMatchingSingle.transpose(retVal.data, retVal.getRowDim(), source);
+            int tmpRowDim = retVal.getRowDim();
+            int tmpColDim = retVal.getColDim();
+
+            if (tmpColDim > FillMatchingSingle.THRESHOLD) {
+
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int first, final int limit) {
+                        FillMatchingSingle.transpose(retVal.data, tmpRowDim, first, limit, source);
+                    }
+
+                };
+
+                tmpConquerer.invoke(0, tmpColDim, FillMatchingSingle.THRESHOLD);
+
+            } else {
+
+                FillMatchingSingle.transpose(retVal.data, tmpRowDim, 0, tmpColDim, source);
+            }
 
             return retVal;
         }
@@ -198,18 +237,10 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
         return new Rotation.Primitive(transformation);
     }
 
-    /**
-     * If the matrix is the transpose of an {@link R064Store}, that store, otherwise null.
-     */
-    static R064Store transposed(final Access1D<?> matrix) {
-        if (matrix instanceof TransjugatedStore<?> && ((TransjugatedStore<?>) matrix).getOriginal() instanceof R064Store) {
-            return (R064Store) ((TransjugatedStore<?>) matrix).getOriginal();
-        }
-        return null;
-    }
-
     private final MultiplyBoth.Primitive multiplyBoth;
+    private final MultiplyLeft.Primitive64 multiplyLeft;
     private final MultiplyNeither.Primitive64 multiplyNeither;
+    private final MultiplyRight.Primitive64 multiplyRight;
     private final int myColDim;
     private final int myRowDim;
     private final Array2D<Double> myUtility;
@@ -225,6 +256,8 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
         myUtility = this.wrapInArray2D(myRowDim);
 
         multiplyBoth = MultiplyBoth.newPrimitive64(myRowDim, myColDim);
+        multiplyLeft = MultiplyLeft.newPrimitive64(myRowDim, myColDim);
+        multiplyRight = MultiplyRight.newPrimitive64(myRowDim, myColDim);
         multiplyNeither = MultiplyNeither.newPrimitive64(myRowDim, myColDim);
     }
 
@@ -391,16 +424,16 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
             ProgrammingError.throwForMultiplicationNotPossible();
         }
 
-        // Plain arrays: an R064Store, or the transpose of one
-        boolean transpL = !(left instanceof R064Store);
-        boolean transpR = !(right instanceof R064Store);
-        R064Store storeL = transpL ? R064Store.transposed(left) : (R064Store) left;
-        R064Store storeR = transpR ? R064Store.transposed(right) : (R064Store) right;
-
         if (complexity == 0) {
             Arrays.fill(data, ZERO);
-        } else if (storeL != null && storeR != null) {
-            multiplyNeither.invoke(data, storeL.data, transpL, complexity, storeR.data, transpR);
+        } else if (left instanceof R064Store) {
+            if (right instanceof R064Store) {
+                multiplyNeither.invoke(data, R064Store.cast(left).data, complexity, R064Store.cast(right).data);
+            } else {
+                multiplyRight.invoke(data, R064Store.cast(left).data, complexity, right);
+            }
+        } else if (right instanceof R064Store) {
+            multiplyLeft.invoke(data, left, complexity, R064Store.cast(right).data);
         } else {
             multiplyBoth.invoke(this, left, complexity, right);
         }
@@ -441,12 +474,23 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
 
         if (values instanceof TransjugatedStore) {
             final TransjugatedStore<?> transposed = (TransjugatedStore<?>) values;
-            final MatrixStore<?> original = transposed.getOriginal();
 
-            if (original instanceof R064Store && original.getRowDim() == this.getColDim() && original.getColDim() == myRowDim) {
-                FillMatchingSingle.transpose(data, myRowDim, ((R064Store) original).data);
+            if (myColDim > FillMatchingSingle.THRESHOLD) {
+
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int first, final int limit) {
+                        FillMatchingSingle.transpose(data, myRowDim, first, limit, transposed.getOriginal());
+                    }
+
+                };
+
+                tmpConquerer.invoke(0, myColDim, FillMatchingSingle.THRESHOLD);
+
             } else {
-                FillMatchingSingle.transpose(data, myRowDim, original);
+
+                FillMatchingSingle.transpose(data, myRowDim, 0, myColDim, transposed.getOriginal());
             }
 
         } else {
@@ -457,12 +501,50 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
 
     @Override
     public void fillMatching(final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        FillMatchingDual.fillMatching(data, myRowDim, left, function, right);
+
+        int matchingCount = MissingMath.toMinIntExact(this.count(), left.count(), right.count());
+
+        if (myColDim > FillMatchingDual.THRESHOLD) {
+
+            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                @Override
+                protected void conquer(final int first, final int limit) {
+                    OperationBinary.invoke(data, first, limit, 1, left, function, right);
+                }
+
+            };
+
+            tmpConquerer.invoke(0, matchingCount, FillMatchingDual.THRESHOLD * FillMatchingDual.THRESHOLD);
+
+        } else {
+
+            OperationBinary.invoke(data, 0, matchingCount, 1, left, function, right);
+        }
     }
 
     @Override
     public void fillMatching(final UnaryFunction<Double> function, final Access1D<Double> arguments) {
-        FillMatchingSingle.fillMatching(data, myRowDim, function, arguments);
+
+        int matchingCount = MissingMath.toMinIntExact(this.count(), arguments.count());
+
+        if (myColDim > FillMatchingSingle.THRESHOLD) {
+
+            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                @Override
+                protected void conquer(final int first, final int limit) {
+                    OperationUnary.invoke(data, first, limit, 1, arguments, function);
+                }
+
+            };
+
+            tmpConquerer.invoke(0, matchingCount, FillMatchingSingle.THRESHOLD * FillMatchingSingle.THRESHOLD);
+
+        } else {
+
+            OperationUnary.invoke(data, 0, matchingCount, 1, arguments, function);
+        }
     }
 
     @Override
@@ -520,7 +602,24 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
 
     @Override
     public void modifyAll(final UnaryFunction<Double> modifier) {
-        ModifyAll.modifyAll(data, myRowDim, modifier);
+
+        if (myColDim > ModifyAll.THRESHOLD) {
+
+            final DivideAndConquer conquerer = new DivideAndConquer() {
+
+                @Override
+                public void conquer(final int first, final int limit) {
+                    R064Store.this.modify(myRowDim * first, myRowDim * limit, 1, modifier);
+                }
+
+            };
+
+            conquerer.invoke(0, myColDim, ModifyAll.THRESHOLD);
+
+        } else {
+
+            this.modify(0, myRowDim * myColDim, 1, modifier);
+        }
     }
 
     @Override
@@ -560,7 +659,7 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
         if (right instanceof R064Store) {
             retVal.multiplyNeither.invoke(retVal.data, data, myColDim, R064Store.cast(right).data);
         } else {
-            retVal.fillByMultiplying(this, right);
+            retVal.multiplyRight.invoke(retVal.data, data, myColDim, right);
         }
 
         return retVal;
@@ -650,7 +749,27 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
 
     @Override
     public void substituteBackwards(final Access2D<Double> body, final boolean unitDiagonal, final boolean conjugated, final boolean hermitian) {
-        SubstituteBackwards.invoke(data, myRowDim, body, unitDiagonal, conjugated, hermitian);
+
+        final int tmpRowDim = myRowDim;
+        final int tmpColDim = myColDim;
+
+        if (tmpColDim > SubstituteBackwards.THRESHOLD) {
+
+            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                @Override
+                public void conquer(final int first, final int limit) {
+                    SubstituteBackwards.invoke(R064Store.this.data, tmpRowDim, first, limit, body, unitDiagonal, conjugated, hermitian);
+                }
+
+            };
+
+            tmpConquerer.invoke(0, tmpColDim, SubstituteBackwards.THRESHOLD);
+
+        } else {
+
+            SubstituteBackwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, hermitian);
+        }
     }
 
     @Override
@@ -660,7 +779,27 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
 
     @Override
     public void substituteForwards(final Access2D<Double> body, final boolean unitDiagonal, final boolean conjugated, final boolean identity) {
-        SubstituteForwards.invoke(data, myRowDim, body, unitDiagonal, conjugated, identity);
+
+        final int tmpRowDim = myRowDim;
+        final int tmpColDim = myColDim;
+
+        if (tmpColDim > SubstituteForwards.THRESHOLD) {
+
+            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                @Override
+                public void conquer(final int first, final int limit) {
+                    SubstituteForwards.invoke(R064Store.this.data, tmpRowDim, first, limit, body, unitDiagonal, conjugated, identity);
+                }
+
+            };
+
+            tmpConquerer.invoke(0, tmpColDim, SubstituteForwards.THRESHOLD);
+
+        } else {
+
+            SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, identity);
+        }
     }
 
     @Override

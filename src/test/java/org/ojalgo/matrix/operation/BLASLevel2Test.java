@@ -34,8 +34,9 @@ import org.ojalgo.matrix.operation.BLASLevel3Test.Storage;
  * diagonal or not, positive, negative and unit increments (a negative increment walks the vector backwards,
  * with the offset still the lowest index), alpha and beta 0, 1 and other, matrices with offsets and padding
  * as well as matrices filling their arrays exactly, and vector shapes. Each case is run through the pure Java
- * implementation and the dispatching {@code invoke}. Elements that are not part of the result must be left
- * untouched, inputs must not change, and a y that need not be set (beta 0) is filled with NaN.
+ * implementation, the dispatching {@code invoke}, and the native implementation when there is one (run with
+ * {@code --enable-native-access=ojalgo,ALL-UNNAMED} to include it). Elements that are not part of the result
+ * must be left untouched, inputs must not change, and a y that need not be set (beta 0) is filled with NaN.
  */
 public class BLASLevel2Test {
 
@@ -58,6 +59,10 @@ public class BLASLevel2Test {
      */
     private static int index(final int i, final int n, final int inc) {
         return inc >= 0 ? OFFSET + i * inc : OFFSET + (n - 1 - i) * -inc;
+    }
+
+    private static boolean isAvailable(final Implementation implementation, final boolean nativeAvailable) {
+        return implementation != Implementation.OFF_HEAP && (implementation != Implementation.NATIVE || nativeAvailable);
     }
 
     private static double[] newVector(final Random random, final int n, final int inc) {
@@ -99,6 +104,9 @@ public class BLASLevel2Test {
             case JAVA:
                 GEMV.JVM.invoke(transpose, m, n, alpha, a.data, a.offset, a.ld, x, OFFSET, incX, beta, y, OFFSET, incY);
                 break;
+            case NATIVE:
+                GEMV.Native.invoke(transpose, m, n, alpha, a.data, a.offset, a.ld, x, OFFSET, incX, beta, y, OFFSET, incY);
+                break;
             default:
                 GEMV.invoke(transpose, m, n, alpha, a.data, a.offset, a.ld, x, OFFSET, incX, beta, y, OFFSET, incY);
                 break;
@@ -136,6 +144,9 @@ public class BLASLevel2Test {
                     GER.JVM.invoke(m, n, alpha, x, OFFSET, incX, y, OFFSET, incY, a.data, a.offset, a.ld);
                 }
                 break;
+            case NATIVE:
+                GER.Native.invoke(m, n, alpha, x, OFFSET, incX, y, OFFSET, incY, a.data, a.offset, a.ld);
+                break;
             default:
                 GER.invoke(m, n, alpha, x, OFFSET, incX, y, OFFSET, incY, a.data, a.offset, a.ld);
                 break;
@@ -162,6 +173,9 @@ public class BLASLevel2Test {
             case JAVA:
                 TRSV.JVM.invoke(upper, transpose, unitDiagonal, n, a.data, a.offset, a.ld, x, OFFSET, incX);
                 break;
+            case NATIVE:
+                TRSV.Native.invoke(upper, transpose, unitDiagonal, n, a.data, a.offset, a.ld, x, OFFSET, incX);
+                break;
             default:
                 TRSV.invoke(upper, transpose, unitDiagonal, n, a.data, a.offset, a.ld, x, OFFSET, incX);
                 break;
@@ -187,41 +201,46 @@ public class BLASLevel2Test {
         }
         BLASLevel3Test.assertUnchanged(message, aBefore, a.data);
 
-        float[] aFloat = new float[a.data.length];
-        for (int p = 0; p < aFloat.length; p++) {
-            aFloat[p] = (float) a.data[p];
-        }
-        float[] xFloat = new float[rhs.length];
-        for (int p = 0; p < xFloat.length; p++) {
-            xFloat[p] = (float) rhs[p];
-        }
+        if (implementation != Implementation.NATIVE) {
 
-        if (implementation == Implementation.JAVA) {
-            TRSV.JVM.invoke(upper, transpose, unitDiagonal, n, aFloat, a.offset, a.ld, xFloat, OFFSET, incX);
-        } else {
-            TRSV.invoke(upper, transpose, unitDiagonal, n, aFloat, a.offset, a.ld, xFloat, OFFSET, incX);
-        }
+            float[] aFloat = new float[a.data.length];
+            for (int p = 0; p < aFloat.length; p++) {
+                aFloat[p] = (float) a.data[p];
+            }
+            float[] xFloat = new float[rhs.length];
+            for (int p = 0; p < xFloat.length; p++) {
+                xFloat[p] = (float) rhs[p];
+            }
 
-        double magnitude = 0.0;
-        for (int p = 0; p < x.length; p++) {
-            magnitude = Math.max(magnitude, Math.abs(x[p]));
-        }
-        for (int p = 0; p < x.length; p++) {
-            TestUtils.assertEquals(message + " float at " + p, x[p], xFloat[p], 1E-5 * magnitude);
+            if (implementation == Implementation.JAVA) {
+                TRSV.JVM.invoke(upper, transpose, unitDiagonal, n, aFloat, a.offset, a.ld, xFloat, OFFSET, incX);
+            } else {
+                TRSV.invoke(upper, transpose, unitDiagonal, n, aFloat, a.offset, a.ld, xFloat, OFFSET, incX);
+            }
+
+            double magnitude = 0.0;
+            for (int p = 0; p < x.length; p++) {
+                magnitude = Math.max(magnitude, Math.abs(x[p]));
+            }
+            for (int p = 0; p < x.length; p++) {
+                TestUtils.assertEquals(message + " float at " + p, x[p], xFloat[p], 1E-5 * magnitude);
+            }
         }
     }
 
     @Test
     public void testGEMV() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (boolean transpose : BOOLEANS) {
-                    for (int[] size : SIZES) {
-                        for (int incX : INCREMENTS) {
-                            for (int incY : INCREMENTS) {
-                                for (double alpha : ALPHAS) {
-                                    for (double beta : BETAS) {
-                                        BLASLevel2Test.doTestGEMV(implementation, tight, transpose, size[0], size[1], incX, incY, alpha, beta);
+            if (BLASLevel2Test.isAvailable(implementation, GEMV.NATIVE)) {
+                for (boolean tight : BOOLEANS) {
+                    for (boolean transpose : BOOLEANS) {
+                        for (int[] size : SIZES) {
+                            for (int incX : INCREMENTS) {
+                                for (int incY : INCREMENTS) {
+                                    for (double alpha : ALPHAS) {
+                                        for (double beta : BETAS) {
+                                            BLASLevel2Test.doTestGEMV(implementation, tight, transpose, size[0], size[1], incX, incY, alpha, beta);
+                                        }
                                     }
                                 }
                             }
@@ -233,8 +252,8 @@ public class BLASLevel2Test {
     }
 
     /**
-     * With alpha 0, A and x are not read: GEMV must work with empty arrays for them. y is scaled by beta (and
-     * not read when beta is 0).
+     * With alpha 0, A and x are not read: GEMV must work with empty arrays for them, also at sizes where the
+     * native implementation is used otherwise. y is scaled by beta (and not read when beta is 0).
      */
     @Test
     public void testGEMVAlphaZero() {
@@ -298,12 +317,14 @@ public class BLASLevel2Test {
     @Test
     public void testGER() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (int[] size : SIZES) {
-                    for (int incX : INCREMENTS) {
-                        for (int incY : INCREMENTS) {
-                            for (double alpha : ALPHAS) {
-                                BLASLevel2Test.doTestGER(implementation, tight, size[0], size[1], incX, incY, alpha);
+            if (BLASLevel2Test.isAvailable(implementation, GER.NATIVE)) {
+                for (boolean tight : BOOLEANS) {
+                    for (int[] size : SIZES) {
+                        for (int incX : INCREMENTS) {
+                            for (int incY : INCREMENTS) {
+                                for (double alpha : ALPHAS) {
+                                    BLASLevel2Test.doTestGER(implementation, tight, size[0], size[1], incX, incY, alpha);
+                                }
                             }
                         }
                     }
@@ -315,13 +336,15 @@ public class BLASLevel2Test {
     @Test
     public void testTRSV() {
         for (Implementation implementation : Implementation.values()) {
-            for (boolean tight : BOOLEANS) {
-                for (boolean upper : BOOLEANS) {
-                    for (boolean transpose : BOOLEANS) {
-                        for (boolean unitDiagonal : BOOLEANS) {
-                            for (int n : SIZES_SQUARE) {
-                                for (int incX : INCREMENTS) {
-                                    BLASLevel2Test.doTestTRSV(implementation, tight, upper, transpose, unitDiagonal, n, incX);
+            if (BLASLevel2Test.isAvailable(implementation, TRSV.NATIVE)) {
+                for (boolean tight : BOOLEANS) {
+                    for (boolean upper : BOOLEANS) {
+                        for (boolean transpose : BOOLEANS) {
+                            for (boolean unitDiagonal : BOOLEANS) {
+                                for (int n : SIZES_SQUARE) {
+                                    for (int incX : INCREMENTS) {
+                                        BLASLevel2Test.doTestTRSV(implementation, tight, upper, transpose, unitDiagonal, n, incX);
+                                    }
                                 }
                             }
                         }

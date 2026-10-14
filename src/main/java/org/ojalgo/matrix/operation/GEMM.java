@@ -21,16 +21,25 @@
  */
 package org.ojalgo.matrix.operation;
 
+import static java.lang.foreign.ValueLayout.*;
 import static org.ojalgo.function.constant.PrimitiveMath.ONE;
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.MemorySegment;
+import java.lang.invoke.MethodHandle;
 import java.lang.management.ManagementFactory;
+import java.util.function.IntSupplier;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.operation.ArrayOperation;
 import org.ojalgo.array.operation.DOT;
+import org.ojalgo.array.operation.NativeLibrary;
 import org.ojalgo.array.operation.SCAL;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.concurrent.Parallelism;
+import org.ojalgo.concurrent.ProcessingService;
 import org.ojalgo.machine.Hardware;
 
 import com.sun.management.HotSpotDiagnosticMXBean;
@@ -38,15 +47,19 @@ import com.sun.management.HotSpotDiagnosticMXBean;
 /**
  * BLAS level 3 {@code ?gemm}: C := alpha*op(A)*op(B) + beta*C, where op(X) is X or X<sup>T</sup>, op(A) is
  * m-by-k, op(B) is k-by-n and C is m-by-n.
+ *
+ * @see NativeLibrary
  */
 public abstract class GEMM implements BLAS3 {
 
     /**
-     * The pure Java implementation.
+     * The pure Java implementation. Everything it calls is pure Java as well – the {@code JVM}
+     * implementations of other operations, never their dispatching {@code invoke} methods (that may call
+     * native code).
      */
     static final class JVM {
 
-        private static final DivideAndConquer.Divider DIVIDER = Parallelism.CORES.newDivider();
+        private static final DivideAndConquer.Divider DIVIDER = ProcessingService.INSTANCE.newDivider();
         /**
          * Whether {@link Math#fma(double, double, double)} is a hardware instruction. Without it, it is
          * computed in software and is very slow.
@@ -88,8 +101,8 @@ public abstract class GEMM implements BLAS3 {
                     int chunk = MatrixOperation.chunk(THRESHOLD, blockM, blockK);
 
                     if (n > chunk) {
-                        DIVIDER.threshold(chunk).divide(0, n, (first, limit) -> JVM.invokeColumns(transposeA, transposeB, blockM, first, limit, blockK, alpha,
-                                a, blockOffsetA, lda, b, blockOffsetB, ldb, blockBeta, c, blockOffsetC, ldc));
+                        DIVIDER.parallelism(PARALLELISM).threshold(chunk).divide(0, n, (first, limit) -> JVM.invokeColumns(transposeA, transposeB, blockM,
+                                first, limit, blockK, alpha, a, blockOffsetA, lda, b, blockOffsetB, ldb, blockBeta, c, blockOffsetC, ldc));
                     } else {
                         JVM.invokeColumns(transposeA, transposeB, blockM, 0, n, blockK, alpha, a, blockOffsetA, lda, b, blockOffsetB, ldb, blockBeta, c,
                                 blockOffsetC, ldc);
@@ -161,61 +174,22 @@ public abstract class GEMM implements BLAS3 {
                     }
                 }
 
-                // The 1 to 3 columns of A that remain, in a single pass over the rows
-                int rowB = k4 * strideL;
-                int colA0 = offsetA + k4 * lda;
-                int colA1 = colA0 + lda;
-                int colA2 = colA1 + lda;
+                for (; l < k; l++) {
 
-                switch (k - k4) {
-                    case 3: {
-                        double b00 = alpha * b[colB0 + rowB], b10 = alpha * b[colB0 + rowB + strideL], b20 = alpha * b[colB0 + rowB + strideL2];
-                        double b01 = alpha * b[colB1 + rowB], b11 = alpha * b[colB1 + rowB + strideL], b21 = alpha * b[colB1 + rowB + strideL2];
-                        double b02 = alpha * b[colB2 + rowB], b12 = alpha * b[colB2 + rowB + strideL], b22 = alpha * b[colB2 + rowB + strideL2];
-                        double b03 = alpha * b[colB3 + rowB], b13 = alpha * b[colB3 + rowB + strideL], b23 = alpha * b[colB3 + rowB + strideL2];
-                        for (int i = 0; i < m; i++) {
-                            double a0 = a[colA0 + i];
-                            double a1 = a[colA1 + i];
-                            double a2 = a[colA2 + i];
-                            c[colC0 + i] = JVM.fma(b20, a2, JVM.fma(b10, a1, JVM.fma(b00, a0, c[colC0 + i])));
-                            c[colC1 + i] = JVM.fma(b21, a2, JVM.fma(b11, a1, JVM.fma(b01, a0, c[colC1 + i])));
-                            c[colC2 + i] = JVM.fma(b22, a2, JVM.fma(b12, a1, JVM.fma(b02, a0, c[colC2 + i])));
-                            c[colC3 + i] = JVM.fma(b23, a2, JVM.fma(b13, a1, JVM.fma(b03, a0, c[colC3 + i])));
-                        }
-                        break;
-                    }
-                    case 2: {
-                        double b00 = alpha * b[colB0 + rowB], b10 = alpha * b[colB0 + rowB + strideL];
-                        double b01 = alpha * b[colB1 + rowB], b11 = alpha * b[colB1 + rowB + strideL];
-                        double b02 = alpha * b[colB2 + rowB], b12 = alpha * b[colB2 + rowB + strideL];
-                        double b03 = alpha * b[colB3 + rowB], b13 = alpha * b[colB3 + rowB + strideL];
-                        for (int i = 0; i < m; i++) {
-                            double a0 = a[colA0 + i];
-                            double a1 = a[colA1 + i];
-                            c[colC0 + i] = JVM.fma(b10, a1, JVM.fma(b00, a0, c[colC0 + i]));
-                            c[colC1 + i] = JVM.fma(b11, a1, JVM.fma(b01, a0, c[colC1 + i]));
-                            c[colC2 + i] = JVM.fma(b12, a1, JVM.fma(b02, a0, c[colC2 + i]));
-                            c[colC3 + i] = JVM.fma(b13, a1, JVM.fma(b03, a0, c[colC3 + i]));
-                        }
-                        break;
-                    }
-                    case 1: {
-                        double b0 = alpha * b[colB0 + rowB];
-                        double b1 = alpha * b[colB1 + rowB];
-                        double b2 = alpha * b[colB2 + rowB];
-                        double b3 = alpha * b[colB3 + rowB];
-                        for (int i = 0; i < m; i++) {
-                            double a0 = a[colA0 + i];
-                            c[colC0 + i] = JVM.fma(b0, a0, c[colC0 + i]);
-                            c[colC1 + i] = JVM.fma(b1, a0, c[colC1 + i]);
-                            c[colC2 + i] = JVM.fma(b2, a0, c[colC2 + i]);
-                            c[colC3 + i] = JVM.fma(b3, a0, c[colC3 + i]);
-                        }
-                        break;
-                    }
-                    default: {
-                        // k is a multiple of 4
-                        break;
+                    int rowB = l * strideL;
+                    double b0 = alpha * b[colB0 + rowB];
+                    double b1 = alpha * b[colB1 + rowB];
+                    double b2 = alpha * b[colB2 + rowB];
+                    double b3 = alpha * b[colB3 + rowB];
+
+                    int colA = offsetA + l * lda;
+
+                    for (int i = 0; i < m; i++) {
+                        double a0 = a[colA + i];
+                        c[colC0 + i] = JVM.fma(b0, a0, c[colC0 + i]);
+                        c[colC1 + i] = JVM.fma(b1, a0, c[colC1 + i]);
+                        c[colC2 + i] = JVM.fma(b2, a0, c[colC2 + i]);
+                        c[colC3 + i] = JVM.fma(b3, a0, c[colC3 + i]);
                     }
                 }
             }
@@ -246,39 +220,11 @@ public abstract class GEMM implements BLAS3 {
                     }
                 }
 
-                int rowB = k4 * strideL;
-                int colA0 = offsetA + k4 * lda;
-                int colA1 = colA0 + lda;
-                int colA2 = colA1 + lda;
-
-                switch (k - k4) {
-                    case 3: {
-                        double b0 = alpha * b[colB + rowB];
-                        double b1 = alpha * b[colB + rowB + strideL];
-                        double b2 = alpha * b[colB + rowB + strideL2];
-                        for (int i = 0; i < m; i++) {
-                            c[colC + i] = JVM.fma(b2, a[colA2 + i], JVM.fma(b1, a[colA1 + i], JVM.fma(b0, a[colA0 + i], c[colC + i])));
-                        }
-                        break;
-                    }
-                    case 2: {
-                        double b0 = alpha * b[colB + rowB];
-                        double b1 = alpha * b[colB + rowB + strideL];
-                        for (int i = 0; i < m; i++) {
-                            c[colC + i] = JVM.fma(b1, a[colA1 + i], JVM.fma(b0, a[colA0 + i], c[colC + i]));
-                        }
-                        break;
-                    }
-                    case 1: {
-                        double b0 = alpha * b[colB + rowB];
-                        for (int i = 0; i < m; i++) {
-                            c[colC + i] = JVM.fma(b0, a[colA0 + i], c[colC + i]);
-                        }
-                        break;
-                    }
-                    default: {
-                        // k is a multiple of 4
-                        break;
+                for (; l < k; l++) {
+                    double b0 = alpha * b[colB + l * strideL];
+                    int colA = offsetA + l * lda;
+                    for (int i = 0; i < m; i++) {
+                        c[colC + i] = JVM.fma(b0, a[colA + i], c[colC + i]);
                     }
                 }
             }
@@ -327,8 +273,8 @@ public abstract class GEMM implements BLAS3 {
             } else {
                 int threshold = MatrixOperation.chunk(THRESHOLD, m, k);
                 if (n > threshold) {
-                    DIVIDER.threshold(threshold).divide(0, n, (first, limit) -> JVM.invokeColumns(transposeA, transposeB, m, first, limit, k, alpha, a, offsetA,
-                            lda, b, offsetB, ldb, beta, c, offsetC, ldc));
+                    DIVIDER.parallelism(PARALLELISM).threshold(threshold).divide(0, n, (first, limit) -> JVM.invokeColumns(transposeA, transposeB, m, first,
+                            limit, k, alpha, a, offsetA, lda, b, offsetB, ldb, beta, c, offsetC, ldc));
                 } else {
                     JVM.invokeColumns(transposeA, transposeB, m, 0, n, k, alpha, a, offsetA, lda, b, offsetB, ldb, beta, c, offsetC, ldc);
                 }
@@ -605,6 +551,82 @@ public abstract class GEMM implements BLAS3 {
     }
 
     /**
+     * Native {@code cblas_dgemm}, initialised only when {@link NativeLibrary#isAvailable()}. Linked as a
+     * critical function so the Java arrays are used in place, without copying. The JVM can't reach a
+     * safepoint (and so can't collect garbage) until the call returns.
+     */
+    static final class Native {
+
+        private static final FunctionDescriptor DESCRIPTOR = FunctionDescriptor.ofVoid(JAVA_INT, JAVA_INT, JAVA_INT, JAVA_INT, JAVA_INT, JAVA_INT, JAVA_DOUBLE,
+                ADDRESS, JAVA_INT, ADDRESS, JAVA_INT, JAVA_DOUBLE, ADDRESS, JAVA_INT);
+
+        static final MethodHandle DGEMM = NativeLibrary.downcall("cblas_dgemm", DESCRIPTOR, true);
+        /**
+         * The same function, not linked as critical. It must be passed native memory, but the JVM can reach
+         * safepoints during the call.
+         */
+        static final MethodHandle DGEMM_OFF_HEAP = NativeLibrary.downcall("cblas_dgemm", DESCRIPTOR, false);
+
+        static void invoke(final boolean transposeA, final boolean transposeB, final int m, final int n, final int k, final double alpha, final double[] a,
+                final int offsetA, final int lda, final double[] b, final int offsetB, final int ldb, final double beta, final double[] c, final int offsetC,
+                final int ldc) {
+
+            MemorySegment segmentA = transposeA ? CBLAS.ofMatrix(a, offsetA, k, m, lda) : CBLAS.ofMatrix(a, offsetA, m, k, lda);
+            MemorySegment segmentB = transposeB ? CBLAS.ofMatrix(b, offsetB, n, k, ldb) : CBLAS.ofMatrix(b, offsetB, k, n, ldb);
+            MemorySegment segmentC = CBLAS.ofMatrix(c, offsetC, m, n, ldc);
+
+            try {
+                DGEMM.invokeExact(CBLAS.COLUMN_MAJOR, CBLAS.transpose(transposeA), CBLAS.transpose(transposeB), m, n, k, alpha, segmentA, lda, segmentB, ldb,
+                        beta, segmentC, ldc);
+            } catch (Throwable cause) {
+                throw new ProgrammingError(cause);
+            }
+        }
+
+        /**
+         * Copies the matrices to native memory, calls {@link #DGEMM_OFF_HEAP} and copies C back. When beta is
+         * 0, C is not copied to native memory. Requires alpha != 0 (A and B are read) and m, n, k > 0.
+         */
+        static void invokeOffHeap(final boolean transposeA, final boolean transposeB, final int m, final int n, final int k, final double alpha,
+                final double[] a, final int offsetA, final int lda, final double[] b, final int offsetB, final int ldb, final double beta, final double[] c,
+                final int offsetC, final int ldc) {
+
+            try (Arena arena = Arena.ofConfined()) {
+
+                MemorySegment segmentA = transposeA ? CBLAS.copyOfMatrix(arena, a, offsetA, k, m, lda) : CBLAS.copyOfMatrix(arena, a, offsetA, m, k, lda);
+                MemorySegment segmentB = transposeB ? CBLAS.copyOfMatrix(arena, b, offsetB, n, k, ldb) : CBLAS.copyOfMatrix(arena, b, offsetB, k, n, ldb);
+                MemorySegment segmentC = beta == ZERO ? arena.allocate(JAVA_DOUBLE, (long) m * n) : CBLAS.copyOfMatrix(arena, c, offsetC, m, n, ldc);
+
+                DGEMM_OFF_HEAP.invokeExact(CBLAS.COLUMN_MAJOR, CBLAS.transpose(transposeA), CBLAS.transpose(transposeB), m, n, k, alpha, segmentA,
+                        transposeA ? k : m, segmentB, transposeB ? n : k, beta, segmentC, m);
+
+                CBLAS.copyBackMatrix(segmentC, c, offsetC, m, n, ldc);
+
+            } catch (RuntimeException | Error cause) {
+                throw cause;
+            } catch (Throwable cause) {
+                throw new ProgrammingError(cause);
+            }
+        }
+
+    }
+
+    static final boolean NATIVE = NativeLibrary.isAvailable() && Native.DGEMM != null;
+    /**
+     * The native implementation is used, if there is one, when m*n*k (the number of multiply-adds) is larger
+     * than this.
+     */
+    private static final double NATIVE_THRESHOLD = 10_000;
+    /**
+     * The native implementation is linked as a critical function, and passed the Java arrays in place. A
+     * critical call blocks safepoints: garbage collection, in the whole JVM, waits until it returns. Long and
+     * compute-intensive calls – m*n*k larger than {@link #OFF_HEAP_THRESHOLD} and the smallest of m, n and k
+     * larger than this – are instead passed copies of the matrices in native memory, and the function is
+     * called without blocking safepoints. The copies then cost little compared to the call.
+     */
+    private static final double OFF_HEAP_DIMENSION = 300;
+    private static final double OFF_HEAP_THRESHOLD = 3E9;
+    /**
      * The block size (rows and columns of A) used when the Java implementation is cache blocked.
      */
     static int BLOCK_SIZE = 512;
@@ -613,6 +635,7 @@ public abstract class GEMM implements BLAS3 {
      * The Java implementation is cache blocked when both m and k are larger than this.
      */
     static int BLOCK_THRESHOLD = 3_000;
+    static IntSupplier PARALLELISM = Parallelism.THREADS;
 
     /**
      * The Java implementation is multi-threaded, splitting the columns of C, when m*n*k is larger than this
@@ -648,7 +671,32 @@ public abstract class GEMM implements BLAS3 {
             return;
         }
 
-        JVM.invoke(transposeA, transposeB, m, n, k, alpha, a, offsetA, lda, b, offsetB, ldb, beta, c, offsetC, ldc);
+        // With alpha 0, A and B are not read and the Java implementation does what remains
+        if (alpha != ZERO && GEMM.isNative(m, n, k)) {
+            if (GEMM.isOffHeap(m, n, k)) {
+                Native.invokeOffHeap(transposeA, transposeB, m, n, k, alpha, a, offsetA, lda, b, offsetB, ldb, beta, c, offsetC, ldc);
+            } else {
+                Native.invoke(transposeA, transposeB, m, n, k, alpha, a, offsetA, lda, b, offsetB, ldb, beta, c, offsetC, ldc);
+            }
+        } else {
+            JVM.invoke(transposeA, transposeB, m, n, k, alpha, a, offsetA, lda, b, offsetB, ldb, beta, c, offsetC, ldc);
+        }
+    }
+
+    /**
+     * Whether to use the native implementation: there is one, and m*n*k is larger than
+     * {@link #NATIVE_THRESHOLD}.
+     */
+    static boolean isNative(final double m, final double n, final double k) {
+        return NATIVE && (m * n * k) > NATIVE_THRESHOLD;
+    }
+
+    /**
+     * Whether to call the native implementation with copies of the matrices in native memory, rather than
+     * critically with the Java arrays in place, see {@link #OFF_HEAP_DIMENSION}.
+     */
+    static boolean isOffHeap(final double m, final double n, final double k) {
+        return m * n * k > OFF_HEAP_THRESHOLD && Math.min(m, Math.min(n, k)) > OFF_HEAP_DIMENSION;
     }
 
 }
