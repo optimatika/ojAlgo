@@ -131,6 +131,25 @@ public class RandomNumberTest extends RandomTests {
         }
     }
 
+    @Test
+    public void testBinomialProbability() {
+
+        TestUtils.assertEquals(0.07958923738717877, new Binomial(100, HALF).getProbability(50), 1E-12);
+        TestUtils.assertEquals(0.09179969176683679, new Binomial(100, 0.25).getProbability(25), 1E-12);
+        TestUtils.assertEquals(0.01783901114585432, new Binomial(2000, HALF).getProbability(1000), 1E-12);
+
+        TestUtils.assertEquals(ONE, new Binomial(0, HALF).getProbability(0));
+        for (double probability : new double[] { ZERO, HALF, ONE }) {
+            Binomial distribution = new Binomial(100, probability);
+            TestUtils.assertEquals(POW.invoke(ONE - probability, 100), distribution.getProbability(0), 1E-12);
+            TestUtils.assertEquals(POW.invoke(probability, 100), distribution.getProbability(100), 1E-12);
+            TestUtils.assertEquals(ZERO, distribution.getProbability(-1));
+            TestUtils.assertEquals(ZERO, distribution.getProbability(101));
+        }
+        TestUtils.assertEquals(ZERO, new Binomial(100, ZERO).getProbability(50));
+        TestUtils.assertEquals(ZERO, new Binomial(100, ONE).getProbability(50));
+    }
+
     /**
      * Tests that the error function implementation returns correct confidence intervals for +/- 6 standard
      * deviations. They are all correct to at least 10 decimal places.
