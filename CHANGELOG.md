@@ -36,6 +36,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - `LU.R064` (up to 512 columns): `getInverse(PhysicalStore)` and `invert(Access2D, PhysicalStore)` returned a wrong inverse when the decomposition pivoted and the preallocated store was not all zeros, e.g. when reused. This also affected `InverterTask.R064.make(dim, false)` from dim 6.
 - `SingularValue` and symmetric/Hermitian `Eigenvalue`: `getInverse(PhysicalStore)` no longer caches the caller's preallocated store as the decomposition's inverse. Later `getInverse(..)` and `getSolution(..)` calls used whatever had since been written to that store.
 
+#### org.ojalgo.matrix.store
+
+- Multiplying an m-by-0 matrix by a 0-by-n matrix (an empty inner dimension) threw `ArithmeticException` (division by zero) in most cases. The product is now an m-by-n matrix of zeros, from `multiply(MatrixStore)` as well as `fillByMultiplying(..)`, for `R064Store`, `R032Store`, `GenericStore` and `RawStore`.
+
 #### org.ojalgo.optimisation.convex
 
 - The active set solvers' initial LP (finding a feasible start) is solved as the primal problem with the revised simplex solver. The dense tableau dual simplex previously used could cycle on degenerate problems and run until the time limit.

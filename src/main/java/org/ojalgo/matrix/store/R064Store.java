@@ -424,7 +424,9 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
             ProgrammingError.throwForMultiplicationNotPossible();
         }
 
-        if (left instanceof R064Store) {
+        if (complexity == 0) {
+            Arrays.fill(data, ZERO);
+        } else if (left instanceof R064Store) {
             if (right instanceof R064Store) {
                 multiplyNeither.invoke(data, R064Store.cast(left).data, complexity, R064Store.cast(right).data);
             } else {
@@ -649,6 +651,10 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
     public MatrixStore<Double> multiply(final MatrixStore<Double> right) {
 
         R064Store retVal = FACTORY.make(myRowDim, right.countColumns());
+
+        if (myColDim == 0) {
+            return retVal; // An empty inner dimension: the product is all zeros, as made
+        }
 
         if (right instanceof R064Store) {
             retVal.multiplyNeither.invoke(retVal.data, data, myColDim, R064Store.cast(right).data);

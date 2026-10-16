@@ -27,11 +27,75 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.random.Normal;
 import org.ojalgo.random.Uniform;
+import org.ojalgo.structure.Factory2D;
 
 public class MultiplicationTest extends MatrixStoreTests {
 
+    /**
+     * A product with an empty inner dimension, m-by-0 times 0-by-n, is an m-by-n matrix of zeros. It used to
+     * throw ArithmeticException (division by zero) for almost every combination of store type and multiply
+     * path. The sizes cover the special-size kernels (up to 10 rows) and the general case.
+     */
+    private static <N extends Comparable<N>, I extends PhysicalStore<N> & Factory2D.Builder<I>> void doTestEmptyInnerDimension(final Factory<N, I> factory) {
+
+        int[] dims = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 40 };
+
+        for (int m : dims) {
+            for (int n : dims) {
+
+                I expected = factory.make(m, n);
+
+                I left = factory.make(m, 0);
+                I right = factory.make(0, n);
+                MatrixStore<N> leftView = factory.make(0, m).transpose();
+                MatrixStore<N> rightView = factory.make(n, 0).transpose();
+
+                TestUtils.assertEquals(expected, left.multiply(right));
+
+                I product = factory.make(m, n);
+                N one = factory.scalar().one().get();
+
+                product.fillAll(one);
+                product.fillByMultiplying(left, right);
+                TestUtils.assertEquals(expected, product);
+
+                product.fillAll(one);
+                product.fillByMultiplying(left, rightView);
+                TestUtils.assertEquals(expected, product);
+
+                product.fillAll(one);
+                product.fillByMultiplying(leftView, right);
+                TestUtils.assertEquals(expected, product);
+
+                product.fillAll(one);
+                product.fillByMultiplying(leftView, rightView);
+                TestUtils.assertEquals(expected, product);
+            }
+        }
+    }
+
     public MultiplicationTest() {
         super();
+    }
+
+    @Test
+    public void testEmptyInnerDimensionGeneric() {
+        MultiplicationTest.doTestEmptyInnerDimension(GenericStore.R128);
+    }
+
+    @Test
+    public void testEmptyInnerDimensionR032() {
+        MultiplicationTest.doTestEmptyInnerDimension(R032Store.FACTORY);
+    }
+
+    @Test
+    public void testEmptyInnerDimensionR064() {
+        MultiplicationTest.doTestEmptyInnerDimension(R064Store.FACTORY);
+    }
+
+    @Test
+    public void testEmptyInnerDimensionRaw() {
+        MultiplicationTest.doTestEmptyInnerDimension(RawStore.FACTORY);
     }
 
     @Test

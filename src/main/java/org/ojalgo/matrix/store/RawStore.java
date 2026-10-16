@@ -616,7 +616,7 @@ public final class RawStore implements PhysicalStore<Double>, Factory2D.Builder<
 
         int nbRows = data.length;
         int cmplxt = myNumberOfColumns;
-        int nbCols = Math.toIntExact(right.count() / cmplxt);
+        int nbCols = Math.toIntExact(right.countColumns());
 
         RawStore retVal = new RawStore(nbRows, nbCols);
 
