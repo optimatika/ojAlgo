@@ -114,7 +114,7 @@ abstract class SimplexStore {
      * ({@link RevisedStore}) and the dense tableau ({@link DenseTableau}) based on the problem size (m*n) and
      * ratio (n/m), where m is the number of constraints and n the total number of variables (including slacks
      * and artificials). The revised store is used when the size is at least 150_000, the ratio at least 5, or
-     * the size at least 40_000 with a ratio of at least 3.
+     * the size at least 30_000 with a ratio of at least 3.
      */
     static Function<LinearStructure, SimplexStore> newStoreFactory(final Options options) {
 
@@ -129,7 +129,7 @@ abstract class SimplexStore {
             long size = structure.getProblemSize();
             double ratio = structure.getProblemRatio();
 
-            if (size >= 150_000L || ratio >= 5.0 || size >= 40_000L && ratio >= 3.0) {
+            if (size >= 150_000L || ratio >= 5.0 || size >= 30_000L && ratio >= 3.0) {
                 return new RevisedStore(structure);
             } else {
                 return new DenseTableau(structure);
