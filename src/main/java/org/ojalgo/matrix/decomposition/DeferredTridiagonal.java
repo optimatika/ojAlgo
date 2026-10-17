@@ -45,9 +45,9 @@ import org.ojalgo.structure.Access2D;
 /**
  * @author apete
  */
-abstract class DeferredTridiagonal<N extends Comparable<N>> extends DenseTridiagonal<N> {
+abstract class DeferredTridiagonal<N extends Comparable<N>, M extends PhysicalStore<N>> extends DenseTridiagonal<N, M> {
 
-    static final class C128 extends DeferredTridiagonal<ComplexNumber> {
+    static final class C128 extends DeferredTridiagonal<ComplexNumber, GenericStore<ComplexNumber>> {
 
         C128() {
             super(GenericStore.C128, GenerateApplyAndCopyHouseholderColumn::invokeGeneric, HouseholderHermitian::invokeGeneric);
@@ -84,7 +84,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends DenseTridiag
 
     }
 
-    static final class H256 extends DeferredTridiagonal<Quaternion> {
+    static final class H256 extends DeferredTridiagonal<Quaternion, GenericStore<Quaternion>> {
 
         H256() {
             super(GenericStore.H256, GenerateApplyAndCopyHouseholderColumn::invokeGeneric, HouseholderHermitian::invokeGeneric);
@@ -121,7 +121,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends DenseTridiag
 
     }
 
-    static final class Q128 extends DeferredTridiagonal<RationalNumber> {
+    static final class Q128 extends DeferredTridiagonal<RationalNumber, GenericStore<RationalNumber>> {
 
         Q128() {
             super(GenericStore.Q128, GenerateApplyAndCopyHouseholderColumn::invokeGeneric, HouseholderHermitian::invokeGeneric);
@@ -133,7 +133,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends DenseTridiag
         }
     }
 
-    static final class R064 extends DeferredTridiagonal<Double> {
+    static final class R064 extends DeferredTridiagonal<Double, R064Store> {
 
         R064() {
             super(R064Store.FACTORY, GenerateApplyAndCopyHouseholderColumn::invokeR064, HouseholderHermitian::invokeR064);
@@ -146,7 +146,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends DenseTridiag
 
     }
 
-    static final class R128 extends DeferredTridiagonal<Quadruple> {
+    static final class R128 extends DeferredTridiagonal<Quadruple, GenericStore<Quadruple>> {
 
         R128() {
             super(GenericStore.R128, GenerateApplyAndCopyHouseholderColumn::invokeGeneric, HouseholderHermitian::invokeGeneric);
@@ -160,13 +160,13 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends DenseTridiag
 
     private transient BasicArray<N> myDiagD = null;
     private transient BasicArray<N> myDiagE = null;
-    private final HouseholderStep<N> myHouseholderColumn;
-    private final HermitianStep<N> myHouseholderHermitian;
+    private final HouseholderStep<N, M> myHouseholderColumn;
+    private final HermitianStep<N, M> myHouseholderHermitian;
     private Array1D<N> myInitDiagQ = null;
     private transient BasicArray<N> myWorker = null;
 
-    protected DeferredTridiagonal(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> factory, final HouseholderStep<N> householderColumn,
-            final HermitianStep<N> householderHermitian) {
+    protected DeferredTridiagonal(final PhysicalStore.Factory<N, ? extends M> factory, final HouseholderStep<N, M> householderColumn,
+            final HermitianStep<N, M> householderHermitian) {
         super(factory);
         myHouseholderColumn = householderColumn;
         myHouseholderHermitian = householderHermitian;
@@ -182,7 +182,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends DenseTridiag
 
             MatrixStore<N> logicallyTriangularMatrix = this.collect(matrix).triangular(false, false);
             // TODO Not optimal code here!
-            PhysicalStore<N> inPlace = this.setInPlace(logicallyTriangularMatrix);
+            M inPlace = this.setInPlace(logicallyTriangularMatrix);
 
             int size = this.getMinDim();
 
@@ -240,9 +240,9 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends DenseTridiag
     }
 
     @Override
-    PhysicalStore<N> makeQ() {
+    M makeQ() {
 
-        PhysicalStore<N> retVal = this.getInPlace();
+        M retVal = this.getInPlace();
         int tmpDim = this.getMinDim();
 
         HouseholderReference<N> tmpReference = HouseholderReference.makeColumn(retVal);

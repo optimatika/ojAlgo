@@ -32,8 +32,8 @@ import org.ojalgo.matrix.transformation.Householder;
  * @author apete
  */
 @FunctionalInterface
-public interface HermitianStep<N extends Comparable<N>> {
+public interface HermitianStep<N extends Comparable<N>, M extends PhysicalStore<N>> {
 
-    void invoke(PhysicalStore<N> store, Householder<N> transformation, BasicArray<N> worker);
+    void invoke(M store, Householder<N> transformation, BasicArray<N> worker);
 
 }

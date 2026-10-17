@@ -466,12 +466,12 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
     @Override
     public MatrixStore<Double> getU() {
-        return myTransposed ? this.wrap(myVt).transpose() : this.wrap(myUt).transpose();
+        return myTransposed ? RawStore.wrap(myVt).transpose() : RawStore.wrap(myUt).transpose();
     }
 
     @Override
     public MatrixStore<Double> getV() {
-        return myTransposed ? this.wrap(myUt).transpose() : this.wrap(myVt).transpose();
+        return myTransposed ? RawStore.wrap(myUt).transpose() : RawStore.wrap(myVt).transpose();
     }
 
     @Override

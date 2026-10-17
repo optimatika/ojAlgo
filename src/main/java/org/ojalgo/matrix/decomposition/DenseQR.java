@@ -46,9 +46,9 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.type.NumberDefinition;
 
-abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> implements QR<N> {
+abstract class DenseQR<N extends Comparable<N>, M extends PhysicalStore<N>> extends InPlaceDecomposition<N, M> implements QR<N> {
 
-    static final class C128 extends DenseQR<ComplexNumber> {
+    static final class C128 extends DenseQR<ComplexNumber, GenericStore<ComplexNumber>> {
 
         C128() {
             this(false);
@@ -60,7 +60,7 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
     }
 
-    static final class H256 extends DenseQR<Quaternion> {
+    static final class H256 extends DenseQR<Quaternion, GenericStore<Quaternion>> {
 
         H256() {
             this(false);
@@ -72,7 +72,7 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
     }
 
-    static final class Q128 extends DenseQR<RationalNumber> {
+    static final class Q128 extends DenseQR<RationalNumber, GenericStore<RationalNumber>> {
 
         Q128() {
             this(false);
@@ -84,7 +84,7 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
     }
 
-    static final class R064 extends DenseQR<Double> {
+    static final class R064 extends DenseQR<Double, R064Store> {
 
         R064() {
             this(false);
@@ -96,7 +96,7 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
     }
 
-    static final class R128 extends DenseQR<Quadruple> {
+    static final class R128 extends DenseQR<Quadruple, GenericStore<Quadruple>> {
 
         R128() {
             this(false);
@@ -271,10 +271,10 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
     }
 
     private final boolean myFullSize;
-    private final HouseholderStep<N> myHouseholderColumn;
+    private final HouseholderStep<N, M> myHouseholderColumn;
     private int myNumberOfHouseholderTransformations = 0;
 
-    protected DenseQR(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> factory, final boolean fullSize, final HouseholderStep<N> householderColumn) {
+    protected DenseQR(final PhysicalStore.Factory<N, ? extends M> factory, final boolean fullSize, final HouseholderStep<N, M> householderColumn) {
         super(factory);
         myFullSize = fullSize;
         myHouseholderColumn = householderColumn;
@@ -332,7 +332,7 @@ abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
         this.reset();
 
-        PhysicalStore<N> tmpStore = this.setInPlace(matrix);
+        M tmpStore = this.setInPlace(matrix);
 
         int m = this.getRowDim();
         int r = this.getMinDim();

@@ -130,7 +130,7 @@ public class CaseQR extends MatrixDecompositionTests {
         final MatrixStore<ComplexNumber> tmpDecompQ = tmpDecomposition.getQ();
         final MatrixStore<ComplexNumber> tmpDecompR = tmpDecomposition.getR();
 
-        final PhysicalStore<ComplexNumber> tmpInPlace = GenericStore.C128.copy(tmpOriginal);
+        final GenericStore<ComplexNumber> tmpInPlace = GenericStore.C128.copy(tmpOriginal);
 
         final PhysicalStore<ComplexNumber> tmpNowQ = GenericStore.C128.makeEye(DIMENSION, DIMENSION);
         final PhysicalStore<ComplexNumber> tmpNowR = GenericStore.C128.copy(tmpOriginal);

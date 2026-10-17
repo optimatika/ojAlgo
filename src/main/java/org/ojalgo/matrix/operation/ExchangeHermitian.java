@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.operation;
 
 import org.ojalgo.matrix.store.GenericStore;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.scalar.Scalar;
 
@@ -34,9 +33,7 @@ import org.ojalgo.scalar.Scalar;
  */
 public abstract class ExchangeHermitian implements MatrixOperation {
 
-    public static <N extends Scalar<N>> void invokeGeneric(final PhysicalStore<N> store, final int indexA, final int indexB) {
-
-        GenericStore<N> matrix = (GenericStore<N>) store;
+    public static <N extends Scalar<N>> void invokeGeneric(final GenericStore<N> matrix, final int indexA, final int indexB) {
 
         int indexMin = Math.min(indexA, indexB);
         int indexMax = Math.max(indexA, indexB);
@@ -66,9 +63,7 @@ public abstract class ExchangeHermitian implements MatrixOperation {
         }
     }
 
-    public static void invokeR064(final PhysicalStore<Double> store, final int indexA, final int indexB) {
-
-        R064Store matrix = (R064Store) store;
+    public static void invokeR064(final R064Store matrix, final int indexA, final int indexB) {
 
         int indexMin = Math.min(indexA, indexB);
         int indexMax = Math.max(indexA, indexB);

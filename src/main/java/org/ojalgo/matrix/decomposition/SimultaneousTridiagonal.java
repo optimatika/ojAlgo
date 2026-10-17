@@ -24,7 +24,6 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.matrix.operation.HouseholderHermitian;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.structure.Access2D;
@@ -34,7 +33,7 @@ import org.ojalgo.structure.Access2D;
  *
  * @author apete
  */
-class SimultaneousTridiagonal extends DenseTridiagonal<Double> {
+class SimultaneousTridiagonal extends DenseTridiagonal<Double, R064Store> {
 
     private ArrayR064 myDiagD;
     private ArrayR064 myDiagE;
@@ -54,7 +53,7 @@ class SimultaneousTridiagonal extends DenseTridiagonal<Double> {
             myDiagE = ArrayR064.make(size);
         }
 
-        HouseholderHermitian.tred2j(((R064Store) this.getInPlace()).data, myDiagD.data, myDiagE.data, true);
+        HouseholderHermitian.tred2j(this.getInPlace().data, myDiagD.data, myDiagE.data, true);
 
         return this.computed(true);
     }
@@ -71,7 +70,7 @@ class SimultaneousTridiagonal extends DenseTridiagonal<Double> {
     }
 
     @Override
-    PhysicalStore<Double> makeQ() {
+    R064Store makeQ() {
         return this.getInPlace();
     }
 

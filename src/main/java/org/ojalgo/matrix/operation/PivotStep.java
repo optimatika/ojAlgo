@@ -31,8 +31,8 @@ import org.ojalgo.matrix.store.PhysicalStore;
  * @author apete
  */
 @FunctionalInterface
-public interface PivotStep<N extends Comparable<N>> {
+public interface PivotStep<N extends Comparable<N>, M extends PhysicalStore<N>> {
 
-    void invoke(PhysicalStore<N> store, int iterationPoint, BasicArray<N> multipliers);
+    void invoke(M store, int iterationPoint, BasicArray<N> multipliers);
 
 }

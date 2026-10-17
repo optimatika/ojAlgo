@@ -48,9 +48,9 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 
-abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecomposition<N> implements Cholesky<N> {
+abstract class DenseCholesky<N extends Comparable<N>, M extends PhysicalStore<N>> extends InPlaceDecomposition<N, M> implements Cholesky<N> {
 
-    static final class C128 extends DenseCholesky<ComplexNumber> {
+    static final class C128 extends DenseCholesky<ComplexNumber, GenericStore<ComplexNumber>> {
 
         C128() {
             super(GenericStore.C128, DivideAndCopyColumn::invokeGeneric, ApplyCholesky::invokeGeneric);
@@ -58,7 +58,7 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
 
     }
 
-    static final class H256 extends DenseCholesky<Quaternion> {
+    static final class H256 extends DenseCholesky<Quaternion, GenericStore<Quaternion>> {
 
         H256() {
             super(GenericStore.H256, DivideAndCopyColumn::invokeGeneric, ApplyCholesky::invokeGeneric);
@@ -66,7 +66,7 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
 
     }
 
-    static final class Q128 extends DenseCholesky<RationalNumber> {
+    static final class Q128 extends DenseCholesky<RationalNumber, GenericStore<RationalNumber>> {
 
         Q128() {
             super(GenericStore.Q128, DivideAndCopyColumn::invokeGeneric, ApplyCholesky::invokeGeneric);
@@ -74,7 +74,7 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
 
     }
 
-    static final class R064 extends DenseCholesky<Double> {
+    static final class R064 extends DenseCholesky<Double, R064Store> {
 
         R064() {
             super(R064Store.FACTORY, DivideAndCopyColumn::invokeR064, ApplyCholesky::invokeR064);
@@ -82,7 +82,7 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
 
     }
 
-    static final class R128 extends DenseCholesky<Quadruple> {
+    static final class R128 extends DenseCholesky<Quadruple, GenericStore<Quadruple>> {
 
         R128() {
             super(GenericStore.R128, DivideAndCopyColumn::invokeGeneric, ApplyCholesky::invokeGeneric);
@@ -97,14 +97,14 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
      */
     private static final double DEPENDENT = 1E-12;
 
-    private final PivotStep<N> myApplyCholesky;
-    private final PivotStep<N> myDivideAndCopyColumn;
+    private final PivotStep<N, M> myApplyCholesky;
+    private final PivotStep<N, M> myDivideAndCopyColumn;
     private double myMaxDiag = ONE;
     private double myMinDiag = ZERO;
     private boolean mySPD = false;
 
-    protected DenseCholesky(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> factory, final PivotStep<N> divideAndCopyColumn,
-            final PivotStep<N> applyCholesky) {
+    protected DenseCholesky(final PhysicalStore.Factory<N, ? extends M> factory, final PivotStep<N, M> divideAndCopyColumn,
+            final PivotStep<N, M> applyCholesky) {
         super(factory);
         myDivideAndCopyColumn = divideAndCopyColumn;
         myApplyCholesky = applyCholesky;
@@ -437,7 +437,7 @@ abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecompositi
 
         this.reset();
 
-        PhysicalStore<N> tmpInPlace = this.setInPlace(matrix);
+        M tmpInPlace = this.setInPlace(matrix);
 
         int tmpRowDim = this.getRowDim();
         int tmpColDim = this.getColDim();

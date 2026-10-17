@@ -30,8 +30,8 @@ import org.ojalgo.matrix.store.PhysicalStore;
  * @author apete
  */
 @FunctionalInterface
-public interface ExchangeStep<N extends Comparable<N>> {
+public interface ExchangeStep<N extends Comparable<N>, M extends PhysicalStore<N>> {
 
-    void invoke(PhysicalStore<N> store, int indexA, int indexB);
+    void invoke(M store, int indexA, int indexB);
 
 }

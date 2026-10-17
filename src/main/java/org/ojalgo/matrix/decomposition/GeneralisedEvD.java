@@ -31,11 +31,11 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 
-final class GeneralisedEvD<N extends Comparable<N>> extends DenseEigenvalue<N> implements Eigenvalue.Generalised<N> {
+final class GeneralisedEvD<N extends Comparable<N>, M extends PhysicalStore<N>> extends DenseEigenvalue<N, M> implements Eigenvalue.Generalised<N> {
 
     private final Cholesky<N> myCholesky;
     private final Eigenvalue<N> myEigenvalue;
-    private final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> myFactory;
+    private final PhysicalStore.Factory<N, ? extends M> myFactory;
     private transient PhysicalStore<N> myRecovered = null;
     /**
      * C
@@ -43,7 +43,7 @@ final class GeneralisedEvD<N extends Comparable<N>> extends DenseEigenvalue<N> i
     private transient PhysicalStore<N> myReduced = null;
     private final Eigenvalue.Generalisation myType;
 
-    GeneralisedEvD(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> factory, final Cholesky<N> cholesky, final Eigenvalue<N> eigenvalue,
+    GeneralisedEvD(final PhysicalStore.Factory<N, ? extends M> factory, final Cholesky<N> cholesky, final Eigenvalue<N> eigenvalue,
             final Eigenvalue.Generalisation type) {
 
         super(factory);

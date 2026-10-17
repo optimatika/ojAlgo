@@ -30,9 +30,9 @@ import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access2D.Collectable;
 
-abstract class DynamicEvD<N extends Comparable<N>> extends DenseEigenvalue<N> {
+abstract class DynamicEvD<N extends Comparable<N>, M extends PhysicalStore<N>> extends DenseEigenvalue<N, M> {
 
-    static final class R064 extends DynamicEvD<Double> {
+    static final class R064 extends DynamicEvD<Double, R064Store> {
 
         R064() {
             super(R064Store.FACTORY, new HermitianEvD.R064(), new GeneralEvD.R064());
@@ -40,20 +40,20 @@ abstract class DynamicEvD<N extends Comparable<N>> extends DenseEigenvalue<N> {
 
     }
 
-    private final DenseEigenvalue<N> myGeneralDelegate;
+    private final DenseEigenvalue<N, M> myGeneralDelegate;
     private boolean myHermitian = false;
-    private final DenseEigenvalue<N> myHermitianDelegate;
+    private final DenseEigenvalue<N, M> myHermitianDelegate;
 
     @SuppressWarnings("unused")
-    private DynamicEvD(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> factory) {
+    private DynamicEvD(final PhysicalStore.Factory<N, ? extends M> factory) {
 
         this(factory, null, null);
 
         ProgrammingError.throwForIllegalInvocation();
     }
 
-    protected DynamicEvD(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> factory, final DenseEigenvalue<N> hermitianDelegate,
-            final DenseEigenvalue<N> generalDelegate) {
+    protected DynamicEvD(final PhysicalStore.Factory<N, ? extends M> factory, final DenseEigenvalue<N, M> hermitianDelegate,
+            final DenseEigenvalue<N, M> generalDelegate) {
 
         super(factory);
 

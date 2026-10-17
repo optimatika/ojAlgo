@@ -25,7 +25,6 @@ import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.ScalarArray;
 import org.ojalgo.matrix.store.GenericStore;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.scalar.Scalar;
 
@@ -58,12 +57,12 @@ public abstract class DivideAndCopyColumn implements MatrixOperation {
         }
     }
 
-    public static <N extends Scalar<N>> void invokeGeneric(final PhysicalStore<N> store, final int iterationPoint, final BasicArray<N> multipliers) {
-        DivideAndCopyColumn.invoke(((GenericStore<N>) store).data, store.getRowDim(), iterationPoint, iterationPoint, ((ScalarArray<N>) multipliers).data);
+    public static <N extends Scalar<N>> void invokeGeneric(final GenericStore<N> store, final int iterationPoint, final BasicArray<N> multipliers) {
+        DivideAndCopyColumn.invoke(store.data, store.getRowDim(), iterationPoint, iterationPoint, ((ScalarArray<N>) multipliers).data);
     }
 
-    public static void invokeR064(final PhysicalStore<Double> store, final int iterationPoint, final BasicArray<Double> multipliers) {
-        DivideAndCopyColumn.invoke(((R064Store) store).data, store.getRowDim(), iterationPoint, iterationPoint, ((ArrayR064) multipliers).data);
+    public static void invokeR064(final R064Store store, final int iterationPoint, final BasicArray<Double> multipliers) {
+        DivideAndCopyColumn.invoke(store.data, store.getRowDim(), iterationPoint, iterationPoint, ((ArrayR064) multipliers).data);
     }
 
 }

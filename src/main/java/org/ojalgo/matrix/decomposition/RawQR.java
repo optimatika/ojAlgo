@@ -108,7 +108,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         @Override
         public MatrixStore<Double> get() {
 
-            RawStore retVal = RawDecomposition.make(myM, myMinDim);
+            RawStore retVal = RawDecomposition.newRawStore(myM, myMinDim);
             double[][] retData = retVal.data;
             double[] work = new double[myMinDim];
 
@@ -200,7 +200,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
             int r = Math.min(myM, myN);
 
-            RawStore retVal = RawDecomposition.make(r, myN);
+            RawStore retVal = RawDecomposition.newRawStore(r, myN);
             double[][] retData = retVal.data;
 
             double[] tmpRow;
@@ -381,7 +381,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
     @Override
     public MatrixStore<Double> getInverse(final PhysicalStore<Double> preallocated) {
-        return this.doGetInverse((R064Store) preallocated);
+        return this.doGetInverse(preallocated);
     }
 
     @Override
@@ -412,7 +412,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
         rhs.supplyTo(preallocated);
 
-        return this.doSolve((R064Store) preallocated);
+        return this.doSolve(preallocated);
     }
 
     @Override
@@ -466,7 +466,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
             preallocated.fillMatching(rhs);
 
-            return this.doSolve((R064Store) preallocated);
+            return this.doSolve(preallocated);
 
         }
         throw RecoverableCondition.newEquationSystemNotSolvable();
@@ -518,11 +518,28 @@ final class RawQR extends RawDecomposition implements QR<Double> {
      * Overwrites {@code preallocated} (m x m) with the identity and solves in place. The returned (pseudo)
      * inverse is a view of its first n rows.
      */
-    private MatrixStore<Double> doGetInverse(final R064Store preallocated) {
+    private MatrixStore<Double> doGetInverse(final PhysicalStore<Double> preallocated) {
 
         R064Store.FACTORY.makeIdentity(this.getRowDim()).supplyTo(preallocated);
 
         return this.doSolve(preallocated);
+    }
+
+    /**
+     * Solves in place. Stores other than {@link R064Store} are solved via a temporary copy that is then
+     * written back.
+     */
+    private MatrixStore<Double> doSolve(final PhysicalStore<Double> preallocated) {
+
+        R064Store solution = RawDecomposition.castOrCopy(preallocated);
+
+        this.doSolve(solution);
+
+        if (preallocated != solution) {
+            solution.supplyTo(preallocated);
+        }
+
+        return preallocated.limits(this.getColDim(), preallocated.getColDim());
     }
 
     private MatrixStore<Double> doSolve(final R064Store preallocated) {

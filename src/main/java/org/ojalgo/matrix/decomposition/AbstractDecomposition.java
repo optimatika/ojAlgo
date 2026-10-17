@@ -41,6 +41,9 @@ import org.ojalgo.structure.Access2D.ColumnView;
 import org.ojalgo.structure.Structure2D;
 
 /**
+ * @param <N> the number type
+ * @param <M> the type of physical store the decomposition creates: preallocated and work stores, and
+ *            collected or wrapped input. The decomposed matrix may be held in some other structure.
  * @author apete
  */
 abstract class AbstractDecomposition<N extends Comparable<N>, M extends PhysicalStore<N>> implements MatrixDecomposition<N> {
@@ -57,7 +60,7 @@ abstract class AbstractDecomposition<N extends Comparable<N>, M extends Physical
      *
      * @param <N> the number type
      */
-    final class FactorLower<N extends Comparable<N>> implements MatrixDecomposition.Factor<N> {
+    static final class FactorLower<N extends Comparable<N>> implements MatrixDecomposition.Factor<N> {
 
         private final PhysicalStore<N> myBody;
         private final boolean myUnitDiagonal;
@@ -118,7 +121,7 @@ abstract class AbstractDecomposition<N extends Comparable<N>, M extends Physical
      *
      * @param <N> the number type
      */
-    final class FactorPivot<N extends Comparable<N>> implements MatrixDecomposition.Factor<N> {
+    static final class FactorPivot<N extends Comparable<N>> implements MatrixDecomposition.Factor<N> {
 
         private final boolean myForward;
         private final MatrixStore<N> myIdentity;
@@ -205,7 +208,7 @@ abstract class AbstractDecomposition<N extends Comparable<N>, M extends Physical
      *
      * @param <N> the number type
      */
-    final class FactorUpperConjugate<N extends Comparable<N>> implements MatrixDecomposition.Factor<N> {
+    static final class FactorUpperConjugate<N extends Comparable<N>> implements MatrixDecomposition.Factor<N> {
 
         private final PhysicalStore<N> myBody;
         private final boolean myUnitDiagonal;

@@ -21,6 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.structure.Structure2D;
@@ -28,14 +29,25 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * In many ways similar to InPlaceDecomposition but this class is hardwired to work with double[][] data. Most
- * of it's originates from JAMA, but have been significantly refactored or even (re)written from scratch.
+ * of it originates from JAMA, but has been significantly refactored or even (re)written from scratch.
+ * <p>
+ * The internal data is double[][] (wrapped by a {@link RawStore}), while the stores created or returned, such
+ * as preallocated and work stores, are {@link R064Store}.
  *
  * @author apete
  */
 abstract class RawDecomposition extends AbstractDecomposition<Double, R064Store> {
 
-    static RawStore make(final int nbRows, final int nbCols) {
-        return RawStore.FACTORY.make(nbRows, nbCols);
+    static R064Store castOrCopy(final MatrixStore<?> input) {
+        if (input instanceof R064Store) {
+            return (R064Store) input;
+        } else {
+            return R064Store.FACTORY.copy(input);
+        }
+    }
+
+    static RawStore newRawStore(final int m, final int n) {
+        return RawStore.FACTORY.make(m, n);
     }
 
     private int myColDim;
@@ -75,10 +87,6 @@ abstract class RawDecomposition extends AbstractDecomposition<Double, R064Store>
         return myInternalStore;
     }
 
-    RawStore newRawStore(final int m, final int n) {
-        return RawStore.FACTORY.make(m, n);
-    }
-
     double[][] reset(final Structure2D template, final boolean transpose) {
 
         this.reset();
@@ -110,10 +118,6 @@ abstract class RawDecomposition extends AbstractDecomposition<Double, R064Store>
         myRowDim = data.length;
         myColDim = data.length > 0 ? data[0].length : 0;
         myInternalStore = data.length > 0 ? RawStore.wrap(data) : null;
-    }
-
-    RawStore wrap(final double[][] data) {
-        return RawStore.wrap(data);
     }
 
 }

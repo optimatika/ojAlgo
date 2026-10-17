@@ -50,9 +50,9 @@ import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
-abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> implements LU<N> {
+abstract class DenseLU<N extends Comparable<N>, M extends PhysicalStore<N>> extends InPlaceDecomposition<N, M> implements LU<N> {
 
-    static final class C128 extends DenseLU<ComplexNumber> {
+    static final class C128 extends DenseLU<ComplexNumber, GenericStore<ComplexNumber>> {
 
         C128() {
             super(GenericStore.C128, DivideAndCopyColumn::invokeGeneric, ApplyLU::invokeGeneric);
@@ -164,7 +164,7 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
     }
 
-    static final class H256 extends DenseLU<Quaternion> {
+    static final class H256 extends DenseLU<Quaternion, GenericStore<Quaternion>> {
 
         H256() {
             super(GenericStore.H256, DivideAndCopyColumn::invokeGeneric, ApplyLU::invokeGeneric);
@@ -172,7 +172,7 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
     }
 
-    static final class Q128 extends DenseLU<RationalNumber> {
+    static final class Q128 extends DenseLU<RationalNumber, GenericStore<RationalNumber>> {
 
         Q128() {
             super(GenericStore.Q128, DivideAndCopyColumn::invokeGeneric, ApplyLU::invokeGeneric);
@@ -180,7 +180,7 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
     }
 
-    static final class R064 extends DenseLU<Double> {
+    static final class R064 extends DenseLU<Double, R064Store> {
 
         R064() {
             super(R064Store.FACTORY, DivideAndCopyColumn::invokeR064, ApplyLU::invokeR064);
@@ -188,7 +188,7 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
     }
 
-    static final class R128 extends DenseLU<Quadruple> {
+    static final class R128 extends DenseLU<Quadruple, GenericStore<Quadruple>> {
 
         R128() {
             super(GenericStore.R128, DivideAndCopyColumn::invokeGeneric, ApplyLU::invokeGeneric);
@@ -196,14 +196,14 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
     }
 
-    private final PivotStep<N> myApplyLU;
+    private final PivotStep<N, M> myApplyLU;
     private Pivot myColPivot = null;
-    private final PivotStep<N> myDivideAndCopyColumn;
+    private final PivotStep<N, M> myDivideAndCopyColumn;
     private final Pivot myPivot = new Pivot();
     private transient PhysicalStore<N> myWorkerColumn = null;
     private transient PhysicalStore<N> myWorkerRow = null;
 
-    protected DenseLU(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> factory, final PivotStep<N> divideAndCopyColumn, final PivotStep<N> applyLU) {
+    protected DenseLU(final PhysicalStore.Factory<N, ? extends M> factory, final PivotStep<N, M> divideAndCopyColumn, final PivotStep<N, M> applyLU) {
         super(factory);
         myDivideAndCopyColumn = divideAndCopyColumn;
         myApplyLU = applyLU;
@@ -487,7 +487,7 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
         this.reset();
 
-        PhysicalStore<N> tmpInPlace = this.setInPlace(matrix);
+        M tmpInPlace = this.setInPlace(matrix);
 
         int tmpRowDim = this.getRowDim();
         this.getColDim();

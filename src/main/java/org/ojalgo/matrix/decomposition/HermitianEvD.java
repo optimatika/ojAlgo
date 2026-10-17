@@ -66,9 +66,9 @@ import org.ojalgo.structure.Access2D.Collectable;
  * V may be badly conditioned, or even singular, so the validity of the equation A = V*D*inverse(V) depends
  * upon V.cond().
  **/
-abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> implements Eigenvalue.Spectral<N> {
+abstract class HermitianEvD<N extends Comparable<N>, M extends PhysicalStore<N>> extends DenseEigenvalue<N, M> implements Eigenvalue.Spectral<N> {
 
-    static final class C128 extends HermitianEvD<ComplexNumber> {
+    static final class C128 extends HermitianEvD<ComplexNumber, GenericStore<ComplexNumber>> {
 
         C128() {
             super(GenericStore.C128, new DeferredTridiagonal.C128(), RotateRight::invokeGeneric);
@@ -85,7 +85,7 @@ abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> 
 
     }
 
-    static final class H256 extends HermitianEvD<Quaternion> {
+    static final class H256 extends HermitianEvD<Quaternion, GenericStore<Quaternion>> {
 
         H256() {
             super(GenericStore.H256, new DeferredTridiagonal.H256(), RotateRight::invokeGeneric);
@@ -93,7 +93,7 @@ abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> 
 
     }
 
-    static final class Q128 extends HermitianEvD<RationalNumber> {
+    static final class Q128 extends HermitianEvD<RationalNumber, GenericStore<RationalNumber>> {
 
         Q128() {
             super(GenericStore.Q128, new DeferredTridiagonal.Q128(), RotateRight::invokeGeneric);
@@ -101,7 +101,7 @@ abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> 
 
     }
 
-    static final class R064 extends HermitianEvD<Double> {
+    static final class R064 extends HermitianEvD<Double, R064Store> {
 
         R064() {
             super(R064Store.FACTORY, new SimultaneousTridiagonal(), RotateRight::invokeR064);
@@ -109,7 +109,7 @@ abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> 
 
     }
 
-    static final class R128 extends HermitianEvD<Quadruple> {
+    static final class R128 extends HermitianEvD<Quadruple, GenericStore<Quadruple>> {
 
         R128() {
             super(GenericStore.R128, new DeferredTridiagonal.R128(), RotateRight::invokeGeneric);
@@ -207,19 +207,19 @@ abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> 
     private double[] d;
     private double[] e;
     private transient MatrixStore<N> myInverse;
-    private final RotationStep<N> myRotateRight;
+    private final RotationStep<N, M> myRotateRight;
     private transient MatrixStore<N> myS = null;
     private transient Array1D<Double> mySingularValues = null;
-    private final DenseTridiagonal<N> myTridiagonal;
+    private final DenseTridiagonal<N, M> myTridiagonal;
     private transient MatrixStore<N> myU = null;
 
     @SuppressWarnings("unused")
-    private HermitianEvD(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> factory) {
+    private HermitianEvD(final PhysicalStore.Factory<N, ? extends M> factory) {
         this(factory, null, null);
     }
 
-    protected HermitianEvD(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> factory, final DenseTridiagonal<N> tridiagonal,
-            final RotationStep<N> rotateRight) {
+    protected HermitianEvD(final PhysicalStore.Factory<N, ? extends M> factory, final DenseTridiagonal<N, M> tridiagonal,
+            final RotationStep<N, M> rotateRight) {
 
         super(factory);
 
@@ -625,7 +625,7 @@ abstract class HermitianEvD<N extends Comparable<N>> extends DenseEigenvalue<N> 
 
         myTridiagonal.supplyDiagonalTo(d, e);
 
-        PhysicalStore<N> mtrxV = valuesOnly ? null : myTridiagonal.getDecompositionQ();
+        M mtrxV = valuesOnly ? null : myTridiagonal.getDecompositionQ();
 
         RotateColumns tmpRotateColumns = valuesOnly ? RotateColumns.NULL : (low, high, cos, sin) -> myRotateRight.invoke(mtrxV, low, high, cos, sin);
         HermitianEvD.tql2(d, e, tmpRotateColumns);

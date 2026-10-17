@@ -74,7 +74,7 @@ public interface LDL<N extends Comparable<N>> extends LDU<N>, MatrixDecompositio
         public LDL<N> make(final Structure2D typical) {
             LDL<N> retVal = myDelegate.make(typical);
             if (myThreshold != null && retVal instanceof DenseLDL) {
-                ((DenseLDL<N>) retVal).setThreshold(myThreshold);
+                ((DenseLDL<N, ?>) retVal).setThreshold(myThreshold);
             }
             return retVal;
         }

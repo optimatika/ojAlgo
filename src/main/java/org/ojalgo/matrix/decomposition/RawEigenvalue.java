@@ -589,7 +589,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
     @Override
     public MatrixStore<Double> getV() {
         if (this.isComputed() && myV == null) {
-            myV = this.wrap(myTransposedV).transpose();
+            myV = RawStore.wrap(myTransposedV).transpose();
         }
         return myV;
     }

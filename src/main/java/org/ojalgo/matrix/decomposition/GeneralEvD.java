@@ -35,7 +35,7 @@ import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access2D.Collectable;
 
-abstract class GeneralEvD<N extends Comparable<N>> extends DenseEigenvalue<N> {
+abstract class GeneralEvD<N extends Comparable<N>, M extends PhysicalStore<N>> extends DenseEigenvalue<N, M> {
 
     /**
      * Eigenvalues and eigenvectors of a real matrix.
@@ -50,39 +50,34 @@ abstract class GeneralEvD<N extends Comparable<N>> extends DenseEigenvalue<N> {
      * V.times(D). The matrix V may be badly conditioned, or even singular, so the validity of the equation A
      * = V*D*inverse(V) depends upon V.cond().
      **/
-    static final class R064 extends GeneralEvD<Double> {
+    static final class R064 extends GeneralEvD<Double, R064Store> {
 
         R064() {
             super(R064Store.FACTORY);
         }
 
-    }
+        @Override
+        Array1D<ComplexNumber> computeInPlaceSchur(final R064Store mtrxA, final R064Store mtrxV) {
 
-    /**
-     * Only implemented for {@link R064Store}.
-     */
-    private static Array1D<ComplexNumber> computeInPlaceSchur(final PhysicalStore<?> matrix, final PhysicalStore<?> transformationCollector) {
+            EvD1D.orthes(mtrxA.data, mtrxV.data, new double[mtrxA.getMinDim()]);
 
-        R064Store mtrxA = (R064Store) matrix;
-        R064Store mtrxV = (R064Store) transformationCollector;
+            double[][] diagonals = EvD1D.hqr2(mtrxA.data, mtrxV.data, true);
+            double[] real = diagonals[0];
+            double[] imaginary = diagonals[1];
+            int length = Math.min(real.length, imaginary.length);
 
-        EvD1D.orthes(mtrxA.data, mtrxV.data, new double[mtrxA.getMinDim()]);
+            ArrayC128 retVal = ArrayC128.make(length);
 
-        double[][] diagonals = EvD1D.hqr2(mtrxA.data, mtrxV.data, true);
-        double[] real = diagonals[0];
-        double[] imaginary = diagonals[1];
-        int length = Math.min(real.length, imaginary.length);
+            for (int i = 0; i < length; i++) {
+                retVal.data[i] = ComplexNumber.of(real[i], imaginary[i]);
+            }
 
-        ArrayC128 retVal = ArrayC128.make(length);
-
-        for (int i = 0; i < length; i++) {
-            retVal.data[i] = ComplexNumber.of(real[i], imaginary[i]);
+            return Array1D.C128.wrap(retVal);
         }
 
-        return Array1D.C128.wrap(retVal);
     }
 
-    protected GeneralEvD(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> factory) {
+    protected GeneralEvD(final PhysicalStore.Factory<N, ? extends M> factory) {
         super(factory);
     }
 
@@ -142,12 +137,12 @@ abstract class GeneralEvD<N extends Comparable<N>> extends DenseEigenvalue<N> {
         final int tmpDiagDim = (int) matrix.countRows();
 
         // final PhysicalStore<N> tmpMtrxA = this.copy(matrix.get());
-        final PhysicalStore<N> tmpMtrxA = this.makeZero(tmpDiagDim, tmpDiagDim);
+        final M tmpMtrxA = this.makeZero(tmpDiagDim, tmpDiagDim);
         matrix.supplyTo(tmpMtrxA);
 
-        final PhysicalStore<N> tmpV = this.makeEye(tmpDiagDim, tmpDiagDim);
+        final M tmpV = this.makeEye(tmpDiagDim, tmpDiagDim);
 
-        final Array1D<ComplexNumber> tmpEigenvalues = GeneralEvD.computeInPlaceSchur(tmpMtrxA, tmpV);
+        final Array1D<ComplexNumber> tmpEigenvalues = this.computeInPlaceSchur(tmpMtrxA, tmpV);
 
         this.setV(tmpV);
         this.setEigenvalues(tmpEigenvalues);
@@ -216,5 +211,7 @@ abstract class GeneralEvD<N extends Comparable<N>> extends DenseEigenvalue<N> {
     protected MatrixStore<N> makeV() {
         return null;
     }
+
+    abstract Array1D<ComplexNumber> computeInPlaceSchur(M mtrxA, M mtrxV);
 
 }

@@ -23,7 +23,6 @@ package org.ojalgo.matrix.operation;
 
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.GenericStore;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.PrimitiveScalar;
@@ -186,13 +185,13 @@ public abstract class GenerateApplyAndCopyHouseholderRow implements MatrixOperat
         return retVal;
     }
 
-    public static <N extends Scalar<N>> boolean invokeGeneric(final PhysicalStore<N> store, final int row, final int column, final Householder<N> destination) {
-        return GenerateApplyAndCopyHouseholderRow.invoke(((GenericStore<N>) store).data, store.getRowDim(), row, column, (Householder.Generic<N>) destination,
+    public static <N extends Scalar<N>> boolean invokeGeneric(final GenericStore<N> store, final int row, final int column, final Householder<N> destination) {
+        return GenerateApplyAndCopyHouseholderRow.invoke(store.data, store.getRowDim(), row, column, (Householder.Generic<N>) destination,
                 store.physical().scalar());
     }
 
-    public static boolean invokeR064(final PhysicalStore<Double> store, final int row, final int column, final Householder<Double> destination) {
-        return GenerateApplyAndCopyHouseholderRow.invoke(((R064Store) store).data, store.getRowDim(), row, column, (Householder.Primitive64) destination);
+    public static boolean invokeR064(final R064Store store, final int row, final int column, final Householder<Double> destination) {
+        return GenerateApplyAndCopyHouseholderRow.invoke(store.data, store.getRowDim(), row, column, (Householder.Primitive64) destination);
     }
 
 }

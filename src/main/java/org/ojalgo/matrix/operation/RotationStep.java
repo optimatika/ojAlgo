@@ -30,8 +30,8 @@ import org.ojalgo.matrix.store.PhysicalStore;
  * @author apete
  */
 @FunctionalInterface
-public interface RotationStep<N extends Comparable<N>> {
+public interface RotationStep<N extends Comparable<N>, M extends PhysicalStore<N>> {
 
-    void invoke(PhysicalStore<N> store, int low, int high, double cos, double sin);
+    void invoke(M store, int low, int high, double cos, double sin);
 
 }

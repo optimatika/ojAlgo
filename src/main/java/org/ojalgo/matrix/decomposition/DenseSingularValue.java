@@ -53,9 +53,9 @@ import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
-abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecomposition<N, PhysicalStore<N>> implements SingularValue<N> {
+abstract class DenseSingularValue<N extends Comparable<N>, M extends PhysicalStore<N>> extends AbstractDecomposition<N, M> implements SingularValue<N> {
 
-    static final class C128 extends DenseSingularValue<ComplexNumber> {
+    static final class C128 extends DenseSingularValue<ComplexNumber, GenericStore<ComplexNumber>> {
 
         C128() {
             this(false);
@@ -261,7 +261,7 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
 
     }
 
-    static final class H256 extends DenseSingularValue<Quaternion> {
+    static final class H256 extends DenseSingularValue<Quaternion, GenericStore<Quaternion>> {
 
         H256() {
             this(false);
@@ -273,7 +273,7 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
 
     }
 
-    static final class Q128 extends DenseSingularValue<RationalNumber> {
+    static final class Q128 extends DenseSingularValue<RationalNumber, GenericStore<RationalNumber>> {
 
         Q128() {
             this(false);
@@ -285,7 +285,7 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
 
     }
 
-    static final class R064 extends DenseSingularValue<Double> {
+    static final class R064 extends DenseSingularValue<Double, R064Store> {
 
         R064() {
             this(false);
@@ -297,7 +297,7 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
 
     }
 
-    static final class R128 extends DenseSingularValue<Quadruple> {
+    static final class R128 extends DenseSingularValue<Quadruple, GenericStore<Quadruple>> {
 
         R128() {
             this(false);
@@ -533,7 +533,7 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
     }
 
     private double[] e = null;
-    private final DenseBidiagonal<N> myBidiagonal;
+    private final DenseBidiagonal<N, M> myBidiagonal;
     private final boolean myFullSize;
     private final Structure2D myInputStructure = new Structure2D() {
 
@@ -548,7 +548,7 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
         }
     };
     private transient MatrixStore<N> myInverse = null;
-    private final RotationStep<N> myRotateRight;
+    private final RotationStep<N, M> myRotateRight;
     private transient MatrixStore<N> myS = null;
     private transient Array1D<Double> mySingularValues = null;
     private boolean myTransposed = false;
@@ -557,8 +557,8 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
     private boolean myValuesOnly = false;
     private double[] s = null;
 
-    DenseSingularValue(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> factory, final DenseBidiagonal<N> bidiagonal, final boolean fullSize,
-            final RotationStep<N> rotateRight) {
+    DenseSingularValue(final PhysicalStore.Factory<N, ? extends M> factory, final DenseBidiagonal<N, M> bidiagonal, final boolean fullSize,
+            final RotationStep<N, M> rotateRight) {
 
         super(factory);
 
@@ -969,8 +969,8 @@ abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecom
 
         DiagonalStore<N, Array1D<N>> tmpBidiagonal = myBidiagonal.doGetDiagonal();
 
-        PhysicalStore<N> tmpQ1 = valuesOnly ? null : myBidiagonal.doGetLQ();
-        PhysicalStore<N> tmpQ2 = valuesOnly ? null : myBidiagonal.doGetRQ();
+        M tmpQ1 = valuesOnly ? null : myBidiagonal.doGetLQ();
+        M tmpQ2 = valuesOnly ? null : myBidiagonal.doGetRQ();
 
         int size = tmpBidiagonal.getDimension();
 

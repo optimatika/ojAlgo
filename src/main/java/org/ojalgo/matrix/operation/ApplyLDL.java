@@ -27,7 +27,6 @@ import org.ojalgo.array.ScalarArray;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.matrix.store.GenericStore;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.scalar.Scalar;
 
@@ -51,9 +50,8 @@ public abstract class ApplyLDL implements MatrixOperation {
         }
     }
 
-    public static <N extends Scalar<N>> void invokeGeneric(final PhysicalStore<N> store, final int iterationPoint, final BasicArray<N> multipliers) {
+    public static <N extends Scalar<N>> void invokeGeneric(final GenericStore<N> matrix, final int iterationPoint, final BasicArray<N> multipliers) {
 
-        GenericStore<N> matrix = (GenericStore<N>) store;
         ScalarArray<N> column = (ScalarArray<N>) multipliers;
 
         if (matrix.getColDim() - iterationPoint - 1 > THRESHOLD) {
@@ -74,9 +72,8 @@ public abstract class ApplyLDL implements MatrixOperation {
         }
     }
 
-    public static void invokeR064(final PhysicalStore<Double> store, final int iterationPoint, final BasicArray<Double> multipliers) {
+    public static void invokeR064(final R064Store matrix, final int iterationPoint, final BasicArray<Double> multipliers) {
 
-        R064Store matrix = (R064Store) store;
         ArrayR064 column = (ArrayR064) multipliers;
 
         if (matrix.getColDim() - iterationPoint - 1 > THRESHOLD) {

@@ -33,8 +33,8 @@ import org.ojalgo.matrix.transformation.Householder;
  * @author apete
  */
 @FunctionalInterface
-public interface HouseholderStep<N extends Comparable<N>> {
+public interface HouseholderStep<N extends Comparable<N>, M extends PhysicalStore<N>> {
 
-    boolean invoke(PhysicalStore<N> store, int row, int column, Householder<N> destination);
+    boolean invoke(M store, int row, int column, Householder<N> destination);
 
 }

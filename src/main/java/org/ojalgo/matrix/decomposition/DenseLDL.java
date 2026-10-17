@@ -52,9 +52,9 @@ import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
-abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N> implements LDL<N> {
+abstract class DenseLDL<N extends Comparable<N>, M extends PhysicalStore<N>> extends InPlaceDecomposition<N, M> implements LDL<N> {
 
-    static final class C128 extends DenseLDL<ComplexNumber> {
+    static final class C128 extends DenseLDL<ComplexNumber, GenericStore<ComplexNumber>> {
 
         C128() {
             super(GenericStore.C128, ExchangeHermitian::invokeGeneric, DivideAndCopyColumn::invokeGeneric, ApplyLDL::invokeGeneric);
@@ -117,7 +117,7 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
 
     }
 
-    static final class H256 extends DenseLDL<Quaternion> {
+    static final class H256 extends DenseLDL<Quaternion, GenericStore<Quaternion>> {
 
         H256() {
             super(GenericStore.H256, ExchangeHermitian::invokeGeneric, DivideAndCopyColumn::invokeGeneric, ApplyLDL::invokeGeneric);
@@ -125,7 +125,7 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
 
     }
 
-    static final class Q128 extends DenseLDL<RationalNumber> {
+    static final class Q128 extends DenseLDL<RationalNumber, GenericStore<RationalNumber>> {
 
         Q128() {
             super(GenericStore.Q128, ExchangeHermitian::invokeGeneric, DivideAndCopyColumn::invokeGeneric, ApplyLDL::invokeGeneric);
@@ -133,7 +133,7 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
 
     }
 
-    static final class R064 extends DenseLDL<Double> {
+    static final class R064 extends DenseLDL<Double, R064Store> {
 
         R064() {
             super(R064Store.FACTORY, ExchangeHermitian::invokeR064, DivideAndCopyColumn::invokeR064, ApplyLDL::invokeR064);
@@ -141,7 +141,7 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
 
     }
 
-    static final class R128 extends DenseLDL<Quadruple> {
+    static final class R128 extends DenseLDL<Quadruple, GenericStore<Quadruple>> {
 
         R128() {
             super(GenericStore.R128, ExchangeHermitian::invokeGeneric, DivideAndCopyColumn::invokeGeneric, ApplyLDL::invokeGeneric);
@@ -149,14 +149,14 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
 
     }
 
-    private final PivotStep<N> myApplyLDL;
-    private final PivotStep<N> myDivideAndCopyColumn;
-    private final ExchangeStep<N> myExchangeHermitian;
+    private final PivotStep<N, M> myApplyLDL;
+    private final PivotStep<N, M> myDivideAndCopyColumn;
+    private final ExchangeStep<N, M> myExchangeHermitian;
     private final Pivot myPivot = new Pivot();
     private double myThreshold = Double.NaN;
 
-    protected DenseLDL(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> factory, final ExchangeStep<N> exchangeHermitian,
-            final PivotStep<N> divideAndCopyColumn, final PivotStep<N> applyLDL) {
+    protected DenseLDL(final PhysicalStore.Factory<N, ? extends M> factory, final ExchangeStep<N, M> exchangeHermitian,
+            final PivotStep<N, M> divideAndCopyColumn, final PivotStep<N, M> applyLDL) {
         super(factory);
         myExchangeHermitian = exchangeHermitian;
         myDivideAndCopyColumn = divideAndCopyColumn;
@@ -395,7 +395,7 @@ abstract class DenseLDL<N extends Comparable<N>> extends InPlaceDecomposition<N>
 
         this.reset();
 
-        PhysicalStore<N> store = this.setInPlace(matrix);
+        M store = this.setInPlace(matrix);
 
         int dim = this.getMinDim();
 

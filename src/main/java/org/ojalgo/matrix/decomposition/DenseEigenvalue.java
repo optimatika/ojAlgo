@@ -30,7 +30,7 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 
-abstract class DenseEigenvalue<N extends Comparable<N>> extends AbstractDecomposition<N, PhysicalStore<N>> implements Eigenvalue<N> {
+abstract class DenseEigenvalue<N extends Comparable<N>, M extends PhysicalStore<N>> extends AbstractDecomposition<N, M> implements Eigenvalue<N> {
 
     private MatrixStore<N> myD = null;
     private Array1D<ComplexNumber> myEigenvalues = null;
@@ -38,7 +38,7 @@ abstract class DenseEigenvalue<N extends Comparable<N>> extends AbstractDecompos
     private MatrixStore<N> myV = null;
     private boolean myValuesOnly = false;
 
-    DenseEigenvalue(final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> aFactory) {
+    DenseEigenvalue(final PhysicalStore.Factory<N, ? extends M> aFactory) {
         super(aFactory);
     }
 
