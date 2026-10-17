@@ -52,9 +52,10 @@ import org.ojalgo.netio.BasicLogger;
  * The library is looked for once, when this class is initialised, so the system property must be set before
  * ojAlgo performs any of the operations concerned.
  * <p>
- * BLAS functions are called through the CBLAS interface, with 32-bit integers (LP64). A library that takes
- * 64-bit integers (ILP64) is detected and not used. On macOS the current Accelerate interface (symbols with a
- * {@code $NEWLAPACK} suffix) is preferred over the deprecated one.
+ * BLAS functions are called through the CBLAS interface, and LAPACK routines through the Fortran interface,
+ * with 32-bit integers (LP64). A library that takes 64-bit integers (ILP64) is detected and not used. On
+ * macOS the current Accelerate interface (symbols with a {@code $NEWLAPACK} suffix) is preferred over the
+ * deprecated one.
  * <p>
  * The library is called with its default configuration. If you know which implementation is used, you can
  * configure it in the environment of the JVM process. For example, OpenBLAS as installed by Homebrew on macOS
@@ -139,7 +140,8 @@ public final class NativeLibrary {
      * function delays garbage collection in the whole JVM until it returns. Non-critical functions must be
      * passed native memory.
      *
-     * @param name       The function's name, such as {@code "cblas_ddot"}
+     * @param name       The function's name, such as {@code "cblas_ddot"}, or for a Fortran routine its name
+     *                   with a trailing underscore, such as {@code "dgetrf_"}
      * @param descriptor The function's signature
      * @param critical   Whether the function is critical (and may be passed heap segments)
      * @return The handle, or {@code null} if native code is not used or the library does not have the
@@ -185,6 +187,14 @@ public final class NativeLibrary {
     }
 
     /**
+     * @see #ofArray(double[], int, long)
+     */
+    public static MemorySegment ofArray(final int[] array, final int offset, final long count) {
+        long elementSize = ValueLayout.JAVA_INT.byteSize();
+        return MemorySegment.ofArray(array).asSlice(offset * elementSize, count * elementSize);
+    }
+
+    /**
      * A heap segment for passing a vector of {@code count} elements, stored in a Java array with increment
      * {@code increment}, to a critical function. As in BLAS, {@code offset} is the lowest index accessed also
      * when the increment is negative. The bounds are checked here.
@@ -211,10 +221,18 @@ public final class NativeLibrary {
 
     /**
      * The function {@code name}, as {@link #downcall(String, FunctionDescriptor, boolean)} links it: the
-     * Accelerate symbol with the {@code $NEWLAPACK} suffix if there is one, otherwise the plain one.
+     * Accelerate symbol with the {@code $NEWLAPACK} suffix if there is one, otherwise the plain one. A
+     * Fortran routine, named with a trailing underscore, is looked for under the names Fortran compilers give
+     * it: {@code dgetrf_} is found as {@code dgetrf$NEWLAPACK} (Accelerate), {@code dgetrf_} or
+     * {@code DGETRF}.
      */
     private static Optional<MemorySegment> find(final SymbolLookup symbols, final String name) {
-        return symbols.find(name + ACCELERATE_SUFFIX).or(() -> symbols.find(name));
+        if (name.endsWith("_")) {
+            String routine = name.substring(0, name.length() - 1);
+            return symbols.find(routine + ACCELERATE_SUFFIX).or(() -> symbols.find(name)).or(() -> symbols.find(routine.toUpperCase(Locale.ROOT)));
+        } else {
+            return symbols.find(name + ACCELERATE_SUFFIX).or(() -> symbols.find(name));
+        }
     }
 
     /**

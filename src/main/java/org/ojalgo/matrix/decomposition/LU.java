@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.array.PlainArray;
+import org.ojalgo.matrix.operation.GETRF;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -70,7 +71,7 @@ public interface LU<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition
 
     Factory<Double> R064 = typical -> {
 
-        if (512L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
+        if ((512L < typical.countColumns() || GETRF.isNative(typical.countRows(), typical.countColumns())) && typical.count() <= PlainArray.MAX_SIZE) {
             return new DenseLU.R064();
         } else {
             return new RawLU();

@@ -114,8 +114,8 @@ public abstract class OffHeapArray extends DenseArray<Double> implements AutoClo
 
     /**
      * @param segment The memory holding the values
-     * @param arena The arena to close when this array is closed, or null if the garbage collector releases
-     *        the memory
+     * @param arena   The arena to close when this array is closed, or null if the garbage collector releases
+     *                the memory
      */
     protected OffHeapArray(final OffHeapArray.Factory factory, final MemorySegment segment, final Arena arena) {
 

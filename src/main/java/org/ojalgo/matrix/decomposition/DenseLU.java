@@ -34,6 +34,9 @@ import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.operation.ApplyLU;
 import org.ojalgo.matrix.operation.DivideAndCopyColumn;
+import org.ojalgo.matrix.operation.GETRF;
+import org.ojalgo.matrix.operation.GETRI;
+import org.ojalgo.matrix.operation.GETRS;
 import org.ojalgo.matrix.operation.PivotStep;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -180,10 +183,135 @@ abstract class DenseLU<N extends Comparable<N>, M extends PhysicalStore<N>> exte
 
     }
 
+    /**
+     * With pivoting, the factorisation is done by {@link GETRF}. Square systems are solved by {@link GETRS},
+     * and inverted by {@link GETRI}.
+     */
     static final class R064 extends DenseLU<Double, R064Store> {
+
+        /**
+         * The row interchanges, as {@link GETRS} and {@link GETRI} take them: as returned by {@link GETRF},
+         * or derived from the pivot order.
+         */
+        private transient int[] myInterchanges = null;
 
         R064() {
             super(R064Store.FACTORY, DivideAndCopyColumn::invokeR064, ApplyLU::invokeR064);
+        }
+
+        @Override
+        public boolean updateColumn(final int columnIndex,
+                final org.ojalgo.structure.Access1D.Collectable<Double, ? super TransformableRegion<Double>> newColumn) {
+            myInterchanges = null;
+            return super.updateColumn(columnIndex, newColumn);
+        }
+
+        /**
+         * The pivot order as a sequence of row interchanges: interchanging row i with row ipiv[i] - 1, for i
+         * = 0, 1, ..., puts the rows in the pivot order.
+         */
+        private int[] getInterchanges() {
+
+            if (myInterchanges == null) {
+
+                int[] order = this.getPivotOrder();
+                int dim = order.length;
+
+                // The row at each position, and the position of each row, as the interchanges are made
+                int[] rows = new int[dim];
+                int[] positions = new int[dim];
+                for (int i = 0; i < dim; i++) {
+                    rows[i] = i;
+                    positions[i] = i;
+                }
+
+                int[] interchanges = new int[dim];
+                for (int i = 0; i < dim; i++) {
+                    int other = positions[order[i]];
+                    interchanges[i] = other + 1;
+                    int displaced = rows[i];
+                    rows[other] = displaced;
+                    positions[displaced] = other;
+                    rows[i] = order[i];
+                    positions[order[i]] = i;
+                }
+
+                myInterchanges = interchanges;
+            }
+
+            return myInterchanges;
+        }
+
+        @Override
+        void factorise(final R064Store inPlace, final Pivot pivot, final boolean pivoting) {
+
+            if (pivoting) {
+
+                int nbRows = this.getRowDim();
+                int[] ipiv = new int[this.getMinDim()];
+
+                GETRF.invoke(nbRows, this.getColDim(), inPlace.data, 0, Math.max(1, nbRows), ipiv, 0);
+
+                for (int i = 0; i < ipiv.length; i++) {
+                    pivot.change(ipiv[i] - 1, i);
+                }
+
+                myInterchanges = ipiv;
+
+            } else {
+
+                super.factorise(inPlace, pivot, false);
+
+                myInterchanges = null;
+            }
+        }
+
+        @Override
+        void substitute(final boolean transpose, final double[] arg) {
+
+            int dim = this.getRowDim();
+
+            if (this.isSquare() && arg.length == dim) {
+                GETRS.invoke(transpose, dim, 1, this.getInPlace().data, 0, Math.max(1, dim), this.getInterchanges(), 0, arg, 0, Math.max(1, dim));
+            } else {
+                super.substitute(transpose, arg);
+            }
+        }
+
+        @Override
+        void substitute(final boolean transpose, final PhysicalStore<Double> arg) {
+
+            int dim = this.getRowDim();
+
+            if (this.isSquare() && arg instanceof R064Store rhs && rhs.getRowDim() == dim) {
+                GETRS.invoke(transpose, dim, rhs.getColDim(), this.getInPlace().data, 0, Math.max(1, dim), this.getInterchanges(), 0, rhs.data, 0,
+                        Math.max(1, dim));
+            } else {
+                super.substitute(transpose, arg);
+            }
+        }
+
+        @Override
+        void substituteColumns(final PhysicalStore<Double> rhs) {
+            this.substitute(false, rhs);
+        }
+
+        /**
+         * A singular matrix is handled as for the other number types: the substitutions divide by zero.
+         */
+        @Override
+        void substituteIdentity(final PhysicalStore<Double> preallocated) {
+
+            int dim = this.getRowDim();
+
+            if (this.isSquare() && preallocated instanceof R064Store inverse && inverse.getRowDim() == dim && inverse.getColDim() == dim) {
+                System.arraycopy(this.getInPlace().data, 0, inverse.data, 0, dim * dim);
+                if (GETRI.invoke(dim, inverse.data, 0, Math.max(1, dim), this.getInterchanges(), 0) != 0) {
+                    super.substituteIdentity(preallocated);
+                }
+            } else {
+                super.substituteIdentity(preallocated);
+            }
         }
 
     }
@@ -216,13 +344,7 @@ abstract class DenseLU<N extends Comparable<N>, M extends PhysicalStore<N>> exte
             myColPivot.applyPivotOrder(arg);
         }
 
-        PhysicalStore<N> body = this.getInPlace();
-
-        body.substituteForwards(true, false, arg);
-
-        body.substituteBackwards(true, true, arg);
-
-        myPivot.applyReverseOrder(arg);
+        this.substitute(true, arg);
     }
 
     @Override
@@ -232,13 +354,7 @@ abstract class DenseLU<N extends Comparable<N>, M extends PhysicalStore<N>> exte
             myColPivot.applyPivotOrder(arg);
         }
 
-        PhysicalStore<N> body = this.getInPlace();
-
-        body.substituteForwards(true, false, arg);
-
-        body.substituteBackwards(true, true, arg);
-
-        myPivot.applyReverseOrder(arg);
+        this.substitute(true, arg);
     }
 
     @Override
@@ -275,13 +391,7 @@ abstract class DenseLU<N extends Comparable<N>, M extends PhysicalStore<N>> exte
     @Override
     public void ftran(final double[] arg) {
 
-        myPivot.applyPivotOrder(arg);
-
-        PhysicalStore<N> body = this.getInPlace();
-
-        body.substituteForwards(false, true, arg);
-
-        body.substituteBackwards(false, false, arg);
+        this.substitute(false, arg);
 
         if (myColPivot != null) {
             myColPivot.applyReverseOrder(arg);
@@ -291,13 +401,7 @@ abstract class DenseLU<N extends Comparable<N>, M extends PhysicalStore<N>> exte
     @Override
     public void ftran(final PhysicalStore<N> arg) {
 
-        myPivot.applyPivotOrder(arg);
-
-        PhysicalStore<N> body = this.getInPlace();
-
-        body.substituteForwards(false, true, arg);
-
-        body.substituteBackwards(false, false, arg);
+        this.substitute(false, arg);
 
         if (myColPivot != null) {
             myColPivot.applyReverseOrder(arg);
@@ -334,20 +438,7 @@ abstract class DenseLU<N extends Comparable<N>, M extends PhysicalStore<N>> exte
     @Override
     public MatrixStore<N> getInverse(final PhysicalStore<N> preallocated) {
 
-        if (myPivot.isModified()) {
-            preallocated.fillAll(this.scalar().zero().get());
-            int[] pivotOrder = myPivot.getOrder();
-            int numbRows = this.getRowDim();
-            for (int i = 0; i < numbRows; i++) {
-                preallocated.set(i, pivotOrder[i], PrimitiveMath.ONE);
-            }
-        }
-
-        PhysicalStore<N> body = this.getInPlace();
-
-        preallocated.substituteForwards(body, true, false, !myPivot.isModified());
-
-        preallocated.substituteBackwards(body, false, false, false);
+        this.substituteIdentity(preallocated);
 
         if (myColPivot != null) {
             this.applyReverseOrder(myColPivot, preallocated);
@@ -401,13 +492,7 @@ abstract class DenseLU<N extends Comparable<N>, M extends PhysicalStore<N>> exte
 
         rhs.supplyTo(preallocated);
 
-        this.applyPivotOrder(myPivot, preallocated);
-
-        PhysicalStore<N> body = this.getInPlace();
-
-        preallocated.substituteForwards(body, true, false, false);
-
-        preallocated.substituteBackwards(body, false, false, false);
+        this.substituteColumns(preallocated);
 
         if (myColPivot != null) {
             this.applyReverseOrder(myColPivot, preallocated);
@@ -489,11 +574,26 @@ abstract class DenseLU<N extends Comparable<N>, M extends PhysicalStore<N>> exte
 
         M tmpInPlace = this.setInPlace(matrix);
 
-        int tmpRowDim = this.getRowDim();
-        this.getColDim();
-        int tmpMinDim = this.getMinDim();
+        myPivot.reset(this.getRowDim());
 
-        myPivot.reset(tmpRowDim);
+        this.factorise(tmpInPlace, myPivot, pivoting);
+
+        return this.computed(true);
+    }
+
+    @Override
+    protected boolean checkSolvability() {
+        return this.isSquare() && this.isFullRank();
+    }
+
+    /**
+     * Factorises the in-place matrix, [A]=[P][L][U], recording the row interchanges in the pivot. Without
+     * pivoting, [P] stays the identity.
+     */
+    void factorise(final M tmpInPlace, final Pivot pivot, final boolean pivoting) {
+
+        int tmpRowDim = this.getRowDim();
+        int tmpMinDim = this.getMinDim();
 
         BasicArray<N> tmpMultipliers = this.makeArray(tmpRowDim);
 
@@ -507,7 +607,7 @@ abstract class DenseLU<N extends Comparable<N>, M extends PhysicalStore<N>> exte
                 // Pivot?
                 if (tmpPivotRow != ij) {
                     tmpInPlace.exchangeRows(tmpPivotRow, ij);
-                    myPivot.change(tmpPivotRow, ij);
+                    pivot.change(tmpPivotRow, ij);
                 }
             }
 
@@ -529,13 +629,6 @@ abstract class DenseLU<N extends Comparable<N>, M extends PhysicalStore<N>> exte
             }
 
         }
-
-        return this.computed(true);
-    }
-
-    @Override
-    protected boolean checkSolvability() {
-        return this.isSquare() && this.isFullRank();
     }
 
     /**
@@ -600,6 +693,78 @@ abstract class DenseLU<N extends Comparable<N>, M extends PhysicalStore<N>> exte
             myWorkerRow = this.preallocate(1, nbCols, 1);
         }
         return myWorkerRow;
+    }
+
+    /**
+     * Solves [P][L][U][x]=[b], or ([P][L][U])<sup>T</sup>[x]=[b] when transposed, in place – ftran and btran
+     * without the column pivot.
+     */
+    void substitute(final boolean transpose, final double[] arg) {
+
+        M body = this.getInPlace();
+
+        if (transpose) {
+            body.substituteForwards(true, false, arg);
+            body.substituteBackwards(true, true, arg);
+            myPivot.applyReverseOrder(arg);
+        } else {
+            myPivot.applyPivotOrder(arg);
+            body.substituteForwards(false, true, arg);
+            body.substituteBackwards(false, false, arg);
+        }
+    }
+
+    /**
+     * @see #substitute(boolean, double[])
+     */
+    void substitute(final boolean transpose, final PhysicalStore<N> arg) {
+
+        M body = this.getInPlace();
+
+        if (transpose) {
+            body.substituteForwards(true, false, arg);
+            body.substituteBackwards(true, true, arg);
+            myPivot.applyReverseOrder(arg);
+        } else {
+            myPivot.applyPivotOrder(arg);
+            body.substituteForwards(false, true, arg);
+            body.substituteBackwards(false, false, arg);
+        }
+    }
+
+    /**
+     * Solves [P][L][U][X]=[B] in place, for all columns of [B].
+     */
+    void substituteColumns(final PhysicalStore<N> rhs) {
+
+        this.applyPivotOrder(myPivot, rhs);
+
+        M body = this.getInPlace();
+
+        rhs.substituteForwards(body, true, false, false);
+
+        rhs.substituteBackwards(body, false, false, false);
+    }
+
+    /**
+     * Solves [P][L][U][X]=[I], writing the inverse of [P][L][U] to preallocated.
+     */
+    void substituteIdentity(final PhysicalStore<N> preallocated) {
+
+        if (myPivot.isModified()) {
+            preallocated.fillAll(this.scalar().zero().get());
+            int[] pivotOrder = myPivot.getOrder();
+            int numbRows = this.getRowDim();
+            for (int i = 0; i < numbRows; i++) {
+                preallocated.set(i, pivotOrder[i], PrimitiveMath.ONE);
+            }
+        }
+
+        M body = this.getInPlace();
+
+        preallocated.substituteForwards(body, true, false, !myPivot.isModified());
+
+        preallocated.substituteBackwards(body, false, false, false);
     }
 
 }
