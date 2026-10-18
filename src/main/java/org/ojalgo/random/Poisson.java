@@ -25,7 +25,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.ONE;
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.function.special.MissingMath;
+import org.ojalgo.function.special.GammaFunction;
 
 /**
  * The Poisson distribution is a discrete probability distribution that expresses the probability of a given
@@ -61,7 +61,15 @@ public class Poisson extends AbstractDiscrete {
     }
 
     public double getProbability(final int value) {
-        return (PrimitiveMath.EXP.invoke(-myLambda) * PrimitiveMath.POW.invoke(myLambda, value)) / MissingMath.factorial(value);
+        if (value < 0) {
+            return ZERO;
+        }
+        if (value == 0) {
+            return PrimitiveMath.EXP.invoke(-myLambda);
+        }
+
+        double logProbability = value * PrimitiveMath.LOG.invoke(myLambda) - myLambda - GammaFunction.Logarithmic.gamma(value + ONE);
+        return PrimitiveMath.EXP.invoke(logProbability);
     }
 
     @Override

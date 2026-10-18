@@ -337,6 +337,18 @@ public class RandomNumberTest extends RandomTests {
     }
 
     @Test
+    public void testGeometricProbability() {
+
+        Geometric distribution = new Geometric(0.2);
+
+        TestUtils.assertEquals(0.2, distribution.getProbability(1), 1E-15);
+        TestUtils.assertEquals(0.1024, distribution.getProbability(4), 1E-15);
+
+        TestUtils.assertEquals(ZERO, distribution.getProbability(0));
+        TestUtils.assertEquals(ZERO, distribution.getProbability(-3));
+    }
+
+    @Test
     @Tag("unstable")
     public void testLogNormal() {
 
@@ -412,6 +424,21 @@ public class RandomNumberTest extends RandomTests {
 
             TestUtils.assertEquals(tmpExpected, tmpActual, 5.0E-3);
         }
+    }
+
+    @Test
+    public void testPoissonProbability() {
+
+        TestUtils.assertEquals(0.21376301724973645, new Poisson(2.5).getProbability(3), 1E-12);
+        TestUtils.assertEquals(0.1251100357211333, new Poisson(10).getProbability(10), 1E-12);
+        TestUtils.assertEquals(0.03255540945683655, new Poisson(150).getProbability(150), 1E-12);
+        TestUtils.assertEquals(0.028197727685920822, new Poisson(200).getProbability(200), 1E-12);
+        TestUtils.assertEquals(0.012614611348721499, new Poisson(1000).getProbability(1000), 1E-12);
+
+        TestUtils.assertEquals(EXP.invoke(-2.5), new Poisson(2.5).getProbability(0), 1E-15);
+        TestUtils.assertEquals(ZERO, new Poisson(2.5).getProbability(-1));
+        TestUtils.assertEquals(ONE, new Poisson(ZERO).getProbability(0));
+        TestUtils.assertEquals(ZERO, new Poisson(ZERO).getProbability(1));
     }
 
     @Test

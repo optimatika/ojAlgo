@@ -23,6 +23,7 @@ package org.ojalgo.random;
 
 import static org.ojalgo.function.constant.PrimitiveMath.HALF;
 import static org.ojalgo.function.constant.PrimitiveMath.ONE;
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import org.ojalgo.function.constant.PrimitiveMath;
 
@@ -56,6 +57,9 @@ public class Geometric extends AbstractDiscrete {
     }
 
     public double getProbability(final int value) {
+        if (value < 1) {
+            return ZERO;
+        }
         return myProbability * PrimitiveMath.POW.invoke(ONE - myProbability, value - ONE);
     }
 

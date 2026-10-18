@@ -11,11 +11,30 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.function.special
+
+- `CombinatorialFunctions.Logarithmic` – the natural logarithms of the counts, also where the counts do not fit in a `long`.
+
+### Changed
+
+#### org.ojalgo.function.special
+
+- `CombinatorialFunctions`: `partitions(..)`, `permutations(..)`, `subsets(..)` and `variations(..)` throw `ArithmeticException` when the count does not fit in a `long`. Previously they returned `Long.MAX_VALUE` or 0. Where there is no way to form the subsets, tuples or partitions – `k < 0` or `k > n`, or subset sizes that are negative or do not sum to `n` – the count is 0. Previously that threw `IllegalArgumentException`, or for `partitions(..)` gave a non-zero count.
+
 ### Fixed
+
+#### org.ojalgo.function.special
+
+- `CombinatorialFunctions` counts are exact. They were computed from `double` factorials, and could be off once those were not exact, e.g. `subsets(55, 24)` was 1 too high.
+- `GammaFunction.Logarithmic.gamma(int)` returned `Infinity` for arguments greater than 171, e.g. for 200 rather than `857.93`.
 
 #### org.ojalgo.random
 
 - `Binomial.getProbability(int)` returned wrong values when the binomial coefficient exceeded `Long.MAX_VALUE` – for the most likely outcomes that is from 67 trials. E.g. `new Binomial(100, 0.5).getProbability(50)` gave `7.3E-12` rather than `0.0796`. Values outside `[0, count]` now give 0 rather than throwing an exception. Found and fixed by ChipLab (@vera-rubin). (PR [#703](https://github.com/optimatika/ojAlgo/pull/703))
+- `Poisson.getProbability(int)` overflowed for large values, e.g. `new Poisson(150).getProbability(150)` gave `Infinity` rather than `0.0326`, and `new Poisson(200).getProbability(200)` gave `NaN`. Negative values now give 0 rather than throwing an exception.
+- `Geometric.getProbability(int)` returned non-zero values outside its support 1, 2, 3, …, e.g. `new Geometric(0.5).getProbability(0)` gave 1.0. Values less than 1 now give 0.
 
 ## [57.5.0] – 2026-10-16
 

@@ -101,6 +101,10 @@ public abstract class GammaFunction {
         }
 
         public static double gamma(final int n) {
+            if (n > 171) {
+                // (n-1)! overflows double
+                return GammaFunction.LanczosApproximation.logarithmic(n);
+            }
             return Math.log(GammaFunction.gamma(n));
         }
 

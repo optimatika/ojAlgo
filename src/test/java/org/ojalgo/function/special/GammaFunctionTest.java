@@ -171,6 +171,16 @@ public class GammaFunctionTest {
         }
     }
 
+    @Test
+    public void testLogarithmicLargeInt() {
+
+        TestUtils.assertEquals(706.5730622457874, GammaFunction.Logarithmic.gamma(171), 1E-10);
+        TestUtils.assertEquals(711.7147258022899, GammaFunction.Logarithmic.gamma(172), 1E-10);
+        TestUtils.assertEquals(857.9336698258574, GammaFunction.Logarithmic.gamma(200), 1E-10);
+        TestUtils.assertEquals(5905.220423209181, GammaFunction.Logarithmic.gamma(1_000), 1E-9);
+        TestUtils.assertEquals(1051287.7089736569, GammaFunction.Logarithmic.gamma(100_000), 1E-6);
+    }
+
     /**
      * https://keisan.casio.com/exec/system/1180573447
      */
