@@ -23,9 +23,10 @@ package org.ojalgo.random;
 
 import static org.ojalgo.function.constant.PrimitiveMath.HALF;
 import static org.ojalgo.function.constant.PrimitiveMath.ONE;
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.function.special.CombinatorialFunctions;
+import org.ojalgo.function.special.GammaFunction;
 
 /**
  * The frequency in count indepedent trials, each with probability probability, has a binomial distribution.
@@ -58,8 +59,20 @@ public class Binomial extends AbstractDiscrete {
     }
 
     public double getProbability(final int value) {
-        return CombinatorialFunctions.subsets(myCount, value) * PrimitiveMath.POW.invoke(myProbability, value)
-                * PrimitiveMath.POW.invoke(ONE - myProbability, myCount - value);
+        if (value < 0 || value > myCount) {
+            return ZERO;
+        }
+        if (value == 0) {
+            return PrimitiveMath.POW.invoke(ONE - myProbability, myCount);
+        }
+        if (value == myCount) {
+            return PrimitiveMath.POW.invoke(myProbability, myCount);
+        }
+
+        double logProbability = GammaFunction.Logarithmic.gamma(myCount + ONE) - GammaFunction.Logarithmic.gamma(value + ONE)
+                - GammaFunction.Logarithmic.gamma(myCount - value + ONE) + value * PrimitiveMath.LOG.invoke(myProbability)
+                + (myCount - value) * PrimitiveMath.LOG1P.invoke(-myProbability);
+        return PrimitiveMath.EXP.invoke(logProbability);
     }
 
     @Override
