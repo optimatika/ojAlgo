@@ -11,6 +11,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Fixed
+
+#### org.ojalgo.random
+
+- `Binomial.getProbability(int)` returned wrong values when the binomial coefficient exceeded `Long.MAX_VALUE` – for the most likely outcomes that is from 67 trials. E.g. `new Binomial(100, 0.5).getProbability(50)` gave `7.3E-12` rather than `0.0796`. Values outside `[0, count]` now give 0 rather than throwing an exception. Found and fixed by ChipLab (@vera-rubin). (PR [#703](https://github.com/optimatika/ojAlgo/pull/703))
+
 ## [57.5.0] – 2026-10-16
 
 ### Added
