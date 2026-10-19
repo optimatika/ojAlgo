@@ -73,8 +73,8 @@ public class CombinatorialFunctionsTest {
             }
         }
 
-        TestUtils.assertEquals(CombinatorialFunctionsTest.ln(CombinatorialFunctionsTest.binomial(2000, 1000)), CombinatorialFunctions.Logarithmic.subsets(2000, 1000),
-                1E-9);
+        TestUtils.assertEquals(CombinatorialFunctionsTest.ln(CombinatorialFunctionsTest.binomial(2000, 1000)),
+                CombinatorialFunctions.Logarithmic.subsets(2000, 1000), 1E-9);
         TestUtils.assertEquals(CombinatorialFunctionsTest.ln(CombinatorialFunctionsTest.binomial(100, 50)),
                 CombinatorialFunctions.Logarithmic.partitions(100, new int[] { 50, 50 }), 1E-10);
         TestUtils.assertEquals(Math.log(2520.0), CombinatorialFunctions.Logarithmic.partitions(10, new int[] { 2, 3, 5 }), 1E-10);
@@ -137,7 +137,8 @@ public class CombinatorialFunctionsTest {
         }
 
         TestUtils.assertEquals(1_313_400L, CombinatorialFunctions.subsets(200, 3));
-        TestUtils.assertEquals(CombinatorialFunctionsTest.binomial(Integer.MAX_VALUE, 2).longValueExact(), CombinatorialFunctions.subsets(Integer.MAX_VALUE, 2));
+        TestUtils.assertEquals(CombinatorialFunctionsTest.binomial(Integer.MAX_VALUE, 2).longValueExact(),
+                CombinatorialFunctions.subsets(Integer.MAX_VALUE, 2));
         TestUtils.assertThrows(ArithmeticException.class, () -> CombinatorialFunctions.subsets(Integer.MAX_VALUE, 3));
 
         TestUtils.assertEquals(1L, CombinatorialFunctions.subsets(0, 0));

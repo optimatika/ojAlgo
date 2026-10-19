@@ -57,7 +57,8 @@ import org.ojalgo.structure.Access2D.Collectable;
 final class RawQR extends RawDecomposition implements QR<Double> {
 
     /**
-     * [A]=[Q][R] — Householder reflections stored in the transposed internal data.
+     * [A]=[Q][R] — Householder reflections stored in the transposed internal data. A column without a
+     * reflector (it was 0 on and below the diagonal) has v(k) = 0.
      * <p>
      * ftran applies Q^T (Householder reflections in forward order). btran applies Q (Householder reflections
      * in reverse order).
@@ -84,9 +85,11 @@ final class RawQR extends RawDecomposition implements QR<Double> {
             for (int k = myMinDim - 1; k >= 0; k--) {
 
                 colK = myData[k];
-                beta = ONE / colK[k];
 
-                HouseholderLeft.call(arg, myM, 0, colK, k, beta);
+                if (colK[k] != ZERO) {
+                    beta = ONE / colK[k];
+                    HouseholderLeft.call(arg, myM, 0, colK, k, beta);
+                }
             }
         }
 
@@ -99,9 +102,11 @@ final class RawQR extends RawDecomposition implements QR<Double> {
             for (int k = 0; k < myMinDim; k++) {
 
                 colK = myData[k];
-                beta = ONE / colK[k];
 
-                HouseholderLeft.call(arg, myM, 0, colK, k, beta);
+                if (colK[k] != ZERO) {
+                    beta = ONE / colK[k];
+                    HouseholderLeft.call(arg, myM, 0, colK, k, beta);
+                }
             }
         }
 
@@ -117,7 +122,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
                     retData[i][k] = ZERO;
                 }
                 retData[k][k] = ONE;
-                if (myData[k][k] != 0) {
+                if (myData[k][k] != ZERO) {
                     double[] colK = myData[k];
                     // Row by row: s[j] = -sum(colK[i] * Q[i][j]) / colK[k], then Q[i][j] += s[j] * colK[i]
                     Arrays.fill(work, k, myMinDim, ZERO);
@@ -266,9 +271,11 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         for (int k = n - 1; k >= 0; k--) {
 
             colK = dataInternal[k];
-            beta = ONE / colK[k];
 
-            HouseholderLeft.call(arg, m, 0, colK, k, beta);
+            if (colK[k] != ZERO) {
+                beta = ONE / colK[k];
+                HouseholderLeft.call(arg, m, 0, colK, k, beta);
+            }
         }
     }
 
@@ -338,9 +345,11 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         for (int k = 0; k < n; k++) {
 
             colK = dataInternal[k];
-            beta = ONE / colK[k];
 
-            HouseholderLeft.call(arg, m, 0, colK, k, beta);
+            if (colK[k] != ZERO) {
+                beta = ONE / colK[k];
+                HouseholderLeft.call(arg, m, 0, colK, k, beta);
+            }
         }
 
         for (int k = n - 1; k >= 0; k--) {
@@ -486,7 +495,8 @@ final class RawQR extends RawDecomposition implements QR<Double> {
             // Compute Infinity-norm of k-th column
             double norm = NRMINF.invoke(colK, k, m);
             if (norm == ZERO) {
-                break;
+                // No reflector: v(k), otherwise in [1, 2], stays 0, and so does R(k,k)
+                continue;
             }
             // Compute 2-norm of k-th column
             norm = NRM2.invoke(colK, norm, k, m);
@@ -566,9 +576,11 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         for (int k = 0; k < n; k++) {
 
             colK = dataInternal[k];
-            beta = ONE / colK[k];
 
-            HouseholderLeft.call(dataRHS, m, 0, colK, k, beta);
+            if (colK[k] != ZERO) {
+                beta = ONE / colK[k];
+                HouseholderLeft.call(dataRHS, m, 0, colK, k, beta);
+            }
         }
 
         // Solve R*X = Y;

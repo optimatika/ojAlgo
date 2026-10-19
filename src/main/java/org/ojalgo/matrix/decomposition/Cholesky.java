@@ -56,9 +56,10 @@ public interface Cholesky<N extends Comparable<N>> extends LDU<N>, MatrixDecompo
     Factory<RationalNumber> Q128 = typical -> new DenseCholesky.Q128();
 
     Factory<Double> R064 = typical -> {
-        if ((32L < typical.countColumns()) && (typical.count() <= PlainArray.MAX_SIZE)) {
+        if (typical.getColDim() > 0 && typical.count() <= PlainArray.MAX_SIZE) {
             return new DenseCholesky.R064();
         } else {
+            // An empty template (to be grown with appendColumn), or too large for a single array
             return new RawCholesky();
         }
     };

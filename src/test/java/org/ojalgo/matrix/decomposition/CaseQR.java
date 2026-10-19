@@ -21,6 +21,9 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import java.util.Arrays;
+import java.util.Random;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
@@ -40,10 +43,13 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.transformation.Householder;
+import org.ojalgo.matrix.transformation.InvertibleFactor;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Normal;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -262,6 +268,28 @@ public class CaseQR extends MatrixDecompositionTests {
         TestUtils.assertEquals(R064Store.FACTORY.copy(tmpOriginal), tmpPrimitiveDecomp, NumberContext.of(7, 14));
     }
 
+    /**
+     * R(k,k) is -norm when the column's k:th element is 0, as when it is positive.
+     */
+    @Test
+    public void testSignOfZeroDiagonal() {
+
+        double[][] rows = { { 0.0, 1.0 }, { 1.0, 0.0 } };
+
+        for (QR<Double> decomp : MatrixDecompositionTests.getPrimitiveQR()) {
+            decomp.decompose(R064Store.FACTORY.rows(rows));
+            TestUtils.assertEquals(decomp.getClass().getSimpleName(), -1.0, decomp.getR().doubleValue(0, 0), 1E-15);
+        }
+
+        QR<ComplexNumber> complex = QR.C128.make();
+        complex.decompose(GenericStore.C128.rows(rows));
+        TestUtils.assertEquals("C128", -1.0, complex.getR().doubleValue(0, 0), 1E-15);
+
+        QR<Quadruple> quadruple = QR.R128.make();
+        quadruple.decompose(GenericStore.R128.rows(rows));
+        TestUtils.assertEquals("R128", -1.0, quadruple.getR().doubleValue(0, 0), 1E-15);
+    }
+
     @Test
     public void testSolveBothWays() {
 
@@ -342,6 +370,43 @@ public class CaseQR extends MatrixDecompositionTests {
             decomp.btran(actual);
 
             TestUtils.assertEquals(expected, actual);
+        }
+    }
+
+    /**
+     * A column that is 0 on and below the diagonal, from the start or after the previous reflections, gets no
+     * reflector, and the columns after it are still factorised. RawQR used to stop at such a column.
+     */
+    @Test
+    public void testZeroColumn() {
+
+        double[][][] matrices = { { { 0.0, 1.0 }, { 0.0, 2.0 }, { 0.0, 3.0 } }, { { 1.0, 5.0, 1.0 }, { 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0 }, { 0.0, 0.0, 4.0 } },
+                { { 2.0, 0.0, 1.0, 3.0 }, { 1.0, 0.0, 4.0, 1.0 }, { 3.0, 0.0, 1.0, 5.0 }, { 1.0, 0.0, 2.0, 2.0 }, { 2.0, 0.0, 1.0, 1.0 } } };
+
+        for (double[][] rows : matrices) {
+
+            R064Store matrix = R064Store.FACTORY.rows(rows);
+            int m = matrix.getRowDim();
+            int minDim = Math.min(m, matrix.getColDim());
+
+            for (QR<Double> decomp : MatrixDecompositionTests.getPrimitiveQR()) {
+
+                String message = decomp.getClass().getSimpleName() + " " + m + "x" + matrix.getColDim();
+
+                decomp.decompose(matrix);
+
+                TestUtils.assertEquals(matrix, decomp, ACCURACY);
+
+                MatrixStore<Double> q = decomp.getQ();
+                TestUtils.assertEquals(message + " Q^T*Q", R064Store.FACTORY.makeIdentity(minDim), q.transpose().multiply(q), ACCURACY);
+
+                double[] x = { 1.0, -2.0, 3.0, -4.0, 5.0 };
+                double[] y = Arrays.copyOf(x, m);
+                InvertibleFactor<Double> factorQ = decomp.getFactors().get(0);
+                factorQ.ftran(y);
+                factorQ.btran(y);
+                TestUtils.assertEquals(message + " Q*Q^T*x", Access1D.wrap(Arrays.copyOf(x, m)), Access1D.wrap(y), ACCURACY);
+            }
         }
     }
 

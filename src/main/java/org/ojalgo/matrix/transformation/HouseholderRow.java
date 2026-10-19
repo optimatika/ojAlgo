@@ -63,6 +63,7 @@ final class HouseholderRow<N extends Comparable<N>> extends RowView<N> implement
         return (P) myWorker;
     }
 
+    @Deprecated
     @Override
     public boolean isZero() {
         double largest = NumberDefinition.doubleValue(myStore.aggregateRow(this.row(), myFirst + 1L, Aggregator.LARGEST));

@@ -99,8 +99,8 @@ public abstract class CombinatorialFunctions {
     /**
      * @param n The number of elements in the set
      * @param k A vector of subset sizes the sum of which must equal the size of the full set
-     * @return The number of ways the set can be partitioned in to subsets of the given sizes, 0 if any size is
-     *         negative or the sizes do not sum to n
+     * @return The number of ways the set can be partitioned in to subsets of the given sizes, 0 if any size
+     *         is negative or the sizes do not sum to n
      * @throws ArithmeticException if the result does not fit in a long
      */
     public static long partitions(final int n, final int[] k) {

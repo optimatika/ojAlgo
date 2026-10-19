@@ -62,6 +62,7 @@ final class HouseholderColumn<N extends Comparable<N>> extends ColumnView<N> imp
         return (P) myWorker;
     }
 
+    @Deprecated
     @Override
     public boolean isZero() {
         double largest = NumberDefinition.doubleValue(myStore.aggregateColumn(myFirst + 1L, this.column(), Aggregator.LARGEST));

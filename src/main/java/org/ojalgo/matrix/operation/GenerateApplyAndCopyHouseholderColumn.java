@@ -25,9 +25,16 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.transformation.Householder;
-import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 
+/**
+ * Generates the Householder reflector for the part of a column from {@code row} down. The column is
+ * overwritten with its first element after the reflection, and the reflector's vector (normalised to 1 at
+ * {@code row}) below it, and the reflector is copied to the destination. There is a reflector unless the part
+ * of the column below {@code row} is exactly 0; then false is returned and the column is left as it is. The
+ * first element after the reflection is -norm when the first element is positive or +0, and +norm when it is
+ * negative or -0 (for other number types: -norm times the first element's phase).
+ */
 public abstract class GenerateApplyAndCopyHouseholderColumn implements MatrixOperation {
 
     public static int THRESHOLD = 128;
@@ -44,7 +51,12 @@ public abstract class GenerateApplyAndCopyHouseholderColumn implements MatrixOpe
             tmpNormInf = Math.max(tmpNormInf, PrimitiveMath.ABS.invoke(tmpVector[i] = data[i + tmpColBase]));
         }
 
-        boolean retVal = tmpNormInf != PrimitiveMath.ZERO;
+        double tmpTailInf = PrimitiveMath.ZERO;
+        for (int i = row + 1; i < structure; i++) {
+            tmpTailInf = PrimitiveMath.MAX.invoke(tmpTailInf, PrimitiveMath.ABS.invoke(tmpVector[i]));
+        }
+
+        boolean retVal = tmpTailInf != PrimitiveMath.ZERO;
         double tmpVal;
         double tmpNorm2 = PrimitiveMath.ZERO;
 
@@ -53,7 +65,6 @@ public abstract class GenerateApplyAndCopyHouseholderColumn implements MatrixOpe
                 tmpVal = tmpVector[i] /= tmpNormInf;
                 tmpNorm2 += tmpVal * tmpVal;
             }
-            retVal = !PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpNorm2);
         }
 
         if (retVal) {
@@ -62,7 +73,7 @@ public abstract class GenerateApplyAndCopyHouseholderColumn implements MatrixOpe
             tmpNorm2 += tmpScale * tmpScale;
             tmpNorm2 = PrimitiveMath.SQRT.invoke(tmpNorm2); // 2-norm of the vector to transform (scaled by inf-norm)
 
-            if (tmpScale <= PrimitiveMath.ZERO) {
+            if (Math.copySign(PrimitiveMath.ONE, tmpScale) < PrimitiveMath.ZERO) {
                 data[row + tmpColBase] = tmpNorm2 * tmpNormInf;
                 tmpScale -= tmpNorm2;
             } else {
@@ -94,7 +105,12 @@ public abstract class GenerateApplyAndCopyHouseholderColumn implements MatrixOpe
             tmpNormInf = PrimitiveMath.MAX.invoke(tmpNormInf, PrimitiveMath.ABS.invoke(tmpVector[i] = data[i + tmpColBase]));
         }
 
-        boolean retVal = tmpNormInf != PrimitiveMath.ZERO;
+        double tmpTailInf = PrimitiveMath.ZERO;
+        for (int i = row + 1; i < structure; i++) {
+            tmpTailInf = PrimitiveMath.MAX.invoke(tmpTailInf, PrimitiveMath.ABS.invoke(tmpVector[i]));
+        }
+
+        boolean retVal = tmpTailInf != PrimitiveMath.ZERO;
         double tmpVal;
         double tmpNorm2 = PrimitiveMath.ZERO;
 
@@ -103,7 +119,6 @@ public abstract class GenerateApplyAndCopyHouseholderColumn implements MatrixOpe
                 tmpVal = tmpVector[i] /= tmpNormInf;
                 tmpNorm2 += tmpVal * tmpVal;
             }
-            retVal = !PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpNorm2);
         }
 
         if (retVal) {
@@ -112,7 +127,7 @@ public abstract class GenerateApplyAndCopyHouseholderColumn implements MatrixOpe
             tmpNorm2 += tmpScale * tmpScale;
             tmpNorm2 = PrimitiveMath.SQRT.invoke(tmpNorm2); // 2-norm of the vector to transform (scaled by inf-norm)
 
-            if (tmpScale <= PrimitiveMath.ZERO) {
+            if (Math.copySign(PrimitiveMath.ONE, tmpScale) < PrimitiveMath.ZERO) {
                 data[row + tmpColBase] = (float) (tmpNorm2 * tmpNormInf);
                 tmpScale -= tmpNorm2;
             } else {
@@ -141,11 +156,16 @@ public abstract class GenerateApplyAndCopyHouseholderColumn implements MatrixOpe
         destination.first = row;
 
         double tmpNormInf = PrimitiveMath.ZERO;
+        double tmpTailInf = PrimitiveMath.ZERO;
         for (int i = row; i < structure; i++) {
-            tmpNormInf = PrimitiveMath.MAX.invoke(tmpNormInf, (tmpVector[i] = data[i + tmpColBase]).norm());
+            double norm = (tmpVector[i] = data[i + tmpColBase]).norm();
+            tmpNormInf = PrimitiveMath.MAX.invoke(tmpNormInf, norm);
+            if (i > row) {
+                tmpTailInf = PrimitiveMath.MAX.invoke(tmpTailInf, norm);
+            }
         }
 
-        boolean retVal = tmpNormInf != PrimitiveMath.ZERO;
+        boolean retVal = tmpTailInf != PrimitiveMath.ZERO;
         Scalar<N> tmpVal;
         double tmpNorm2 = PrimitiveMath.ZERO;
 
@@ -155,7 +175,6 @@ public abstract class GenerateApplyAndCopyHouseholderColumn implements MatrixOpe
                 tmpNorm2 += tmpVal.norm() * tmpVal.norm();
                 tmpVector[i] = tmpVal.get();
             }
-            retVal = !PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpNorm2);
         }
 
         if (retVal) {

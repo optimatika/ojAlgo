@@ -19,6 +19,13 @@ public interface HouseholderReference<N extends Comparable<N>> extends Household
 
     <P extends Householder<N>> P getWorker(PhysicalStore.Factory<N, ?> factory);
 
+    /**
+     * Whether the referenced vector is negligible after its first element (which is 1), so that the reflector
+     * is (close to) the identity.
+     *
+     * @deprecated Record whether there is a reflector, and its beta, when it is generated
+     */
+    @Deprecated
     boolean isZero();
 
     void point(long row, long col);

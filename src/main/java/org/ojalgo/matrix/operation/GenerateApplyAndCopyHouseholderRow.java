@@ -25,9 +25,16 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.transformation.Householder;
-import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 
+/**
+ * Generates the Householder reflector for the part of a row from {@code col} on. The row is overwritten with
+ * its first element after the reflection, and the reflector's vector (normalised to 1 at {@code col}) after
+ * it, and the reflector is copied to the destination. There is a reflector unless the part of the row after
+ * {@code col} is exactly 0; then false is returned and the row is left as it is. The first element after the
+ * reflection is -norm when the first element is positive or +0, and +norm when it is negative or -0 (for
+ * other number types: -norm times the first element's phase).
+ */
 public abstract class GenerateApplyAndCopyHouseholderRow implements MatrixOperation {
 
     public static int THRESHOLD = 128;
@@ -44,7 +51,12 @@ public abstract class GenerateApplyAndCopyHouseholderRow implements MatrixOperat
             tmpNormInf = PrimitiveMath.MAX.invoke(tmpNormInf, PrimitiveMath.ABS.invoke(tmpVector[j] = data[row + j * structure]));
         }
 
-        boolean retVal = tmpNormInf != PrimitiveMath.ZERO;
+        double tmpTailInf = PrimitiveMath.ZERO;
+        for (int j = col + 1; j < tmpColDim; j++) {
+            tmpTailInf = PrimitiveMath.MAX.invoke(tmpTailInf, PrimitiveMath.ABS.invoke(tmpVector[j]));
+        }
+
+        boolean retVal = tmpTailInf != PrimitiveMath.ZERO;
         double tmpVal;
         double tmpNorm2 = PrimitiveMath.ZERO;
 
@@ -53,8 +65,6 @@ public abstract class GenerateApplyAndCopyHouseholderRow implements MatrixOperat
                 tmpVal = tmpVector[j] /= tmpNormInf;
                 tmpNorm2 += tmpVal * tmpVal;
             }
-            double value = tmpNorm2;
-            retVal = !PrimitiveScalar.isSmall(PrimitiveMath.ONE, value);
         }
 
         if (retVal) {
@@ -63,7 +73,7 @@ public abstract class GenerateApplyAndCopyHouseholderRow implements MatrixOperat
             tmpNorm2 += tmpScale * tmpScale;
             tmpNorm2 = PrimitiveMath.SQRT.invoke(tmpNorm2); // 2-norm of the vector to transform (scaled by inf-norm)
 
-            if (tmpScale <= PrimitiveMath.ZERO) {
+            if (Math.copySign(PrimitiveMath.ONE, tmpScale) < PrimitiveMath.ZERO) {
                 data[row + col * structure] = tmpNorm2 * tmpNormInf;
                 tmpScale -= tmpNorm2;
             } else {
@@ -95,7 +105,12 @@ public abstract class GenerateApplyAndCopyHouseholderRow implements MatrixOperat
             tmpNormInf = PrimitiveMath.MAX.invoke(tmpNormInf, PrimitiveMath.ABS.invoke(tmpVector[j] = data[row + j * structure]));
         }
 
-        boolean retVal = tmpNormInf != PrimitiveMath.ZERO;
+        double tmpTailInf = PrimitiveMath.ZERO;
+        for (int j = col + 1; j < tmpColDim; j++) {
+            tmpTailInf = PrimitiveMath.MAX.invoke(tmpTailInf, PrimitiveMath.ABS.invoke(tmpVector[j]));
+        }
+
+        boolean retVal = tmpTailInf != PrimitiveMath.ZERO;
         double tmpVal;
         double tmpNorm2 = PrimitiveMath.ZERO;
 
@@ -104,8 +119,6 @@ public abstract class GenerateApplyAndCopyHouseholderRow implements MatrixOperat
                 tmpVal = tmpVector[j] /= tmpNormInf;
                 tmpNorm2 += tmpVal * tmpVal;
             }
-            double value = tmpNorm2;
-            retVal = !PrimitiveScalar.isSmall(PrimitiveMath.ONE, value);
         }
 
         if (retVal) {
@@ -114,7 +127,7 @@ public abstract class GenerateApplyAndCopyHouseholderRow implements MatrixOperat
             tmpNorm2 += tmpScale * tmpScale;
             tmpNorm2 = PrimitiveMath.SQRT.invoke(tmpNorm2); // 2-norm of the vector to transform (scaled by inf-norm)
 
-            if (tmpScale <= PrimitiveMath.ZERO) {
+            if (Math.copySign(PrimitiveMath.ONE, tmpScale) < PrimitiveMath.ZERO) {
                 data[row + col * structure] = (float) (tmpNorm2 * tmpNormInf);
                 tmpScale -= tmpNorm2;
             } else {
@@ -147,7 +160,12 @@ public abstract class GenerateApplyAndCopyHouseholderRow implements MatrixOperat
             tmpNormInf = PrimitiveMath.MAX.invoke(tmpNormInf, (tmpVector[j] = data[row + j * structure]).norm());
         }
 
-        boolean retVal = tmpNormInf != PrimitiveMath.ZERO;
+        double tmpTailInf = PrimitiveMath.ZERO;
+        for (int j = col + 1; j < tmpColDim; j++) {
+            tmpTailInf = PrimitiveMath.MAX.invoke(tmpTailInf, tmpVector[j].norm());
+        }
+
+        boolean retVal = tmpTailInf != PrimitiveMath.ZERO;
         N tmpVal;
         double tmpNorm2 = PrimitiveMath.ZERO;
 
@@ -157,8 +175,6 @@ public abstract class GenerateApplyAndCopyHouseholderRow implements MatrixOperat
                 tmpNorm2 += tmpVal.norm() * tmpVal.norm();
                 tmpVector[j] = tmpVal;
             }
-            double value = tmpNorm2;
-            retVal = !PrimitiveScalar.isSmall(PrimitiveMath.ONE, value);
         }
 
         if (retVal) {
