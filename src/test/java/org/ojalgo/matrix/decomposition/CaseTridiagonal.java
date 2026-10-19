@@ -21,6 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import java.util.Random;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -96,6 +98,41 @@ public class CaseTridiagonal extends MatrixDecompositionTests {
                         { 0.0, 0.0, 0.0, -7.994421195, 3.358186868, 1.759360415 }, { 0.0, 0.0, 0.0, 0.0, 1.759360415, -2.142670196 } });
 
         this.doTheTest(tmpMtrxA, tmpMtrxD);
+    }
+
+    /**
+     * A column with a tiny part below the subdiagonal (compared to the column) still gets a reflector, so
+     * that the decomposition is accurate to full precision.
+     */
+    @Test
+    public void testTinySubdiagonal() {
+
+        NumberContext accuracy = NumberContext.of(12, 14);
+
+        for (double tail : new double[] { 1E-9, 1E-12, 1E-17 }) {
+
+            Random random = new Random(3);
+            double[][] rows = new double[8][8];
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j <= i; j++) {
+                    rows[i][j] = rows[j][i] = random.nextDouble() - 0.5;
+                }
+            }
+            for (int i = 2; i < 8; i++) {
+                rows[i][0] *= tail;
+                rows[0][i] = rows[i][0];
+            }
+
+            R064Store primitive = R064Store.FACTORY.rows(rows);
+            Tridiagonal<Double> decomposition = Tridiagonal.R064.make(primitive);
+            decomposition.decompose(primitive);
+            TestUtils.assertEquals(primitive, decomposition, accuracy);
+
+            GenericStore<ComplexNumber> complex = GenericStore.C128.rows(rows);
+            Tridiagonal<ComplexNumber> complexDecomposition = Tridiagonal.C128.make(complex);
+            complexDecomposition.decompose(complex);
+            TestUtils.assertEquals(complex, complexDecomposition, accuracy);
+        }
     }
 
     @Test

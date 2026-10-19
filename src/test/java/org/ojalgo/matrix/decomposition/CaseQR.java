@@ -374,6 +374,89 @@ public class CaseQR extends MatrixDecompositionTests {
     }
 
     /**
+     * A column with a very small part below the diagonal, compared to the rest of the column. Solving with
+     * the decomposition, and with its factors, must give the solution of A*x = (1, 1), x = (1, 1 - t), to
+     * full precision: there is a reflector unless that part is exactly 0. Applying a reflector that the
+     * factorisation did not apply (or not applying one that it did) flips the sign of the first element.
+     */
+    @Test
+    public void testTinySubdiagonal() {
+
+        NumberContext accuracy = NumberContext.of(14);
+
+        for (double tail : new double[] { 1E-6, 1E-9, 1E-10, 1E-12, 1E-17 }) {
+
+            double[][] rows = { { 1.0, 0.0 }, { tail, 1.0 } };
+            R064Store expected = R064Store.FACTORY.column(1.0, 1.0 - tail);
+
+            for (QR<Double> decomp : MatrixDecompositionTests.getPrimitiveQR()) {
+
+                String message = decomp.getClass().getSimpleName() + " tail=" + tail;
+
+                decomp.decompose(R064Store.FACTORY.rows(rows));
+                TestUtils.assertEquals(message, expected, decomp.getSolution(R064Store.FACTORY.column(1.0, 1.0)), accuracy);
+
+                double[] x = { 1.0, 1.0 };
+                for (InvertibleFactor<Double> factor : decomp.getFactors()) {
+                    factor.ftran(x);
+                }
+                TestUtils.assertEquals(message + " factors", expected, Access1D.wrap(x), accuracy);
+            }
+
+            QR<ComplexNumber> complex = QR.C128.make();
+            complex.decompose(GenericStore.C128.rows(rows));
+            TestUtils.assertEquals("C128 tail=" + tail, expected, complex.getSolution(GenericStore.C128.column(1.0, 1.0)), accuracy);
+
+            QR<Quadruple> quadruple = QR.R128.make();
+            quadruple.decompose(GenericStore.R128.rows(rows));
+            TestUtils.assertEquals("R128 tail=" + tail, expected, quadruple.getSolution(GenericStore.R128.column(1.0, 1.0)), accuracy);
+        }
+    }
+
+    /**
+     * As {@link #testTinySubdiagonal()}, but large enough for the native implementation, when there is one.
+     * LAPACK generates a reflector for any part below the diagonal that is not exactly 0, also a tiny one.
+     * Solving with the factors must use the reflectors the factorisation generated.
+     */
+    @Test
+    public void testTinySubdiagonalLarge() {
+
+        int n = 100;
+        NumberContext accuracy = NumberContext.of(12);
+
+        for (double tail : new double[] { 1E-9, 1E-17, 1E-20 }) {
+
+            Random random = new Random(1);
+            R064Store matrix = R064Store.FACTORY.make(n, n);
+            for (int j = 0; j < n; j++) {
+                for (int i = 0; i <= j; i++) {
+                    matrix.set(i, j, random.nextDouble() + (i == j ? n : 0));
+                }
+            }
+            matrix.set(1, 0, tail);
+
+            R064Store rhs = R064Store.FACTORY.make(n, 1);
+            for (int i = 0; i < n; i++) {
+                rhs.set(i, 0, 1.0 + i);
+            }
+
+            for (QR<Double> decomp : MatrixDecompositionTests.getPrimitiveQR()) {
+
+                String message = decomp.getClass().getSimpleName() + " tail=" + tail;
+
+                decomp.decompose(matrix);
+                TestUtils.assertEquals(message, rhs, matrix.multiply(decomp.getSolution(rhs)), accuracy);
+
+                double[] x = rhs.toRawCopy1D();
+                for (InvertibleFactor<Double> factor : decomp.getFactors()) {
+                    factor.ftran(x);
+                }
+                TestUtils.assertEquals(message + " factors", rhs, matrix.multiply(R064Store.FACTORY.column(x)), accuracy);
+            }
+        }
+    }
+
+    /**
      * A column that is 0 on and below the diagonal, from the start or after the previous reflections, gets no
      * reflector, and the columns after it are still factorised. RawQR used to stop at such a column.
      */

@@ -200,6 +200,14 @@ abstract class DenseBidiagonal<N extends Comparable<N>, M extends PhysicalStore<
 
     }
 
+    /**
+     * beta of the column reflectors (for the left Q), 0 where there is none
+     */
+    private double[] myBetaLQ = null;
+    /**
+     * beta of the row reflectors (for the right Q), 0 where there is none
+     */
+    private double[] myBetaRQ = null;
     private transient DiagonalStore<N, Array1D<N>> myDiagonal;
     private final boolean myFullSize;
     private final HouseholderStep<N, M> myHouseholderColumn;
@@ -232,16 +240,27 @@ abstract class DenseBidiagonal<N extends Comparable<N>, M extends PhysicalStore<
         Householder<N> tmpHouseholderRow = this.makeHouseholder(tmpColDim);
         Householder<N> tmpHouseholderCol = this.makeHouseholder(tmpRowDim);
 
+        if (myBetaLQ == null || myBetaLQ.length != tmpLimit) {
+            myBetaLQ = new double[tmpLimit];
+            myBetaRQ = new double[tmpLimit];
+        }
+
         if (this.isAspectRatioNormal()) {
 
             for (int ij = 0; ij < tmpLimit; ij++) {
 
                 if (ij + 1 < tmpRowDim && myHouseholderColumn.invoke(storage, ij, ij, tmpHouseholderCol)) {
                     storage.transformLeft(tmpHouseholderCol, ij + 1);
+                    myBetaLQ[ij] = InPlaceDecomposition.getBeta(tmpHouseholderCol);
+                } else {
+                    myBetaLQ[ij] = PrimitiveMath.ZERO;
                 }
 
                 if (ij + 2 < tmpColDim && myHouseholderRow.invoke(storage, ij, ij + 1, tmpHouseholderRow)) {
                     storage.transformRight(tmpHouseholderRow, ij + 1);
+                    myBetaRQ[ij] = InPlaceDecomposition.getBeta(tmpHouseholderRow);
+                } else {
+                    myBetaRQ[ij] = PrimitiveMath.ZERO;
                 }
             }
 
@@ -257,10 +276,16 @@ abstract class DenseBidiagonal<N extends Comparable<N>, M extends PhysicalStore<
 
                 if (ij + 1 < tmpColDim && myHouseholderRow.invoke(storage, ij, ij, tmpHouseholderRow)) {
                     storage.transformRight(tmpHouseholderRow, ij + 1);
+                    myBetaRQ[ij] = InPlaceDecomposition.getBeta(tmpHouseholderRow);
+                } else {
+                    myBetaRQ[ij] = PrimitiveMath.ZERO;
                 }
 
                 if (ij + 2 < tmpRowDim && myHouseholderColumn.invoke(storage, ij + 1, ij, tmpHouseholderCol)) {
                     storage.transformLeft(tmpHouseholderCol, ij + 1);
+                    myBetaLQ[ij] = InPlaceDecomposition.getBeta(tmpHouseholderCol);
+                } else {
+                    myBetaLQ[ij] = PrimitiveMath.ZERO;
                 }
             }
 
@@ -347,6 +372,9 @@ abstract class DenseBidiagonal<N extends Comparable<N>, M extends PhysicalStore<
         int tmpRowDim = this.getRowDim();
         int tmpMinDim = this.getMinDim();
 
+        Householder<N> worker = this.makeHouseholder(tmpRowDim);
+        PhysicalStore.Factory<N, ?> factory = this.getInPlace().physical();
+
         M retVal = null;
         if (myInitDiagLQ != null) {
             retVal = this.makeZero(tmpRowDim, myFullSize ? tmpRowDim : tmpMinDim);
@@ -360,10 +388,9 @@ abstract class DenseBidiagonal<N extends Comparable<N>, M extends PhysicalStore<
         boolean tmpUpper = this.isUpper();
         for (int ij = tmpUpper && tmpRowDim != tmpMinDim ? tmpMinDim - 1 : tmpMinDim - 2; ij >= 0; ij--) {
 
-            tmpReference.point(tmpUpper ? ij : ij + 1, ij);
-
-            if (!tmpReference.isZero()) {
-                retVal.transformLeft(tmpReference, ij);
+            if (myBetaLQ[ij] != PrimitiveMath.ZERO) {
+                tmpReference.point(tmpUpper ? ij : ij + 1, ij);
+                retVal.transformLeft(InPlaceDecomposition.copyReflector(worker, tmpReference, myBetaLQ[ij], factory), ij);
             }
         }
 
@@ -376,6 +403,9 @@ abstract class DenseBidiagonal<N extends Comparable<N>, M extends PhysicalStore<
 
         int tmpColDim = this.getColDim();
         int tmpMinDim = this.getMinDim();
+
+        Householder<N> worker = this.makeHouseholder(tmpColDim);
+        PhysicalStore.Factory<N, ?> factory = this.getInPlace().physical();
 
         M retVal = null;
         if (myInitDiagRQ != null) {
@@ -390,10 +420,9 @@ abstract class DenseBidiagonal<N extends Comparable<N>, M extends PhysicalStore<
         boolean tmpUpper = this.isUpper();
         for (int ij = tmpUpper ? tmpMinDim - 2 : tmpMinDim - 1; ij >= 0; ij--) {
 
-            tmpReference.point(ij, tmpUpper ? ij + 1 : ij);
-
-            if (!tmpReference.isZero()) {
-                retVal.transformLeft(tmpReference, ij);
+            if (myBetaRQ[ij] != PrimitiveMath.ZERO) {
+                tmpReference.point(ij, tmpUpper ? ij + 1 : ij);
+                retVal.transformLeft(InPlaceDecomposition.copyReflector(worker, tmpReference, myBetaRQ[ij], factory), ij);
             }
         }
 

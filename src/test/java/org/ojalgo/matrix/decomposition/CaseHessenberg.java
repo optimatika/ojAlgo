@@ -21,13 +21,17 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import java.util.Random;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.context.NumberContext;
 
@@ -56,6 +60,42 @@ public class CaseHessenberg extends MatrixDecompositionTests {
         final PhysicalStore<Double> tmpMatrix = R064Store.FACTORY.copy(TestUtils.makeRandomComplexStore(5, 5));
 
         this.doTestCorrect(tmpMatrix);
+    }
+
+    /**
+     * A column with a tiny part below the subdiagonal (compared to the column) still gets a reflector, so
+     * that the decomposition is accurate to full precision.
+     */
+    @Test
+    public void testTinySubdiagonal() {
+
+        NumberContext accuracy = NumberContext.of(12, 14);
+
+        for (double tail : new double[] { 1E-9, 1E-12, 1E-17 }) {
+
+            Random random = new Random(2);
+            double[][] rows = new double[8][8];
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
+                    rows[i][j] = random.nextDouble() - 0.5;
+                }
+            }
+            for (int i = 2; i < 8; i++) {
+                rows[i][0] *= tail;
+            }
+
+            R064Store primitive = R064Store.FACTORY.rows(rows);
+            Hessenberg<Double> decomposition = Hessenberg.R064.make(primitive);
+            decomposition.decompose(primitive);
+            TestUtils.assertEquals(primitive, decomposition, accuracy);
+            MatrixStore<Double> q = decomposition.getQ();
+            TestUtils.assertEquals(R064Store.FACTORY.makeIdentity(8), q.transpose().multiply(q), accuracy);
+
+            GenericStore<ComplexNumber> complex = GenericStore.C128.rows(rows);
+            Hessenberg<ComplexNumber> complexDecomposition = Hessenberg.C128.make(complex);
+            complexDecomposition.decompose(complex);
+            TestUtils.assertEquals(complex, complexDecomposition, accuracy);
+        }
     }
 
     private void doPrint(final DenseHessenberg<Double, R064Store> aDecomposition, final PhysicalStore<Double> aMatrix) {

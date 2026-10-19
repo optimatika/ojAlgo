@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.function.constant.PrimitiveMath.MACHINE_SMALLEST;
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import java.util.List;
 
@@ -109,21 +110,24 @@ abstract class DenseQR<N extends Comparable<N>, M extends PhysicalStore<N>> exte
     }
 
     /**
-     * [A]=[Q][R] — Householder reflections stored in the lower part of the in-place body.
+     * [A]=[Q][R] — Householder reflections stored in the lower part of the in-place body, with their beta (0
+     * where there is no reflector).
      * <p>
      * ftran applies Q^T (Householder reflections in forward order). btran applies Q (Householder reflections
      * in reverse order).
      */
     static final class FactorQ<N extends Comparable<N>> implements MatrixDecomposition.Factor<N> {
 
+        private final double[] myBeta;
         private final PhysicalStore<N> myBody;
         private final PhysicalStore.Factory<N, ?> myFactory;
         private final boolean myFullSize;
         private final int myMinDim;
 
-        FactorQ(final PhysicalStore<N> body, final PhysicalStore.Factory<N, ?> factory, final int minDim, final boolean fullSize) {
+        FactorQ(final PhysicalStore<N> body, final double[] beta, final PhysicalStore.Factory<N, ?> factory, final int minDim, final boolean fullSize) {
             super();
             myBody = body;
+            myBeta = beta;
             myFactory = factory;
             myMinDim = minDim;
             myFullSize = fullSize;
@@ -140,13 +144,12 @@ abstract class DenseQR<N extends Comparable<N>, M extends PhysicalStore<N>> exte
         public void btran(final PhysicalStore<N> arg) {
 
             HouseholderReference<N> reference = HouseholderReference.makeColumn(myBody);
+            Householder<N> worker = myFactory.makeHouseholder(myBody.getRowDim());
 
             for (int j = myMinDim - 1; j >= 0; j--) {
-
-                reference.point(j, j);
-
-                if (!reference.isZero()) {
-                    arg.transformLeft(reference, 0);
+                if (myBeta[j] != ZERO) {
+                    reference.point(j, j);
+                    arg.transformLeft(InPlaceDecomposition.copyReflector(worker, reference, myBeta[j], myFactory), 0);
                 }
             }
         }
@@ -162,13 +165,12 @@ abstract class DenseQR<N extends Comparable<N>, M extends PhysicalStore<N>> exte
         public void ftran(final PhysicalStore<N> arg) {
 
             HouseholderReference<N> reference = HouseholderReference.makeColumn(myBody);
+            Householder<N> worker = myFactory.makeHouseholder(myBody.getRowDim());
 
             for (int j = 0; j < myMinDim; j++) {
-
-                reference.point(j, j);
-
-                if (!reference.isZero()) {
-                    arg.transformLeft(reference, 0);
+                if (myBeta[j] != ZERO) {
+                    reference.point(j, j);
+                    arg.transformLeft(InPlaceDecomposition.copyReflector(worker, reference, myBeta[j], myFactory), 0);
                 }
             }
         }
@@ -182,13 +184,12 @@ abstract class DenseQR<N extends Comparable<N>, M extends PhysicalStore<N>> exte
             PhysicalStore<N> retVal = myFactory.makeEye(m, cols);
 
             HouseholderReference<N> reference = HouseholderReference.makeColumn(myBody);
+            Householder<N> worker = myFactory.makeHouseholder(m);
 
             for (int j = myMinDim - 1; j >= 0; j--) {
-
-                reference.point(j, j);
-
-                if (!reference.isZero()) {
-                    retVal.transformLeft(reference, j);
+                if (myBeta[j] != ZERO) {
+                    reference.point(j, j);
+                    retVal.transformLeft(InPlaceDecomposition.copyReflector(worker, reference, myBeta[j], myFactory), j);
                 }
             }
 
@@ -270,6 +271,10 @@ abstract class DenseQR<N extends Comparable<N>, M extends PhysicalStore<N>> exte
 
     }
 
+    /**
+     * beta of the reflectors, 0 where there is none
+     */
+    private double[] myBeta = null;
     private final boolean myFullSize;
     private final HouseholderStep<N, M> myHouseholderColumn;
     private int myNumberOfHouseholderTransformations = 0;
@@ -289,21 +294,8 @@ abstract class DenseQR<N extends Comparable<N>, M extends PhysicalStore<N>> exte
 
     @Override
     public void btran(final PhysicalStore<N> arg) {
-
-        PhysicalStore<N> body = this.getInPlace();
-
-        arg.substituteForwards(body, false, true, false);
-
-        HouseholderReference<N> reference = HouseholderReference.makeColumn(body);
-
-        for (int j = this.getMinDim() - 1; j >= 0; j--) {
-
-            reference.point(j, j);
-
-            if (!reference.isZero()) {
-                arg.transformLeft(reference, 0);
-            }
-        }
+        this.substitute(true, arg);
+        this.reflect(false, arg);
     }
 
     @Override
@@ -334,17 +326,7 @@ abstract class DenseQR<N extends Comparable<N>, M extends PhysicalStore<N>> exte
 
         M tmpStore = this.setInPlace(matrix);
 
-        int m = this.getRowDim();
-        int r = this.getMinDim();
-
-        Householder<N> tmpHouseholder = this.makeHouseholder(m);
-
-        for (int k = 0; k < r; k++) {
-            if (k + 1 < m && myHouseholderColumn.invoke(tmpStore, k, k, tmpHouseholder)) {
-                tmpStore.transformLeft(tmpHouseholder, k + 1);
-                myNumberOfHouseholderTransformations++;
-            }
-        }
+        myNumberOfHouseholderTransformations = this.factorise(tmpStore);
 
         return this.computed(true);
     }
@@ -358,21 +340,8 @@ abstract class DenseQR<N extends Comparable<N>, M extends PhysicalStore<N>> exte
 
     @Override
     public void ftran(final PhysicalStore<N> arg) {
-
-        PhysicalStore<N> body = this.getInPlace();
-
-        HouseholderReference<N> reference = HouseholderReference.makeColumn(body);
-
-        for (int j = 0, limit = this.getMinDim(); j < limit; j++) {
-
-            reference.point(j, j);
-
-            if (!reference.isZero()) {
-                arg.transformLeft(reference, 0);
-            }
-        }
-
-        arg.substituteBackwards(body, false, false, false);
+        this.reflect(true, arg);
+        this.substitute(false, arg);
     }
 
     @Override
@@ -434,22 +403,11 @@ abstract class DenseQR<N extends Comparable<N>, M extends PhysicalStore<N>> exte
 
         rhs.supplyTo(preallocated);
 
-        PhysicalStore<N> body = this.getInPlace();
+        this.reflect(true, preallocated);
+        this.substitute(false, preallocated);
+
         int m = this.getRowDim();
         int n = this.getColDim();
-
-        HouseholderReference<N> reference = HouseholderReference.makeColumn(body);
-
-        for (int j = 0, limit = this.getMinDim(); j < limit; j++) {
-
-            reference.point(j, j);
-
-            if (!reference.isZero()) {
-                preallocated.transformLeft(reference, 0);
-            }
-        }
-
-        preallocated.substituteBackwards(body, false, false, false);
 
         if (n < m) {
             return preallocated.limits(n, preallocated.getColDim());
@@ -523,11 +481,39 @@ abstract class DenseQR<N extends Comparable<N>, M extends PhysicalStore<N>> exte
     }
 
     /**
+     * Factorises the in-place matrix, [A]=[Q][R], and returns the number of Householder reflections (those
+     * that are not the identity).
+     */
+    int factorise(final M inPlace) {
+
+        int m = this.getRowDim();
+        int r = this.getMinDim();
+
+        if (myBeta == null || myBeta.length != r) {
+            myBeta = new double[r];
+        }
+
+        Householder<N> householder = this.makeHouseholder(m);
+
+        int retVal = 0;
+        for (int k = 0; k < r; k++) {
+            if (k + 1 < m && myHouseholderColumn.invoke(inPlace, k, k, householder)) {
+                inPlace.transformLeft(householder, k + 1);
+                myBeta[k] = InPlaceDecomposition.getBeta(householder);
+                retVal++;
+            } else {
+                myBeta[k] = ZERO;
+            }
+        }
+        return retVal;
+    }
+
+    /**
      * [A]=[Q][R]
      */
     MatrixDecomposition.Factor<N> getFactorQ() {
         PhysicalStore<N> body = this.getInPlace();
-        return new FactorQ<>(body, body.physical(), this.getMinDim(), myFullSize);
+        return new FactorQ<>(body, myBeta, body.physical(), this.getMinDim(), myFullSize);
     }
 
     /**
@@ -535,6 +521,32 @@ abstract class DenseQR<N extends Comparable<N>, M extends PhysicalStore<N>> exte
      */
     MatrixDecomposition.Factor<N> getFactorR() {
         return new FactorR<>(this.getInPlace(), myFullSize);
+    }
+
+    /**
+     * Multiplies [X] by [Q]<sup>T</sup>, or by [Q] when not transposed, in place, for all columns of [X].
+     */
+    void reflect(final boolean transpose, final PhysicalStore<N> arg) {
+        if (transpose) {
+            this.getFactorQ().ftran(arg);
+        } else {
+            this.getFactorQ().btran(arg);
+        }
+    }
+
+    /**
+     * Solves [R][X]=[B], or [R]<sup>T</sup>[X]=[B] when transposed, in place, for all columns of [B]. Only
+     * the first min(m,n) rows of [B] are solved for; the others are left as they are.
+     */
+    void substitute(final boolean transpose, final PhysicalStore<N> arg) {
+
+        M body = this.getInPlace();
+
+        if (transpose) {
+            arg.substituteForwards(body, false, true, false);
+        } else {
+            arg.substituteBackwards(body, false, false, false);
+        }
     }
 
     /**

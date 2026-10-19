@@ -21,8 +21,11 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import java.util.Random;
+
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
@@ -131,6 +134,46 @@ public class CaseBidiagonal extends MatrixDecompositionTests {
         final PhysicalStore<Double> tmpMatrix = R064Store.FACTORY.copy(TestUtils.makeRandomComplexStore(6, 4));
 
         this.doTestCorrect(tmpMatrix);
+    }
+
+    /**
+     * A column with a tiny part below the diagonal, and a row with a tiny part right of the superdiagonal
+     * (compared to the column or row), still get reflectors, so that the decomposition is accurate to full
+     * precision.
+     */
+    @Test
+    public void testTinyTails() {
+
+        NumberContext accuracy = NumberContext.of(12, 14);
+
+        for (int[] size : new int[][] { { 8, 8 }, { 9, 6 }, { 6, 9 } }) {
+            for (double tail : new double[] { 1E-9, 1E-12, 1E-17 }) {
+
+                Random random = new Random(1);
+                double[][] rows = new double[size[0]][size[1]];
+                for (int i = 0; i < size[0]; i++) {
+                    for (int j = 0; j < size[1]; j++) {
+                        rows[i][j] = random.nextDouble() - 0.5;
+                    }
+                }
+                for (int i = 1; i < size[0]; i++) {
+                    rows[i][0] *= tail;
+                }
+                for (int j = 2; j < size[1]; j++) {
+                    rows[0][j] *= tail;
+                }
+
+                R064Store primitive = R064Store.FACTORY.rows(rows);
+                Bidiagonal<Double> decomposition = Bidiagonal.R064.make(primitive);
+                decomposition.decompose(primitive);
+                TestUtils.assertEquals(primitive, decomposition, accuracy);
+
+                GenericStore<ComplexNumber> complex = GenericStore.C128.rows(rows);
+                Bidiagonal<ComplexNumber> complexDecomposition = Bidiagonal.C128.make(complex);
+                complexDecomposition.decompose(complex);
+                TestUtils.assertEquals(complex, complexDecomposition, accuracy);
+            }
+        }
     }
 
     private void doPrint(final DenseBidiagonal<Double, R064Store> aDecomposition, final PhysicalStore<Double> aMatrix) {

@@ -21,6 +21,9 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import java.util.Arrays;
+
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.operation.GenerateApplyAndCopyHouseholderColumn;
 import org.ojalgo.matrix.operation.GenerateApplyAndCopyHouseholderRow;
 import org.ojalgo.matrix.operation.HouseholderStep;
@@ -79,6 +82,10 @@ abstract class DenseHessenberg<N extends Comparable<N>, M extends PhysicalStore<
 
     }
 
+    /**
+     * beta of the reflectors, 0 where there is none
+     */
+    private double[] myBeta = null;
     private final HouseholderStep<N, M> myHouseholderColumn;
     private final HouseholderStep<N, M> myHouseholderRow;
     private transient PhysicalStore<N> myQ = null;
@@ -104,6 +111,13 @@ abstract class DenseHessenberg<N extends Comparable<N>, M extends PhysicalStore<
         final int tmpRowDim = this.getRowDim();
         final int tmpColDim = this.getColDim();
 
+        int minDim = Math.min(tmpRowDim, tmpColDim);
+        if (myBeta == null || myBeta.length != minDim) {
+            myBeta = new double[minDim];
+        } else {
+            Arrays.fill(myBeta, PrimitiveMath.ZERO);
+        }
+
         if (upper) {
 
             final Householder<N> tmpHouseholderCol = this.makeHouseholder(tmpRowDim);
@@ -114,6 +128,7 @@ abstract class DenseHessenberg<N extends Comparable<N>, M extends PhysicalStore<
                 if (myHouseholderColumn.invoke(tmpStore, ij + 1, ij, tmpHouseholderCol)) {
                     tmpStore.transformLeft(tmpHouseholderCol, ij + 1);
                     tmpStore.transformRight(tmpHouseholderCol, 0);
+                    myBeta[ij] = InPlaceDecomposition.getBeta(tmpHouseholderCol);
                 }
             }
 
@@ -127,6 +142,7 @@ abstract class DenseHessenberg<N extends Comparable<N>, M extends PhysicalStore<
                 if (myHouseholderRow.invoke(tmpStore, ij, ij + 1, tmpHouseholderRow)) {
                     tmpStore.transformRight(tmpHouseholderRow, ij + 1);
                     tmpStore.transformLeft(tmpHouseholderRow, 0);
+                    myBeta[ij] = InPlaceDecomposition.getBeta(tmpHouseholderRow);
                 }
             }
         }
@@ -171,13 +187,13 @@ abstract class DenseHessenberg<N extends Comparable<N>, M extends PhysicalStore<
         final int tmpRowAndColDim = (int) storeToTransform.countRows();
 
         final HouseholderReference<N> tmpReference = HouseholderReference.make(this.getInPlace(), upper);
+        Householder<N> worker = this.makeHouseholder(upper ? this.getRowDim() : this.getColDim());
+        PhysicalStore.Factory<N, ?> factory = this.getInPlace().physical();
 
-        for (int ij = tmpRowAndColDim - 3; ij >= 0; ij--) {
-
-            tmpReference.point(upper ? ij + 1 : ij, upper ? ij : ij + 1);
-
-            if (!tmpReference.isZero()) {
-                storeToTransform.transformLeft(tmpReference, eye ? ij : 0);
+        for (int ij = Math.min(tmpRowAndColDim - 3, myBeta.length - 1); ij >= 0; ij--) {
+            if (myBeta[ij] != PrimitiveMath.ZERO) {
+                tmpReference.point(upper ? ij + 1 : ij, upper ? ij : ij + 1);
+                storeToTransform.transformLeft(InPlaceDecomposition.copyReflector(worker, tmpReference, myBeta[ij], factory), eye ? ij : 0);
             }
         }
 

@@ -21,6 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import java.util.Arrays;
+
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.constant.PrimitiveMath;
@@ -158,6 +160,10 @@ abstract class DeferredTridiagonal<N extends Comparable<N>, M extends PhysicalSt
         }
     }
 
+    /**
+     * beta of the reflectors, 0 where there is none
+     */
+    private double[] myBeta = null;
     private transient BasicArray<N> myDiagD = null;
     private transient BasicArray<N> myDiagE = null;
     private final HouseholderStep<N, M> myHouseholderColumn;
@@ -192,12 +198,19 @@ abstract class DeferredTridiagonal<N extends Comparable<N>, M extends PhysicalSt
                 myWorker = this.makeArray(size);
             }
 
+            if (myBeta == null || myBeta.length != size) {
+                myBeta = new double[size];
+            } else {
+                Arrays.fill(myBeta, PrimitiveMath.ZERO);
+            }
+
             Householder<N> tmpHouseholder = this.makeHouseholder(size);
 
             int limit = size - 2;
             for (int ij = 0; ij < limit; ij++) {
                 if (myHouseholderColumn.invoke(inPlace, ij + 1, ij, tmpHouseholder)) {
                     myHouseholderHermitian.invoke(inPlace, tmpHouseholder, myWorker);
+                    myBeta[ij] = InPlaceDecomposition.getBeta(tmpHouseholder);
                 }
             }
 
@@ -246,6 +259,8 @@ abstract class DeferredTridiagonal<N extends Comparable<N>, M extends PhysicalSt
         int tmpDim = this.getMinDim();
 
         HouseholderReference<N> tmpReference = HouseholderReference.makeColumn(retVal);
+        Householder<N> worker = this.makeHouseholder(tmpDim);
+        PhysicalStore.Factory<N, ?> factory = retVal.physical();
         N zero = this.scalar().zero().get();
 
         if (myInitDiagQ != null) {
@@ -265,10 +280,9 @@ abstract class DeferredTridiagonal<N extends Comparable<N>, M extends PhysicalSt
 
         for (int ij = tmpDim - 3; ij >= 0; ij--) {
 
-            tmpReference.point(ij + 1, ij);
-
-            if (!tmpReference.isZero()) {
-                retVal.transformLeft(tmpReference, ij);
+            if (myBeta[ij] != PrimitiveMath.ZERO) {
+                tmpReference.point(ij + 1, ij);
+                retVal.transformLeft(InPlaceDecomposition.copyReflector(worker, tmpReference, myBeta[ij], factory), ij);
             }
 
             retVal.set(ij, ij, PrimitiveMath.ONE);

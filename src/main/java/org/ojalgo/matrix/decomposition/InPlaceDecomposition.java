@@ -24,7 +24,10 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.transformation.Householder;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.type.NumberDefinition;
 
 /**
  * Holds the decomposed matrix, in place, in a single physical store.
@@ -34,6 +37,32 @@ import org.ojalgo.structure.Access2D;
  *            decomposed matrix
  */
 abstract class InPlaceDecomposition<N extends Comparable<N>, M extends PhysicalStore<N>> extends AbstractDecomposition<N, M> {
+
+    /**
+     * Copies a reflector, stored as a column or row of the decomposed matrix, to {@code worker}, with the
+     * given beta.
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    static <N extends Comparable<N>> Householder<N> copyReflector(final Householder<N> worker, final Householder<N> source, final double beta,
+            final PhysicalStore.Factory<N, ?> factory) {
+        if (worker instanceof Householder.Generic) {
+            ((Householder.Generic) worker).copy(source, (Scalar) factory.scalar().cast(beta));
+        } else {
+            ((Householder.Primitive64) worker).copy((Householder<Double>) source, beta);
+        }
+        return worker;
+    }
+
+    /**
+     * The beta of a reflector, as a double.
+     */
+    static double getBeta(final Householder<?> householder) {
+        if (householder instanceof Householder.Generic<?>) {
+            return NumberDefinition.doubleValue(((Householder.Generic<?>) householder).beta);
+        } else {
+            return ((Householder.Primitive64) householder).beta;
+        }
+    }
 
     private int myColDim;
     private M myInPlace;
