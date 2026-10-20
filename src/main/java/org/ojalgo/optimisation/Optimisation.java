@@ -562,9 +562,10 @@ public interface Optimisation {
 
         /**
          * Accuracy used when converting the solver's double-precision solution back to BigDecimal in the
-         * model. Also used by some solvers as a convergence threshold.
+         * model. By default the values are not rounded. A precision or scale set here rounds every variable
+         * value accordingly. Also used by some solvers as a convergence threshold.
          */
-        public NumberContext solution = NumberContext.ofScale(14).withMode(RoundingMode.HALF_DOWN);
+        public NumberContext solution = NumberContext.of(14).withMode(RoundingMode.HALF_DOWN).withoutPrecision().withoutScale();
 
         /**
          * Controls sparse/iterative vs dense/direct solver selection:

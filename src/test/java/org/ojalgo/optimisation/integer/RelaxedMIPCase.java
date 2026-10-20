@@ -241,6 +241,21 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
     }
 
     /**
+     * https://miplib.zib.de/instance_details_neos-3421095-cinca.html
+     * <p>
+     * LP: 36590350 (CLP)
+     * <p>
+     * MIP: 44269368.138
+     * <p>
+     * Big-M rows with -1E+17 coefficients. The LP optimum has binaries relaxed to values around 1E-13, and
+     * rounding those to a fixed number of decimals violated the big-M rows by up to 494.
+     */
+    @Test
+    public void testNeos3421095cinca() {
+        RelaxedMIPCase.doTest("neos-3421095-cinca.mps", "36590350", null, null);
+    }
+
+    /**
      * https://miplib.zib.de/instance_details_neos5.html
      * <ul>
      * Mac Pro (Early 2009)

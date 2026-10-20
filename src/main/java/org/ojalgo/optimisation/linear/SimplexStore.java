@@ -683,6 +683,11 @@ abstract class SimplexStore {
     }
 
     /**
+     * The constraint right-hand side in original (unshifted) space, as it was when building was done.
+     */
+    abstract double getOriginalRHS(int i);
+
+    /**
      * The upper bound in original (unshifted) space. Subclasses that shift bounds must override.
      */
     double getOriginalUpperBound(final int index) {
@@ -772,6 +777,14 @@ abstract class SimplexStore {
     abstract boolean isPhase1();
 
     /**
+     * Is the pivot element of the basis update the same, when computed from the pivot row and from the
+     * entering column? The default is true: a tableau computes it only once.
+     */
+    boolean isPivotAccurate(final IterDescr iteration) {
+        return true;
+    }
+
+    /**
      * The problem is small enough to be explicitly printed/logged – log the entire tableau at each iteration
      * when debugging.
      */
@@ -831,6 +844,17 @@ abstract class SimplexStore {
      * they are kept; only the basic solution is refreshed.
      */
     abstract void prepareToIterate(boolean cold);
+
+    /**
+     * Recompute the values of the basic variables, from the right-hand side and the values of the non-basic
+     * variables, with the current basis representation. The default does nothing: a tableau has no other
+     * source for them.
+     *
+     * @return true if they were recomputed
+     */
+    boolean recomputeBasicSolution() {
+        return false;
+    }
 
     /**
      * Refactorise the basis, if it has been updated since it was last factorised, and recompute the basic

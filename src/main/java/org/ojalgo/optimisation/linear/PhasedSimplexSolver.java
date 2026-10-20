@@ -56,19 +56,17 @@ final class PhasedSimplexSolver extends SimplexSolver {
             return this.extractResult();
         }
 
-        IterDescr iteration;
-        boolean resetEdgeWeights;
-
         if (state == State.APPROXIMATE) {
             // Warm start after variable range update
 
-            iteration = this.prepareToIterate(false);
-            resetEdgeWeights = false;
+            IterDescr iteration = this.prepareToIterate(false);
+
+            this.iterateToOptimal(iteration, false);
 
         } else {
             // Normal cold start optimisation
 
-            iteration = this.prepareToIterate(true);
+            IterDescr iteration = this.prepareToIterate(true);
 
             this.doDualIterations(iteration, true);
 
@@ -76,25 +74,11 @@ final class PhasedSimplexSolver extends SimplexSolver {
 
             this.doPrimalIterations(iteration, true);
 
-            if (!state.isOptimal() || this.verifyPrimalFeasibility()) {
-                return this.extractResult();
-            }
-
-            // Optimal, but the primal iterations left some basic variables outside their bounds. The basis is
-            // dual feasible, so continue as after a warm start.
-            state = State.APPROXIMATE;
-            resetEdgeWeights = true;
-        }
-
-        this.doDualIterations(iteration, resetEdgeWeights);
-
-        if (state.isFeasible()) {
-            if (this.isDualFeasible()) {
-                state = State.OPTIMAL;
-            } else {
-                // Primal feasible but (marginally) not dual feasible - finish with primal iterations
-                // rather than reporting a merely FEASIBLE point
-                this.doPrimalIterations(iteration, true);
+            // Optimal, but the primal iterations may have left some basic variables outside their bounds. The
+            // basis is dual feasible, so continue as after a warm start.
+            if (state.isOptimal() && (!this.verifyPrimalFeasibility() || this.isRecomputedInfeasible())) {
+                state = State.APPROXIMATE;
+                this.iterateToOptimal(iteration, true);
             }
         }
 

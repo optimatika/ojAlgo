@@ -13,38 +13,50 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Added
 
-#### org.ojalgo.function.special
+#### org.ojalgo.function
 
 - `CombinatorialFunctions.Logarithmic` – the natural logarithms of the counts, also where the counts do not fit in a `long`.
 
 ### Changed
 
-#### org.ojalgo.function.special
+#### org.ojalgo.function
 
 - `CombinatorialFunctions`: `partitions(..)`, `permutations(..)`, `subsets(..)` and `variations(..)` throw `ArithmeticException` when the count does not fit in a `long`. Previously they returned `Long.MAX_VALUE` or 0. Where there is no way to form the subsets, tuples or partitions – `k < 0` or `k > n`, or subset sizes that are negative or do not sum to `n` – the count is 0. Previously that threw `IllegalArgumentException`, or for `partitions(..)` gave a non-zero count.
 
-#### org.ojalgo.matrix.decomposition
+#### org.ojalgo.matrix
 
 - The dense `QR`, `Bidiagonal`, `Hessenberg` and `Tridiagonal` decompositions: a Householder reflection is generated whenever the part of the column (or row) after its first element is not exactly 0. Previously there was none when that part was negligible compared to the first element (relative size below about 3E-8), and those elements were dropped.
 - The same decompositions: when the first element is 0, the element after the reflection is -norm, as when it is positive (for example `R(k,k)` of `QR`). Previously it was +norm. `RawQR` already did this.
 - `Cholesky.R064` returns the dense implementation also for matrices with up to 32 columns. `RawCholesky` is used only for an empty template (to be grown with `appendColumn`) and for matrices too large for a single array.
 
+#### org.ojalgo.optimisation
+
+- `Optimisation.Options.solution` no longer rounds the variable values of a result from `ExpressionsBasedModel` by default; they are the solver's values. Previously they were rounded to 14 decimals, and a tiny value of a variable with very large coefficients could be rounded enough to violate constraints – by up to 494 in the LP relaxation of MIPLIB neos-3421095-cinca, with coefficients of -1E17. Set a precision or scale on `options.solution` to get rounded values.
+- The `LinearSolver` dual simplex uses a bound flipping ratio test: variables with finite ranges that would limit the dual step switch to their other bound rather than enter the basis, so a single iteration can pass several of them. This cuts the number of iterations, in particular on models with many bounded variables – by about 10% on the Netlib models, and 3–4x on some of the Issue [#700](https://github.com/optimatika/ojAlgo/issues/700) recordings.
+- `LinearSolver`: before a solve ends `OPTIMAL`, the values of the basic variables are recomputed if primal iterations or bound switches have updated them since they were last computed. If they then violate their bounds, the iterations continue. The incrementally updated values could drift, and the returned point violate constraints beyond the feasibility tolerance.
+
 ### Deprecated
 
-#### org.ojalgo.matrix.transformation
+#### org.ojalgo.matrix
 
 - `HouseholderReference.isZero()` – whether there is a reflector is known when it is generated; record it, together with its beta, then.
 
 ### Fixed
 
-#### org.ojalgo.function.special
+#### org.ojalgo.function
 
 - `CombinatorialFunctions` counts are exact. They were computed from `double` factorials, and could be off once those were not exact, e.g. `subsets(55, 24)` was 1 too high.
 - `GammaFunction.Logarithmic.gamma(int)` returned `Infinity` for arguments greater than 171, e.g. for 200 rather than `857.93`.
 
-#### org.ojalgo.matrix.decomposition
+#### org.ojalgo.matrix
 
 - `QR.R064` for tall or square matrices with more than 64 columns (`RawQR`): a column that was 0 on and below the diagonal, from the start or after the previous reflections, ended the decomposition. The columns after it were not factorised, `getQ()` and `getR()` were wrong, and solving gave NaN. Such a column now gets no reflector, and the decomposition continues.
+
+#### org.ojalgo.optimisation
+
+- `LinearSolver`: a warm re-solve, after tightening variable ranges with `updateRange(..)`, could return `INFEASIBLE` for a feasible problem, with a certificate that had negative multipliers for inequalities. The dual simplex ratio test discarded small pivot elements of variables without a finite range, such as slack variables, even when only those could remove the infeasibility. `INFEASIBLE` is now concluded only when the infeasibility can not be removed even by moving every candidate across its whole range, so the certificate holds within the variable bounds. (Issue [#704](https://github.com/optimatika/ojAlgo/issues/704))
+- `LinearSolver`: a warm re-solve could end `FAILED`: a pivot whose element differed when computed from the pivot row and from the entering column was made anyway, and the basis became singular. The basis is now refactorised and the iteration repeated. (Issue [#704](https://github.com/optimatika/ojAlgo/issues/704))
+- `LinearSolver`: an infeasible problem could be reported `OPTIMAL`, with constraints violated, in warm re-solves as well as when solving from scratch. A basic variable's violation was judged against the largest basic value, and taken as rounding error when that was large – a violation of 1.0 next to values around 1E9. The violation is now recomputed from the original problem data and judged against the size of the terms it is computed from. (Issue [#704](https://github.com/optimatika/ojAlgo/issues/704))
 
 #### org.ojalgo.random
 

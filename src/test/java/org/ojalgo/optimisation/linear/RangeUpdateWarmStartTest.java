@@ -37,9 +37,11 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * A solver instance is solved, then some variable ranges are updated in place with
  * {@link LinearSolver#updateRange(int, double, double)}, and it is solved again. This is what a branch and
- * bound search does. The last solve must agree with a solver built from scratch on the final ranges, and
- * every solve must terminate within {@link #ITERATIONS_ABORT} iterations. When the last solve is INFEASIBLE,
- * both must come with an infeasibility certificate (GitHub issue 701).
+ * bound search does. Every solve must terminate within {@link #ITERATIONS_ABORT} iterations, and be either
+ * OPTIMAL, with a solution that satisfies the rows and ranges, or INFEASIBLE, with an infeasibility
+ * certificate (GitHub issue 701). After an INFEASIBLE solve the range updates are refused, and the instance
+ * is built anew on the current ranges, as a search would. The last solve must also agree with a solver built
+ * from scratch on the final ranges.
  * <p>
  * The problems are linear relaxations of constraint-programming models solved by choco-solver. They have
  * integer ranges and a single-variable objective to minimise.
@@ -61,6 +63,14 @@ import org.ojalgo.type.context.NumberContext;
  * <li>{@link #COINS_GRID_COLD}, {@link #COINS_GRID_COLD_2}, {@link #COINS_GRID_COLD_3}: the same model, other
  * ranges, a single solve of a fresh instance. Most dual pivots of phase 1 were degenerate, and the solves
  * needed up to 15,000 iterations (GitHub issue 700).
+ * <li>{@link #FM3_TIGHTENING}: an fm3 model, reduced (94 variables, 8 equalities, 53 inequalities, some rows
+ * with coefficients above 10^6). A solve, 4 range updates that all tighten, and a second solve. The final
+ * problem is feasible, but the second solve returned INFEASIBLE with the sparse store, with a certificate
+ * that was not one (GitHub issue 704).
+ * <li>{@link #FM3_FAILED}: the same model, partly reduced (244 variables, 25 equalities, 477 inequalities),
+ * 20 solves with 373 range updates in between. Solves 7 and 8 are infeasible, a row with only fixed variables
+ * reads 1 <= 0, but were reported OPTIMAL. The last solve, on a feasible problem, returned FAILED with the
+ * sparse store (GitHub issue 704).
  * </ul>
  * File format, one item per line:
  *
@@ -155,6 +165,13 @@ public class RangeUpdateWarmStartTest extends OptimisationLinearTests {
     private static final String COINS_GRID_COLD = "/optimisation/usersupplied/ChocoCoinsGridCold.txt";
     private static final String COINS_GRID_COLD_2 = "/optimisation/usersupplied/ChocoCoinsGridCold2.txt";
     private static final String COINS_GRID_COLD_3 = "/optimisation/usersupplied/ChocoCoinsGridCold3.txt";
+    /**
+     * Relative to the size of the terms of a row (at least 1), or to the bound of a range. Warm solves that
+     * follow many range updates, on the dense store, have residuals up to about 1e-7 relative.
+     */
+    private static final NumberContext FEASIBILITY = NumberContext.of(7);
+    private static final String FM3_FAILED = "/optimisation/usersupplied/ChocoFm3RangeUpdate.txt";
+    private static final String FM3_TIGHTENING = "/optimisation/usersupplied/ChocoFm3RangeTightening.txt";
     private static final String HC_PIZZA = "/optimisation/usersupplied/ChocoHCPizzaRangeUpdate.txt";
     /**
      * The sum of the 1,000 optimal values of {@link #HC_PIZZA}, the same with every ojAlgo version since
@@ -173,12 +190,42 @@ public class RangeUpdateWarmStartTest extends OptimisationLinearTests {
     private static final String STEINER = "/optimisation/usersupplied/ChocoSteinerRangeRelaxation.txt";
 
     /**
+     * The solution satisfies every row and range, by {@link #FEASIBILITY}.
+     */
+    private static void assertFeasible(final double[][] rows, final double[] rhs, final int nbInequalities, final double[] lower, final double[] upper,
+            final Optimisation.Result result) {
+
+        for (int j = 0; j < lower.length; j++) {
+            double value = result.doubleValue(j);
+            double violation = Math.max(lower[j] - value, value - upper[j]);
+            double magnitude = Math.max(1.0, Math.max(Math.abs(lower[j]), Math.abs(upper[j])));
+            TestUtils.assertTrue("Range " + j + " violated by " + violation, violation <= 0.0 || FEASIBILITY.isSmall(magnitude, violation));
+        }
+
+        for (int i = 0; i < rows.length; i++) {
+            double body = 0.0;
+            double magnitude = Math.abs(rhs[i]);
+            for (int j = 0; j < lower.length; j++) {
+                double term = rows[i][j] * result.doubleValue(j);
+                body += term;
+                magnitude += Math.abs(term);
+            }
+            double violation = i < nbInequalities ? body - rhs[i] : Math.abs(body - rhs[i]);
+            TestUtils.assertTrue("Row " + i + " violated by " + violation, violation <= 0.0 || FEASIBILITY.isSmall(Math.max(1.0, magnitude), violation));
+        }
+    }
+
+    /**
      * @param state The expected state of the last solve
-     * @return The sum of the values of the optimal solves of the reused instance
+     * @return The sum of the values of the optimal solves
      */
     private static double doTest(final String resource, final Optimisation.State state, final Boolean sparse) {
 
         Scenario scenario = RangeUpdateWarmStartTest.read(resource);
+
+        double[][] rows = scenario.rows();
+        double[] rhs = scenario.rhs();
+        int nbInequalities = scenario.leRHS.size();
 
         Optimisation.Options options = new Optimisation.Options();
         options.linear().dual();
@@ -194,19 +241,21 @@ public class RangeUpdateWarmStartTest extends OptimisationLinearTests {
         double sum = 0.0;
         for (double[] step : scenario.steps) {
             if (step == null) {
-                if (actual != null) {
-                    // Every solve but the last
-                    TestUtils.assertStateNotLessThanOptimal(actual);
-                }
                 actual = warm.solve();
                 if (actual.getState().isOptimal()) {
+                    RangeUpdateWarmStartTest.assertFeasible(rows, rhs, nbInequalities, lower, upper, actual);
                     sum += actual.getValue();
+                } else {
+                    InfeasibilityCertificateTest.assertCertificate(rows, rhs, nbInequalities, lower, upper, actual, warm);
                 }
             } else {
                 int index = (int) step[0];
                 lower[index] = step[1];
                 upper[index] = step[2];
-                TestUtils.assertTrue(warm.updateRange(index, step[1], step[2]));
+                if (!warm.updateRange(index, step[1], step[2])) {
+                    // Refused after an INFEASIBLE solve
+                    warm = scenario.newBuilder(lower, upper).build(options);
+                }
             }
         }
 
@@ -224,11 +273,7 @@ public class RangeUpdateWarmStartTest extends OptimisationLinearTests {
         if (state.isOptimal()) {
             TestUtils.assertEquals(expected.getValue(), actual.getValue(), ACCURACY);
         } else if (state == Optimisation.State.INFEASIBLE) {
-            double[][] rows = scenario.rows();
-            double[] rhs = scenario.rhs();
-            int nbInequalities = scenario.leRHS.size();
             InfeasibilityCertificateTest.assertCertificate(rows, rhs, nbInequalities, lower, upper, expected, cold);
-            InfeasibilityCertificateTest.assertCertificate(rows, rhs, nbInequalities, lower, upper, actual, warm);
         }
 
         return sum;
@@ -359,6 +404,36 @@ public class RangeUpdateWarmStartTest extends OptimisationLinearTests {
     @Test
     public void testCoinsGridSparse() {
         RangeUpdateWarmStartTest.doTest(COINS_GRID, Optimisation.State.OPTIMAL, Boolean.TRUE);
+    }
+
+    @Test
+    public void testFm3FailedDefault() {
+        RangeUpdateWarmStartTest.doTest(FM3_FAILED, Optimisation.State.OPTIMAL, null);
+    }
+
+    @Test
+    public void testFm3FailedDense() {
+        RangeUpdateWarmStartTest.doTest(FM3_FAILED, Optimisation.State.OPTIMAL, Boolean.FALSE);
+    }
+
+    @Test
+    public void testFm3FailedSparse() {
+        RangeUpdateWarmStartTest.doTest(FM3_FAILED, Optimisation.State.OPTIMAL, Boolean.TRUE);
+    }
+
+    @Test
+    public void testFm3TighteningDefault() {
+        RangeUpdateWarmStartTest.doTest(FM3_TIGHTENING, Optimisation.State.OPTIMAL, null);
+    }
+
+    @Test
+    public void testFm3TighteningDense() {
+        RangeUpdateWarmStartTest.doTest(FM3_TIGHTENING, Optimisation.State.OPTIMAL, Boolean.FALSE);
+    }
+
+    @Test
+    public void testFm3TighteningSparse() {
+        RangeUpdateWarmStartTest.doTest(FM3_TIGHTENING, Optimisation.State.OPTIMAL, Boolean.TRUE);
     }
 
     @Test

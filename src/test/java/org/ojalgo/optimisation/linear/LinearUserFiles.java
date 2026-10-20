@@ -148,7 +148,9 @@ public class LinearUserFiles extends OptimisationLinearTests implements ModelFil
      * the objective expression) are integer, scaling is disabled and the poorly-scaled model reaches the
      * simplex unscaled. The phase-1 feasibility verdict then compared a tiny floating-point residual on a
      * near-zero slack — proportional to the large solution magnitude — against a fixed absolute tolerance and
-     * wrongly declared INFEASIBLE. The verdict now judges the residual relative to the solution magnitude.
+     * wrongly declared INFEASIBLE. The verdict now recomputes that slack from the original right-hand side,
+     * without the rounding errors accumulated by the iterations, and judges the residual relative to the
+     * terms it is computed from.
      * <p>
      * The model is soft-relaxed ({@code relax(true)}): it uses the LP solver rather than the IntegerSolver,
      * but the variables stay flagged integer, so scaling stays disabled — the exact configuration that

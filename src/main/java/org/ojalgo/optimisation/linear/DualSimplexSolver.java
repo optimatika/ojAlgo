@@ -55,6 +55,10 @@ final class DualSimplexSolver extends SimplexSolver {
             state = Optimisation.State.OPTIMAL;
         }
 
+        if (this.isRecomputedInfeasible()) {
+            this.iterateToOptimal(iteration, true);
+        }
+
         return this.extractResult();
     }
 

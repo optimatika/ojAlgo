@@ -360,18 +360,16 @@ abstract class SimplexSolver extends LinearSolver {
     private static final double PERTURBATION = 5E-7;
     /**
      * Elements of the pivot row (dual simplex) or column (primal simplex) this small are not pivots. In the
-     * dual simplex such an element is still a candidate, used only if there are no others, when its product
-     * with the range of the variable is not this small. That product does not depend on how the column is
-     * scaled, and through it a variable with a wide range can still remove the infeasibility: without it a
-     * badly scaled column could never enter, and infeasibility would be concluded where there is none.
+     * dual simplex such an element still enters, if there are no others, when together with the other small
+     * elements it can remove the infeasibility, see {@link #judgeInfeasibility(ExitInfo)}.
      */
     private static final NumberContext PIVOT = NumberContext.of(6);
     /**
      * A pivot must also be large relative to the largest element of the pivot row (dual simplex) or column
      * (primal simplex), 1e-9 relative, no absolute tolerance. Smaller elements neither limit the step nor
-     * become pivots. If this rejects all the dual candidates, the basis is refactorised (if it has been
-     * updated) and the iteration repeated before infeasibility is concluded (see
-     * {@link SimplexStore#refactorise()}). If it rejects all the primal rows that bound the step, the basis
+     * become pivots, and in the dual simplex they count as zero. Without a regular dual candidate the basis
+     * is refactorised (if it has been updated) and the iteration repeated, before anything else is done (see
+     * {@link SimplexStore#refactorise()}). If this rejects all the primal rows that bound the step, the basis
      * is refactorised the same way, and if it had not been updated those rows are accepted after all: this
      * limit never turns a bounded step into an unbounded one.
      */
@@ -616,6 +614,13 @@ abstract class SimplexSolver extends LinearSolver {
     }
 
     /**
+     * Set by {@link #testDualEnterRatio}, when no regular candidate enters: the number of candidates, regular
+     * or with elements that are small only by {@link #PIVOT}, first in the ratio cache, and how far they can
+     * move the exit variable together, the sum of their elements times their ranges.
+     */
+    private int myFallbackCount = 0;
+    private double myFallbackReach = ZERO;
+    /**
      * Where the dual simplex concluded INFEASIBLE: the basis position (row) of a basic variable outside its
      * bounds that no non-basic variable can bring back, or -1. That row of the basis inverse is a dual ray,
      * an infeasibility certificate, see {@link #extractDualMultipliers()}.
@@ -627,11 +632,21 @@ abstract class SimplexSolver extends LinearSolver {
      */
     private double myFarkasSign = ZERO;
     /**
-     * Set by {@link #testDualEnterRatio}: there were candidates, but {@link #PIVOT_GROWTH} rejected them all.
+     * Set by {@link #walkDualEnter(EnterInfo, int, double, boolean)}: the number of candidates, first in the
+     * ratio cache, that switch bounds.
+     */
+    private int myFlipCount = 0;
+    /**
      * Set by {@link #testPrimalExitRatio}: the step is unbounded only because {@link #PIVOT_GROWTH} rejected
      * the rows that bound it.
      */
     private boolean myGrowthLimited = false;
+    /**
+     * The values of the basic variables have been updated by primal iterations, or for variables that
+     * switched bounds in dual iterations, since they were last recomputed, see
+     * {@link #isRecomputedInfeasible()}.
+     */
+    private boolean myIncrementallyUpdated = false;
     /**
      * Reused across solves. {@link IterDescr} only captures the (stable, lifetime-fixed) {@code excluded}
      * /{@code included} arrays of the store, so a single instance can be {@code reset()} and reused every
@@ -767,6 +782,32 @@ abstract class SimplexSolver extends LinearSolver {
         return mySimplex.extractValue();
     }
 
+    /**
+     * The candidates passed by {@link #walkDualEnter(EnterInfo, int, double, boolean)}, first in the ratio
+     * cache, switch to their other bound.
+     */
+    private void flipBounds() {
+
+        if (myFlipCount > 0) {
+            myIncrementallyUpdated = true;
+        }
+
+        int[] excluded = mySimplex.excluded;
+
+        for (int k = 0; k < myFlipCount; k++) {
+            int j = excluded[myRatioCacheIdx[k]];
+            if (myRatioCacheState[k] == ColumnState.LOWER) {
+                mySimplex.setToUpper(j);
+            } else {
+                mySimplex.setToLower(j);
+            }
+        }
+
+        if (myFlipCount > 0 && this.isLogDebug()) {
+            this.log("Switched bounds of {} candidates", myFlipCount);
+        }
+    }
+
     private boolean getDualExitCandidate(final IterDescr iteration) {
 
         if (iteration != null && this.isLogDebug()) {
@@ -825,10 +866,6 @@ abstract class SimplexSolver extends LinearSolver {
         }
 
         return retVal;
-    }
-
-    private double getLowerBound(final int index) {
-        return mySimplex.getOriginalLowerBound(index);
     }
 
     private double[] getLowerBounds() {
@@ -919,10 +956,6 @@ abstract class SimplexSolver extends LinearSolver {
         return retVal;
     }
 
-    private double getUpperBound(final int index) {
-        return mySimplex.getOriginalUpperBound(index);
-    }
-
     private double[] getUpperBounds() {
 
         double[] retVal = new double[mySimplex.n];
@@ -932,6 +965,72 @@ abstract class SimplexSolver extends LinearSolver {
         }
 
         return retVal;
+    }
+
+    /**
+     * When no regular candidate enters, see {@link #testDualEnterRatio(IterDescr)}. The value of the basic
+     * variable at the exit row is recomputed from the original right-hand side b, as y b - sum(a_j x_j),
+     * where y is that row of the basis inverse, a_j the elements of the pivot row and x_j the values of the
+     * non-basic variables. Its distance to the violated bound, the infeasibility, is judged relative to the
+     * size of the terms, sum(|y_i b_i|) + sum(|a_j x_j|), at least 1, by {@link #INFEASIBILITY}. Over their
+     * ranges r_j, the candidates can reduce it by at most sum(|a_j| r_j).
+     *
+     * @return {@link State#FEASIBLE} if the infeasibility is only rounding error, {@link State#INFEASIBLE} if
+     *         the candidates can not remove it (then the row of the basis inverse is an infeasibility
+     *         certificate), otherwise null: one of them enters
+     */
+    private State judgeInfeasibility(final ExitInfo exit) {
+
+        double value = ZERO;
+        double magnitude = ZERO;
+
+        Primitive1D inverseRow = mySimplex.sliceInverseRow(exit.index);
+        for (int i = 0; i < mySimplex.m; i++) {
+            double term = inverseRow.doubleValue(i) * mySimplex.getOriginalRHS(i);
+            value += term;
+            magnitude += Math.abs(term);
+        }
+
+        int[] excluded = mySimplex.excluded;
+        int[] candidates = mySimplex.getDualDirectionIndices();
+        int nbCandidates = mySimplex.countDualDirection();
+        for (int k = 0; k < nbCandidates; k++) {
+            int je = candidates != null ? candidates[k] : k;
+            int j = excluded[je];
+
+            ColumnState columnState = mySimplex.getColumnState(j);
+            double x = ZERO;
+            if (columnState == ColumnState.LOWER) {
+                x = mySimplex.getOriginalLowerBound(j);
+            } else if (columnState == ColumnState.UPPER) {
+                x = mySimplex.getOriginalUpperBound(j);
+            }
+
+            if (x != ZERO) {
+                double term = mySimplex.getCurrentElement(exit, je) * x;
+                value -= term;
+                magnitude += Math.abs(term);
+            }
+        }
+
+        int basic = exit.column();
+        double infeasibility;
+        if (exit.direction == Direction.INCREASE) {
+            infeasibility = mySimplex.getOriginalLowerBound(basic) - value;
+        } else {
+            infeasibility = value - mySimplex.getOriginalUpperBound(basic);
+        }
+
+        if (INFEASIBILITY.isSmall(Math.max(ONE, magnitude), Math.max(ZERO, infeasibility))) {
+            return State.FEASIBLE;
+        }
+
+        double margin = infeasibility - myFallbackReach;
+        if (margin > ZERO && !INFEASIBILITY.isSmall(Math.max(ONE, magnitude + myFallbackReach), margin)) {
+            return State.INFEASIBLE;
+        }
+
+        return null;
     }
 
     private void logCurrentState() {
@@ -995,46 +1094,45 @@ abstract class SimplexSolver extends LinearSolver {
         return install;
     }
 
-    private Optimisation.Result solveUnconstrained() {
+    /**
+     * Swaps two ratio cache entries.
+     */
+    private void swapRatioCache(final int k1, final int k2) {
 
-        int nbVars = mySimplex.n;
-
-        double retValue = ZERO;
-        double[] retSolution = new double[nbVars];
-        State retState = State.OPTIMAL;
-
-        for (int j = 0; j < nbVars; j++) {
-
-            double cost = mySimplex.getCost(j);
-            double value;
-
-            if (cost == ZERO) {
-                value = mySimplex.getOriginalLowerBound(j);
-                retSolution[j] = Double.isFinite(value) ? value : ZERO;
-            } else if (cost > ZERO) {
-                value = this.getLowerBound(j);
-                if (Double.isFinite(value)) {
-                    retSolution[j] = value;
-                    retValue += value * cost;
-                } else {
-                    retSolution[j] = ZERO;
-                    retState = State.UNBOUNDED;
-                }
-            } else if (cost < ZERO) {
-                value = this.getUpperBound(j);
-                if (Double.isFinite(value)) {
-                    retSolution[j] = value;
-                    retValue += value * cost;
-                } else {
-                    retSolution[j] = ZERO;
-                    retState = State.UNBOUNDED;
-                }
-            }
+        if (k1 == k2) {
+            return;
         }
 
-        return Result.of(retValue, retState, retSolution);
+        int idx = myRatioCacheIdx[k1];
+        myRatioCacheIdx[k1] = myRatioCacheIdx[k2];
+        myRatioCacheIdx[k2] = idx;
+
+        double relaxed = myRatioCacheRelaxed[k1];
+        myRatioCacheRelaxed[k1] = myRatioCacheRelaxed[k2];
+        myRatioCacheRelaxed[k2] = relaxed;
+
+        double scale = myRatioCacheScale[k1];
+        myRatioCacheScale[k1] = myRatioCacheScale[k2];
+        myRatioCacheScale[k2] = scale;
+
+        double trueRatio = myRatioCacheTrueRatio[k1];
+        myRatioCacheTrueRatio[k1] = myRatioCacheTrueRatio[k2];
+        myRatioCacheTrueRatio[k2] = trueRatio;
+
+        ColumnState state = myRatioCacheState[k1];
+        myRatioCacheState[k1] = myRatioCacheState[k2];
+        myRatioCacheState[k2] = state;
     }
 
+    /**
+     * The bound flipping ratio test, see {@link #walkDualEnter(EnterInfo, int, double, boolean)}, among the
+     * regular candidates: those with elements that are small neither by {@link #PIVOT} nor by
+     * {@link #PIVOT_GROWTH}. If none enters, because there are none or because they can all switch bounds
+     * without removing the infeasibility, they are kept together with the candidates with elements that are
+     * small only by {@link #PIVOT}, see {@link #judgeInfeasibility(ExitInfo)}.
+     *
+     * @return true if a regular candidate enters
+     */
     private boolean testDualEnterRatio(final IterDescr iteration) {
 
         if (this.isLogDebug()) {
@@ -1045,7 +1143,6 @@ abstract class SimplexSolver extends LinearSolver {
         boolean printable = mySimplex.isPrintable();
 
         ExitInfo exit = iteration.exit;
-        EnterInfo enter = iteration.enter;
         Direction exitDirection = exit.direction;
 
         double tolerance = COST.getAbsoluteError();
@@ -1057,11 +1154,11 @@ abstract class SimplexSolver extends LinearSolver {
 
         this.ensureRatioCacheCapacity(excluded.length);
 
-        // Pass 1: find the largest element of the row, and cache the valid candidates (idx, scale, relaxed
-        // ratio, trueRatio, state), where the relaxed ratio is (gap + tolerance) / |denom|.
+        // Pass 1: find the largest element of the row, and cache the candidates that move the exit variable
+        // towards its bound (idx, scale, relaxed ratio, trueRatio, state), where the relaxed ratio is (gap +
+        // tolerance) / |denom|.
         int cachedCount = 0;
         double largest = ZERO;
-        boolean regular = false;
 
         for (int k = 0; k < nbCandidates; k++) {
             int je = candidates != null ? candidates[k] : k;
@@ -1078,8 +1175,7 @@ abstract class SimplexSolver extends LinearSolver {
             double denom = mySimplex.getCurrentElement(exit, je);
             double scale = Math.abs(denom);
             largest = Math.max(largest, scale);
-            boolean small = PIVOT.isZero(denom);
-            if (small && (!Double.isFinite(range) || PIVOT.isZero(scale * range))) {
+            if (denom == ZERO) {
                 continue;
             }
 
@@ -1125,7 +1221,6 @@ abstract class SimplexSolver extends LinearSolver {
                 this.log(1, "{}({}) relaxed = {}", j, je, relaxed);
             }
 
-            regular |= !small;
             myRatioCacheIdx[cachedCount] = je;
             myRatioCacheRelaxed[cachedCount] = relaxed;
             myRatioCacheScale[cachedCount] = scale;
@@ -1134,61 +1229,41 @@ abstract class SimplexSolver extends LinearSolver {
             cachedCount++;
         }
 
-        // Keep the cached candidates that pass the growth limit (relative to the largest element of the row),
-        // and compute the relaxed minimum theta_max over them. Candidates below PIVOT only if there are no
-        // others.
-        double thetaMax = MACHINE_LARGEST;
-        int nbKept = 0;
-
+        // The regular candidates first in the cache, then those with elements that are small only by PIVOT
+        int nbRegular = 0;
         for (int k = 0; k < cachedCount; k++) {
             double scale = myRatioCacheScale[k];
-            if (regular && PIVOT.isZero(scale) || PIVOT_GROWTH.isSmall(largest, scale)) {
-                continue;
-            }
-            double relaxed = myRatioCacheRelaxed[k];
-            if (relaxed < thetaMax) {
-                thetaMax = relaxed;
-            }
-            myRatioCacheIdx[nbKept] = myRatioCacheIdx[k];
-            myRatioCacheScale[nbKept] = myRatioCacheScale[k];
-            myRatioCacheTrueRatio[nbKept] = myRatioCacheTrueRatio[k];
-            myRatioCacheState[nbKept] = myRatioCacheState[k];
-            nbKept++;
-        }
-        myGrowthLimited = regular && nbKept == 0;
-        cachedCount = nbKept;
-
-        if (cachedCount == 0) {
-            // No valid candidate found
-            if (this.isLogDebug()) {
-                this.log("==>> {}", enter);
-            }
-            return false;
-        }
-
-        // Pass 2: among cached candidates with true ratio <= thetaMax, pick the largest |denom|.
-        double bestScale = -ONE;
-
-        for (int k = 0; k < cachedCount; k++) {
-            double scale = myRatioCacheScale[k];
-            if (myRatioCacheTrueRatio[k] <= thetaMax && scale > bestScale) {
-                bestScale = scale;
-                ColumnState columnState = myRatioCacheState[k];
-                enter.index = myRatioCacheIdx[k];
-                enter.from = columnState;
-                enter.direction = columnState == ColumnState.UPPER ? Direction.DECREASE : Direction.INCREASE;
-
-                if (this.isLogDebug()) {
-                    this.log(2, "{} (scale {}) => {}", myRatioCacheTrueRatio[k], scale, enter);
-                }
+            if (!PIVOT.isZero(scale) && !PIVOT_GROWTH.isSmall(largest, scale)) {
+                this.swapRatioCache(k, nbRegular++);
             }
         }
+        int nbUsable = nbRegular;
+        for (int k = nbRegular; k < cachedCount; k++) {
+            if (!PIVOT_GROWTH.isSmall(largest, myRatioCacheScale[k])) {
+                this.swapRatioCache(k, nbUsable++);
+            }
+        }
+
+        double infeasibility = Math.abs(mySimplex.getInfeasibility(exit.index));
+
+        if (this.walkDualEnter(iteration.enter, nbRegular, infeasibility, false)) {
+            myFallbackCount = 0;
+            myFallbackReach = ZERO;
+            return true;
+        }
+
+        double reach = ZERO;
+        for (int k = 0; k < nbUsable; k++) {
+            reach += myRatioCacheScale[k] * mySimplex.getRange(excluded[myRatioCacheIdx[k]]);
+        }
+        myFallbackCount = nbUsable;
+        myFallbackReach = reach;
 
         if (this.isLogDebug()) {
-            this.log("==>> {}", enter);
+            this.log("==>> none enters, {} candidates ({} regular) reaching {}", nbUsable, nbRegular, reach);
         }
 
-        return enter.index >= 0;
+        return false;
     }
 
     /**
@@ -1435,6 +1510,81 @@ abstract class SimplexSolver extends LinearSolver {
         return retVal;
     }
 
+    /**
+     * The bound flipping ratio test, with Harris' tolerance, over the first count cached candidates. In order
+     * of their ratios, bunches of candidates are passed: those with a true ratio not above the smallest
+     * relaxed ratio of the remaining candidates. Passing a bunch reduces the slope of the dual objective,
+     * initially the infeasibility of the exit variable, by sum(|a_j| r_j), where a_j are the elements and r_j
+     * the ranges of the candidates. In the first bunch that would make the slope non-positive, the candidate
+     * with the largest element enters, and the candidates of the bunches before it switch bounds, see
+     * {@link #flipBounds()}. Those are first in the cache.
+     *
+     * @param force What to do if every bunch can be passed: true to let the last one decide the entering
+     *              variable anyway, false to return false
+     */
+    private boolean walkDualEnter(final EnterInfo enter, final int count, final double infeasibility, final boolean force) {
+
+        int[] excluded = mySimplex.excluded;
+
+        myFlipCount = 0;
+
+        double slope = infeasibility;
+        int first = 0;
+
+        while (first < count) {
+
+            double thetaMax = MACHINE_LARGEST;
+            for (int k = first; k < count; k++) {
+                double relaxed = myRatioCacheRelaxed[k];
+                if (relaxed < thetaMax) {
+                    thetaMax = relaxed;
+                }
+            }
+
+            // The bunch, moved to [first, limit)
+            int limit = first;
+            int best = -1;
+            double bestScale = -ONE;
+            double reduction = ZERO;
+            for (int k = first; k < count; k++) {
+                if (myRatioCacheTrueRatio[k] <= thetaMax) {
+                    this.swapRatioCache(k, limit);
+                    double scale = myRatioCacheScale[limit];
+                    reduction += scale * mySimplex.getRange(excluded[myRatioCacheIdx[limit]]);
+                    if (scale > bestScale) {
+                        bestScale = scale;
+                        best = limit;
+                    }
+                    limit++;
+                }
+            }
+
+            if (slope - reduction > ZERO && (limit < count || !force)) {
+                if (limit == count) {
+                    return false;
+                }
+                slope -= reduction;
+                first = limit;
+                continue;
+            }
+
+            myFlipCount = first;
+
+            ColumnState columnState = myRatioCacheState[best];
+            enter.index = myRatioCacheIdx[best];
+            enter.from = columnState;
+            enter.direction = columnState == ColumnState.UPPER ? Direction.DECREASE : Direction.INCREASE;
+
+            if (this.isLogDebug()) {
+                this.log("==>> {} (scale {}), switching {}", enter, bestScale, myFlipCount);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
     final SimplexSolver basis(final int[] basis) {
         mySimplex.resetBasis(basis);
         state = State.UNEXPLORED;
@@ -1478,7 +1628,39 @@ abstract class SimplexSolver extends LinearSolver {
 
                 mySimplex.calculateDualDirection(iteration.exit);
 
-                if (this.testDualEnterRatio(iteration)) {
+                boolean pivot = this.testDualEnterRatio(iteration);
+
+                if (!pivot) {
+
+                    if (mySimplex.refactorise()) {
+                        // Redo the iteration with the refactorised basis
+                        continue;
+                    }
+
+                    State verdict = this.judgeInfeasibility(iteration.exit);
+
+                    if (verdict == State.FEASIBLE) {
+                        state = State.FEASIBLE;
+                        done = true;
+                    } else if (verdict == State.INFEASIBLE) {
+                        state = State.INFEASIBLE;
+                        myFarkasRow = iteration.exit.index;
+                        myFarkasSign = iteration.exit.direction == Direction.INCREASE ? ONE : NEG;
+                    } else {
+                        double infeasibility = Math.abs(mySimplex.getInfeasibility(iteration.exit.index));
+                        pivot = this.walkDualEnter(iteration.enter, myFallbackCount, infeasibility, true);
+                    }
+                }
+
+                if (pivot) {
+
+                    if (iteration.isBasisUpdate()) {
+                        mySimplex.calculatePrimalDirection(iteration.enter);
+                        if (!mySimplex.isPivotAccurate(iteration) && mySimplex.refactorise()) {
+                            // Redo the iteration with the refactorised basis
+                            continue;
+                        }
+                    }
 
                     // The dual step goes forward if this is positive
                     double reducedCost = mySimplex.getReducedCost(iteration.enter.index);
@@ -1495,39 +1677,15 @@ abstract class SimplexSolver extends LinearSolver {
                         mySimplex.shiftCost(iteration.enter.index, -reducedCost);
                     }
 
+                    this.flipBounds();
+
                     if (iteration.isBasisUpdate()) {
-                        mySimplex.calculatePrimalDirection(iteration.enter);
                         mySimplex.updateDualEdgeWeights(iteration);
                     }
 
                     this.update(iteration);
 
                     this.incrementIterationsCount();
-
-                } else if (!myGrowthLimited || !mySimplex.refactorise()) {
-
-                    double infeasibility = Math.abs(mySimplex.getInfeasibility(iteration.exit.index));
-                    // Judge the residual relative to the magnitude of the basic solution rather than against
-                    // a fixed absolute tolerance. On badly-scaled problems the residual of a near-zero
-                    // variable is just floating-point noise proportional to the largest solution value
-                    // (e.g. b - Ax with large b, Ax), so it must be compared to that scale. The reference is
-                    // floored at 1 so well-scaled problems keep essentially the original absolute behaviour.
-                    double reference = ONE;
-                    int[] basics = mySimplex.included;
-                    for (int ji = 0; ji < basics.length; ji++) {
-                        double value = Math.abs(mySimplex.getCurrentRHS(ji));
-                        if (value > reference) {
-                            reference = value;
-                        }
-                    }
-                    if (INFEASIBILITY.isSmall(reference, infeasibility)) {
-                        state = State.FEASIBLE;
-                        done = true;
-                    } else {
-                        state = State.INFEASIBLE;
-                        myFarkasRow = iteration.exit.index;
-                        myFarkasSign = iteration.exit.direction == Direction.INCREASE ? ONE : NEG;
-                    }
                 }
 
             } else {
@@ -1583,10 +1741,16 @@ abstract class SimplexSolver extends LinearSolver {
 
                     if (iteration.isBasisUpdate()) {
                         mySimplex.calculateDualDirection(iteration.exit);
+                        if (!mySimplex.isPivotAccurate(iteration) && mySimplex.refactorise()) {
+                            // Redo the iteration with the refactorised basis
+                            continue;
+                        }
                         mySimplex.updatePrimalEdgeWeights(iteration);
                     }
 
                     this.update(iteration);
+
+                    myIncrementallyUpdated = true;
 
                     this.incrementIterationsCount();
 
@@ -1730,19 +1894,63 @@ abstract class SimplexSolver extends LinearSolver {
         return !this.getDualExitCandidate(null);
     }
 
+    /**
+     * When the state is OPTIMAL and {@link #myIncrementallyUpdated}: the values of the basic variables are
+     * recomputed. Are they then outside their bounds (by {@link Optimisation.Options#feasibility})? If so the
+     * state is set to APPROXIMATE.
+     */
+    final boolean isRecomputedInfeasible() {
+
+        if (!state.isOptimal() || !myIncrementallyUpdated || !mySimplex.recomputeBasicSolution()) {
+            return false;
+        }
+
+        myIncrementallyUpdated = false;
+
+        if (this.verifyPrimalFeasibility()) {
+            return false;
+        }
+
+        state = State.APPROXIMATE;
+        return true;
+    }
+
+    /**
+     * Dual iterations, and when they end primal feasible, primal iterations unless the basis is already dual
+     * feasible. Repeated while {@link #isRecomputedInfeasible()}.
+     */
+    final void iterateToOptimal(final IterDescr iteration, final boolean resetEdgeWeights) {
+
+        boolean reset = resetEdgeWeights;
+
+        do {
+
+            this.doDualIterations(iteration, reset);
+            reset = true;
+
+            if (state.isFeasible()) {
+                if (this.isDualFeasible()) {
+                    state = State.OPTIMAL;
+                } else {
+                    // Primal feasible but (marginally) not dual feasible - finish with primal iterations
+                    // rather than reporting a merely FEASIBLE point
+                    this.doPrimalIterations(iteration, true);
+                }
+            }
+
+        } while (this.isRecomputedInfeasible());
+    }
+
     final IterDescr prepareToIterate(final boolean cold) {
 
         state = State.UNEXPLORED;
         myFarkasRow = -1;
+        myIncrementallyUpdated = false;
 
         this.invalidateCache();
 
         if (cold) {
             this.setup(mySimplex);
-        }
-
-        if (mySimplex.m == 0) {
-            this.solveUnconstrained(); // TODO return?
         }
 
         mySimplex.prepareToIterate(cold);

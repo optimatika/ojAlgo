@@ -440,6 +440,30 @@ class ExpressionsBasedModelTest extends OptimisationTests {
     }
 
     /**
+     * The optimal Y is 2.5046E-13 and its coefficient in BIG_M is -1E+17. Rounding Y to 14 decimals, 2.5E-13,
+     * violates BIG_M by 46. Same structure as the big-M rows in the LP relaxation of MIPLIB
+     * neos-3421095-cinca.
+     */
+    @Test
+    void testRoundingOfSmallValuesWithLargeFactors() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x1 = model.newVariable("X1").lower(ZERO);
+        Variable x2 = model.newVariable("X2").lower(ZERO);
+        Variable y = model.newVariable("Y").lower(ZERO).upper(ONE).weight(ONE);
+
+        model.newExpression("DEMAND").lower(25046).set(x1, ONE).set(x2, ONE);
+        model.newExpression("BIG_M").upper(ZERO).set(x1, ONE).set(x2, ONE).set(y, new BigDecimal("-1E+17"));
+
+        Optimisation.Result result = model.minimise();
+
+        TestUtils.assertStateNotLessThanOptimal(result);
+        TestUtils.assertTrue(model.validate(result, NumberContext.of(6, 4)));
+        TestUtils.assertEquals(25046.0, 1E17 * y.getValue().doubleValue(), NumberContext.of(8));
+    }
+
+    /**
      * https://github.com/optimatika/ojAlgo/issues/415
      */
     @Test

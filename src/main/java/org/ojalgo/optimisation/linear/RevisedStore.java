@@ -177,7 +177,7 @@ final class RevisedStore extends SimplexStore {
     /**
      * The pivot element is computed twice each iteration: from the pivot row (BTRAN + PRICE) and from the
      * entering column (FTRAN). A relative difference larger than this indicates that the updated basis
-     * representation has lost accuracy, and it is refactorised instead of updated.
+     * representation has lost accuracy, see {@link #isPivotAccurate(IterDescr)}.
      */
     private static final NumberContext BASIS_REPRESENTATION_ACCURACY = NumberContext.ofPrecision(8);
 
@@ -241,8 +241,8 @@ final class RevisedStore extends SimplexStore {
     private R064CSR myConstraintsCSR;
 
     /**
-     * Right-hand side vector b of Ax = b. Updated when bounds are shifted. Used to compute the current basic
-     * solution.
+     * Right-hand side vector b of Ax = b. Not changed after building (bounds are not shifted). Used to
+     * compute the current basic solution.
      */
     private final R064Store myConstraintsRHS;
 
@@ -437,10 +437,8 @@ final class RevisedStore extends SimplexStore {
     }
 
     /**
-     * Update the basis representation, or refactorise it. The representation refactorises by itself when its
-     * own limits are reached (see {@link BasisRepresentation#update(R064CSC, int[], int, int)}). This store
-     * forces a refactorisation when the pivot element differs when computed from the row and from the column,
-     * which only it can see.
+     * Update the basis representation. The representation refactorises by itself when its own limits are
+     * reached (see {@link BasisRepresentation#update(R064CSC, int[], int, int)}).
      */
     @Override
     protected void pivot(final IterDescr iteration) {
@@ -448,18 +446,9 @@ final class RevisedStore extends SimplexStore {
         int iterExitInd = iteration.exit.index;
         int iterEnterCol = iteration.enter.column();
 
-        int nbUpdates = myInvBasis.countUpdates();
-
-        double alphaFromColumn = Math.abs(myColumnDirection.values[iterExitInd]);
-        double alphaFromRow = Math.abs(myRowDirection.values[iteration.enter.index]);
-        boolean refactor = nbUpdates > 0 && BASIS_REPRESENTATION_ACCURACY.isDifferent(alphaFromColumn, alphaFromRow);
-
         super.pivot(iteration);
 
-        if (refactor) {
-            myInvBasis.reset(myConstraintsCSC, included);
-            myRefactored = true;
-        } else if (myInvBasis.update(myConstraintsCSC, included, iterExitInd, iterEnterCol)) {
+        if (myInvBasis.update(myConstraintsCSC, included, iterExitInd, iterEnterCol)) {
             myRefactored = true;
         }
     }
@@ -644,6 +633,11 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
+    double getOriginalRHS(final int i) {
+        return myConstraintsRHS.doubleValue(i);
+    }
+
+    @Override
     int[] getPrimalDirectionIndices() {
         return myColumnDirection.indices();
     }
@@ -661,6 +655,18 @@ final class RevisedStore extends SimplexStore {
     @Override
     boolean isPhase1() {
         return myPhase1Objective != null;
+    }
+
+    /**
+     * By {@link #BASIS_REPRESENTATION_ACCURACY}
+     */
+    @Override
+    boolean isPivotAccurate(final IterDescr iteration) {
+
+        double alphaFromColumn = Math.abs(myColumnDirection.values[iteration.exit.index]);
+        double alphaFromRow = Math.abs(myRowDirection.values[iteration.enter.index]);
+
+        return !BASIS_REPRESENTATION_ACCURACY.isDifferent(alphaFromColumn, alphaFromRow);
     }
 
     @Override
@@ -708,6 +714,12 @@ final class RevisedStore extends SimplexStore {
             this.updateDualsAndReducedCosts();
             this.refreshBasicSolution();
         }
+    }
+
+    @Override
+    boolean recomputeBasicSolution() {
+        this.refreshBasicSolution();
+        return true;
     }
 
     @Override

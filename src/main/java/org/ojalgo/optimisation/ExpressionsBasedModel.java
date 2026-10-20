@@ -2352,7 +2352,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             for (int i = 0, limit = myVariables.size(); i < limit; i++) {
                 Variable tmpVariable = myVariables.get(i);
                 if (!tmpVariable.isFixed()) {
-                    tmpVariable.setValue(options.solution.enforce(result.get(i)).stripTrailingZeros());
+                    tmpVariable.setValue(options.solution.enforce(result.get(i)));
                 }
             }
         }

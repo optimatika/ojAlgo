@@ -91,6 +91,11 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
     private transient Primitive2D myConstraintsBody = null;
     private transient Primitive1D myConstraintsRHS = null;
     private transient Primitive1D myObjective = null;
+    /**
+     * A copy of the constraints' RHS, made in {@link #doneBuilding(LinearSolver.Configuration)}. The RHS of
+     * the tableau changes with every pivot and shift.
+     */
+    private double[] myOriginalRHS = null;
     private final double[] mySolutionShift;
     private double myValueShift = ZERO;
 
@@ -205,6 +210,18 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
             myConstraintsRHS = this.newConstraintsRHS();
         }
         return myConstraintsRHS;
+    }
+
+    @Override
+    void doneBuilding(final LinearSolver.Configuration configuration) {
+
+        super.doneBuilding(configuration);
+
+        Primitive1D constraintsRHS = this.constraintsRHS();
+        myOriginalRHS = new double[m];
+        for (int i = 0; i < m; i++) {
+            myOriginalRHS[i] = constraintsRHS.doubleValue(i);
+        }
     }
 
     @Override
@@ -386,6 +403,11 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
     @Override
     double getOriginalLowerBound(final int index) {
         return this.getLowerBound(index) + mySolutionShift[index];
+    }
+
+    @Override
+    double getOriginalRHS(final int i) {
+        return myOriginalRHS[i];
     }
 
     @Override
