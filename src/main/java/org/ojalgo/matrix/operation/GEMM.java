@@ -172,22 +172,57 @@ public abstract class GEMM implements BLAS3 {
                     }
                 }
 
-                for (; l < k; l++) {
+                // The 1 to 3 columns of A that remain, in a single pass over the rows
+                int rowB = k4 * strideL;
+                int colA0 = offsetA + k4 * lda;
+                int colA1 = colA0 + lda;
+                int colA2 = colA1 + lda;
 
-                    int rowB = l * strideL;
-                    double b0 = alpha * b[colB0 + rowB];
-                    double b1 = alpha * b[colB1 + rowB];
-                    double b2 = alpha * b[colB2 + rowB];
-                    double b3 = alpha * b[colB3 + rowB];
-
-                    int colA = offsetA + l * lda;
-
-                    for (int i = 0; i < m; i++) {
-                        double a0 = a[colA + i];
-                        c[colC0 + i] = JVM.fma(b0, a0, c[colC0 + i]);
-                        c[colC1 + i] = JVM.fma(b1, a0, c[colC1 + i]);
-                        c[colC2 + i] = JVM.fma(b2, a0, c[colC2 + i]);
-                        c[colC3 + i] = JVM.fma(b3, a0, c[colC3 + i]);
+                switch (k - k4) {
+                    case 3  -> {
+                        double b00 = alpha * b[colB0 + rowB], b10 = alpha * b[colB0 + rowB + strideL], b20 = alpha * b[colB0 + rowB + strideL2];
+                        double b01 = alpha * b[colB1 + rowB], b11 = alpha * b[colB1 + rowB + strideL], b21 = alpha * b[colB1 + rowB + strideL2];
+                        double b02 = alpha * b[colB2 + rowB], b12 = alpha * b[colB2 + rowB + strideL], b22 = alpha * b[colB2 + rowB + strideL2];
+                        double b03 = alpha * b[colB3 + rowB], b13 = alpha * b[colB3 + rowB + strideL], b23 = alpha * b[colB3 + rowB + strideL2];
+                        for (int i = 0; i < m; i++) {
+                            double a0 = a[colA0 + i];
+                            double a1 = a[colA1 + i];
+                            double a2 = a[colA2 + i];
+                            c[colC0 + i] = JVM.fma(b20, a2, JVM.fma(b10, a1, JVM.fma(b00, a0, c[colC0 + i])));
+                            c[colC1 + i] = JVM.fma(b21, a2, JVM.fma(b11, a1, JVM.fma(b01, a0, c[colC1 + i])));
+                            c[colC2 + i] = JVM.fma(b22, a2, JVM.fma(b12, a1, JVM.fma(b02, a0, c[colC2 + i])));
+                            c[colC3 + i] = JVM.fma(b23, a2, JVM.fma(b13, a1, JVM.fma(b03, a0, c[colC3 + i])));
+                        }
+                    }
+                    case 2  -> {
+                        double b00 = alpha * b[colB0 + rowB], b10 = alpha * b[colB0 + rowB + strideL];
+                        double b01 = alpha * b[colB1 + rowB], b11 = alpha * b[colB1 + rowB + strideL];
+                        double b02 = alpha * b[colB2 + rowB], b12 = alpha * b[colB2 + rowB + strideL];
+                        double b03 = alpha * b[colB3 + rowB], b13 = alpha * b[colB3 + rowB + strideL];
+                        for (int i = 0; i < m; i++) {
+                            double a0 = a[colA0 + i];
+                            double a1 = a[colA1 + i];
+                            c[colC0 + i] = JVM.fma(b10, a1, JVM.fma(b00, a0, c[colC0 + i]));
+                            c[colC1 + i] = JVM.fma(b11, a1, JVM.fma(b01, a0, c[colC1 + i]));
+                            c[colC2 + i] = JVM.fma(b12, a1, JVM.fma(b02, a0, c[colC2 + i]));
+                            c[colC3 + i] = JVM.fma(b13, a1, JVM.fma(b03, a0, c[colC3 + i]));
+                        }
+                    }
+                    case 1  -> {
+                        double b0 = alpha * b[colB0 + rowB];
+                        double b1 = alpha * b[colB1 + rowB];
+                        double b2 = alpha * b[colB2 + rowB];
+                        double b3 = alpha * b[colB3 + rowB];
+                        for (int i = 0; i < m; i++) {
+                            double a0 = a[colA0 + i];
+                            c[colC0 + i] = JVM.fma(b0, a0, c[colC0 + i]);
+                            c[colC1 + i] = JVM.fma(b1, a0, c[colC1 + i]);
+                            c[colC2 + i] = JVM.fma(b2, a0, c[colC2 + i]);
+                            c[colC3 + i] = JVM.fma(b3, a0, c[colC3 + i]);
+                        }
+                    }
+                    default -> {
+                        // k is a multiple of 4
                     }
                 }
             }
@@ -218,11 +253,35 @@ public abstract class GEMM implements BLAS3 {
                     }
                 }
 
-                for (; l < k; l++) {
-                    double b0 = alpha * b[colB + l * strideL];
-                    int colA = offsetA + l * lda;
-                    for (int i = 0; i < m; i++) {
-                        c[colC + i] = JVM.fma(b0, a[colA + i], c[colC + i]);
+                int rowB = k4 * strideL;
+                int colA0 = offsetA + k4 * lda;
+                int colA1 = colA0 + lda;
+                int colA2 = colA1 + lda;
+
+                switch (k - k4) {
+                    case 3  -> {
+                        double b0 = alpha * b[colB + rowB];
+                        double b1 = alpha * b[colB + rowB + strideL];
+                        double b2 = alpha * b[colB + rowB + strideL2];
+                        for (int i = 0; i < m; i++) {
+                            c[colC + i] = JVM.fma(b2, a[colA2 + i], JVM.fma(b1, a[colA1 + i], JVM.fma(b0, a[colA0 + i], c[colC + i])));
+                        }
+                    }
+                    case 2  -> {
+                        double b0 = alpha * b[colB + rowB];
+                        double b1 = alpha * b[colB + rowB + strideL];
+                        for (int i = 0; i < m; i++) {
+                            c[colC + i] = JVM.fma(b1, a[colA1 + i], JVM.fma(b0, a[colA0 + i], c[colC + i]));
+                        }
+                    }
+                    case 1  -> {
+                        double b0 = alpha * b[colB + rowB];
+                        for (int i = 0; i < m; i++) {
+                            c[colC + i] = JVM.fma(b0, a[colA0 + i], c[colC + i]);
+                        }
+                    }
+                    default -> {
+                        // k is a multiple of 4
                     }
                 }
             }
@@ -637,7 +696,7 @@ public abstract class GEMM implements BLAS3 {
      * The native implementation is used, if there is one, when m*n*k (the number of multiply-adds) is larger
      * than this.
      */
-    private static final double NATIVE_THRESHOLD = 10_000;
+    private static final double NATIVE_THRESHOLD = 2_500;
     /**
      * The block size (rows and columns of A) used when the Java implementation is cache blocked.
      */

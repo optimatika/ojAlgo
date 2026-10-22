@@ -227,7 +227,7 @@ public abstract class GEMV implements BLAS2 {
      * The native implementation is used, if there is one, when m*n (the number of multiply-adds) is larger
      * than this.
      */
-    private static final double NATIVE_THRESHOLD = 8_000;
+    private static final double NATIVE_THRESHOLD = 1_500;
     /**
      * The Java implementation is multi-threaded, splitting the elements of y, when y has increment 1 and more
      * elements than max(this, this squared divided by the other dimension of A). The divider splits in

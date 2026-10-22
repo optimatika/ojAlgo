@@ -57,6 +57,7 @@ import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.type.SortOrder;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -106,11 +107,11 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
             if (DEBUG) {
 
                 BasicLogger.debug();
-                BasicLogger.debug("{}, ordered={}", evd.getClass(), evd.isOrdered());
+                BasicLogger.debug("{}, order={}", evd.getClass(), evd.getOrder());
                 BasicLogger.debug("Eigenvalues: {}", actual);
             }
 
-            if (!evd.isOrdered()) {
+            if (evd.getOrder() != SortOrder.DESCENDING) {
                 actual.sort(Comparator.comparing(ComplexNumber::norm).reversed());
             }
 

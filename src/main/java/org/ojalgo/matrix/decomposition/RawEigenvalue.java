@@ -39,6 +39,7 @@ import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.matrix.operation.ExchangeColumns;
 import org.ojalgo.matrix.operation.RotateColumns;
+import org.ojalgo.matrix.operation.STEQR;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
@@ -48,6 +49,7 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
+import org.ojalgo.type.SortOrder;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -74,17 +76,17 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
 
         @Override
+        public SortOrder getOrder() {
+            // The symmetric implementation is sorted, the general is not.
+            return this.isHermitian() ? SortOrder.DESCENDING : SortOrder.UNSORTED;
+        }
+
+        @Override
         public boolean isHermitian() {
             if (mySymmetric == null) {
                 mySymmetric = Boolean.valueOf(this.checkSymmetry());
             }
             return mySymmetric.booleanValue();
-        }
-
-        @Override
-        public boolean isOrdered() {
-            // The symmetric implementation is sorted, the general is not.
-            return this.isHermitian();
         }
 
         @Override
@@ -108,12 +110,12 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
 
         @Override
-        public boolean isHermitian() {
-            return false;
+        public SortOrder getOrder() {
+            return SortOrder.UNSORTED;
         }
 
         @Override
-        public boolean isOrdered() {
+        public boolean isHermitian() {
             return false;
         }
 
@@ -279,6 +281,11 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
 
         @Override
+        public SortOrder getOrder() {
+            return SortOrder.DESCENDING;
+        }
+
+        @Override
         public double getRankThreshold() {
             double[] d = this.getRealParts();
             return Math.max(MACHINE_SMALLEST, Math.abs(d[0])) * this.getDimensionalEpsilon();
@@ -400,11 +407,6 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         @Override
         public boolean isHermitian() {
-            return true;
-        }
-
-        @Override
-        public boolean isOrdered() {
             return true;
         }
 
@@ -798,7 +800,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             }
 
         };
-        HermitianEvD.tql2(d, e, tmpRotateColumns);
+        STEQR.invoke(d, e, tmpRotateColumns);
 
         // Diagonalize > Sort
 

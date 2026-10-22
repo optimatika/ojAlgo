@@ -93,52 +93,6 @@ public class TestSpecificSizeImplementationQuadruple {
     }
 
     @Test
-    public void testMultiplyLeft() {
-
-        for (int m : DIMS) {
-            for (int c : DIMS) {
-                for (int n : DIMS) {
-
-                    GenericStore<Quadruple> left = GenericStore.R128.makeFilled(m, c, Normal.standard());
-                    GenericStore<Quadruple> right = GenericStore.R128.makeFilled(c, n, Normal.standard());
-                    GenericStore<Quadruple> expected = GenericStore.R128.make(m, n);
-                    GenericStore<Quadruple> actual = GenericStore.R128.make(m, n);
-
-                    MultiplyLeft.fillMxN(expected.data, left, c, right.data, Quadruple.FACTORY);
-                    MultiplyLeft.Generic<Quadruple> generic = MultiplyLeft.newGeneric(m, n);
-                    generic.invoke(actual.data, left, c, right.data, Quadruple.FACTORY);
-
-                    TestUtils.assertEquals(m + "-" + c + "-" + n, expected, actual, ACCURACY_P64);
-                }
-            }
-        }
-    }
-
-    @Test
-    public void testMultiplyLeftShaded() {
-
-        for (int m : DIMS) {
-            for (int c : DIMS) {
-                for (int n : DIMS) {
-
-                    GenericStore<Quadruple> left = GenericStore.R128.makeFilled(m, c, Normal.standard());
-                    GenericStore<Quadruple> right = GenericStore.R128.makeFilled(c, n, Normal.standard());
-                    GenericStore<Quadruple> expected = GenericStore.R128.make(m, n);
-                    GenericStore<Quadruple> actual = GenericStore.R128.make(m, n);
-
-                    MatrixStore<Quadruple> l = left.tridiagonal();
-
-                    MultiplyLeft.fillMxN(expected.data, l, c, right.data, Quadruple.FACTORY);
-                    MultiplyLeft.Generic<Quadruple> generic = MultiplyLeft.newGeneric(m, n);
-                    generic.invoke(actual.data, l, c, right.data, Quadruple.FACTORY);
-
-                    TestUtils.assertEquals(m + "-" + c + "-" + n, expected, actual, ACCURACY_P64);
-                }
-            }
-        }
-    }
-
-    @Test
     public void testMultiplyNeither() {
 
         for (int m : DIMS) {
@@ -146,61 +100,26 @@ public class TestSpecificSizeImplementationQuadruple {
                 for (int n : DIMS) {
 
                     GenericStore<Quadruple> left = GenericStore.R128.makeFilled(m, c, Normal.standard());
+                    GenericStore<Quadruple> leftT = GenericStore.R128.makeFilled(c, m, Normal.standard());
                     GenericStore<Quadruple> right = GenericStore.R128.makeFilled(c, n, Normal.standard());
+                    GenericStore<Quadruple> rightT = GenericStore.R128.makeFilled(n, c, Normal.standard());
                     GenericStore<Quadruple> expected = GenericStore.R128.make(m, n);
                     GenericStore<Quadruple> actual = GenericStore.R128.make(m, n);
 
-                    MultiplyNeither.fillMxN(expected.data, left.data, c, right.data, Quadruple.FACTORY);
                     MultiplyNeither.Generic<Quadruple> generic = MultiplyNeither.newGeneric(m, n);
-                    generic.invoke(actual.data, left.data, c, right.data, Quadruple.FACTORY);
 
-                    TestUtils.assertEquals(m + "-" + c + "-" + n, expected, actual, ACCURACY_P64);
-                }
-            }
-        }
-    }
+                    for (boolean transpL : new boolean[] { false, true }) {
+                        for (boolean transpR : new boolean[] { false, true }) {
 
-    @Test
-    public void testMultiplyRight() {
+                            Quadruple[] dataL = transpL ? leftT.data : left.data;
+                            Quadruple[] dataR = transpR ? rightT.data : right.data;
 
-        for (int m : DIMS) {
-            for (int c : DIMS) {
-                for (int n : DIMS) {
+                            MultiplyNeither.fillMxN(expected.data, dataL, transpL, c, dataR, transpR, Quadruple.FACTORY);
+                            generic.invoke(actual.data, dataL, transpL, c, dataR, transpR, Quadruple.FACTORY);
 
-                    GenericStore<Quadruple> left = GenericStore.R128.makeFilled(m, c, Normal.standard());
-                    GenericStore<Quadruple> right = GenericStore.R128.makeFilled(c, n, Normal.standard());
-                    GenericStore<Quadruple> expected = GenericStore.R128.make(m, n);
-                    GenericStore<Quadruple> actual = GenericStore.R128.make(m, n);
-
-                    MultiplyRight.fillMxN(expected.data, left.data, c, right, Quadruple.FACTORY);
-                    MultiplyRight.Generic<Quadruple> generic = MultiplyRight.newGeneric(m, n);
-                    generic.invoke(actual.data, left.data, c, right, Quadruple.FACTORY);
-
-                    TestUtils.assertEquals(m + "-" + c + "-" + n, expected, actual, ACCURACY_P64);
-                }
-            }
-        }
-    }
-
-    @Test
-    public void testMultiplyRightShaded() {
-
-        for (int m : DIMS) {
-            for (int c : DIMS) {
-                for (int n : DIMS) {
-
-                    GenericStore<Quadruple> left = GenericStore.R128.makeFilled(m, c, Normal.standard());
-                    GenericStore<Quadruple> right = GenericStore.R128.makeFilled(c, n, Normal.standard());
-                    GenericStore<Quadruple> expected = GenericStore.R128.make(m, n);
-                    GenericStore<Quadruple> actual = GenericStore.R128.make(m, n);
-
-                    MatrixStore<Quadruple> r = right.tridiagonal();
-
-                    MultiplyRight.fillMxN(expected.data, left.data, c, r, Quadruple.FACTORY);
-                    MultiplyRight.Generic<Quadruple> generic = MultiplyRight.newGeneric(m, n);
-                    generic.invoke(actual.data, left.data, c, r, Quadruple.FACTORY);
-
-                    TestUtils.assertEquals(m + "-" + c + "-" + n, expected, actual, ACCURACY_P64);
+                            TestUtils.assertEquals(m + "-" + c + "-" + n + " " + transpL + "/" + transpR, expected, actual, ACCURACY_P64);
+                        }
+                    }
                 }
             }
         }

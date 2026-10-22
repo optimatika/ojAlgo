@@ -39,6 +39,7 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
+import org.ojalgo.type.SortOrder;
 
 /**
  * Notation used to describe the various matrix decompositions:
@@ -202,13 +203,26 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
     interface Ordered<N extends Comparable<N>> extends MatrixDecomposition<N> {
 
         /**
+         * The order of the values (the diagonal elements of D or S), and of the corresponding rows/columns of
+         * the other matrix factors. Singular values are ordered by value, eigenvalues by their norm
+         * (modulus). This is a property of the algorithm/implementation, not the data.
+         *
+         * @return {@link SortOrder#UNSORTED} if there is no guaranteed order
+         */
+        SortOrder getOrder();
+
+        /**
          * This is a property of the algorithm/implementation, not the data. Typically relevant for
          * {@link SingularValue}, {@link Eigenvalue} or any {@link RankRevealing} decomposition.
          *
          * @return true if the rows/columns of the returned matrix factors are guaranteed some specific order;
          *         false if there is no such guarantee.
+         * @deprecated v58 Use {@link #getOrder()} instead
          */
-        boolean isOrdered();
+        @Deprecated
+        default boolean isOrdered() {
+            return this.getOrder() != SortOrder.UNSORTED;
+        }
 
     }
 

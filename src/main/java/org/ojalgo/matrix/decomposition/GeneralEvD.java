@@ -34,6 +34,7 @@ import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access2D.Collectable;
+import org.ojalgo.type.SortOrder;
 
 abstract class GeneralEvD<N extends Comparable<N>, M extends PhysicalStore<N>> extends DenseEigenvalue<N, M> {
 
@@ -107,6 +108,11 @@ abstract class GeneralEvD<N extends Comparable<N>, M extends PhysicalStore<N>> e
     }
 
     @Override
+    public SortOrder getOrder() {
+        return SortOrder.UNSORTED;
+    }
+
+    @Override
     public final ComplexNumber getTrace() {
 
         final AggregatorFunction<ComplexNumber> tmpVisitor = ComplexAggregator.getSet().sum();
@@ -118,11 +124,6 @@ abstract class GeneralEvD<N extends Comparable<N>, M extends PhysicalStore<N>> e
 
     @Override
     public final boolean isHermitian() {
-        return false;
-    }
-
-    @Override
-    public boolean isOrdered() {
         return false;
     }
 

@@ -31,6 +31,7 @@ import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.DOT;
 import org.ojalgo.array.operation.NRM2;
 import org.ojalgo.array.operation.NRMINF;
+import org.ojalgo.matrix.operation.BDSQR;
 import org.ojalgo.matrix.operation.ExchangeColumns;
 import org.ojalgo.matrix.operation.NegateColumn;
 import org.ojalgo.matrix.operation.RotateColumns;
@@ -42,6 +43,7 @@ import org.ojalgo.matrix.transformation.InvertibleFactor;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
+import org.ojalgo.type.SortOrder;
 
 /**
  * Singular Value Decomposition.
@@ -420,6 +422,11 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     @Override
+    public SortOrder getOrder() {
+        return SortOrder.DESCENDING;
+    }
+
+    @Override
     public double getRankThreshold() {
         return Math.max(MACHINE_SMALLEST, s[0]) * this.getDimensionalEpsilon();
     }
@@ -493,11 +500,6 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     @Override
     public boolean isFullSize() {
         return false;
-    }
-
-    @Override
-    public boolean isOrdered() {
-        return true;
     }
 
     @Override
@@ -782,7 +784,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
             }
         } : NegateColumn.NULL;
 
-        DenseSingularValue.toDiagonal(s, e, q1RotR, q2RotR, q1XchgCols, q2XchgCols, q2NegCol);
+        BDSQR.invoke(s, e, q1RotR, q2RotR, q1XchgCols, q2XchgCols, q2NegCol);
 
         return this.computed(true);
     }

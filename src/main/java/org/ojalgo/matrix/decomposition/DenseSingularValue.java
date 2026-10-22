@@ -30,11 +30,12 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.matrix.operation.BDSQR;
 import org.ojalgo.matrix.operation.ExchangeColumns;
+import org.ojalgo.matrix.operation.GESDD;
 import org.ojalgo.matrix.operation.NegateColumn;
 import org.ojalgo.matrix.operation.RotateColumns;
 import org.ojalgo.matrix.operation.RotateRight;
-import org.ojalgo.matrix.operation.RotationStep;
 import org.ojalgo.matrix.store.DiagonalStore;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -47,22 +48,22 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
-import org.ojalgo.structure.Structure2D;
-import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.type.SortOrder;
 
 abstract class DenseSingularValue<N extends Comparable<N>, M extends PhysicalStore<N>> extends AbstractDecomposition<N, M> implements SingularValue<N> {
 
-    static final class C128 extends DenseSingularValue<ComplexNumber, GenericStore<ComplexNumber>> {
+    static final class C128 extends Generic<ComplexNumber> {
 
         C128() {
             this(false);
         }
 
         C128(final boolean fullSize) {
-            super(GenericStore.C128, new DenseBidiagonal.C128(fullSize), fullSize, RotateRight::invokeGeneric);
+            super(GenericStore.C128, new DenseBidiagonal.C128(fullSize), fullSize);
         }
 
     }
@@ -261,310 +262,150 @@ abstract class DenseSingularValue<N extends Comparable<N>, M extends PhysicalSto
 
     }
 
-    static final class H256 extends DenseSingularValue<Quaternion, GenericStore<Quaternion>> {
+    /**
+     * The number types other than double: the matrix (or its conjugate transpose, if it has fewer rows than
+     * columns) is reduced to bidiagonal form by {@link DenseBidiagonal}, and the bidiagonal matrix
+     * diagonalised by {@link BDSQR}.
+     */
+    abstract static class Generic<N extends Scalar<N>> extends DenseSingularValue<N, GenericStore<N>> {
+
+        private double[] e = null;
+        private final DenseBidiagonal<N, GenericStore<N>> myBidiagonal;
+
+        Generic(final PhysicalStore.Factory<N, GenericStore<N>> factory, final DenseBidiagonal<N, GenericStore<N>> bidiagonal, final boolean fullSize) {
+            super(factory, fullSize);
+            myBidiagonal = bidiagonal;
+        }
+
+        @Override
+        int compute(final Collectable<N, ? super TransformableRegion<N>> matrix, final double[] values, final GenericStore<N> u, final GenericStore<N> v,
+                final boolean fullSize) {
+
+            boolean transposed = matrix.countRows() < matrix.countColumns();
+
+            myBidiagonal.decompose(transposed ? this.collect(matrix).conjugate() : matrix);
+
+            DiagonalStore<N, Array1D<N>> tmpBidiagonal = myBidiagonal.doGetDiagonal();
+
+            int size = tmpBidiagonal.getDimension();
+
+            if (e == null || e.length != size) {
+                e = new double[size];
+            }
+
+            tmpBidiagonal.supplyMainDiagonalTo(values);
+            tmpBidiagonal.supplySuperdiagonalTo(e);
+
+            GenericStore<N> tmpQ1 = u != null ? myBidiagonal.doGetLQ() : null;
+            GenericStore<N> tmpQ2 = v != null ? myBidiagonal.doGetRQ() : null;
+
+            UnaryFunction<N> negate = this.function().negate();
+
+            RotateColumns q1RotR = tmpQ1 != null ? (low, high, cos, sin) -> RotateRight.invokeGeneric(tmpQ1, low, high, cos, sin) : RotateColumns.NULL;
+            RotateColumns q2RotR = tmpQ2 != null ? (low, high, cos, sin) -> RotateRight.invokeGeneric(tmpQ2, low, high, cos, sin) : RotateColumns.NULL;
+            ExchangeColumns q1XchgCols = tmpQ1 != null ? tmpQ1::exchangeColumns : ExchangeColumns.NULL;
+            ExchangeColumns q2XchgCols = tmpQ2 != null ? tmpQ2::exchangeColumns : ExchangeColumns.NULL;
+            NegateColumn q2NegCol = tmpQ2 != null ? col -> tmpQ2.modifyColumn(0L, col, negate) : NegateColumn.NULL;
+
+            BDSQR.invoke(values, e, q1RotR, q2RotR, q1XchgCols, q2XchgCols, q2NegCol);
+
+            if (u != null) {
+                u.fillMatching(transposed ? tmpQ2 : tmpQ1);
+                v.fillMatching(transposed ? tmpQ1 : tmpQ2);
+            }
+
+            return 0;
+        }
+
+    }
+
+    static final class H256 extends Generic<Quaternion> {
 
         H256() {
             this(false);
         }
 
         H256(final boolean fullSize) {
-            super(GenericStore.H256, new DenseBidiagonal.H256(fullSize), fullSize, RotateRight::invokeGeneric);
+            super(GenericStore.H256, new DenseBidiagonal.H256(fullSize), fullSize);
         }
 
     }
 
-    static final class Q128 extends DenseSingularValue<RationalNumber, GenericStore<RationalNumber>> {
+    static final class Q128 extends Generic<RationalNumber> {
 
         Q128() {
             this(false);
         }
 
         Q128(final boolean fullSize) {
-            super(GenericStore.Q128, new DenseBidiagonal.Q128(fullSize), fullSize, RotateRight::invokeGeneric);
+            super(GenericStore.Q128, new DenseBidiagonal.Q128(fullSize), fullSize);
         }
 
     }
 
+    /**
+     * {@link GESDD} on a copy of the matrix.
+     */
     static final class R064 extends DenseSingularValue<Double, R064Store> {
+
+        private transient R064Store myWork = null;
 
         R064() {
             this(false);
         }
 
         R064(final boolean fullSize) {
-            super(R064Store.FACTORY, new DenseBidiagonal.R064(fullSize), fullSize, RotateRight::invokeR064);
+            super(R064Store.FACTORY, fullSize);
+        }
+
+        @Override
+        int compute(final Collectable<Double, ? super TransformableRegion<Double>> matrix, final double[] values, final R064Store u, final R064Store v,
+                final boolean fullSize) {
+
+            int m = (int) matrix.countRows();
+            int n = (int) matrix.countColumns();
+
+            if (myWork == null || myWork.getRowDim() != m || myWork.getColDim() != n) {
+                myWork = this.makeZero(m, n);
+            }
+            matrix.supplyTo(myWork);
+
+            boolean vectors = u != null;
+
+            return GESDD.invoke(vectors, fullSize, m, n, myWork.data, 0, Math.max(1, m), values, 0, vectors ? u.data : null, 0, Math.max(1, m),
+                    vectors ? v.data : null, 0, Math.max(1, n));
         }
 
     }
 
-    static final class R128 extends DenseSingularValue<Quadruple, GenericStore<Quadruple>> {
+    static final class R128 extends Generic<Quadruple> {
 
         R128() {
             this(false);
         }
 
         R128(final boolean fullSize) {
-            super(GenericStore.R128, new DenseBidiagonal.R128(fullSize), fullSize, RotateRight::invokeGeneric);
+            super(GenericStore.R128, new DenseBidiagonal.R128(fullSize), fullSize);
         }
 
     }
 
-    /**
-     * ≈ 1.6E-291
-     */
-    private static final double TINY = Math.pow(2.0, -966.0);
-
-    private static void doCase1(final double[] s, final double[] e, final int p, final int k, final RotateColumns q2RotR) {
-
-        double f = e[p - 2];
-        e[p - 2] = ZERO;
-
-        double tmp, cos, sin;
-
-        for (int j = p - 2; j > k; j--) {
-
-            tmp = HYPOT.invoke(s[j], f);
-            cos = s[j] / tmp;
-            sin = f / tmp;
-            s[j] = tmp;
-
-            q2RotR.rotateColumns(p - 1, j, cos, sin);
-
-            tmp = e[j - 1];
-            f = -sin * tmp;
-            e[j - 1] = cos * tmp;
-        }
-
-        tmp = HYPOT.invoke(s[k], f);
-        cos = s[k] / tmp;
-        sin = f / tmp;
-        s[k] = tmp;
-
-        q2RotR.rotateColumns(p - 1, k, cos, sin);
-    }
-
-    private static void doCase2(final double[] s, final double[] e, final int p, final int k, final RotateColumns mtrxQ1) {
-
-        double f = e[k - 1];
-        e[k - 1] = ZERO;
-
-        double tmp, cos, sin;
-
-        for (int j = k; j < p; j++) {
-
-            tmp = HYPOT.invoke(s[j], f);
-            cos = s[j] / tmp;
-            sin = f / tmp;
-            s[j] = tmp;
-
-            mtrxQ1.rotateColumns(k - 1, j, cos, sin);
-
-            tmp = e[j];
-            f = -sin * tmp;
-            e[j] = cos * tmp;
-        }
-    }
-
-    private static void doCase3(final double[] s, final double[] e, final int p, final int k, final RotateColumns q1RotR, final RotateColumns q2RotR) {
-
-        // Calculate the shift.
-        final double scale = MAX.invoke(MAX.invoke(MAX.invoke(MAX.invoke(ABS.invoke(s[p - 1]), ABS.invoke(s[p - 2])), ABS.invoke(e[p - 2])), ABS.invoke(s[k])),
-                ABS.invoke(e[k]));
-
-        final double s_p1 = s[p - 1] / scale;
-        final double s_p2 = s[p - 2] / scale;
-        final double e_p2 = e[p - 2] / scale;
-
-        final double s_k = s[k] / scale;
-        final double e_k = e[k] / scale;
-
-        final double b = ((s_p2 + s_p1) * (s_p2 - s_p1) + e_p2 * e_p2) / TWO;
-        final double c = s_p1 * e_p2 * (s_p1 * e_p2);
-
-        double shift = ZERO;
-        if (NumberContext.compare(b, ZERO) != 0 || NumberContext.compare(c, ZERO) != 0) {
-            shift = SQRT.invoke(b * b + c);
-            if (b < ZERO) {
-                shift = -shift;
-            }
-            shift = c / (b + shift);
-        }
-
-        double f = (s_k + s_p1) * (s_k - s_p1) + shift;
-        double g = s_k * e_k;
-
-        double tmp, cos, sin;
-
-        // Chase zeros.
-        for (int j = k; j < p - 1; j++) {
-
-            tmp = HYPOT.invoke(f, g);
-            cos = f / tmp;
-            sin = g / tmp;
-
-            if (j != k) {
-                e[j - 1] = tmp;
-            }
-
-            f = cos * s[j] + sin * e[j];
-            e[j] = cos * e[j] - sin * s[j];
-            g = sin * s[j + 1];
-            s[j + 1] = cos * s[j + 1];
-
-            q2RotR.rotateColumns(j + 1, j, cos, sin);
-
-            tmp = HYPOT.invoke(f, g);
-            cos = f / tmp;
-            sin = g / tmp;
-            s[j] = tmp;
-
-            f = cos * e[j] + sin * s[j + 1];
-            s[j + 1] = -sin * e[j] + cos * s[j + 1];
-            g = sin * e[j + 1];
-            e[j + 1] = cos * e[j + 1];
-
-            q1RotR.rotateColumns(j + 1, j, cos, sin);
-        }
-
-        e[p - 2] = f;
-    }
-
-    private static void doCase4(final double[] s, final int k, final NegateColumn q2NegCol, final ExchangeColumns q1XchgCols,
-            final ExchangeColumns q2XchgCols) {
-
-        // Make the singular values positive.
-        if (s[k] <= ZERO) {
-            s[k] = s[k] < ZERO ? -s[k] : ZERO;
-            q2NegCol.negateColumn(k);
-        }
-
-        final int size = s.length;
-        double tmp;
-
-        // Order the singular values.
-        for (int iter = k, next = iter + 1; next < size && s[iter] < s[next]; iter++, next++) {
-
-            tmp = s[iter];
-            s[iter] = s[next];
-            s[next] = tmp;
-
-            q1XchgCols.exchangeColumns(iter, next);
-            q2XchgCols.exchangeColumns(iter, next);
-        }
-    }
-
-    static void toDiagonal(final double[] s, final double[] e, final RotateColumns q1RotR, final RotateColumns q2RotR, final ExchangeColumns q1XchgCols,
-            final ExchangeColumns q2XchgCols, final NegateColumn q2NegCol) {
-
-        int p = s.length;
-        while (p > 0) {
-            int k, kase;
-
-            // This section of the program inspects for negligible elements in the s and e arrays.
-            // On completion the variables kase and k are set as follows:
-            //
-            // kase = 1 if s[p] and e[k-1] are negligible and k<p => deflate negligible s[p]
-            // kase = 2 if s[k] is negligible and k<p => split at negligible s[k]
-            // kase = 3 if e[k-1] is negligible, k<p, and s(k)...s(p) are not negligible => perform QR-step
-            // kase = 4 if e[p-1] is negligible => convergence
-
-            for (k = p - 2; k >= 0; k--) {
-                if (ABS.invoke(e[k]) <= TINY + MACHINE_EPSILON * (ABS.invoke(s[k]) + ABS.invoke(s[k + 1]))) {
-                    e[k] = ZERO;
-                    break;
-                }
-            }
-            if (k == p - 2) {
-                kase = 4;
-            } else {
-                int ks;
-                for (ks = p - 1; ks > k; ks--) {
-                    final double t = ABS.invoke(e[ks]) + (ks != k + 1 ? ABS.invoke(e[ks - 1]) : ZERO);
-                    if (ABS.invoke(s[ks]) <= TINY + MACHINE_EPSILON * t) {
-                        s[ks] = ZERO;
-                        break;
-                    }
-                }
-                if (ks == k) {
-                    kase = 3;
-                } else if (ks == p - 1) {
-                    kase = 1;
-                } else {
-                    kase = 2;
-                    k = ks;
-                }
-            }
-            k++;
-
-            switch (kase) { // Perform the task indicated by kase.
-
-                // s[p] and e[k-1] are negligible and k<p
-                case 1: // Deflate negligible s[p]
-
-                    DenseSingularValue.doCase1(s, e, p, k, q2RotR);
-                    break;
-
-                // s[k] is negligible and k<p
-                case 2: // Split at negligible s[k]
-
-                    DenseSingularValue.doCase2(s, e, p, k, q1RotR);
-                    break;
-
-                // e[k-1] is negligible, k<p, and s(k)...s(p) are not negligible
-                case 3: // Perform QR-step.
-
-                    DenseSingularValue.doCase3(s, e, p, k, q1RotR, q2RotR);
-                    break;
-
-                // e[p-1] is negligible
-                case 4: // Convergence
-
-                    DenseSingularValue.doCase4(s, k, q2NegCol, q1XchgCols, q2XchgCols);
-                    p--;
-                    break;
-
-                // Should never happen
-                default:
-
-                    throw new IllegalStateException();
-
-            } // switch
-        } // while
-    }
-
-    private double[] e = null;
-    private final DenseBidiagonal<N, M> myBidiagonal;
+    private int myColDim = 0;
     private final boolean myFullSize;
-    private final Structure2D myInputStructure = new Structure2D() {
-
-        @Override
-        public int getColDim() {
-            return myTransposed ? myBidiagonal.getRowDim() : myBidiagonal.getColDim();
-        }
-
-        @Override
-        public int getRowDim() {
-            return myTransposed ? myBidiagonal.getColDim() : myBidiagonal.getRowDim();
-        }
-    };
     private transient MatrixStore<N> myInverse = null;
-    private final RotationStep<N, M> myRotateRight;
+    private int myRowDim = 0;
     private transient MatrixStore<N> myS = null;
     private transient Array1D<Double> mySingularValues = null;
-    private boolean myTransposed = false;
-    private transient MatrixStore<N> myU = null;
-    private transient MatrixStore<N> myV = null;
+    private M myU = null;
+    private M myV = null;
     private boolean myValuesOnly = false;
     private double[] s = null;
 
-    DenseSingularValue(final PhysicalStore.Factory<N, ? extends M> factory, final DenseBidiagonal<N, M> bidiagonal, final boolean fullSize,
-            final RotationStep<N, M> rotateRight) {
+    DenseSingularValue(final PhysicalStore.Factory<N, ? extends M> factory, final boolean fullSize) {
 
         super(factory);
 
-        myBidiagonal = bidiagonal;
         myFullSize = fullSize;
-        myRotateRight = rotateRight;
     }
 
     @Override
@@ -649,7 +490,7 @@ abstract class DenseSingularValue<N extends Comparable<N>, M extends PhysicalSto
 
     @Override
     public int getColDim() {
-        return myTransposed ? myBidiagonal.getRowDim() : myBidiagonal.getColDim();
+        return myColDim;
     }
 
     @Override
@@ -753,13 +594,18 @@ abstract class DenseSingularValue<N extends Comparable<N>, M extends PhysicalSto
     }
 
     @Override
+    public SortOrder getOrder() {
+        return SortOrder.DESCENDING;
+    }
+
+    @Override
     public double getRankThreshold() {
         return Math.max(MACHINE_SMALLEST, s[0]) * this.getDimensionalEpsilon();
     }
 
     @Override
     public int getRowDim() {
-        return myTransposed ? myBidiagonal.getColDim() : myBidiagonal.getRowDim();
+        return myRowDim;
     }
 
     @Override
@@ -809,30 +655,11 @@ abstract class DenseSingularValue<N extends Comparable<N>, M extends PhysicalSto
 
     @Override
     public MatrixStore<N> getU() {
-
-        if (!myValuesOnly && this.isComputed() && myU == null) {
-
-            if (myTransposed) {
-                myU = myBidiagonal.doGetRQ();
-            } else {
-                myU = myBidiagonal.doGetLQ();
-            }
-        }
-
         return myU;
     }
 
     @Override
     public MatrixStore<N> getV() {
-
-        if (this.isComputed() && !myValuesOnly && myV == null) {
-            if (myTransposed) {
-                myV = myBidiagonal.doGetLQ();
-            } else {
-                myV = myBidiagonal.doGetRQ();
-            }
-        }
-
         return myV;
     }
 
@@ -870,11 +697,6 @@ abstract class DenseSingularValue<N extends Comparable<N>, M extends PhysicalSto
     }
 
     @Override
-    public boolean isOrdered() {
-        return true;
-    }
-
-    @Override
     public boolean isSolvable() {
         return super.isSolvable();
     }
@@ -889,8 +711,6 @@ abstract class DenseSingularValue<N extends Comparable<N>, M extends PhysicalSto
 
         super.reset();
 
-        myBidiagonal.reset();
-
         myS = null;
         myU = null;
         myV = null;
@@ -899,7 +719,6 @@ abstract class DenseSingularValue<N extends Comparable<N>, M extends PhysicalSto
         myInverse = null;
 
         myValuesOnly = false;
-        myTransposed = false;
     }
 
     @Override
@@ -933,79 +752,49 @@ abstract class DenseSingularValue<N extends Comparable<N>, M extends PhysicalSto
 
         this.reset();
 
-        if (matrix.countRows() >= matrix.countColumns()) {
-            myTransposed = false;
-        } else {
-            myTransposed = true;
+        myRowDim = (int) matrix.countRows();
+        myColDim = (int) matrix.countColumns();
+        myValuesOnly = valuesOnly;
+
+        int minDim = Math.min(myRowDim, myColDim);
+
+        if (s == null || s.length != minDim) {
+            s = new double[minDim];
         }
 
-        myValuesOnly = valuesOnly;
+        M u = valuesOnly ? null : this.makeZero(myRowDim, fullSize ? myRowDim : minDim);
+        M v = valuesOnly ? null : this.makeZero(myColDim, fullSize ? myColDim : minDim);
 
         boolean computeOK = false;
 
         try {
 
-            computeOK = this.doCompute(myTransposed ? this.collect(matrix).conjugate() : matrix, valuesOnly, fullSize);
+            computeOK = this.compute(matrix, s, u, v, fullSize) == 0;
 
         } catch (final Exception xcptn) {
 
             BasicLogger.error(xcptn.toString());
 
-            this.reset();
-
             computeOK = false;
+        }
+
+        if (computeOK) {
+            myU = u;
+            myV = v;
+        } else {
+            this.reset();
         }
 
         return this.computed(computeOK);
     }
 
-    protected boolean computeBidiagonal(final Access2D.Collectable<N, ? super TransformableRegion<N>> matrix, final boolean fullSize) {
-        return myBidiagonal.decompose(matrix);
-    }
-
-    protected boolean doCompute(final Access2D.Collectable<N, ? super TransformableRegion<N>> matrix, final boolean valuesOnly, final boolean fullSize) {
-
-        this.computeBidiagonal(matrix, fullSize);
-
-        DiagonalStore<N, Array1D<N>> tmpBidiagonal = myBidiagonal.doGetDiagonal();
-
-        M tmpQ1 = valuesOnly ? null : myBidiagonal.doGetLQ();
-        M tmpQ2 = valuesOnly ? null : myBidiagonal.doGetRQ();
-
-        int size = tmpBidiagonal.getDimension();
-
-        if (s == null || s.length != size) {
-            s = new double[size];
-            e = new double[size];
-        }
-
-        tmpBidiagonal.supplyMainDiagonalTo(s);
-        tmpBidiagonal.supplySuperdiagonalTo(e);
-
-        UnaryFunction<N> negate = this.function().negate();
-
-        RotateColumns q1RotR = tmpQ1 != null ? (low, high, cos, sin) -> myRotateRight.invoke(tmpQ1, low, high, cos, sin) : RotateColumns.NULL;
-        RotateColumns q2RotR = tmpQ2 != null ? (low, high, cos, sin) -> myRotateRight.invoke(tmpQ2, low, high, cos, sin) : RotateColumns.NULL;
-        ExchangeColumns q1XchgCols = tmpQ1 != null ? tmpQ1::exchangeColumns : ExchangeColumns.NULL;
-        ExchangeColumns q2XchgCols = tmpQ2 != null ? tmpQ2::exchangeColumns : ExchangeColumns.NULL;
-        NegateColumn q2NegCol = tmpQ2 != null ? col -> tmpQ2.modifyColumn(0L, col, negate) : NegateColumn.NULL;
-
-        DenseSingularValue.toDiagonal(s, e, q1RotR, q2RotR, q1XchgCols, q2XchgCols, q2NegCol);
-
-        return this.computed(true);
-    }
-
-    protected boolean isTransposed() {
-        return myTransposed;
-    }
-
     protected MatrixStore<N> makeD() {
         MatrixStore<N> retVal = this.makeDiagonal(this.getSingularValues()).get();
         if (myFullSize) {
-            if (myInputStructure.countRows() > retVal.countRows()) {
-                retVal = retVal.below((int) (myInputStructure.countRows() - retVal.countRows()));
-            } else if (myInputStructure.countColumns() > retVal.countColumns()) {
-                retVal = retVal.right((int) (myInputStructure.countColumns() - retVal.countColumns()));
+            if (myRowDim > retVal.countRows()) {
+                retVal = retVal.below((int) (myRowDim - retVal.countRows()));
+            } else if (myColDim > retVal.countColumns()) {
+                retVal = retVal.right((int) (myColDim - retVal.countColumns()));
             }
         }
         return retVal;
@@ -1014,5 +803,14 @@ abstract class DenseSingularValue<N extends Comparable<N>, M extends PhysicalSto
     protected Array1D<Double> makeSingularValues() {
         return Array1D.R064.wrap(ArrayR064.wrap(s));
     }
+
+    /**
+     * The singular values, in descending order, to {@code values}, and, if u and v are not null, the left and
+     * right singular vectors to the columns of u and v: m-by-min(m,n) and n-by-min(m,n), or m-by-m and n-by-n
+     * with fullSize.
+     *
+     * @return 0 if successful
+     */
+    abstract int compute(Collectable<N, ? super TransformableRegion<N>> matrix, double[] values, M u, M v, boolean fullSize);
 
 }

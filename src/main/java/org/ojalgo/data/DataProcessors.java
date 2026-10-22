@@ -40,6 +40,7 @@ import org.ojalgo.structure.Access2D.RowView;
 import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Transformation2D;
+import org.ojalgo.type.SortOrder;
 
 /**
  * Various data processors that could be useful when doing data science or similar. With ojAlgo it is highly
@@ -204,8 +205,8 @@ public class DataProcessors {
             throw new ProgrammingError("The decomposition must be computed!");
         }
 
-        if (!svd.isOrdered()) {
-            throw new ProgrammingError("The singular values must be ordered!");
+        if (svd.getOrder() != SortOrder.DESCENDING) {
+            throw new ProgrammingError("The singular values must be in descending order!");
         }
 
         long numberOfSamples = svd.countRows();

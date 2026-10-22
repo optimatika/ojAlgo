@@ -30,6 +30,7 @@ import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
+import org.ojalgo.type.SortOrder;
 
 final class GeneralisedEvD<N extends Comparable<N>, M extends PhysicalStore<N>> extends DenseEigenvalue<N, M> implements Eigenvalue.Generalised<N> {
 
@@ -69,6 +70,11 @@ final class GeneralisedEvD<N extends Comparable<N>, M extends PhysicalStore<N>> 
     }
 
     @Override
+    public SortOrder getOrder() {
+        return myEigenvalue.getOrder();
+    }
+
+    @Override
     public ComplexNumber getTrace() {
         return myEigenvalue.getTrace();
     }
@@ -76,11 +82,6 @@ final class GeneralisedEvD<N extends Comparable<N>, M extends PhysicalStore<N>> 
     @Override
     public boolean isHermitian() {
         return myEigenvalue.isHermitian();
-    }
-
-    @Override
-    public boolean isOrdered() {
-        return myEigenvalue.isOrdered();
     }
 
     @Override

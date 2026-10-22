@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.TreeSet;
 
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition;
@@ -139,7 +140,7 @@ public final class GaussianField<K extends Comparable<? super K>> extends Random
             MatrixStore<Double> tmpV = tmpEvD.getV();
             PhysicalStore<Double> tmpD = tmpEvD.getD().copy();
 
-            double tmpLargest = tmpD.doubleValue(0, 0);
+            double tmpLargest = tmpD.aggregateDiagonal(Aggregator.LARGEST);
             double tmpLimit = PrimitiveMath.MAX.invoke(PrimitiveMath.MACHINE_EPSILON * tmpLargest, 1E-12);
 
             int tmpLength = (int) Math.min(tmpD.countRows(), tmpD.countColumns());

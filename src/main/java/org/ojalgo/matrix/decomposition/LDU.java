@@ -21,6 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.ojalgo.type.SortOrder;
+
 /**
  * LDU: [A] = [L][D][U] ( [P<sub>L</sub>][L][D][U][P<sub>U</sub>] )
  * <ul>
@@ -60,8 +62,8 @@ package org.ojalgo.matrix.decomposition;
 public interface LDU<N extends Comparable<N>> extends MatrixDecomposition.Solver<N>, MatrixDecomposition.Determinant<N>, MatrixDecomposition.RankRevealing<N> {
 
     @Override
-    default boolean isOrdered() {
-        return false;
+    default SortOrder getOrder() {
+        return SortOrder.UNSORTED;
     }
 
 }

@@ -283,6 +283,11 @@ public abstract class POTRS implements LAPACK {
      */
     private static final int COLUMNS_THRESHOLD = 3;
     /**
+     * The block size (rows and columns) of the copy of the lower triangle of the inverse to its upper
+     * triangle.
+     */
+    private static final int MIRROR_BLOCK = 32;
+    /**
      * The native implementation is used, if there is one, when n*n*nrhs (the number of multiply-adds) is
      * larger than this.
      */
@@ -411,23 +416,37 @@ public abstract class POTRS implements LAPACK {
     }
 
     /**
-     * Copies the strictly lower triangle of the n-by-n matrix B to its upper triangle.
+     * Copies the strictly lower triangle of the n-by-n matrix B to its upper triangle, in square blocks of
+     * {@link #MIRROR_BLOCK} rows and columns.
      */
     private static void copyLowerToUpper(final int n, final double[] b, final int offsetB, final int ldb) {
-        for (int j = 1; j < n; j++) {
-            for (int i = 0; i < j; i++) {
-                b[offsetB + i + j * ldb] = b[offsetB + j + i * ldb];
+        for (int jj = 0; jj < n; jj += MIRROR_BLOCK) {
+            int jLimit = Math.min(n, jj + MIRROR_BLOCK);
+            for (int ii = 0; ii <= jj; ii += MIRROR_BLOCK) {
+                int iLimit = Math.min(n, ii + MIRROR_BLOCK);
+                for (int j = jj; j < jLimit; j++) {
+                    for (int i = ii, limit = Math.min(iLimit, j); i < limit; i++) {
+                        b[offsetB + i + j * ldb] = b[offsetB + j + i * ldb];
+                    }
+                }
             }
         }
     }
 
     /**
-     * Copies the conjugate of the strictly lower triangle of the n-by-n matrix B to its upper triangle.
+     * Copies the conjugate of the strictly lower triangle of the n-by-n matrix B to its upper triangle, in
+     * square blocks of {@link #MIRROR_BLOCK} rows and columns.
      */
     private static <N extends Scalar<N>> void copyLowerToUpper(final int n, final N[] b, final int offsetB, final int ldb) {
-        for (int j = 1; j < n; j++) {
-            for (int i = 0; i < j; i++) {
-                b[offsetB + i + j * ldb] = b[offsetB + j + i * ldb].conjugate().get();
+        for (int jj = 0; jj < n; jj += MIRROR_BLOCK) {
+            int jLimit = Math.min(n, jj + MIRROR_BLOCK);
+            for (int ii = 0; ii <= jj; ii += MIRROR_BLOCK) {
+                int iLimit = Math.min(n, ii + MIRROR_BLOCK);
+                for (int j = jj; j < jLimit; j++) {
+                    for (int i = ii, limit = Math.min(iLimit, j); i < limit; i++) {
+                        b[offsetB + i + j * ldb] = b[offsetB + j + i * ldb].conjugate().get();
+                    }
+                }
             }
         }
     }

@@ -32,6 +32,7 @@ import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
+import org.ojalgo.type.SortOrder;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -98,14 +99,14 @@ public interface QR<N extends Comparable<N>> extends MatrixDecomposition.Updatab
         return Access2D.equals(tmpStore, matrix, context);
     }
 
+    @Override
+    default SortOrder getOrder() {
+        return SortOrder.UNSORTED;
+    }
+
     MatrixStore<N> getQ();
 
     MatrixStore<N> getR();
-
-    @Override
-    default boolean isOrdered() {
-        return false;
-    }
 
     @Override
     default MatrixStore<N> reconstruct() {

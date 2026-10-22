@@ -36,11 +36,12 @@ import org.ojalgo.scalar.Scalar;
 
 /**
  * The overloads for other number types of {@link GEQRF}, {@link GETRF}, {@link GETRS}, {@link ORGQR},
- * {@link ORMQR}, {@link POTRF}, {@link POTRS}, {@link TRSV} and {@link TRTRS} against their definitions, as
- * in {@link LAPACKTest}, with complex numbers and quaternions. Quaternion multiplication does not commute, so
- * this also checks that the factors of every product are in the right order. All elements have nonzero
- * imaginary parts. The matrices are stored from an offset with padding, and elements outside them must be
- * left untouched. The operation thresholds are minimised, so that the multi-threaded code is run too.
+ * {@link ORMQR}, {@link POTRF}, {@link POTRS}, {@link SYEVD}, {@link TRSV} and {@link TRTRS} against their
+ * definitions, as in {@link LAPACKTest}, with complex numbers and quaternions. Quaternion multiplication does
+ * not commute, so this also checks that the factors of every product are in the right order. All elements
+ * have nonzero imaginary parts. The matrices are stored from an offset with padding, and elements outside
+ * them must be left untouched. The operation thresholds are minimised, so that the multi-threaded code is run
+ * too.
  */
 public class LAPACKGenericTest {
 
@@ -391,6 +392,60 @@ public class LAPACKGenericTest {
         }
     }
 
+    private static <N extends Scalar<N>> void doTestSYEVD(final Type<N> type, final int n) {
+
+        String message = "SYEVD " + type.name + " " + n;
+        Random random = new Random(n);
+
+        N[][] factor = LAPACKGenericTest.make(type, n, n);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                factor[i][j] = type.generator.apply(random);
+            }
+        }
+        N[][] original = LAPACKGenericTest.make(type, n, n);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                original[i][j] = factor[i][j].add(factor[j][i].conjugate()).get();
+            }
+        }
+
+        Matrix<N> a = LAPACKGenericTest.newTriangle(type, random, original, false);
+        N[] before = a.data.clone();
+        double[] w = new double[n + 4];
+        Arrays.fill(w, SENTINEL);
+
+        TestUtils.assertEquals(message + ", info", 0, SYEVD.invoke(true, n, a.data, a.offset, a.ld, w, 2, type.scalar));
+
+        LAPACKGenericTest.assertOutsideUnchanged(message, before, a);
+        TestUtils.assertTrue(message + ", w outside", w[0] == SENTINEL && w[1] == SENTINEL && w[n + 2] == SENTINEL && w[n + 3] == SENTINEL);
+        for (int i = 1; i < n; i++) {
+            TestUtils.assertTrue(message + ", not ascending", w[1 + i] <= w[2 + i]);
+        }
+
+        N[][] vectors = LAPACKGenericTest.copy(type, a);
+        N[][] scaled = LAPACKGenericTest.make(type, n, n);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                scaled[i][j] = vectors[i][j].multiply(w[2 + j]).get();
+            }
+        }
+
+        LAPACKGenericTest.assertClose(message + ", Z^H Z = I", LAPACKGenericTest.identity(type, n),
+                LAPACKGenericTest.multiply(type, vectors, true, vectors, false), Math.sqrt(n));
+        LAPACKGenericTest.assertClose(message + ", A Z = Z diag(w)", scaled, LAPACKGenericTest.multiply(type, original, false, vectors, false),
+                LAPACKGenericTest.norm(original));
+
+        // The eigenvalues only: the same computation of the eigenvalues
+        Matrix<N> b = LAPACKGenericTest.newTriangle(type, random, original, false);
+        double[] values = new double[n + 4];
+        Arrays.fill(values, SENTINEL);
+
+        TestUtils.assertEquals(message + ", values only, info", 0, SYEVD.invoke(false, n, b.data, b.offset, b.ld, values, 2, type.scalar));
+
+        TestUtils.assertTrue(message + ", values only", Arrays.equals(w, values));
+    }
+
     private static <N extends Scalar<N>> void doTestTRSV(final Type<N> type, final boolean upper, final boolean transpose, final boolean unitDiagonal,
             final int n, final int incX) {
 
@@ -638,6 +693,14 @@ public class LAPACKGenericTest {
                 LAPACKGenericTest.doTestPOTRS(C128, upper, size[0], size[1]);
                 LAPACKGenericTest.doTestPOTRS(H256, upper, size[0], size[1]);
             }
+        }
+    }
+
+    @Test
+    public void testSYEVD() {
+        for (int n : new int[] { 1, 2, 3, 7, 17, 40 }) {
+            LAPACKGenericTest.doTestSYEVD(C128, n);
+            LAPACKGenericTest.doTestSYEVD(H256, n);
         }
     }
 

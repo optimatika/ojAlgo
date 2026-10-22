@@ -84,11 +84,17 @@ public final class CBLAS {
     public static final int UPPER = 121;
 
     /**
+     * Native copies of matrices are aligned to this many bytes.
+     */
+    private static final long ALIGNMENT = 64;
+
+    /**
      * Native memory for a column-major matrix with leading dimension {@code leadingDimension}, for a function
-     * that is not critical to write to. The memory is zero.
+     * that is not critical to write to. The memory is zero, and aligned to {@link #ALIGNMENT} bytes.
      */
     public static MemorySegment allocateMatrix(final SegmentAllocator allocator, final int rows, final int columns, final int leadingDimension) {
-        return allocator.allocate(JAVA_DOUBLE, columns == 0 ? 0L : (columns - 1L) * leadingDimension + rows);
+        long count = columns == 0 ? 0L : (columns - 1L) * leadingDimension + rows;
+        return allocator.allocate(JAVA_DOUBLE.byteSize() * count, ALIGNMENT);
     }
 
     /**
@@ -129,18 +135,19 @@ public final class CBLAS {
     /**
      * Native memory holding a copy of a column-major matrix, stored in a Java array from {@code offset} with
      * leading dimension {@code leadingDimension}, for passing to a function that is not critical. The copy
-     * has leading dimension {@code copyLeadingDimension}, normally {@link #leadingDimensionOfCopy(int)}. The
-     * elements are checked to be within the array.
+     * has leading dimension {@code copyLeadingDimension}, normally {@link #leadingDimensionOfCopy(int)}, and
+     * is aligned as {@link #allocateMatrix(SegmentAllocator, int, int, int)}. The elements are checked to be
+     * within the array.
      *
      * @throws IndexOutOfBoundsException if the elements are not all within the array
      */
     public static MemorySegment copyOfMatrix(final SegmentAllocator allocator, final double[] array, final int offset, final int rows, final int columns,
             final int leadingDimension, final int copyLeadingDimension) {
-        if (columns == 1 || leadingDimension == copyLeadingDimension) {
-            long count = columns == 0 ? 0L : (columns - 1L) * copyLeadingDimension + rows;
-            return allocator.allocateFrom(JAVA_DOUBLE, MemorySegment.ofArray(array), JAVA_DOUBLE, JAVA_DOUBLE.byteSize() * offset, count);
-        }
         MemorySegment retVal = CBLAS.allocateMatrix(allocator, rows, columns, copyLeadingDimension);
+        if (columns == 1 || leadingDimension == copyLeadingDimension) {
+            MemorySegment.copy(array, offset, retVal, JAVA_DOUBLE, 0L, Math.toIntExact(retVal.byteSize() / JAVA_DOUBLE.byteSize()));
+            return retVal;
+        }
         for (int j = 0; j < columns; j++) {
             MemorySegment.copy(array, offset + j * leadingDimension, retVal, JAVA_DOUBLE, JAVA_DOUBLE.byteSize() * j * copyLeadingDimension, rows);
         }

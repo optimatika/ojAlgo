@@ -6,10 +6,9 @@
     <artifactId>ojalgo</artifactId>
     <version>58.0.0-SNAPSHOT</version>
     <name>ojAlgo</name>
-    <description>oj! Algorithms - ojAlgo - is Open Source Java code that has to
-        do with mathematics, linear algebra and optimisation.</description>
+    <description>oj! Algorithms - ojAlgo - is a pure Java library, with zero dependencies, for mathematical optimisation and linear algebra: LP, QP and MIP solvers, dense and sparse matrices with the standard decompositions, and arrays, statistics and time series to go with them.</description>
     <packaging>jar</packaging>
-    <url>http://ojalgo.org</url>
+    <url>https://www.ojalgo.org/</url>
     <licenses>
         <license>
             <name>MIT</name>

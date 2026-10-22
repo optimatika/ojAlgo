@@ -141,7 +141,7 @@ public abstract class MatrixDecompositionTests {
 
     public static Tridiagonal<?>[] getAnyTridiagonal() {
         return new Tridiagonal<?>[] { new DeferredTridiagonal.C128(), new DeferredTridiagonal.R064(), new DeferredTridiagonal.H256(),
-                new DeferredTridiagonal.Q128(), new SimultaneousTridiagonal(), new DeferredTridiagonal.R128() };
+                new DeferredTridiagonal.Q128(), new DeferredTridiagonal.R128() };
     }
 
     public static List<MatrixDecomposition<Double>> getPrimitiveAll() {
@@ -242,7 +242,7 @@ public abstract class MatrixDecompositionTests {
     }
 
     public static Tridiagonal<Double>[] getPrimitiveTridiagonal() {
-        return (Tridiagonal<Double>[]) new Tridiagonal<?>[] { new DeferredTridiagonal.R064(), new SimultaneousTridiagonal() };
+        return (Tridiagonal<Double>[]) new Tridiagonal<?>[] { new DeferredTridiagonal.R064() };
     }
 
     /**

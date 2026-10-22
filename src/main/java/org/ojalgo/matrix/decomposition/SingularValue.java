@@ -34,6 +34,7 @@ import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Structure2D;
+import org.ojalgo.type.SortOrder;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -78,7 +79,7 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
     Factory<RationalNumber> Q128 = (typical, fullSize) -> new DenseSingularValue.Q128(fullSize);
 
     Factory<Double> R064 = (typical, fullSize) -> {
-        if (fullSize || 1024L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
+        if (fullSize || typical.count() <= PlainArray.MAX_SIZE) {
             return new DenseSingularValue.R064(fullSize);
         } else {
             return new RawSingularValue();
@@ -141,9 +142,14 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
             for (int i = 1; retVal && i < tmpSV.size(); i++) {
                 retVal &= tmpSV.doubleValue(i - 1) >= tmpSV.doubleValue(i);
             }
-            if (retVal && decomposition.isOrdered()) {
+            SortOrder order = decomposition.getOrder();
+            if (retVal && order == SortOrder.DESCENDING) {
                 for (int ij = 1; retVal && ij < tmpD.countRows(); ij++) {
                     retVal &= tmpD.doubleValue(ij - 1, ij - 1) >= tmpD.doubleValue(ij, ij);
+                }
+            } else if (retVal && order == SortOrder.ASCENDING) {
+                for (int ij = 1; retVal && ij < tmpD.countRows(); ij++) {
+                    retVal &= tmpD.doubleValue(ij - 1, ij - 1) <= tmpD.doubleValue(ij, ij);
                 }
             }
         }

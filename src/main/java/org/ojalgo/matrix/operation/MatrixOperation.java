@@ -135,9 +135,7 @@ public interface MatrixOperation extends ArrayOperation {
         HouseholderRight.THRESHOLD = Math.min(max, HouseholderRight.THRESHOLD);
         ModifyAll.THRESHOLD = Math.min(max, ModifyAll.THRESHOLD);
         MultiplyBoth.THRESHOLD = Math.min(max, MultiplyBoth.THRESHOLD);
-        MultiplyLeft.THRESHOLD = Math.min(max, MultiplyLeft.THRESHOLD);
         MultiplyNeither.THRESHOLD = Math.min(max, MultiplyNeither.THRESHOLD);
-        MultiplyRight.THRESHOLD = Math.min(max, MultiplyRight.THRESHOLD);
         ORMQR.THRESHOLD = Math.min(max, ORMQR.THRESHOLD);
         POTRF.THRESHOLD = Math.min(max, POTRF.THRESHOLD);
         POTRS.THRESHOLD = Math.min(max, POTRS.THRESHOLD);
@@ -170,9 +168,7 @@ public interface MatrixOperation extends ArrayOperation {
         HouseholderRight.THRESHOLD = Math.max(min, HouseholderRight.THRESHOLD);
         ModifyAll.THRESHOLD = Math.max(min, ModifyAll.THRESHOLD);
         MultiplyBoth.THRESHOLD = Math.max(min, MultiplyBoth.THRESHOLD);
-        MultiplyLeft.THRESHOLD = Math.max(min, MultiplyLeft.THRESHOLD);
         MultiplyNeither.THRESHOLD = Math.max(min, MultiplyNeither.THRESHOLD);
-        MultiplyRight.THRESHOLD = Math.max(min, MultiplyRight.THRESHOLD);
         ORMQR.THRESHOLD = Math.max(min, ORMQR.THRESHOLD);
         POTRF.THRESHOLD = Math.max(min, POTRF.THRESHOLD);
         POTRS.THRESHOLD = Math.max(min, POTRS.THRESHOLD);

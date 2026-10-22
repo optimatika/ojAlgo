@@ -32,6 +32,7 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.PlainArray;
 import org.ojalgo.matrix.Provider2D;
 import org.ojalgo.matrix.operation.ExchangeColumns;
+import org.ojalgo.matrix.operation.SYEVD;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -44,6 +45,7 @@ import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
+import org.ojalgo.type.SortOrder;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -340,7 +342,7 @@ public interface Eigenvalue<N extends Comparable<N>>
         @Override
         public Eigenvalue<Double> make(final Structure2D typical, final boolean hermitian) {
             if (hermitian) {
-                if (8192L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
+                if ((8192L < typical.countColumns() || SYEVD.isNative(true, typical.countColumns())) && typical.count() <= PlainArray.MAX_SIZE) {
                     return new HermitianEvD.R064();
                 } else {
                     return new RawEigenvalue.Symmetric();
@@ -487,8 +489,7 @@ public interface Eigenvalue<N extends Comparable<N>>
     }
 
     /**
-     * This list is always ordered in descending eigenvalue order – that's regardless of if
-     * {@link #isOrdered()} returns true or false.
+     * This list is always ordered in descending eigenvalue order – that's regardless of {@link #getOrder()}.
      *
      * @see org.ojalgo.matrix.Provider2D.Eigenpairs#getEigenpairs()
      */
@@ -542,7 +543,7 @@ public interface Eigenvalue<N extends Comparable<N>>
      * they need to be expressed as complex numbers when [A] is not symmetric.
      * <p>
      * The values should be in the same order as the matrices "V" and "D", and if they are ordered or not is
-     * indicated by the {@link #isOrdered()} method.
+     * indicated by the {@link #getOrder()} method.
      *
      * @return The eigenvalues.
      */
@@ -592,6 +593,14 @@ public interface Eigenvalue<N extends Comparable<N>>
     }
 
     /**
+     * The order of the eigenvalues in D (and the eigenvectors in V), by their norm (modulus). For a hermitian
+     * matrix that is also the order of the singular values. This is a property of the
+     * algorithm/implementation, not the data.
+     */
+    @Override
+    SortOrder getOrder();
+
+    /**
      * A matrix' trace is the sum of the diagonal elements. It is also the sum of the eigenvalues. This method
      * should return the sum of the eigenvalues.
      *
@@ -610,15 +619,6 @@ public interface Eigenvalue<N extends Comparable<N>>
      * If [A] is hermitian then [V][D][V]<sup>-1</sup> becomes [Q][D][Q]<sup>H</sup>...
      */
     boolean isHermitian();
-
-    /**
-     * The eigenvalues in D (and the eigenvectors in V) are not necessarily ordered. This is a property of the
-     * algorithm/implementation, not the data.
-     *
-     * @return true if they are ordered
-     */
-    @Override
-    boolean isOrdered();
 
     @Override
     default MatrixStore<N> reconstruct() {

@@ -136,10 +136,10 @@ public class BLASLevel3Test {
     private static final double[] BETAS = { 0.0, 1.0, -0.3 };
     private static final boolean[] BOOLEANS = { false, true };
     /**
-     * m, n, k – including the shapes where GEMM is a level 2 operation (m, n or k is 1); the larger ones pass
-     * the native thresholds.
+     * m, n, k – including the shapes where GEMM is a level 2 operation (m, n or k is 1), and k leaving 1, 2
+     * and 3 after a multiple of 4; the larger ones pass the native thresholds.
      */
-    private static final int[][] SIZES = { { 1, 1, 1 }, { 1, 9, 6 }, { 7, 1, 5 }, { 6, 8, 1 }, { 3, 4, 2 }, { 17, 19, 18 }, { 40, 33, 37 } };
+    private static final int[][] SIZES = { { 1, 1, 1 }, { 1, 9, 6 }, { 7, 1, 5 }, { 6, 8, 1 }, { 3, 4, 2 }, { 13, 10, 11 }, { 17, 19, 18 }, { 40, 33, 37 } };
 
     private static boolean isAvailable(final Implementation implementation, final boolean nativeAvailable) {
         return implementation != Implementation.NATIVE && implementation != Implementation.OFF_HEAP || nativeAvailable;
