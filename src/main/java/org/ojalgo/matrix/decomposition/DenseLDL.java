@@ -289,7 +289,7 @@ abstract class DenseLDL<N extends Comparable<N>, M extends PhysicalStore<N>> ext
 
         BinaryFunction<N> divide = this.function().divide();
         for (int i = 0; i < order.length; i++) {
-            preallocated.modifyRow(i, 0, divide.by(body.doubleValue(i, i)));
+            preallocated.modifyRow(i, divide.by(body.get(i, i)));
         }
 
         preallocated.substituteBackwards(body, true, true, false);

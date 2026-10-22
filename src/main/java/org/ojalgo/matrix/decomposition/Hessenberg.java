@@ -78,6 +78,6 @@ public interface Hessenberg<N extends Comparable<N>> extends MatrixDecomposition
     default MatrixStore<N> reconstruct() {
         MatrixStore<N> mtrxQ = this.getQ();
         MatrixStore<N> mtrxH = this.getH();
-        return mtrxQ.multiply(mtrxH).multiply(mtrxQ.transpose());
+        return mtrxQ.multiply(mtrxH).multiply(mtrxQ.conjugate());
     }
 }

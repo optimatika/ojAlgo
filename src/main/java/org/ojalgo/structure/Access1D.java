@@ -27,6 +27,9 @@ import java.util.List;
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.special.MissingMath;
+import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
@@ -238,9 +241,13 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
     }
 
     /**
-     * Tests if the two data structures are numerically equal to the given accuracy. (Only works with real
-     * numbers, and can't handle more than "double precision".) You have to implement your own version to
-     * handle other cases.
+     * Tests if the two data structures are numerically equal to the given accuracy. They are equal if they
+     * have the same number of elements, their largest element magnitudes are equal, and every element
+     * difference is small compared to the largest element magnitude.
+     * <p>
+     * If the first element of either structure is a {@link ComplexNumber} or a {@link Quaternion}, the
+     * magnitudes and differences are norms, and all components of each element are compared. Otherwise
+     * elements are compared using {@link #doubleValue(long)} (can't handle more than "double precision").
      */
     static boolean equals(final Access1D<?> accessA, final Access1D<?> accessB, final NumberContext accuracy) {
 
@@ -248,6 +255,10 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
 
         if (length != accessB.count()) {
             return false;
+        }
+
+        if (length > 0L && (Access1D.isHypercomplex(accessA.get(0L)) || Access1D.isHypercomplex(accessB.get(0L)))) {
+            return Access1D.equalsHypercomplex(accessA, accessB, accuracy);
         }
 
         double magnitudeA = 0D;
@@ -347,6 +358,47 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
             }
 
         };
+    }
+
+    private static boolean equalsHypercomplex(final Access1D<?> accessA, final Access1D<?> accessB, final NumberContext accuracy) {
+
+        long length = accessA.count();
+
+        double magnitudeA = 0D;
+        for (long i = 0; i < length; i++) {
+            magnitudeA = Math.max(magnitudeA, Access1D.norm(Quaternion.valueOf(accessA.get(i))));
+        }
+
+        double magnitudeB = 0D;
+        for (long i = 0; i < length; i++) {
+            magnitudeB = Math.max(magnitudeB, Access1D.norm(Quaternion.valueOf(accessB.get(i))));
+        }
+
+        if (accuracy.isDifferent(magnitudeA, magnitudeB)) {
+            return false;
+        }
+
+        double magnitude = Math.max(magnitudeA, magnitudeB);
+
+        for (long i = 0; i < length; i++) {
+            Quaternion difference = Quaternion.valueOf(accessA.get(i)).subtract(Quaternion.valueOf(accessB.get(i)));
+            if (!accuracy.isSmall(magnitude, Access1D.norm(difference))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static boolean isHypercomplex(final Comparable<?> element) {
+        return element instanceof ComplexNumber || element instanceof Quaternion;
+    }
+
+    /**
+     * The norm (modulus) of the quaternion, without overflow or underflow in intermediate results.
+     */
+    private static double norm(final Quaternion value) {
+        return MissingMath.hypot(MissingMath.hypot(value.scalar(), value.i), MissingMath.hypot(value.j, value.k));
     }
 
     /**

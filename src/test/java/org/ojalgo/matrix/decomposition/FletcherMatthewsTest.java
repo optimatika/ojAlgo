@@ -21,13 +21,21 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import java.util.Random;
+import java.util.function.Supplier;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.DecompositionUpdateTest.UpdateCase;
 import org.ojalgo.matrix.decomposition.DecompositionUpdateTest.UpdateSequence;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.Scalar;
+import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 
 /**
@@ -36,6 +44,52 @@ import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
  * Focuses on testing repeated updates and column pivoting behavior.
  */
 public class FletcherMatthewsTest extends MatrixDecompositionTests {
+
+    private static final NumberContext ACCURACY = NumberContext.of(10);
+
+    /**
+     * Replaces columns, one at a time, of a random matrix, and checks each update by solving with the updated
+     * decomposition. Each element is compared component by component.
+     */
+    private static <N extends Scalar<N>> void doTestRepeatedUpdates(final GenericStore.Factory<N> storeFactory, final LU.Factory<N> luFactory,
+            final Supplier<N> supplier) {
+
+        int dim = 6;
+        int[] columns = { 2, 0, 5, 3, 0, 1 };
+
+        GenericStore<N> matrix = FletcherMatthewsTest.makeFilled(storeFactory, dim, dim, supplier);
+        GenericStore<N> rhs = FletcherMatthewsTest.makeFilled(storeFactory, dim, 1, supplier);
+
+        LU<N> decomposition = luFactory.make(matrix);
+        decomposition.decompose(matrix);
+
+        for (int columnIndex : columns) {
+
+            GenericStore<N> newColumn = FletcherMatthewsTest.makeFilled(storeFactory, dim, 1, supplier);
+            matrix.fillColumn(columnIndex, newColumn);
+
+            TestUtils.assertTrue(decomposition.updateColumn(columnIndex, newColumn));
+
+            GenericStore<N> solution = rhs.copy();
+            decomposition.ftran(solution);
+
+            MatrixStore<N> product = matrix.multiply(solution);
+            for (int i = 0; i < dim; i++) {
+                TestUtils.assertEquals(rhs.get(i), product.get(i), ACCURACY);
+            }
+        }
+    }
+
+    private static <N extends Scalar<N>> GenericStore<N> makeFilled(final GenericStore.Factory<N> storeFactory, final int nbRows, final int nbCols,
+            final Supplier<N> supplier) {
+        GenericStore<N> retVal = storeFactory.make(nbRows, nbCols);
+        for (int j = 0; j < nbCols; j++) {
+            for (int i = 0; i < nbRows; i++) {
+                retVal.set(i, j, supplier.get());
+            }
+        }
+        return retVal;
+    }
 
     /**
      * Tests updateColumn on a small matrix with a known pattern.
@@ -54,6 +108,22 @@ public class FletcherMatthewsTest extends MatrixDecompositionTests {
 
         TestUtils.assertFalse(decomposition.updateColumn(columnIndex, newColumn));
 
+    }
+
+    @Test
+    public void testRepeatedUpdatesC128() {
+        Random random = new Random(1234L);
+        FletcherMatthewsTest.doTestRepeatedUpdates(GenericStore.C128, LU.C128, () -> ComplexNumber.of(random.nextGaussian(), random.nextGaussian()));
+    }
+
+    /**
+     * Quaternion multiplication is not commutative – the order of the factors in the updates matters.
+     */
+    @Test
+    public void testRepeatedUpdatesH256() {
+        Random random = new Random(1234L);
+        FletcherMatthewsTest.doTestRepeatedUpdates(GenericStore.H256, LU.H256,
+                () -> Quaternion.of(random.nextGaussian(), random.nextGaussian(), random.nextGaussian(), random.nextGaussian()));
     }
 
     /**

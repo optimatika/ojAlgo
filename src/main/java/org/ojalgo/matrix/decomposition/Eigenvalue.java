@@ -454,7 +454,7 @@ public interface Eigenvalue<N extends Comparable<N>>
             }
         } else {
             for (int i = 0; i < tmpDimension; i++) {
-                destination.set(i, tmpV.doubleValue(i, index));
+                destination.set(i, tmpV.get(i, index));
             }
         }
     }

@@ -48,6 +48,26 @@ public class CaseLU extends MatrixDecompositionTests {
         TestUtils.minimiseAllBranchLimits();
     }
 
+    /**
+     * i*[[1,2],[3,4]] is non-singular, and the diagonal of U is purely imaginary.
+     */
+    @Test
+    public void testImaginaryMatrix() {
+
+        GenericStore<ComplexNumber> matrix = GenericStore.C128.make(2, 2);
+        matrix.set(0, 0, ComplexNumber.of(0.0, 1.0));
+        matrix.set(0, 1, ComplexNumber.of(0.0, 2.0));
+        matrix.set(1, 0, ComplexNumber.of(0.0, 3.0));
+        matrix.set(1, 1, ComplexNumber.of(0.0, 4.0));
+
+        LU<ComplexNumber> decomposition = LU.C128.make(matrix);
+        decomposition.decompose(matrix);
+
+        TestUtils.assertEquals(2, decomposition.getRank());
+        TestUtils.assertTrue(decomposition.isFullRank());
+        TestUtils.assertTrue(decomposition.isSolvable());
+    }
+
     @Test
     public void testP20061119Case() {
 

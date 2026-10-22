@@ -23,9 +23,26 @@ package org.ojalgo.array.operation;
 
 import java.util.function.DoubleUnaryOperator;
 
+import org.ojalgo.concurrent.DivideAndConquer;
+import org.ojalgo.concurrent.Parallelism;
+import org.ojalgo.function.UnaryFunction;
+
 public abstract class ModifyAll implements ArrayOperation {
 
     public static int THRESHOLD = 64;
+
+    private static final DivideAndConquer.Divider DIVIDER = Parallelism.THREADS.newDivider();
+
+    public static void modifyAll(final double[] data, final int structure, final UnaryFunction<Double> function) {
+
+        int nbCols = structure > 0 ? data.length / structure : 0;
+
+        if (nbCols > THRESHOLD) {
+            DIVIDER.threshold(THRESHOLD).divide(0, nbCols, (f, l) -> OperationUnary.invoke(data, structure * f, structure * l, 1, data, function));
+        } else {
+            OperationUnary.invoke(data, 0, structure * nbCols, 1, data, function);
+        }
+    }
 
     public static void modifyAll(final double[][] target, final DoubleUnaryOperator function) {
         int tmpLength = target.length;
@@ -34,6 +51,17 @@ public abstract class ModifyAll implements ArrayOperation {
             for (int j = 0; j < tmpInnerLength; j++) {
                 target[i][j] = function.applyAsDouble(target[i][j]);
             }
+        }
+    }
+
+    public static <N extends Comparable<N>> void modifyAll(final N[] data, final int structure, final UnaryFunction<N> function) {
+
+        int nbCols = structure > 0 ? data.length / structure : 0;
+
+        if (nbCols > THRESHOLD) {
+            DIVIDER.threshold(THRESHOLD).divide(0, nbCols, (f, l) -> ModifyAll.modify(data, structure * f, structure * l, function));
+        } else {
+            ModifyAll.modify(data, 0, structure * nbCols, function);
         }
     }
 
@@ -54,6 +82,12 @@ public abstract class ModifyAll implements ArrayOperation {
         double[] targetRow = target[row];
         for (int j = col, limit = targetRow.length; j < limit; j++) {
             targetRow[j] = function.applyAsDouble(targetRow[j]);
+        }
+    }
+
+    private static <N extends Comparable<N>> void modify(final N[] data, final int first, final int limit, final UnaryFunction<N> function) {
+        for (int i = first; i < limit; i++) {
+            data[i] = function.invoke(data[i]);
         }
     }
 

@@ -24,7 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import java.util.Arrays;
 import java.util.BitSet;
 
-import org.ojalgo.structure.Access2D;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure1D;
 
@@ -91,25 +91,34 @@ final class Pivot {
         }
     }
 
-    private <N extends Comparable<N>, M extends Access2D<N> & Mutate2D> void followPermutationCycles(final M elements, final int[] order) {
+    /**
+     * Moves row j to row order[j], for all j – whole rows, all columns. A single row is instead permuted as a
+     * vector: column j is moved to column order[j]. Rows (or columns) are exchanged, so the elements
+     * themselves are moved, whatever their type.
+     */
+    private void followPermutationCycles(final Mutate2D.Exchangeable elements, final int[] order) {
 
-        myDoneBits.clear();
-        int dim = order.length;
+        if (elements instanceof R064Store && (elements.getColDim() == 1 || elements.getRowDim() == 1)) {
 
-        for (int i = 0; i < dim; i++) {
-            if (!myDoneBits.get(i)) {
-                // Follow the cycle starting at i
-                int j = i;
-                double temp = elements.doubleValue(i);
+            this.followPermutationCycles(((R064Store) elements).data, order);
 
-                while (!myDoneBits.get(j)) {
-                    myDoneBits.set(j);
-                    int next = order[j];
-                    if (next != j) {
-                        double val = elements.doubleValue(next);
-                        elements.set(next, temp);
-                        temp = val;
-                        j = next;
+        } else {
+
+            boolean row = elements.getRowDim() == 1;
+
+            myDoneBits.clear();
+            int dim = order.length;
+
+            for (int i = 0; i < dim; i++) {
+                if (!myDoneBits.get(i)) {
+                    myDoneBits.set(i);
+                    for (int next = order[i]; next != i; next = order[next]) {
+                        myDoneBits.set(next);
+                        if (row) {
+                            elements.exchangeColumns(i, next);
+                        } else {
+                            elements.exchangeRows(i, next);
+                        }
                     }
                 }
             }
@@ -125,7 +134,7 @@ final class Pivot {
     /**
      * Equivalent to selecting the rows (or columns) in the pivot order, {@code arg.rows(pivot.getOrder())}.
      */
-    <N extends Comparable<N>, M extends Access2D<N> & Mutate2D> void applyPivotOrder(final M arg) {
+    void applyPivotOrder(final Mutate2D.Exchangeable arg) {
         if (myModified) {
             this.followPermutationCycles(arg, this.reverseOrder());
         }
@@ -141,7 +150,7 @@ final class Pivot {
      * Equivalent to selecting the rows (or columns) in the reverse order,
      * {@code arg.rows(pivot.reverseOrder())}.
      */
-    <N extends Comparable<N>, M extends Access2D<N> & Mutate2D> void applyReverseOrder(final M arg) {
+    void applyReverseOrder(final Mutate2D.Exchangeable arg) {
         if (myModified) {
             this.followPermutationCycles(arg, myOrder);
         }

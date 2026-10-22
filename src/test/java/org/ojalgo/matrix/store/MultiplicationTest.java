@@ -21,12 +21,15 @@
  */
 package org.ojalgo.matrix.store;
 
+import java.util.Random;
+
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.random.Normal;
 import org.ojalgo.random.Uniform;
+import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.structure.Factory2D;
 
 public class MultiplicationTest extends MatrixStoreTests {
@@ -74,6 +77,33 @@ public class MultiplicationTest extends MatrixStoreTests {
         }
     }
 
+    private static GenericStore<Quaternion> makeQuaternions(final Random random, final int nbRows, final int nbCols) {
+        GenericStore<Quaternion> retVal = GenericStore.H256.make(nbRows, nbCols);
+        for (int j = 0; j < nbCols; j++) {
+            for (int i = 0; i < nbRows; i++) {
+                retVal.set(i, j, Quaternion.of(random.nextDouble() - 0.5, random.nextDouble() - 0.5, random.nextDouble() - 0.5, random.nextDouble() - 0.5));
+            }
+        }
+        return retVal;
+    }
+
+    /**
+     * The product, element by element, with the left factor on the left in each product.
+     */
+    private static GenericStore<Quaternion> multiplyNaively(final MatrixStore<Quaternion> left, final MatrixStore<Quaternion> right) {
+        GenericStore<Quaternion> retVal = GenericStore.H256.make(left.getRowDim(), right.getColDim());
+        for (int j = 0; j < right.getColDim(); j++) {
+            for (int i = 0; i < left.getRowDim(); i++) {
+                Quaternion sum = Quaternion.ZERO;
+                for (int p = 0; p < left.getColDim(); p++) {
+                    sum = sum.add(left.get(i, p).multiply(right.get(p, j)));
+                }
+                retVal.set(i, j, sum);
+            }
+        }
+        return retVal;
+    }
+
     public MultiplicationTest() {
         super();
     }
@@ -111,6 +141,61 @@ public class MultiplicationTest extends MatrixStoreTests {
             MatrixStore<Double> actual = random.power(p);
             TestUtils.assertEquals(expected, actual);
             expected = expected.multiply(random);
+        }
+    }
+
+    /**
+     * Quaternion multiplication does not commute: each element of a matrix product must be formed with the
+     * left factor's elements on the left. Plain, transposed and conjugated operands, in all combinations, are
+     * compared to a naive implementation by the quaternion norm of the difference (all four components).
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testQuaternionProducts() {
+
+        String[] names = { "plain", "transposed", "conjugated" };
+
+        int[][] dims = { { 1, 1, 1 }, { 1, 5, 4 }, { 5, 1, 4 }, { 5, 4, 1 }, { 3, 4, 2 }, { 7, 7, 7 }, { 11, 9, 13 }, { 40, 30, 35 } };
+
+        for (int[] mkn : dims) {
+
+            int m = mkn[0];
+            int k = mkn[1];
+            int n = mkn[2];
+
+            Random random = new Random(m + 31 * k + 961 * n);
+            GenericStore<Quaternion> left = MultiplicationTest.makeQuaternions(random, m, k);
+            GenericStore<Quaternion> leftT = MultiplicationTest.makeQuaternions(random, k, m);
+            GenericStore<Quaternion> right = MultiplicationTest.makeQuaternions(random, k, n);
+            GenericStore<Quaternion> rightT = MultiplicationTest.makeQuaternions(random, n, k);
+
+            MatrixStore<Quaternion>[] lefts = new MatrixStore[] { left, leftT.transpose(), leftT.conjugate() };
+            MatrixStore<Quaternion>[] rights = new MatrixStore[] { right, rightT.transpose(), rightT.conjugate() };
+
+            GenericStore<Quaternion> product = GenericStore.H256.make(m, n);
+
+            for (int l = 0; l < lefts.length; l++) {
+                for (int r = 0; r < rights.length; r++) {
+
+                    String message = m + "x" + k + "x" + n + " " + names[l] + " * " + names[r];
+
+                    GenericStore<Quaternion> expected = MultiplicationTest.multiplyNaively(lefts[l], rights[r]);
+                    product.fillByMultiplying(lefts[l], rights[r]);
+
+                    MatrixStore<Quaternion>[] actuals = new MatrixStore[] { lefts[l].multiply(rights[r]), product };
+
+                    for (MatrixStore<Quaternion> actual : actuals) {
+                        TestUtils.assertEquals(message + ", rows", m, actual.countRows());
+                        TestUtils.assertEquals(message + ", columns", n, actual.countColumns());
+                        for (int j = 0; j < n; j++) {
+                            for (int i = 0; i < m; i++) {
+                                double error = expected.get(i, j).subtract(actual.get(i, j)).norm();
+                                TestUtils.assertTrue(message + " at (" + i + "," + j + "): " + error, error <= 1E-12 * k);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 

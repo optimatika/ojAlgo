@@ -22,19 +22,16 @@
 package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.function.constant.PrimitiveMath.MACHINE_SMALLEST;
-import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import java.util.List;
 import java.util.Optional;
 
 import org.ojalgo.RecoverableCondition;
-import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.operation.ApplyLU;
-import org.ojalgo.matrix.operation.DivideAndCopyColumn;
-import org.ojalgo.matrix.operation.PivotStep;
+import org.ojalgo.matrix.operation.GETRF;
+import org.ojalgo.matrix.operation.GETRS;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -45,17 +42,18 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.type.NumberDefinition;
-import org.ojalgo.type.context.NumberContext;
 
 abstract class DenseLU<N extends Comparable<N>, M extends PhysicalStore<N>> extends InPlaceDecomposition<N, M> implements LU<N> {
 
-    static final class C128 extends DenseLU<ComplexNumber, GenericStore<ComplexNumber>> {
+    static final class C128 extends Generic<ComplexNumber> {
 
         C128() {
-            super(GenericStore.C128, DivideAndCopyColumn::invokeGeneric, ApplyLU::invokeGeneric);
+            super(GenericStore.C128);
         }
 
     }
@@ -164,49 +162,225 @@ abstract class DenseLU<N extends Comparable<N>, M extends PhysicalStore<N>> exte
 
     }
 
-    static final class H256 extends DenseLU<Quaternion, GenericStore<Quaternion>> {
+    /**
+     * The factorisation is done by {@link GETRF}. Square systems are solved, and inverted, by {@link GETRS}.
+     */
+    abstract static class Generic<N extends Scalar<N>> extends DenseLU<N, GenericStore<N>> {
+
+        Generic(final GenericStore.Factory<N> factory) {
+            super(factory);
+        }
+
+        @Override
+        public int countSignificant(final double threshold) {
+
+            GenericStore<N> internal = this.getInPlace();
+
+            int significant = 0;
+            for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
+                if (internal.get(ij, ij).norm() > threshold) {
+                    significant++;
+                }
+            }
+
+            return significant;
+        }
+
+        @Override
+        void factorise(final GenericStore<N> inPlace, final int[] ipiv) {
+            int nbRows = this.getRowDim();
+            GETRF.invoke(nbRows, this.getColDim(), inPlace.data, 0, Math.max(1, nbRows), ipiv, 0, this.scalar());
+        }
+
+        @Override
+        void factoriseWithoutPivoting(final GenericStore<N> inPlace) {
+            int nbRows = this.getRowDim();
+            GETRF.invokeWithoutPivoting(nbRows, this.getColDim(), inPlace.data, 0, Math.max(1, nbRows), this.scalar());
+        }
+
+        @Override
+        void substitute(final boolean transpose, final PhysicalStore<N> arg) {
+
+            int dim = this.getRowDim();
+
+            if (this.isSquare() && arg instanceof GenericStore && arg.getRowDim() == dim) {
+                GenericStore<N> rhs = (GenericStore<N>) arg;
+                GETRS.invoke(transpose, dim, rhs.getColDim(), this.getInPlace().data, 0, Math.max(1, dim), this.getInterchanges(), 0, rhs.data, 0,
+                        Math.max(1, dim), this.scalar());
+            } else {
+                super.substitute(transpose, arg);
+            }
+        }
+
+        @Override
+        void substituteColumns(final PhysicalStore<N> rhs) {
+
+            int dim = this.getRowDim();
+
+            if (this.isSquare() && rhs instanceof GenericStore && rhs.getRowDim() == dim) {
+                GenericStore<N> columns = (GenericStore<N>) rhs;
+                GETRS.invoke(false, dim, columns.getColDim(), this.getInPlace().data, 0, Math.max(1, dim), this.getInterchanges(), 0, columns.data, 0,
+                        Math.max(1, dim), this.scalar());
+            } else {
+                super.substituteColumns(rhs);
+            }
+        }
+
+        @Override
+        void substituteIdentity(final PhysicalStore<N> preallocated) {
+
+            int dim = this.getRowDim();
+
+            if (this.isSquare() && preallocated instanceof GenericStore && preallocated.getRowDim() == dim && preallocated.getColDim() == dim) {
+                GenericStore<N> inverse = (GenericStore<N>) preallocated;
+                GETRS.invokeIdentity(dim, this.getInPlace().data, 0, Math.max(1, dim), this.getInterchanges(), 0, inverse.data, 0, Math.max(1, dim),
+                        this.scalar());
+            } else {
+                super.substituteIdentity(preallocated);
+            }
+        }
+
+        @Override
+        boolean update(final Pivot rowOrder, final Pivot colOrder, final int columnIndex,
+                final Access1D.Collectable<N, ? super TransformableRegion<N>> column) {
+            return FletcherMatthews.update(rowOrder, this.getInPlace(), colOrder, columnIndex, column, this.getWorkerColumn(this.getRowDim()), this.scalar());
+        }
+
+    }
+
+    static final class H256 extends Generic<Quaternion> {
 
         H256() {
-            super(GenericStore.H256, DivideAndCopyColumn::invokeGeneric, ApplyLU::invokeGeneric);
+            super(GenericStore.H256);
         }
 
     }
 
-    static final class Q128 extends DenseLU<RationalNumber, GenericStore<RationalNumber>> {
+    static final class Q128 extends Generic<RationalNumber> {
 
         Q128() {
-            super(GenericStore.Q128, DivideAndCopyColumn::invokeGeneric, ApplyLU::invokeGeneric);
+            super(GenericStore.Q128);
         }
 
     }
 
+    /**
+     * The factorisation is done by {@link GETRF}. Square systems are solved, and inverted, by {@link GETRS}.
+     */
     static final class R064 extends DenseLU<Double, R064Store> {
 
         R064() {
-            super(R064Store.FACTORY, DivideAndCopyColumn::invokeR064, ApplyLU::invokeR064);
+            super(R064Store.FACTORY);
+        }
+
+        @Override
+        public int countSignificant(final double threshold) {
+
+            R064Store internal = this.getInPlace();
+
+            int significant = 0;
+            for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
+                if (Math.abs(internal.doubleValue(ij, ij)) > threshold) {
+                    significant++;
+                }
+            }
+
+            return significant;
+        }
+
+        @Override
+        void factorise(final R064Store inPlace, final int[] ipiv) {
+            int nbRows = this.getRowDim();
+            GETRF.invoke(nbRows, this.getColDim(), inPlace.data, 0, Math.max(1, nbRows), ipiv, 0);
+        }
+
+        @Override
+        void factoriseWithoutPivoting(final R064Store inPlace) {
+            int nbRows = this.getRowDim();
+            GETRF.invokeWithoutPivoting(nbRows, this.getColDim(), inPlace.data, 0, Math.max(1, nbRows));
+        }
+
+        @Override
+        void substitute(final boolean transpose, final double[] arg) {
+
+            int dim = this.getRowDim();
+
+            if (this.isSquare() && arg.length == dim) {
+                GETRS.invoke(transpose, dim, 1, this.getInPlace().data, 0, Math.max(1, dim), this.getInterchanges(), 0, arg, 0, Math.max(1, dim));
+            } else {
+                super.substitute(transpose, arg);
+            }
+        }
+
+        @Override
+        void substitute(final boolean transpose, final PhysicalStore<Double> arg) {
+
+            int dim = this.getRowDim();
+
+            if (this.isSquare() && arg instanceof R064Store && arg.getRowDim() == dim) {
+                R064Store rhs = (R064Store) arg;
+                GETRS.invoke(transpose, dim, rhs.getColDim(), this.getInPlace().data, 0, Math.max(1, dim), this.getInterchanges(), 0, rhs.data, 0,
+                        Math.max(1, dim));
+            } else {
+                super.substitute(transpose, arg);
+            }
+        }
+
+        @Override
+        void substituteColumns(final PhysicalStore<Double> rhs) {
+
+            int dim = this.getRowDim();
+
+            if (this.isSquare() && rhs instanceof R064Store && rhs.getRowDim() == dim) {
+                R064Store columns = (R064Store) rhs;
+                GETRS.invoke(false, dim, columns.getColDim(), this.getInPlace().data, 0, Math.max(1, dim), this.getInterchanges(), 0, columns.data, 0,
+                        Math.max(1, dim));
+            } else {
+                super.substituteColumns(rhs);
+            }
+        }
+
+        @Override
+        void substituteIdentity(final PhysicalStore<Double> preallocated) {
+
+            int dim = this.getRowDim();
+
+            if (this.isSquare() && preallocated instanceof R064Store && preallocated.getRowDim() == dim && preallocated.getColDim() == dim) {
+                R064Store inverse = (R064Store) preallocated;
+                GETRS.invokeIdentity(dim, this.getInPlace().data, 0, Math.max(1, dim), this.getInterchanges(), 0, inverse.data, 0, Math.max(1, dim));
+            } else {
+                super.substituteIdentity(preallocated);
+            }
+        }
+
+        @Override
+        boolean update(final Pivot rowOrder, final Pivot colOrder, final int columnIndex,
+                final Access1D.Collectable<Double, ? super TransformableRegion<Double>> column) {
+            return FletcherMatthews.update(rowOrder, this.getInPlace(), colOrder, columnIndex, column, this.getWorkerColumn(this.getRowDim()));
         }
 
     }
 
-    static final class R128 extends DenseLU<Quadruple, GenericStore<Quadruple>> {
+    static final class R128 extends Generic<Quadruple> {
 
         R128() {
-            super(GenericStore.R128, DivideAndCopyColumn::invokeGeneric, ApplyLU::invokeGeneric);
+            super(GenericStore.R128);
         }
 
     }
 
-    private final PivotStep<N, M> myApplyLU;
     private Pivot myColPivot = null;
-    private final PivotStep<N, M> myDivideAndCopyColumn;
+    /**
+     * The row interchanges, as {@link GETRS} takes them: as returned by {@link GETRF}, or derived from the
+     * pivot order.
+     */
+    private transient int[] myInterchanges = null;
     private final Pivot myPivot = new Pivot();
     private transient PhysicalStore<N> myWorkerColumn = null;
     private transient PhysicalStore<N> myWorkerRow = null;
 
-    protected DenseLU(final PhysicalStore.Factory<N, ? extends M> factory, final PivotStep<N, M> divideAndCopyColumn, final PivotStep<N, M> applyLU) {
+    protected DenseLU(final PhysicalStore.Factory<N, ? extends M> factory) {
         super(factory);
-        myDivideAndCopyColumn = divideAndCopyColumn;
-        myApplyLU = applyLU;
     }
 
     @Override
@@ -216,13 +390,7 @@ abstract class DenseLU<N extends Comparable<N>, M extends PhysicalStore<N>> exte
             myColPivot.applyPivotOrder(arg);
         }
 
-        PhysicalStore<N> body = this.getInPlace();
-
-        body.substituteForwards(true, false, arg);
-
-        body.substituteBackwards(true, true, arg);
-
-        myPivot.applyReverseOrder(arg);
+        this.substitute(true, arg);
     }
 
     @Override
@@ -232,34 +400,13 @@ abstract class DenseLU<N extends Comparable<N>, M extends PhysicalStore<N>> exte
             myColPivot.applyPivotOrder(arg);
         }
 
-        PhysicalStore<N> body = this.getInPlace();
-
-        body.substituteForwards(true, false, arg);
-
-        body.substituteBackwards(true, true, arg);
-
-        myPivot.applyReverseOrder(arg);
+        this.substitute(true, arg);
     }
 
     @Override
     public N calculateDeterminant(final Access2D<?> matrix) {
         this.decompose(this.wrap(matrix));
         return this.getDeterminant();
-    }
-
-    @Override
-    public int countSignificant(final double threshold) {
-
-        PhysicalStore<N> internal = this.getInPlace();
-
-        int significant = 0;
-        for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
-            if (Math.abs(internal.doubleValue(ij, ij)) > threshold) {
-                significant++;
-            }
-        }
-
-        return significant;
     }
 
     @Override
@@ -275,13 +422,7 @@ abstract class DenseLU<N extends Comparable<N>, M extends PhysicalStore<N>> exte
     @Override
     public void ftran(final double[] arg) {
 
-        myPivot.applyPivotOrder(arg);
-
-        PhysicalStore<N> body = this.getInPlace();
-
-        body.substituteForwards(false, true, arg);
-
-        body.substituteBackwards(false, false, arg);
+        this.substitute(false, arg);
 
         if (myColPivot != null) {
             myColPivot.applyReverseOrder(arg);
@@ -291,13 +432,7 @@ abstract class DenseLU<N extends Comparable<N>, M extends PhysicalStore<N>> exte
     @Override
     public void ftran(final PhysicalStore<N> arg) {
 
-        myPivot.applyPivotOrder(arg);
-
-        PhysicalStore<N> body = this.getInPlace();
-
-        body.substituteForwards(false, true, arg);
-
-        body.substituteBackwards(false, false, arg);
+        this.substitute(false, arg);
 
         if (myColPivot != null) {
             myColPivot.applyReverseOrder(arg);
@@ -334,20 +469,7 @@ abstract class DenseLU<N extends Comparable<N>, M extends PhysicalStore<N>> exte
     @Override
     public MatrixStore<N> getInverse(final PhysicalStore<N> preallocated) {
 
-        if (myPivot.isModified()) {
-            preallocated.fillAll(this.scalar().zero().get());
-            int[] pivotOrder = myPivot.getOrder();
-            int numbRows = this.getRowDim();
-            for (int i = 0; i < numbRows; i++) {
-                preallocated.set(i, pivotOrder[i], PrimitiveMath.ONE);
-            }
-        }
-
-        PhysicalStore<N> body = this.getInPlace();
-
-        preallocated.substituteForwards(body, true, false, !myPivot.isModified());
-
-        preallocated.substituteBackwards(body, false, false, false);
+        this.substituteIdentity(preallocated);
 
         if (myColPivot != null) {
             this.applyReverseOrder(myColPivot, preallocated);
@@ -401,13 +523,7 @@ abstract class DenseLU<N extends Comparable<N>, M extends PhysicalStore<N>> exte
 
         rhs.supplyTo(preallocated);
 
-        this.applyPivotOrder(myPivot, preallocated);
-
-        PhysicalStore<N> body = this.getInPlace();
-
-        preallocated.substituteForwards(body, true, false, false);
-
-        preallocated.substituteBackwards(body, false, false, false);
+        this.substituteColumns(preallocated);
 
         if (myColPivot != null) {
             this.applyReverseOrder(myColPivot, preallocated);
@@ -473,14 +589,16 @@ abstract class DenseLU<N extends Comparable<N>, M extends PhysicalStore<N>> exte
     }
 
     @Override
-    public boolean updateColumn(final int columnIndex, final org.ojalgo.structure.Access1D.Collectable<N, ? super TransformableRegion<N>> newColumn) {
+    public boolean updateColumn(final int columnIndex, final Access1D.Collectable<N, ? super TransformableRegion<N>> newColumn) {
+
+        myInterchanges = null;
 
         if (myColPivot == null) {
             myColPivot = new Pivot();
             myColPivot.reset(this.getColDim());
         }
 
-        return FletcherMatthews.update(myPivot, this.getInPlace(), myColPivot, columnIndex, newColumn, this.getWorkerColumn(this.getRowDim()));
+        return this.update(myPivot, myColPivot, columnIndex, newColumn);
     }
 
     private boolean doDecompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean pivoting) {
@@ -489,45 +607,25 @@ abstract class DenseLU<N extends Comparable<N>, M extends PhysicalStore<N>> exte
 
         M tmpInPlace = this.setInPlace(matrix);
 
-        int tmpRowDim = this.getRowDim();
-        this.getColDim();
-        int tmpMinDim = this.getMinDim();
+        myPivot.reset(this.getRowDim());
 
-        myPivot.reset(tmpRowDim);
+        if (pivoting) {
 
-        BasicArray<N> tmpMultipliers = this.makeArray(tmpRowDim);
+            int[] ipiv = new int[this.getMinDim()];
 
-        // Main loop - along the diagonal
-        for (int ij = 0; ij < tmpMinDim; ij++) {
+            this.factorise(tmpInPlace, ipiv);
 
-            if (pivoting) {
-                // Find next pivot row
-                int tmpPivotRow = tmpInPlace.indexOfLargestInColumn(ij, ij);
-
-                // Pivot?
-                if (tmpPivotRow != ij) {
-                    tmpInPlace.exchangeRows(tmpPivotRow, ij);
-                    myPivot.change(tmpPivotRow, ij);
-                }
+            for (int i = 0; i < ipiv.length; i++) {
+                myPivot.change(ipiv[i] - 1, i);
             }
 
-            // Do the calculations...
-            // if (!tmpInPlace.isZero(ij, ij)) {
-            // if (tmpInPlace.doubleValue(ij, ij) != PrimitiveMath.ZERO) {
-            if (NumberContext.compare(tmpInPlace.doubleValue(ij, ij), PrimitiveMath.ZERO) != 0) {
+            myInterchanges = ipiv;
 
-                // Calculate multipliers and copy to local column
-                // Current column, below the diagonal
-                myDivideAndCopyColumn.invoke(tmpInPlace, ij, tmpMultipliers);
+        } else {
 
-                // Apply transformations to everything below and to the right of the pivot element
-                myApplyLU.invoke(tmpInPlace, ij, tmpMultipliers);
+            this.factoriseWithoutPivoting(tmpInPlace);
 
-            } else {
-
-                tmpInPlace.set(ij, ij, ZERO);
-            }
-
+            myInterchanges = null;
         }
 
         return this.computed(true);
@@ -537,6 +635,17 @@ abstract class DenseLU<N extends Comparable<N>, M extends PhysicalStore<N>> exte
     protected boolean checkSolvability() {
         return this.isSquare() && this.isFullRank();
     }
+
+    /**
+     * Factorises the in-place matrix, [A]=[P][L][U], returning [P] as row interchanges, as {@link GETRF}
+     * does.
+     */
+    abstract void factorise(M inPlace, int[] ipiv);
+
+    /**
+     * Factorises the in-place matrix, [A]=[L][U], without pivoting.
+     */
+    abstract void factoriseWithoutPivoting(M inPlace);
 
     /**
      * [A]=[P][L][U][Q]
@@ -571,6 +680,42 @@ abstract class DenseLU<N extends Comparable<N>, M extends PhysicalStore<N>> exte
         return new FactorU<>(this.getInPlace(), myColPivot);
     }
 
+    /**
+     * The pivot order as a sequence of row interchanges: interchanging row i with row ipiv[i] - 1, for i = 0,
+     * 1, ..., puts the rows in the pivot order.
+     */
+    int[] getInterchanges() {
+
+        if (myInterchanges == null) {
+
+            int[] order = this.getPivotOrder();
+            int dim = order.length;
+
+            // The row at each position, and the position of each row, as the interchanges are made
+            int[] rows = new int[dim];
+            int[] positions = new int[dim];
+            for (int i = 0; i < dim; i++) {
+                rows[i] = i;
+                positions[i] = i;
+            }
+
+            int[] interchanges = new int[dim];
+            for (int i = 0; i < dim; i++) {
+                int other = positions[order[i]];
+                interchanges[i] = other + 1;
+                int displaced = rows[i];
+                rows[other] = displaced;
+                positions[displaced] = other;
+                rows[i] = order[i];
+                positions[order[i]] = i;
+            }
+
+            myInterchanges = interchanges;
+        }
+
+        return myInterchanges;
+    }
+
     int[] getReducedPivots() {
 
         int[] retVal = new int[this.getRank()];
@@ -601,5 +746,85 @@ abstract class DenseLU<N extends Comparable<N>, M extends PhysicalStore<N>> exte
         }
         return myWorkerRow;
     }
+
+    /**
+     * Solves [P][L][U][x]=[b], or ([P][L][U])<sup>T</sup>[x]=[b] when transposed, in place – ftran and btran
+     * without the column pivot.
+     */
+    void substitute(final boolean transpose, final double[] arg) {
+
+        M body = this.getInPlace();
+
+        if (transpose) {
+            body.substituteForwards(true, false, arg);
+            body.substituteBackwards(true, true, arg);
+            myPivot.applyReverseOrder(arg);
+        } else {
+            myPivot.applyPivotOrder(arg);
+            body.substituteForwards(false, true, arg);
+            body.substituteBackwards(false, false, arg);
+        }
+    }
+
+    /**
+     * @see #substitute(boolean, double[])
+     */
+    void substitute(final boolean transpose, final PhysicalStore<N> arg) {
+
+        M body = this.getInPlace();
+
+        if (transpose) {
+            body.substituteForwards(true, false, arg);
+            body.substituteBackwards(true, true, arg);
+            myPivot.applyReverseOrder(arg);
+        } else {
+            myPivot.applyPivotOrder(arg);
+            body.substituteForwards(false, true, arg);
+            body.substituteBackwards(false, false, arg);
+        }
+    }
+
+    /**
+     * Solves [P][L][U][X]=[B] in place, for all columns of [B].
+     */
+    void substituteColumns(final PhysicalStore<N> rhs) {
+
+        this.applyPivotOrder(myPivot, rhs);
+
+        M body = this.getInPlace();
+
+        rhs.substituteForwards(body, true, false, false);
+
+        rhs.substituteBackwards(body, false, false, false);
+    }
+
+    /**
+     * Solves [P][L][U][X]=[I], writing the inverse of [P][L][U] to preallocated.
+     */
+    void substituteIdentity(final PhysicalStore<N> preallocated) {
+
+        if (myPivot.isModified()) {
+            preallocated.fillAll(this.scalar().zero().get());
+            int[] pivotOrder = myPivot.getOrder();
+            int numbRows = this.getRowDim();
+            for (int i = 0; i < numbRows; i++) {
+                preallocated.set(i, pivotOrder[i], PrimitiveMath.ONE);
+            }
+        }
+
+        M body = this.getInPlace();
+
+        preallocated.substituteForwards(body, true, false, !myPivot.isModified());
+
+        preallocated.substituteBackwards(body, false, false, false);
+    }
+
+    /**
+     * Updates [P][L][U][Q], in place, when the column at columnIndex of the decomposed matrix is replaced –
+     * by {@link FletcherMatthews}.
+     *
+     * @return false if the updated matrix is singular, or the update numerically unstable
+     */
+    abstract boolean update(Pivot rowOrder, Pivot colOrder, int columnIndex, Access1D.Collectable<N, ? super TransformableRegion<N>> column);
 
 }

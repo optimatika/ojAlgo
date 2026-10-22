@@ -597,10 +597,10 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
         } else {
 
-            Scalar<N> sclr = this.physical().scalar().convert(scalar);
+            BinaryFunction<N> multiply = this.physical().function().multiply();
 
             for (ElementView2D<N, ?> nonzero : this.nonzeros()) {
-                retVal.set(nonzero.index(), sclr.multiply(nonzero.get()).get());
+                retVal.set(nonzero.index(), multiply.invoke(nonzero.get(), scalar));
             }
         }
 

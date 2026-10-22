@@ -21,23 +21,19 @@
  */
 package org.ojalgo.matrix.operation;
 
-import java.util.function.IntSupplier;
-
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.concurrent.DivideAndConquer.Conquerer;
 import org.ojalgo.concurrent.Parallelism;
-import org.ojalgo.concurrent.ProcessingService;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.Scalar;
 
 public final class HouseholderRight implements MatrixOperation {
 
-    public static IntSupplier PARALLELISM = Parallelism.THREADS;
     public static int THRESHOLD = 256;
 
-    private static final DivideAndConquer.Divider DIVIDER = ProcessingService.INSTANCE.newDivider();
+    private static final DivideAndConquer.Divider DIVIDER = Parallelism.CORES.newDivider();
 
     public static void call(final double[] data, final int structure, final int first, final Householder.Primitive64 householder, final double[] work) {
 
@@ -119,13 +115,13 @@ public final class HouseholderRight implements MatrixOperation {
             tmpScale = scalar.zero();
             tmpIndex = i + hFirst * structure;
             for (int j = hFirst; j < numberOfColumns; j++) {
-                tmpScale = tmpScale.add(hVector[j].conjugate().multiply(data[tmpIndex].conjugate()));
+                tmpScale = tmpScale.add(data[tmpIndex].multiply(hVector[j]));
                 tmpIndex += structure;
             }
             tmpScale = tmpScale.multiply(hBeta);
             tmpIndex = i + hFirst * structure;
             for (int j = hFirst; j < numberOfColumns; j++) {
-                data[tmpIndex] = data[tmpIndex].conjugate().subtract(tmpScale.multiply(hVector[j])).conjugate().get();
+                data[tmpIndex] = data[tmpIndex].subtract(tmpScale.multiply(hVector[j].conjugate())).get();
                 tmpIndex += structure;
             }
         }
@@ -206,7 +202,7 @@ public final class HouseholderRight implements MatrixOperation {
     }
 
     static void divide(final int first, final int limit, final Conquerer conquerer) {
-        DIVIDER.parallelism(PARALLELISM).threshold(THRESHOLD).divide(first, limit, conquerer);
+        DIVIDER.threshold(THRESHOLD).divide(first, limit, conquerer);
     }
 
 }

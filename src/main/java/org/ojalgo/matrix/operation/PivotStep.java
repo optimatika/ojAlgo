@@ -25,8 +25,8 @@ import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.store.PhysicalStore;
 
 /**
- * An in-place step, at a diagonal (pivot) element, of an LU, LDL or Cholesky decomposition. Implemented by
- * {@link ApplyCholesky}, {@link ApplyLDL}, {@link ApplyLU} and {@link DivideAndCopyColumn}.
+ * An in-place step, at a diagonal (pivot) element, of an LDL decomposition. Implemented by {@link ApplyLDL}
+ * and {@link DivideAndCopyColumn}.
  *
  * @author apete
  */

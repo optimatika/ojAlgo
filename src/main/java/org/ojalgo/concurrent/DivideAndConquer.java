@@ -21,6 +21,7 @@
  */
 package org.ojalgo.concurrent;
 
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -29,22 +30,27 @@ import java.util.function.IntSupplier;
 import org.ojalgo.OjAlgoUtils;
 
 /**
- * Divide an index (int) range into smaller parts, and conquer each part in parallel. There are two ways to
- * use this class:
- * <ul>
- * <li>Extend it and implement the {@link #conquer(int, int)} method, and then invoke it with
- * {@link #invoke(int, int, int)}.
- * <li>Use the {@link Divider} to divide a range and provide a {@link Conquerer} that will be called with the
- * range of indices to conquer. You can get a {@link Divider} from {@link ProcessingService#newDivider()} or
- * from {@link Parallelism#newDivider(int)}.
- * </ul>
+ * Divide an index (int) range into smaller parts, and conquer each part in parallel.
+ * <p>
+ * The preferred way to use this is with a {@link Divider}, from {@link Parallelism#newDivider()} or
+ * {@link ProcessingService#newDivider(IntSupplier)}, that calls a {@link Conquerer} with each part. A divider
+ * is typically created once and kept as a static constant. The alternative is to extend this class, implement
+ * {@link #conquer(int, int)} and call {@link #invoke(int, int, int)}.
+ * <p>
+ * A range of count indices is split while count is larger than the threshold and more than one worker is
+ * available. The number of workers is the parallelism, but at most count. Each split divides the w workers
+ * into w/2 and w - w/2, and the range in the same proportion. The first part is submitted to the executor,
+ * the second is conquered by the calling thread, that then waits for the first. Unless the threshold stops
+ * it, a range is divided into as many parts, of (almost) equal size, as there are workers. A
+ * {@link RuntimeException} or {@link Error} thrown by the conquerer is rethrown in the calling thread.
  *
  * @author apete
  */
 public abstract class DivideAndConquer {
 
     /**
-     * A conquerer is a function that will be called with a range of indices to conquer.
+     * Called with each part, a range of indices from first (inclusive) to limit (exclusive). Parts are
+     * disjoint and may be conquered concurrently, by different threads.
      */
     @FunctionalInterface
     public interface Conquerer {
@@ -54,38 +60,55 @@ public abstract class DivideAndConquer {
     }
 
     /**
-     * A configurable divider that can be used to divide a range of indices and conquer each part in parallel.
-     * You can configure the divider with a maximum parallelism level and a threshold for the size of the
-     * parts to conquer.
+     * Divides a range of indices and conquers the parts in parallel. The parallelism, the maximum number of
+     * parts, is fixed when the divider is created. The threshold, the number of indices above which a range
+     * is split, is set with {@link #threshold(int)}, typically before each call to
+     * {@link #divide(int, int, Conquerer)}.
+     * <p>
+     * A divider may be shared between threads. The threshold is not synchronised: when threads set different
+     * thresholds on the same divider, a call may use the threshold set by another thread. That only changes
+     * how the range is split, not which indices are conquered.
      */
     public static final class Divider {
 
         private final ExecutorService myExecutor;
-
-        private IntSupplier myParallelism = Parallelism.THREADS;
-
+        private final IntSupplier myParallelism;
         private int myThreshold = 128;
 
-        Divider(final ExecutorService executor) {
+        Divider(final ExecutorService executor, final IntSupplier parallelism) {
             super();
-            myExecutor = executor;
+            myExecutor = Objects.requireNonNull(executor);
+            myParallelism = Objects.requireNonNull(parallelism);
         }
 
+        /**
+         * Same as {@link #divide(int, int, Conquerer)} with first 0.
+         */
         public void divide(final int limit, final Conquerer conquerer) {
-            this.divide(0, limit, conquerer);
+            DivideAndConquer.call(myExecutor, 0, limit, myThreshold, myParallelism.getAsInt(), Objects.requireNonNull(conquerer));
         }
 
+        /**
+         * Conquers the range from first (inclusive) to limit (exclusive), in parallel parts, and returns when
+         * all parts are done.
+         */
         public void divide(final int first, final int limit, final Conquerer conquerer) {
-            DivideAndConquer.call(myExecutor, first, limit, myThreshold, myParallelism.getAsInt(), conquerer);
+            DivideAndConquer.call(myExecutor, first, limit, myThreshold, myParallelism.getAsInt(), Objects.requireNonNull(conquerer));
         }
 
+        /**
+         * @deprecated v58 Use {@link ProcessingService#newDivider(IntSupplier)} instead. This method no
+         *             longer does anything!
+         */
+        @Deprecated
         public Divider parallelism(final IntSupplier parallelism) {
-            if (parallelism != null) {
-                myParallelism = parallelism;
-            }
             return this;
         }
 
+        /**
+         * @param threshold A range is split only when it has more indices than this. The default is 128.
+         * @return This divider
+         */
         public Divider threshold(final int threshold) {
             myThreshold = threshold;
             return this;
@@ -97,16 +120,18 @@ public abstract class DivideAndConquer {
             final DivideAndConquer.Conquerer conquerer) {
 
         int count = limit - first;
+        int available = Math.min(workers, count);
 
-        if (count > threshold && workers > 1) {
+        if (count > threshold && available > 1) {
 
-            int split = first + count / 2;
-            int nextWorkers = workers / 2;
+            int firstWorkers = available / 2;
+            int lastWorkers = available - firstWorkers;
+            int split = first + (int) ((long) count * firstWorkers / available);
 
-            Future<?> firstPart = executor.submit(() -> DivideAndConquer.call(executor, first, split, threshold, nextWorkers, conquerer));
+            Future<?> firstPart = executor.submit(() -> DivideAndConquer.call(executor, first, split, threshold, firstWorkers, conquerer));
 
             try {
-                DivideAndConquer.call(executor, split, limit, threshold, nextWorkers, conquerer);
+                DivideAndConquer.call(executor, split, limit, threshold, lastWorkers, conquerer);
             } catch (RuntimeException | Error t) {
                 firstPart.cancel(true);
                 throw t;
@@ -134,25 +159,28 @@ public abstract class DivideAndConquer {
         }
     }
 
-    public DivideAndConquer() {
+    protected DivideAndConquer() {
         super();
     }
 
     /**
-     * Synchronous execution - wait until it's finished.
+     * Conquers the range from first (inclusive) to limit (exclusive), in parallel parts, and returns when all
+     * parts are done. The parallelism is {@link Parallelism#THREADS}.
      *
-     * @param first The first index, in a range, to include.
-     * @param limit The first index NOT to include - last (excl.) index in a range.
+     * @param first     The first index to include
+     * @param limit     The first index not to include
+     * @param threshold A range is split only when it has more indices than this
      */
     public final void invoke(final int first, final int limit, final int threshold) {
 
-        // int availableWorkers = OjAlgoUtils.ENVIRONMENT.threads -
-        // DaemonPoolExecutor.INSTANCE.getActiveCount() / 2;
         int availableWorkers = OjAlgoUtils.ENVIRONMENT.threads;
 
         DivideAndConquer.call(DaemonPoolExecutor.INSTANCE, first, limit, threshold, availableWorkers, this::conquer);
     }
 
+    /**
+     * @see Conquerer#conquer(int, int)
+     */
     protected abstract void conquer(final int first, final int limit);
 
 }

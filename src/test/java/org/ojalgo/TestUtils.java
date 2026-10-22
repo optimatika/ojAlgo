@@ -313,11 +313,11 @@ public abstract class TestUtils {
             double expNorm = 0.0;
             for (long i = 0L; i < expected.count(); i++) {
 
-                double act = actual.doubleValue(i);
-                double exp = expected.doubleValue(i);
+                Quaternion act = Quaternion.valueOf(actual.get(i));
+                Quaternion exp = Quaternion.valueOf(expected.get(i));
 
-                diffNorm = MissingMath.hypot(diffNorm, act - exp);
-                expNorm = MissingMath.hypot(expNorm, exp);
+                diffNorm = MissingMath.hypot(diffNorm, act.subtract(exp).norm());
+                expNorm = MissingMath.hypot(expNorm, exp.norm());
             }
 
             TestUtils.assertTrue(message + ", large norm differences " + diffNorm + " !<< " + expNorm, Access1D.equals(expected, actual, context));

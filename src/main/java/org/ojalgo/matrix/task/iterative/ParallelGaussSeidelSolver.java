@@ -29,7 +29,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.concurrent.DivideAndConquer.Conquerer;
 import org.ojalgo.concurrent.Parallelism;
-import org.ojalgo.concurrent.ProcessingService;
 import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.type.context.NumberContext;
@@ -56,7 +55,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class ParallelGaussSeidelSolver extends IterativeSolverTask {
 
-    private static final DivideAndConquer.Divider DIVIDER = ProcessingService.INSTANCE.newDivider().parallelism(Parallelism.CORES).threshold(128);
+    private static final DivideAndConquer.Divider DIVIDER = Parallelism.CORES.newDivider().threshold(128);
 
     private static void divide(final int nbEquations, final Conquerer conquerer) {
         DIVIDER.divide(0, nbEquations, conquerer);

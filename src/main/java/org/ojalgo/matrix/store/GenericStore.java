@@ -34,16 +34,12 @@ import org.ojalgo.array.ScalarArray;
 import org.ojalgo.array.operation.FillMatchingDual;
 import org.ojalgo.array.operation.FillMatchingSingle;
 import org.ojalgo.array.operation.ModifyAll;
-import org.ojalgo.array.operation.OperationBinary;
-import org.ojalgo.array.operation.OperationUnary;
-import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.operation.*;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
@@ -89,26 +85,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
             GenericStore<N> retVal = this.make(source.getColDim(), source.getRowDim());
 
-            int tmpRowDim = retVal.getRowDim();
-            int tmpColDim = retVal.getColDim();
-
-            if (tmpColDim > FillMatchingSingle.THRESHOLD) {
-
-                DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                    @Override
-                    public void conquer(final int aFirst, final int aLimit) {
-                        FillMatchingSingle.conjugate(retVal.data, tmpRowDim, aFirst, aLimit, source, Factory.this.scalar());
-                    }
-
-                };
-
-                tmpConquerer.invoke(0, tmpColDim, FillMatchingSingle.THRESHOLD);
-
-            } else {
-
-                FillMatchingSingle.conjugate(retVal.data, tmpRowDim, 0, tmpColDim, source, Factory.this.scalar());
-            }
+            FillMatchingSingle.conjugate(retVal.data, retVal.getRowDim(), source, this.scalar());
 
             return retVal;
         }
@@ -121,23 +98,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
             final GenericStore<N> retVal = this.make(tmpRowDim, tmpColDim);
 
-            if (tmpColDim > FillMatchingSingle.THRESHOLD) {
-
-                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                    @Override
-                    public void conquer(final int aFirst, final int aLimit) {
-                        FillMatchingSingle.copy(retVal.data, tmpRowDim, aFirst, aLimit, source, Factory.this.scalar());
-                    }
-
-                };
-
-                tmpConquerer.invoke(0, tmpColDim, FillMatchingSingle.THRESHOLD);
-
-            } else {
-
-                FillMatchingSingle.copy(retVal.data, tmpRowDim, 0, tmpColDim, source, Factory.this.scalar());
-            }
+            FillMatchingSingle.copy(retVal.data, tmpRowDim, source, this.scalar());
 
             return retVal;
         }
@@ -185,26 +146,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
             GenericStore<N> retVal = this.make(source.getColDim(), source.getRowDim());
 
-            int tmpRowDim = retVal.getRowDim();
-            int tmpColDim = retVal.getColDim();
-
-            if (tmpColDim > FillMatchingSingle.THRESHOLD) {
-
-                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                    @Override
-                    public void conquer(final int aFirst, final int aLimit) {
-                        FillMatchingSingle.transpose(retVal.data, tmpRowDim, aFirst, aLimit, source, Factory.this.scalar());
-                    }
-
-                };
-
-                tmpConquerer.invoke(0, tmpColDim, FillMatchingSingle.THRESHOLD);
-
-            } else {
-
-                FillMatchingSingle.transpose(retVal.data, tmpRowDim, 0, tmpColDim, source, Factory.this.scalar());
-            }
+            FillMatchingSingle.transpose(retVal.data, retVal.getRowDim(), source, this.scalar());
 
             return retVal;
         }
@@ -398,44 +340,12 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         if (values instanceof ConjugatedStore) {
             final TransjugatedStore<?> conjugated = (ConjugatedStore<?>) values;
 
-            if (myColDim > FillMatchingSingle.THRESHOLD) {
-
-                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                    @Override
-                    public void conquer(final int first, final int limit) {
-                        FillMatchingSingle.conjugate(data, myRowDim, first, limit, conjugated.getOriginal(), myFactory.scalar());
-                    }
-
-                };
-
-                tmpConquerer.invoke(0, myColDim, FillMatchingSingle.THRESHOLD);
-
-            } else {
-
-                FillMatchingSingle.conjugate(data, myRowDim, 0, myColDim, conjugated.getOriginal(), myFactory.scalar());
-            }
+            FillMatchingSingle.conjugate(data, myRowDim, conjugated.getOriginal(), myFactory.scalar());
 
         } else if (values instanceof TransposedStore) {
             final TransjugatedStore<?> transposed = (TransposedStore<?>) values;
 
-            if (myColDim > FillMatchingSingle.THRESHOLD) {
-
-                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                    @Override
-                    public void conquer(final int first, final int limit) {
-                        FillMatchingSingle.transpose(data, myRowDim, first, limit, transposed.getOriginal(), myFactory.scalar());
-                    }
-
-                };
-
-                tmpConquerer.invoke(0, myColDim, FillMatchingSingle.THRESHOLD);
-
-            } else {
-
-                FillMatchingSingle.transpose(data, myRowDim, 0, myColDim, transposed.getOriginal(), myFactory.scalar());
-            }
+            FillMatchingSingle.transpose(data, myRowDim, transposed.getOriginal(), myFactory.scalar());
 
         } else {
 
@@ -445,50 +355,12 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
     @Override
     public void fillMatching(final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
-
-        int matchingCount = MissingMath.toMinIntExact(this.count(), left.count(), right.count());
-
-        if (myColDim > FillMatchingDual.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                protected void conquer(final int first, final int limit) {
-                    OperationBinary.invoke(data, first, limit, 1, left, function, right);
-                }
-
-            };
-
-            tmpConquerer.invoke(0, matchingCount, FillMatchingDual.THRESHOLD * FillMatchingDual.THRESHOLD);
-
-        } else {
-
-            OperationBinary.invoke(data, 0, matchingCount, 1, left, function, right);
-        }
+        FillMatchingDual.fillMatching(data, myRowDim, left, function, right);
     }
 
     @Override
     public void fillMatching(final UnaryFunction<N> function, final Access1D<N> arguments) {
-
-        int matchingCount = MissingMath.toMinIntExact(this.count(), arguments.count());
-
-        if (myColDim > FillMatchingSingle.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                protected void conquer(final int first, final int limit) {
-                    OperationUnary.invoke(data, first, limit, 1, arguments, function);
-                }
-
-            };
-
-            tmpConquerer.invoke(0, matchingCount, FillMatchingSingle.THRESHOLD * FillMatchingSingle.THRESHOLD);
-
-        } else {
-
-            OperationUnary.invoke(data, 0, matchingCount, 1, arguments, function);
-        }
+        FillMatchingSingle.fillMatching(data, myRowDim, function, arguments);
     }
 
     @Override
@@ -547,27 +419,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
     @Override
     public void modifyAll(final UnaryFunction<N> modifier) {
-
-        final int numberOfRows = myRowDim;
-        final int numberOfCols = myColDim;
-
-        if (numberOfCols > ModifyAll.THRESHOLD) {
-
-            final DivideAndConquer conquerer = new DivideAndConquer() {
-
-                @Override
-                public void conquer(final int aFirst, final int aLimit) {
-                    GenericStore.this.modify(numberOfRows * aFirst, numberOfRows * aLimit, 1, modifier);
-                }
-
-            };
-
-            conquerer.invoke(0, numberOfCols, ModifyAll.THRESHOLD);
-
-        } else {
-
-            this.modify(0, numberOfRows * numberOfCols, 1, modifier);
-        }
+        ModifyAll.modifyAll(data, myRowDim, modifier);
     }
 
     @Override
@@ -700,28 +552,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
     @Override
     public void substituteBackwards(final Access2D<N> body, final boolean unitDiagonal, final boolean conjugated, final boolean hermitian) {
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        if (tmpColDim > SubstituteBackwards.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                public void conquer(final int aFirst, final int aLimit) {
-                    SubstituteBackwards.invoke(GenericStore.this.data, tmpRowDim, aFirst, aLimit, body, unitDiagonal, conjugated, hermitian,
-                            myFactory.scalar());
-                }
-
-            };
-
-            tmpConquerer.invoke(0, tmpColDim, SubstituteBackwards.THRESHOLD);
-
-        } else {
-
-            SubstituteBackwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, hermitian, myFactory.scalar());
-        }
+        SubstituteBackwards.invoke(data, myRowDim, body, unitDiagonal, conjugated, hermitian, myFactory.scalar());
     }
 
     @Override
@@ -751,27 +582,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
     @Override
     public void substituteForwards(final Access2D<N> body, final boolean unitDiagonal, final boolean conjugated, final boolean identity) {
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        if (tmpColDim > SubstituteForwards.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                public void conquer(final int aFirst, final int aLimit) {
-                    SubstituteForwards.invoke(GenericStore.this.data, tmpRowDim, aFirst, aLimit, body, unitDiagonal, conjugated, identity, myFactory.scalar());
-                }
-
-            };
-
-            tmpConquerer.invoke(0, tmpColDim, SubstituteForwards.THRESHOLD);
-
-        } else {
-
-            SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, identity, myFactory.scalar());
-        }
+        SubstituteForwards.invoke(data, myRowDim, body, unitDiagonal, conjugated, identity, myFactory.scalar());
     }
 
     @Override

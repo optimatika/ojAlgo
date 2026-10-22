@@ -147,11 +147,11 @@ public final class ProcessingService {
     }
 
     /**
-     * @deprecated v56 Use {@link #newDivider()} or {@link Parallelism#newDivider(int)} instead
+     * @deprecated v56 Use {@link #newDivider(IntSupplier)} or {@link Parallelism#newDivider()} instead
      */
     @Deprecated
     public DivideAndConquer.Divider divider() {
-        return this.newDivider();
+        return this.newDivider(Parallelism.THREADS);
     }
 
     /**
@@ -194,8 +194,21 @@ public final class ProcessingService {
         return this.map(work, parallelism.getAsInt(), mapper);
     }
 
+    /**
+     * @deprecated v58 Use {@link #newDivider(IntSupplier)} instead.
+     */
+    @Deprecated
     public DivideAndConquer.Divider newDivider() {
-        return new DivideAndConquer.Divider(myExecutor);
+        return this.newDivider(Parallelism.THREADS);
+    }
+
+    /**
+     * @param parallelism The maximum number of parts a range is divided into, evaluated at each call to
+     *                    {@link DivideAndConquer.Divider#divide(int, int, DivideAndConquer.Conquerer)}
+     * @return A new divider that submits its parts to this service's executor
+     */
+    public DivideAndConquer.Divider newDivider(final IntSupplier parallelism) {
+        return new DivideAndConquer.Divider(myExecutor, parallelism);
     }
 
     /**

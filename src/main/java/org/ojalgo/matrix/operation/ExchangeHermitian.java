@@ -56,6 +56,10 @@ public abstract class ExchangeHermitian implements MatrixOperation {
             matrix.set(indexMax, ij, tmpVal.conjugate().get());
         }
 
+        if (indexMin != indexMax) {
+            matrix.set(indexMax, indexMin, matrix.get(indexMax, indexMin).conjugate().get());
+        }
+
         for (int i = indexMax + 1, limit = matrix.getRowDim(); i < limit; i++) {
             tmpVal = matrix.get(i, indexMin);
             matrix.set(i, indexMin, matrix.get(i, indexMax));

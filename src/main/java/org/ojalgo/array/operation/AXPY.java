@@ -34,7 +34,34 @@ import org.ojalgo.structure.Mutate1D;
  *
  * @author apete
  */
-public abstract class AXPY implements ArrayOperation {
+public abstract class AXPY implements BLAS1 {
+
+    /**
+     * The pure Java implementation.
+     */
+    public static final class JVM {
+
+        /**
+         * The pure Java implementation of
+         * {@link AXPY#invoke(int, double, double[], int, int, double[], int, int)}, for {@code n >= 0}.
+         */
+        public static void invoke(final int n, final double alpha, final double[] x, final int offsetX, final int incX, final double[] y, final int offsetY,
+                final int incY) {
+
+            if (incX == 1 && incY == 1) {
+                for (int i = 0; i < n; i++) {
+                    y[offsetY + i] += alpha * x[offsetX + i];
+                }
+            } else {
+                int ix = incX < 0 ? offsetX - (n - 1) * incX : offsetX;
+                int iy = incY < 0 ? offsetY - (n - 1) * incY : offsetY;
+                for (int i = 0; i < n; i++, ix += incX, iy += incY) {
+                    y[iy] += alpha * x[ix];
+                }
+            }
+        }
+
+    }
 
     public static void invoke(final BigDecimal[] y, final int basey, final BigDecimal a, final BigDecimal[] x, final int basex, final int first,
             final int limit) {
@@ -69,6 +96,20 @@ public abstract class AXPY implements ArrayOperation {
         }
     }
 
+    /**
+     * BLAS {@code daxpy}: y := alpha*x + y for the {@code n} elements of x and y, stored from {@code offsetX}
+     * and {@code offsetY} with increments {@code incX} and {@code incY}. As in BLAS, a negative increment
+     * walks the vector backwards, and the offset is still the lowest index accessed. Nothing is done when n
+     * is not positive or alpha is 0.
+     */
+    public static void invoke(final int n, final double alpha, final double[] x, final int offsetX, final int incX, final double[] y, final int offsetY,
+            final int incY) {
+        if (n <= 0 || alpha == 0.0) {
+            return;
+        }
+        JVM.invoke(n, alpha, x, offsetX, incX, y, offsetY, incY);
+    }
+
     public static void invoke(final Mutate1D.Modifiable<?> y, final double a, final BigDecimal[] x) {
         BigDecimal tmpA = new BigDecimal(a);
         for (int i = 0; i < x.length; i++) {
@@ -94,9 +135,12 @@ public abstract class AXPY implements ArrayOperation {
         }
     }
 
+    /**
+     * y := x*a + y, for the elements first to limit (exclusive), with x on the left in each product.
+     */
     public static <N extends Scalar<N>> void invoke(final N[] y, final int basey, final N a, final N[] x, final int basex, final int first, final int limit) {
         for (int i = first; i < limit; i++) {
-            y[basey + i] = y[basey + i].add(a.multiply(x[basex + i])).get();
+            y[basey + i] = y[basey + i].add(x[basex + i].multiply(a)).get();
         }
     }
 

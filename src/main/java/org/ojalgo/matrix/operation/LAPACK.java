@@ -21,19 +21,6 @@
  */
 package org.ojalgo.matrix.operation;
 
-import org.ojalgo.array.BasicArray;
-import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.transformation.Householder;
-
-/**
- * Applies a Householder transformation from both sides to a hermitian matrix, using a worker array of (at
- * least) the same length as the number of rows. Implemented by {@link HouseholderHermitian}.
- *
- * @author apete
- */
-@FunctionalInterface
-public interface HermitianStep<N extends Comparable<N>, M extends PhysicalStore<N>> {
-
-    void invoke(M store, Householder<N> transformation, BasicArray<N> worker);
+interface LAPACK extends MatrixOperation {
 
 }

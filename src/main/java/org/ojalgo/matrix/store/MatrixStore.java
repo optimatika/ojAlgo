@@ -33,6 +33,7 @@ import org.ojalgo.matrix.Matrix2D;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
@@ -361,6 +362,21 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
                 }
             }
 
+        } else if (element instanceof Quaternion) {
+
+            Quaternion lowerLeft;
+            Quaternion upperRight;
+
+            for (int j = 0; retVal && j < numberOfColumns; j++) {
+                retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, Quaternion.valueOf(this.get(j, j)).getVectorLength());
+                for (int i = j + 1; retVal && i < numberOfRows; i++) {
+                    lowerLeft = Quaternion.valueOf(this.get(i, j)).conjugate();
+                    upperRight = Quaternion.valueOf(this.get(j, i));
+                    double magnitude = Math.max(PrimitiveMath.ONE, Math.max(lowerLeft.norm(), upperRight.norm()));
+                    retVal &= PrimitiveScalar.isSmall(magnitude, lowerLeft.subtract(upperRight).norm());
+                }
+            }
+
         } else {
 
             for (int j = 0; retVal && j < numberOfColumns; j++) {
@@ -464,7 +480,7 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
 
         PhysicalStore<N> tmpLeft = this.physical().row(leftAndRight);
         tmpLeft.modifyAll(this.physical().function().conjugate());
-        tmpStep1.fillByMultiplying(tmpLeft.conjugate(), this);
+        tmpStep1.fillByMultiplying(tmpLeft, this);
 
         tmpStep2.fillByMultiplying(tmpStep1, leftAndRight);
 

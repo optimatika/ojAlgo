@@ -24,6 +24,11 @@ package org.ojalgo.array.operation;
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleSupplier;
 
+import org.ojalgo.concurrent.DivideAndConquer;
+import org.ojalgo.concurrent.Parallelism;
+import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.special.MissingMath;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure2D;
 
 public abstract class FillMatchingDual implements ArrayOperation {
@@ -33,6 +38,8 @@ public abstract class FillMatchingDual implements ArrayOperation {
      * benchmark) at size 200. So I cahnged it to 256.
      */
     public static int THRESHOLD = 256;
+
+    private static final DivideAndConquer.Divider DIVIDER = Parallelism.CORES.newDivider();
 
     public static void fillAll(final double[][] target, final double value) {
         int limit = target.length;
@@ -107,6 +114,30 @@ public abstract class FillMatchingDual implements ArrayOperation {
             for (int j = 0; j < tmpInnerLength; j++) {
                 target[i][j] = function.applyAsDouble(left[i][j], right[i][j]);
             }
+        }
+    }
+
+    public static void fillMatching(final double[] data, final int structure, final Access1D<Double> left, final BinaryFunction<Double> function,
+            final Access1D<Double> right) {
+
+        int limit = MissingMath.toMinIntExact(data.length, left.count(), right.count());
+
+        if (structure > 0 && data.length / structure > THRESHOLD) {
+            DIVIDER.threshold(THRESHOLD * THRESHOLD).divide(0, limit, (f, l) -> OperationBinary.invoke(data, f, l, 1, left, function, right));
+        } else {
+            OperationBinary.invoke(data, 0, limit, 1, left, function, right);
+        }
+    }
+
+    public static <N extends Comparable<N>> void fillMatching(final N[] data, final int structure, final Access1D<N> left, final BinaryFunction<N> function,
+            final Access1D<N> right) {
+
+        int limit = MissingMath.toMinIntExact(data.length, left.count(), right.count());
+
+        if (structure > 0 && data.length / structure > THRESHOLD) {
+            DIVIDER.threshold(THRESHOLD * THRESHOLD).divide(0, limit, (f, l) -> OperationBinary.invoke(data, f, l, 1, left, function, right));
+        } else {
+            OperationBinary.invoke(data, 0, limit, 1, left, function, right);
         }
     }
 

@@ -22,14 +22,12 @@
 package org.ojalgo.matrix.operation;
 
 import java.util.Arrays;
-import java.util.function.IntSupplier;
 
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.DOT;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.concurrent.DivideAndConquer.Conquerer;
 import org.ojalgo.concurrent.Parallelism;
-import org.ojalgo.concurrent.ProcessingService;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.scalar.Scalar.Factory;
@@ -59,15 +57,15 @@ public class MultiplyRight implements MatrixOperation {
 
     }
 
-    public static IntSupplier PARALLELISM = Parallelism.THREADS;
-    public static int THRESHOLD = 32;
+    /**
+     * The general case is multi-threaded, splitting the columns of the product, when m*n*k is larger than
+     * this cubed. See {@link MatrixOperation#chunk(int, double)}.
+     */
+    static int THRESHOLD = 44;
 
-    private static final DivideAndConquer.Divider DIVIDER = ProcessingService.INSTANCE.newDivider();
+    private static final DivideAndConquer.Divider DIVIDER = Parallelism.CORES.newDivider();
 
     public static <N extends Scalar<N>> MultiplyRight.Generic<N> newGeneric(final long rows, final long columns) {
-        if (rows > THRESHOLD && columns > THRESHOLD) {
-            return MultiplyRight::fillMxN_MT;
-        }
         if (columns == 1) {
             return MultiplyRight::fillMx1;
         }
@@ -78,9 +76,6 @@ public class MultiplyRight implements MatrixOperation {
     }
 
     public static MultiplyRight.Primitive32 newPrimitive32(final long rows, final long columns) {
-        if (rows > THRESHOLD && columns > THRESHOLD) {
-            return MultiplyRight::fillMxN_MT;
-        }
         if (columns == 1) {
             return MultiplyRight::fillMx1;
         }
@@ -91,9 +86,6 @@ public class MultiplyRight implements MatrixOperation {
     }
 
     public static MultiplyRight.Primitive64 newPrimitive64(final long rows, final long columns) {
-        if (rows > THRESHOLD && columns > THRESHOLD) {
-            return MultiplyRight::fillMxN_MT;
-        }
         if (rows == 5 && columns == 5) {
             return MultiplyRight::fill5x5;
         }
@@ -236,20 +228,8 @@ public class MultiplyRight implements MatrixOperation {
         }
     }
 
-    static void addMxN_MT(final double[] product, final double[] left, final int complexity, final Access1D<?> right) {
-        MultiplyRight.divide(0, Math.toIntExact(right.count() / complexity), (f, l) -> MultiplyRight.addMxC(product, f, l, left, complexity, right));
-    }
-
-    static void addMxN_MT(final float[] product, final float[] left, final int complexity, final Access1D<?> right) {
-        MultiplyRight.divide(0, Math.toIntExact(right.count() / complexity), (f, l) -> MultiplyRight.addMxC(product, f, l, left, complexity, right));
-    }
-
-    static <N extends Scalar<N>> void addMxN_MT(final N[] product, final N[] left, final int complexity, final Access1D<N> right) {
-        MultiplyRight.divide(0, Math.toIntExact(right.count() / complexity), (f, l) -> MultiplyRight.addMxC(product, f, l, left, complexity, right));
-    }
-
-    static void divide(final int first, final int limit, final Conquerer conquerer) {
-        DIVIDER.parallelism(PARALLELISM).threshold(THRESHOLD).divide(first, limit, conquerer);
+    static void divide(final int first, final int limit, final int chunk, final Conquerer conquerer) {
+        DIVIDER.threshold(chunk).divide(first, limit, conquerer);
     }
 
     static void fill0xN(final double[] product, final double[] left, final int complexity, final Access1D<?> right) {
@@ -771,44 +751,47 @@ public class MultiplyRight implements MatrixOperation {
 
     static void fillMxN(final double[] product, final double[] left, final int complexity, final Access1D<?> right) {
 
+        int nbRows = left.length / complexity;
+        int nbCols = Math.toIntExact(right.count() / complexity);
+        int chunk = MatrixOperation.chunk(THRESHOLD, nbRows, complexity);
+
         Arrays.fill(product, 0D);
 
-        MultiplyRight.addMxC(product, 0, Math.toIntExact(right.count() / complexity), left, complexity, right);
+        if (nbCols > chunk) {
+            MultiplyRight.divide(0, nbCols, chunk, (f, l) -> MultiplyRight.addMxC(product, f, l, left, complexity, right));
+        } else {
+            MultiplyRight.addMxC(product, 0, nbCols, left, complexity, right);
+        }
     }
 
     static void fillMxN(final float[] product, final float[] left, final int complexity, final Access1D<?> right) {
 
+        int nbRows = left.length / complexity;
+        int nbCols = Math.toIntExact(right.count() / complexity);
+        int chunk = MatrixOperation.chunk(THRESHOLD, nbRows, complexity);
+
         Arrays.fill(product, 0F);
 
-        MultiplyRight.addMxC(product, 0, Math.toIntExact(right.count() / complexity), left, complexity, right);
+        if (nbCols > chunk) {
+            MultiplyRight.divide(0, nbCols, chunk, (f, l) -> MultiplyRight.addMxC(product, f, l, left, complexity, right));
+        } else {
+            MultiplyRight.addMxC(product, 0, nbCols, left, complexity, right);
+        }
     }
 
     static <N extends Scalar<N>> void fillMxN(final N[] product, final N[] left, final int complexity, final Access1D<N> right, final Factory<N> scalar) {
 
-        Arrays.fill(product, scalar.zero().get());
-
-        MultiplyRight.addMxC(product, 0, Math.toIntExact(right.count() / complexity), left, complexity, right);
-    }
-
-    static void fillMxN_MT(final double[] product, final double[] left, final int complexity, final Access1D<?> right) {
-
-        Arrays.fill(product, 0D);
-
-        MultiplyRight.addMxN_MT(product, left, complexity, right);
-    }
-
-    static void fillMxN_MT(final float[] product, final float[] left, final int complexity, final Access1D<?> right) {
-
-        Arrays.fill(product, 0F);
-
-        MultiplyRight.addMxN_MT(product, left, complexity, right);
-    }
-
-    static <N extends Scalar<N>> void fillMxN_MT(final N[] product, final N[] left, final int complexity, final Access1D<N> right, final Factory<N> scalar) {
+        int nbRows = left.length / complexity;
+        int nbCols = Math.toIntExact(right.count() / complexity);
+        int chunk = MatrixOperation.chunk(THRESHOLD, nbRows, complexity);
 
         Arrays.fill(product, scalar.zero().get());
 
-        MultiplyRight.addMxN_MT(product, left, complexity, right);
+        if (nbCols > chunk) {
+            MultiplyRight.divide(0, nbCols, chunk, (f, l) -> MultiplyRight.addMxC(product, f, l, left, complexity, right));
+        } else {
+            MultiplyRight.addMxC(product, 0, nbCols, left, complexity, right);
+        }
     }
 
 }

@@ -79,8 +79,22 @@ public interface ParallelismSupplier extends IntSupplier {
         return () -> Math.min(this.getAsInt(), notMoreThan.getAsInt());
     }
 
+    /**
+     * A new {@link Divider}, from {@link ProcessingService#INSTANCE}, with this parallelism.
+     */
+    default Divider newDivider() {
+        return ProcessingService.INSTANCE.newDivider(this);
+    }
+
+    /**
+     * A new {@link Divider}, from {@link ProcessingService#INSTANCE}, with this parallelism and the given
+     * threshold.
+     *
+     * @deprecated v58 Use {@link #newDivider()} and then {@link Divider#threshold(int)} instead.
+     */
+    @Deprecated
     default Divider newDivider(final int threshold) {
-        return ProcessingService.INSTANCE.newDivider().parallelism(this).threshold(threshold);
+        return this.newDivider().threshold(threshold);
     }
 
     default ParallelismSupplier require(final int atLeast) {

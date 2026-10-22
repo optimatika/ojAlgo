@@ -29,181 +29,389 @@ import java.util.List;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.matrix.operation.GenerateApplyAndCopyHouseholderColumn;
-import org.ojalgo.matrix.operation.HouseholderStep;
+import org.ojalgo.matrix.operation.GEQRF;
+import org.ojalgo.matrix.operation.ORGQR;
+import org.ojalgo.matrix.operation.ORMQR;
+import org.ojalgo.matrix.operation.TRTRS;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.TransformableRegion;
-import org.ojalgo.matrix.transformation.Householder;
-import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.InvertibleFactor;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.type.NumberDefinition;
 
 abstract class DenseQR<N extends Comparable<N>, M extends PhysicalStore<N>> extends InPlaceDecomposition<N, M> implements QR<N> {
 
-    static final class C128 extends DenseQR<ComplexNumber, GenericStore<ComplexNumber>> {
+    static final class C128 extends Generic<ComplexNumber> {
 
         C128() {
             this(false);
         }
 
         C128(final boolean fullSize) {
-            super(GenericStore.C128, fullSize, GenerateApplyAndCopyHouseholderColumn::invokeGeneric);
+            super(GenericStore.C128, fullSize);
         }
 
     }
 
-    static final class H256 extends DenseQR<Quaternion, GenericStore<Quaternion>> {
+    /**
+     * The factorisation is done by {@link GEQRF}. Q is formed by {@link ORGQR} and applied by {@link ORMQR},
+     * and systems with R are solved by {@link TRTRS}.
+     */
+    abstract static class Generic<N extends Scalar<N>> extends DenseQR<N, GenericStore<N>> {
+
+        /**
+         * [A]=[Q][R] — Q from the reflectors stored below the diagonal and their tau, as returned by
+         * {@link GEQRF}.
+         * <p>
+         * ftran applies Q<sup>H</sup>. btran applies Q.
+         */
+        static final class FactorQ<N extends Scalar<N>> implements MatrixDecomposition.Factor<N> {
+
+            private final GenericStore<N> myBody;
+            private final boolean myFullSize;
+            private final int myMinDim;
+            private final N[] myTau;
+
+            FactorQ(final GenericStore<N> body, final N[] tau, final int minDim, final boolean fullSize) {
+                super();
+                myBody = body;
+                myTau = tau;
+                myMinDim = minDim;
+                myFullSize = fullSize;
+            }
+
+            @Override
+            public void btran(final double[] arg) {
+                PhysicalStore<N> x = myBody.physical().column(arg);
+                this.btran(x);
+                x.supplyTo(arg);
+            }
+
+            @Override
+            public void btran(final PhysicalStore<N> arg) {
+                this.multiply(false, arg);
+            }
+
+            @Override
+            public void ftran(final double[] arg) {
+                PhysicalStore<N> x = myBody.physical().column(arg);
+                this.ftran(x);
+                x.supplyTo(arg);
+            }
+
+            @Override
+            public void ftran(final PhysicalStore<N> arg) {
+                this.multiply(true, arg);
+            }
+
+            @Override
+            public MatrixStore<N> get() {
+
+                int m = myBody.getRowDim();
+
+                GenericStore<N> retVal = myBody.physical().make(m, myFullSize ? m : myMinDim);
+
+                System.arraycopy(myBody.data, 0, retVal.data, 0, m * myMinDim);
+
+                ORGQR.invoke(m, retVal.getColDim(), myMinDim, retVal.data, 0, Math.max(1, m), myTau, 0, myBody.physical().scalar());
+
+                return retVal;
+            }
+
+            @Override
+            public int getColDim() {
+                return myBody.getRowDim();
+            }
+
+            @Override
+            public int getRowDim() {
+                return myBody.getRowDim();
+            }
+
+            /**
+             * The first m rows of [X] are multiplied; other stores are multiplied via a {@link GenericStore}
+             * copy.
+             */
+            private void multiply(final boolean transpose, final PhysicalStore<N> arg) {
+
+                int m = myBody.getRowDim();
+
+                if (arg instanceof GenericStore) {
+                    GenericStore<N> store = (GenericStore<N>) arg;
+                    ORMQR.invoke(transpose, m, store.getColDim(), myMinDim, myBody.data, 0, Math.max(1, m), myTau, 0, store.data, 0,
+                            Math.max(1, store.getRowDim()));
+                } else {
+                    GenericStore<N> copy = myBody.physical().copy(arg);
+                    this.multiply(transpose, copy);
+                    copy.supplyTo(arg);
+                }
+            }
+
+        }
+
+        /**
+         * tau of the reflectors, as returned by {@link GEQRF}
+         */
+        private N[] myTau = null;
+
+        Generic(final GenericStore.Factory<N> factory, final boolean fullSize) {
+            super(factory, fullSize);
+        }
+
+        @Override
+        public int countSignificant(final double threshold) {
+
+            GenericStore<N> internal = this.getInPlace();
+
+            int significant = 0;
+            for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
+                if (internal.get(ij, ij).norm() > threshold) {
+                    significant++;
+                }
+            }
+
+            return significant;
+        }
+
+        @Override
+        int factorise(final GenericStore<N> inPlace) {
+
+            int m = this.getRowDim();
+            int r = this.getMinDim();
+
+            if (myTau == null || myTau.length != r) {
+                myTau = this.scalar().newArrayInstance(r);
+            }
+
+            GEQRF.invoke(m, this.getColDim(), inPlace.data, 0, Math.max(1, m), myTau, 0, this.scalar());
+
+            int retVal = 0;
+            for (int k = 0; k < r; k++) {
+                if (!myTau[k].isZero()) {
+                    retVal++;
+                }
+            }
+            return retVal;
+        }
+
+        @Override
+        MatrixDecomposition.Factor<N> getFactorQ() {
+            return new FactorQ<>(this.getInPlace(), myTau, this.getMinDim(), this.isFullSize());
+        }
+
+        @Override
+        void substitute(final boolean transpose, final PhysicalStore<N> arg) {
+
+            int m = this.getRowDim();
+
+            if (arg instanceof GenericStore && arg.getRowDim() == m) {
+                GenericStore<N> store = (GenericStore<N>) arg;
+                int info = TRTRS.invoke(true, transpose, false, this.getMinDim(), store.getColDim(), this.getInPlace().data, 0, Math.max(1, m), store.data, 0,
+                        Math.max(1, m), this.scalar());
+                if (info == 0) {
+                    return;
+                }
+            }
+
+            // Also when R is exactly singular, and nothing was solved: the generic code then divides by zero
+            super.substitute(transpose, arg);
+        }
+
+    }
+
+    static final class H256 extends Generic<Quaternion> {
 
         H256() {
             this(false);
         }
 
         H256(final boolean fullSize) {
-            super(GenericStore.H256, fullSize, GenerateApplyAndCopyHouseholderColumn::invokeGeneric);
+            super(GenericStore.H256, fullSize);
         }
 
     }
 
-    static final class Q128 extends DenseQR<RationalNumber, GenericStore<RationalNumber>> {
+    static final class Q128 extends Generic<RationalNumber> {
 
         Q128() {
             this(false);
         }
 
         Q128(final boolean fullSize) {
-            super(GenericStore.Q128, fullSize, GenerateApplyAndCopyHouseholderColumn::invokeGeneric);
+            super(GenericStore.Q128, fullSize);
         }
 
     }
 
     static final class R064 extends DenseQR<Double, R064Store> {
 
+        /**
+         * [A]=[Q][R] — Q from the reflectors stored below the diagonal and their tau, as returned by
+         * {@link GEQRF}.
+         * <p>
+         * ftran applies Q^T. btran applies Q.
+         */
+        static final class FactorQ extends AbstractDecomposition.PrimitiveFactor {
+
+            private final double[] myData;
+            private final boolean myFullSize;
+            private final int myM;
+            private final int myMinDim;
+            private final double[] myTau;
+
+            FactorQ(final double[] data, final double[] tau, final int m, final int minDim, final boolean fullSize) {
+                super();
+                myData = data;
+                myTau = tau;
+                myM = m;
+                myMinDim = minDim;
+                myFullSize = fullSize;
+            }
+
+            @Override
+            public void btran(final double[] arg) {
+                ORMQR.invoke(false, myM, 1, myMinDim, myData, 0, Math.max(1, myM), myTau, 0, arg, 0, Math.max(1, myM));
+            }
+
+            @Override
+            public void ftran(final double[] arg) {
+                ORMQR.invoke(true, myM, 1, myMinDim, myData, 0, Math.max(1, myM), myTau, 0, arg, 0, Math.max(1, myM));
+            }
+
+            @Override
+            public MatrixStore<Double> get() {
+
+                R064Store retVal = R064Store.FACTORY.make(myM, myFullSize ? myM : myMinDim);
+
+                System.arraycopy(myData, 0, retVal.data, 0, myM * myMinDim);
+
+                ORGQR.invoke(myM, retVal.getColDim(), myMinDim, retVal.data, 0, Math.max(1, myM), myTau, 0);
+
+                return retVal;
+            }
+
+            @Override
+            public int getColDim() {
+                return myM;
+            }
+
+            @Override
+            public int getRowDim() {
+                return myM;
+            }
+
+        }
+
+        /**
+         * tau of the reflectors, as returned by {@link GEQRF}
+         */
+        private double[] myTau = null;
+
         R064() {
             this(false);
         }
 
         R064(final boolean fullSize) {
-            super(R064Store.FACTORY, fullSize, GenerateApplyAndCopyHouseholderColumn::invokeR064);
+            super(R064Store.FACTORY, fullSize);
+        }
+
+        @Override
+        public int countSignificant(final double threshold) {
+
+            R064Store internal = this.getInPlace();
+
+            int significant = 0;
+            for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
+                if (Math.abs(internal.doubleValue(ij, ij)) > threshold) {
+                    significant++;
+                }
+            }
+
+            return significant;
+        }
+
+        @Override
+        int factorise(final R064Store inPlace) {
+
+            int m = this.getRowDim();
+            int r = this.getMinDim();
+
+            if (myTau == null || myTau.length != r) {
+                myTau = new double[r];
+            }
+
+            GEQRF.invoke(m, this.getColDim(), inPlace.data, 0, Math.max(1, m), myTau, 0);
+
+            int retVal = 0;
+            for (int k = 0; k < r; k++) {
+                if (myTau[k] != ZERO) {
+                    retVal++;
+                }
+            }
+            return retVal;
+        }
+
+        @Override
+        MatrixDecomposition.Factor<Double> getFactorQ() {
+            return new FactorQ(this.getInPlace().data, myTau, this.getRowDim(), this.getMinDim(), this.isFullSize());
+        }
+
+        /**
+         * The first m rows of [X] are multiplied; other stores are multiplied via an {@link R064Store} copy.
+         */
+        @Override
+        void reflect(final boolean transpose, final PhysicalStore<Double> arg) {
+
+            int m = this.getRowDim();
+
+            if (arg instanceof R064Store) {
+                R064Store store = (R064Store) arg;
+                ORMQR.invoke(transpose, m, store.getColDim(), this.getMinDim(), this.getInPlace().data, 0, Math.max(1, m), myTau, 0, store.data, 0,
+                        Math.max(1, store.getRowDim()));
+            } else {
+                R064Store copy = R064Store.FACTORY.copy(arg);
+                this.reflect(transpose, copy);
+                copy.supplyTo(arg);
+            }
+        }
+
+        @Override
+        void substitute(final boolean transpose, final PhysicalStore<Double> arg) {
+
+            int m = this.getRowDim();
+
+            if (arg instanceof R064Store && arg.getRowDim() == m) {
+                R064Store store = (R064Store) arg;
+                int info = TRTRS.invoke(true, transpose, false, this.getMinDim(), store.getColDim(), this.getInPlace().data, 0, Math.max(1, m), store.data, 0,
+                        Math.max(1, m));
+                if (info == 0) {
+                    return;
+                }
+            }
+
+            // Also when R is exactly singular, and nothing was solved: the generic code then divides by zero
+            super.substitute(transpose, arg);
         }
 
     }
 
-    static final class R128 extends DenseQR<Quadruple, GenericStore<Quadruple>> {
+    static final class R128 extends Generic<Quadruple> {
 
         R128() {
             this(false);
         }
 
         R128(final boolean fullSize) {
-            super(GenericStore.R128, fullSize, GenerateApplyAndCopyHouseholderColumn::invokeGeneric);
-        }
-
-    }
-
-    /**
-     * [A]=[Q][R] — Householder reflections stored in the lower part of the in-place body, with their beta (0
-     * where there is no reflector).
-     * <p>
-     * ftran applies Q^T (Householder reflections in forward order). btran applies Q (Householder reflections
-     * in reverse order).
-     */
-    static final class FactorQ<N extends Comparable<N>> implements MatrixDecomposition.Factor<N> {
-
-        private final double[] myBeta;
-        private final PhysicalStore<N> myBody;
-        private final PhysicalStore.Factory<N, ?> myFactory;
-        private final boolean myFullSize;
-        private final int myMinDim;
-
-        FactorQ(final PhysicalStore<N> body, final double[] beta, final PhysicalStore.Factory<N, ?> factory, final int minDim, final boolean fullSize) {
-            super();
-            myBody = body;
-            myBeta = beta;
-            myFactory = factory;
-            myMinDim = minDim;
-            myFullSize = fullSize;
-        }
-
-        @Override
-        public void btran(final double[] arg) {
-            PhysicalStore<N> x = myFactory.column(arg);
-            this.btran(x);
-            x.supplyTo(arg);
-        }
-
-        @Override
-        public void btran(final PhysicalStore<N> arg) {
-
-            HouseholderReference<N> reference = HouseholderReference.makeColumn(myBody);
-            Householder<N> worker = myFactory.makeHouseholder(myBody.getRowDim());
-
-            for (int j = myMinDim - 1; j >= 0; j--) {
-                if (myBeta[j] != ZERO) {
-                    reference.point(j, j);
-                    arg.transformLeft(InPlaceDecomposition.copyReflector(worker, reference, myBeta[j], myFactory), 0);
-                }
-            }
-        }
-
-        @Override
-        public void ftran(final double[] arg) {
-            PhysicalStore<N> x = myFactory.column(arg);
-            this.ftran(x);
-            x.supplyTo(arg);
-        }
-
-        @Override
-        public void ftran(final PhysicalStore<N> arg) {
-
-            HouseholderReference<N> reference = HouseholderReference.makeColumn(myBody);
-            Householder<N> worker = myFactory.makeHouseholder(myBody.getRowDim());
-
-            for (int j = 0; j < myMinDim; j++) {
-                if (myBeta[j] != ZERO) {
-                    reference.point(j, j);
-                    arg.transformLeft(InPlaceDecomposition.copyReflector(worker, reference, myBeta[j], myFactory), 0);
-                }
-            }
-        }
-
-        @Override
-        public MatrixStore<N> get() {
-
-            int m = myBody.getRowDim();
-            int cols = myFullSize ? m : myMinDim;
-
-            PhysicalStore<N> retVal = myFactory.makeEye(m, cols);
-
-            HouseholderReference<N> reference = HouseholderReference.makeColumn(myBody);
-            Householder<N> worker = myFactory.makeHouseholder(m);
-
-            for (int j = myMinDim - 1; j >= 0; j--) {
-                if (myBeta[j] != ZERO) {
-                    reference.point(j, j);
-                    retVal.transformLeft(InPlaceDecomposition.copyReflector(worker, reference, myBeta[j], myFactory), j);
-                }
-            }
-
-            return retVal;
-        }
-
-        @Override
-        public int getColDim() {
-            return myBody.getRowDim();
-        }
-
-        @Override
-        public int getRowDim() {
-            return myBody.getRowDim();
+            super(GenericStore.R128, fullSize);
         }
 
     }
@@ -271,18 +479,12 @@ abstract class DenseQR<N extends Comparable<N>, M extends PhysicalStore<N>> exte
 
     }
 
-    /**
-     * beta of the reflectors, 0 where there is none
-     */
-    private double[] myBeta = null;
     private final boolean myFullSize;
-    private final HouseholderStep<N, M> myHouseholderColumn;
     private int myNumberOfHouseholderTransformations = 0;
 
-    protected DenseQR(final PhysicalStore.Factory<N, ? extends M> factory, final boolean fullSize, final HouseholderStep<N, M> householderColumn) {
+    protected DenseQR(final PhysicalStore.Factory<N, ? extends M> factory, final boolean fullSize) {
         super(factory);
         myFullSize = fullSize;
-        myHouseholderColumn = householderColumn;
     }
 
     @Override
@@ -302,21 +504,6 @@ abstract class DenseQR<N extends Comparable<N>, M extends PhysicalStore<N>> exte
     public N calculateDeterminant(final Access2D<?> matrix) {
         this.decompose(this.wrap(matrix));
         return this.getDeterminant();
-    }
-
-    @Override
-    public int countSignificant(final double threshold) {
-
-        PhysicalStore<N> internal = this.getInPlace();
-
-        int significant = 0;
-        for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
-            if (Math.abs(internal.doubleValue(ij, ij)) > threshold) {
-                significant++;
-            }
-        }
-
-        return significant;
     }
 
     @Override
@@ -484,37 +671,12 @@ abstract class DenseQR<N extends Comparable<N>, M extends PhysicalStore<N>> exte
      * Factorises the in-place matrix, [A]=[Q][R], and returns the number of Householder reflections (those
      * that are not the identity).
      */
-    int factorise(final M inPlace) {
-
-        int m = this.getRowDim();
-        int r = this.getMinDim();
-
-        if (myBeta == null || myBeta.length != r) {
-            myBeta = new double[r];
-        }
-
-        Householder<N> householder = this.makeHouseholder(m);
-
-        int retVal = 0;
-        for (int k = 0; k < r; k++) {
-            if (k + 1 < m && myHouseholderColumn.invoke(inPlace, k, k, householder)) {
-                inPlace.transformLeft(householder, k + 1);
-                myBeta[k] = InPlaceDecomposition.getBeta(householder);
-                retVal++;
-            } else {
-                myBeta[k] = ZERO;
-            }
-        }
-        return retVal;
-    }
+    abstract int factorise(M inPlace);
 
     /**
      * [A]=[Q][R]
      */
-    MatrixDecomposition.Factor<N> getFactorQ() {
-        PhysicalStore<N> body = this.getInPlace();
-        return new FactorQ<>(body, myBeta, body.physical(), this.getMinDim(), myFullSize);
-    }
+    abstract MatrixDecomposition.Factor<N> getFactorQ();
 
     /**
      * [A]=[Q][R]

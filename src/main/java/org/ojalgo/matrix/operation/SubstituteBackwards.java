@@ -23,6 +23,8 @@ package org.ojalgo.matrix.operation;
 
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.DOT;
+import org.ojalgo.concurrent.DivideAndConquer;
+import org.ojalgo.concurrent.Parallelism;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.scalar.Scalar;
@@ -31,6 +33,8 @@ import org.ojalgo.structure.Access2D;
 public abstract class SubstituteBackwards implements MatrixOperation {
 
     public static int THRESHOLD = 64;
+
+    private static final DivideAndConquer.Divider DIVIDER = Parallelism.THREADS.newDivider();
 
     public static void invoke(final double[] data, final Access2D<?> body, final boolean unitDiagonal, final boolean conjugated, final double[] work) {
 
@@ -71,15 +75,8 @@ public abstract class SubstituteBackwards implements MatrixOperation {
     }
 
     /**
-     * Single-RHS backward substitution operating directly on raw column-major body data.
-     * <p>
-     * Not conjugated (upper triangular body): a column sweep from the last column to the first – each solved
-     * element immediately updates all preceding elements, reading the body column contiguously.
-     * <p>
-     * Conjugated (the transpose of a lower triangular body): one dot product per element, reading a body
-     * column contiguously. Each dot product is summed from the far end, so that the element solved just
-     * before is the last term. Summed the other way, every dot product has to wait for the previous element
-     * before it can start, and the solve becomes latency-bound (more than twice as slow).
+     * Single-RHS backward substitution operating directly on raw column-major body data: U*x = b, or
+     * L<sup>T</sup>*x = b when conjugated, solved by {@link TRSV}.
      *
      * @param data          Single-column RHS, overwritten with the solution
      * @param bodyData      Column-major body data (upper triangular, or lower when conjugated)
@@ -88,37 +85,7 @@ public abstract class SubstituteBackwards implements MatrixOperation {
      * @param conjugated    Body is transposed: upper part stored in lower columns
      */
     public static void invoke(final double[] data, final double[] bodyData, final int bodyStructure, final boolean unitDiagonal, final boolean conjugated) {
-
-        int n = data.length;
-
-        if (conjugated) {
-
-            for (int j = n - 1; j >= 0; j--) {
-
-                int count = n - j - 1;
-                double solved = data[j] - DOT.invoke(bodyData, j * bodyStructure + (n - 1), -1, data, n - 1, -1, count);
-
-                if (!unitDiagonal) {
-                    solved /= bodyData[j + j * bodyStructure];
-                }
-
-                data[j] = solved;
-            }
-
-        } else {
-
-            for (int j = n - 1; j >= 0; j--) {
-
-                if (!unitDiagonal) {
-                    data[j] /= bodyData[j + j * bodyStructure];
-                }
-
-                double solved = data[j];
-                if (solved != PrimitiveMath.ZERO) {
-                    AXPY.invoke(data, 0, -solved, bodyData, j * bodyStructure, 0, j);
-                }
-            }
-        }
+        TRSV.invoke(!conjugated, conjugated, unitDiagonal, data.length, bodyData, 0, Math.max(1, bodyStructure), data, 0, 1);
     }
 
     /**
@@ -166,49 +133,27 @@ public abstract class SubstituteBackwards implements MatrixOperation {
     /**
      * @param data         RHS data that will be overwritten with the solution
      * @param structure    The structure (number of rows) in data
-     * @param first        The first (incl) column/solution to handle
-     * @param limit        The last (excl) column/solution to handle
      * @param body         The equation system body (assumed to be upper/right triangular)
      * @param unitDiagonal Assume the body has a unit diagonal
      * @param conjugated   Assume the body is conjugated/transposed so that the upper/right part is actually
      *                     stored in the lower/left part.
      * @param hermitian    Assume the solution is hermitian/symmetric
      */
-    public static void invoke(final double[] data, final int structure, final int first, final int limit, final Access2D<?> body, final boolean unitDiagonal,
-            final boolean conjugated, final boolean hermitian) {
+    public static void invoke(final double[] data, final int structure, final Access2D<?> body, final boolean unitDiagonal, final boolean conjugated,
+            final boolean hermitian) {
 
-        int diagDim = MissingMath.toMinIntExact(body.countRows(), body.countColumns());
-        double[] bodyRow = new double[diagDim];
-        double tmpVal;
-        int colBaseIndex;
+        int nbCols = structure > 0 ? data.length / structure : 0;
 
-        int firstRow = hermitian ? first : 0;
-        for (int i = diagDim - 1; i >= firstRow; i--) {
-
-            for (int j = i; j < diagDim; j++) {
-                bodyRow[j] = conjugated ? body.doubleValue(j, i) : body.doubleValue(i, j);
-            }
-
-            int columnLimit = hermitian ? Math.min(i + 1, limit) : limit;
-            for (int s = first; s < columnLimit; s++) {
-                colBaseIndex = s * structure;
-
-                tmpVal = PrimitiveMath.ZERO;
-                for (int j = i + 1; j < diagDim; j++) {
-                    tmpVal += bodyRow[j] * data[j + colBaseIndex];
-                }
-                tmpVal = data[i + colBaseIndex] - tmpVal;
-                if (!unitDiagonal) {
-                    tmpVal /= bodyRow[i];
-                }
-
-                data[i + colBaseIndex] = tmpVal;
-            }
+        if (nbCols > THRESHOLD) {
+            DIVIDER.threshold(THRESHOLD).divide(0, nbCols,
+                    (f, l) -> SubstituteBackwards.invoke(data, structure, f, l, body, unitDiagonal, conjugated, hermitian));
+        } else {
+            SubstituteBackwards.invoke(data, structure, 0, nbCols, body, unitDiagonal, conjugated, hermitian);
         }
     }
 
     /**
-     * @see #invoke(double[], int, int, int, Access2D, boolean, boolean, boolean)
+     * @see #invoke(double[], int, Access2D, boolean, boolean, boolean)
      */
     public static void invoke(final double[][] data, final Access2D<?> body, final boolean unitDiagonal, final boolean conjugated, final boolean hermitian) {
 
@@ -247,69 +192,19 @@ public abstract class SubstituteBackwards implements MatrixOperation {
      * @see #invoke(double[], double[], int, boolean, boolean)
      */
     public static void invoke(final float[] data, final float[] bodyData, final int bodyStructure, final boolean unitDiagonal, final boolean conjugated) {
-
-        int n = data.length;
-
-        if (conjugated) {
-
-            for (int j = n - 1; j >= 0; j--) {
-
-                int count = n - j - 1;
-                float solved = data[j] - DOT.invoke(bodyData, j * bodyStructure + (j + 1), 1, data, j + 1, 1, count);
-
-                if (!unitDiagonal) {
-                    solved /= bodyData[j + j * bodyStructure];
-                }
-
-                data[j] = solved;
-            }
-
-        } else {
-
-            for (int j = n - 1; j >= 0; j--) {
-
-                int count = n - j - 1;
-                float solved = data[j] - DOT.invoke(bodyData, j + (j + 1) * bodyStructure, bodyStructure, data, j + 1, 1, count);
-
-                if (!unitDiagonal) {
-                    solved /= bodyData[j + j * bodyStructure];
-                }
-
-                data[j] = solved;
-            }
-        }
+        TRSV.invoke(!conjugated, conjugated, unitDiagonal, data.length, bodyData, 0, Math.max(1, bodyStructure), data, 0, 1);
     }
 
-    public static void invoke(final float[] data, final int structure, final int first, final int limit, final Access2D<?> body, final boolean unitDiagonal,
-            final boolean conjugated, final boolean hermitian) {
+    public static void invoke(final float[] data, final int structure, final Access2D<?> body, final boolean unitDiagonal, final boolean conjugated,
+            final boolean hermitian) {
 
-        int diagDim = MissingMath.toMinIntExact(body.countRows(), body.countColumns());
-        float[] bodyRow = new float[diagDim];
-        float tmpVal;
-        int colBaseIndex;
+        int nbCols = structure > 0 ? data.length / structure : 0;
 
-        int firstRow = hermitian ? first : 0;
-        for (int i = diagDim - 1; i >= firstRow; i--) {
-
-            for (int j = i; j < diagDim; j++) {
-                bodyRow[j] = conjugated ? body.floatValue(j, i) : body.floatValue(i, j);
-            }
-
-            int columnLimit = hermitian ? Math.min(i + 1, limit) : limit;
-            for (int s = first; s < columnLimit; s++) {
-                colBaseIndex = s * structure;
-
-                tmpVal = 0F;
-                for (int j = i + 1; j < diagDim; j++) {
-                    tmpVal += bodyRow[j] * data[j + colBaseIndex];
-                }
-                tmpVal = data[i + colBaseIndex] - tmpVal;
-                if (!unitDiagonal) {
-                    tmpVal /= bodyRow[i];
-                }
-
-                data[i + colBaseIndex] = tmpVal;
-            }
+        if (nbCols > THRESHOLD) {
+            DIVIDER.threshold(THRESHOLD).divide(0, nbCols,
+                    (f, l) -> SubstituteBackwards.invoke(data, structure, f, l, body, unitDiagonal, conjugated, hermitian));
+        } else {
+            SubstituteBackwards.invoke(data, structure, 0, nbCols, body, unitDiagonal, conjugated, hermitian);
         }
     }
 
@@ -343,7 +238,8 @@ public abstract class SubstituteBackwards implements MatrixOperation {
             tmpVal = data[i].subtract(tmpVal);
 
             if (!unitDiagonal) {
-                tmpVal = tmpVal.divide(bodyRow[i]);
+                // From the left: [body]_ii^-1 * tmpVal
+                tmpVal = tmpVal.conjugate().divide(bodyRow[i].conjugate()).conjugate();
             }
 
             data[i] = tmpVal.get();
@@ -351,9 +247,88 @@ public abstract class SubstituteBackwards implements MatrixOperation {
     }
 
     /**
-     * @see #invoke(double[], int, int, int, Access2D, boolean, boolean, boolean)
+     * @see #invoke(double[], int, Access2D, boolean, boolean, boolean)
      */
-    public static <N extends Scalar<N>> void invoke(final N[] data, final int structure, final int first, final int limit, final Access2D<N> body,
+    public static <N extends Scalar<N>> void invoke(final N[] data, final int structure, final Access2D<N> body, final boolean unitDiagonal,
+            final boolean conjugated, final boolean hermitian, final Scalar.Factory<N> scalar) {
+
+        int nbCols = structure > 0 ? data.length / structure : 0;
+
+        if (nbCols > THRESHOLD) {
+            DIVIDER.threshold(THRESHOLD).divide(0, nbCols,
+                    (f, l) -> SubstituteBackwards.invoke(data, structure, f, l, body, unitDiagonal, conjugated, hermitian, scalar));
+        } else {
+            SubstituteBackwards.invoke(data, structure, 0, nbCols, body, unitDiagonal, conjugated, hermitian, scalar);
+        }
+    }
+
+    private static void invoke(final double[] data, final int structure, final int first, final int limit, final Access2D<?> body, final boolean unitDiagonal,
+            final boolean conjugated, final boolean hermitian) {
+
+        int diagDim = MissingMath.toMinIntExact(body.countRows(), body.countColumns());
+        double[] bodyRow = new double[diagDim];
+        double tmpVal;
+        int colBaseIndex;
+
+        int firstRow = hermitian ? first : 0;
+        for (int i = diagDim - 1; i >= firstRow; i--) {
+
+            for (int j = i; j < diagDim; j++) {
+                bodyRow[j] = conjugated ? body.doubleValue(j, i) : body.doubleValue(i, j);
+            }
+
+            int columnLimit = hermitian ? Math.min(i + 1, limit) : limit;
+            for (int s = first; s < columnLimit; s++) {
+                colBaseIndex = s * structure;
+
+                tmpVal = PrimitiveMath.ZERO;
+                for (int j = i + 1; j < diagDim; j++) {
+                    tmpVal += bodyRow[j] * data[j + colBaseIndex];
+                }
+                tmpVal = data[i + colBaseIndex] - tmpVal;
+                if (!unitDiagonal) {
+                    tmpVal /= bodyRow[i];
+                }
+
+                data[i + colBaseIndex] = tmpVal;
+            }
+        }
+    }
+
+    private static void invoke(final float[] data, final int structure, final int first, final int limit, final Access2D<?> body, final boolean unitDiagonal,
+            final boolean conjugated, final boolean hermitian) {
+
+        int diagDim = MissingMath.toMinIntExact(body.countRows(), body.countColumns());
+        float[] bodyRow = new float[diagDim];
+        float tmpVal;
+        int colBaseIndex;
+
+        int firstRow = hermitian ? first : 0;
+        for (int i = diagDim - 1; i >= firstRow; i--) {
+
+            for (int j = i; j < diagDim; j++) {
+                bodyRow[j] = conjugated ? body.floatValue(j, i) : body.floatValue(i, j);
+            }
+
+            int columnLimit = hermitian ? Math.min(i + 1, limit) : limit;
+            for (int s = first; s < columnLimit; s++) {
+                colBaseIndex = s * structure;
+
+                tmpVal = 0F;
+                for (int j = i + 1; j < diagDim; j++) {
+                    tmpVal += bodyRow[j] * data[j + colBaseIndex];
+                }
+                tmpVal = data[i + colBaseIndex] - tmpVal;
+                if (!unitDiagonal) {
+                    tmpVal /= bodyRow[i];
+                }
+
+                data[i + colBaseIndex] = tmpVal;
+            }
+        }
+    }
+
+    private static <N extends Scalar<N>> void invoke(final N[] data, final int structure, final int first, final int limit, final Access2D<N> body,
             final boolean unitDiagonal, final boolean conjugated, final boolean hermitian, final Scalar.Factory<N> scalar) {
 
         int diagDim = (int) Math.min(body.countRows(), body.countColumns());
@@ -379,7 +354,8 @@ public abstract class SubstituteBackwards implements MatrixOperation {
                 }
                 tmpVal = data[i + colBaseIndex].subtract(tmpVal);
                 if (!unitDiagonal) {
-                    tmpVal = tmpVal.divide(bodyRow[i]);
+                    // From the left: [body]_ii^-1 * tmpVal
+                    tmpVal = tmpVal.conjugate().divide(bodyRow[i].conjugate()).conjugate();
                 }
 
                 data[i + colBaseIndex] = tmpVal.get();

@@ -77,7 +77,7 @@ public interface QR<N extends Comparable<N>> extends MatrixDecomposition.Updatab
     Factory<RationalNumber> Q128 = (typical, fullSize) -> new DenseQR.Q128(fullSize);
 
     Factory<Double> R064 = (typical, fullSize) -> {
-        if (fullSize || typical.isFat() || 64L >= typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
+        if (fullSize || typical.isFat() || 64 >= typical.getColDim() && typical.count() <= PlainArray.MAX_SIZE) {
             return new DenseQR.R064(fullSize);
         } else {
             return new RawQR();

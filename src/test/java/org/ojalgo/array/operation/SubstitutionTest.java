@@ -50,9 +50,9 @@ public class SubstitutionTest extends ArrayOperationTests {
 
         R064Store expected = R064Store.FACTORY.copy(denseRHS);
 
-        SubstituteBackwards.invoke(denseRHS.data, numbEquations, 0, numbSolutions, primitiveBody, false, false, false);
+        SubstituteBackwards.invoke(denseRHS.data, numbEquations, primitiveBody, false, false, false);
         SubstituteBackwards.invoke(rawRHS.data, primitiveBody, false, false, false);
-        SubstituteBackwards.invoke(rationalRHS.data, numbEquations, 0, numbSolutions, rationalBody, false, false, false, RationalNumber.FACTORY);
+        SubstituteBackwards.invoke(rationalRHS.data, numbEquations, rationalBody, false, false, false, RationalNumber.FACTORY);
 
         TestUtils.assertEquals(expected, denseRHS);
         TestUtils.assertEquals(expected, rawRHS);
@@ -64,17 +64,17 @@ public class SubstitutionTest extends ArrayOperationTests {
         primitiveBody = cholesky.getR();
         rationalBody = GenericStore.Q128.copy(primitiveBody);
 
-        SubstituteBackwards.invoke(denseRHS.data, numbEquations, 0, numbSolutions, primitiveBody, true, true, false);
+        SubstituteBackwards.invoke(denseRHS.data, numbEquations, primitiveBody, true, true, false);
         SubstituteBackwards.invoke(rawRHS.data, primitiveBody, true, true, false);
-        SubstituteBackwards.invoke(rationalRHS.data, numbEquations, 0, numbSolutions, rationalBody, true, true, false, RationalNumber.FACTORY);
+        SubstituteBackwards.invoke(rationalRHS.data, numbEquations, rationalBody, true, true, false, RationalNumber.FACTORY);
 
         TestUtils.assertEquals(expected, denseRHS);
         TestUtils.assertEquals(expected, rawRHS);
         TestUtils.assertEquals(expected, rationalRHS);
 
-        SubstituteBackwards.invoke(denseRHS.data, numbEquations, 0, numbSolutions, primitiveBody, false, false, false);
+        SubstituteBackwards.invoke(denseRHS.data, numbEquations, primitiveBody, false, false, false);
         SubstituteBackwards.invoke(rawRHS.data, primitiveBody, false, false, false);
-        SubstituteBackwards.invoke(rationalRHS.data, numbEquations, 0, numbSolutions, rationalBody, false, false, false, RationalNumber.FACTORY);
+        SubstituteBackwards.invoke(rationalRHS.data, numbEquations, rationalBody, false, false, false, RationalNumber.FACTORY);
 
         TestUtils.assertEquals(denseRHS, rawRHS);
         TestUtils.assertEquals(denseRHS, rationalRHS);
@@ -95,9 +95,9 @@ public class SubstitutionTest extends ArrayOperationTests {
 
         R064Store expected = R064Store.FACTORY.copy(denseRHS);
 
-        SubstituteForwards.invoke(denseRHS.data, numbEquations, 0, numbSolutions, primitiveBody, false, false, false);
+        SubstituteForwards.invoke(denseRHS.data, numbEquations, primitiveBody, false, false, false);
         SubstituteForwards.invoke(rawRHS.data, primitiveBody, false, false, false);
-        SubstituteForwards.invoke(rationalRHS.data, numbEquations, 0, numbSolutions, rationalBody, false, false, false, RationalNumber.FACTORY);
+        SubstituteForwards.invoke(rationalRHS.data, numbEquations, rationalBody, false, false, false, RationalNumber.FACTORY);
 
         TestUtils.assertEquals(expected, denseRHS);
         TestUtils.assertEquals(expected, rawRHS);
@@ -109,17 +109,17 @@ public class SubstitutionTest extends ArrayOperationTests {
         primitiveBody = cholesky.getL();
         rationalBody = GenericStore.Q128.copy(primitiveBody);
 
-        SubstituteForwards.invoke(denseRHS.data, numbEquations, 0, numbSolutions, primitiveBody, true, true, false);
+        SubstituteForwards.invoke(denseRHS.data, numbEquations, primitiveBody, true, true, false);
         SubstituteForwards.invoke(rawRHS.data, primitiveBody, true, true, false);
-        SubstituteForwards.invoke(rationalRHS.data, numbEquations, 0, numbSolutions, rationalBody, true, true, false, RationalNumber.FACTORY);
+        SubstituteForwards.invoke(rationalRHS.data, numbEquations, rationalBody, true, true, false, RationalNumber.FACTORY);
 
         TestUtils.assertEquals(expected, denseRHS);
         TestUtils.assertEquals(expected, rawRHS);
         TestUtils.assertEquals(expected, rationalRHS);
 
-        SubstituteForwards.invoke(denseRHS.data, numbEquations, 0, numbSolutions, primitiveBody, false, false, false);
+        SubstituteForwards.invoke(denseRHS.data, numbEquations, primitiveBody, false, false, false);
         SubstituteForwards.invoke(rawRHS.data, primitiveBody, false, false, false);
-        SubstituteForwards.invoke(rationalRHS.data, numbEquations, 0, numbSolutions, rationalBody, false, false, false, RationalNumber.FACTORY);
+        SubstituteForwards.invoke(rationalRHS.data, numbEquations, rationalBody, false, false, false, RationalNumber.FACTORY);
 
         TestUtils.assertEquals(denseRHS, rawRHS);
         TestUtils.assertEquals(denseRHS, rationalRHS);

@@ -13,11 +13,19 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Added
 
+#### org.ojalgo.concurrent
+
+- `ProcessingService.newDivider(IntSupplier)` and `ParallelismSupplier.newDivider()` (e.g. `Parallelism.CORES.newDivider()`) create a `DivideAndConquer.Divider` with the given parallelism, fixed for the lifetime of the divider.
+
 #### org.ojalgo.function
 
 - `CombinatorialFunctions.Logarithmic` – the natural logarithms of the counts, also where the counts do not fit in a `long`.
 
 ### Changed
+
+#### org.ojalgo.concurrent
+
+- `DivideAndConquer`, and its `Divider`, divide a range into as many parts as there are workers, of almost equal size, unless the threshold stops it. The number of workers is the parallelism, but at most the number of indices. Previously the range was halved recursively, with half the workers for each half, so there could be fewer parts than workers – 4 parts with 6 workers, 8 with 12.
 
 #### org.ojalgo.function
 
@@ -28,6 +36,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - The dense `QR`, `Bidiagonal`, `Hessenberg` and `Tridiagonal` decompositions: a Householder reflection is generated whenever the part of the column (or row) after its first element is not exactly 0. Previously there was none when that part was negligible compared to the first element (relative size below about 3E-8), and those elements were dropped.
 - The same decompositions: when the first element is 0, the element after the reflection is -norm, as when it is positive (for example `R(k,k)` of `QR`). Previously it was +norm. `RawQR` already did this.
 - `Cholesky.R064` returns the dense implementation also for matrices with up to 32 columns. `RawCholesky` is used only for an empty template (to be grown with `appendColumn`) and for matrices too large for a single array.
+- Dense `double` matrix multiplication is faster: new kernels, using fused multiply-add when the hardware has it, cache blocking for large matrices, and multi-threading decided by the amount of work rather than by fixed sizes. Results can differ from earlier versions in the last digits.
+- Multi-threading of the other matrix multiplications – `float` (`R032Store`), the generic number types (`GenericStore`), and products where an operand is not a physical store – is also decided by the amount of work. Previously it required both dimensions of the product to be larger than 32 (8 when neither operand was a physical store).
+- The dense `LU`, `Cholesky` and `QR` decompositions, for all number types, and `Tridiagonal` are reimplemented on new LAPACK-style kernels. They are multi-threaded according to the amount of work rather than the number of columns. Results, in particular solutions (`getSolution(..)`, `solve(..)`) and inverses (`getInverse(..)`, `invert(..)`), can differ from earlier versions in the last digits. So can the factors of `QR.Q128` and `QR.R128`, which had their Householder coefficients rounded to `double`.
+- `LU.R064` returns the dense implementation for matrices with more than 60 columns. Previously that required more than 512 columns, and `RawLU` was used up to that. `RawLU` is still used up to 60 columns, and for matrices too large for a single array.
 
 #### org.ojalgo.optimisation
 
@@ -35,7 +47,17 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - The `LinearSolver` dual simplex uses a bound flipping ratio test: variables with finite ranges that would limit the dual step switch to their other bound rather than enter the basis, so a single iteration can pass several of them. This cuts the number of iterations, in particular on models with many bounded variables – by about 10% on the Netlib models, and 3–4x on some of the Issue [#700](https://github.com/optimatika/ojAlgo/issues/700) recordings.
 - `LinearSolver`: before a solve ends `OPTIMAL`, the values of the basic variables are recomputed if primal iterations or bound switches have updated them since they were last computed. If they then violate their bounds, the iterations continue. The incrementally updated values could drift, and the returned point violate constraints beyond the feasibility tolerance.
 
+#### org.ojalgo.structure
+
+- `Access1D.equals(Access1D, Access1D, NumberContext)` compares all components of complex and quaternion elements, by the norm of each element difference relative to the largest element norm. Previously only the real parts (`doubleValue`) were compared. This applies to everything that delegates to it: `Access2D.equals(..)`, `MatrixStore.equals(..)`, `BasicMatrix.equals(..)` and `BasicMatrix.isHermitian()`, and the decompositions' static `equals(..)` checks. E.g. a `MatrixC128` [[i]] was equal to [[2i]], and [[1, i], [i, 1]] was Hermitian.
+
 ### Deprecated
+
+#### org.ojalgo.concurrent
+
+- `DivideAndConquer.Divider.parallelism(IntSupplier)` – a divider's parallelism is set when it is created, with `ProcessingService.newDivider(IntSupplier)` or `ParallelismSupplier.newDivider()`. Calling it no longer changes anything.
+- `ProcessingService.newDivider()` – use `newDivider(IntSupplier)`. It still gives `Parallelism.THREADS`.
+- `ParallelismSupplier.newDivider(int)` – use `newDivider()` and then `Divider.threshold(int)`.
 
 #### org.ojalgo.matrix
 
@@ -51,6 +73,17 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.matrix
 
 - `QR.R064` for tall or square matrices with more than 64 columns (`RawQR`): a column that was 0 on and below the diagonal, from the start or after the previous reflections, ended the decomposition. The columns after it were not factorised, `getQ()` and `getR()` were wrong, and solving gave NaN. Such a column now gets no reflector, and the decomposition continues.
+- Quaternion (`H256`) matrix multiplication formed the element products in the wrong order, b·a rather than a·b, and quaternion multiplication does not commute. This affected `multiply(..)` and `fillByMultiplying(..)` of `GenericStore.H256` in most cases, the product of two transposed matrices (computed as (B·A)<sup>T</sup>), and `SparseStore.multiply(N)` (s·a rather than a·s).
+- The quaternion (`H256`) decompositions – `LU`, `Cholesky`, `LDL`, `QR`, `Hessenberg`, `Bidiagonal`, `SingularValue`, `Tridiagonal` and the Hermitian `Eigenvalue` – gave wrong results for matrices with general quaternion elements. Products and divisions of elements in the elimination updates, the Householder reflections and the triangular solves had their factors in the wrong order, so `Tridiagonal.getQ()` and the eigenvectors were wrong too. `SingularValue.H256` computed the singular values from the real parts of a bidiagonal matrix that had not been made real. `PhysicalStore.substituteForwards(..)` and `substituteBackwards(..)` of `GenericStore.H256` divided by the diagonal from the right.
+- `MatrixStore.isHermitian()` of quaternion matrices compared only the real parts of the elements, so e.g. [[1, j], [j, 1]] was Hermitian, and `Cholesky.H256.checkAndDecompose(..)` accepted it.
+- `LU` of complex (`C128`) and quaternion (`H256`) matrices chose pivots by the real parts of the elements only, and a pivot with a zero real part was taken to be zero and replaced by 0. E.g. `LU.C128` of i·[[1, 2], [3, 4]] gave a `U` with zeros on the diagonal. Pivots are now chosen by norm. `LU` and `QR` also counted the rank (`getRank()`, `isFullRank()`, `isSolvable()`) from the real parts of the diagonal of U or R only – that matrix had rank 0.
+- `LU` and `LDL` of `C128`, `H256`, `Q128` and `R128` matrices: when the decomposition had exchanged rows, solving for a single right-hand side column – `getSolution(..)`, `solve(..)`, `ftran(PhysicalStore)` and `btran(PhysicalStore)` – permuted it as `double` values. The moved elements lost their imaginary (or i, j, k) parts, and rational and quad precision values were rounded to `double`.
+- `LU.updateColumn(..)` of `C128`, `H256`, `Q128` and `R128` matrices calculated with `double` values: only the real parts of complex and quaternion elements were used, and rational and quad precision values were rounded.
+- `LDL` of complex (`C128`) and quaternion (`H256`) matrices: when the decomposition pivoted, the element between the two exchanged rows/columns was not conjugated, and the factors were wrong if that element was not real. `getInverse()` and `invert(..)` threw `ClassCastException` for all number types other than `double`.
+- `SingularValue.getCovariance()` of complex and quaternion matrices used the transpose rather than the conjugate transpose of V: V·S<sup>-2</sup>·V<sup>T</sup> rather than V·S<sup>-2</sup>·V<sup>H</sup>. Likewise `Hessenberg.reconstruct()` gave Q·H·Q<sup>T</sup> rather than Q·H·Q<sup>H</sup>.
+- `Eigenvalue.getEigenvectors()` of complex (`C128`) Hermitian matrices, and of the generalised `C128` problem, returned only the real parts of the eigenvectors. `getEigenpair(int)` was correct.
+- `MatrixStore.multiplyBoth(Access1D)` (x<sup>H</sup>·A·x) of complex and quaternion matrices that are not a `GenericStore` themselves – transposed, sliced and other logical views – conjugated x twice and gave x<sup>T</sup>·A·x. E.g. -1 rather than 1 for x = [i] and A = [1].
+- `doubleValue(..)` of a complex or quaternion matrix from `onAll(UnaryFunction)` applied the function to the real part only. That matrix is also what the default `add(N)`, `subtract(N)`, `multiply(N)`, `divide(N)` and `negate()` return. E.g. `GenericStore.C128` [[1 + 2i]] `.multiply(ComplexNumber.I).doubleValue(0, 0)` was 0.0 rather than -2.0. `get(..)` was correct.
 
 #### org.ojalgo.optimisation
 

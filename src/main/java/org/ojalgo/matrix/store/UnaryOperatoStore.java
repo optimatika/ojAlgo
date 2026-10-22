@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.store;
 
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.type.NumberDefinition;
 
 final class UnaryOperatoStore<N extends Comparable<N>> extends LogicalStore<N> {
 
@@ -36,7 +37,11 @@ final class UnaryOperatoStore<N extends Comparable<N>> extends LogicalStore<N> {
 
     @Override
     public double doubleValue(final int row, final int col) {
-        return myOperator.invoke(base.doubleValue(row, col));
+        if (this.isPrimitive()) {
+            return myOperator.invoke(base.doubleValue(row, col));
+        } else {
+            return NumberDefinition.doubleValue(this.get(row, col));
+        }
     }
 
     @Override

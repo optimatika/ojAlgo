@@ -35,7 +35,33 @@ import org.ojalgo.structure.Access1D;
  *
  * @author apete
  */
-public abstract class DOT implements ArrayOperation {
+public abstract class DOT implements BLAS1 {
+
+    /**
+     * The pure Java implementation.
+     */
+    public static final class JVM {
+
+        /**
+         * The pure Java implementation of {@link DOT#invoke(int, double[], int, int, double[], int, int)},
+         * for {@code n >= 0}.
+         */
+        public static double invoke(final int n, final double[] x, final int offsetX, final int incX, final double[] y, final int offsetY, final int incY) {
+
+            if (incX == 1 && incY == 1) {
+                return DOT.unrolled04(x, offsetX, y, offsetY, 0, n);
+            }
+
+            double retVal = PrimitiveMath.ZERO;
+            int ix = incX < 0 ? offsetX - (n - 1) * incX : offsetX;
+            int iy = incY < 0 ? offsetY - (n - 1) * incY : offsetY;
+            for (int i = 0; i < n; i++, ix += incX, iy += incY) {
+                retVal += x[ix] * y[iy];
+            }
+            return retVal;
+        }
+
+    }
 
     public static double invoke(final Access1D<?> array1, final int offset1, final double[] array2, final int offset2, final int first, final int limit) {
         double retVal = PrimitiveMath.ZERO;
@@ -53,9 +79,16 @@ public abstract class DOT implements ArrayOperation {
         return retVal;
     }
 
-    public static <N extends Scalar<N>> N invoke(final Access1D<N> array2, final int offset2, final N[] array1, final int offset1, final int first,
+    /**
+     * The sum of array1(i)*array2(i), with array1 on the left in each product.
+     */
+    public static <N extends Scalar<N>> N invoke(final Access1D<N> array1, final int offset1, final N[] array2, final int offset2, final int first,
             final int limit, final Scalar.Factory<N> factory) {
-        return DOT.invoke(array1, offset1, array2, offset2, first, limit, factory);
+        Scalar<N> retVal = factory.zero();
+        for (int i = first; i < limit; i++) {
+            retVal = retVal.add(array1.get(offset1 + i).multiply(array2[offset2 + i]));
+        }
+        return retVal.get();
     }
 
     public static BigDecimal invoke(final BigDecimal[] array1, final int offset1, final BigDecimal[] array2, final int offset2, final int first,
@@ -113,6 +146,43 @@ public abstract class DOT implements ArrayOperation {
         return DOT.unrolled04(array1, offset1, array2, offset2, first, limit);
     }
 
+    /**
+     * BLAS {@code ddot}: the sum of x<sub>i</sub>*y<sub>i</sub> over the {@code n} elements of x and y,
+     * stored from {@code offsetX} and {@code offsetY} with increments {@code incX} and {@code incY}. As in
+     * BLAS, a negative increment walks the vector backwards, and the offset is still the lowest index
+     * accessed.
+     */
+    public static double invoke(final int n, final double[] x, final int offsetX, final int incX, final double[] y, final int offsetY, final int incY) {
+        if (n <= 0) {
+            return PrimitiveMath.ZERO;
+        }
+        return JVM.invoke(n, x, offsetX, incX, y, offsetY, incY);
+    }
+
+    /**
+     * BLAS {@code sdot}.
+     *
+     * @see #invoke(int, double[], int, int, double[], int, int)
+     */
+    public static float invoke(final int n, final float[] x, final int offsetX, final int incX, final float[] y, final int offsetY, final int incY) {
+
+        if (n <= 0) {
+            return 0F;
+        }
+
+        if (incX == 1 && incY == 1) {
+            return DOT.unrolled04(x, offsetX, y, offsetY, 0, n);
+        }
+
+        float retVal = 0F;
+        int ix = incX < 0 ? offsetX - (n - 1) * incX : offsetX;
+        int iy = incY < 0 ? offsetY - (n - 1) * incY : offsetY;
+        for (int i = 0; i < n; i++, ix += incX, iy += incY) {
+            retVal += x[ix] * y[iy];
+        }
+        return retVal;
+    }
+
     public static <N extends Scalar<N>> N invoke(final N[] array1, final int offset1, final Access1D<N> array2, final int offset2, final int first,
             final int limit, final Scalar.Factory<N> factory) {
         Scalar<N> retVal = factory.zero();
@@ -144,32 +214,6 @@ public abstract class DOT implements ArrayOperation {
         double retVal = PrimitiveMath.ZERO;
         for (int i = first; i < limit; i++) {
             retVal += array1.doubleValue(offset1 + i) * array2.doubleValue(offset2 + i);
-        }
-        return retVal;
-    }
-
-    /**
-     * Strided dot product matching the BLAS ddot convention. Computes
-     * {@code sum(array1[base1 + i*inc1] * array2[base2 + i*inc2])} for {@code i = 0..count-1}.
-     */
-    public static double invoke(final double[] array1, final int base1, final int inc1, final double[] array2, final int base2, final int inc2,
-            final int count) {
-        double retVal = 0D;
-        for (int i = 0, ix = base1, iy = base2; i < count; i++, ix += inc1, iy += inc2) {
-            retVal += array1[ix] * array2[iy];
-        }
-        return retVal;
-    }
-
-    /**
-     * Strided dot product matching the BLAS sdot convention.
-     *
-     * @see #invoke(double[], int, int, double[], int, int, int)
-     */
-    public static float invoke(final float[] array1, final int base1, final int inc1, final float[] array2, final int base2, final int inc2, final int count) {
-        float retVal = 0F;
-        for (int i = 0, ix = base1, iy = base2; i < count; i++, ix += inc1, iy += inc2) {
-            retVal += array1[ix] * array2[iy];
         }
         return retVal;
     }

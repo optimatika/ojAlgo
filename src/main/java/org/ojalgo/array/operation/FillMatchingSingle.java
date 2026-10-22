@@ -23,6 +23,10 @@ package org.ojalgo.array.operation;
 
 import java.math.BigDecimal;
 
+import org.ojalgo.concurrent.DivideAndConquer;
+import org.ojalgo.concurrent.Parallelism;
+import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
@@ -32,61 +36,68 @@ public abstract class FillMatchingSingle implements ArrayOperation {
 
     public static int THRESHOLD = 256;
 
-    public static void conjugate(final BigDecimal[] data, final int structure, final int firstColumn, final int limitColumn, final Access2D<?> source) {
-        FillMatchingSingle.transpose(data, structure, firstColumn, limitColumn, source);
+    private static final DivideAndConquer.Divider DIVIDER = Parallelism.THREADS.newDivider();
+
+    public static void conjugate(final BigDecimal[] data, final int structure, final Access2D<?> source) {
+        FillMatchingSingle.transpose(data, structure, source);
     }
 
-    public static void conjugate(final double[] data, final int structure, final int firstColumn, final int limitColumn, final Access2D<?> source) {
-        FillMatchingSingle.transpose(data, structure, firstColumn, limitColumn, source);
+    public static void conjugate(final double[] data, final int structure, final Access2D<?> source) {
+        FillMatchingSingle.transpose(data, structure, source);
     }
 
-    public static <N extends Scalar<N>> void conjugate(final N[] data, final int structure, final int firstColumn, final int limitColumn,
-            final Access2D<?> source, final Scalar.Factory<N> scalar) {
-        int index = structure * firstColumn;
-        for (int j = firstColumn; j < limitColumn; j++) {
-            for (int i = 0; i < structure; i++) {
-                data[index++] = scalar.cast(source.get(j, i)).conjugate().get();
-            }
+    public static <N extends Scalar<N>> void conjugate(final N[] data, final int structure, final Access2D<?> source, final Scalar.Factory<N> scalar) {
+
+        int nbCols = structure > 0 ? data.length / structure : 0;
+
+        if (nbCols > THRESHOLD) {
+            DIVIDER.threshold(THRESHOLD).divide(0, nbCols, (f, l) -> FillMatchingSingle.conjugate(data, structure, f, l, source, scalar));
+        } else {
+            FillMatchingSingle.conjugate(data, structure, 0, nbCols, source, scalar);
         }
     }
 
-    public static void copy(final BigDecimal[] data, final int structure, final int firstColumn, final int limitColumn,
-            final Access2D<? extends Comparable<?>> source) {
-        int index = structure * firstColumn;
-        for (int j = firstColumn; j < limitColumn; j++) {
-            for (int i = 0; i < structure; i++) {
-                data[index++] = TypeUtils.toBigDecimal(source.get(i, j));
-            }
+    public static void copy(final BigDecimal[] data, final int structure, final Access2D<? extends Comparable<?>> source) {
+
+        int nbCols = structure > 0 ? data.length / structure : 0;
+
+        if (nbCols > THRESHOLD) {
+            DIVIDER.threshold(THRESHOLD).divide(0, nbCols, (f, l) -> FillMatchingSingle.copy(data, structure, f, l, source));
+        } else {
+            FillMatchingSingle.copy(data, structure, 0, nbCols, source);
         }
     }
 
-    public static void copy(final double[] data, final int structure, final int firstColumn, final int limitColumn,
-            final Access2D<? extends Comparable<?>> source) {
-        int index = structure * firstColumn;
-        for (int j = firstColumn; j < limitColumn; j++) {
-            for (int i = 0; i < structure; i++) {
-                data[index++] = source.doubleValue(i, j);
-            }
+    public static void copy(final double[] data, final int structure, final Access2D<? extends Comparable<?>> source) {
+
+        int nbCols = structure > 0 ? data.length / structure : 0;
+
+        if (nbCols > THRESHOLD) {
+            DIVIDER.threshold(THRESHOLD).divide(0, nbCols, (f, l) -> FillMatchingSingle.copy(data, structure, f, l, source));
+        } else {
+            FillMatchingSingle.copy(data, structure, 0, nbCols, source);
         }
     }
 
-    public static void copy(final float[] data, final int structure, final int firstColumn, final int limitColumn,
-            final Access2D<? extends Comparable<?>> source) {
-        int index = structure * firstColumn;
-        for (int j = firstColumn; j < limitColumn; j++) {
-            for (int i = 0; i < structure; i++) {
-                data[index++] = source.floatValue(i, j);
-            }
+    public static void copy(final float[] data, final int structure, final Access2D<? extends Comparable<?>> source) {
+
+        int nbCols = structure > 0 ? data.length / structure : 0;
+
+        if (nbCols > THRESHOLD) {
+            DIVIDER.threshold(THRESHOLD).divide(0, nbCols, (f, l) -> FillMatchingSingle.copy(data, structure, f, l, source));
+        } else {
+            FillMatchingSingle.copy(data, structure, 0, nbCols, source);
         }
     }
 
-    public static <N extends Scalar<N>> void copy(final N[] data, final int structure, final int firstColumn, final int limitColumn, final Access2D<?> source,
-            final Scalar.Factory<N> scalar) {
-        int index = structure * firstColumn;
-        for (int j = firstColumn; j < limitColumn; j++) {
-            for (int i = 0; i < structure; i++) {
-                data[index++] = scalar.cast(source.get(i, j));
-            }
+    public static <N extends Scalar<N>> void copy(final N[] data, final int structure, final Access2D<?> source, final Scalar.Factory<N> scalar) {
+
+        int nbCols = structure > 0 ? data.length / structure : 0;
+
+        if (nbCols > THRESHOLD) {
+            DIVIDER.threshold(THRESHOLD).divide(0, nbCols, (f, l) -> FillMatchingSingle.copy(data, structure, f, l, source, scalar));
+        } else {
+            FillMatchingSingle.copy(data, structure, 0, nbCols, source, scalar);
         }
     }
 
@@ -125,6 +136,29 @@ public abstract class FillMatchingSingle implements ArrayOperation {
         }
     }
 
+    public static void fillMatching(final double[] data, final int structure, final UnaryFunction<Double> function, final Access1D<Double> arguments) {
+
+        int limit = MissingMath.toMinIntExact(data.length, arguments.count());
+
+        if (structure > 0 && data.length / structure > THRESHOLD) {
+            DIVIDER.threshold(THRESHOLD * THRESHOLD).divide(0, limit, (f, l) -> OperationUnary.invoke(data, f, l, 1, arguments, function));
+        } else {
+            OperationUnary.invoke(data, 0, limit, 1, arguments, function);
+        }
+    }
+
+    public static <N extends Comparable<N>> void fillMatching(final N[] data, final int structure, final UnaryFunction<N> function,
+            final Access1D<N> arguments) {
+
+        int limit = MissingMath.toMinIntExact(data.length, arguments.count());
+
+        if (structure > 0 && data.length / structure > THRESHOLD) {
+            DIVIDER.threshold(THRESHOLD * THRESHOLD).divide(0, limit, (f, l) -> OperationUnary.invoke(data, f, l, 1, arguments, function));
+        } else {
+            OperationUnary.invoke(data, 0, limit, 1, arguments, function);
+        }
+    }
+
     public static void invoke(final double[] source, final int sourceOffset, final double[] destination, final int destinationOffset, final int first,
             final int limit) {
         for (int i = first; i < limit; i++) {
@@ -132,7 +166,101 @@ public abstract class FillMatchingSingle implements ArrayOperation {
         }
     }
 
-    public static void transpose(final BigDecimal[] data, final int structure, final int firstColumn, final int limitColumn, final Access2D<?> source) {
+    public static void transpose(final BigDecimal[] data, final int structure, final Access2D<?> source) {
+
+        int nbCols = structure > 0 ? data.length / structure : 0;
+
+        if (nbCols > THRESHOLD) {
+            DIVIDER.threshold(THRESHOLD).divide(0, nbCols, (f, l) -> FillMatchingSingle.transpose(data, structure, f, l, source));
+        } else {
+            FillMatchingSingle.transpose(data, structure, 0, nbCols, source);
+        }
+    }
+
+    public static void transpose(final double[] data, final int structure, final Access2D<?> source) {
+
+        int nbCols = structure > 0 ? data.length / structure : 0;
+
+        if (nbCols > THRESHOLD) {
+            DIVIDER.threshold(THRESHOLD).divide(0, nbCols, (f, l) -> FillMatchingSingle.transpose(data, structure, f, l, source));
+        } else {
+            FillMatchingSingle.transpose(data, structure, 0, nbCols, source);
+        }
+    }
+
+    public static void transpose(final float[] data, final int structure, final Access2D<?> source) {
+
+        int nbCols = structure > 0 ? data.length / structure : 0;
+
+        if (nbCols > THRESHOLD) {
+            DIVIDER.threshold(THRESHOLD).divide(0, nbCols, (f, l) -> FillMatchingSingle.transpose(data, structure, f, l, source));
+        } else {
+            FillMatchingSingle.transpose(data, structure, 0, nbCols, source);
+        }
+    }
+
+    public static <N extends Scalar<N>> void transpose(final N[] data, final int structure, final Access2D<?> source, final Scalar.Factory<N> scalar) {
+
+        int nbCols = structure > 0 ? data.length / structure : 0;
+
+        if (nbCols > THRESHOLD) {
+            DIVIDER.threshold(THRESHOLD).divide(0, nbCols, (f, l) -> FillMatchingSingle.transpose(data, structure, f, l, source, scalar));
+        } else {
+            FillMatchingSingle.transpose(data, structure, 0, nbCols, source, scalar);
+        }
+    }
+
+    private static <N extends Scalar<N>> void conjugate(final N[] data, final int structure, final int firstColumn, final int limitColumn,
+            final Access2D<?> source, final Scalar.Factory<N> scalar) {
+        int index = structure * firstColumn;
+        for (int j = firstColumn; j < limitColumn; j++) {
+            for (int i = 0; i < structure; i++) {
+                data[index++] = scalar.cast(source.get(j, i)).conjugate().get();
+            }
+        }
+    }
+
+    private static void copy(final BigDecimal[] data, final int structure, final int firstColumn, final int limitColumn,
+            final Access2D<? extends Comparable<?>> source) {
+        int index = structure * firstColumn;
+        for (int j = firstColumn; j < limitColumn; j++) {
+            for (int i = 0; i < structure; i++) {
+                data[index++] = TypeUtils.toBigDecimal(source.get(i, j));
+            }
+        }
+    }
+
+    private static void copy(final double[] data, final int structure, final int firstColumn, final int limitColumn,
+            final Access2D<? extends Comparable<?>> source) {
+        int index = structure * firstColumn;
+        for (int j = firstColumn; j < limitColumn; j++) {
+            for (int i = 0; i < structure; i++) {
+                data[index++] = source.doubleValue(i, j);
+            }
+        }
+    }
+
+    private static void copy(final float[] data, final int structure, final int firstColumn, final int limitColumn,
+            final Access2D<? extends Comparable<?>> source) {
+        int index = structure * firstColumn;
+        for (int j = firstColumn; j < limitColumn; j++) {
+            for (int i = 0; i < structure; i++) {
+                data[index++] = source.floatValue(i, j);
+            }
+        }
+    }
+
+    private static <N extends Scalar<N>> void copy(final N[] data, final int structure, final int firstColumn, final int limitColumn, final Access2D<?> source,
+            final Scalar.Factory<N> scalar) {
+        int index = structure * firstColumn;
+        for (int j = firstColumn; j < limitColumn; j++) {
+            for (int i = 0; i < structure; i++) {
+                data[index++] = scalar.cast(source.get(i, j));
+            }
+        }
+    }
+
+    private static void transpose(final BigDecimal[] data, final int structure, final int firstColumn, final int limitColumn, final Access2D<?> source) {
         int index = structure * firstColumn;
         for (int j = firstColumn; j < limitColumn; j++) {
             for (int i = 0; i < structure; i++) {
@@ -141,7 +269,7 @@ public abstract class FillMatchingSingle implements ArrayOperation {
         }
     }
 
-    public static void transpose(final double[] data, final int structure, final int firstColumn, final int limitColumn, final Access2D<?> source) {
+    private static void transpose(final double[] data, final int structure, final int firstColumn, final int limitColumn, final Access2D<?> source) {
         int index = structure * firstColumn;
         for (int j = firstColumn; j < limitColumn; j++) {
             for (int i = 0; i < structure; i++) {
@@ -150,7 +278,7 @@ public abstract class FillMatchingSingle implements ArrayOperation {
         }
     }
 
-    public static void transpose(final float[] data, final int structure, final int firstColumn, final int limitColumn, final Access2D<?> source) {
+    private static void transpose(final float[] data, final int structure, final int firstColumn, final int limitColumn, final Access2D<?> source) {
         int index = structure * firstColumn;
         for (int j = firstColumn; j < limitColumn; j++) {
             for (int i = 0; i < structure; i++) {
@@ -159,7 +287,7 @@ public abstract class FillMatchingSingle implements ArrayOperation {
         }
     }
 
-    public static <N extends Scalar<N>> void transpose(final N[] data, final int structure, final int firstColumn, final int limitColumn,
+    private static <N extends Scalar<N>> void transpose(final N[] data, final int structure, final int firstColumn, final int limitColumn,
             final Access2D<?> source, final Scalar.Factory<N> scalar) {
         int index = structure * firstColumn;
         for (int j = firstColumn; j < limitColumn; j++) {

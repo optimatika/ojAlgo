@@ -143,8 +143,77 @@ abstract class DenseBidiagonal<N extends Comparable<N>, M extends PhysicalStore<
 
         @Override
         Array1D<Quaternion>[] makeReal() {
-            // TODO Implement something similar to what's in "Complex"
-            return null;
+
+            DiagonalStore<Quaternion, Array1D<Quaternion>> tmpDiagonalAccessD = this.doGetDiagonal();
+
+            // [B] = [P][B'][R]^H with [B'] real, [P] and [R] diagonal unitary: left factors (rows) multiply from
+            // the left, right factors (columns) from the right
+            Array1D<Quaternion> tmpInitDiagQ1 = Array1D.H256.make(tmpDiagonalAccessD.getDimension());
+            tmpInitDiagQ1.fillAll(Quaternion.ONE);
+
+            Array1D<Quaternion> tmpInitDiagQ2 = Array1D.H256.make(tmpDiagonalAccessD.getDimension());
+            tmpInitDiagQ2.fillAll(Quaternion.ONE);
+
+            Array1D<Quaternion> tmpMainDiagonal = tmpDiagonalAccessD.getMainDiagonal().get();
+
+            if (this.isUpper()) {
+
+                Array1D<Quaternion> tmpSuperdiagonal = tmpDiagonalAccessD.getSuperdiagonal().get();
+
+                int tmpLimit = (int) tmpSuperdiagonal.count();
+                for (int i = 0; i < tmpLimit; i++) {
+
+                    if (!tmpMainDiagonal.get(i).isReal()) {
+                        Quaternion tmpSignum = tmpMainDiagonal.get(i).normalised();
+                        tmpMainDiagonal.set(i, tmpSignum.conjugate().multiply(tmpMainDiagonal.get(i)));
+                        tmpSuperdiagonal.set(i, tmpSignum.conjugate().multiply(tmpSuperdiagonal.get(i)));
+                        tmpInitDiagQ1.set(i, tmpSignum);
+                    }
+
+                    if (!tmpSuperdiagonal.get(i).isReal()) {
+                        Quaternion tmpSignum = tmpSuperdiagonal.get(i).normalised();
+                        tmpSuperdiagonal.set(i, tmpSuperdiagonal.get(i).multiply(tmpSignum.conjugate()));
+                        tmpMainDiagonal.set(i + 1, tmpMainDiagonal.get(i + 1).multiply(tmpSignum.conjugate()));
+                        tmpInitDiagQ2.set(i + 1, tmpSignum.conjugate());
+                    }
+                }
+
+                if (!tmpMainDiagonal.get(tmpLimit).isReal()) {
+                    Quaternion tmpSignum = tmpMainDiagonal.get(tmpLimit).normalised();
+                    tmpMainDiagonal.set(tmpLimit, tmpSignum.conjugate().multiply(tmpMainDiagonal.get(tmpLimit)));
+                    tmpInitDiagQ1.set(tmpLimit, tmpSignum);
+                }
+
+            } else {
+
+                Array1D<Quaternion> tmpSubdiagonal = tmpDiagonalAccessD.getSubdiagonal().get();
+
+                int tmpLimit = (int) tmpSubdiagonal.count();
+                for (int i = 0; i < tmpLimit; i++) {
+
+                    if (!tmpMainDiagonal.get(i).isReal()) {
+                        Quaternion tmpSignum = tmpMainDiagonal.get(i).normalised();
+                        tmpMainDiagonal.set(i, tmpMainDiagonal.get(i).multiply(tmpSignum.conjugate()));
+                        tmpSubdiagonal.set(i, tmpSubdiagonal.get(i).multiply(tmpSignum.conjugate()));
+                        tmpInitDiagQ2.set(i, tmpSignum.conjugate());
+                    }
+
+                    if (!tmpSubdiagonal.get(i).isReal()) {
+                        Quaternion tmpSignum = tmpSubdiagonal.get(i).normalised();
+                        tmpSubdiagonal.set(i, tmpSignum.conjugate().multiply(tmpSubdiagonal.get(i)));
+                        tmpMainDiagonal.set(i + 1, tmpSignum.conjugate().multiply(tmpMainDiagonal.get(i + 1)));
+                        tmpInitDiagQ1.set(i + 1, tmpSignum);
+                    }
+                }
+
+                if (!tmpMainDiagonal.get(tmpLimit).isReal()) {
+                    Quaternion tmpSignum = tmpMainDiagonal.get(tmpLimit).normalised();
+                    tmpMainDiagonal.set(tmpLimit, tmpMainDiagonal.get(tmpLimit).multiply(tmpSignum.conjugate()));
+                    tmpInitDiagQ2.set(tmpLimit, tmpSignum.conjugate());
+                }
+            }
+
+            return new Array1D[] { tmpInitDiagQ1, tmpInitDiagQ2 };
         }
 
     }

@@ -21,27 +21,23 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import java.util.Arrays;
-
 import org.ojalgo.array.Array1D;
+import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.BasicArray;
-import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.operation.GenerateApplyAndCopyHouseholderColumn;
-import org.ojalgo.matrix.operation.HermitianStep;
-import org.ojalgo.matrix.operation.HouseholderHermitian;
-import org.ojalgo.matrix.operation.HouseholderStep;
+import org.ojalgo.array.ScalarArray;
+import org.ojalgo.matrix.operation.ORGTR;
+import org.ojalgo.matrix.operation.SYTRD;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.TransformableRegion;
-import org.ojalgo.matrix.transformation.Householder;
-import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access2D;
 
 /**
@@ -49,10 +45,10 @@ import org.ojalgo.structure.Access2D;
  */
 abstract class DeferredTridiagonal<N extends Comparable<N>, M extends PhysicalStore<N>> extends DenseTridiagonal<N, M> {
 
-    static final class C128 extends DeferredTridiagonal<ComplexNumber, GenericStore<ComplexNumber>> {
+    static final class C128 extends Generic<ComplexNumber> {
 
         C128() {
-            super(GenericStore.C128, GenerateApplyAndCopyHouseholderColumn::invokeGeneric, HouseholderHermitian::invokeGeneric);
+            super(GenericStore.C128);
         }
 
         @Override
@@ -86,10 +82,34 @@ abstract class DeferredTridiagonal<N extends Comparable<N>, M extends PhysicalSt
 
     }
 
-    static final class H256 extends DeferredTridiagonal<Quaternion, GenericStore<Quaternion>> {
+    /**
+     * The number types other than double, stored in a {@link GenericStore}.
+     */
+    abstract static class Generic<N extends Scalar<N>> extends DeferredTridiagonal<N, GenericStore<N>> {
+
+        Generic(final GenericStore.Factory<N> factory) {
+            super(factory);
+        }
+
+        @Override
+        void generateQ(final GenericStore<N> inPlace, final BasicArray<N> tau) {
+            int n = inPlace.getRowDim();
+            ORGTR.invoke(n, inPlace.data, 0, Math.max(1, n), ((ScalarArray<N>) tau).data, 0, inPlace.physical().scalar());
+        }
+
+        @Override
+        void reduce(final GenericStore<N> inPlace, final BasicArray<N> d, final BasicArray<N> e, final BasicArray<N> tau) {
+            int n = inPlace.getRowDim();
+            SYTRD.invoke(n, inPlace.data, 0, Math.max(1, n), ((ScalarArray<N>) d).data, 0, ((ScalarArray<N>) e).data, 0, ((ScalarArray<N>) tau).data, 0,
+                    inPlace.physical().scalar());
+        }
+
+    }
+
+    static final class H256 extends Generic<Quaternion> {
 
         H256() {
-            super(GenericStore.H256, GenerateApplyAndCopyHouseholderColumn::invokeGeneric, HouseholderHermitian::invokeGeneric);
+            super(GenericStore.H256);
         }
 
         @Override
@@ -123,10 +143,10 @@ abstract class DeferredTridiagonal<N extends Comparable<N>, M extends PhysicalSt
 
     }
 
-    static final class Q128 extends DeferredTridiagonal<RationalNumber, GenericStore<RationalNumber>> {
+    static final class Q128 extends Generic<RationalNumber> {
 
         Q128() {
-            super(GenericStore.Q128, GenerateApplyAndCopyHouseholderColumn::invokeGeneric, HouseholderHermitian::invokeGeneric);
+            super(GenericStore.Q128);
         }
 
         @Override
@@ -138,7 +158,13 @@ abstract class DeferredTridiagonal<N extends Comparable<N>, M extends PhysicalSt
     static final class R064 extends DeferredTridiagonal<Double, R064Store> {
 
         R064() {
-            super(R064Store.FACTORY, GenerateApplyAndCopyHouseholderColumn::invokeR064, HouseholderHermitian::invokeR064);
+            super(R064Store.FACTORY);
+        }
+
+        @Override
+        void generateQ(final R064Store inPlace, final BasicArray<Double> tau) {
+            int n = inPlace.getRowDim();
+            ORGTR.invoke(n, inPlace.data, 0, Math.max(1, n), ((ArrayR064) tau).data, 0);
         }
 
         @Override
@@ -146,12 +172,18 @@ abstract class DeferredTridiagonal<N extends Comparable<N>, M extends PhysicalSt
             return null;
         }
 
+        @Override
+        void reduce(final R064Store inPlace, final BasicArray<Double> d, final BasicArray<Double> e, final BasicArray<Double> tau) {
+            int n = inPlace.getRowDim();
+            SYTRD.invoke(n, inPlace.data, 0, Math.max(1, n), ((ArrayR064) d).data, 0, ((ArrayR064) e).data, 0, ((ArrayR064) tau).data, 0);
+        }
+
     }
 
-    static final class R128 extends DeferredTridiagonal<Quadruple, GenericStore<Quadruple>> {
+    static final class R128 extends Generic<Quadruple> {
 
         R128() {
-            super(GenericStore.R128, GenerateApplyAndCopyHouseholderColumn::invokeGeneric, HouseholderHermitian::invokeGeneric);
+            super(GenericStore.R128);
         }
 
         @Override
@@ -160,22 +192,16 @@ abstract class DeferredTridiagonal<N extends Comparable<N>, M extends PhysicalSt
         }
     }
 
-    /**
-     * beta of the reflectors, 0 where there is none
-     */
-    private double[] myBeta = null;
     private transient BasicArray<N> myDiagD = null;
     private transient BasicArray<N> myDiagE = null;
-    private final HouseholderStep<N, M> myHouseholderColumn;
-    private final HermitianStep<N, M> myHouseholderHermitian;
     private Array1D<N> myInitDiagQ = null;
-    private transient BasicArray<N> myWorker = null;
+    /**
+     * tau of the reflectors, as returned by {@link SYTRD}
+     */
+    private BasicArray<N> myTau = null;
 
-    protected DeferredTridiagonal(final PhysicalStore.Factory<N, ? extends M> factory, final HouseholderStep<N, M> householderColumn,
-            final HermitianStep<N, M> householderHermitian) {
+    protected DeferredTridiagonal(final PhysicalStore.Factory<N, ? extends M> factory) {
         super(factory);
-        myHouseholderColumn = householderColumn;
-        myHouseholderHermitian = householderHermitian;
     }
 
     public boolean decompose(final Access2D.Collectable<N, ? super TransformableRegion<N>> matrix) {
@@ -195,27 +221,10 @@ abstract class DeferredTridiagonal<N extends Comparable<N>, M extends PhysicalSt
             if (myDiagD == null || myDiagD.count() != size) {
                 myDiagD = this.makeArray(size);
                 myDiagE = this.makeArray(size);
-                myWorker = this.makeArray(size);
+                myTau = this.makeArray(size);
             }
 
-            if (myBeta == null || myBeta.length != size) {
-                myBeta = new double[size];
-            } else {
-                Arrays.fill(myBeta, PrimitiveMath.ZERO);
-            }
-
-            Householder<N> tmpHouseholder = this.makeHouseholder(size);
-
-            int limit = size - 2;
-            for (int ij = 0; ij < limit; ij++) {
-                if (myHouseholderColumn.invoke(inPlace, ij + 1, ij, tmpHouseholder)) {
-                    myHouseholderHermitian.invoke(inPlace, tmpHouseholder, myWorker);
-                    myBeta[ij] = InPlaceDecomposition.getBeta(tmpHouseholder);
-                }
-            }
-
-            myDiagD.fillMatching(inPlace.sliceDiagonal(0, 0));
-            myDiagE.fillMatching(inPlace.sliceDiagonal(1, 0));
+            this.reduce(inPlace, myDiagD, myDiagE, myTau);
 
             myInitDiagQ = this.makeReal(myDiagE);
 
@@ -247,6 +256,12 @@ abstract class DeferredTridiagonal<N extends Comparable<N>, M extends PhysicalSt
         myDiagE.supplyTo(e);
     }
 
+    /**
+     * Overwrites the reflectors in the lower triangle of the reduced matrix with Q, using tau as returned by
+     * {@link #reduce(PhysicalStore, BasicArray, BasicArray, BasicArray)}.
+     */
+    abstract void generateQ(M inPlace, BasicArray<N> tau);
+
     @Override
     MatrixStore<N> makeD() {
         return this.makeDiagonal(myDiagD).superdiagonal(myDiagE).subdiagonal(myDiagE).get();
@@ -256,39 +271,18 @@ abstract class DeferredTridiagonal<N extends Comparable<N>, M extends PhysicalSt
     M makeQ() {
 
         M retVal = this.getInPlace();
-        int tmpDim = this.getMinDim();
 
-        HouseholderReference<N> tmpReference = HouseholderReference.makeColumn(retVal);
-        Householder<N> worker = this.makeHouseholder(tmpDim);
-        PhysicalStore.Factory<N, ?> factory = retVal.physical();
-        N zero = this.scalar().zero().get();
+        this.generateQ(retVal, myTau);
 
         if (myInitDiagQ != null) {
-            retVal.set(tmpDim - 1, tmpDim - 1, myInitDiagQ.get(tmpDim - 1));
-            if (tmpDim >= 2) {
-                retVal.set(tmpDim - 2, tmpDim - 2, myInitDiagQ.get(tmpDim - 2));
-            }
-        } else {
-            retVal.set(tmpDim - 1, tmpDim - 1, PrimitiveMath.ONE);
-            if (tmpDim >= 2) {
-                retVal.set(tmpDim - 2, tmpDim - 2, PrimitiveMath.ONE);
-            }
-        }
-        if (tmpDim >= 2) {
-            retVal.set(tmpDim - 1, tmpDim - 2, PrimitiveMath.ZERO);
-        }
-
-        for (int ij = tmpDim - 3; ij >= 0; ij--) {
-
-            if (myBeta[ij] != PrimitiveMath.ZERO) {
-                tmpReference.point(ij + 1, ij);
-                retVal.transformLeft(InPlaceDecomposition.copyReflector(worker, tmpReference, myBeta[ij], factory), ij);
-            }
-
-            retVal.set(ij, ij, PrimitiveMath.ONE);
-            retVal.fillColumn(ij + 1, ij, zero);
-            if (myInitDiagQ != null) {
-                retVal.set(ij, ij, myInitDiagQ.get(ij));
+            // Q * diag(myInitDiagQ)
+            Scalar.Factory<N> scalar = this.scalar();
+            int n = this.getMinDim();
+            for (int j = 0; j < n; j++) {
+                N phase = myInitDiagQ.get(j);
+                for (int i = 0; i < n; i++) {
+                    retVal.set(i, j, scalar.convert(retVal.get(i, j)).multiply(phase).get());
+                }
             }
         }
 
@@ -296,5 +290,11 @@ abstract class DeferredTridiagonal<N extends Comparable<N>, M extends PhysicalSt
     }
 
     abstract Array1D<N> makeReal(BasicArray<N> offDiagonal);
+
+    /**
+     * Reduces the lower triangle of the in-place matrix to tridiagonal form, writing its diagonal and
+     * subdiagonal to d and e, and tau of the reflectors (that stay in the lower triangle) to tau.
+     */
+    abstract void reduce(M inPlace, BasicArray<N> d, BasicArray<N> e, BasicArray<N> tau);
 
 }

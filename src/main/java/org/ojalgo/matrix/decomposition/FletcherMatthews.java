@@ -28,6 +28,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
 
@@ -235,6 +236,149 @@ abstract class FletcherMatthews {
                 BasicLogger.debugMatrix("L", tmpL);
                 BasicLogger.debugMatrix("U", tmpU);
                 BasicLogger.debugMatrix("LU", tmpL.multiply(tmpU));
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * As {@link #update(Pivot, PhysicalStore, Pivot, int, Access1D.Collectable, PhysicalStore)}, for other
+     * number types. The calculations are done with the elements themselves, and the tolerances are compared
+     * with their norms. Multipliers are applied to the rows of U from the left, and to the columns of L from
+     * the right, so non-commutative types (quaternions) are handled as well.
+     *
+     * @param scalar The scalar factory of the number type
+     */
+    static <N extends Scalar<N>> boolean update(final Pivot rowOrder, final PhysicalStore<N> combined, final Pivot colOrder, final int columnIndex,
+            final Access1D.Collectable<N, ? super TransformableRegion<N>> column, final PhysicalStore<N> preallocated, final Scalar.Factory<N> scalar) {
+
+        int m = combined.getRowDim();
+        int n = combined.getColDim();
+
+        int col = colOrder.locationOf(columnIndex);
+
+        column.supplyTo(preallocated);
+        rowOrder.applyPivotOrder(preallocated);
+        preallocated.substituteForwards(combined, true, false, false);
+
+        N zero = scalar.zero().get();
+        N temp = zero, diag = zero;
+
+        int lastRowNonZero = -1;
+        for (int i = m - 1; i >= 0; i--) {
+            temp = preallocated.get(i);
+            if (!PRECISION.isZero(temp.norm())) {
+                lastRowNonZero = i;
+                diag = temp;
+                break;
+            }
+        }
+
+        if (lastRowNonZero < col) {
+
+            return false;
+
+        } else if (SAFE.isZero(diag.norm())) {
+
+            return false;
+
+        } else if (lastRowNonZero == col) {
+
+            for (int i = 0; i <= col; i++) {
+                combined.set(i, col, preallocated.get(i));
+            }
+
+        } else {
+
+            N offLr1, offLc1, offUr1;
+
+            for (int ij = col; ij < lastRowNonZero; ij++) {
+                int ijp1 = ij + 1;
+                int ijp2 = ij + 2;
+
+                offLr1 = combined.get(ijp1, ij);
+
+                colOrder.change(ij, ijp1);
+                for (int i = 0; i <= ijp1; i++) {
+                    combined.set(i, ij, combined.get(i, ijp1));
+                }
+
+                diag = combined.get(ij, ij);
+                offUr1 = combined.get(ijp1, ij);
+
+                if (offUr1.norm() > diag.norm()) {
+
+                    if (SAFE.isZero(offUr1.norm())) {
+                        return false;
+                    }
+
+                    combined.exchangeRows(ij, ijp1);
+                    preallocated.exchangeRows(ij, ijp1);
+
+                    rowOrder.change(ij, ijp1);
+
+                    for (int i = ijp2; i < m; i++) {
+                        temp = combined.get(i, ijp1);
+                        combined.set(i, ijp1, combined.get(i, ij));
+                        combined.set(i, ij, temp);
+                    }
+
+                    temp = diag;
+                    diag = offUr1;
+                    offUr1 = temp;
+
+                    offLc1 = offLr1;
+                    offLr1 = zero;
+
+                    if (!PRECISION.isZero(offLc1.norm())) {
+
+                        for (int i = ijp2; i < m; i++) {
+                            combined.set(i, ijp1, combined.get(i, ijp1).subtract(combined.get(i, ij).multiply(offLc1)).get());
+                        }
+
+                        for (int j = ij; j < n; j++) {
+                            combined.set(ij, j, combined.get(ij, j).add(offLc1.multiply(combined.get(ijp1, j))).get());
+                        }
+                        preallocated.set(ij, preallocated.get(ij).add(offLc1.multiply(preallocated.get(ijp1))).get());
+                        diag = diag.add(offLc1.multiply(offUr1)).get();
+                    }
+                }
+
+                if (SAFE.isZero(diag.norm())) {
+                    return false;
+                }
+
+                if (!PRECISION.isZero(offUr1.norm())) {
+
+                    if (SAFE.isSmall(offUr1.norm(), diag.norm())) {
+                        return false;
+                    }
+
+                    temp = offUr1.divide(diag).get();
+
+                    for (int j = ijp2; j < n; j++) {
+                        combined.set(ijp1, j, combined.get(ijp1, j).subtract(temp.multiply(combined.get(ij, j))).get());
+                    }
+                    preallocated.set(ijp1, preallocated.get(ijp1).subtract(temp.multiply(preallocated.get(ij))).get());
+
+                    combined.set(ijp1, ij, offLr1.add(temp).get());
+                    for (int i = ijp2; i < m; i++) {
+                        combined.set(i, ij, combined.get(i, ij).add(combined.get(i, ijp1).multiply(temp)).get());
+                    }
+
+                } else {
+
+                    combined.set(ijp1, ij, zero);
+                }
+            }
+
+            if (SAFE.isZero(preallocated.get(lastRowNonZero).norm())) {
+                return false;
+            }
+
+            for (int i = 0; i <= lastRowNonZero; i++) {
+                combined.set(i, lastRowNonZero, preallocated.get(i));
             }
         }
 

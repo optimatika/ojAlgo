@@ -308,7 +308,7 @@ abstract class HermitianEvD<N extends Comparable<N>, M extends PhysicalStore<N>>
 
         MatrixStore<N> tmp = v.limits(-1, rank).onColumns(divide, values).collect(v.physical());
 
-        return tmp.multiply(tmp.transpose());
+        return tmp.multiply(tmp.conjugate());
     }
 
     @Override

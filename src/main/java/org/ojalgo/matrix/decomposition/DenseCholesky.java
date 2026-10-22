@@ -27,12 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ojalgo.RecoverableCondition;
-import org.ojalgo.array.BasicArray;
-import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.matrix.operation.ApplyCholesky;
-import org.ojalgo.matrix.operation.DivideAndCopyColumn;
-import org.ojalgo.matrix.operation.PivotStep;
+import org.ojalgo.matrix.operation.POTRF;
+import org.ojalgo.matrix.operation.POTRS;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -50,42 +47,172 @@ import org.ojalgo.structure.Access2D.Collectable;
 
 abstract class DenseCholesky<N extends Comparable<N>, M extends PhysicalStore<N>> extends InPlaceDecomposition<N, M> implements Cholesky<N> {
 
-    static final class C128 extends DenseCholesky<ComplexNumber, GenericStore<ComplexNumber>> {
+    static final class C128 extends Generic<ComplexNumber> {
 
         C128() {
-            super(GenericStore.C128, DivideAndCopyColumn::invokeGeneric, ApplyCholesky::invokeGeneric);
+            super(GenericStore.C128);
         }
 
     }
 
-    static final class H256 extends DenseCholesky<Quaternion, GenericStore<Quaternion>> {
+    /**
+     * The factorisation is done by {@link POTRF}. Square systems are solved, and inverted, by {@link POTRS}.
+     */
+    abstract static class Generic<N extends Scalar<N>> extends DenseCholesky<N, GenericStore<N>> {
+
+        Generic(final GenericStore.Factory<N> factory) {
+            super(factory);
+        }
+
+        @Override
+        boolean factorise(final GenericStore<N> inPlace) {
+
+            int dim = this.getRowDim();
+
+            int info = POTRF.invoke(false, dim, inPlace.data, 0, Math.max(1, dim), this.scalar(), this.function());
+
+            this.updateDiagonalRange(info == 0 ? dim : info - 1);
+
+            return info == 0;
+        }
+
+        @Override
+        void substitute(final PhysicalStore<N> arg) {
+
+            int dim = this.getRowDim();
+
+            if (this.isSquare() && arg instanceof GenericStore && arg.getRowDim() == dim) {
+                GenericStore<N> rhs = (GenericStore<N>) arg;
+                POTRS.invoke(false, dim, rhs.getColDim(), this.getInPlace().data, 0, Math.max(1, dim), rhs.data, 0, Math.max(1, dim), this.scalar());
+            } else {
+                super.substitute(arg);
+            }
+        }
+
+        @Override
+        void substituteColumns(final PhysicalStore<N> rhs) {
+
+            int dim = this.getRowDim();
+
+            if (this.isSquare() && rhs instanceof GenericStore && rhs.getRowDim() == dim) {
+                GenericStore<N> columns = (GenericStore<N>) rhs;
+                POTRS.invoke(false, dim, columns.getColDim(), this.getInPlace().data, 0, Math.max(1, dim), columns.data, 0, Math.max(1, dim), this.scalar());
+            } else {
+                super.substituteColumns(rhs);
+            }
+        }
+
+        @Override
+        MatrixStore<N> substituteIdentity(final PhysicalStore<N> preallocated) {
+
+            int dim = this.getRowDim();
+
+            if (this.isSquare() && preallocated instanceof GenericStore && preallocated.getRowDim() == dim && preallocated.getColDim() == dim) {
+                GenericStore<N> inverse = (GenericStore<N>) preallocated;
+                POTRS.invokeIdentity(false, dim, this.getInPlace().data, 0, Math.max(1, dim), inverse.data, 0, Math.max(1, dim), this.scalar());
+                return inverse;
+            } else {
+                return super.substituteIdentity(preallocated);
+            }
+        }
+
+    }
+
+    static final class H256 extends Generic<Quaternion> {
 
         H256() {
-            super(GenericStore.H256, DivideAndCopyColumn::invokeGeneric, ApplyCholesky::invokeGeneric);
+            super(GenericStore.H256);
         }
 
     }
 
-    static final class Q128 extends DenseCholesky<RationalNumber, GenericStore<RationalNumber>> {
+    static final class Q128 extends Generic<RationalNumber> {
 
         Q128() {
-            super(GenericStore.Q128, DivideAndCopyColumn::invokeGeneric, ApplyCholesky::invokeGeneric);
+            super(GenericStore.Q128);
         }
 
     }
 
+    /**
+     * The factorisation is done by {@link POTRF}. Square systems are solved, and inverted, by {@link POTRS}.
+     */
     static final class R064 extends DenseCholesky<Double, R064Store> {
 
         R064() {
-            super(R064Store.FACTORY, DivideAndCopyColumn::invokeR064, ApplyCholesky::invokeR064);
+            super(R064Store.FACTORY);
+        }
+
+        @Override
+        boolean factorise(final R064Store inPlace) {
+
+            int dim = this.getRowDim();
+
+            int info = POTRF.invoke(false, dim, inPlace.data, 0, Math.max(1, dim));
+
+            this.updateDiagonalRange(info == 0 ? dim : info - 1);
+
+            return info == 0;
+        }
+
+        @Override
+        void substitute(final double[] arg) {
+
+            int dim = this.getRowDim();
+
+            if (this.isSquare() && arg.length == dim) {
+                POTRS.invoke(false, dim, 1, this.getInPlace().data, 0, Math.max(1, dim), arg, 0, Math.max(1, dim));
+            } else {
+                super.substitute(arg);
+            }
+        }
+
+        @Override
+        void substitute(final PhysicalStore<Double> arg) {
+
+            int dim = this.getRowDim();
+
+            if (this.isSquare() && arg instanceof R064Store && arg.getRowDim() == dim) {
+                R064Store rhs = (R064Store) arg;
+                POTRS.invoke(false, dim, rhs.getColDim(), this.getInPlace().data, 0, Math.max(1, dim), rhs.data, 0, Math.max(1, dim));
+            } else {
+                super.substitute(arg);
+            }
+        }
+
+        @Override
+        void substituteColumns(final PhysicalStore<Double> rhs) {
+
+            int dim = this.getRowDim();
+
+            if (this.isSquare() && rhs instanceof R064Store && rhs.getRowDim() == dim) {
+                R064Store columns = (R064Store) rhs;
+                POTRS.invoke(false, dim, columns.getColDim(), this.getInPlace().data, 0, Math.max(1, dim), columns.data, 0, Math.max(1, dim));
+            } else {
+                super.substituteColumns(rhs);
+            }
+        }
+
+        @Override
+        MatrixStore<Double> substituteIdentity(final PhysicalStore<Double> preallocated) {
+
+            int dim = this.getRowDim();
+
+            if (this.isSquare() && preallocated instanceof R064Store && preallocated.getRowDim() == dim && preallocated.getColDim() == dim) {
+                R064Store inverse = (R064Store) preallocated;
+                POTRS.invokeIdentity(false, dim, this.getInPlace().data, 0, Math.max(1, dim), inverse.data, 0, Math.max(1, dim));
+                return inverse;
+            } else {
+                return super.substituteIdentity(preallocated);
+            }
         }
 
     }
 
-    static final class R128 extends DenseCholesky<Quadruple, GenericStore<Quadruple>> {
+    static final class R128 extends Generic<Quadruple> {
 
         R128() {
-            super(GenericStore.R128, DivideAndCopyColumn::invokeGeneric, ApplyCholesky::invokeGeneric);
+            super(GenericStore.R128);
         }
 
     }
@@ -97,17 +224,12 @@ abstract class DenseCholesky<N extends Comparable<N>, M extends PhysicalStore<N>
      */
     private static final double DEPENDENT = 1E-12;
 
-    private final PivotStep<N, M> myApplyCholesky;
-    private final PivotStep<N, M> myDivideAndCopyColumn;
     private double myMaxDiag = ONE;
     private double myMinDiag = ZERO;
     private boolean mySPD = false;
 
-    protected DenseCholesky(final PhysicalStore.Factory<N, ? extends M> factory, final PivotStep<N, M> divideAndCopyColumn,
-            final PivotStep<N, M> applyCholesky) {
+    protected DenseCholesky(final PhysicalStore.Factory<N, ? extends M> factory) {
         super(factory);
-        myDivideAndCopyColumn = divideAndCopyColumn;
-        myApplyCholesky = applyCholesky;
     }
 
     @Override
@@ -153,7 +275,7 @@ abstract class DenseCholesky<N extends Comparable<N>, M extends PhysicalStore<N>
         extended.set(dim, dim, SQRT.invoke(pivot));
 
         this.setInPlace(extended);
-        this.updateDiagonalRange();
+        this.updateDiagonalRange(this.getRowDim());
         mySPD = true;
 
         return this.computed(true);
@@ -204,20 +326,12 @@ abstract class DenseCholesky<N extends Comparable<N>, M extends PhysicalStore<N>
 
     @Override
     public void ftran(final double[] arg) {
-
-        PhysicalStore<N> body = this.getInPlace();
-
-        body.substituteForwards(false, false, arg);
-        body.substituteBackwards(true, false, arg);
+        this.substitute(arg);
     }
 
     @Override
     public void ftran(final PhysicalStore<N> arg) {
-
-        PhysicalStore<N> body = this.getInPlace();
-
-        body.substituteForwards(false, false, arg);
-        body.substituteBackwards(true, false, arg);
+        this.substitute(arg);
     }
 
     @Override
@@ -238,16 +352,7 @@ abstract class DenseCholesky<N extends Comparable<N>, M extends PhysicalStore<N>
 
     @Override
     public MatrixStore<N> getInverse(final PhysicalStore<N> preallocated) {
-
-        // No need to reset the contents of preallocated
-
-        PhysicalStore<N> body = this.getInPlace();
-
-        // With the last arg true, preallocated is assumed to an identity
-        preallocated.substituteForwards(body, false, false, true);
-        preallocated.substituteBackwards(body, false, true, true);
-
-        return preallocated.hermitian(false);
+        return this.substituteIdentity(preallocated);
     }
 
     @Override
@@ -283,10 +388,7 @@ abstract class DenseCholesky<N extends Comparable<N>, M extends PhysicalStore<N>
 
         rhs.supplyTo(preallocated);
 
-        PhysicalStore<N> body = this.getInPlace();
-
-        preallocated.substituteForwards(body, false, false, false);
-        preallocated.substituteBackwards(body, false, true, false);
+        this.substituteColumns(preallocated);
 
         return preallocated;
     }
@@ -398,7 +500,7 @@ abstract class DenseCholesky<N extends Comparable<N>, M extends PhysicalStore<N>
         }
 
         this.setInPlace(reduced);
-        this.updateDiagonalRange();
+        this.updateDiagonalRange(this.getRowDim());
         mySPD = true;
 
         return this.computed(true);
@@ -421,67 +523,101 @@ abstract class DenseCholesky<N extends Comparable<N>, M extends PhysicalStore<N>
         return mySPD && myMinDiag > this.getRankThreshold();
     }
 
-    private void updateDiagonalRange() {
-        PhysicalStore<N> inPlace = this.getInPlace();
-        myMaxDiag = MACHINE_SMALLEST;
-        myMinDiag = MACHINE_LARGEST;
-        for (int ij = 0, limit = this.getRowDim(); ij < limit; ij++) {
-            double diagonal = inPlace.doubleValue(ij, ij);
-            double pivot = diagonal * diagonal;
-            myMaxDiag = MAX.invoke(myMaxDiag, pivot);
-            myMinDiag = MIN.invoke(myMinDiag, pivot);
-        }
-    }
-
     boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean checkHermitian) {
 
         this.reset();
 
         M tmpInPlace = this.setInPlace(matrix);
 
-        int tmpRowDim = this.getRowDim();
-        int tmpColDim = this.getColDim();
-        int tmpMinDim = Math.min(tmpRowDim, tmpColDim);
-
         // true if (Hermitian) Positive Definite
-        boolean tmpPositiveDefinite = tmpRowDim == tmpColDim;
+        boolean tmpPositiveDefinite = this.getRowDim() == this.getColDim();
         myMaxDiag = MACHINE_SMALLEST;
         myMinDiag = MACHINE_LARGEST;
-
-        BasicArray<N> tmpMultipliers = this.makeArray(tmpRowDim);
 
         // Check if hermitian, maybe
         if (tmpPositiveDefinite && checkHermitian) {
             tmpPositiveDefinite &= tmpInPlace.isHermitian();
         }
 
-        UnaryFunction<N> tmpSqrtFunc = this.function().sqrt();
-
-        // Main loop - along the diagonal
-        for (int ij = 0; tmpPositiveDefinite && ij < tmpMinDim; ij++) {
-
-            // Do the calculations...
-            double tmpVal = tmpInPlace.doubleValue(ij, ij);
-            myMaxDiag = MAX.invoke(myMaxDiag, tmpVal);
-            myMinDiag = MIN.invoke(myMinDiag, tmpVal);
-            if (tmpVal > ZERO) {
-
-                tmpInPlace.modifyOne(ij, ij, tmpSqrtFunc);
-
-                // Calculate multipliers and copy to local column
-                // Current column, below the diagonal
-                myDivideAndCopyColumn.invoke(tmpInPlace, ij, tmpMultipliers);
-
-                // Remaining columns, below the diagonal
-                myApplyCholesky.invoke(tmpInPlace, ij, tmpMultipliers);
-
-            } else {
-
-                tmpPositiveDefinite = false;
-            }
+        if (tmpPositiveDefinite) {
+            tmpPositiveDefinite = this.factorise(tmpInPlace);
         }
 
         return this.computed(mySPD = tmpPositiveDefinite);
+    }
+
+    /**
+     * Factorises the (square) in-place matrix, [A]=[L][L]<sup>H</sup>, in its lower triangle, and updates the
+     * range of the pivots.
+     *
+     * @return true if [A] is positive definite (and the factorisation completed)
+     */
+    abstract boolean factorise(M inPlace);
+
+    /**
+     * Solves [L][L]<sup>H</sup>[x]=[b] in place – ftran, and btran.
+     */
+    void substitute(final double[] arg) {
+
+        PhysicalStore<N> body = this.getInPlace();
+
+        body.substituteForwards(false, false, arg);
+        body.substituteBackwards(true, false, arg);
+    }
+
+    /**
+     * @see #substitute(double[])
+     */
+    void substitute(final PhysicalStore<N> arg) {
+
+        PhysicalStore<N> body = this.getInPlace();
+
+        body.substituteForwards(false, false, arg);
+        body.substituteBackwards(true, false, arg);
+    }
+
+    /**
+     * Solves [L][L]<sup>H</sup>[X]=[B] in place, for all columns of [B].
+     */
+    void substituteColumns(final PhysicalStore<N> rhs) {
+
+        PhysicalStore<N> body = this.getInPlace();
+
+        rhs.substituteForwards(body, false, false, false);
+        rhs.substituteBackwards(body, false, true, false);
+    }
+
+    /**
+     * Solves [L][L]<sup>H</sup>[X]=[I], writing the inverse to preallocated.
+     *
+     * @return The inverse – preallocated, or a (Hermitian) view of it
+     */
+    MatrixStore<N> substituteIdentity(final PhysicalStore<N> preallocated) {
+
+        // No need to reset the contents of preallocated
+
+        PhysicalStore<N> body = this.getInPlace();
+
+        // With the last arg true, preallocated is assumed to an identity
+        preallocated.substituteForwards(body, false, false, true);
+        preallocated.substituteBackwards(body, false, true, true);
+
+        return preallocated.hermitian(false);
+    }
+
+    /**
+     * The range of the pivots – the diagonal elements of [L], squared – of the first rows/columns.
+     */
+    void updateDiagonalRange(final int limit) {
+        PhysicalStore<N> inPlace = this.getInPlace();
+        myMaxDiag = MACHINE_SMALLEST;
+        myMinDiag = MACHINE_LARGEST;
+        for (int ij = 0; ij < limit; ij++) {
+            double diagonal = inPlace.doubleValue(ij, ij);
+            double pivot = diagonal * diagonal;
+            myMaxDiag = MAX.invoke(myMaxDiag, pivot);
+            myMinDiag = MIN.invoke(myMinDiag, pivot);
+        }
     }
 
 }

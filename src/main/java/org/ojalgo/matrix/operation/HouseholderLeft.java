@@ -21,23 +21,19 @@
  */
 package org.ojalgo.matrix.operation;
 
-import java.util.function.IntSupplier;
-
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.DOT;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.concurrent.DivideAndConquer.Conquerer;
 import org.ojalgo.concurrent.Parallelism;
-import org.ojalgo.concurrent.ProcessingService;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.Scalar;
 
 public final class HouseholderLeft implements MatrixOperation {
 
-    public static IntSupplier PARALLELISM = Parallelism.THREADS;
     public static int THRESHOLD = 128;
 
-    private static final DivideAndConquer.Divider DIVIDER = ProcessingService.INSTANCE.newDivider();
+    private static final DivideAndConquer.Divider DIVIDER = Parallelism.CORES.newDivider();
 
     public static void call(final double[] data, final int structure, final int first, final double[] hVector, final int hFirst, final double hBeta) {
 
@@ -103,7 +99,7 @@ public final class HouseholderLeft implements MatrixOperation {
     }
 
     static void divide(final int first, final int limit, final Conquerer conquerer) {
-        DIVIDER.parallelism(PARALLELISM).threshold(THRESHOLD).divide(first, limit, conquerer);
+        DIVIDER.threshold(THRESHOLD).divide(first, limit, conquerer);
     }
 
     static void invoke(final double[] data, final int structure, final int first, final int limit, final double[] hVector, final int hFirst,
@@ -149,7 +145,7 @@ public final class HouseholderLeft implements MatrixOperation {
             tmpScale = tmpScale.multiply(hBeta);
             tmpIndex = hFirst + j * structure;
             for (int i = hFirst; i < structure; i++) {
-                data[tmpIndex] = data[tmpIndex].subtract(tmpScale.multiply(hVector[i])).get();
+                data[tmpIndex] = data[tmpIndex].subtract(hVector[i].multiply(tmpScale)).get();
                 tmpIndex++;
             }
         }

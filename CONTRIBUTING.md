@@ -22,7 +22,7 @@ All source lives under `org.ojalgo` with these key packages:
   - `MatrixR064`, `MatrixR032`, `MatrixC128`, etc. — user-facing immutable matrix types
   - `store/` — mutable matrix storage (`R064Store`, `GenericStore`, `SparseStore`, `RawStore`) plus logical/virtual stores (transposed, conjugated, sliced, composed)
   - `decomposition/` — LU, QR, Cholesky, SVD, Eigenvalue, LDL, Bidiagonal, Hessenberg, Tridiagonal with Dense/Raw/Sparse variants
-  - `operation/` — low-level BLAS-like primitives
+  - `operation/` — low-level operations, moving towards the BLAS/LAPACK API (see below)
 - **`optimisation`** — Mathematical programming:
   - `ExpressionsBasedModel` — the primary modelling API (variables + expressions/constraints)
   - `linear/` — Simplex solvers (primal, dual, phased, revised) with dense and sparse tableaux
@@ -32,6 +32,29 @@ All source lives under `org.ojalgo` with these key packages:
 - **`function`** — Mathematical functions, aggregators, constants (`PrimitiveMath`)
 - **`concurrent`** — Threading utilities used internally
 - **`data`** — Data science utilities (clustering, ANN)
+
+## BLAS/LAPACK Operations
+
+The low-level operations in `org.ojalgo.array.operation` and `org.ojalgo.matrix.operation` are moving towards the standard BLAS/LAPACK API. The design assumes all of BLAS and the LAPACK routines ojAlgo needs; they are added incrementally, `double` first, other precisions as overloads later.
+
+- One class per routine, named after it without the precision prefix: `GEMM`, `TRSM`, `DOT`, `GETRF`… Level 1 (vectors) belongs in `org.ojalgo.array.operation`; levels 2 and 3 and LAPACK – anything 2D – in `org.ojalgo.matrix.operation`.
+- The package-private tag interfaces `BLAS1`, `BLAS2`, `BLAS3` and `LAPACK` organise the routine classes. A class gets its tag once its API matches the BLAS/LAPACK signature. Older operations with BLAS-like names (`AMAX`, `ASUM`, `COPY`, `NRM2`, `SWAP`…) stay untagged until they are aligned.
+- The canonical entry point is `invoke(...)` with the CBLAS argument order and BLAS names (`m`, `n`, `k`, `alpha`, `beta`, `lda`, `incX`), except:
+  - always column-major, no layout argument;
+  - each pointer becomes an array followed by an offset (`a, offsetA, lda`);
+  - options are booleans (`transposeA`, `left`, `upper`, `unitDiagonal`);
+  - precision is chosen by overloading on the array type.
+- Semantics follow reference BLAS: argument checks (`ArrayOperation.checkArgument`, `IllegalArgumentException`), the same quick returns, beta 0 means C is not read, alpha 0 means A and B are not read, and a negative increment walks the vector backwards with the offset still the lowest index accessed.
+- Each routine class has a nested class `JVM` – the pure Java implementation, `JVM.invoke(...)`, with its kernels. It covers the full semantics and is multi-threaded above the routine's `THRESHOLD`. It calls other routines' `JVM.invoke`, never a dispatching `invoke`.
+- The outer class holds the API, the argument checks and quick returns, any special cases, and all thresholds. Other code calls the outer `invoke(...)`.
+- The call direction is from the ojAlgo-specific operations to the standard routines, never the reverse. `MultiplyNeither`, `SubstituteForwards`, `HouseholderLeft`… keep their special-case kernels (fixed small sizes, other number types) and call the standard routines for the general case. Such a change must not make their pure Java paths slower – check with JMH, and keep results bit-identical where possible.
+
+### Thresholds
+
+- The default is single-threaded. Thresholds decide when to switch to multi-threading.
+- Multi-threading: a package-private `static int THRESHOLD`, an equivalent matrix dimension (the work is compared with its cube), changed with `MatrixOperation.setThresholds*`. `MatrixOperation.chunk(...)` turns it into the part size for the `DivideAndConquer.Divider`.
+- Comparisons use `>` only, and the values don't sit on common benchmark sizes (powers of 2, the 1-2-5 series), so it is never ambiguous which side of a threshold a benchmark size is on.
+- Prefer simple, rough rules to finely tuned ones. Measure with JMH.
 
 ## Coding Conventions
 
@@ -63,6 +86,7 @@ All source lives under `org.ojalgo` with these key packages:
 - Use `TestUtils` (not JUnit `Assertions`) for test assertions.
 - Prefer deterministic tests. For numerics, use tolerances via `TestUtils` and avoid brittle equality checks.
 - Keep tests fast and focused.
+- The BLAS and LAPACK tests (`BLASLevel1Test`, `BLASLevel2Test`, `BLASLevel3Test`, `LAPACKTest`) run every case through `JVM.invoke(...)` and through the dispatching `invoke(...)`.
 - `MIPLIBTheEasySet` mirrors the MIPLIB benchmark, where every solver runs with its default settings: no per-model configuration there. A test that the defaults do not solve reliably is tagged `slow` or `unstable` (both excluded from the default run). Tests on user-supplied models (`IntegerUserFiles`) use whatever configuration solves the model best.
 
 ### Diagnosing flaky solver tests

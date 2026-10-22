@@ -73,6 +73,38 @@ import org.ojalgo.array.operation.ModifyAll;
 public interface MatrixOperation extends ArrayOperation {
 
     /**
+     * The size of the parts (rows or columns) to hand to a
+     * {@link org.ojalgo.concurrent.DivideAndConquer.Divider} when an operation is multi-threaded: as many
+     * rows or columns as it takes to make {@code threshold} cubed multiply-adds, given {@code workPerPart}
+     * for one row or column. The divider splits a range only while it is larger than this, in halves, so it
+     * splits only when the total work is larger than {@code threshold} cubed, and each part then gets more
+     * than half of that.
+     *
+     * @param threshold   The operation's multi-threading threshold, as an equivalent matrix dimension
+     * @param workPerPart The number of multiply-adds for one row or column
+     */
+    static int chunk(final int threshold, final double workPerPart) {
+        double chunk = Math.ceil(MatrixOperation.cube(threshold) / workPerPart);
+        return (int) Math.min(Integer.MAX_VALUE, Math.max(1.0, chunk));
+    }
+
+    /**
+     * As {@link #chunk(int, double)}, with the work for one row or column given as the product of two
+     * dimensions, such as m*k for a column of an m-by-n product with complexity k.
+     */
+    static int chunk(final int threshold, final double workRows, final double workCols) {
+        double chunk = Math.ceil(MatrixOperation.cube(threshold) / (workRows * workCols));
+        return (int) Math.min(Integer.MAX_VALUE, Math.max(1.0, chunk));
+    }
+
+    /**
+     * A threshold, given as an equivalent matrix dimension, as a number of multiply-adds.
+     */
+    static double cube(final double threshold) {
+        return threshold * threshold * threshold;
+    }
+
+    /**
      * Sets all matrix size operation thresholds to precisly this value.
      *
      * @param value The threshold
@@ -89,26 +121,32 @@ public interface MatrixOperation extends ArrayOperation {
      * @param max The max allowed value
      */
     static void setThresholdsMaxValue(final int max) {
-        ApplyCholesky.THRESHOLD = Math.min(max, ApplyCholesky.THRESHOLD);
         ApplyLDL.THRESHOLD = Math.min(max, ApplyLDL.THRESHOLD);
-        ApplyLU.THRESHOLD = Math.min(max, ApplyLU.THRESHOLD);
         FillMatchingDual.THRESHOLD = Math.min(max, FillMatchingDual.THRESHOLD);
         FillMatchingSingle.THRESHOLD = Math.min(max, FillMatchingSingle.THRESHOLD);
+        GEMM.THRESHOLD = Math.min(max, GEMM.THRESHOLD);
+        GEMV.THRESHOLD = Math.min(max, GEMV.THRESHOLD);
+        GEQRF.THRESHOLD = Math.min(max, GEQRF.THRESHOLD);
+        GETRF.THRESHOLD = Math.min(max, GETRF.THRESHOLD);
+        GETRS.THRESHOLD = Math.min(max, GETRS.THRESHOLD);
         GenerateApplyAndCopyHouseholderColumn.THRESHOLD = Math.min(max, GenerateApplyAndCopyHouseholderColumn.THRESHOLD);
         GenerateApplyAndCopyHouseholderRow.THRESHOLD = Math.min(max, GenerateApplyAndCopyHouseholderRow.THRESHOLD);
-        HermitianRank2Update.THRESHOLD = Math.min(max, HermitianRank2Update.THRESHOLD);
         HouseholderLeft.THRESHOLD = Math.min(max, HouseholderLeft.THRESHOLD);
         HouseholderRight.THRESHOLD = Math.min(max, HouseholderRight.THRESHOLD);
         ModifyAll.THRESHOLD = Math.min(max, ModifyAll.THRESHOLD);
         MultiplyBoth.THRESHOLD = Math.min(max, MultiplyBoth.THRESHOLD);
-        MultiplyHermitianAndVector.THRESHOLD = Math.min(max, MultiplyHermitianAndVector.THRESHOLD);
         MultiplyLeft.THRESHOLD = Math.min(max, MultiplyLeft.THRESHOLD);
         MultiplyNeither.THRESHOLD = Math.min(max, MultiplyNeither.THRESHOLD);
         MultiplyRight.THRESHOLD = Math.min(max, MultiplyRight.THRESHOLD);
+        ORMQR.THRESHOLD = Math.min(max, ORMQR.THRESHOLD);
+        POTRF.THRESHOLD = Math.min(max, POTRF.THRESHOLD);
+        POTRS.THRESHOLD = Math.min(max, POTRS.THRESHOLD);
         RotateLeft.THRESHOLD = Math.min(max, RotateLeft.THRESHOLD);
         RotateRight.THRESHOLD = Math.min(max, RotateRight.THRESHOLD);
+        SYTRD.THRESHOLD = Math.min(max, SYTRD.THRESHOLD);
         SubstituteBackwards.THRESHOLD = Math.min(max, SubstituteBackwards.THRESHOLD);
         SubstituteForwards.THRESHOLD = Math.min(max, SubstituteForwards.THRESHOLD);
+        TRTRS.THRESHOLD = Math.min(max, TRTRS.THRESHOLD);
     }
 
     /**
@@ -118,26 +156,32 @@ public interface MatrixOperation extends ArrayOperation {
      * @param min The min allowed value
      */
     static void setThresholdsMinValue(final int min) {
-        ApplyCholesky.THRESHOLD = Math.max(min, ApplyCholesky.THRESHOLD);
         ApplyLDL.THRESHOLD = Math.max(min, ApplyLDL.THRESHOLD);
-        ApplyLU.THRESHOLD = Math.max(min, ApplyLU.THRESHOLD);
         FillMatchingDual.THRESHOLD = Math.max(min, FillMatchingDual.THRESHOLD);
         FillMatchingSingle.THRESHOLD = Math.max(min, FillMatchingSingle.THRESHOLD);
+        GEMM.THRESHOLD = Math.max(min, GEMM.THRESHOLD);
+        GEMV.THRESHOLD = Math.max(min, GEMV.THRESHOLD);
+        GEQRF.THRESHOLD = Math.max(min, GEQRF.THRESHOLD);
+        GETRF.THRESHOLD = Math.max(min, GETRF.THRESHOLD);
+        GETRS.THRESHOLD = Math.max(min, GETRS.THRESHOLD);
         GenerateApplyAndCopyHouseholderColumn.THRESHOLD = Math.max(min, GenerateApplyAndCopyHouseholderColumn.THRESHOLD);
         GenerateApplyAndCopyHouseholderRow.THRESHOLD = Math.max(min, GenerateApplyAndCopyHouseholderRow.THRESHOLD);
-        HermitianRank2Update.THRESHOLD = Math.max(min, HermitianRank2Update.THRESHOLD);
         HouseholderLeft.THRESHOLD = Math.max(min, HouseholderLeft.THRESHOLD);
         HouseholderRight.THRESHOLD = Math.max(min, HouseholderRight.THRESHOLD);
         ModifyAll.THRESHOLD = Math.max(min, ModifyAll.THRESHOLD);
         MultiplyBoth.THRESHOLD = Math.max(min, MultiplyBoth.THRESHOLD);
-        MultiplyHermitianAndVector.THRESHOLD = Math.max(min, MultiplyHermitianAndVector.THRESHOLD);
         MultiplyLeft.THRESHOLD = Math.max(min, MultiplyLeft.THRESHOLD);
         MultiplyNeither.THRESHOLD = Math.max(min, MultiplyNeither.THRESHOLD);
         MultiplyRight.THRESHOLD = Math.max(min, MultiplyRight.THRESHOLD);
+        ORMQR.THRESHOLD = Math.max(min, ORMQR.THRESHOLD);
+        POTRF.THRESHOLD = Math.max(min, POTRF.THRESHOLD);
+        POTRS.THRESHOLD = Math.max(min, POTRS.THRESHOLD);
         RotateLeft.THRESHOLD = Math.max(min, RotateLeft.THRESHOLD);
         RotateRight.THRESHOLD = Math.max(min, RotateRight.THRESHOLD);
+        SYTRD.THRESHOLD = Math.max(min, SYTRD.THRESHOLD);
         SubstituteBackwards.THRESHOLD = Math.max(min, SubstituteBackwards.THRESHOLD);
         SubstituteForwards.THRESHOLD = Math.max(min, SubstituteForwards.THRESHOLD);
+        TRTRS.THRESHOLD = Math.max(min, TRTRS.THRESHOLD);
     }
 
 }

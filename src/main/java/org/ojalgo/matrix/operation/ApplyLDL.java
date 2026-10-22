@@ -26,6 +26,7 @@ import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.ScalarArray;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.concurrent.DivideAndConquer;
+import org.ojalgo.concurrent.Parallelism;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.scalar.Scalar;
@@ -33,6 +34,8 @@ import org.ojalgo.scalar.Scalar;
 public abstract class ApplyLDL implements MatrixOperation {
 
     public static int THRESHOLD = 256;
+
+    private static final DivideAndConquer.Divider DIVIDER = Parallelism.CORES.newDivider();
 
     public static void invoke(final double[] data, final int structure, final int firstColumn, final int columnLimit, final double[] multipliers,
             final int iterationPoint) {
@@ -56,15 +59,8 @@ public abstract class ApplyLDL implements MatrixOperation {
 
         if (matrix.getColDim() - iterationPoint - 1 > THRESHOLD) {
 
-            DivideAndConquer conquerer = new DivideAndConquer() {
-
-                @Override
-                protected void conquer(final int first, final int limit) {
-                    ApplyLDL.invoke(matrix.data, matrix.getRowDim(), first, limit, column.data, iterationPoint);
-                }
-            };
-
-            conquerer.invoke(iterationPoint + 1, matrix.getColDim(), THRESHOLD);
+            DIVIDER.threshold(THRESHOLD).divide(iterationPoint + 1, matrix.getColDim(),
+                    (first, limit) -> ApplyLDL.invoke(matrix.data, matrix.getRowDim(), first, limit, column.data, iterationPoint));
 
         } else {
 
@@ -78,15 +74,8 @@ public abstract class ApplyLDL implements MatrixOperation {
 
         if (matrix.getColDim() - iterationPoint - 1 > THRESHOLD) {
 
-            DivideAndConquer conquerer = new DivideAndConquer() {
-
-                @Override
-                protected void conquer(final int first, final int limit) {
-                    ApplyLDL.invoke(matrix.data, matrix.getRowDim(), first, limit, column.data, iterationPoint);
-                }
-            };
-
-            conquerer.invoke(iterationPoint + 1, matrix.getColDim(), THRESHOLD);
+            DIVIDER.threshold(THRESHOLD).divide(iterationPoint + 1, matrix.getColDim(),
+                    (first, limit) -> ApplyLDL.invoke(matrix.data, matrix.getRowDim(), first, limit, column.data, iterationPoint));
 
         } else {
 

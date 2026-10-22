@@ -23,6 +23,7 @@ package org.ojalgo.matrix.store;
 
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 
@@ -52,7 +53,8 @@ final class TransposedStore<N extends Comparable<N>> extends TransjugatedStore<N
 
         MatrixStore<N> retVal;
 
-        if (right instanceof TransposedStore<?>) {
+        // A^T * B^T = (B * A)^T only when multiplication is commutative, which is not the case for quaternions
+        if (right instanceof TransposedStore<?> && !(this.physical().scalar().zero().get() instanceof Quaternion)) {
 
             retVal = ((TransposedStore<N>) right).getOriginal().multiply(base);
 

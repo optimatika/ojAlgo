@@ -189,9 +189,9 @@ public abstract class GenerateApplyAndCopyHouseholderRow implements MatrixOperat
 
             tmpVector[col] = scalar.one().get();
 
+            N tmpScaleConjugate = tmpScale.conjugate().get();
             for (int j = col + 1; j < tmpColDim; j++) {
-                // data[row + (j * structure)] = tmpVector[j] = ComplexFunction.DIVIDE.invoke(tmpVector[j], tmpScale).conjugate();
-                data[row + j * structure] = tmpVector[j] = tmpVector[j].divide(tmpScale).conjugate().get();
+                data[row + j * structure] = tmpVector[j] = tmpVector[j].conjugate().divide(tmpScaleConjugate).get();
             }
 
             // destination.beta = ComplexNumber.valueOf(tmpScale.norm() / tmpNorm2);

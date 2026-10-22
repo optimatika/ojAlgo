@@ -70,7 +70,7 @@ public interface LU<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition
 
     Factory<Double> R064 = typical -> {
 
-        if (512L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
+        if (60 < typical.getColDim() && typical.count() <= PlainArray.MAX_SIZE) {
             return new DenseLU.R064();
         } else {
             return new RawLU();
