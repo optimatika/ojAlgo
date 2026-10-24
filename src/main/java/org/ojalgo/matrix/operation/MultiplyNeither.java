@@ -353,6 +353,37 @@ public class MultiplyNeither implements MatrixOperation {
         }
     }
 
+    static void fill2x2(final double[] product, final double[] left, final int complexity, final double[] right) {
+
+        double tmp00 = PrimitiveMath.ZERO;
+        double tmp10 = PrimitiveMath.ZERO;
+        double tmp01 = PrimitiveMath.ZERO;
+        double tmp11 = PrimitiveMath.ZERO;
+
+        int tmpIndex;
+        for (int c = 0; c < complexity; c++) {
+
+            tmpIndex = c * 2;
+            double tmpLeft0 = left[tmpIndex];
+            tmpIndex++;
+            double tmpLeft1 = left[tmpIndex];
+            tmpIndex = c;
+            double tmpRight0 = right[tmpIndex];
+            tmpIndex += complexity;
+            double tmpRight1 = right[tmpIndex];
+
+            tmp00 = GEMM.JVM.fma(tmpLeft0, tmpRight0, tmp00);
+            tmp10 = GEMM.JVM.fma(tmpLeft1, tmpRight0, tmp10);
+            tmp01 = GEMM.JVM.fma(tmpLeft0, tmpRight1, tmp01);
+            tmp11 = GEMM.JVM.fma(tmpLeft1, tmpRight1, tmp11);
+        }
+
+        product[0] = tmp00;
+        product[1] = tmp10;
+        product[2] = tmp01;
+        product[3] = tmp11;
+    }
+
     /**
      * As {@link #fill2x2(double[], double[], int, double[])}, with element (i,c) of op(A) in
      * {@code left[i * sAi + c * sAc]} and element (c,j) of op(B) in {@code right[c * sBc + j * sBj]}.
@@ -386,93 +417,12 @@ public class MultiplyNeither implements MatrixOperation {
         product[3] = tmp11;
     }
 
-    static void fill2x2(final double[] product, final double[] left, final int complexity, final double[] right) {
-
-        double tmp00 = PrimitiveMath.ZERO;
-        double tmp10 = PrimitiveMath.ZERO;
-        double tmp01 = PrimitiveMath.ZERO;
-        double tmp11 = PrimitiveMath.ZERO;
-
-        int tmpIndex;
-        for (int c = 0; c < complexity; c++) {
-
-            tmpIndex = c * 2;
-            double tmpLeft0 = left[tmpIndex];
-            tmpIndex++;
-            double tmpLeft1 = left[tmpIndex];
-            tmpIndex = c;
-            double tmpRight0 = right[tmpIndex];
-            tmpIndex += complexity;
-            double tmpRight1 = right[tmpIndex];
-
-            tmp00 = GEMM.JVM.fma(tmpLeft0, tmpRight0, tmp00);
-            tmp10 = GEMM.JVM.fma(tmpLeft1, tmpRight0, tmp10);
-            tmp01 = GEMM.JVM.fma(tmpLeft0, tmpRight1, tmp01);
-            tmp11 = GEMM.JVM.fma(tmpLeft1, tmpRight1, tmp11);
-        }
-
-        product[0] = tmp00;
-        product[1] = tmp10;
-        product[2] = tmp01;
-        product[3] = tmp11;
-    }
-
     static void fill3x3(final double[] product, final double[] left, final boolean transpL, final int complexity, final double[] right, final boolean transpR) {
         if (transpL || transpR) {
             MultiplyNeither.fill3x3(product, left, transpL ? complexity : 1, transpL ? 1 : 3, complexity, right, transpR ? 3 : 1, transpR ? 1 : complexity);
         } else {
             MultiplyNeither.fill3x3(product, left, complexity, right);
         }
-    }
-
-    /**
-     * As {@link #fill3x3(double[], double[], int, double[])}, with element (i,c) of op(A) in
-     * {@code left[i * sAi + c * sAc]} and element (c,j) of op(B) in {@code right[c * sBc + j * sBj]}.
-     */
-    static void fill3x3(final double[] product, final double[] left, final int sAi, final int sAc, final int complexity, final double[] right, final int sBc,
-            final int sBj) {
-
-        double tmp00 = PrimitiveMath.ZERO;
-        double tmp10 = PrimitiveMath.ZERO;
-        double tmp20 = PrimitiveMath.ZERO;
-        double tmp01 = PrimitiveMath.ZERO;
-        double tmp11 = PrimitiveMath.ZERO;
-        double tmp21 = PrimitiveMath.ZERO;
-        double tmp02 = PrimitiveMath.ZERO;
-        double tmp12 = PrimitiveMath.ZERO;
-        double tmp22 = PrimitiveMath.ZERO;
-
-        for (int c = 0; c < complexity; c++) {
-
-            int indexA = c * sAc;
-            int indexB = c * sBc;
-            double tmpLeft0 = left[indexA];
-            double tmpLeft1 = left[indexA + sAi];
-            double tmpLeft2 = left[indexA + 2 * sAi];
-            double tmpRight0 = right[indexB];
-            double tmpRight1 = right[indexB + sBj];
-            double tmpRight2 = right[indexB + 2 * sBj];
-
-            tmp00 = GEMM.JVM.fma(tmpLeft0, tmpRight0, tmp00);
-            tmp10 = GEMM.JVM.fma(tmpLeft1, tmpRight0, tmp10);
-            tmp20 = GEMM.JVM.fma(tmpLeft2, tmpRight0, tmp20);
-            tmp01 = GEMM.JVM.fma(tmpLeft0, tmpRight1, tmp01);
-            tmp11 = GEMM.JVM.fma(tmpLeft1, tmpRight1, tmp11);
-            tmp21 = GEMM.JVM.fma(tmpLeft2, tmpRight1, tmp21);
-            tmp02 = GEMM.JVM.fma(tmpLeft0, tmpRight2, tmp02);
-            tmp12 = GEMM.JVM.fma(tmpLeft1, tmpRight2, tmp12);
-            tmp22 = GEMM.JVM.fma(tmpLeft2, tmpRight2, tmp22);
-        }
-
-        product[0] = tmp00;
-        product[1] = tmp10;
-        product[2] = tmp20;
-        product[3] = tmp01;
-        product[4] = tmp11;
-        product[5] = tmp21;
-        product[6] = tmp02;
-        product[7] = tmp12;
-        product[8] = tmp22;
     }
 
     static void fill3x3(final double[] product, final double[] left, final int complexity, final double[] right) {
@@ -525,37 +475,22 @@ public class MultiplyNeither implements MatrixOperation {
         product[8] = tmp22;
     }
 
-    static void fill4x4(final double[] product, final double[] left, final boolean transpL, final int complexity, final double[] right, final boolean transpR) {
-        if (transpL || transpR) {
-            MultiplyNeither.fill4x4(product, left, transpL ? complexity : 1, transpL ? 1 : 4, complexity, right, transpR ? 4 : 1, transpR ? 1 : complexity);
-        } else {
-            MultiplyNeither.fill4x4(product, left, complexity, right);
-        }
-    }
-
     /**
-     * As {@link #fill4x4(double[], double[], int, double[])}, with element (i,c) of op(A) in
+     * As {@link #fill3x3(double[], double[], int, double[])}, with element (i,c) of op(A) in
      * {@code left[i * sAi + c * sAc]} and element (c,j) of op(B) in {@code right[c * sBc + j * sBj]}.
      */
-    static void fill4x4(final double[] product, final double[] left, final int sAi, final int sAc, final int complexity, final double[] right, final int sBc,
+    static void fill3x3(final double[] product, final double[] left, final int sAi, final int sAc, final int complexity, final double[] right, final int sBc,
             final int sBj) {
 
         double tmp00 = PrimitiveMath.ZERO;
         double tmp10 = PrimitiveMath.ZERO;
         double tmp20 = PrimitiveMath.ZERO;
-        double tmp30 = PrimitiveMath.ZERO;
         double tmp01 = PrimitiveMath.ZERO;
         double tmp11 = PrimitiveMath.ZERO;
         double tmp21 = PrimitiveMath.ZERO;
-        double tmp31 = PrimitiveMath.ZERO;
         double tmp02 = PrimitiveMath.ZERO;
         double tmp12 = PrimitiveMath.ZERO;
         double tmp22 = PrimitiveMath.ZERO;
-        double tmp32 = PrimitiveMath.ZERO;
-        double tmp03 = PrimitiveMath.ZERO;
-        double tmp13 = PrimitiveMath.ZERO;
-        double tmp23 = PrimitiveMath.ZERO;
-        double tmp33 = PrimitiveMath.ZERO;
 
         for (int c = 0; c < complexity; c++) {
 
@@ -564,46 +499,38 @@ public class MultiplyNeither implements MatrixOperation {
             double tmpLeft0 = left[indexA];
             double tmpLeft1 = left[indexA + sAi];
             double tmpLeft2 = left[indexA + 2 * sAi];
-            double tmpLeft3 = left[indexA + 3 * sAi];
             double tmpRight0 = right[indexB];
             double tmpRight1 = right[indexB + sBj];
             double tmpRight2 = right[indexB + 2 * sBj];
-            double tmpRight3 = right[indexB + 3 * sBj];
 
             tmp00 = GEMM.JVM.fma(tmpLeft0, tmpRight0, tmp00);
             tmp10 = GEMM.JVM.fma(tmpLeft1, tmpRight0, tmp10);
             tmp20 = GEMM.JVM.fma(tmpLeft2, tmpRight0, tmp20);
-            tmp30 = GEMM.JVM.fma(tmpLeft3, tmpRight0, tmp30);
             tmp01 = GEMM.JVM.fma(tmpLeft0, tmpRight1, tmp01);
             tmp11 = GEMM.JVM.fma(tmpLeft1, tmpRight1, tmp11);
             tmp21 = GEMM.JVM.fma(tmpLeft2, tmpRight1, tmp21);
-            tmp31 = GEMM.JVM.fma(tmpLeft3, tmpRight1, tmp31);
             tmp02 = GEMM.JVM.fma(tmpLeft0, tmpRight2, tmp02);
             tmp12 = GEMM.JVM.fma(tmpLeft1, tmpRight2, tmp12);
             tmp22 = GEMM.JVM.fma(tmpLeft2, tmpRight2, tmp22);
-            tmp32 = GEMM.JVM.fma(tmpLeft3, tmpRight2, tmp32);
-            tmp03 = GEMM.JVM.fma(tmpLeft0, tmpRight3, tmp03);
-            tmp13 = GEMM.JVM.fma(tmpLeft1, tmpRight3, tmp13);
-            tmp23 = GEMM.JVM.fma(tmpLeft2, tmpRight3, tmp23);
-            tmp33 = GEMM.JVM.fma(tmpLeft3, tmpRight3, tmp33);
         }
 
         product[0] = tmp00;
         product[1] = tmp10;
         product[2] = tmp20;
-        product[3] = tmp30;
-        product[4] = tmp01;
-        product[5] = tmp11;
-        product[6] = tmp21;
-        product[7] = tmp31;
-        product[8] = tmp02;
-        product[9] = tmp12;
-        product[10] = tmp22;
-        product[11] = tmp32;
-        product[12] = tmp03;
-        product[13] = tmp13;
-        product[14] = tmp23;
-        product[15] = tmp33;
+        product[3] = tmp01;
+        product[4] = tmp11;
+        product[5] = tmp21;
+        product[6] = tmp02;
+        product[7] = tmp12;
+        product[8] = tmp22;
+    }
+
+    static void fill4x4(final double[] product, final double[] left, final boolean transpL, final int complexity, final double[] right, final boolean transpR) {
+        if (transpL || transpR) {
+            MultiplyNeither.fill4x4(product, left, transpL ? complexity : 1, transpL ? 1 : 4, complexity, right, transpR ? 4 : 1, transpR ? 1 : complexity);
+        } else {
+            MultiplyNeither.fill4x4(product, left, complexity, right);
+        }
     }
 
     static void fill4x4(final double[] product, final double[] left, final int complexity, final double[] right) {
@@ -682,6 +609,110 @@ public class MultiplyNeither implements MatrixOperation {
     }
 
     /**
+     * As {@link #fill4x4(double[], double[], int, double[])}, with element (i,c) of op(A) in
+     * {@code left[i * sAi + c * sAc]} and element (c,j) of op(B) in {@code right[c * sBc + j * sBj]}.
+     */
+    static void fill4x4(final double[] product, final double[] left, final int sAi, final int sAc, final int complexity, final double[] right, final int sBc,
+            final int sBj) {
+
+        double tmp00 = PrimitiveMath.ZERO;
+        double tmp10 = PrimitiveMath.ZERO;
+        double tmp20 = PrimitiveMath.ZERO;
+        double tmp30 = PrimitiveMath.ZERO;
+        double tmp01 = PrimitiveMath.ZERO;
+        double tmp11 = PrimitiveMath.ZERO;
+        double tmp21 = PrimitiveMath.ZERO;
+        double tmp31 = PrimitiveMath.ZERO;
+        double tmp02 = PrimitiveMath.ZERO;
+        double tmp12 = PrimitiveMath.ZERO;
+        double tmp22 = PrimitiveMath.ZERO;
+        double tmp32 = PrimitiveMath.ZERO;
+        double tmp03 = PrimitiveMath.ZERO;
+        double tmp13 = PrimitiveMath.ZERO;
+        double tmp23 = PrimitiveMath.ZERO;
+        double tmp33 = PrimitiveMath.ZERO;
+
+        for (int c = 0; c < complexity; c++) {
+
+            int indexA = c * sAc;
+            int indexB = c * sBc;
+            double tmpLeft0 = left[indexA];
+            double tmpLeft1 = left[indexA + sAi];
+            double tmpLeft2 = left[indexA + 2 * sAi];
+            double tmpLeft3 = left[indexA + 3 * sAi];
+            double tmpRight0 = right[indexB];
+            double tmpRight1 = right[indexB + sBj];
+            double tmpRight2 = right[indexB + 2 * sBj];
+            double tmpRight3 = right[indexB + 3 * sBj];
+
+            tmp00 = GEMM.JVM.fma(tmpLeft0, tmpRight0, tmp00);
+            tmp10 = GEMM.JVM.fma(tmpLeft1, tmpRight0, tmp10);
+            tmp20 = GEMM.JVM.fma(tmpLeft2, tmpRight0, tmp20);
+            tmp30 = GEMM.JVM.fma(tmpLeft3, tmpRight0, tmp30);
+            tmp01 = GEMM.JVM.fma(tmpLeft0, tmpRight1, tmp01);
+            tmp11 = GEMM.JVM.fma(tmpLeft1, tmpRight1, tmp11);
+            tmp21 = GEMM.JVM.fma(tmpLeft2, tmpRight1, tmp21);
+            tmp31 = GEMM.JVM.fma(tmpLeft3, tmpRight1, tmp31);
+            tmp02 = GEMM.JVM.fma(tmpLeft0, tmpRight2, tmp02);
+            tmp12 = GEMM.JVM.fma(tmpLeft1, tmpRight2, tmp12);
+            tmp22 = GEMM.JVM.fma(tmpLeft2, tmpRight2, tmp22);
+            tmp32 = GEMM.JVM.fma(tmpLeft3, tmpRight2, tmp32);
+            tmp03 = GEMM.JVM.fma(tmpLeft0, tmpRight3, tmp03);
+            tmp13 = GEMM.JVM.fma(tmpLeft1, tmpRight3, tmp13);
+            tmp23 = GEMM.JVM.fma(tmpLeft2, tmpRight3, tmp23);
+            tmp33 = GEMM.JVM.fma(tmpLeft3, tmpRight3, tmp33);
+        }
+
+        product[0] = tmp00;
+        product[1] = tmp10;
+        product[2] = tmp20;
+        product[3] = tmp30;
+        product[4] = tmp01;
+        product[5] = tmp11;
+        product[6] = tmp21;
+        product[7] = tmp31;
+        product[8] = tmp02;
+        product[9] = tmp12;
+        product[10] = tmp22;
+        product[11] = tmp32;
+        product[12] = tmp03;
+        product[13] = tmp13;
+        product[14] = tmp23;
+        product[15] = tmp33;
+    }
+
+    static void fill5xN(final double[] product, final double[] left, final int complexity, final double[] right) {
+
+        int tmpRowDim = 5;
+        int tmpColDim = right.length / complexity;
+
+        for (int j = 0; j < tmpColDim; j++) {
+
+            double tmp0J = PrimitiveMath.ZERO;
+            double tmp1J = PrimitiveMath.ZERO;
+            double tmp2J = PrimitiveMath.ZERO;
+            double tmp3J = PrimitiveMath.ZERO;
+            double tmp4J = PrimitiveMath.ZERO;
+
+            int tmpIndex = 0;
+            for (int c = 0; c < complexity; c++) {
+                double tmpRightCJ = right[c + j * complexity];
+                tmp0J = GEMM.JVM.fma(left[tmpIndex++], tmpRightCJ, tmp0J);
+                tmp1J = GEMM.JVM.fma(left[tmpIndex++], tmpRightCJ, tmp1J);
+                tmp2J = GEMM.JVM.fma(left[tmpIndex++], tmpRightCJ, tmp2J);
+                tmp3J = GEMM.JVM.fma(left[tmpIndex++], tmpRightCJ, tmp3J);
+                tmp4J = GEMM.JVM.fma(left[tmpIndex++], tmpRightCJ, tmp4J);
+            }
+
+            product[tmpIndex = j * tmpRowDim] = tmp0J;
+            product[++tmpIndex] = tmp1J;
+            product[++tmpIndex] = tmp2J;
+            product[++tmpIndex] = tmp3J;
+            product[++tmpIndex] = tmp4J;
+        }
+    }
+
+    /**
      * As {@link #fill5xN(double[], double[], int, double[])}, with element (i,c) of op(A) in
      * {@code left[i * sAi + c * sAc]} and element (c,j) of op(B) in {@code right[c * sBc + j * sBj]}.
      */
@@ -720,9 +751,9 @@ public class MultiplyNeither implements MatrixOperation {
         }
     }
 
-    static void fill5xN(final double[] product, final double[] left, final int complexity, final double[] right) {
+    static void fill6xN(final double[] product, final double[] left, final int complexity, final double[] right) {
 
-        int tmpRowDim = 5;
+        int tmpRowDim = 6;
         int tmpColDim = right.length / complexity;
 
         for (int j = 0; j < tmpColDim; j++) {
@@ -732,6 +763,7 @@ public class MultiplyNeither implements MatrixOperation {
             double tmp2J = PrimitiveMath.ZERO;
             double tmp3J = PrimitiveMath.ZERO;
             double tmp4J = PrimitiveMath.ZERO;
+            double tmp5J = PrimitiveMath.ZERO;
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
@@ -741,6 +773,7 @@ public class MultiplyNeither implements MatrixOperation {
                 tmp2J = GEMM.JVM.fma(left[tmpIndex++], tmpRightCJ, tmp2J);
                 tmp3J = GEMM.JVM.fma(left[tmpIndex++], tmpRightCJ, tmp3J);
                 tmp4J = GEMM.JVM.fma(left[tmpIndex++], tmpRightCJ, tmp4J);
+                tmp5J = GEMM.JVM.fma(left[tmpIndex++], tmpRightCJ, tmp5J);
             }
 
             product[tmpIndex = j * tmpRowDim] = tmp0J;
@@ -748,6 +781,7 @@ public class MultiplyNeither implements MatrixOperation {
             product[++tmpIndex] = tmp2J;
             product[++tmpIndex] = tmp3J;
             product[++tmpIndex] = tmp4J;
+            product[++tmpIndex] = tmp5J;
         }
     }
 
@@ -794,9 +828,9 @@ public class MultiplyNeither implements MatrixOperation {
         }
     }
 
-    static void fill6xN(final double[] product, final double[] left, final int complexity, final double[] right) {
+    static void fill7xN(final double[] product, final double[] left, final int complexity, final double[] right) {
 
-        int tmpRowDim = 6;
+        int tmpRowDim = 7;
         int tmpColDim = right.length / complexity;
 
         for (int j = 0; j < tmpColDim; j++) {
@@ -807,6 +841,7 @@ public class MultiplyNeither implements MatrixOperation {
             double tmp3J = PrimitiveMath.ZERO;
             double tmp4J = PrimitiveMath.ZERO;
             double tmp5J = PrimitiveMath.ZERO;
+            double tmp6J = PrimitiveMath.ZERO;
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
@@ -817,6 +852,7 @@ public class MultiplyNeither implements MatrixOperation {
                 tmp3J = GEMM.JVM.fma(left[tmpIndex++], tmpRightCJ, tmp3J);
                 tmp4J = GEMM.JVM.fma(left[tmpIndex++], tmpRightCJ, tmp4J);
                 tmp5J = GEMM.JVM.fma(left[tmpIndex++], tmpRightCJ, tmp5J);
+                tmp6J = GEMM.JVM.fma(left[tmpIndex++], tmpRightCJ, tmp6J);
             }
 
             product[tmpIndex = j * tmpRowDim] = tmp0J;
@@ -825,6 +861,7 @@ public class MultiplyNeither implements MatrixOperation {
             product[++tmpIndex] = tmp3J;
             product[++tmpIndex] = tmp4J;
             product[++tmpIndex] = tmp5J;
+            product[++tmpIndex] = tmp6J;
         }
     }
 
@@ -872,43 +909,6 @@ public class MultiplyNeither implements MatrixOperation {
             product[indexC + 4] = tmp4J;
             product[indexC + 5] = tmp5J;
             product[indexC + 6] = tmp6J;
-        }
-    }
-
-    static void fill7xN(final double[] product, final double[] left, final int complexity, final double[] right) {
-
-        int tmpRowDim = 7;
-        int tmpColDim = right.length / complexity;
-
-        for (int j = 0; j < tmpColDim; j++) {
-
-            double tmp0J = PrimitiveMath.ZERO;
-            double tmp1J = PrimitiveMath.ZERO;
-            double tmp2J = PrimitiveMath.ZERO;
-            double tmp3J = PrimitiveMath.ZERO;
-            double tmp4J = PrimitiveMath.ZERO;
-            double tmp5J = PrimitiveMath.ZERO;
-            double tmp6J = PrimitiveMath.ZERO;
-
-            int tmpIndex = 0;
-            for (int c = 0; c < complexity; c++) {
-                double tmpRightCJ = right[c + j * complexity];
-                tmp0J = GEMM.JVM.fma(left[tmpIndex++], tmpRightCJ, tmp0J);
-                tmp1J = GEMM.JVM.fma(left[tmpIndex++], tmpRightCJ, tmp1J);
-                tmp2J = GEMM.JVM.fma(left[tmpIndex++], tmpRightCJ, tmp2J);
-                tmp3J = GEMM.JVM.fma(left[tmpIndex++], tmpRightCJ, tmp3J);
-                tmp4J = GEMM.JVM.fma(left[tmpIndex++], tmpRightCJ, tmp4J);
-                tmp5J = GEMM.JVM.fma(left[tmpIndex++], tmpRightCJ, tmp5J);
-                tmp6J = GEMM.JVM.fma(left[tmpIndex++], tmpRightCJ, tmp6J);
-            }
-
-            product[tmpIndex = j * tmpRowDim] = tmp0J;
-            product[++tmpIndex] = tmp1J;
-            product[++tmpIndex] = tmp2J;
-            product[++tmpIndex] = tmp3J;
-            product[++tmpIndex] = tmp4J;
-            product[++tmpIndex] = tmp5J;
-            product[++tmpIndex] = tmp6J;
         }
     }
 

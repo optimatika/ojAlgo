@@ -60,13 +60,8 @@ public class MultiplyBoth implements MatrixOperation {
 
     }
 
-    /**
-     * The general case is multi-threaded, splitting the columns of the product, when m*n*k is larger than
-     * this cubed. See {@link MatrixOperation#chunk(int, double)}.
-     */
-    static int THRESHOLD = 44;
-
     private static final DivideAndConquer.Divider DIVIDER = Parallelism.CORES.newDivider();
+
     /**
      * The zero of each element type, made by its no-argument constructor.
      */
@@ -82,6 +77,11 @@ public class MultiplyBoth implements MatrixOperation {
         }
 
     };
+    /**
+     * The general case is multi-threaded, splitting the columns of the product, when m*n*k is larger than
+     * this cubed. See {@link MatrixOperation#chunk(int, double)}.
+     */
+    static int THRESHOLD = 44;
 
     public static <N extends Scalar<N>> MultiplyBoth.Generic<N> newGeneric(final int rows, final int columns) {
         if (rows == 1) {
@@ -211,75 +211,55 @@ public class MultiplyBoth implements MatrixOperation {
     }
 
     /**
-     * Columns firstColumn to columnLimit - 1 of the product, each built by AXPY of the columns of the left
-     * operand, stored in {@code dataL} with their ranges in {@code firstL} and {@code limitL}, skipping zero
-     * elements of the right operand. The right operand is read from {@code dataR} when that is not null, and
-     * the product written to {@code dataP} when that is not null.
+     * 10 rows, any number of columns: each column over the range of the complexity where both operands may
+     * have non-zero elements.
      */
-    static void fillColumns_P64(final TransformableRegion<Double> product, final int firstColumn, final int columnLimit, final double[] dataL,
-            final int[] firstL, final int[] limitL, final int complexity, final Access1D<Double> right, final double[] dataR, final double[] dataP) {
+    static void fill0xN_P64(final TransformableRegion<Double> product, final Access2D<?> left, final int complexity, final Access2D<?> right) {
 
-        int nbRows = product.getRowDim();
-        double[] column = dataP != null ? dataP : new double[nbRows];
-        Access2D<Double> mtrxR = MultiplyBoth.matrix(right, complexity, product.getColDim());
+        int nbCols = product.getColDim();
+        int firstL = MultiplyBoth.firstInRows(left, 10, complexity);
+        int limitL = MultiplyBoth.limitOfRows(left, 10, complexity);
 
-        for (int j = firstColumn; j < columnLimit; j++) {
+        for (int j = 0; j < nbCols; j++) {
 
-            int base = dataP != null ? j * nbRows : 0;
-            Arrays.fill(column, base, base + nbRows, PrimitiveMath.ZERO);
+            int first = Structure2D.firstInColumn(right, j, firstL);
+            int limit = Structure2D.limitOfColumn(right, j, limitL);
 
-            int first = mtrxR != null ? Structure2D.firstInColumn(mtrxR, j, 0) : 0;
-            int limit = mtrxR != null ? Structure2D.limitOfColumn(mtrxR, j, complexity) : complexity;
-            int colR = j * complexity;
+            double tmp0J = PrimitiveMath.ZERO;
+            double tmp1J = PrimitiveMath.ZERO;
+            double tmp2J = PrimitiveMath.ZERO;
+            double tmp3J = PrimitiveMath.ZERO;
+            double tmp4J = PrimitiveMath.ZERO;
+            double tmp5J = PrimitiveMath.ZERO;
+            double tmp6J = PrimitiveMath.ZERO;
+            double tmp7J = PrimitiveMath.ZERO;
+            double tmp8J = PrimitiveMath.ZERO;
+            double tmp9J = PrimitiveMath.ZERO;
 
             for (int c = first; c < limit; c++) {
-                double valR = dataR != null ? dataR[colR + c] : mtrxR != null ? mtrxR.doubleValue(c, j) : right.doubleValue(colR + c);
-                if (valR != PrimitiveMath.ZERO) {
-                    AXPY.invoke(column, base, valR, dataL, c * nbRows, firstL[c], limitL[c]);
-                }
+                double tmpRightCJ = right.doubleValue(c, j);
+                tmp0J += left.doubleValue(0, c) * tmpRightCJ;
+                tmp1J += left.doubleValue(1, c) * tmpRightCJ;
+                tmp2J += left.doubleValue(2, c) * tmpRightCJ;
+                tmp3J += left.doubleValue(3, c) * tmpRightCJ;
+                tmp4J += left.doubleValue(4, c) * tmpRightCJ;
+                tmp5J += left.doubleValue(5, c) * tmpRightCJ;
+                tmp6J += left.doubleValue(6, c) * tmpRightCJ;
+                tmp7J += left.doubleValue(7, c) * tmpRightCJ;
+                tmp8J += left.doubleValue(8, c) * tmpRightCJ;
+                tmp9J += left.doubleValue(9, c) * tmpRightCJ;
             }
 
-            if (dataP == null) {
-                for (int i = 0; i < nbRows; i++) {
-                    product.set(i, j, column[i]);
-                }
-            }
-        }
-    }
-
-    /**
-     * @see #fillColumns_P64(TransformableRegion, int, int, double[], int[], int[], int, Access1D, double[],
-     *      double[])
-     */
-    static <N extends Scalar<N>> void fillColumns_G(final TransformableRegion<N> product, final int firstColumn, final int columnLimit, final N[] dataL,
-            final int[] firstL, final int[] limitL, final int complexity, final Access1D<N> right, final N[] dataR, final N[] dataP, final N zero) {
-
-        int nbRows = product.getRowDim();
-        N[] column = dataP != null ? dataP : MultiplyBoth.newZeros(zero, nbRows);
-        Access2D<N> mtrxR = MultiplyBoth.matrix(right, complexity, product.getColDim());
-
-        for (int j = firstColumn; j < columnLimit; j++) {
-
-            int base = dataP != null ? j * nbRows : 0;
-            Arrays.fill(column, base, base + nbRows, zero);
-
-            int first = mtrxR != null ? Structure2D.firstInColumn(mtrxR, j, 0) : 0;
-            int limit = mtrxR != null ? Structure2D.limitOfColumn(mtrxR, j, complexity) : complexity;
-            int colR = j * complexity;
-
-            for (int c = first; c < limit; c++) {
-                N valR = dataR != null ? dataR[colR + c] : mtrxR != null ? mtrxR.get(c, j) : right.get(colR + c);
-                int colL = c * nbRows;
-                for (int i = firstL[c]; i < limitL[c]; i++) {
-                    column[base + i] = column[base + i].add(dataL[colL + i].multiply(valR)).get();
-                }
-            }
-
-            if (dataP == null) {
-                for (int i = 0; i < nbRows; i++) {
-                    product.set(i, j, column[i]);
-                }
-            }
+            product.set(0, j, tmp0J);
+            product.set(1, j, tmp1J);
+            product.set(2, j, tmp2J);
+            product.set(3, j, tmp3J);
+            product.set(4, j, tmp4J);
+            product.set(5, j, tmp5J);
+            product.set(6, j, tmp6J);
+            product.set(7, j, tmp7J);
+            product.set(8, j, tmp8J);
+            product.set(9, j, tmp9J);
         }
     }
 
@@ -401,6 +381,35 @@ public class MultiplyBoth implements MatrixOperation {
     }
 
     /**
+     * 2 rows, any number of columns: each column over the range of the complexity where both operands may
+     * have non-zero elements.
+     */
+    static void fill2xN_P64(final TransformableRegion<Double> product, final Access2D<?> left, final int complexity, final Access2D<?> right) {
+
+        int nbCols = product.getColDim();
+        int firstL = MultiplyBoth.firstInRows(left, 2, complexity);
+        int limitL = MultiplyBoth.limitOfRows(left, 2, complexity);
+
+        for (int j = 0; j < nbCols; j++) {
+
+            int first = Structure2D.firstInColumn(right, j, firstL);
+            int limit = Structure2D.limitOfColumn(right, j, limitL);
+
+            double tmp0J = PrimitiveMath.ZERO;
+            double tmp1J = PrimitiveMath.ZERO;
+
+            for (int c = first; c < limit; c++) {
+                double tmpRightCJ = right.doubleValue(c, j);
+                tmp0J += left.doubleValue(0, c) * tmpRightCJ;
+                tmp1J += left.doubleValue(1, c) * tmpRightCJ;
+            }
+
+            product.set(0, j, tmp0J);
+            product.set(1, j, tmp1J);
+        }
+    }
+
+    /**
      * A 3-by-3 product, the operands read by row and column, over the range of the complexity where both may
      * have non-zero elements.
      */
@@ -454,6 +463,38 @@ public class MultiplyBoth implements MatrixOperation {
         product.set(0, 2, tmp02);
         product.set(1, 2, tmp12);
         product.set(2, 2, tmp22);
+    }
+
+    /**
+     * 3 rows, any number of columns: each column over the range of the complexity where both operands may
+     * have non-zero elements.
+     */
+    static void fill3xN_P64(final TransformableRegion<Double> product, final Access2D<?> left, final int complexity, final Access2D<?> right) {
+
+        int nbCols = product.getColDim();
+        int firstL = MultiplyBoth.firstInRows(left, 3, complexity);
+        int limitL = MultiplyBoth.limitOfRows(left, 3, complexity);
+
+        for (int j = 0; j < nbCols; j++) {
+
+            int first = Structure2D.firstInColumn(right, j, firstL);
+            int limit = Structure2D.limitOfColumn(right, j, limitL);
+
+            double tmp0J = PrimitiveMath.ZERO;
+            double tmp1J = PrimitiveMath.ZERO;
+            double tmp2J = PrimitiveMath.ZERO;
+
+            for (int c = first; c < limit; c++) {
+                double tmpRightCJ = right.doubleValue(c, j);
+                tmp0J += left.doubleValue(0, c) * tmpRightCJ;
+                tmp1J += left.doubleValue(1, c) * tmpRightCJ;
+                tmp2J += left.doubleValue(2, c) * tmpRightCJ;
+            }
+
+            product.set(0, j, tmp0J);
+            product.set(1, j, tmp1J);
+            product.set(2, j, tmp2J);
+        }
     }
 
     /**
@@ -533,6 +574,41 @@ public class MultiplyBoth implements MatrixOperation {
         product.set(1, 3, tmp13);
         product.set(2, 3, tmp23);
         product.set(3, 3, tmp33);
+    }
+
+    /**
+     * 4 rows, any number of columns: each column over the range of the complexity where both operands may
+     * have non-zero elements.
+     */
+    static void fill4xN_P64(final TransformableRegion<Double> product, final Access2D<?> left, final int complexity, final Access2D<?> right) {
+
+        int nbCols = product.getColDim();
+        int firstL = MultiplyBoth.firstInRows(left, 4, complexity);
+        int limitL = MultiplyBoth.limitOfRows(left, 4, complexity);
+
+        for (int j = 0; j < nbCols; j++) {
+
+            int first = Structure2D.firstInColumn(right, j, firstL);
+            int limit = Structure2D.limitOfColumn(right, j, limitL);
+
+            double tmp0J = PrimitiveMath.ZERO;
+            double tmp1J = PrimitiveMath.ZERO;
+            double tmp2J = PrimitiveMath.ZERO;
+            double tmp3J = PrimitiveMath.ZERO;
+
+            for (int c = first; c < limit; c++) {
+                double tmpRightCJ = right.doubleValue(c, j);
+                tmp0J += left.doubleValue(0, c) * tmpRightCJ;
+                tmp1J += left.doubleValue(1, c) * tmpRightCJ;
+                tmp2J += left.doubleValue(2, c) * tmpRightCJ;
+                tmp3J += left.doubleValue(3, c) * tmpRightCJ;
+            }
+
+            product.set(0, j, tmp0J);
+            product.set(1, j, tmp1J);
+            product.set(2, j, tmp2J);
+            product.set(3, j, tmp3J);
+        }
     }
 
     /**
@@ -641,102 +717,6 @@ public class MultiplyBoth implements MatrixOperation {
         product.set(2, 4, tmp24);
         product.set(3, 4, tmp34);
         product.set(4, 4, tmp44);
-    }
-
-    /**
-     * 2 rows, any number of columns: each column over the range of the complexity where both operands may
-     * have non-zero elements.
-     */
-    static void fill2xN_P64(final TransformableRegion<Double> product, final Access2D<?> left, final int complexity, final Access2D<?> right) {
-
-        int nbCols = product.getColDim();
-        int firstL = MultiplyBoth.firstInRows(left, 2, complexity);
-        int limitL = MultiplyBoth.limitOfRows(left, 2, complexity);
-
-        for (int j = 0; j < nbCols; j++) {
-
-            int first = Structure2D.firstInColumn(right, j, firstL);
-            int limit = Structure2D.limitOfColumn(right, j, limitL);
-
-            double tmp0J = PrimitiveMath.ZERO;
-            double tmp1J = PrimitiveMath.ZERO;
-
-            for (int c = first; c < limit; c++) {
-                double tmpRightCJ = right.doubleValue(c, j);
-                tmp0J += left.doubleValue(0, c) * tmpRightCJ;
-                tmp1J += left.doubleValue(1, c) * tmpRightCJ;
-            }
-
-            product.set(0, j, tmp0J);
-            product.set(1, j, tmp1J);
-        }
-    }
-
-    /**
-     * 3 rows, any number of columns: each column over the range of the complexity where both operands may
-     * have non-zero elements.
-     */
-    static void fill3xN_P64(final TransformableRegion<Double> product, final Access2D<?> left, final int complexity, final Access2D<?> right) {
-
-        int nbCols = product.getColDim();
-        int firstL = MultiplyBoth.firstInRows(left, 3, complexity);
-        int limitL = MultiplyBoth.limitOfRows(left, 3, complexity);
-
-        for (int j = 0; j < nbCols; j++) {
-
-            int first = Structure2D.firstInColumn(right, j, firstL);
-            int limit = Structure2D.limitOfColumn(right, j, limitL);
-
-            double tmp0J = PrimitiveMath.ZERO;
-            double tmp1J = PrimitiveMath.ZERO;
-            double tmp2J = PrimitiveMath.ZERO;
-
-            for (int c = first; c < limit; c++) {
-                double tmpRightCJ = right.doubleValue(c, j);
-                tmp0J += left.doubleValue(0, c) * tmpRightCJ;
-                tmp1J += left.doubleValue(1, c) * tmpRightCJ;
-                tmp2J += left.doubleValue(2, c) * tmpRightCJ;
-            }
-
-            product.set(0, j, tmp0J);
-            product.set(1, j, tmp1J);
-            product.set(2, j, tmp2J);
-        }
-    }
-
-    /**
-     * 4 rows, any number of columns: each column over the range of the complexity where both operands may
-     * have non-zero elements.
-     */
-    static void fill4xN_P64(final TransformableRegion<Double> product, final Access2D<?> left, final int complexity, final Access2D<?> right) {
-
-        int nbCols = product.getColDim();
-        int firstL = MultiplyBoth.firstInRows(left, 4, complexity);
-        int limitL = MultiplyBoth.limitOfRows(left, 4, complexity);
-
-        for (int j = 0; j < nbCols; j++) {
-
-            int first = Structure2D.firstInColumn(right, j, firstL);
-            int limit = Structure2D.limitOfColumn(right, j, limitL);
-
-            double tmp0J = PrimitiveMath.ZERO;
-            double tmp1J = PrimitiveMath.ZERO;
-            double tmp2J = PrimitiveMath.ZERO;
-            double tmp3J = PrimitiveMath.ZERO;
-
-            for (int c = first; c < limit; c++) {
-                double tmpRightCJ = right.doubleValue(c, j);
-                tmp0J += left.doubleValue(0, c) * tmpRightCJ;
-                tmp1J += left.doubleValue(1, c) * tmpRightCJ;
-                tmp2J += left.doubleValue(2, c) * tmpRightCJ;
-                tmp3J += left.doubleValue(3, c) * tmpRightCJ;
-            }
-
-            product.set(0, j, tmp0J);
-            product.set(1, j, tmp1J);
-            product.set(2, j, tmp2J);
-            product.set(3, j, tmp3J);
-        }
     }
 
     /**
@@ -960,55 +940,75 @@ public class MultiplyBoth implements MatrixOperation {
     }
 
     /**
-     * 10 rows, any number of columns: each column over the range of the complexity where both operands may
-     * have non-zero elements.
+     * @see #fillColumns_P64(TransformableRegion, int, int, double[], int[], int[], int, Access1D, double[],
+     *      double[])
      */
-    static void fill0xN_P64(final TransformableRegion<Double> product, final Access2D<?> left, final int complexity, final Access2D<?> right) {
+    static <N extends Scalar<N>> void fillColumns_G(final TransformableRegion<N> product, final int firstColumn, final int columnLimit, final N[] dataL,
+            final int[] firstL, final int[] limitL, final int complexity, final Access1D<N> right, final N[] dataR, final N[] dataP, final N zero) {
 
-        int nbCols = product.getColDim();
-        int firstL = MultiplyBoth.firstInRows(left, 10, complexity);
-        int limitL = MultiplyBoth.limitOfRows(left, 10, complexity);
+        int nbRows = product.getRowDim();
+        N[] column = dataP != null ? dataP : MultiplyBoth.newZeros(zero, nbRows);
+        Access2D<N> mtrxR = MultiplyBoth.matrix(right, complexity, product.getColDim());
 
-        for (int j = 0; j < nbCols; j++) {
+        for (int j = firstColumn; j < columnLimit; j++) {
 
-            int first = Structure2D.firstInColumn(right, j, firstL);
-            int limit = Structure2D.limitOfColumn(right, j, limitL);
+            int base = dataP != null ? j * nbRows : 0;
+            Arrays.fill(column, base, base + nbRows, zero);
 
-            double tmp0J = PrimitiveMath.ZERO;
-            double tmp1J = PrimitiveMath.ZERO;
-            double tmp2J = PrimitiveMath.ZERO;
-            double tmp3J = PrimitiveMath.ZERO;
-            double tmp4J = PrimitiveMath.ZERO;
-            double tmp5J = PrimitiveMath.ZERO;
-            double tmp6J = PrimitiveMath.ZERO;
-            double tmp7J = PrimitiveMath.ZERO;
-            double tmp8J = PrimitiveMath.ZERO;
-            double tmp9J = PrimitiveMath.ZERO;
+            int first = mtrxR != null ? Structure2D.firstInColumn(mtrxR, j, 0) : 0;
+            int limit = mtrxR != null ? Structure2D.limitOfColumn(mtrxR, j, complexity) : complexity;
+            int colR = j * complexity;
 
             for (int c = first; c < limit; c++) {
-                double tmpRightCJ = right.doubleValue(c, j);
-                tmp0J += left.doubleValue(0, c) * tmpRightCJ;
-                tmp1J += left.doubleValue(1, c) * tmpRightCJ;
-                tmp2J += left.doubleValue(2, c) * tmpRightCJ;
-                tmp3J += left.doubleValue(3, c) * tmpRightCJ;
-                tmp4J += left.doubleValue(4, c) * tmpRightCJ;
-                tmp5J += left.doubleValue(5, c) * tmpRightCJ;
-                tmp6J += left.doubleValue(6, c) * tmpRightCJ;
-                tmp7J += left.doubleValue(7, c) * tmpRightCJ;
-                tmp8J += left.doubleValue(8, c) * tmpRightCJ;
-                tmp9J += left.doubleValue(9, c) * tmpRightCJ;
+                N valR = dataR != null ? dataR[colR + c] : mtrxR != null ? mtrxR.get(c, j) : right.get(colR + c);
+                int colL = c * nbRows;
+                for (int i = firstL[c]; i < limitL[c]; i++) {
+                    column[base + i] = column[base + i].add(dataL[colL + i].multiply(valR)).get();
+                }
             }
 
-            product.set(0, j, tmp0J);
-            product.set(1, j, tmp1J);
-            product.set(2, j, tmp2J);
-            product.set(3, j, tmp3J);
-            product.set(4, j, tmp4J);
-            product.set(5, j, tmp5J);
-            product.set(6, j, tmp6J);
-            product.set(7, j, tmp7J);
-            product.set(8, j, tmp8J);
-            product.set(9, j, tmp9J);
+            if (dataP == null) {
+                for (int i = 0; i < nbRows; i++) {
+                    product.set(i, j, column[i]);
+                }
+            }
+        }
+    }
+
+    /**
+     * Columns firstColumn to columnLimit - 1 of the product, each built by AXPY of the columns of the left
+     * operand, stored in {@code dataL} with their ranges in {@code firstL} and {@code limitL}, skipping zero
+     * elements of the right operand. The right operand is read from {@code dataR} when that is not null, and
+     * the product written to {@code dataP} when that is not null.
+     */
+    static void fillColumns_P64(final TransformableRegion<Double> product, final int firstColumn, final int columnLimit, final double[] dataL,
+            final int[] firstL, final int[] limitL, final int complexity, final Access1D<Double> right, final double[] dataR, final double[] dataP) {
+
+        int nbRows = product.getRowDim();
+        double[] column = dataP != null ? dataP : new double[nbRows];
+        Access2D<Double> mtrxR = MultiplyBoth.matrix(right, complexity, product.getColDim());
+
+        for (int j = firstColumn; j < columnLimit; j++) {
+
+            int base = dataP != null ? j * nbRows : 0;
+            Arrays.fill(column, base, base + nbRows, PrimitiveMath.ZERO);
+
+            int first = mtrxR != null ? Structure2D.firstInColumn(mtrxR, j, 0) : 0;
+            int limit = mtrxR != null ? Structure2D.limitOfColumn(mtrxR, j, complexity) : complexity;
+            int colR = j * complexity;
+
+            for (int c = first; c < limit; c++) {
+                double valR = dataR != null ? dataR[colR + c] : mtrxR != null ? mtrxR.doubleValue(c, j) : right.doubleValue(colR + c);
+                if (valR != PrimitiveMath.ZERO) {
+                    AXPY.invoke(column, base, valR, dataL, c * nbRows, firstL[c], limitL[c]);
+                }
+            }
+
+            if (dataP == null) {
+                for (int i = 0; i < nbRows; i++) {
+                    product.set(i, j, column[i]);
+                }
+            }
         }
     }
 
