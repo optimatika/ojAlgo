@@ -21,17 +21,106 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import static org.ojalgo.function.constant.PrimitiveMath.ONE;
+
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.ArrayC128;
-import org.ojalgo.array.DenseArray;
+import org.ojalgo.matrix.operation.TRMM;
+import org.ojalgo.matrix.operation.TRSM;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
+import org.ojalgo.type.SortOrder;
 
-final class GeneralisedEvD<N extends Comparable<N>, M extends PhysicalStore<N>> extends DenseEigenvalue<N, M> implements Eigenvalue.Generalised<N> {
+class GeneralisedEvD<N extends Comparable<N>, M extends PhysicalStore<N>> extends DenseEigenvalue<N, M> implements Eigenvalue.Generalised<N> {
+
+    /**
+     * With the factor L of a {@link DenseCholesky.R064} decomposition of B, C is formed and the eigenvectors
+     * recovered by {@link TRSM} and {@link TRMM}. Otherwise as for the other number types.
+     */
+    static final class R064 extends GeneralisedEvD<Double, R064Store> {
+
+        /**
+         * C
+         */
+        private transient R064Store myC = null;
+        /**
+         * The eigenvectors, when they are not recovered in place
+         */
+        private transient R064Store myV = null;
+
+        R064(final Cholesky<Double> cholesky, final Eigenvalue<Double> eigenvalue, final Eigenvalue.Generalisation type) {
+            super(R064Store.FACTORY, cholesky, eigenvalue, type);
+        }
+
+        @Override
+        MatrixStore<Double> recover(final MatrixStore<Double> reduced, final Cholesky<Double> cholesky, final Eigenvalue.Generalisation type) {
+
+            R064Store factor = cholesky instanceof DenseCholesky.R064 ? ((DenseCholesky.R064) cholesky).getInPlace() : null;
+
+            if (factor == null || factor.getRowDim() != reduced.getRowDim()) {
+                return super.recover(reduced, cholesky, type);
+            }
+
+            int n = factor.getRowDim();
+            int nbVectors = reduced.getColDim();
+
+            R064Store vectors;
+            if (type != Eigenvalue.Generalisation.BA && reduced instanceof R064Store) {
+                vectors = (R064Store) reduced;
+            } else {
+                if (myV == null || myV.getRowDim() != n || myV.getColDim() != nbVectors) {
+                    myV = R064Store.FACTORY.make(n, nbVectors);
+                }
+                reduced.supplyTo(myV);
+                vectors = myV;
+            }
+
+            if (type == Eigenvalue.Generalisation.BA) {
+                // V = L*V
+                TRMM.invoke(true, false, false, false, n, nbVectors, ONE, factor.data, 0, Math.max(1, n), vectors.data, 0, Math.max(1, n));
+            } else {
+                // V = inv(L)^T*V
+                TRSM.invoke(true, false, true, false, n, nbVectors, ONE, factor.data, 0, Math.max(1, n), vectors.data, 0, Math.max(1, n));
+            }
+
+            return vectors;
+        }
+
+        @Override
+        PhysicalStore<Double> reduce(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> original, final Cholesky<Double> cholesky,
+                final Eigenvalue.Generalisation type) {
+
+            R064Store factor = cholesky instanceof DenseCholesky.R064 ? ((DenseCholesky.R064) cholesky).getInPlace() : null;
+
+            if (factor == null || factor.getRowDim() != original.countRows() || factor.getColDim() != original.countColumns()) {
+                return super.reduce(original, cholesky, type);
+            }
+
+            int n = factor.getRowDim();
+
+            if (myC == null || myC.getRowDim() != n || myC.getColDim() != n) {
+                myC = R064Store.FACTORY.make(n, n);
+            }
+            original.supplyTo(myC);
+
+            if (type == Eigenvalue.Generalisation.A_B) {
+                // C = inv(L)*A*inv(L)^T
+                TRSM.invoke(true, false, false, false, n, n, ONE, factor.data, 0, Math.max(1, n), myC.data, 0, Math.max(1, n));
+                TRSM.invoke(false, false, true, false, n, n, ONE, factor.data, 0, Math.max(1, n), myC.data, 0, Math.max(1, n));
+            } else {
+                // C = L^T*A*L
+                TRMM.invoke(false, false, false, false, n, n, ONE, factor.data, 0, Math.max(1, n), myC.data, 0, Math.max(1, n));
+                TRMM.invoke(true, false, true, false, n, n, ONE, factor.data, 0, Math.max(1, n), myC.data, 0, Math.max(1, n));
+            }
+
+            return myC;
+        }
+
+    }
 
     private final Cholesky<N> myCholesky;
     private final Eigenvalue<N> myEigenvalue;
@@ -60,12 +149,8 @@ final class GeneralisedEvD<N extends Comparable<N>, M extends PhysicalStore<N>> 
     }
 
     @Override
-    public Eigenpair getEigenpair(final int index) {
-
-        ComplexNumber value = ComplexNumber.FACTORY.cast(this.getD().get(index, index));
-        DenseArray<ComplexNumber> vector = ArrayC128.FACTORY.copy(this.getV().sliceColumn(index));
-
-        return new Eigenpair(value, vector);
+    public SortOrder getOrder() {
+        return myEigenvalue.getOrder();
     }
 
     @Override
@@ -76,11 +161,6 @@ final class GeneralisedEvD<N extends Comparable<N>, M extends PhysicalStore<N>> 
     @Override
     public boolean isHermitian() {
         return myEigenvalue.isHermitian();
-    }
-
-    @Override
-    public boolean isOrdered() {
-        return myEigenvalue.isOrdered();
     }
 
     @Override
@@ -109,7 +189,7 @@ final class GeneralisedEvD<N extends Comparable<N>, M extends PhysicalStore<N>> 
     protected boolean doDecompose(final Collectable<N, ? super TransformableRegion<N>> matrix, final boolean valuesOnly) {
 
         if (myCholesky.isComputed()) {
-            myReduced = this.reduce(matrix);
+            myReduced = this.reduce(matrix, myCholesky, myType);
         } else {
             myReduced = matrix.collect(myFactory);
         }
@@ -135,17 +215,21 @@ final class GeneralisedEvD<N extends Comparable<N>, M extends PhysicalStore<N>> 
     protected MatrixStore<N> makeV() {
         MatrixStore<N> subV = myEigenvalue.getV();
         if (myCholesky.isComputed()) {
-            return this.recover(subV);
+            return this.recover(subV, myCholesky, myType);
         } else {
             return subV;
         }
     }
 
-    MatrixStore<N> recover(final MatrixStore<N> reduced) {
+    /**
+     * The eigenvectors of the generalised problem, from those of the reduced problem (C), with the Cholesky
+     * factor L of B.
+     */
+    MatrixStore<N> recover(final MatrixStore<N> reduced, final Cholesky<N> cholesky, final Eigenvalue.Generalisation type) {
 
-        MatrixStore<N> mtrxL = myCholesky.getL();
+        MatrixStore<N> mtrxL = cholesky.getL();
 
-        switch (myType) {
+        switch (type) {
 
             case BA:
 
@@ -173,11 +257,16 @@ final class GeneralisedEvD<N extends Comparable<N>, M extends PhysicalStore<N>> 
         }
     }
 
-    PhysicalStore<N> reduce(final Access2D.Collectable<N, ? super PhysicalStore<N>> original) {
+    /**
+     * The reduced problem: C = inv(L)*A*inv(L)<sup>H</sup> (A_B) or C = L<sup>H</sup>*A*L (AB and BA), with
+     * the Cholesky factor L of B.
+     */
+    PhysicalStore<N> reduce(final Access2D.Collectable<N, ? super PhysicalStore<N>> original, final Cholesky<N> cholesky,
+            final Eigenvalue.Generalisation type) {
 
-        MatrixStore<N> mtrxL = myCholesky.getL();
+        MatrixStore<N> mtrxL = cholesky.getL();
 
-        switch (myType) {
+        switch (type) {
 
             case A_B:
 

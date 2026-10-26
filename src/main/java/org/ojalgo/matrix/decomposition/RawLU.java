@@ -313,12 +313,29 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return myPivot.reverseOrder();
     }
 
+    /**
+     * A single right hand side, from one {@link R064Store} to another, is copied to the pivot order in one
+     * pass – no permutation cycles to follow.
+     */
     @Override
     public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
 
-        rhs.supplyTo(preallocated);
+        if (rhs != preallocated && this.isColumn(rhs) && this.isColumn(preallocated)) {
 
-        this.applyPivotOrder(myPivot, preallocated);
+            double[] column = ((R064Store) rhs).data;
+            double[] solution = ((R064Store) preallocated).data;
+            int[] pivotOrder = myPivot.getOrder();
+
+            for (int i = 0; i < pivotOrder.length; i++) {
+                solution[i] = column[pivotOrder[i]];
+            }
+
+        } else {
+
+            rhs.supplyTo(preallocated);
+
+            this.applyPivotOrder(myPivot, preallocated);
+        }
 
         return this.doSolve(preallocated);
     }
@@ -469,19 +486,47 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return preallocated;
     }
 
+    /**
+     * A single right hand side, in an {@link R064Store}, is solved in place by the kernels for the row-major
+     * body, where each row of L and U is contiguous. Otherwise each row of the body is copied, through
+     * {@link Access2D}, and then used for all right hand sides.
+     */
     private MatrixStore<Double> doSolve(final PhysicalStore<Double> preallocated) {
 
         RawStore body = this.getInternalStore();
 
-        preallocated.substituteForwards(body, true, false, false);
+        if (this.isColumn(preallocated)) {
 
-        preallocated.substituteBackwards(body, false, false, false);
+            double[] solution = ((R064Store) preallocated).data;
+
+            body.substituteForwards(false, true, solution);
+
+            body.substituteBackwards(false, false, solution);
+
+        } else {
+
+            preallocated.substituteForwards(body, true, false, false);
+
+            preallocated.substituteBackwards(body, false, false, false);
+        }
 
         if (myColPivot != null) {
             this.applyReverseOrder(myColPivot, preallocated);
         }
 
         return preallocated;
+    }
+
+    /**
+     * A single column {@link R064Store}, with as many rows as the decomposed matrix – and that matrix is
+     * square.
+     */
+    private boolean isColumn(final Object store) {
+        if (store instanceof R064Store && this.isSquare()) {
+            R064Store column = (R064Store) store;
+            return column.getRowDim() == this.getRowDim() && column.getColDim() == 1;
+        }
+        return false;
     }
 
     @Override

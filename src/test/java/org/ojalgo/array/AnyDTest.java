@@ -37,7 +37,7 @@ public class AnyDTest extends ArrayTests {
     @Test
     public void testMatrices() {
 
-        long[] shape = { 4, 9, 5 };
+        long[] shape = { 4, 4, 5 };
 
         ArrayAnyD<Double> array = ArrayAnyD.R064.makeFilled(shape, Uniform.standard());
 

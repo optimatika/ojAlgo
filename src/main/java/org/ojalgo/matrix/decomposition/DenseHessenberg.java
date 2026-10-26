@@ -21,47 +21,72 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import java.util.Arrays;
-
-import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.operation.GenerateApplyAndCopyHouseholderColumn;
-import org.ojalgo.matrix.operation.GenerateApplyAndCopyHouseholderRow;
-import org.ojalgo.matrix.operation.HouseholderStep;
+import org.ojalgo.array.ArrayR064;
+import org.ojalgo.array.BasicArray;
+import org.ojalgo.array.ScalarArray;
+import org.ojalgo.matrix.operation.GEHRD;
+import org.ojalgo.matrix.operation.ORGHR;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.TransformableRegion;
-import org.ojalgo.matrix.transformation.Householder;
-import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access2D;
 
+/**
+ * The reduction to upper Hessenberg form is done by {@link GEHRD}, and Q formed by {@link ORGHR}. The lower
+ * Hessenberg form is the conjugate transpose of the upper Hessenberg form of the conjugate transpose.
+ */
 abstract class DenseHessenberg<N extends Comparable<N>, M extends PhysicalStore<N>> extends InPlaceDecomposition<N, M> implements Hessenberg<N> {
 
-    static final class C128 extends DenseHessenberg<ComplexNumber, GenericStore<ComplexNumber>> {
+    static final class C128 extends Generic<ComplexNumber> {
 
         C128() {
-            super(GenericStore.C128, GenerateApplyAndCopyHouseholderColumn::invokeGeneric, GenerateApplyAndCopyHouseholderRow::invokeGeneric);
+            super(GenericStore.C128);
         }
 
     }
 
-    static final class H256 extends DenseHessenberg<Quaternion, GenericStore<Quaternion>> {
+    /**
+     * The number types other than double, stored in a {@link GenericStore}.
+     */
+    abstract static class Generic<N extends Scalar<N>> extends DenseHessenberg<N, GenericStore<N>> {
+
+        Generic(final GenericStore.Factory<N> factory) {
+            super(factory);
+        }
+
+        @Override
+        void generateQ(final GenericStore<N> q, final BasicArray<N> tau) {
+            int n = q.getRowDim();
+            ORGHR.invoke(n, q.data, 0, Math.max(1, n), ((ScalarArray<N>) tau).data, 0, q.physical().scalar());
+        }
+
+        @Override
+        void reduce(final GenericStore<N> inPlace, final BasicArray<N> tau) {
+            int n = inPlace.getRowDim();
+            GEHRD.invoke(n, inPlace.data, 0, Math.max(1, n), ((ScalarArray<N>) tau).data, 0, inPlace.physical().scalar());
+        }
+
+    }
+
+    static final class H256 extends Generic<Quaternion> {
 
         H256() {
-            super(GenericStore.H256, GenerateApplyAndCopyHouseholderColumn::invokeGeneric, GenerateApplyAndCopyHouseholderRow::invokeGeneric);
+            super(GenericStore.H256);
         }
 
     }
 
-    static final class Q128 extends DenseHessenberg<RationalNumber, GenericStore<RationalNumber>> {
+    static final class Q128 extends Generic<RationalNumber> {
 
         Q128() {
-            super(GenericStore.Q128, GenerateApplyAndCopyHouseholderColumn::invokeGeneric, GenerateApplyAndCopyHouseholderRow::invokeGeneric);
+            super(GenericStore.Q128);
         }
 
     }
@@ -69,34 +94,40 @@ abstract class DenseHessenberg<N extends Comparable<N>, M extends PhysicalStore<
     static final class R064 extends DenseHessenberg<Double, R064Store> {
 
         R064() {
-            super(R064Store.FACTORY, GenerateApplyAndCopyHouseholderColumn::invokeR064, GenerateApplyAndCopyHouseholderRow::invokeR064);
+            super(R064Store.FACTORY);
+        }
+
+        @Override
+        void generateQ(final R064Store q, final BasicArray<Double> tau) {
+            int n = q.getRowDim();
+            ORGHR.invoke(n, q.data, 0, Math.max(1, n), ((ArrayR064) tau).data, 0);
+        }
+
+        @Override
+        void reduce(final R064Store inPlace, final BasicArray<Double> tau) {
+            int n = inPlace.getRowDim();
+            GEHRD.invoke(n, inPlace.data, 0, Math.max(1, n), ((ArrayR064) tau).data, 0);
         }
 
     }
 
-    static final class R128 extends DenseHessenberg<Quadruple, GenericStore<Quadruple>> {
+    static final class R128 extends Generic<Quadruple> {
 
         R128() {
-            super(GenericStore.R128, GenerateApplyAndCopyHouseholderColumn::invokeGeneric, GenerateApplyAndCopyHouseholderRow::invokeGeneric);
+            super(GenericStore.R128);
         }
 
     }
 
+    private transient M myQ = null;
     /**
-     * beta of the reflectors, 0 where there is none
+     * tau of the reflectors, as returned by {@link GEHRD}
      */
-    private double[] myBeta = null;
-    private final HouseholderStep<N, M> myHouseholderColumn;
-    private final HouseholderStep<N, M> myHouseholderRow;
-    private transient PhysicalStore<N> myQ = null;
-
+    private BasicArray<N> myTau = null;
     private boolean myUpper = true;
 
-    protected DenseHessenberg(final PhysicalStore.Factory<N, ? extends M> factory, final HouseholderStep<N, M> householderColumn,
-            final HouseholderStep<N, M> householderRow) {
+    protected DenseHessenberg(final PhysicalStore.Factory<N, ? extends M> factory) {
         super(factory);
-        myHouseholderColumn = householderColumn;
-        myHouseholderRow = householderRow;
     }
 
     @Override
@@ -106,46 +137,19 @@ abstract class DenseHessenberg<N extends Comparable<N>, M extends PhysicalStore<
 
         myUpper = upper;
 
-        final M tmpStore = this.setInPlace(matrix);
+        M inPlace = upper ? this.setInPlace(matrix) : this.setInPlace(this.collect(matrix).conjugate());
 
-        final int tmpRowDim = this.getRowDim();
-        final int tmpColDim = this.getColDim();
+        int n = this.getRowDim();
 
-        int minDim = Math.min(tmpRowDim, tmpColDim);
-        if (myBeta == null || myBeta.length != minDim) {
-            myBeta = new double[minDim];
-        } else {
-            Arrays.fill(myBeta, PrimitiveMath.ZERO);
+        if (n != this.getColDim()) {
+            return this.computed(false);
         }
 
-        if (upper) {
-
-            final Householder<N> tmpHouseholderCol = this.makeHouseholder(tmpRowDim);
-
-            final int tmpLimit = Math.min(tmpRowDim, tmpColDim) - 2;
-
-            for (int ij = 0; ij < tmpLimit; ij++) {
-                if (myHouseholderColumn.invoke(tmpStore, ij + 1, ij, tmpHouseholderCol)) {
-                    tmpStore.transformLeft(tmpHouseholderCol, ij + 1);
-                    tmpStore.transformRight(tmpHouseholderCol, 0);
-                    myBeta[ij] = InPlaceDecomposition.getBeta(tmpHouseholderCol);
-                }
-            }
-
-        } else {
-
-            final Householder<N> tmpHouseholderRow = this.makeHouseholder(tmpColDim);
-
-            final int tmpLimit = Math.min(tmpRowDim, tmpColDim) - 2;
-
-            for (int ij = 0; ij < tmpLimit; ij++) {
-                if (myHouseholderRow.invoke(tmpStore, ij, ij + 1, tmpHouseholderRow)) {
-                    tmpStore.transformRight(tmpHouseholderRow, ij + 1);
-                    tmpStore.transformLeft(tmpHouseholderRow, 0);
-                    myBeta[ij] = InPlaceDecomposition.getBeta(tmpHouseholderRow);
-                }
-            }
+        if (myTau == null || myTau.count() != n) {
+            myTau = this.makeArray(n);
         }
+
+        this.reduce(inPlace, myTau);
 
         return this.computed(true);
     }
@@ -157,13 +161,17 @@ abstract class DenseHessenberg<N extends Comparable<N>, M extends PhysicalStore<
 
     @Override
     public final MatrixStore<N> getH() {
-        return this.getInPlace().hessenberg(myUpper);
+        MatrixStore<N> upperH = this.getInPlace().hessenberg(true);
+        return myUpper ? upperH : upperH.conjugate();
     }
 
     @Override
     public final MatrixStore<N> getQ() {
         if (myQ == null) {
-            myQ = this.makeQ(this.makeEye(this.getRowDim(), this.getColDim()), myUpper, true);
+            M inPlace = this.getInPlace();
+            myQ = this.makeZero(inPlace.getRowDim(), inPlace.getColDim());
+            inPlace.supplyTo(myQ);
+            this.generateQ(myQ, myTau);
         }
         return myQ;
     }
@@ -182,26 +190,21 @@ abstract class DenseHessenberg<N extends Comparable<N>, M extends PhysicalStore<
         myUpper = true;
     }
 
-    private final PhysicalStore<N> makeQ(final PhysicalStore<N> storeToTransform, final boolean upper, final boolean eye) {
-
-        final int tmpRowAndColDim = (int) storeToTransform.countRows();
-
-        final HouseholderReference<N> tmpReference = HouseholderReference.make(this.getInPlace(), upper);
-        Householder<N> worker = this.makeHouseholder(upper ? this.getRowDim() : this.getColDim());
-        PhysicalStore.Factory<N, ?> factory = this.getInPlace().physical();
-
-        for (int ij = Math.min(tmpRowAndColDim - 3, myBeta.length - 1); ij >= 0; ij--) {
-            if (myBeta[ij] != PrimitiveMath.ZERO) {
-                tmpReference.point(upper ? ij + 1 : ij, upper ? ij : ij + 1);
-                storeToTransform.transformLeft(InPlaceDecomposition.copyReflector(worker, tmpReference, myBeta[ij], factory), eye ? ij : 0);
-            }
-        }
-
-        return storeToTransform;
-    }
-
     final PhysicalStore<N> doQ(final PhysicalStore<N> aStoreToTransform) {
-        return this.makeQ(aStoreToTransform, myUpper, false);
+        this.getQ().multiply(aStoreToTransform).supplyTo(aStoreToTransform);
+        return aStoreToTransform;
     }
+
+    /**
+     * Overwrites q, a copy of the reduced matrix, with Q, using tau as returned by
+     * {@link #reduce(PhysicalStore, BasicArray)}.
+     */
+    abstract void generateQ(M q, BasicArray<N> tau);
+
+    /**
+     * Reduces the in-place matrix to upper Hessenberg form, leaving the reflectors below the first
+     * subdiagonal, and writing their tau to tau.
+     */
+    abstract void reduce(M inPlace, BasicArray<N> tau);
 
 }

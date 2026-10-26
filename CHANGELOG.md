@@ -21,11 +21,23 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - `CombinatorialFunctions.Logarithmic` – the natural logarithms of the counts, also where the counts do not fit in a `long`.
 
+#### org.ojalgo.matrix
+
+- `MatrixDecomposition.Ordered.getOrder()`: the order of a decomposition's values – the diagonal of D or S – and of the corresponding columns of its other factors, as delivered by the algorithm. What it is measured on is defined by each kind of decomposition: by absolute value for `RankRevealing` decompositions (`LU`, `Cholesky`, `LDL`, `QR`, `SingularValue`), by modulus for `Eigenvalue`. Replaces `isOrdered()`.
+
+#### org.ojalgo.type
+
+- `SortOrder` – `ASCENDING`, `DESCENDING` or `UNSORTED`.
+
 ### Changed
 
 #### org.ojalgo.concurrent
 
 - `DivideAndConquer`, and its `Divider`, divide a range into as many parts as there are workers, of almost equal size, unless the threshold stops it. The number of workers is the parallelism, but at most the number of indices. Previously the range was halved recursively, with half the workers for each half, so there could be fewer parts than workers – 4 parts with 6 workers, 8 with 12.
+
+#### org.ojalgo.data
+
+- `DataProcessors.covariances(Factory2D, SingularValue, ..)` accepts a decomposition in any order. Previously it threw `ProgrammingError` unless the singular values were ordered.
 
 #### org.ojalgo.function
 
@@ -40,6 +52,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - Multi-threading of the other matrix multiplications – `float` (`R032Store`), the generic number types (`GenericStore`), and products where an operand is not a physical store – is also decided by the amount of work. Previously it required both dimensions of the product to be larger than 32 (8 when neither operand was a physical store).
 - The dense `LU`, `Cholesky` and `QR` decompositions, for all number types, and `Tridiagonal` are reimplemented on new LAPACK-style kernels. They are multi-threaded according to the amount of work rather than the number of columns. Results, in particular solutions (`getSolution(..)`, `solve(..)`) and inverses (`getInverse(..)`, `invert(..)`), can differ from earlier versions in the last digits. So can the factors of `QR.Q128` and `QR.R128`, which had their Householder coefficients rounded to `double`.
 - `LU.R064` returns the dense implementation for matrices with more than 60 columns. Previously that required more than 512 columns, and `RawLU` was used up to that. `RawLU` is still used up to 60 columns, and for matrices too large for a single array.
+- `Eigenvalue.getEigenvalues()`, and `getEigenvalues(double[], Optional)`, always give the eigenvalues in descending order, as defined by `Eigenvalue.DESCENDING_NORM`, whatever the order of D and V. `getEigenpair(int)` gives the eigenpair of the eigenvalue at that index, and `getEigenpairs()` is in the same order. Previously the eigenvalues, and `getEigenpair(int)`, followed the columns of D and V, which are in no particular order for general (non-Hermitian) matrices.
+- The Hermitian (symmetric) `Eigenvalue` decompositions – from `make(.., true)` and `makeSpectral(..)` for all number types, and the generalised ones – no longer sort D and V. `getOrder()` is `UNSORTED`; previously `isOrdered()` was true, with the eigenvalues in descending order of their absolute values. As an `Eigenvalue.Spectral` (singular value) decomposition the same goes for S, U and V; `getSingularValues()` is still in descending order. Code that takes the leading columns of V as the eigenvectors of the largest eigenvalues should use `getEigenpairs()`, or pick the columns by the diagonal of D.
+- `Eigenvalue.R064` for general (non-Hermitian) matrices returns the dense implementation, for any size that fits in a single array. Previously `RawEigenvalue` was used up to 8192 columns. The eigenvectors are normalised as by LAPACK's `dgeev`: unit 2-norm, with the largest component real. The eigenvalues are still in no particular order, but in a different one than before. A non-square matrix throws `ProgrammingError`; `RawEigenvalue` decomposed its leading square block.
+- `SingularValue.R064` returns the dense implementation for any size that fits in a single array. Previously `RawSingularValue` was used up to 1024 columns, unless full size was requested. Results can differ in the last digits, and corresponding columns of U and V can have the opposite signs.
+- `Eigenvalue.R064.makeGeneralised(..)`: the reduction to a standard eigenvalue problem, and the recovery of the eigenvectors, use blocked and multi-threaded triangular solves and products. It is 1.05–1.3x faster.
+- Matrix products where an operand is the transpose of an `R064Store`, `R032Store` or `GenericStore` – `transpose()`, or `conjugate()` of a real matrix – use the same kernels as products of the stores themselves. They are many times faster than before, and the results can differ in the last digits.
 
 #### org.ojalgo.optimisation
 
@@ -61,6 +79,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 #### org.ojalgo.matrix
 
+- `MatrixDecomposition.Ordered.isOrdered()` – use `getOrder()`.
+- `Eigenvalue.sort(double[], ExchangeColumns)` – no longer used internally. `getEigenpairs()` gives the eigenvalues and eigenvectors in descending order.
 - `HouseholderReference.isZero()` – whether there is a reflector is known when it is generated; record it, together with its beta, then.
 
 ### Fixed
@@ -84,6 +104,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - `Eigenvalue.getEigenvectors()` of complex (`C128`) Hermitian matrices, and of the generalised `C128` problem, returned only the real parts of the eigenvectors. `getEigenpair(int)` was correct.
 - `MatrixStore.multiplyBoth(Access1D)` (x<sup>H</sup>·A·x) of complex and quaternion matrices that are not a `GenericStore` themselves – transposed, sliced and other logical views – conjugated x twice and gave x<sup>T</sup>·A·x. E.g. -1 rather than 1 for x = [i] and A = [1].
 - `doubleValue(..)` of a complex or quaternion matrix from `onAll(UnaryFunction)` applied the function to the real part only. That matrix is also what the default `add(N)`, `subtract(N)`, `multiply(N)`, `divide(N)` and `negate()` return. E.g. `GenericStore.C128` [[1 + 2i]] `.multiply(ComplexNumber.I).doubleValue(0, 0)` was 0.0 rather than -2.0. `get(..)` was correct.
+- `RawEigenvalue`, which `Eigenvalue.R064.make(.., false)` returned up to 8192 columns, never returned from decomposing a 0 matrix with 3 or more rows.
 
 #### org.ojalgo.optimisation
 

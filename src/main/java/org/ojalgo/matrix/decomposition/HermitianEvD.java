@@ -23,22 +23,19 @@ package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.array.ArrayC128;
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
-import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.operation.ExchangeColumns;
-import org.ojalgo.matrix.operation.RotateColumns;
-import org.ojalgo.matrix.operation.RotateRight;
-import org.ojalgo.matrix.operation.RotationStep;
+import org.ojalgo.matrix.operation.SYEVD;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -49,9 +46,11 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
+import org.ojalgo.type.SortOrder;
 
 /**
  * Eigenvalues and eigenvectors of a real matrix.
@@ -68,163 +67,94 @@ import org.ojalgo.structure.Access2D.Collectable;
  **/
 abstract class HermitianEvD<N extends Comparable<N>, M extends PhysicalStore<N>> extends DenseEigenvalue<N, M> implements Eigenvalue.Spectral<N> {
 
-    static final class C128 extends HermitianEvD<ComplexNumber, GenericStore<ComplexNumber>> {
+    static final class C128 extends Generic<ComplexNumber> {
 
         C128() {
-            super(GenericStore.C128, new DeferredTridiagonal.C128(), RotateRight::invokeGeneric);
+            super(GenericStore.C128);
+        }
+
+    }
+
+    /**
+     * The eigenvalues and eigenvectors are computed by {@link SYEVD}.
+     */
+    abstract static class Generic<N extends Scalar<N>> extends HermitianEvD<N, GenericStore<N>> {
+
+        Generic(final GenericStore.Factory<N> factory) {
+            super(factory);
         }
 
         @Override
-        public Eigenpair getEigenpair(final int index) {
-
-            ComplexNumber value = this.getD().get(index, index);
-            Access1D<ComplexNumber> vector = this.getV().sliceColumn(index);
-
-            return new Eigenpair(value, vector);
+        int compute(final Collectable<N, ? super TransformableRegion<N>> matrix, final GenericStore<N> inPlace, final double[] values,
+                final boolean valuesOnly) {
+            int n = inPlace.getRowDim();
+            matrix.supplyTo(inPlace);
+            return SYEVD.invoke(!valuesOnly, n, inPlace.data, 0, Math.max(1, n), values, 0, this.scalar());
         }
 
     }
 
-    static final class H256 extends HermitianEvD<Quaternion, GenericStore<Quaternion>> {
+    static final class H256 extends Generic<Quaternion> {
 
         H256() {
-            super(GenericStore.H256, new DeferredTridiagonal.H256(), RotateRight::invokeGeneric);
+            super(GenericStore.H256);
         }
 
     }
 
-    static final class Q128 extends HermitianEvD<RationalNumber, GenericStore<RationalNumber>> {
+    static final class Q128 extends Generic<RationalNumber> {
 
         Q128() {
-            super(GenericStore.Q128, new DeferredTridiagonal.Q128(), RotateRight::invokeGeneric);
+            super(GenericStore.Q128);
         }
 
     }
 
+    /**
+     * The eigenvalues and eigenvectors are computed by {@link SYEVD}.
+     */
     static final class R064 extends HermitianEvD<Double, R064Store> {
 
         R064() {
-            super(R064Store.FACTORY, new SimultaneousTridiagonal(), RotateRight::invokeR064);
+            super(R064Store.FACTORY);
+        }
+
+        /**
+         * An {@link R064Store} matrix is read where it is, not copied to the in-place store first.
+         */
+        @Override
+        int compute(final Collectable<Double, ? super TransformableRegion<Double>> matrix, final R064Store inPlace, final double[] values,
+                final boolean valuesOnly) {
+            int n = inPlace.getRowDim();
+            if (matrix instanceof R064Store) {
+                return SYEVD.invoke(!valuesOnly, n, ((R064Store) matrix).data, 0, Math.max(1, n), values, 0, inPlace.data, 0, Math.max(1, n));
+            }
+            matrix.supplyTo(inPlace);
+            return SYEVD.invoke(!valuesOnly, n, inPlace.data, 0, Math.max(1, n), values, 0);
         }
 
     }
 
-    static final class R128 extends HermitianEvD<Quadruple, GenericStore<Quadruple>> {
+    static final class R128 extends Generic<Quadruple> {
 
         R128() {
-            super(GenericStore.R128, new DeferredTridiagonal.R128(), RotateRight::invokeGeneric);
+            super(GenericStore.R128);
         }
 
-    }
-
-    static void tql2(final double[] d, final double[] e, final RotateColumns mtrxV) {
-
-        int size = d.length;
-        int limit = size - 1;
-
-        double shift = ZERO;
-        double increment;
-
-        double magnitude = ZERO;
-        double epsilon;
-
-        double d_l, e_l;
-
-        int m;
-        // Main loop
-        for (int l = 0; l < size; l++) {
-
-            d_l = d[l];
-            e_l = e[l];
-
-            // Find small subdiagonal element
-            magnitude = PrimitiveMath.MAX.invoke(magnitude, PrimitiveMath.ABS.invoke(d_l) + PrimitiveMath.ABS.invoke(e_l));
-            epsilon = MACHINE_EPSILON * magnitude;
-
-            m = l;
-            while (m < limit && PrimitiveMath.ABS.invoke(e[m]) > epsilon) {
-                m++;
-            }
-
-            // If m == l, d[l] is an eigenvalue, otherwise, iterate.
-            if (l < m) {
-                do {
-
-                    // Compute implicit shift
-
-                    double p = (d[l + 1] - d_l) / (e_l + e_l);
-                    double r = PrimitiveMath.HYPOT.invoke(p, ONE);
-                    if (p < ZERO) {
-                        r = -r;
-                    }
-
-                    d[l + 1] = e_l * (p + r);
-                    increment = d_l - (d[l] = e_l / (p + r));
-                    for (int i = l + 2; i < size; i++) {
-                        d[i] -= increment;
-                    }
-                    shift += increment;
-
-                    // Implicit QL transformation
-
-                    double cos1 = ONE, sin1 = ZERO, cos2 = cos1;
-                    double d_i, e_i;
-
-                    p = d[m];
-                    for (int i = m - 1; i >= l; i--) {
-                        d_i = d[i];
-                        e_i = e[i];
-
-                        r = PrimitiveMath.HYPOT.invoke(p, e_i);
-
-                        e[i + 1] = sin1 * r;
-
-                        cos2 = cos1;
-
-                        cos1 = p / r;
-                        sin1 = e_i / r;
-
-                        d[i + 1] = cos2 * p + sin1 * (cos1 * cos2 * e_i + sin1 * d_i);
-
-                        p = cos1 * d_i - sin1 * cos2 * e_i;
-
-                        // Accumulate transformation - rotate the eigenvector matrix
-                        mtrxV.rotateColumns(i, i + 1, cos1, sin1);
-                    }
-
-                    d_l = d[l] = cos1 * p;
-                    e_l = e[l] = sin1 * p;
-
-                } while (PrimitiveMath.ABS.invoke(e[l]) > epsilon); // Check for convergence
-            } // End if (m > l)
-
-            d[l] += shift;
-            e[l] = ZERO;
-
-        } // End main loop - l
     }
 
     private double[] d;
-    private double[] e;
+    /**
+     * The matrix, overwritten with the eigenvectors
+     */
+    private transient M myInPlace = null;
     private transient MatrixStore<N> myInverse;
-    private final RotationStep<N, M> myRotateRight;
     private transient MatrixStore<N> myS = null;
     private transient Array1D<Double> mySingularValues = null;
-    private final DenseTridiagonal<N, M> myTridiagonal;
     private transient MatrixStore<N> myU = null;
 
-    @SuppressWarnings("unused")
-    private HermitianEvD(final PhysicalStore.Factory<N, ? extends M> factory) {
-        this(factory, null, null);
-    }
-
-    protected HermitianEvD(final PhysicalStore.Factory<N, ? extends M> factory, final DenseTridiagonal<N, M> tridiagonal,
-            final RotationStep<N, M> rotateRight) {
-
+    protected HermitianEvD(final PhysicalStore.Factory<N, ? extends M> factory) {
         super(factory);
-
-        myTridiagonal = tridiagonal;
-        myRotateRight = rotateRight;
     }
 
     @Override
@@ -263,23 +193,25 @@ abstract class HermitianEvD<N extends Comparable<N>, M extends PhysicalStore<N>>
 
         MatrixStore<N> mV = this.getV();
 
-        int rank = this.getRank();
+        int[] significant = this.getSignificant();
         int dim = arg.length;
 
-        double[] work = new double[rank];
-        for (int i = 0; i < rank; i++) {
+        double[] work = new double[significant.length];
+        for (int k = 0; k < significant.length; k++) {
+            int i = significant[k];
             double sum = ZERO;
             for (int j = 0; j < dim; j++) {
                 sum += mV.doubleValue(j, i) * arg[j];
             }
-            work[i] = sum / d[i];
+            work[k] = sum / d[i];
         }
 
-        java.util.Arrays.fill(arg, ZERO);
-        for (int i = 0; i < rank; i++) {
-            double wi = work[i];
+        Arrays.fill(arg, ZERO);
+        for (int k = 0; k < significant.length; k++) {
+            int i = significant[k];
+            double wk = work[k];
             for (int j = 0; j < dim; j++) {
-                arg[j] += mV.doubleValue(j, i) * wi;
+                arg[j] += mV.doubleValue(j, i) * wk;
             }
         }
     }
@@ -291,22 +223,21 @@ abstract class HermitianEvD<N extends Comparable<N>, M extends PhysicalStore<N>>
 
     @Override
     public double getCondition() {
-        double largest = Math.abs(d[0]);
-        double smallest = Math.abs(d[d.length - 1]);
-        return largest / smallest;
+        Array1D<Double> values = this.getSingularValues();
+        return values.doubleValue(0) / values.doubleValue(values.size() - 1);
     }
 
     @Override
     public MatrixStore<N> getCovariance() {
 
-        MatrixStore<N> v = this.getV();
-        Access1D<N> values = this.getD().sliceDiagonal();
+        int[] significant = this.getSignificant();
 
-        int rank = this.getRank();
+        MatrixStore<N> v = this.getV().columns(significant);
+        Access1D<N> values = this.getD().rows(significant).columns(significant).sliceDiagonal();
 
         BinaryFunction<N> divide = this.function().divide();
 
-        MatrixStore<N> tmp = v.limits(-1, rank).onColumns(divide, values).collect(v.physical());
+        MatrixStore<N> tmp = v.onColumns(divide, values).collect(v.physical());
 
         return tmp.multiply(tmp.conjugate());
     }
@@ -322,18 +253,6 @@ abstract class HermitianEvD<N extends Comparable<N>, M extends PhysicalStore<N>>
     }
 
     @Override
-    public void getEigenvalues(final double[] realParts, final Optional<double[]> imaginaryParts) {
-
-        int length = realParts.length;
-
-        System.arraycopy(d, 0, realParts, 0, length);
-
-        if (imaginaryParts.isPresent()) {
-            System.arraycopy(e, 0, imaginaryParts.get(), 0, length);
-        }
-    }
-
-    @Override
     public List<InvertibleFactor<N>> getFactors() {
         if (this.isValuesOnly()) {
             return List.of(this);
@@ -342,9 +261,18 @@ abstract class HermitianEvD<N extends Comparable<N>, M extends PhysicalStore<N>>
         if (mV == null) {
             return List.of(this);
         }
-        int rank = this.getRank();
+        int[] significant = this.getSignificant();
+        int rank = significant.length;
         int dim = d.length;
-        return List.of(new DenseSingularValue.FactorUT<>(mV, rank, dim), new DenseSingularValue.FactorSinv<>(d, rank, dim),
+        double[] values = d;
+        if (rank < dim) {
+            mV = mV.columns(significant);
+            values = new double[rank];
+            for (int k = 0; k < rank; k++) {
+                values[k] = d[significant[k]];
+            }
+        }
+        return List.of(new DenseSingularValue.FactorUT<>(mV, rank, dim), new DenseSingularValue.FactorSinv<>(values, rank, dim),
                 new DenseSingularValue.FactorV<>(mV, rank, dim));
     }
 
@@ -388,10 +316,12 @@ abstract class HermitianEvD<N extends Comparable<N>, M extends PhysicalStore<N>>
     @Override
     public double getKyFanNorm(final int k) {
 
+        Array1D<Double> values = this.getSingularValues();
+
         double retVal = ZERO;
 
         for (int i = Math.min(d.length, k) - 1; i >= 0; i--) {
-            retVal += Math.abs(d[i]);
+            retVal += values.doubleValue(i);
         }
 
         return retVal;
@@ -399,12 +329,18 @@ abstract class HermitianEvD<N extends Comparable<N>, M extends PhysicalStore<N>>
 
     @Override
     public double getOperatorNorm() {
-        return Math.abs(d[0]);
+        // d is in ascending order
+        return Math.max(Math.abs(d[0]), Math.abs(d[d.length - 1]));
+    }
+
+    @Override
+    public SortOrder getOrder() {
+        return SortOrder.UNSORTED;
     }
 
     @Override
     public double getRankThreshold() {
-        return Math.max(MACHINE_SMALLEST, Math.abs(d[0])) * this.getDimensionalEpsilon();
+        return Math.max(MACHINE_SMALLEST, this.getOperatorNorm()) * this.getDimensionalEpsilon();
     }
 
     /**
@@ -438,9 +374,14 @@ abstract class HermitianEvD<N extends Comparable<N>, M extends PhysicalStore<N>>
     public Array1D<Double> getSingularValues() {
 
         if (this.isComputed() && mySingularValues == null) {
+            // d is in ascending order, so the largest remaining |d| is always at one of the ends
             double[] abs = new double[d.length];
-            for (int i = 0; i < d.length; i++) {
-                abs[i] = Math.abs(d[i]);
+            for (int i = 0, first = 0, last = d.length - 1; first <= last; i++) {
+                if (Math.abs(d[first]) > Math.abs(d[last])) {
+                    abs[i] = Math.abs(d[first++]);
+                } else {
+                    abs[i] = Math.abs(d[last--]);
+                }
             }
             mySingularValues = Array1D.R064.wrap(ArrayR064.wrap(abs));
         }
@@ -547,11 +488,6 @@ abstract class HermitianEvD<N extends Comparable<N>, M extends PhysicalStore<N>>
     }
 
     @Override
-    public boolean isOrdered() {
-        return true;
-    }
-
-    @Override
     public boolean isSolvable() {
         return super.isSolvable();
     }
@@ -586,8 +522,6 @@ abstract class HermitianEvD<N extends Comparable<N>, M extends PhysicalStore<N>>
 
         super.reset();
 
-        myTridiagonal.reset();
-
         myInverse = null;
         myS = null; // clear adjusted caches
         myU = null;
@@ -606,6 +540,22 @@ abstract class HermitianEvD<N extends Comparable<N>, M extends PhysicalStore<N>>
         }
     }
 
+    /**
+     * The columns of [D] and [V] with the significant eigenvalues, those counted by {@link #getRank()}.
+     */
+    private int[] getSignificant() {
+
+        double threshold = this.getRankThreshold();
+
+        int[] retVal = new int[this.countSignificant(threshold)];
+        for (int i = 0, k = 0; i < d.length; i++) {
+            if (Math.abs(d[i]) > threshold) {
+                retVal[k++] = i;
+            }
+        }
+        return retVal;
+    }
+
     @Override
     protected boolean checkSolvability() {
         return this.isComputed() && this.isHermitian();
@@ -616,27 +566,20 @@ abstract class HermitianEvD<N extends Comparable<N>, M extends PhysicalStore<N>>
 
         int size = (int) matrix.countRows();
 
-        myTridiagonal.decompose(matrix);
+        if (myInPlace == null || myInPlace.getRowDim() != size || myInPlace.getColDim() != size) {
+            myInPlace = this.makeZero(size, size);
+        }
 
         if (d == null || d.length != size) {
             d = new double[size];
-            e = new double[size];
         }
 
-        myTridiagonal.supplyDiagonalTo(d, e);
-
-        M mtrxV = valuesOnly ? null : myTridiagonal.getDecompositionQ();
-
-        RotateColumns tmpRotateColumns = valuesOnly ? RotateColumns.NULL : (low, high, cos, sin) -> myRotateRight.invoke(mtrxV, low, high, cos, sin);
-        HermitianEvD.tql2(d, e, tmpRotateColumns);
-
-        if (this.isOrdered()) {
-            ExchangeColumns tmpExchangeColumns = valuesOnly ? ExchangeColumns.NULL : mtrxV::exchangeColumns;
-            Eigenvalue.sort(d, tmpExchangeColumns);
+        if (this.compute(matrix, myInPlace, d, valuesOnly) != 0) {
+            return this.computed(false);
         }
 
         if (!valuesOnly) {
-            this.setV(mtrxV);
+            this.setV(myInPlace);
         }
 
         return this.computed(true);
@@ -652,18 +595,27 @@ abstract class HermitianEvD<N extends Comparable<N>, M extends PhysicalStore<N>>
 
         int length = d.length;
 
-        Array1D<ComplexNumber> retVal = Array1D.C128.make(length);
+        ArrayC128 retVal = ArrayC128.make(length);
 
         for (int ij = 0; ij < length; ij++) {
-            retVal.set(ij, ComplexNumber.valueOf(d[ij]));
+            retVal.data[ij] = ComplexNumber.valueOf(d[ij]);
         }
+        Arrays.sort(retVal.data, Eigenvalue.DESCENDING_NORM);
 
-        return retVal;
+        return Array1D.C128.wrap(retVal);
     }
 
     @Override
     protected MatrixStore<N> makeV() {
-        return myTridiagonal.getQ();
+        return null;
     }
+
+    /**
+     * Writes the eigenvalues of the matrix, in ascending order, to values, and its eigenvectors (unless
+     * values only) to the in-place store. The matrix is not changed.
+     *
+     * @return 0, or not if the computation failed
+     */
+    abstract int compute(Collectable<N, ? super TransformableRegion<N>> matrix, M inPlace, double[] values, boolean valuesOnly);
 
 }

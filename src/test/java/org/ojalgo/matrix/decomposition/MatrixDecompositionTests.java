@@ -28,7 +28,10 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.ojalgo.TestUtils;
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.type.SortOrder;
 
 /**
  * @author apete
@@ -141,7 +144,7 @@ public abstract class MatrixDecompositionTests {
 
     public static Tridiagonal<?>[] getAnyTridiagonal() {
         return new Tridiagonal<?>[] { new DeferredTridiagonal.C128(), new DeferredTridiagonal.R064(), new DeferredTridiagonal.H256(),
-                new DeferredTridiagonal.Q128(), new SimultaneousTridiagonal(), new DeferredTridiagonal.R128() };
+                new DeferredTridiagonal.Q128(), new DeferredTridiagonal.R128() };
     }
 
     public static List<MatrixDecomposition<Double>> getPrimitiveAll() {
@@ -242,7 +245,7 @@ public abstract class MatrixDecompositionTests {
     }
 
     public static Tridiagonal<Double>[] getPrimitiveTridiagonal() {
-        return (Tridiagonal<Double>[]) new Tridiagonal<?>[] { new DeferredTridiagonal.R064(), new SimultaneousTridiagonal() };
+        return (Tridiagonal<Double>[]) new Tridiagonal<?>[] { new DeferredTridiagonal.R064() };
     }
 
     /**
@@ -259,6 +262,35 @@ public abstract class MatrixDecompositionTests {
             for (int i = 0; i < dim; i++) {
                 retVal.add(i, j, (i + 1.0) * (j + 1.0));
             }
+        }
+
+        return retVal;
+    }
+
+    /**
+     * The columns of a decomposition's diagonal factor, [D] or [S], in descending order of the modulus of
+     * their diagonal elements. Decompositions that may be in different orders are compared in this order.
+     * When the decomposition is known to be in descending (ascending) order that is just the columns in
+     * (reverse) order – only an unsorted decomposition needs sorting.
+     */
+    static int[] descending(final MatrixDecomposition.Ordered<?> decomposition, final MatrixStore<?> diagonal) {
+
+        int size = Math.toIntExact(Math.min(diagonal.countRows(), diagonal.countColumns()));
+
+        int[] retVal = new int[size];
+
+        SortOrder order = decomposition.getOrder();
+
+        if (order == SortOrder.DESCENDING) {
+            Arrays.setAll(retVal, j -> j);
+        } else if (order == SortOrder.ASCENDING) {
+            Arrays.setAll(retVal, j -> size - 1 - j);
+        } else {
+            Integer[] sorted = new Integer[size];
+            Arrays.setAll(sorted, j -> j);
+            Arrays.sort(sorted,
+                    (j1, j2) -> Double.compare(ComplexNumber.valueOf(diagonal.get(j2, j2)).norm(), ComplexNumber.valueOf(diagonal.get(j1, j1)).norm()));
+            Arrays.setAll(retVal, j -> sorted[j]);
         }
 
         return retVal;

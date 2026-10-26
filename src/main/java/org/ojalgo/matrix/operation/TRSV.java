@@ -34,8 +34,11 @@ import org.ojalgo.scalar.Scalar;
  * The pure Java kernels for contiguous x are the ones ojAlgo's single right-hand-side substitutions (ftran
  * and btran of LU and Cholesky) were tuned with:
  * <ul>
- * <li>L*x = b and U<sup>T</sup>*x = b (forwards) sum each row with a single accumulator. A row uses the
- * element solved just before only in its last term, so consecutive rows overlap.
+ * <li>U<sup>T</sup>*x = b (forwards) sums each row with a single accumulator. A row uses the element solved
+ * just before only in its last term, so consecutive rows overlap.
+ * <li>L*x = b (forwards) does the same up to order {@link #COLUMN_SWEEP_THRESHOLD}, and above that it is a
+ * column sweep, as U*x = b. A row of the column-major L is strided: those loads can't be vectorised, and with
+ * a leading dimension that is a power of 2 they all map to the same few cache sets.
  * <li>U*x = b (backwards) is a column sweep, skipping zero elements.
  * <li>L<sup>T</sup>*x = b (backwards) sums each row from the far end, so the element solved just before is
  * used in the last term. Summed the other way, every row has to wait for the previous one before it can
@@ -50,35 +53,64 @@ public abstract class TRSV implements BLAS2 {
     static final class JVM {
 
         /**
-         * L*x = b, forwards, each row summed with a single accumulator.
+         * L*x = b, forwards, each row summed with a single accumulator – or, when n is larger than
+         * {@link TRSV#COLUMN_SWEEP_THRESHOLD}, as a column sweep that skips zero elements of x.
          */
         private static void solveL(final boolean unitDiagonal, final int n, final double[] a, final int offsetA, final int lda, final double[] x,
                 final int offsetX) {
-            for (int j = 0; j < n; j++) {
-                double sum = 0D;
-                for (int i = 0, ia = offsetA + j, ix = offsetX; i < j; i++, ia += lda, ix++) {
-                    sum += a[ia] * x[ix];
+            if (n > COLUMN_SWEEP_THRESHOLD) {
+                for (int j = 0; j < n; j++) {
+                    if (!unitDiagonal) {
+                        x[offsetX + j] /= a[offsetA + j + j * lda];
+                    }
+                    double solved = x[offsetX + j];
+                    if (solved != ZERO) {
+                        AXPY.JVM.invoke(n - 1 - j, -solved, a, offsetA + j + 1 + j * lda, 1, x, offsetX + j + 1, 1);
+                    }
                 }
-                double solved = x[offsetX + j] - sum;
-                if (!unitDiagonal) {
-                    solved /= a[offsetA + j + j * lda];
+            } else {
+                for (int j = 0; j < n; j++) {
+                    double sum = 0D;
+                    for (int i = 0, ia = offsetA + j, ix = offsetX; i < j; i++, ia += lda, ix++) {
+                        sum += a[ia] * x[ix];
+                    }
+                    double solved = x[offsetX + j] - sum;
+                    if (!unitDiagonal) {
+                        solved /= a[offsetA + j + j * lda];
+                    }
+                    x[offsetX + j] = solved;
                 }
-                x[offsetX + j] = solved;
             }
         }
 
+        /**
+         * L*x = b, forwards, each row summed with a single accumulator – or, when n is larger than
+         * {@link TRSV#COLUMN_SWEEP_THRESHOLD}, as a column sweep that skips zero elements of x.
+         */
         private static void solveL(final boolean unitDiagonal, final int n, final float[] a, final int offsetA, final int lda, final float[] x,
                 final int offsetX) {
-            for (int j = 0; j < n; j++) {
-                float sum = 0F;
-                for (int i = 0, ia = offsetA + j, ix = offsetX; i < j; i++, ia += lda, ix++) {
-                    sum += a[ia] * x[ix];
+            if (n > COLUMN_SWEEP_THRESHOLD) {
+                for (int j = 0; j < n; j++) {
+                    if (!unitDiagonal) {
+                        x[offsetX + j] /= a[offsetA + j + j * lda];
+                    }
+                    float solved = x[offsetX + j];
+                    if (solved != 0F) {
+                        AXPY.invoke(x, offsetX, -solved, a, offsetA + j * lda, j + 1, n);
+                    }
                 }
-                float solved = x[offsetX + j] - sum;
-                if (!unitDiagonal) {
-                    solved /= a[offsetA + j + j * lda];
+            } else {
+                for (int j = 0; j < n; j++) {
+                    float sum = 0F;
+                    for (int i = 0, ia = offsetA + j, ix = offsetX; i < j; i++, ia += lda, ix++) {
+                        sum += a[ia] * x[ix];
+                    }
+                    float solved = x[offsetX + j] - sum;
+                    if (!unitDiagonal) {
+                        solved /= a[offsetA + j + j * lda];
+                    }
+                    x[offsetX + j] = solved;
                 }
-                x[offsetX + j] = solved;
             }
         }
 
@@ -235,20 +267,18 @@ public abstract class TRSV implements BLAS2 {
         }
 
         /**
-         * U*x = b, backwards, each row summed in order with a single accumulator.
+         * U*x = b, backwards, as a column sweep that skips zero elements of x.
          */
         private static void solveU(final boolean unitDiagonal, final int n, final float[] a, final int offsetA, final int lda, final float[] x,
                 final int offsetX) {
             for (int j = n - 1; j >= 0; j--) {
-                float sum = 0F;
-                for (int i = j + 1, ia = offsetA + j + (j + 1) * lda; i < n; i++, ia += lda) {
-                    sum += a[ia] * x[offsetX + i];
-                }
-                float solved = x[offsetX + j] - sum;
                 if (!unitDiagonal) {
-                    solved /= a[offsetA + j + j * lda];
+                    x[offsetX + j] /= a[offsetA + j + j * lda];
                 }
-                x[offsetX + j] = solved;
+                float solved = x[offsetX + j];
+                if (solved != 0F) {
+                    AXPY.invoke(x, offsetX, -solved, a, offsetA + j * lda, 0, j);
+                }
             }
         }
 
@@ -366,6 +396,13 @@ public abstract class TRSV implements BLAS2 {
         }
 
     }
+
+    /**
+     * The pure Java L*x = b, with contiguous x, sums each row with a single accumulator up to this order, and
+     * is a column sweep above it. The row sums are faster while L is small, the column sweep from n ≈ 50 –
+     * more than 5 times faster for n = 512.
+     */
+    private static final int COLUMN_SWEEP_THRESHOLD = 40;
 
     /**
      * {@code dtrsv}: solves op(A)*x = b, x overwrites b

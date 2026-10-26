@@ -34,6 +34,14 @@ public abstract class SubstituteBackwards implements MatrixOperation {
 
     public static int THRESHOLD = 64;
 
+    /**
+     * The single right-hand-side kernel for a row-major body sums each row from the far end with a single
+     * accumulator up to this order, so that the element solved just before is used in the last term and
+     * consecutive rows overlap. That is faster than {@link DOT} (1.4 times for n = 10) until the rows get
+     * long.
+     */
+    private static final int SINGLE_ACCUMULATOR_THRESHOLD = 80;
+
     private static final DivideAndConquer.Divider DIVIDER = Parallelism.THREADS.newDivider();
 
     public static void invoke(final double[] data, final Access2D<?> body, final boolean unitDiagonal, final boolean conjugated, final double[] work) {
@@ -91,6 +99,9 @@ public abstract class SubstituteBackwards implements MatrixOperation {
     /**
      * Single-RHS backward substitution for row-major (double[][]) body data. Each row of the body array
      * corresponds to a matrix row.
+     * <p>
+     * Not conjugated, each row is summed from the far end with a single accumulator up to order
+     * {@link #SINGLE_ACCUMULATOR_THRESHOLD}, and with {@link DOT} above that.
      *
      * @param data         Single-column RHS, overwritten with the solution
      * @param bodyRows     Row-major body data (bodyRows[i][j] = body element at row i, col j)
@@ -115,7 +126,7 @@ public abstract class SubstituteBackwards implements MatrixOperation {
                 }
             }
 
-        } else {
+        } else if (n > SINGLE_ACCUMULATOR_THRESHOLD) {
 
             for (int j = n - 1; j >= 0; j--) {
 
@@ -123,6 +134,26 @@ public abstract class SubstituteBackwards implements MatrixOperation {
 
                 if (!unitDiagonal) {
                     solved /= bodyRows[j][j];
+                }
+
+                data[j] = solved;
+            }
+
+        } else {
+
+            for (int j = n - 1; j >= 0; j--) {
+
+                double[] row = bodyRows[j];
+
+                double sum = PrimitiveMath.ZERO;
+                for (int i = n - 1; i > j; i--) {
+                    sum += row[i] * data[i];
+                }
+
+                double solved = data[j] - sum;
+
+                if (!unitDiagonal) {
+                    solved /= row[j];
                 }
 
                 data[j] = solved;

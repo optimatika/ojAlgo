@@ -93,52 +93,6 @@ public class TestSpecificSizeImplementationRational {
     }
 
     @Test
-    public void testMultiplyLeft() {
-
-        for (int m : DIMS) {
-            for (int c : DIMS) {
-                for (int n : DIMS) {
-
-                    GenericStore<RationalNumber> left = GenericStore.Q128.makeFilled(m, c, Normal.standard());
-                    GenericStore<RationalNumber> right = GenericStore.Q128.makeFilled(c, n, Normal.standard());
-                    GenericStore<RationalNumber> expected = GenericStore.Q128.make(m, n);
-                    GenericStore<RationalNumber> actual = GenericStore.Q128.make(m, n);
-
-                    MultiplyLeft.fillMxN(expected.data, left, c, right.data, RationalNumber.FACTORY);
-                    MultiplyLeft.Generic<RationalNumber> generic = MultiplyLeft.newGeneric(m, n);
-                    generic.invoke(actual.data, left, c, right.data, RationalNumber.FACTORY);
-
-                    TestUtils.assertEquals(m + "-" + c + "-" + n, expected, actual, ACCURACY_P64);
-                }
-            }
-        }
-    }
-
-    @Test
-    public void testMultiplyLeftShaded() {
-
-        for (int m : DIMS) {
-            for (int c : DIMS) {
-                for (int n : DIMS) {
-
-                    GenericStore<RationalNumber> left = GenericStore.Q128.makeFilled(m, c, Normal.standard());
-                    GenericStore<RationalNumber> right = GenericStore.Q128.makeFilled(c, n, Normal.standard());
-                    GenericStore<RationalNumber> expected = GenericStore.Q128.make(m, n);
-                    GenericStore<RationalNumber> actual = GenericStore.Q128.make(m, n);
-
-                    MatrixStore<RationalNumber> l = left.tridiagonal();
-
-                    MultiplyLeft.fillMxN(expected.data, l, c, right.data, RationalNumber.FACTORY);
-                    MultiplyLeft.Generic<RationalNumber> generic = MultiplyLeft.newGeneric(m, n);
-                    generic.invoke(actual.data, l, c, right.data, RationalNumber.FACTORY);
-
-                    TestUtils.assertEquals(m + "-" + c + "-" + n, expected, actual, ACCURACY_P64);
-                }
-            }
-        }
-    }
-
-    @Test
     public void testMultiplyNeither() {
 
         for (int m : DIMS) {
@@ -146,61 +100,26 @@ public class TestSpecificSizeImplementationRational {
                 for (int n : DIMS) {
 
                     GenericStore<RationalNumber> left = GenericStore.Q128.makeFilled(m, c, Normal.standard());
+                    GenericStore<RationalNumber> leftT = GenericStore.Q128.makeFilled(c, m, Normal.standard());
                     GenericStore<RationalNumber> right = GenericStore.Q128.makeFilled(c, n, Normal.standard());
+                    GenericStore<RationalNumber> rightT = GenericStore.Q128.makeFilled(n, c, Normal.standard());
                     GenericStore<RationalNumber> expected = GenericStore.Q128.make(m, n);
                     GenericStore<RationalNumber> actual = GenericStore.Q128.make(m, n);
 
-                    MultiplyNeither.fillMxN(expected.data, left.data, c, right.data, RationalNumber.FACTORY);
                     MultiplyNeither.Generic<RationalNumber> generic = MultiplyNeither.newGeneric(m, n);
-                    generic.invoke(actual.data, left.data, c, right.data, RationalNumber.FACTORY);
 
-                    TestUtils.assertEquals(m + "-" + c + "-" + n, expected, actual, ACCURACY_P64);
-                }
-            }
-        }
-    }
+                    for (boolean transpL : new boolean[] { false, true }) {
+                        for (boolean transpR : new boolean[] { false, true }) {
 
-    @Test
-    public void testMultiplyRight() {
+                            RationalNumber[] dataL = transpL ? leftT.data : left.data;
+                            RationalNumber[] dataR = transpR ? rightT.data : right.data;
 
-        for (int m : DIMS) {
-            for (int c : DIMS) {
-                for (int n : DIMS) {
+                            MultiplyNeither.fillMxN(expected.data, dataL, transpL, c, dataR, transpR, RationalNumber.FACTORY);
+                            generic.invoke(actual.data, dataL, transpL, c, dataR, transpR, RationalNumber.FACTORY);
 
-                    GenericStore<RationalNumber> left = GenericStore.Q128.makeFilled(m, c, Normal.standard());
-                    GenericStore<RationalNumber> right = GenericStore.Q128.makeFilled(c, n, Normal.standard());
-                    GenericStore<RationalNumber> expected = GenericStore.Q128.make(m, n);
-                    GenericStore<RationalNumber> actual = GenericStore.Q128.make(m, n);
-
-                    MultiplyRight.fillMxN(expected.data, left.data, c, right, RationalNumber.FACTORY);
-                    MultiplyRight.Generic<RationalNumber> generic = MultiplyRight.newGeneric(m, n);
-                    generic.invoke(actual.data, left.data, c, right, RationalNumber.FACTORY);
-
-                    TestUtils.assertEquals(m + "-" + c + "-" + n, expected, actual, ACCURACY_P64);
-                }
-            }
-        }
-    }
-
-    @Test
-    public void testMultiplyRightShaded() {
-
-        for (int m : DIMS) {
-            for (int c : DIMS) {
-                for (int n : DIMS) {
-
-                    GenericStore<RationalNumber> left = GenericStore.Q128.makeFilled(m, c, Normal.standard());
-                    GenericStore<RationalNumber> right = GenericStore.Q128.makeFilled(c, n, Normal.standard());
-                    GenericStore<RationalNumber> expected = GenericStore.Q128.make(m, n);
-                    GenericStore<RationalNumber> actual = GenericStore.Q128.make(m, n);
-
-                    MatrixStore<RationalNumber> r = right.tridiagonal();
-
-                    MultiplyRight.fillMxN(expected.data, left.data, c, r, RationalNumber.FACTORY);
-                    MultiplyRight.Generic<RationalNumber> generic = MultiplyRight.newGeneric(m, n);
-                    generic.invoke(actual.data, left.data, c, r, RationalNumber.FACTORY);
-
-                    TestUtils.assertEquals(m + "-" + c + "-" + n, expected, actual, ACCURACY_P64);
+                            TestUtils.assertEquals(m + "-" + c + "-" + n + " " + transpL + "/" + transpR, expected, actual, ACCURACY_P64);
+                        }
+                    }
                 }
             }
         }

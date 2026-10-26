@@ -35,12 +35,13 @@ import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.Scalar;
 
 /**
- * The overloads for other number types of {@link GEQRF}, {@link GETRF}, {@link GETRS}, {@link ORGQR},
- * {@link ORMQR}, {@link POTRF}, {@link POTRS}, {@link TRSV} and {@link TRTRS} against their definitions, as
- * in {@link LAPACKTest}, with complex numbers and quaternions. Quaternion multiplication does not commute, so
- * this also checks that the factors of every product are in the right order. All elements have nonzero
- * imaginary parts. The matrices are stored from an offset with padding, and elements outside them must be
- * left untouched. The operation thresholds are minimised, so that the multi-threaded code is run too.
+ * The overloads for other number types of {@link GEBRD}, {@link GEHRD}, {@link GEQRF}, {@link GETRF},
+ * {@link GETRS}, {@link ORGBR}, {@link ORGHR}, {@link ORGQR}, {@link ORMQR}, {@link POTRF}, {@link POTRS},
+ * {@link SYEVD}, {@link TRSV} and {@link TRTRS} against their definitions, as in {@link LAPACKTest}, with
+ * complex numbers and quaternions. Quaternion multiplication does not commute, so this also checks that the
+ * factors of every product are in the right order. All elements have nonzero imaginary parts. The matrices
+ * are stored from an offset with padding, and elements outside them must be left untouched. The operation
+ * thresholds are minimised, so that the multi-threaded code is run too.
  */
 public class LAPACKGenericTest {
 
@@ -153,6 +154,121 @@ public class LAPACKGenericTest {
             }
         }
         return retVal;
+    }
+
+    private static <N extends Scalar<N>> void doTestGEBRD(final Type<N> type, final int m, final int n) {
+
+        String message = "GEBRD " + type.name + " " + m + "x" + n;
+        Random random = new Random(m + 31 * n);
+
+        Matrix<N> a = new Matrix<>(type, random, m, n);
+        N[][] original = LAPACKGenericTest.copy(type, a);
+        N[] before = a.data.clone();
+
+        N[] d = type.scalar.newArrayInstance(n + 4);
+        N[] e = type.scalar.newArrayInstance(n + 4);
+        N[] tauq = type.scalar.newArrayInstance(n + 4);
+        N[] taup = type.scalar.newArrayInstance(n + 4);
+        N sentinel = type.scalar.one().get();
+        Arrays.fill(d, sentinel);
+        Arrays.fill(e, sentinel);
+        Arrays.fill(tauq, sentinel);
+        Arrays.fill(taup, sentinel);
+
+        GEBRD.invoke(m, n, a.data, a.offset, a.ld, d, 2, e, 2, tauq, 2, taup, 2, type.scalar);
+
+        LAPACKGenericTest.assertOutsideUnchanged(message, before, a);
+        for (Object[] array : new Object[][] { d, e, tauq, taup }) {
+            TestUtils.assertTrue(message + ", outside", array[0] == sentinel && array[1] == sentinel && array[n + 2] == sentinel && array[n + 3] == sentinel);
+        }
+        TestUtils.assertTrue(message + ", e outside", n == 0 || e[n + 1] == sentinel);
+
+        // B, from d and e, also on the diagonal and the superdiagonal of A
+        N[][] b = LAPACKGenericTest.make(type, n, n);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                b[i][j] = type.scalar.zero().get();
+            }
+            b[i][i] = d[2 + i];
+            TestUtils.assertTrue(message + ", d", a.get(i, i) == d[2 + i]);
+            if (i + 1 < n) {
+                b[i][i + 1] = e[2 + i];
+                TestUtils.assertTrue(message + ", e", a.get(i, i + 1) == e[2 + i]);
+            }
+        }
+
+        // Q, m-by-n, and P^H, n-by-n, from ORGBR with the reflectors copied to separate matrices
+        Matrix<N> q = new Matrix<>(type, random, m, n);
+        Matrix<N> p = new Matrix<>(type, random, n, n);
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i < m; i++) {
+                q.set(i, j, a.get(i, j));
+                if (i < n) {
+                    p.set(i, j, a.get(i, j));
+                }
+            }
+        }
+        N[] beforeQ = q.data.clone();
+        N[] beforeP = p.data.clone();
+        ORGBR.invoke(true, m, n, n, q.data, q.offset, q.ld, tauq, 2, type.scalar);
+        ORGBR.invoke(false, n, n, m, p.data, p.offset, p.ld, taup, 2, type.scalar);
+        LAPACKGenericTest.assertOutsideUnchanged(message + ", ORGBR Q", beforeQ, q);
+        LAPACKGenericTest.assertOutsideUnchanged(message + ", ORGBR P", beforeP, p);
+
+        N[][] explicitQ = LAPACKGenericTest.copy(type, q);
+        N[][] adjointP = LAPACKGenericTest.copy(type, p);
+
+        LAPACKGenericTest.assertClose(message + ", Q^H Q = I", LAPACKGenericTest.identity(type, n),
+                LAPACKGenericTest.multiply(type, explicitQ, true, explicitQ, false), Math.sqrt(n));
+        LAPACKGenericTest.assertClose(message + ", P^H P = I", LAPACKGenericTest.identity(type, n),
+                LAPACKGenericTest.multiply(type, adjointP, false, adjointP, true), Math.sqrt(n));
+        LAPACKGenericTest.assertClose(message + ", Q B P^H = A", original,
+                LAPACKGenericTest.multiply(type, LAPACKGenericTest.multiply(type, explicitQ, false, b, false), false, adjointP, false),
+                LAPACKGenericTest.norm(original));
+    }
+
+    private static <N extends Scalar<N>> void doTestGEHRD(final Type<N> type, final int n) {
+
+        String message = "GEHRD " + type.name + " " + n;
+        Random random = new Random(n);
+
+        Matrix<N> a = new Matrix<>(type, random, n, n);
+        N[][] original = LAPACKGenericTest.copy(type, a);
+        N[] before = a.data.clone();
+
+        N[] tau = type.scalar.newArrayInstance(n + 3);
+        Arrays.fill(tau, type.scalar.one().get());
+        N sentinel = tau[0];
+
+        GEHRD.invoke(n, a.data, a.offset, a.ld, tau, 2, type.scalar);
+
+        LAPACKGenericTest.assertOutsideUnchanged(message, before, a);
+        TestUtils.assertTrue(message + ", tau outside", tau[0] == sentinel && tau[1] == sentinel && tau[n + 1] == sentinel && tau[n + 2] == sentinel);
+
+        // Q from ORGHR with the reflectors copied to a separate matrix
+        Matrix<N> q = new Matrix<>(type, random, n, n);
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i < n; i++) {
+                q.set(i, j, a.get(i, j));
+            }
+        }
+        N[] beforeQ = q.data.clone();
+        ORGHR.invoke(n, q.data, q.offset, q.ld, tau, 2, type.scalar);
+        LAPACKGenericTest.assertOutsideUnchanged(message + ", ORGHR", beforeQ, q);
+
+        N[][] explicitQ = LAPACKGenericTest.copy(type, q);
+        N[][] h = LAPACKGenericTest.make(type, n, n);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                h[i][j] = i <= j + 1 ? a.get(i, j) : type.scalar.zero().get();
+            }
+        }
+
+        LAPACKGenericTest.assertClose(message + ", Q^H Q = I", LAPACKGenericTest.identity(type, n),
+                LAPACKGenericTest.multiply(type, explicitQ, true, explicitQ, false), Math.sqrt(n));
+        LAPACKGenericTest.assertClose(message + ", Q H Q^H = A", original,
+                LAPACKGenericTest.multiply(type, LAPACKGenericTest.multiply(type, explicitQ, false, h, false), false, explicitQ, true),
+                LAPACKGenericTest.norm(original));
     }
 
     private static <N extends Scalar<N>> void doTestGEQRF(final Type<N> type, final int m, final int n) {
@@ -391,6 +507,60 @@ public class LAPACKGenericTest {
         }
     }
 
+    private static <N extends Scalar<N>> void doTestSYEVD(final Type<N> type, final int n) {
+
+        String message = "SYEVD " + type.name + " " + n;
+        Random random = new Random(n);
+
+        N[][] factor = LAPACKGenericTest.make(type, n, n);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                factor[i][j] = type.generator.apply(random);
+            }
+        }
+        N[][] original = LAPACKGenericTest.make(type, n, n);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                original[i][j] = factor[i][j].add(factor[j][i].conjugate()).get();
+            }
+        }
+
+        Matrix<N> a = LAPACKGenericTest.newTriangle(type, random, original, false);
+        N[] before = a.data.clone();
+        double[] w = new double[n + 4];
+        Arrays.fill(w, SENTINEL);
+
+        TestUtils.assertEquals(message + ", info", 0, SYEVD.invoke(true, n, a.data, a.offset, a.ld, w, 2, type.scalar));
+
+        LAPACKGenericTest.assertOutsideUnchanged(message, before, a);
+        TestUtils.assertTrue(message + ", w outside", w[0] == SENTINEL && w[1] == SENTINEL && w[n + 2] == SENTINEL && w[n + 3] == SENTINEL);
+        for (int i = 1; i < n; i++) {
+            TestUtils.assertTrue(message + ", not ascending", w[1 + i] <= w[2 + i]);
+        }
+
+        N[][] vectors = LAPACKGenericTest.copy(type, a);
+        N[][] scaled = LAPACKGenericTest.make(type, n, n);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                scaled[i][j] = vectors[i][j].multiply(w[2 + j]).get();
+            }
+        }
+
+        LAPACKGenericTest.assertClose(message + ", Z^H Z = I", LAPACKGenericTest.identity(type, n),
+                LAPACKGenericTest.multiply(type, vectors, true, vectors, false), Math.sqrt(n));
+        LAPACKGenericTest.assertClose(message + ", A Z = Z diag(w)", scaled, LAPACKGenericTest.multiply(type, original, false, vectors, false),
+                LAPACKGenericTest.norm(original));
+
+        // The eigenvalues only: the same computation of the eigenvalues
+        Matrix<N> b = LAPACKGenericTest.newTriangle(type, random, original, false);
+        double[] values = new double[n + 4];
+        Arrays.fill(values, SENTINEL);
+
+        TestUtils.assertEquals(message + ", values only, info", 0, SYEVD.invoke(false, n, b.data, b.offset, b.ld, values, 2, type.scalar));
+
+        TestUtils.assertTrue(message + ", values only", Arrays.equals(w, values));
+    }
+
     private static <N extends Scalar<N>> void doTestTRSV(final Type<N> type, final boolean upper, final boolean transpose, final boolean unitDiagonal,
             final int n, final int incX) {
 
@@ -594,6 +764,22 @@ public class LAPACKGenericTest {
     }
 
     @Test
+    public void testGEBRD() {
+        for (int[] size : new int[][] { { 1, 1 }, { 6, 1 }, { 3, 3 }, { 7, 4 }, { 17, 17 }, { 30, 25 }, { 40, 33 } }) {
+            LAPACKGenericTest.doTestGEBRD(C128, size[0], size[1]);
+            LAPACKGenericTest.doTestGEBRD(H256, size[0], size[1]);
+        }
+    }
+
+    @Test
+    public void testGEHRD() {
+        for (int n : new int[] { 1, 2, 3, 7, 17, 40 }) {
+            LAPACKGenericTest.doTestGEHRD(C128, n);
+            LAPACKGenericTest.doTestGEHRD(H256, n);
+        }
+    }
+
+    @Test
     public void testGEQRF() {
         for (int[] size : SIZES) {
             LAPACKGenericTest.doTestGEQRF(C128, size[0], size[1]);
@@ -638,6 +824,14 @@ public class LAPACKGenericTest {
                 LAPACKGenericTest.doTestPOTRS(C128, upper, size[0], size[1]);
                 LAPACKGenericTest.doTestPOTRS(H256, upper, size[0], size[1]);
             }
+        }
+    }
+
+    @Test
+    public void testSYEVD() {
+        for (int n : new int[] { 1, 2, 3, 7, 17, 40 }) {
+            LAPACKGenericTest.doTestSYEVD(C128, n);
+            LAPACKGenericTest.doTestSYEVD(H256, n);
         }
     }
 

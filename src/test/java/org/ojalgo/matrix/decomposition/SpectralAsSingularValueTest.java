@@ -55,7 +55,10 @@ public class SpectralAsSingularValueTest extends MatrixDecompositionTests {
         TestUtils.assertEquals(svd.getOperatorNorm(), spectral.getOperatorNorm(), ACC);
         TestUtils.assertEquals(svd.getTraceNorm(), spectral.getTraceNorm(), ACC);
 
-        TestUtils.assertEquals(svd.getS(), spectral.getS(), ACC);
+        // [S] compared in the same order
+        int[] svdOrder = MatrixDecompositionTests.descending(svd, svd.getS());
+        int[] spectralOrder = MatrixDecompositionTests.descending(spectral, spectral.getS());
+        TestUtils.assertEquals(svd.getS().rows(svdOrder).columns(svdOrder), spectral.getS().rows(spectralOrder).columns(spectralOrder), ACC);
 
         TestUtils.assertEquals(original, Eigenvalue.reconstruct(spectral), ACC);
         TestUtils.assertEquals(original, SingularValue.reconstruct(spectral), ACC);

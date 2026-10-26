@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import java.util.Arrays;
+import java.util.Random;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -174,6 +175,52 @@ public class CaseLU extends MatrixDecompositionTests {
             decomp.btran(actual);
 
             TestUtils.assertEquals(expected, actual);
+        }
+    }
+
+    /**
+     * A single right hand side: from one R064Store to another, in place, from some other MatrixStore, and
+     * with ftran – on both sides of the substitution kernels' thresholds (40 for TRSV, 80 for the row-major
+     * kernels).
+     */
+    @Test
+    public void testSolveSingleColumn() {
+
+        NumberContext accuracy = NumberContext.of(8);
+
+        for (int n : new int[] { 1, 2, 7, 40, 41, 80, 81, 130 }) {
+
+            Random random = new Random(n);
+
+            R064Store body = R064Store.FACTORY.make(n, n);
+            R064Store rhs = R064Store.FACTORY.make(n, 1);
+            for (int i = 0; i < n * n; i++) {
+                body.set(i, 2.0 * random.nextDouble() - 1.0);
+            }
+            for (int i = 0; i < n; i++) {
+                rhs.set(i, 2.0 * random.nextDouble() - 1.0);
+            }
+
+            for (LU<Double> decomp : MatrixDecompositionTests.getPrimitiveLU()) {
+
+                decomp.decompose(body);
+
+                String message = decomp.getClass().getSimpleName() + " n=" + n;
+
+                MatrixStore<Double> solution = decomp.getSolution(rhs, decomp.preallocate(n, n, 1));
+                TestUtils.assertEquals(message, rhs, body.multiply(solution), accuracy);
+
+                R064Store inPlace = rhs.copy();
+                decomp.getSolution(inPlace, inPlace);
+                TestUtils.assertEquals(message, solution, inPlace, accuracy);
+
+                MatrixStore<Double> fromOther = decomp.getSolution(rhs.limits(n, 1), decomp.preallocate(n, n, 1));
+                TestUtils.assertEquals(message, solution, fromOther, accuracy);
+
+                double[] ftran = rhs.toRawCopy1D();
+                decomp.ftran(ftran);
+                TestUtils.assertEquals(message, solution, R064Store.FACTORY.column(ftran), accuracy);
+            }
         }
     }
 

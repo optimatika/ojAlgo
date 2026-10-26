@@ -167,9 +167,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
     }
 
     private final MultiplyBoth.Generic<N> multiplyBoth;
-    private final MultiplyLeft.Generic<N> multiplyLeft;
     private final MultiplyNeither.Generic<N> multiplyNeither;
-    private final MultiplyRight.Generic<N> multiplyRight;
     private final int myColDim;
     private final GenericStore.Factory<N> myFactory;
     private final int myRowDim;
@@ -187,8 +185,6 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         myUtility = this.wrapInArray2D(myRowDim);
 
         multiplyBoth = MultiplyBoth.newGeneric(myRowDim, myColDim);
-        multiplyLeft = MultiplyLeft.newGeneric(myRowDim, myColDim);
-        multiplyRight = MultiplyRight.newGeneric(myRowDim, myColDim);
         multiplyNeither = MultiplyNeither.newGeneric(myRowDim, myColDim);
     }
 
@@ -294,16 +290,16 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
             ProgrammingError.throwForMultiplicationNotPossible();
         }
 
+        // Plain arrays: a GenericStore, or the transpose (not the conjugate transpose) of one
+        boolean transpL = !(left instanceof GenericStore);
+        boolean transpR = !(right instanceof GenericStore);
+        GenericStore<N> storeL = transpL ? this.transposed(left) : this.cast(left);
+        GenericStore<N> storeR = transpR ? this.transposed(right) : this.cast(right);
+
         if (complexity == 0) {
             Arrays.fill(data, myFactory.scalar().zero());
-        } else if (left instanceof GenericStore) {
-            if (right instanceof GenericStore) {
-                multiplyNeither.invoke(data, this.cast(left).data, complexity, this.cast(right).data, myFactory.scalar());
-            } else {
-                multiplyRight.invoke(data, this.cast(left).data, complexity, right, myFactory.scalar());
-            }
-        } else if (right instanceof GenericStore) {
-            multiplyLeft.invoke(data, left, complexity, this.cast(right).data, myFactory.scalar());
+        } else if (storeL != null && storeR != null) {
+            multiplyNeither.invoke(data, storeL.data, transpL, complexity, storeR.data, transpR, myFactory.scalar());
         } else {
             multiplyBoth.invoke(this, left, complexity, right);
         }
@@ -459,7 +455,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         if (right instanceof GenericStore) {
             retVal.multiplyNeither.invoke(retVal.data, data, myColDim, this.cast(right).data, myFactory.scalar());
         } else {
-            retVal.multiplyRight.invoke(retVal.data, data, myColDim, right, myFactory.scalar());
+            retVal.fillByMultiplying(this, right);
         }
 
         return retVal;
@@ -721,6 +717,17 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
             return (Rotation.Generic<N>) transformation;
         }
         return new Rotation.Generic<>(transformation);
+    }
+
+    /**
+     * If the matrix is the transpose (not the conjugate transpose) of a {@link GenericStore}, that store,
+     * otherwise null.
+     */
+    private GenericStore<N> transposed(final Access1D<?> matrix) {
+        if (matrix instanceof TransposedStore<?> && ((TransposedStore<?>) matrix).getOriginal() instanceof GenericStore<?>) {
+            return (GenericStore<N>) ((TransposedStore<?>) matrix).getOriginal();
+        }
+        return null;
     }
 
 }

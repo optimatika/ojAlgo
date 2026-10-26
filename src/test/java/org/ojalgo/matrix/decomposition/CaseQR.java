@@ -35,7 +35,7 @@ import org.ojalgo.matrix.MatrixR064.DenseReceiver;
 import org.ojalgo.matrix.P20030422Case;
 import org.ojalgo.matrix.SimpleCholeskyCase;
 import org.ojalgo.matrix.SimpleEquationCase;
-import org.ojalgo.matrix.operation.GenerateApplyAndCopyHouseholderColumn;
+import org.ojalgo.matrix.operation.GEQRF;
 import org.ojalgo.matrix.operation.MatrixOperation;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -136,7 +136,10 @@ public class CaseQR extends MatrixDecompositionTests {
         final MatrixStore<ComplexNumber> tmpDecompQ = tmpDecomposition.getQ();
         final MatrixStore<ComplexNumber> tmpDecompR = tmpDecomposition.getR();
 
+        // The reflectors, as QR.C128 gets them: below the diagonal of the reduced matrix, with tau
         final GenericStore<ComplexNumber> tmpInPlace = GenericStore.C128.copy(tmpOriginal);
+        final ComplexNumber[] tmpTau = ComplexNumber.FACTORY.newArrayInstance(DIMENSION);
+        GEQRF.invoke(DIMENSION, DIMENSION, tmpInPlace.data, 0, DIMENSION, tmpTau, 0, ComplexNumber.FACTORY);
 
         final PhysicalStore<ComplexNumber> tmpNowQ = GenericStore.C128.makeEye(DIMENSION, DIMENSION);
         final PhysicalStore<ComplexNumber> tmpNowR = GenericStore.C128.copy(tmpOriginal);
@@ -151,12 +154,15 @@ public class CaseQR extends MatrixDecompositionTests {
         for (int ij = 0; ij < tmpLim; ij++) {
 
             final Householder.Generic<ComplexNumber> tmpVector = new Householder.Generic<>(ComplexNumber.FACTORY, DIMENSION);
-
-            if (GenerateApplyAndCopyHouseholderColumn.invokeGeneric(tmpInPlace, ij, ij, tmpVector)) {
-                tmpInPlace.transformLeft(tmpVector, ij + 1);
-                tmpNowQ.transformRight(tmpVector, 0);
-                tmpNowR.transformLeft(tmpVector, ij);
+            tmpVector.first = ij;
+            tmpVector.vector[ij] = ComplexNumber.ONE;
+            for (int i = ij + 1; i < DIMENSION; i++) {
+                tmpVector.vector[i] = tmpInPlace.get(i, ij);
             }
+            tmpVector.beta = tmpTau[ij];
+
+            tmpNowQ.transformRight(tmpVector, 0);
+            tmpNowR.transformLeft(tmpVector, ij);
 
             tmpHouseholders[ij] = tmpVector;
         }

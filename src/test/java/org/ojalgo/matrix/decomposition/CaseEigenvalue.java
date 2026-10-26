@@ -27,9 +27,7 @@ import java.io.IOException;
 import java.math.MathContext;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -90,6 +88,33 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         return mtrxQ.multiply(mtrxD).multiply(mtrxQ.conjugate());
     }
 
+    /**
+     * The same eigenvalues, in any order: each expected one is compared with the closest actual one that
+     * remains.
+     */
+    private static void assertSameEigenvalues(final Array1D<ComplexNumber> expected, final Array1D<ComplexNumber> actual) {
+
+        int size = expected.size();
+        TestUtils.assertEquals(size, actual.size());
+
+        boolean[] matched = new boolean[size];
+
+        for (int i = 0; i < size; i++) {
+            ComplexNumber value = expected.get(i);
+            int closest = -1;
+            double distance = Double.POSITIVE_INFINITY;
+            for (int j = 0; j < size; j++) {
+                double d = value.subtract(actual.get(j)).norm();
+                if (!matched[j] && d < distance) {
+                    closest = j;
+                    distance = d;
+                }
+            }
+            matched[closest] = true;
+            TestUtils.assertEquals("Eigenvalue " + i, value, actual.get(closest));
+        }
+    }
+
     private static void doTestEigenvalues(final MatrixStore<Double> matrix, final NumberContext accuracy, final double... expected) {
 
         TestUtils.assertEquals(expected.length, matrix.getRowDim());
@@ -106,12 +131,8 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
             if (DEBUG) {
 
                 BasicLogger.debug();
-                BasicLogger.debug("{}, ordered={}", evd.getClass(), evd.isOrdered());
+                BasicLogger.debug("{}, order={}", evd.getClass(), evd.getOrder());
                 BasicLogger.debug("Eigenvalues: {}", actual);
-            }
-
-            if (!evd.isOrdered()) {
-                actual.sort(Comparator.comparing(ComplexNumber::norm).reversed());
             }
 
             for (int i = 0; i < expected.length; i++) {
@@ -140,7 +161,8 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
             tmpEigenvalue.computeValuesOnly(matrix);
             Array1D<ComplexNumber> tmpEigenvaluesOnly = tmpEigenvalue.getEigenvalues();
-            TestUtils.assertEquals(tmpValues, tmpEigenvaluesOnly);
+            // Unsorted, so they may come in another order
+            CaseEigenvalue.assertSameEigenvalues(tmpValues, tmpEigenvaluesOnly);
         }
     }
 
@@ -181,15 +203,18 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
             }
         }
 
+        // The eigenpairs are in descending order, [D] and [V] in the order of the decomposition
+        int[] order = MatrixDecompositionTests.descending(evd, mtrxD);
+
         Eigenpair pair0 = eigenpairs.get(0);
-        TestUtils.assertEquals(mtrxD.get(0, 0), pair0.value);
-        TestUtils.assertEquals(mtrxV.get(0, 0), pair0.vector.get(0));
-        TestUtils.assertEquals(mtrxV.get(1, 0), pair0.vector.get(1));
+        TestUtils.assertEquals(mtrxD.get(order[0], order[0]), pair0.value);
+        TestUtils.assertEquals(mtrxV.get(0, order[0]), pair0.vector.get(0));
+        TestUtils.assertEquals(mtrxV.get(1, order[0]), pair0.vector.get(1));
 
         Eigenpair pair1 = eigenpairs.get(1);
-        TestUtils.assertEquals(mtrxD.get(1, 1), pair1.value);
-        TestUtils.assertEquals(mtrxV.get(0, 1), pair1.vector.get(0));
-        TestUtils.assertEquals(mtrxV.get(1, 1), pair1.vector.get(1));
+        TestUtils.assertEquals(mtrxD.get(order[1], order[1]), pair1.value);
+        TestUtils.assertEquals(mtrxV.get(0, order[1]), pair1.vector.get(0));
+        TestUtils.assertEquals(mtrxV.get(1, order[1]), pair1.vector.get(1));
 
         TestUtils.assertEquals(matrix, evd, NumberContext.of(8));
     }
@@ -236,15 +261,18 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
             }
         }
 
+        // The eigenpairs are in descending order, [D] and [V] in the order of the decomposition
+        int[] order = MatrixDecompositionTests.descending(evd, mtrxD);
+
         Eigenpair pair0 = eigenpairs.get(0);
-        TestUtils.assertEquals(mtrxD.get(0, 0), pair0.value);
-        TestUtils.assertEquals(mtrxV.get(0, 0), pair0.vector.get(0));
-        TestUtils.assertEquals(mtrxV.get(1, 0), pair0.vector.get(1));
+        TestUtils.assertEquals(mtrxD.get(order[0], order[0]), pair0.value);
+        TestUtils.assertEquals(mtrxV.get(0, order[0]), pair0.vector.get(0));
+        TestUtils.assertEquals(mtrxV.get(1, order[0]), pair0.vector.get(1));
 
         Eigenpair pair1 = eigenpairs.get(1);
-        TestUtils.assertEquals(mtrxD.get(1, 1), pair1.value);
-        TestUtils.assertEquals(mtrxV.get(0, 1), pair1.vector.get(0));
-        TestUtils.assertEquals(mtrxV.get(1, 1), pair1.vector.get(1));
+        TestUtils.assertEquals(mtrxD.get(order[1], order[1]), pair1.value);
+        TestUtils.assertEquals(mtrxV.get(0, order[1]), pair1.vector.get(0));
+        TestUtils.assertEquals(mtrxV.get(1, order[1]), pair1.vector.get(1));
 
         MatrixStore<ComplexNumber> left = mtrxA.multiply(mtrxV);
         MatrixStore<ComplexNumber> right = mtrxB.multiply(mtrxV).multiply(mtrxD);
@@ -437,12 +465,17 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         TestUtils.assertEquals(tmpExp1, tmpAct1);
 
         GenericStore<ComplexNumber> tmpComplexD = GenericStore.C128.make(tmpLength, tmpLength);
+        GenericStore<ComplexNumber> tmpComplexV = GenericStore.C128.make(tmpLength, tmpLength);
+        List<Eigenpair> tmpPairs = tmpEvD.getEigenpairs();
         for (int j = 0; j < tmpLength; j++) {
-            tmpComplexD.set(j, j, tmpValues.get(j));
+            Eigenpair tmpPair = tmpPairs.get(j);
+            TestUtils.assertEquals(tmpValues.get(j), tmpPair.value);
+            tmpComplexD.set(j, j, tmpPair.value);
+            tmpComplexV.fillColumn(0, j, tmpPair.vector);
         }
 
-        MatrixStore<ComplexNumber> tmpExp2 = tmpCmplA.multiply(tmpVectors);
-        MatrixStore<ComplexNumber> tmpAct2 = tmpVectors.multiply(tmpComplexD);
+        MatrixStore<ComplexNumber> tmpExp2 = tmpCmplA.multiply(tmpComplexV);
+        MatrixStore<ComplexNumber> tmpAct2 = tmpComplexV.multiply(tmpComplexD);
         TestUtils.assertEquals(tmpExp2, tmpAct2);
 
         tmpEvD.computeValuesOnly(tmpA);
@@ -467,7 +500,6 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         MatrixStore<Double> tmpV = tmpEvD.getV();
 
         Array1D<ComplexNumber> tmpValues = tmpEvD.getEigenvalues();
-        MatrixStore<ComplexNumber> tmpVectors = tmpEvD.getEigenvectors();
 
         GenericStore<ComplexNumber> tmpCmplA = GenericStore.C128.copy(tmpA);
         GenericStore<ComplexNumber> tmpCmplD = GenericStore.C128.copy(tmpD);
@@ -478,10 +510,14 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         TestUtils.assertEquals(tmpExp1, tmpAct1);
 
         GenericStore<ComplexNumber> tmpAltD = GenericStore.C128.make(tmpLength, tmpLength);
-        MatrixStore<ComplexNumber> tmpAltV = tmpVectors;
+        GenericStore<ComplexNumber> tmpAltV = GenericStore.C128.make(tmpLength, tmpLength);
 
+        List<Eigenpair> tmpPairs = tmpEvD.getEigenpairs();
         for (int j = 0; j < tmpLength; j++) {
-            tmpAltD.set(j, j, tmpValues.get(j));
+            Eigenpair tmpPair = tmpPairs.get(j);
+            TestUtils.assertEquals(tmpValues.get(j), tmpPair.value);
+            tmpAltD.set(j, j, tmpPair.value);
+            tmpAltV.fillColumn(0, j, tmpPair.vector);
         }
 
         MatrixStore<ComplexNumber> tmpExp2 = tmpCmplA.multiply(tmpAltV);
@@ -526,8 +562,8 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
             eigenvalue.decompose(mtrxC);
             TestUtils.assertEquals(mtrxC, eigenvalue, accuracy);
 
-            double[] values = new double[dim];
-            eigenvalue.getEigenvalues(values, Optional.empty());
+            // The eigenvalues in the order of the columns of [V]
+            Access1D<Double> values = eigenvalue.getD().sliceDiagonal();
 
             MatrixStore<Double> vectorsY = eigenvalue.getV();
 
@@ -546,8 +582,11 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
             generalised.decompose(mtrxA, mtrxB);
 
             TestUtils.assertEquals(mtrxC, generalised.reconstruct(), accuracy);
-            TestUtils.assertEquals(vectorsZ, generalised.getV(), accuracy);
-            TestUtils.assertEquals(eigenvalue.getD(), generalised.getD(), accuracy);
+            // Compared in the same order
+            int[] order = MatrixDecompositionTests.descending(eigenvalue, eigenvalue.getD());
+            int[] orderGeneralised = MatrixDecompositionTests.descending(generalised, generalised.getD());
+            TestUtils.assertEquals(vectorsZ.columns(order), generalised.getV().columns(orderGeneralised), accuracy);
+            TestUtils.assertEquals(eigenvalue.getD().rows(order).columns(order), generalised.getD().rows(orderGeneralised).columns(orderGeneralised), accuracy);
         }
     }
 
@@ -573,8 +612,8 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
             eigenvalue.decompose(mtrxC);
             TestUtils.assertEquals(mtrxC, eigenvalue, accuracy);
 
-            double[] values = new double[dim];
-            eigenvalue.getEigenvalues(values, Optional.empty());
+            // The eigenvalues in the order of the columns of [V]
+            Access1D<Double> values = eigenvalue.getD().sliceDiagonal();
 
             MatrixStore<Double> vectorsY = eigenvalue.getV();
 
@@ -597,8 +636,11 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
             }
 
             TestUtils.assertEquals(mtrxC, generalised.reconstruct(), accuracy);
-            TestUtils.assertEquals(vectorsZ, generalised.getV(), accuracy);
-            TestUtils.assertEquals(eigenvalue.getD(), generalised.getD(), accuracy);
+            // Compared in the same order
+            int[] order = MatrixDecompositionTests.descending(eigenvalue, eigenvalue.getD());
+            int[] orderGeneralised = MatrixDecompositionTests.descending(generalised, generalised.getD());
+            TestUtils.assertEquals(vectorsZ.columns(order), generalised.getV().columns(orderGeneralised), accuracy);
+            TestUtils.assertEquals(eigenvalue.getD().rows(order).columns(order), generalised.getD().rows(orderGeneralised).columns(orderGeneralised), accuracy);
         }
     }
 
@@ -624,8 +666,8 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
             eigenvalue.decompose(mtrxC);
             TestUtils.assertEquals(mtrxC, eigenvalue, accuracy);
 
-            double[] values = new double[dim];
-            eigenvalue.getEigenvalues(values, Optional.empty());
+            // The eigenvalues in the order of the columns of [V]
+            Access1D<Double> values = eigenvalue.getD().sliceDiagonal();
 
             MatrixStore<Double> vectorsY = eigenvalue.getV();
 
@@ -644,8 +686,11 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
             generalised.decompose(mtrxA, mtrxB);
 
             TestUtils.assertEquals(mtrxC, generalised.reconstruct(), accuracy);
-            TestUtils.assertEquals(vectorsZ, generalised.getV(), accuracy);
-            TestUtils.assertEquals(eigenvalue.getD(), generalised.getD(), accuracy);
+            // Compared in the same order
+            int[] order = MatrixDecompositionTests.descending(eigenvalue, eigenvalue.getD());
+            int[] orderGeneralised = MatrixDecompositionTests.descending(generalised, generalised.getD());
+            TestUtils.assertEquals(vectorsZ.columns(order), generalised.getV().columns(orderGeneralised), accuracy);
+            TestUtils.assertEquals(eigenvalue.getD().rows(order).columns(order), generalised.getD().rows(orderGeneralised).columns(orderGeneralised), accuracy);
         }
     }
 
@@ -667,8 +712,11 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
             TestUtils.assertEquals(mtrxA, generalised, accuracy);
 
             TestUtils.assertEquals(eigenvalue.reconstruct(), generalised.reconstruct(), accuracy);
-            TestUtils.assertEquals(eigenvalue.getV(), generalised.getV(), accuracy);
-            TestUtils.assertEquals(eigenvalue.getD(), generalised.getD(), accuracy);
+            // Compared in the same order
+            int[] order = MatrixDecompositionTests.descending(eigenvalue, eigenvalue.getD());
+            int[] orderGeneralised = MatrixDecompositionTests.descending(generalised, generalised.getD());
+            TestUtils.assertEquals(eigenvalue.getV().columns(order), generalised.getV().columns(orderGeneralised), accuracy);
+            TestUtils.assertEquals(eigenvalue.getD().rows(order).columns(order), generalised.getD().rows(orderGeneralised).columns(orderGeneralised), accuracy);
         }
     }
 

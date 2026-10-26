@@ -73,7 +73,7 @@ abstract class EvD2D {
                 if (NumberContext.compare(s, ZERO) == 0) {
                     s = norm;
                 }
-                if (ABS.invoke(mtrxH[l][l - 1]) < MACHINE_EPSILON * s) {
+                if (ABS.invoke(mtrxH[l][l - 1]) <= MACHINE_EPSILON * s) {
                     break;
                 }
                 l--;

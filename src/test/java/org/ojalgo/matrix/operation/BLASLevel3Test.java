@@ -82,9 +82,10 @@ public class BLASLevel3Test {
     private static final double[] BETAS = { 0.0, 1.0, -0.3 };
     private static final boolean[] BOOLEANS = { false, true };
     /**
-     * m, n, k – including the shapes where GEMM is a level 2 operation (m, n or k is 1).
+     * m, n, k – including the shapes where GEMM is a level 2 operation (m, n or k is 1), and k leaving 1, 2
+     * and 3 after a multiple of 4.
      */
-    private static final int[][] SIZES = { { 1, 1, 1 }, { 1, 9, 6 }, { 7, 1, 5 }, { 6, 8, 1 }, { 3, 4, 2 }, { 17, 19, 18 }, { 40, 33, 37 } };
+    private static final int[][] SIZES = { { 1, 1, 1 }, { 1, 9, 6 }, { 7, 1, 5 }, { 6, 8, 1 }, { 3, 4, 2 }, { 13, 10, 11 }, { 17, 19, 18 }, { 40, 33, 37 } };
 
     /**
      * A symmetric matrix stored in one triangle; the other (strict) triangle is filled with NaN.
@@ -670,6 +671,77 @@ public class BLASLevel3Test {
         }
     }
 
+    /**
+     * The blocked Java implementation, with the block size lowered so that several blocks, including a
+     * partial last block, occur at test sizes.
+     */
+    @Test
+    public void testTRMMBlocked() {
+
+        int blockSize = TRMM.BLOCK_SIZE;
+
+        try {
+
+            TRMM.BLOCK_SIZE = 5;
+
+            for (boolean tight : BOOLEANS) {
+                for (boolean left : BOOLEANS) {
+                    for (boolean upper : BOOLEANS) {
+                        for (boolean transposeA : BOOLEANS) {
+                            for (boolean unitDiagonal : BOOLEANS) {
+                                for (int[] size : new int[][] { { 23, 17 }, { 17, 23 }, { 5, 9 }, { 9, 5 } }) {
+                                    for (double alpha : ALPHAS) {
+                                        BLASLevel3Test.doTestTRMM(Implementation.JAVA, tight, left, upper, transposeA, unitDiagonal, size[0], size[1], alpha);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+        } finally {
+            TRMM.BLOCK_SIZE = blockSize;
+        }
+    }
+
+    /**
+     * The multi-threaded Java implementation, with the threshold lowered so that the blocks on the diagonal
+     * are split at test sizes.
+     */
+    @Test
+    public void testTRMMParallel() {
+
+        int blockSize = TRMM.BLOCK_SIZE;
+        int threshold = TRMM.THRESHOLD;
+
+        try {
+
+            TRMM.BLOCK_SIZE = 16;
+            TRMM.THRESHOLD = 2;
+
+            for (boolean tight : BOOLEANS) {
+                for (boolean left : BOOLEANS) {
+                    for (boolean upper : BOOLEANS) {
+                        for (boolean transposeA : BOOLEANS) {
+                            for (boolean unitDiagonal : BOOLEANS) {
+                                for (int[] size : new int[][] { { 70, 45 }, { 45, 70 }, { 9, 60 }, { 60, 9 } }) {
+                                    for (double alpha : ALPHAS) {
+                                        BLASLevel3Test.doTestTRMM(Implementation.JAVA, tight, left, upper, transposeA, unitDiagonal, size[0], size[1], alpha);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+        } finally {
+            TRMM.BLOCK_SIZE = blockSize;
+            TRMM.THRESHOLD = threshold;
+        }
+    }
+
     @Test
     public void testTRSM() {
         for (Implementation implementation : Implementation.values()) {
@@ -688,6 +760,77 @@ public class BLASLevel3Test {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * The blocked Java implementation, with the block size lowered so that several blocks, including a
+     * partial last block, occur at test sizes.
+     */
+    @Test
+    public void testTRSMBlocked() {
+
+        int blockSize = TRSM.BLOCK_SIZE;
+
+        try {
+
+            TRSM.BLOCK_SIZE = 5;
+
+            for (boolean tight : BOOLEANS) {
+                for (boolean left : BOOLEANS) {
+                    for (boolean upper : BOOLEANS) {
+                        for (boolean transposeA : BOOLEANS) {
+                            for (boolean unitDiagonal : BOOLEANS) {
+                                for (int[] size : new int[][] { { 23, 17 }, { 17, 23 }, { 5, 9 }, { 9, 5 } }) {
+                                    for (double alpha : ALPHAS) {
+                                        BLASLevel3Test.doTestTRSM(Implementation.JAVA, tight, left, upper, transposeA, unitDiagonal, size[0], size[1], alpha);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+        } finally {
+            TRSM.BLOCK_SIZE = blockSize;
+        }
+    }
+
+    /**
+     * The multi-threaded Java implementation, with the threshold lowered so that the blocks on the diagonal
+     * are split at test sizes.
+     */
+    @Test
+    public void testTRSMParallel() {
+
+        int blockSize = TRSM.BLOCK_SIZE;
+        int threshold = TRSM.THRESHOLD;
+
+        try {
+
+            TRSM.BLOCK_SIZE = 16;
+            TRSM.THRESHOLD = 2;
+
+            for (boolean tight : BOOLEANS) {
+                for (boolean left : BOOLEANS) {
+                    for (boolean upper : BOOLEANS) {
+                        for (boolean transposeA : BOOLEANS) {
+                            for (boolean unitDiagonal : BOOLEANS) {
+                                for (int[] size : new int[][] { { 70, 45 }, { 45, 70 }, { 9, 60 }, { 60, 9 } }) {
+                                    for (double alpha : ALPHAS) {
+                                        BLASLevel3Test.doTestTRSM(Implementation.JAVA, tight, left, upper, transposeA, unitDiagonal, size[0], size[1], alpha);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+        } finally {
+            TRSM.BLOCK_SIZE = blockSize;
+            TRSM.THRESHOLD = threshold;
         }
     }
 

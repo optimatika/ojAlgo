@@ -137,10 +137,18 @@ public final class R032Store extends ArrayR032 implements PhysicalStore<Double>,
         return new Rotation.Primitive(transformation);
     }
 
+    /**
+     * If the matrix is the transpose of an {@link R032Store}, that store, otherwise null.
+     */
+    static R032Store transposed(final Access1D<?> matrix) {
+        if (matrix instanceof TransjugatedStore<?> && ((TransjugatedStore<?>) matrix).getOriginal() instanceof R032Store) {
+            return (R032Store) ((TransjugatedStore<?>) matrix).getOriginal();
+        }
+        return null;
+    }
+
     private final MultiplyBoth.Primitive multiplyBoth;
-    private final MultiplyLeft.Primitive32 multiplyLeft;
     private final MultiplyNeither.Primitive32 multiplyNeither;
-    private final MultiplyRight.Primitive32 multiplyRight;
     private final int myColDim;
     private final int myRowDim;
     private final Array2D<Double> myUtility;
@@ -157,8 +165,6 @@ public final class R032Store extends ArrayR032 implements PhysicalStore<Double>,
         myUtility = this.wrapInArray2D(myRowDim);
 
         multiplyBoth = MultiplyBoth.newPrimitive32(myRowDim, myColDim);
-        multiplyLeft = MultiplyLeft.newPrimitive32(myRowDim, myColDim);
-        multiplyRight = MultiplyRight.newPrimitive32(myRowDim, myColDim);
         multiplyNeither = MultiplyNeither.newPrimitive32(myRowDim, myColDim);
     }
 
@@ -305,16 +311,16 @@ public final class R032Store extends ArrayR032 implements PhysicalStore<Double>,
             ProgrammingError.throwForMultiplicationNotPossible();
         }
 
+        // Plain arrays: an R032Store, or the transpose of one
+        boolean transpL = !(left instanceof R032Store);
+        boolean transpR = !(right instanceof R032Store);
+        R032Store storeL = transpL ? R032Store.transposed(left) : (R032Store) left;
+        R032Store storeR = transpR ? R032Store.transposed(right) : (R032Store) right;
+
         if (complexity == 0) {
             Arrays.fill(data, 0F);
-        } else if (left instanceof R032Store) {
-            if (right instanceof R032Store) {
-                multiplyNeither.invoke(data, R032Store.cast(left).data, complexity, R032Store.cast(right).data);
-            } else {
-                multiplyRight.invoke(data, R032Store.cast(left).data, complexity, right);
-            }
-        } else if (right instanceof R032Store) {
-            multiplyLeft.invoke(data, left, complexity, R032Store.cast(right).data);
+        } else if (storeL != null && storeR != null) {
+            multiplyNeither.invoke(data, storeL.data, transpL, complexity, storeR.data, transpR);
         } else {
             multiplyBoth.invoke(this, left, complexity, right);
         }
@@ -595,7 +601,7 @@ public final class R032Store extends ArrayR032 implements PhysicalStore<Double>,
         if (right instanceof R032Store) {
             retVal.multiplyNeither.invoke(retVal.data, data, myColDim, R032Store.cast(right).data);
         } else {
-            retVal.multiplyRight.invoke(retVal.data, data, myColDim, right);
+            retVal.fillByMultiplying(this, right);
         }
 
         return retVal;

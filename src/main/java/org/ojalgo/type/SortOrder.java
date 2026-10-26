@@ -19,22 +19,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.operation;
-
-import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.transformation.Householder;
+package org.ojalgo.type;
 
 /**
- * Generates a Householder transformation from (the remaining part of) a column or row, applies it to that
- * column or row and copies it to the destination. Returns false when there was nothing to transform.
- * Implemented by {@link GenerateApplyAndCopyHouseholderColumn} and
- * {@link GenerateApplyAndCopyHouseholderRow}.
- *
- * @author apete
+ * The order of a sequence of values. What the values are compared on (value, modulus, ...) is defined where
+ * the order is reported.
  */
-@FunctionalInterface
-public interface HouseholderStep<N extends Comparable<N>, M extends PhysicalStore<N>> {
+public enum SortOrder {
 
-    boolean invoke(M store, int row, int column, Householder<N> destination);
+    /**
+     * Each value is less than or equal to the next.
+     */
+    ASCENDING,
+    /**
+     * Each value is greater than or equal to the next.
+     */
+    DESCENDING,
+    /**
+     * No guaranteed order.
+     */
+    UNSORTED;
 
 }

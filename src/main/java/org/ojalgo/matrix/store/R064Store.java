@@ -198,10 +198,18 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
         return new Rotation.Primitive(transformation);
     }
 
+    /**
+     * If the matrix is the transpose of an {@link R064Store}, that store, otherwise null.
+     */
+    static R064Store transposed(final Access1D<?> matrix) {
+        if (matrix instanceof TransjugatedStore<?> && ((TransjugatedStore<?>) matrix).getOriginal() instanceof R064Store) {
+            return (R064Store) ((TransjugatedStore<?>) matrix).getOriginal();
+        }
+        return null;
+    }
+
     private final MultiplyBoth.Primitive multiplyBoth;
-    private final MultiplyLeft.Primitive64 multiplyLeft;
     private final MultiplyNeither.Primitive64 multiplyNeither;
-    private final MultiplyRight.Primitive64 multiplyRight;
     private final int myColDim;
     private final int myRowDim;
     private final Array2D<Double> myUtility;
@@ -217,8 +225,6 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
         myUtility = this.wrapInArray2D(myRowDim);
 
         multiplyBoth = MultiplyBoth.newPrimitive64(myRowDim, myColDim);
-        multiplyLeft = MultiplyLeft.newPrimitive64(myRowDim, myColDim);
-        multiplyRight = MultiplyRight.newPrimitive64(myRowDim, myColDim);
         multiplyNeither = MultiplyNeither.newPrimitive64(myRowDim, myColDim);
     }
 
@@ -385,16 +391,16 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
             ProgrammingError.throwForMultiplicationNotPossible();
         }
 
+        // Plain arrays: an R064Store, or the transpose of one
+        boolean transpL = !(left instanceof R064Store);
+        boolean transpR = !(right instanceof R064Store);
+        R064Store storeL = transpL ? R064Store.transposed(left) : (R064Store) left;
+        R064Store storeR = transpR ? R064Store.transposed(right) : (R064Store) right;
+
         if (complexity == 0) {
             Arrays.fill(data, ZERO);
-        } else if (left instanceof R064Store) {
-            if (right instanceof R064Store) {
-                multiplyNeither.invoke(data, R064Store.cast(left).data, complexity, R064Store.cast(right).data);
-            } else {
-                multiplyRight.invoke(data, R064Store.cast(left).data, complexity, right);
-            }
-        } else if (right instanceof R064Store) {
-            multiplyLeft.invoke(data, left, complexity, R064Store.cast(right).data);
+        } else if (storeL != null && storeR != null) {
+            multiplyNeither.invoke(data, storeL.data, transpL, complexity, storeR.data, transpR);
         } else {
             multiplyBoth.invoke(this, left, complexity, right);
         }
@@ -435,8 +441,13 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
 
         if (values instanceof TransjugatedStore) {
             final TransjugatedStore<?> transposed = (TransjugatedStore<?>) values;
+            final MatrixStore<?> original = transposed.getOriginal();
 
-            FillMatchingSingle.transpose(data, myRowDim, transposed.getOriginal());
+            if (original instanceof R064Store && original.getRowDim() == this.getColDim() && original.getColDim() == myRowDim) {
+                FillMatchingSingle.transpose(data, myRowDim, ((R064Store) original).data);
+            } else {
+                FillMatchingSingle.transpose(data, myRowDim, original);
+            }
 
         } else {
 
@@ -549,7 +560,7 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
         if (right instanceof R064Store) {
             retVal.multiplyNeither.invoke(retVal.data, data, myColDim, R064Store.cast(right).data);
         } else {
-            retVal.multiplyRight.invoke(retVal.data, data, myColDim, right);
+            retVal.fillByMultiplying(this, right);
         }
 
         return retVal;

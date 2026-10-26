@@ -30,6 +30,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -97,6 +98,8 @@ public class SVDbyEvD extends MatrixDecompositionTests {
         decompEvD.decompose(leftA);
         final MatrixStore<Double> leftD = decompEvD.getD();
         final MatrixStore<Double> leftV = decompEvD.getV();
+        // Always in descending order, whatever the order of D
+        final Array1D<ComplexNumber> leftValues = decompEvD.getEigenvalues();
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debugMatrix("Left D", leftD, CONTEXT);
             BasicLogger.debugMatrix("Left V", leftV, CONTEXT);
@@ -107,6 +110,7 @@ public class SVDbyEvD extends MatrixDecompositionTests {
         decompEvD.decompose(rightA);
         final MatrixStore<Double> rightD = decompEvD.getD();
         final MatrixStore<Double> rightV = decompEvD.getV();
+        final Array1D<ComplexNumber> rightValues = decompEvD.getEigenvalues();
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debugMatrix("Right D", rightD, CONTEXT);
             BasicLogger.debugMatrix("Right V", rightV, CONTEXT);
@@ -117,8 +121,8 @@ public class SVDbyEvD extends MatrixDecompositionTests {
         // Check that the, left and right, singular values are correct
         for (int ij = 0; ij < singularValues.length; ij++) {
             final double expected = singularValues.doubleValue(ij);
-            final double leftActual = PrimitiveMath.SQRT.invoke(PrimitiveMath.ABS.invoke(leftD.doubleValue(ij, ij)));
-            final double rightActual = PrimitiveMath.SQRT.invoke(PrimitiveMath.ABS.invoke(rightD.doubleValue(ij, ij)));
+            final double leftActual = PrimitiveMath.SQRT.invoke(PrimitiveMath.ABS.invoke(leftValues.doubleValue(ij)));
+            final double rightActual = PrimitiveMath.SQRT.invoke(PrimitiveMath.ABS.invoke(rightValues.doubleValue(ij)));
             TestUtils.assertEquals("Left " + ij, expected, leftActual, CONTEXT);
             TestUtils.assertEquals("Right " + ij, expected, rightActual, CONTEXT);
         }

@@ -394,7 +394,7 @@ public abstract class FinanceUtils {
             MatrixStore<Double> mtrxV = evd.getV();
             PhysicalStore<Double> mtrxD = evd.getD().copy();
 
-            double largest = evd.getEigenvalues().get(0).norm();
+            double largest = mtrxD.aggregateDiagonal(Aggregator.LARGEST);
             double limit = largest * size * PrimitiveMath.RELATIVELY_SMALL;
 
             for (int ij = 0; ij < size; ij++) {

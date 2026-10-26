@@ -36,6 +36,14 @@ public abstract class FillMatchingSingle implements ArrayOperation {
 
     public static int THRESHOLD = 256;
 
+    /**
+     * {@link #transpose(double[], int, double[])} fills one column at a time up to this many rows, and tiles
+     * of {@link #TILE_SIZE} by {@link #TILE_SIZE} above it. One column at a time is faster for small
+     * matrices, the tiles for those with a large power of 2 rows (almost 3 times for 512).
+     */
+    private static final int TILE_THRESHOLD = 120;
+    private static final int TILE_SIZE = 32;
+
     private static final DivideAndConquer.Divider DIVIDER = Parallelism.THREADS.newDivider();
 
     public static void conjugate(final BigDecimal[] data, final int structure, final Access2D<?> source) {
@@ -188,6 +196,26 @@ public abstract class FillMatchingSingle implements ArrayOperation {
         }
     }
 
+    /**
+     * [data] = [source]<sup>T</sup>, both column-major and stored from index 0: data has structure rows, and
+     * source has as many rows as data has columns, and as many columns as data has rows.
+     * <p>
+     * Each column of data is a row of source, read with a stride. Up to {@link #TILE_THRESHOLD} rows the
+     * columns are filled one at a time, and above that 32 by 32 tiles at a time – otherwise, when the stride
+     * is a multiple of a large power of 2, the cache lines of source that the next columns need are evicted
+     * before they're used.
+     */
+    public static void transpose(final double[] data, final int structure, final double[] source) {
+
+        int nbCols = structure > 0 ? data.length / structure : 0;
+
+        if (nbCols > THRESHOLD) {
+            DIVIDER.threshold(THRESHOLD).divide(0, nbCols, (f, l) -> FillMatchingSingle.transpose(data, structure, f, l, source, nbCols));
+        } else {
+            FillMatchingSingle.transpose(data, structure, 0, nbCols, source, nbCols);
+        }
+    }
+
     public static void transpose(final float[] data, final int structure, final Access2D<?> source) {
 
         int nbCols = structure > 0 ? data.length / structure : 0;
@@ -274,6 +302,30 @@ public abstract class FillMatchingSingle implements ArrayOperation {
         for (int j = firstColumn; j < limitColumn; j++) {
             for (int i = 0; i < structure; i++) {
                 data[index++] = source.doubleValue(j, i);
+            }
+        }
+    }
+
+    private static void transpose(final double[] data, final int structure, final int firstColumn, final int limitColumn, final double[] source,
+            final int sourceStructure) {
+        if (structure > TILE_THRESHOLD) {
+            for (int tileColumn = firstColumn; tileColumn < limitColumn; tileColumn += TILE_SIZE) {
+                int tileColumnLimit = Math.min(limitColumn, tileColumn + TILE_SIZE);
+                for (int tileRow = 0; tileRow < structure; tileRow += TILE_SIZE) {
+                    int tileRowLimit = Math.min(structure, tileRow + TILE_SIZE);
+                    for (int j = tileColumn; j < tileColumnLimit; j++) {
+                        for (int i = tileRow, index = i + j * structure,
+                                sourceIndex = j + i * sourceStructure; i < tileRowLimit; i++, index++, sourceIndex += sourceStructure) {
+                            data[index] = source[sourceIndex];
+                        }
+                    }
+                }
+            }
+        } else {
+            for (int j = firstColumn; j < limitColumn; j++) {
+                for (int i = 0, index = j * structure, sourceIndex = j; i < structure; i++, index++, sourceIndex += sourceStructure) {
+                    data[index] = source[sourceIndex];
+                }
             }
         }
     }

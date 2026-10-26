@@ -25,6 +25,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.ONE;
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -35,6 +36,7 @@ import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.type.SortOrder;
 
 /**
  * Spectral clustering for {@link Point}s using a fully connected RBF similarity graph and the symmetric
@@ -131,6 +133,21 @@ final class SpectralClusterer extends FeatureBasedClusterer {
         spectral.decompose(laplacian);
         MatrixStore<Double> mtrxV = spectral.getV();
 
+        // The columns of V in descending order of the eigenvalues' modulus
+        int[] columns = new int[n];
+        SortOrder order = spectral.getOrder();
+        if (order == SortOrder.DESCENDING) {
+            Arrays.setAll(columns, j -> j);
+        } else if (order == SortOrder.ASCENDING) {
+            Arrays.setAll(columns, j -> n - 1 - j);
+        } else {
+            MatrixStore<Double> mtrxD = spectral.getD();
+            Integer[] sorted = new Integer[n];
+            Arrays.setAll(sorted, j -> j);
+            Arrays.sort(sorted, (j1, j2) -> Double.compare(Math.abs(mtrxD.doubleValue(j2, j2)), Math.abs(mtrxD.doubleValue(j1, j1))));
+            Arrays.setAll(columns, j -> sorted[j]);
+        }
+
         int effectiveK = Math.max(n - spectral.getRank(), myK);
 
         int start = n - effectiveK;
@@ -139,7 +156,7 @@ final class SpectralClusterer extends FeatureBasedClusterer {
         for (int i = 0; i < n; i++) {
             double norm = ZERO;
             for (int c = 0; c < effectiveK; c++) {
-                double v = mtrxV.doubleValue(i, start + c);
+                double v = mtrxV.doubleValue(i, columns[start + c]);
                 embed[i][c] = (float) v;
                 norm += v * v;
             }

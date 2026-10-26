@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -35,7 +36,6 @@ import org.ojalgo.matrix.operation.ExchangeColumns;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
@@ -44,6 +44,7 @@ import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
+import org.ojalgo.type.SortOrder;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -346,7 +347,7 @@ public interface Eigenvalue<N extends Comparable<N>>
                     return new RawEigenvalue.Symmetric();
                 }
             } else {
-                if (8192L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
+                if (typical.count() <= PlainArray.MAX_SIZE) {
                     return new GeneralEvD.R064();
                 } else {
                     return new RawEigenvalue.General();
@@ -357,11 +358,10 @@ public interface Eigenvalue<N extends Comparable<N>>
         @Override
         public Eigenvalue.Generalised<Double> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
 
-            PhysicalStore.Factory<Double, R064Store> factory = R064Store.FACTORY;
             Cholesky<Double> cholesky = Cholesky.R064.make(typical);
             Eigenvalue<Double> eigenvalue = this.make(typical, true);
 
-            return new GeneralisedEvD<>(factory, cholesky, eigenvalue, type);
+            return new GeneralisedEvD.R064(cholesky, eigenvalue, type);
         }
 
     };
@@ -408,7 +408,10 @@ public interface Eigenvalue<N extends Comparable<N>>
      *
      * @param values         The eigenvalues to sort
      * @param vectorExchange A function that can exchange the eigenvectors to follow the new order.
+     * @deprecated v58 No longer used internally, and will be removed. Use {@link #getEigenpairs()} to get the
+     *             eigenvalues and eigenvectors in descending order.
      */
+    @Deprecated
     static void sort(final double[] values, final ExchangeColumns vectorExchange) {
 
         int size = values.length;
@@ -460,6 +463,30 @@ public interface Eigenvalue<N extends Comparable<N>>
     }
 
     /**
+     * The eigenvalue of each column of [D] and [V]. A 2-by-2 block of [D] holds a complex conjugate pair: the
+     * eigenvalue with the positive imaginary part in its first column, the other in its second.
+     */
+    private ComplexNumber[] getColumnEigenvalues() {
+
+        MatrixStore<N> mtrxD = this.getD();
+        int dim = mtrxD.getColDim();
+
+        ComplexNumber[] retVal = new ComplexNumber[dim];
+
+        for (int j = 0; j < dim; j++) {
+            if (j < dim - 1 && mtrxD.doubleValue(j + 1, j) != 0.0) {
+                retVal[j] = ComplexNumber.of(mtrxD.doubleValue(j, j), mtrxD.doubleValue(j, j + 1));
+            } else if (j > 0 && mtrxD.doubleValue(j - 1, j) != 0.0) {
+                retVal[j] = ComplexNumber.of(mtrxD.doubleValue(j, j), mtrxD.doubleValue(j, j - 1));
+            } else {
+                retVal[j] = ComplexNumber.valueOf(mtrxD.get(j, j));
+            }
+        }
+
+        return retVal;
+    }
+
+    /**
      * The only requirements on [D] are that it should contain the eigenvalues and that [A][V] = [V][D]. The
      * ordering of the eigenvalues is not specified.
      * <ul>
@@ -473,32 +500,41 @@ public interface Eigenvalue<N extends Comparable<N>>
      */
     MatrixStore<N> getD();
 
+    /**
+     * @param index The index of the eigenvalue in {@link #getEigenvalues()}
+     * @return The eigenvalue and its eigenvector
+     */
     default Eigenpair getEigenpair(final int index) {
 
-        final long dim = this.getV().countColumns();
+        ComplexNumber[] values = this.getColumnEigenvalues();
 
-        final Array1D<ComplexNumber> vector = Array1D.C128.make(dim);
-        this.copyEigenvector(index, vector);
+        Integer[] columns = new Integer[values.length];
+        Arrays.setAll(columns, j -> j);
+        Arrays.sort(columns, (j1, j2) -> DESCENDING_NORM.compare(values[j1], values[j2]));
+        int column = columns[index];
 
-        final Array1D<ComplexNumber> values = this.getEigenvalues();
-        final ComplexNumber value = values.get(index);
+        Array1D<ComplexNumber> vector = Array1D.C128.make(values.length);
+        this.copyEigenvector(column, vector);
 
-        return new Eigenpair(value, vector);
+        return new Eigenpair(values[column], vector);
     }
 
     /**
-     * This list is always ordered in descending eigenvalue order – that's regardless of if
-     * {@link #isOrdered()} returns true or false.
+     * The eigenpairs in the order of {@link #getEigenvalues()}, regardless of {@link #getOrder()}.
      *
      * @see org.ojalgo.matrix.Provider2D.Eigenpairs#getEigenpairs()
      */
     @Override
     default List<Eigenpair> getEigenpairs() {
 
-        List<Eigenpair> retVal = new ArrayList<>();
+        ComplexNumber[] values = this.getColumnEigenvalues();
 
-        for (int i = 0, limit = this.getEigenvalues().size(); i < limit; i++) {
-            retVal.add(this.getEigenpair(i));
+        List<Eigenpair> retVal = new ArrayList<>(values.length);
+
+        for (int j = 0; j < values.length; j++) {
+            Array1D<ComplexNumber> vector = Array1D.C128.make(values.length);
+            this.copyEigenvector(j, vector);
+            retVal.add(new Eigenpair(values[j], vector));
         }
 
         Collections.sort(retVal);
@@ -541,14 +577,16 @@ public interface Eigenvalue<N extends Comparable<N>>
      * Even for real matrices the eigenvalues (and eigenvectors) are potentially complex numbers. Typically
      * they need to be expressed as complex numbers when [A] is not symmetric.
      * <p>
-     * The values should be in the same order as the matrices "V" and "D", and if they are ordered or not is
-     * indicated by the {@link #isOrdered()} method.
+     * The eigenvalues are in descending order, as defined by {@link #DESCENDING_NORM}, regardless of
+     * {@link #getOrder()}. They are not necessarily in the same order as the columns of [D] and [V].
      *
      * @return The eigenvalues.
      */
     Array1D<ComplexNumber> getEigenvalues();
 
     /**
+     * The eigenvalues in the order of {@link #getEigenvalues()}.
+     *
      * @param realParts      An array that will receive the real parts of the eigenvalues
      * @param imaginaryParts An optional array that, if present, will receive the imaginary parts of the
      *                       eigenvalues
@@ -592,6 +630,14 @@ public interface Eigenvalue<N extends Comparable<N>>
     }
 
     /**
+     * The order of the eigenvalues in D (and the eigenvectors in V), by their norm (modulus). For a hermitian
+     * matrix that is also the order of the singular values. This is a property of the
+     * algorithm/implementation, not the data.
+     */
+    @Override
+    SortOrder getOrder();
+
+    /**
      * A matrix' trace is the sum of the diagonal elements. It is also the sum of the eigenvalues. This method
      * should return the sum of the eigenvalues.
      *
@@ -610,15 +656,6 @@ public interface Eigenvalue<N extends Comparable<N>>
      * If [A] is hermitian then [V][D][V]<sup>-1</sup> becomes [Q][D][Q]<sup>H</sup>...
      */
     boolean isHermitian();
-
-    /**
-     * The eigenvalues in D (and the eigenvectors in V) are not necessarily ordered. This is a property of the
-     * algorithm/implementation, not the data.
-     *
-     * @return true if they are ordered
-     */
-    @Override
-    boolean isOrdered();
 
     @Override
     default MatrixStore<N> reconstruct() {

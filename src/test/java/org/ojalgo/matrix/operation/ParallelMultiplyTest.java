@@ -36,10 +36,9 @@ import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * The general case of {@link MultiplyLeft}, {@link MultiplyRight}, {@link MultiplyBoth} and
- * {@link MultiplyNeither} (float and generic variants) must give the same product multi-threaded (threshold
- * lowered so that it splits at test size) as single-threaded (threshold raised so that it doesn't). The
- * non-array operands are transposed views, as in A<sup>T</sup>B.
+ * The general case of {@link MultiplyBoth} and {@link MultiplyNeither} (float and generic variants) must give
+ * the same product multi-threaded (threshold lowered so that it splits at test size) as single-threaded
+ * (threshold raised so that it doesn't). The non-array operands are transposed views, as in A<sup>T</sup>B.
  */
 public class ParallelMultiplyTest {
 
@@ -101,48 +100,6 @@ public class ParallelMultiplyTest {
     }
 
     @Test
-    public void testMultiplyLeft() {
-
-        int threshold = MultiplyLeft.THRESHOLD;
-
-        try {
-
-            R064Store a = R064Store.FACTORY.makeFilled(COMPLEXITY, NB_ROWS, new Uniform());
-            R064Store b = R064Store.FACTORY.makeFilled(COMPLEXITY, NB_COLS, new Uniform());
-            MatrixStore<Double> at = a.transpose();
-
-            ParallelMultiplyTest.compare(t -> MultiplyLeft.THRESHOLD = t, () -> {
-                R064Store product = R064Store.FACTORY.make(NB_ROWS, NB_COLS);
-                MultiplyLeft.newPrimitive64(NB_ROWS, NB_COLS).invoke(product.data, at, COMPLEXITY, b.data);
-                return product;
-            }, (single, parallel) -> TestUtils.assertEquals(single, parallel, PRIMITIVE_ACCURACY));
-
-            R032Store fa = R032Store.FACTORY.makeFilled(COMPLEXITY, NB_ROWS, new Uniform());
-            R032Store fb = R032Store.FACTORY.makeFilled(COMPLEXITY, NB_COLS, new Uniform());
-            MatrixStore<Double> fat = fa.transpose();
-
-            ParallelMultiplyTest.compare(t -> MultiplyLeft.THRESHOLD = t, () -> {
-                R032Store product = R032Store.FACTORY.make(NB_ROWS, NB_COLS);
-                MultiplyLeft.newPrimitive32(NB_ROWS, NB_COLS).invoke(product.data, fat, COMPLEXITY, fb.data);
-                return product;
-            }, (single, parallel) -> TestUtils.assertEquals(single, parallel, FLOAT_ACCURACY));
-
-            GenericStore<Quadruple> ga = GenericStore.R128.makeFilled(COMPLEXITY, NB_ROWS, new Uniform());
-            GenericStore<Quadruple> gb = GenericStore.R128.makeFilled(COMPLEXITY, NB_COLS, new Uniform());
-            MatrixStore<Quadruple> gat = ga.transpose();
-
-            ParallelMultiplyTest.compare(t -> MultiplyLeft.THRESHOLD = t, () -> {
-                GenericStore<Quadruple> product = GenericStore.R128.make(NB_ROWS, NB_COLS);
-                MultiplyLeft.<Quadruple>newGeneric(NB_ROWS, NB_COLS).invoke(product.data, gat, COMPLEXITY, gb.data, Quadruple.FACTORY);
-                return product;
-            }, (single, parallel) -> TestUtils.assertEquals(single, parallel, GENERIC_ACCURACY));
-
-        } finally {
-            MultiplyLeft.THRESHOLD = threshold;
-        }
-    }
-
-    @Test
     public void testMultiplyNeither() {
 
         int threshold = MultiplyNeither.THRESHOLD;
@@ -169,48 +126,6 @@ public class ParallelMultiplyTest {
 
         } finally {
             MultiplyNeither.THRESHOLD = threshold;
-        }
-    }
-
-    @Test
-    public void testMultiplyRight() {
-
-        int threshold = MultiplyRight.THRESHOLD;
-
-        try {
-
-            R064Store a = R064Store.FACTORY.makeFilled(NB_ROWS, COMPLEXITY, new Uniform());
-            R064Store b = R064Store.FACTORY.makeFilled(NB_COLS, COMPLEXITY, new Uniform());
-            MatrixStore<Double> bt = b.transpose();
-
-            ParallelMultiplyTest.compare(t -> MultiplyRight.THRESHOLD = t, () -> {
-                R064Store product = R064Store.FACTORY.make(NB_ROWS, NB_COLS);
-                MultiplyRight.newPrimitive64(NB_ROWS, NB_COLS).invoke(product.data, a.data, COMPLEXITY, bt);
-                return product;
-            }, (single, parallel) -> TestUtils.assertEquals(single, parallel, PRIMITIVE_ACCURACY));
-
-            R032Store fa = R032Store.FACTORY.makeFilled(NB_ROWS, COMPLEXITY, new Uniform());
-            R032Store fb = R032Store.FACTORY.makeFilled(NB_COLS, COMPLEXITY, new Uniform());
-            MatrixStore<Double> fbt = fb.transpose();
-
-            ParallelMultiplyTest.compare(t -> MultiplyRight.THRESHOLD = t, () -> {
-                R032Store product = R032Store.FACTORY.make(NB_ROWS, NB_COLS);
-                MultiplyRight.newPrimitive32(NB_ROWS, NB_COLS).invoke(product.data, fa.data, COMPLEXITY, fbt);
-                return product;
-            }, (single, parallel) -> TestUtils.assertEquals(single, parallel, FLOAT_ACCURACY));
-
-            GenericStore<Quadruple> ga = GenericStore.R128.makeFilled(NB_ROWS, COMPLEXITY, new Uniform());
-            GenericStore<Quadruple> gb = GenericStore.R128.makeFilled(NB_COLS, COMPLEXITY, new Uniform());
-            MatrixStore<Quadruple> gbt = gb.transpose();
-
-            ParallelMultiplyTest.compare(t -> MultiplyRight.THRESHOLD = t, () -> {
-                GenericStore<Quadruple> product = GenericStore.R128.make(NB_ROWS, NB_COLS);
-                MultiplyRight.<Quadruple>newGeneric(NB_ROWS, NB_COLS).invoke(product.data, ga.data, COMPLEXITY, gbt, Quadruple.FACTORY);
-                return product;
-            }, (single, parallel) -> TestUtils.assertEquals(single, parallel, GENERIC_ACCURACY));
-
-        } finally {
-            MultiplyRight.THRESHOLD = threshold;
         }
     }
 

@@ -57,6 +57,7 @@ import org.ojalgo.tensor.Tensor;
 import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.NumberDefinition;
+import org.ojalgo.type.SortOrder;
 import org.ojalgo.type.Stopwatch;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -232,15 +233,22 @@ public abstract class TestUtils {
         if (!Eigenvalue.equals(expected, actual, context)) {
             Assertions.fail(() -> "Eigenvalue<N> failed for " + expected);
         }
-        if (actual.isOrdered()) {
+        // The eigenvalues are always in descending order, whatever the order of [D] and [V]
+        Array1D<ComplexNumber> tmpEigenvalues = actual.getEigenvalues();
+        for (int i = 1; i < tmpEigenvalues.length; i++) {
+            Assertions.assertTrue(tmpEigenvalues.get(i - 1).getModulus() >= tmpEigenvalues.get(i).getModulus());
+        }
+        SortOrder order = actual.getOrder();
+        if (order != SortOrder.UNSORTED) {
             MatrixStore<N> mtrxD = actual.getD();
-            double bigger = Double.MAX_VALUE;
-            Array1D<ComplexNumber> tmpEigenvalues = actual.getEigenvalues();
-            for (int i = 0; i < tmpEigenvalues.length; i++) {
-                ComplexNumber value = tmpEigenvalues.get(i);
-                Assertions.assertTrue(bigger >= value.getModulus());
-                Assertions.assertEquals(value.doubleValue(), mtrxD.doubleValue(i, i), context.epsilon());
-                bigger = value.getModulus();
+            for (int i = 1; i < mtrxD.getColDim(); i++) {
+                double previous = ComplexNumber.valueOf(mtrxD.get(i - 1, i - 1)).getModulus();
+                double current = ComplexNumber.valueOf(mtrxD.get(i, i)).getModulus();
+                if (order == SortOrder.DESCENDING) {
+                    Assertions.assertTrue(previous >= current);
+                } else {
+                    Assertions.assertTrue(previous <= current);
+                }
             }
         }
     }

@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.matrix.decomposition.Eigenvalue.Eigenpair;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -547,17 +548,15 @@ public class DecompositionProblems extends MatrixDecompositionTests {
             Array1D<ComplexNumber> values = evd.getEigenvalues();
             MatrixStore<ComplexNumber> vectors = evd.getEigenvectors();
 
-            TestUtils.assertEquals(className, values.get(0), d.doubleValue(0, 0));
-            TestUtils.assertEquals(className, values.get(0), evd.getEigenpair(0).value);
-            TestUtils.assertEquals(className, vectors.sliceColumn(0), evd.getEigenpair(0).vector);
+            // The eigenvalues and eigenpairs are in descending order, [D] and [V] in the order of the decomposition
+            int[] order = MatrixDecompositionTests.descending(evd, d);
 
-            TestUtils.assertEquals(className, values.get(1), d.doubleValue(1, 1));
-            TestUtils.assertEquals(className, values.get(1), evd.getEigenpair(1).value);
-            TestUtils.assertEquals(className, vectors.sliceColumn(1), evd.getEigenpair(1).vector);
-
-            TestUtils.assertEquals(className, values.get(2), d.doubleValue(2, 2));
-            TestUtils.assertEquals(className, values.get(2), evd.getEigenpair(2).value);
-            TestUtils.assertEquals(className, vectors.sliceColumn(2), evd.getEigenpair(2).vector);
+            for (int i = 0; i < 3; i++) {
+                Eigenpair pair = evd.getEigenpair(i);
+                TestUtils.assertEquals(className, values.get(i), d.doubleValue(order[i], order[i]));
+                TestUtils.assertEquals(className, values.get(i), pair.value);
+                TestUtils.assertEquals(className, vectors.sliceColumn(order[i]), pair.vector);
+            }
         }
 
     }

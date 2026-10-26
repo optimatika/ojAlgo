@@ -39,6 +39,7 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
+import org.ojalgo.type.SortOrder;
 
 /**
  * Notation used to describe the various matrix decompositions:
@@ -199,7 +200,22 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
         }
     }
 
+    /**
+     * A decomposition with a (block) diagonal matrix factor. Its elements, the values of the decomposition,
+     * and the corresponding rows/columns of the other matrix factors may come in a specific order. Whether
+     * they do is a property of the algorithm/implementation, not of the data. The order is declared, not
+     * required: an implementation reports the order its algorithm delivers, and is not required to reorder
+     * its results. What the order is measured on is defined by each kind of decomposition.
+     */
     interface Ordered<N extends Comparable<N>> extends MatrixDecomposition<N> {
+
+        /**
+         * The order of the values, and of the corresponding rows/columns of the other matrix factors. What it
+         * is measured on is defined by each kind of decomposition.
+         *
+         * @return {@link SortOrder#UNSORTED} if there is no guaranteed order
+         */
+        SortOrder getOrder();
 
         /**
          * This is a property of the algorithm/implementation, not the data. Typically relevant for
@@ -207,8 +223,12 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          *
          * @return true if the rows/columns of the returned matrix factors are guaranteed some specific order;
          *         false if there is no such guarantee.
+         * @deprecated v58 Use {@link #getOrder()} instead
          */
-        boolean isOrdered();
+        @Deprecated
+        default boolean isOrdered() {
+            return this.getOrder() != SortOrder.UNSORTED;
+        }
 
     }
 
@@ -265,14 +285,13 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
      * <li>[D] is diagonal with nonnegative and non-increasing values on the diagonal.
      * </ul>
      * <p>
-     * The defintion that [X] and [Y] should be well conditioned is subject to interpretation. A specific
+     * The definition that [X] and [Y] should be well conditioned is subject to interpretation. A specific
      * decomposition algorithm can be more or less good at revealing the rank. Typically the
      * {@link SingularValue} decomposition is the best.
      * <p>
-     * The requirement to have the diagonal elements of [D] ordered can be very practical, but is not always
-     * strictly necessary in order to just reveal the rank. The method {@link #isOrdered()} indicates if the
-     * elements (rows and columns) of the returned matrix factors actually are ordered or not for this
-     * particular implementation.
+     * Having the diagonal elements of [D] ordered can be very practical, but is not necessary to reveal the
+     * rank. {@link #getOrder()} declares the order of the diagonal of [D], and of the corresponding columns
+     * of [X] and [Y], for a particular implementation.
      */
     interface RankRevealing<N extends Comparable<N>> extends Ordered<N>, Provider2D.Rank {
 
@@ -281,6 +300,13 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          * @return The number of elements in the diagonal matrix that are greater than the threshold
          */
         int countSignificant(double threshold);
+
+        /**
+         * The order of the diagonal elements of [D], by absolute value, and of the corresponding columns of
+         * [X] and [Y]. This is a property of the algorithm/implementation, not the data.
+         */
+        @Override
+        SortOrder getOrder();
 
         /**
          * The best (and most expensive) way to get the effective numerical rank is by calculating a

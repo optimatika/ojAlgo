@@ -21,6 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import java.util.Arrays;
+
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.PlainArray;
@@ -34,6 +36,7 @@ import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Structure2D;
+import org.ojalgo.type.SortOrder;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -78,7 +81,7 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
     Factory<RationalNumber> Q128 = (typical, fullSize) -> new DenseSingularValue.Q128(fullSize);
 
     Factory<Double> R064 = (typical, fullSize) -> {
-        if (fullSize || 1024L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
+        if (fullSize || typical.count() <= PlainArray.MAX_SIZE) {
             return new DenseSingularValue.R064(fullSize);
         } else {
             return new RawSingularValue();
@@ -141,9 +144,51 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
             for (int i = 1; retVal && i < tmpSV.size(); i++) {
                 retVal &= tmpSV.doubleValue(i - 1) >= tmpSV.doubleValue(i);
             }
-            if (retVal && decomposition.isOrdered()) {
+            SortOrder order = decomposition.getOrder();
+            if (retVal && order == SortOrder.DESCENDING) {
                 for (int ij = 1; retVal && ij < tmpD.countRows(); ij++) {
                     retVal &= tmpD.doubleValue(ij - 1, ij - 1) >= tmpD.doubleValue(ij, ij);
+                }
+            } else if (retVal && order == SortOrder.ASCENDING) {
+                for (int ij = 1; retVal && ij < tmpD.countRows(); ij++) {
+                    retVal &= tmpD.doubleValue(ij - 1, ij - 1) <= tmpD.doubleValue(ij, ij);
+                }
+            }
+        }
+
+        return retVal;
+    }
+
+    /**
+     * The columns of [U], [S] and [V] with the k largest singular values, in descending order.
+     */
+    private static int[] getColumns(final SingularValue<?> decomposition, final int k) {
+
+        int[] retVal = new int[k];
+
+        SortOrder order = decomposition.getOrder();
+
+        if (order == SortOrder.DESCENDING) {
+
+            Arrays.setAll(retVal, j -> j);
+
+        } else {
+
+            MatrixStore<?> mtrxS = decomposition.getS();
+            int size = Math.toIntExact(Math.min(mtrxS.countRows(), mtrxS.countColumns()));
+
+            if (order == SortOrder.ASCENDING) {
+
+                Arrays.setAll(retVal, j -> size - 1 - j);
+
+            } else {
+
+                Integer[] columns = new Integer[size];
+                Arrays.setAll(columns, j -> j);
+                Arrays.sort(columns, (j1, j2) -> Double.compare(mtrxS.doubleValue(j2, j2), mtrxS.doubleValue(j1, j1)));
+
+                for (int j = 0; j < k; j++) {
+                    retVal[j] = columns[j];
                 }
             }
         }
@@ -164,18 +209,19 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
 
         } else {
 
-            PhysicalStore<N> work = decomposition.getV().limits(-1, rank).collect(factory);
+            int[] columns = SingularValue.getColumns(decomposition, rank);
+            MatrixStore<N> mtrxS = decomposition.getS();
+
+            PhysicalStore<N> work = decomposition.getV().columns(columns).collect(factory);
 
             BinaryFunction<N> multiply = factory.function().multiply();
 
-            Array1D<Double> singularValues = decomposition.getSingularValues();
-
             for (int j = 0; j < rank; j++) {
-                N factor = scalar.cast(1.0 / singularValues.doubleValue(j));
+                N factor = scalar.cast(1.0 / mtrxS.doubleValue(columns[j], columns[j]));
                 work.modifyColumn(0, j, multiply.by(factor));
             }
 
-            preallocated.fillByMultiplying(work, decomposition.getU().limits(-1, rank).conjugate());
+            preallocated.fillByMultiplying(work, decomposition.getU().columns(columns).conjugate());
         }
 
         return preallocated;
@@ -201,18 +247,19 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
 
         } else {
 
-            PhysicalStore<N> work = decomposition.getU().limits(-1, rank).conjugate().multiply(rhs).copy();
+            int[] columns = SingularValue.getColumns(decomposition, rank);
+            MatrixStore<N> mtrxS = decomposition.getS();
+
+            PhysicalStore<N> work = decomposition.getU().columns(columns).conjugate().multiply(rhs).copy();
 
             BinaryFunction<N> multiply = factory.function().multiply();
 
-            Array1D<Double> singularValues = decomposition.getSingularValues();
-
             for (int i = 0; i < rank; i++) {
-                N factor = scalar.cast(1.0 / singularValues.doubleValue(i));
+                N factor = scalar.cast(1.0 / mtrxS.doubleValue(columns[i], columns[i]));
                 work.modifyRow(i, 0, multiply.by(factor));
             }
 
-            preallocated.fillByMultiplying(decomposition.getV().limits(-1, rank), work);
+            preallocated.fillByMultiplying(decomposition.getV().columns(columns), work);
         }
 
         return preallocated;
@@ -272,11 +319,16 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
     MatrixStore<N> getS();
 
     /**
-     * @return The singular values ordered in descending order.
+     * The singular values are in descending order, regardless of {@link #getOrder()}. They are not
+     * necessarily in the same order as the diagonal of [S] and the columns of [U] and [V].
+     *
+     * @return The singular values.
      */
     Array1D<Double> getSingularValues();
 
     /**
+     * The singular values in the order of {@link #getSingularValues()}.
+     *
      * @param values An array that will receive the singular values
      */
     default void getSingularValues(final double[] values) {
@@ -296,8 +348,8 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
     /**
      * If [A] is m-by-n and its rank is r, then:
      * <ul>
-     * <li>The first r columns of [U] span the column space, range or image of [A].
-     * <li>The last m-r columns of [U] span the left nullspace or cokernel of [A].
+     * <li>The r columns of [U] with nonzero singular values span the column space, range or image of [A].
+     * <li>The other m-r columns of [U] span the left nullspace or cokernel of [A].
      * </ul>
      * Calculating the QR decomposition of [A] is a faster alternative.
      */
@@ -306,8 +358,8 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
     /**
      * If [A] is m-by-n and its rank is r, then:
      * <ul>
-     * <li>The first r columns of [V] span the row space or coimage of [A].
-     * <li>The last n-r columns of [V] span the nullspace or kernel of [A].
+     * <li>The r columns of [V] with nonzero singular values span the row space or coimage of [A].
+     * <li>The other n-r columns of [V] span the nullspace or kernel of [A].
      * </ul>
      * Calculating the QR decomposition of [A]<sup>T</sup> is a faster alternative.
      */
@@ -321,10 +373,11 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
     default MatrixStore<N> reconstruct(final int k) {
 
         int limit = Math.min(k, this.getRank());
+        int[] columns = SingularValue.getColumns(this, limit);
 
-        MatrixStore<N> mtrxQ1 = this.getU().limits(-1, limit);
-        MatrixStore<N> mtrxD = this.getS().limits(limit, limit);
-        MatrixStore<N> mtrxQ2 = this.getV().limits(-1, limit);
+        MatrixStore<N> mtrxQ1 = this.getU().columns(columns);
+        MatrixStore<N> mtrxD = this.getS().rows(columns).columns(columns);
+        MatrixStore<N> mtrxQ2 = this.getV().columns(columns);
 
         return mtrxQ1.multiply(mtrxD).multiply(mtrxQ2.conjugate());
     }

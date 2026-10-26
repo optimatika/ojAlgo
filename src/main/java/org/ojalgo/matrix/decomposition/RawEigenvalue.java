@@ -25,10 +25,10 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.array.ArrayC128;
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.DOT;
@@ -37,8 +37,8 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
-import org.ojalgo.matrix.operation.ExchangeColumns;
 import org.ojalgo.matrix.operation.RotateColumns;
+import org.ojalgo.matrix.operation.STEQR;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
@@ -48,6 +48,7 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
+import org.ojalgo.type.SortOrder;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -74,17 +75,16 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
 
         @Override
+        public SortOrder getOrder() {
+            return SortOrder.UNSORTED;
+        }
+
+        @Override
         public boolean isHermitian() {
             if (mySymmetric == null) {
                 mySymmetric = Boolean.valueOf(this.checkSymmetry());
             }
             return mySymmetric.booleanValue();
-        }
-
-        @Override
-        public boolean isOrdered() {
-            // The symmetric implementation is sorted, the general is not.
-            return this.isHermitian();
         }
 
         @Override
@@ -108,12 +108,12 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
 
         @Override
-        public boolean isHermitian() {
-            return false;
+        public SortOrder getOrder() {
+            return SortOrder.UNSORTED;
         }
 
         @Override
-        public boolean isOrdered() {
+        public boolean isHermitian() {
             return false;
         }
 
@@ -166,17 +166,18 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
             double[] eigenvalues = this.getRealParts();
             double[][] vt = this.getTransposedV();
-            int rank = this.getRank();
+            int[] significant = this.getSignificant();
             int dim = arg.length;
 
-            double[] work = new double[rank];
-            for (int i = 0; i < rank; i++) {
-                work[i] = DOT.invoke(vt[i], 0, arg, 0, 0, dim) / eigenvalues[i];
+            double[] work = new double[significant.length];
+            for (int k = 0; k < significant.length; k++) {
+                int i = significant[k];
+                work[k] = DOT.invoke(vt[i], 0, arg, 0, 0, dim) / eigenvalues[i];
             }
 
-            java.util.Arrays.fill(arg, ZERO);
-            for (int i = 0; i < rank; i++) {
-                AXPY.invoke(arg, 0, work[i], vt[i], 0, 0, dim);
+            Arrays.fill(arg, ZERO);
+            for (int k = 0; k < significant.length; k++) {
+                AXPY.invoke(arg, 0, work[k], vt[significant[k]], 0, 0, dim);
             }
         }
 
@@ -187,21 +188,21 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         @Override
         public double getCondition() {
-            double[] d = this.getRealParts();
-            return Math.abs(d[0]) / Math.abs(d[d.length - 1]);
+            Array1D<Double> values = this.getSingularValues();
+            return values.doubleValue(0) / values.doubleValue(values.size() - 1);
         }
 
         @Override
         public MatrixStore<Double> getCovariance() {
 
-            MatrixStore<Double> v = this.getV();
-            Access1D<Double> values = this.getD().sliceDiagonal();
+            int[] significant = this.getSignificant();
 
-            int rank = this.getRank();
+            MatrixStore<Double> v = this.getV().columns(significant);
+            Access1D<Double> values = this.getD().rows(significant).columns(significant).sliceDiagonal();
 
             BinaryFunction<Double> divide = this.function().divide();
 
-            MatrixStore<Double> tmp = v.limits(-1, rank).onColumns(divide, values).collect(v.physical());
+            MatrixStore<Double> tmp = v.onColumns(divide, values).collect(v.physical());
 
             return tmp.multiply(tmp.transpose());
         }
@@ -213,8 +214,19 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                 return List.of(this);
             }
             double[] eigenvalues = this.getRealParts();
-            int rank = this.getRank();
+            int[] significant = this.getSignificant();
+            int rank = significant.length;
             int dim = eigenvalues.length;
+            if (rank < dim) {
+                double[][] rows = new double[rank][];
+                double[] values = new double[rank];
+                for (int k = 0; k < rank; k++) {
+                    rows[k] = vt[significant[k]];
+                    values[k] = eigenvalues[significant[k]];
+                }
+                vt = rows;
+                eigenvalues = values;
+            }
             return List.of(new RawSingularValue.FactorUT(vt, rank, dim), new RawSingularValue.FactorSinv(eigenvalues, rank, dim),
                     new RawSingularValue.FactorV(vt, rank, dim));
         }
@@ -261,12 +273,12 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         @Override
         public double getKyFanNorm(final int k) {
 
-            double[] d = this.getRealParts();
+            Array1D<Double> values = this.getSingularValues();
 
             double retVal = ZERO;
 
-            for (int i = Math.min(d.length, k) - 1; i >= 0; i--) {
-                retVal += Math.abs(d[i]);
+            for (int i = Math.min(values.size(), k) - 1; i >= 0; i--) {
+                retVal += values.doubleValue(i);
             }
 
             return retVal;
@@ -274,14 +286,24 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         @Override
         public double getOperatorNorm() {
+
             double[] d = this.getRealParts();
-            return Math.abs(d[0]);
+
+            double retVal = ZERO;
+            for (int i = 0; i < d.length; i++) {
+                retVal = Math.max(retVal, Math.abs(d[i]));
+            }
+            return retVal;
+        }
+
+        @Override
+        public SortOrder getOrder() {
+            return SortOrder.UNSORTED;
         }
 
         @Override
         public double getRankThreshold() {
-            double[] d = this.getRealParts();
-            return Math.max(MACHINE_SMALLEST, Math.abs(d[0])) * this.getDimensionalEpsilon();
+            return Math.max(MACHINE_SMALLEST, this.getOperatorNorm()) * this.getDimensionalEpsilon();
         }
 
         @Override
@@ -314,9 +336,16 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         @Override
         public Array1D<Double> getSingularValues() {
             double[] d = this.getRealParts();
+            int last = d.length - 1;
             double[] abs = new double[d.length];
             for (int i = 0; i < d.length; i++) {
                 abs[i] = Math.abs(d[i]);
+            }
+            Arrays.sort(abs);
+            for (int i = 0, j = last; i < j; i++, j--) {
+                double tmp = abs[i];
+                abs[i] = abs[j];
+                abs[j] = tmp;
             }
             return Array1D.R064.wrap(ArrayR064.wrap(abs));
         }
@@ -404,11 +433,6 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
 
         @Override
-        public boolean isOrdered() {
-            return true;
-        }
-
-        @Override
         public boolean isSolvable() {
             return super.isSolvable();
         }
@@ -451,6 +475,23 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             } else {
                 throw RecoverableCondition.newEquationSystemNotSolvable();
             }
+        }
+
+        /**
+         * The columns of [D] and [V] with the significant eigenvalues, those counted by {@link #getRank()}.
+         */
+        private int[] getSignificant() {
+
+            double[] d = this.getRealParts();
+            double threshold = this.getRankThreshold();
+
+            int[] retVal = new int[this.countSignificant(threshold)];
+            for (int i = 0, k = 0; i < d.length; i++) {
+                if (Math.abs(d[i]) > threshold) {
+                    retVal[k++] = i;
+                }
+            }
+            return retVal;
         }
 
         @Override
@@ -548,27 +589,14 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         double[] tmpRe = this.getRealParts();
         double[] tmpIm = this.getImaginaryParts();
 
-        Array1D<ComplexNumber> retVal = Array1D.C128.make(tmpRe.length);
+        ArrayC128 retVal = ArrayC128.make(tmpRe.length);
 
-        for (int i = 0; i < retVal.size(); i++) {
-            retVal.set(i, ComplexNumber.of(tmpRe[i], tmpIm[i]));
+        for (int i = 0; i < tmpRe.length; i++) {
+            retVal.data[i] = ComplexNumber.of(tmpRe[i], tmpIm[i]);
         }
+        Arrays.sort(retVal.data, Eigenvalue.DESCENDING_NORM);
 
-        // retVal.sortDescending();
-
-        return retVal;
-    }
-
-    @Override
-    public void getEigenvalues(final double[] realParts, final Optional<double[]> imaginaryParts) {
-
-        int length = realParts.length;
-
-        System.arraycopy(this.getRealParts(), 0, realParts, 0, length);
-
-        if (imaginaryParts.isPresent()) {
-            System.arraycopy(this.getImaginaryParts(), 0, imaginaryParts.get(), 0, length);
-        }
+        return Array1D.C128.wrap(retVal);
     }
 
     @Override
@@ -798,19 +826,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             }
 
         };
-        HermitianEvD.tql2(d, e, tmpRotateColumns);
-
-        // Diagonalize > Sort
-
-        if (this.isOrdered()) {
-            ExchangeColumns tmpExchangeColumns = valuesOnly ? ExchangeColumns.NULL : (colA, colB) -> {
-                double[] tmp = data[colA];
-                data[colA] = data[colB];
-                data[colB] = tmp;
-            };
-            Eigenvalue.sort(d, tmpExchangeColumns);
-        }
-
+        STEQR.invoke(d, e, tmpRotateColumns);
     }
 
     /**

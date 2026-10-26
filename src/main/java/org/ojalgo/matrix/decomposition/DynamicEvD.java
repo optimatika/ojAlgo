@@ -29,6 +29,7 @@ import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access2D.Collectable;
+import org.ojalgo.type.SortOrder;
 
 abstract class DynamicEvD<N extends Comparable<N>, M extends PhysicalStore<N>> extends DenseEigenvalue<N, M> {
 
@@ -76,6 +77,11 @@ abstract class DynamicEvD<N extends Comparable<N>, M extends PhysicalStore<N>> e
     }
 
     @Override
+    public SortOrder getOrder() {
+        return myHermitian ? myHermitianDelegate.getOrder() : myGeneralDelegate.getOrder();
+    }
+
+    @Override
     public ComplexNumber getTrace() {
         if (myHermitian) {
             return myHermitianDelegate.getTrace();
@@ -87,11 +93,6 @@ abstract class DynamicEvD<N extends Comparable<N>, M extends PhysicalStore<N>> e
     @Override
     public boolean isHermitian() {
         return myHermitian;
-    }
-
-    @Override
-    public boolean isOrdered() {
-        return myHermitian ? myHermitianDelegate.isOrdered() : myGeneralDelegate.isOrdered();
     }
 
     @Override

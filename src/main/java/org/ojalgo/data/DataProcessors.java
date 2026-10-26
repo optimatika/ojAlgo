@@ -23,6 +23,7 @@ package org.ojalgo.data;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.Arrays;
 import java.util.function.Function;
 
 import org.ojalgo.ProgrammingError;
@@ -40,6 +41,7 @@ import org.ojalgo.structure.Access2D.RowView;
 import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Transformation2D;
+import org.ojalgo.type.SortOrder;
 
 /**
  * Various data processors that could be useful when doing data science or similar. With ojAlgo it is highly
@@ -204,10 +206,6 @@ public class DataProcessors {
             throw new ProgrammingError("The decomposition must be computed!");
         }
 
-        if (!svd.isOrdered()) {
-            throw new ProgrammingError("The singular values must be ordered!");
-        }
-
         long numberOfSamples = svd.countRows();
         long numberOfVariables = svd.countColumns();
 
@@ -220,12 +218,39 @@ public class DataProcessors {
         int limit = Math.min(complexity, svd.getRank());
         if (limit > 0) {
 
-            Array1D<Double> values = svd.getSingularValues();
+            Access1D<Double> values;
             MatrixStore<Double> vectors = svd.getV();
 
-            if (limit < numberOfVariables) {
-                values = values.sliceRange(0L, limit);
-                vectors = vectors.limits(-1, limit);
+            SortOrder order = svd.getOrder();
+
+            if (order == SortOrder.DESCENDING) {
+
+                values = svd.getSingularValues();
+
+                if (limit < numberOfVariables) {
+                    values = svd.getSingularValues().sliceRange(0L, limit);
+                    vectors = vectors.limits(-1, limit);
+                }
+
+            } else {
+
+                // The columns with the largest singular values, found on the diagonal of S
+                MatrixStore<Double> mtrxS = svd.getS();
+                int size = Math.toIntExact(Math.min(mtrxS.countRows(), mtrxS.countColumns()));
+
+                int[] columns = new int[limit];
+
+                if (order == SortOrder.ASCENDING) {
+                    Arrays.setAll(columns, j -> size - 1 - j);
+                } else {
+                    Integer[] sorted = new Integer[size];
+                    Arrays.setAll(sorted, j -> j);
+                    Arrays.sort(sorted, (j1, j2) -> Double.compare(mtrxS.doubleValue(j2, j2), mtrxS.doubleValue(j1, j1)));
+                    Arrays.setAll(columns, j -> sorted[j]);
+                }
+
+                values = mtrxS.rows(columns).columns(columns).sliceDiagonal();
+                vectors = vectors.columns(columns);
             }
 
             MatrixStore<Double> scaledV = vectors.onColumns(MULTIPLY, values).collect(factory);

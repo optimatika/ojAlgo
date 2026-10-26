@@ -21,6 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import java.util.Arrays;
+
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.ArrayC128;
@@ -28,12 +30,14 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.matrix.operation.GEEV;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access2D.Collectable;
+import org.ojalgo.type.SortOrder;
 
 abstract class GeneralEvD<N extends Comparable<N>, M extends PhysicalStore<N>> extends DenseEigenvalue<N, M> {
 
@@ -49,30 +53,31 @@ abstract class GeneralEvD<N extends Comparable<N>, M extends PhysicalStore<N>> e
      * The columns of V represent the eigenvectors in the sense that A*V = V*D, i.e. A.times(V) equals
      * V.times(D). The matrix V may be badly conditioned, or even singular, so the validity of the equation A
      * = V*D*inverse(V) depends upon V.cond().
+     * <P>
+     * Computed by {@link GEEV}.
      **/
     static final class R064 extends GeneralEvD<Double, R064Store> {
+
+        private transient R064Store myWork = null;
 
         R064() {
             super(R064Store.FACTORY);
         }
 
         @Override
-        Array1D<ComplexNumber> computeInPlaceSchur(final R064Store mtrxA, final R064Store mtrxV) {
+        int compute(final Collectable<Double, ? super TransformableRegion<Double>> matrix, final double[] wr, final double[] wi, final R064Store vectors) {
 
-            EvD1D.orthes(mtrxA.data, mtrxV.data, new double[mtrxA.getMinDim()]);
+            int n = wr.length;
 
-            double[][] diagonals = EvD1D.hqr2(mtrxA.data, mtrxV.data, true);
-            double[] real = diagonals[0];
-            double[] imaginary = diagonals[1];
-            int length = Math.min(real.length, imaginary.length);
-
-            ArrayC128 retVal = ArrayC128.make(length);
-
-            for (int i = 0; i < length; i++) {
-                retVal.data[i] = ComplexNumber.of(real[i], imaginary[i]);
+            if (myWork == null || myWork.getRowDim() != n || myWork.getColDim() != n) {
+                myWork = R064Store.FACTORY.make(n, n);
             }
+            matrix.supplyTo(myWork);
 
-            return Array1D.C128.wrap(retVal);
+            boolean computeVectors = vectors != null;
+
+            return GEEV.invoke(computeVectors, n, myWork.data, 0, Math.max(1, n), wr, 0, wi, 0, computeVectors ? vectors.data : null, 0,
+                    computeVectors ? Math.max(1, n) : 1);
         }
 
     }
@@ -107,6 +112,11 @@ abstract class GeneralEvD<N extends Comparable<N>, M extends PhysicalStore<N>> e
     }
 
     @Override
+    public SortOrder getOrder() {
+        return SortOrder.UNSORTED;
+    }
+
+    @Override
     public final ComplexNumber getTrace() {
 
         final AggregatorFunction<ComplexNumber> tmpVisitor = ComplexAggregator.getSet().sum();
@@ -122,11 +132,6 @@ abstract class GeneralEvD<N extends Comparable<N>, M extends PhysicalStore<N>> e
     }
 
     @Override
-    public boolean isOrdered() {
-        return false;
-    }
-
-    @Override
     protected boolean checkSolvability() {
         return this.isComputed() && this.isHermitian();
     }
@@ -134,42 +139,37 @@ abstract class GeneralEvD<N extends Comparable<N>, M extends PhysicalStore<N>> e
     @Override
     protected boolean doDecompose(final Collectable<N, ? super TransformableRegion<N>> matrix, final boolean valuesOnly) {
 
-        final int tmpDiagDim = (int) matrix.countRows();
+        int n = (int) matrix.countRows();
 
-        // final PhysicalStore<N> tmpMtrxA = this.copy(matrix.get());
-        final M tmpMtrxA = this.makeZero(tmpDiagDim, tmpDiagDim);
-        matrix.supplyTo(tmpMtrxA);
+        double[] wr = new double[n];
+        double[] wi = new double[n];
+        M vectors = valuesOnly ? null : this.makeZero(n, n);
 
-        final M tmpV = this.makeEye(tmpDiagDim, tmpDiagDim);
+        if (this.compute(matrix, wr, wi, vectors) != 0) {
+            return this.computed(false);
+        }
 
-        final Array1D<ComplexNumber> tmpEigenvalues = this.computeInPlaceSchur(tmpMtrxA, tmpV);
+        ArrayC128 eigenvalues = ArrayC128.make(n);
+        for (int i = 0; i < n; i++) {
+            eigenvalues.data[i] = ComplexNumber.of(wr[i], wi[i]);
+        }
+        Arrays.sort(eigenvalues.data, Eigenvalue.DESCENDING_NORM);
+        this.setEigenvalues(Array1D.C128.wrap(eigenvalues));
 
-        this.setV(tmpV);
-        this.setEigenvalues(tmpEigenvalues);
+        if (!valuesOnly) {
+            this.setV(vectors);
+        }
 
-        final PhysicalStore<N> tmpD = this.makeZero(tmpDiagDim, tmpDiagDim);
-        ComplexNumber tmpValue;
-        double tmpImaginary;
-        for (int ij = 0; ij < tmpDiagDim; ij++) {
-
-            tmpValue = tmpEigenvalues.get(ij);
-            tmpD.set(ij, ij, tmpValue.doubleValue());
-
-            tmpImaginary = tmpValue.i;
-
-            if (tmpImaginary > PrimitiveMath.ZERO) {
-                tmpD.set(ij, ij + 1, tmpImaginary);
-            } else if (tmpImaginary < PrimitiveMath.ZERO) {
-                tmpD.set(ij, ij - 1, tmpImaginary);
+        PhysicalStore<N> mtrxD = this.makeZero(n, n);
+        for (int ij = 0; ij < n; ij++) {
+            mtrxD.set(ij, ij, wr[ij]);
+            if (wi[ij] > PrimitiveMath.ZERO) {
+                mtrxD.set(ij, ij + 1, wi[ij]);
+            } else if (wi[ij] < PrimitiveMath.ZERO) {
+                mtrxD.set(ij, ij - 1, wi[ij]);
             }
         }
-        this.setD(tmpD);
-
-        // BasicLogger.logDebug("Eigenvalues: {}", tmpEigenvalues);
-        // BasicLogger.logDebug("D", tmpD);
-        // BasicLogger.logDebug("THIS", tmpMtrxA);
-
-        // tmpEigenvalues.sortDescending();
+        this.setD(mtrxD);
 
         return this.computed(true);
     }
@@ -212,6 +212,12 @@ abstract class GeneralEvD<N extends Comparable<N>, M extends PhysicalStore<N>> e
         return null;
     }
 
-    abstract Array1D<ComplexNumber> computeInPlaceSchur(M mtrxA, M mtrxV);
+    /**
+     * Writes the eigenvalues to wr and wi, and the eigenvectors (unless null) to vectors, as {@link GEEV}
+     * does. The matrix is not changed.
+     *
+     * @return 0, or not if the computation failed
+     */
+    abstract int compute(Collectable<N, ? super TransformableRegion<N>> matrix, double[] wr, double[] wi, M vectors);
 
 }
