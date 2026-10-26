@@ -1,7 +1,10 @@
 # oj! Algorithms
 [![Build Status](https://github.com/optimatika/ojAlgo/actions/workflows/maven.yml/badge.svg)](https://github.com/optimatika/ojAlgo/actions/workflows/maven.yml)
 [![CodeQL](https://github.com/optimatika/ojAlgo/workflows/CodeQL/badge.svg)](https://github.com/optimatika/ojAlgo/actions/workflows/codeql-analysis.yml)
+
 [![Maven Central](https://img.shields.io/badge/dynamic/xml?label=Maven%20Central&url=https%3A%2F%2Frepo1.maven.org%2Fmaven2%2Forg%2Fojalgo%2Fojalgo%2Fmaven-metadata.xml&query=%2Fmetadata%2Fversioning%2Frelease&color=blue&cacheSeconds=300)](https://central.sonatype.com/artifact/org.ojalgo/ojalgo/versions)
+[![Downloads](https://api.scarf.sh/v2/packages/Optimatika/feb3f99a-23d0-4752-8bc2-156bf8a564a3/downloads-badge)](https://central.sonatype.com/artifact/org.ojalgo/ojalgo)
+[![Commercial Users](https://api.scarf.sh/v2/packages/Optimatika/feb3f99a-23d0-4752-8bc2-156bf8a564a3/commercial-users-badge)](https://central.sonatype.com/artifact/org.ojalgo/ojalgo)
 
 oj! Algorithms - ojAlgo - is a pure Java library, with zero dependencies, for mathematical optimisation and linear algebra: LP, QP and MIP solvers, dense and sparse matrices with the standard decompositions, and arrays, statistics and time series to go with them. Open source, MIT licensed, in continuous development since 2003.
 
