@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.scalar.Scalar.Factory;
 import org.ojalgo.type.math.MathType;
@@ -118,10 +117,6 @@ public interface Factory2D<I extends Structure2D> extends FactorySupplement {
             return builder.build();
         }
 
-        /**
-         * @deprecated v54 Use {@link RawStore#wrap(double[][])} and {@link MatrixStore#transpose()} instead.
-         */
-        @Deprecated
         default I columns(final double[][] columns) {
             return this.copy(RawStore.wrap(columns).transpose());
         }
@@ -239,10 +234,6 @@ public interface Factory2D<I extends Structure2D> extends FactorySupplement {
             return builder.build();
         }
 
-        /**
-         * @deprecated v54 Use {@link RawStore#wrap(double[][])} instead.
-         */
-        @Deprecated
         default I rows(final double[][] rows) {
             return this.copy(RawStore.wrap(rows));
         }

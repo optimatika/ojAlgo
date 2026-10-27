@@ -21,6 +21,8 @@
  */
 package org.ojalgo.scalar;
 
+import static org.ojalgo.function.constant.PrimitiveMath.MACHINE_EPSILON;
+
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 
@@ -57,6 +59,16 @@ public interface Scalar<N extends Comparable<N>> extends AccessScalar<N>, Field<
         Scalar<N> convert(Comparable<?> number);
 
         Scalar<N> convert(double value);
+
+        /**
+         * The relative precision of the number type – a bound on the relative rounding error of its arithmetic.
+         * The default is the machine epsilon of {@code double}, 2<sup>-52</sup>.
+         *
+         * @return The relative precision
+         */
+        default double epsilon() {
+            return MACHINE_EPSILON;
+        }
 
         @SuppressWarnings("unchecked")
         default N[] newArrayInstance(final int length) {

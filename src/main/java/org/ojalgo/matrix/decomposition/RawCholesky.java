@@ -60,6 +60,11 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
     private double myMaxDiag = ONE;
     private double myMinDiag = ZERO;
+    /**
+     * The number of pivots computed – fewer than the dimension if the factorisation stopped at a
+     * non-positive one.
+     */
+    private int myNbPivots = 0;
     private boolean mySPD = false;
 
     /**
@@ -120,6 +125,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
             myMaxDiag = MAX.invoke(myMaxDiag, pivot);
             myMinDiag = MIN.invoke(myMinDiag, pivot);
         }
+        myNbPivots = dim + 1;
         mySPD = true;
 
         return this.computed(true);
@@ -168,7 +174,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         RawStore internal = this.getInternalStore();
 
         int significant = 0;
-        for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
+        for (int ij = 0; ij < myNbPivots; ij++) {
             if (internal.doubleValue(ij, ij) > minimum) {
                 significant++;
             }
@@ -333,6 +339,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
             myMaxDiag = MAX.invoke(myMaxDiag, pivot);
             myMinDiag = MIN.invoke(myMinDiag, pivot);
         }
+        myNbPivots = newDim;
         mySPD = true;
 
         return this.computed(true);
@@ -361,6 +368,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         mySPD = this.getColDim() == tmpDiagDim;
         myMaxDiag = MACHINE_SMALLEST;
         myMinDiag = MACHINE_LARGEST;
+        myNbPivots = 0;
 
         double[] tmpRowIJ;
         double[] tmpRowI;
@@ -375,6 +383,9 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
             myMinDiag = MIN.invoke(myMinDiag, tmpVal);
             tmpVal = tmpRowIJ[ij] = SQRT.invoke(tmpVal);
             mySPD = mySPD && tmpVal > ZERO;
+            if (mySPD) {
+                myNbPivots++;
+            }
 
             for (int i = ij + 1; i < tmpDiagDim; i++) { // Update column below current row
                 tmpRowI = data[i];

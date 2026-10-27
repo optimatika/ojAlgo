@@ -11,6 +11,56 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [57.6.1] – 2026-10-28
+
+### Added
+
+#### org.ojalgo.matrix
+
+- `BasicMatrix.getEigenvalues()` – the eigenvalues, in descending order, as `ComplexNumber`s. Uses the matrix' cached eigenvalue decomposition if there is one, otherwise calculates the eigenvalues only (no eigenvectors). Only defined for square matrices.
+- `BasicMatrix.getSingularValues()` – the singular values, in descending order. The singular value decomposition is cached, and reused by for instance `getRank()` and `getCondition()`.
+- `Provider2D.Eigenvalues` and `Provider2D.SingularValues`, implemented by `BasicMatrix` and by the `Eigenvalue` and `SingularValue` decompositions.
+- `SparseQDLDL.countPositive()` – the number of positive entries in D, and so (Sylvester's law of inertia) the number of positive eigenvalues of the factorised matrix. A quasi-definite matrix [[H, A<sup>T</sup>], [A, -G]], with H n×n and G positive definite, has exactly n.
+
+#### org.ojalgo.scalar
+
+- `Scalar.Factory.epsilon()` – the relative precision of a number type: 2<sup>-52</sup> by default, as for `double`, and 2<sup>-104</sup> for `Quadruple`.
+
+### Changed
+
+#### org.ojalgo.matrix
+
+- `BasicMatrix.getRank()` uses the matrix' cached decomposition if that reveals the rank, otherwise it calculates (and caches) a singular value decomposition. Previously it used `QR` for tall matrices and `LU` (or `LDL`, `Cholesky`) for square ones, and the rank was wrong for about 5–9% of random rank deficient matrices.
+- The rank and solvability thresholds of the decompositions – `getRank()`, `isFullRank()` and `isSolvable()` – scale with the precision of the number type, `Scalar.Factory.epsilon()`. For `R128` that is 2<sup>-104</sup>; previously all types used 2<sup>-52</sup>, as for `double`. The other types are unchanged. E.g. `LU.R128` of the 14×14 Hilbert matrix reported it singular, and `MatrixR128.invert()` fell back to the singular value decomposition with a residual H<sup>-1</sup>·H - I of order 1. Now `LU` is used, and the residual is of order 1E-12.
+- `SparseQDLDL.isSolvable()` is true if the factorisation completed and all |D[i]| are larger than `getRankThreshold()`, the same test as `isFullRank()`. Previously it also required all D[i] to be positive – a positive definite matrix – and was false for the quasi-definite (indefinite) matrices it is designed to solve.
+
+#### org.ojalgo.structure
+
+- `Factory2D.TwoStep.rows(double[][])` and `columns(double[][])` are no longer deprecated.
+
+#### org.ojalgo.tensor
+
+- `conjugate()` of `AnyTensor`, `MatrixTensor` and `VectorTensor` conjugates the elements, and reverses the order of the indices: the conjugate transpose of a matrix, the conjugate of each element of a vector. Previously the elements were not conjugated. `VectorTensor.conjugate()` returns a new tensor; previously it returned itself.
+
+### Fixed
+
+#### org.ojalgo.function
+
+- `first(double)` and `second(double)` of `ComplexFunction.Binary`, `QuaternionFunction.Binary`, `RationalFunction.Binary`, `QuadrupleFunction.Binary` and `BigFunction.Binary` passed the argument on as a `Double`, and the resulting function threw `ClassCastException` when invoked. E.g. `MatrixC128.onAll(ComplexMath.MULTIPLY, 2.0)`, `MatrixQ128.onAll(RationalMath.MULTIPLY, 2.0)`, and `multiply(double)` of complex, quaternion and rational tensors.
+
+#### org.ojalgo.matrix
+
+- `BasicMatrix.calculateFrobeniusNorm(..)` returned `norm()`, which for matrices that are not vectors is the Frobenius norm divided by the square root of min(m, n). E.g. 3.87 rather than 5.48 for [[1, -2], [3, 4]].
+- `Cholesky` (dense and `RawCholesky`): when the decomposition stopped at a non-positive pivot, `getRank()` and `countSignificant(..)` also counted the diagonal elements after it, which had not been factorised.
+
+#### org.ojalgo.optimisation
+
+- `ConvexSolver` with the ADMM algorithm (`AlternatingDirectionSolver`) ignored a failed initial factorisation of the KKT system, and iterated with it. It now returns state `FAILED`. Failures when the factorisation is updated during the iterations were already handled.
+
+#### org.ojalgo.tensor
+
+- The tensor factories calculated with `double` values: `TensorFactory1D.sum(..)`, `TensorFactory2D.kronecker(..)`, `product(..)` and `power2(..)`, and `TensorFactoryAnyD.blocks(..)`, `product(..)`, `power(..)` and `sum(..)`. Complex and quaternion elements lost all but their real parts, and rational and quad precision values were rounded to `double`. So did `AnyTensor.conjugate()`. This also applied to the tensor factories of the matrix factories, e.g. `MatrixC128.FACTORY.tensor2D().kronecker(A, B)`. Elements are now multiplied in the number type of the factory, in the order of the arguments.
+
 ## [57.6.0] – 2026-10-26
 
 ### Added

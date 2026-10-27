@@ -159,8 +159,10 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
             for (int i = 0; i < transp.length; i++) {
                 transp[max - i] = ref[i];
             }
-            array.set(transp, myArray.doubleValue(ref));
+            array.set(transp, myArray.get(ref));
         });
+
+        this.conjugate(array, array);
 
         return retVal;
     }

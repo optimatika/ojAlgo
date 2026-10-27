@@ -94,6 +94,17 @@ public interface LU<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition
 
     MatrixStore<N> getL();
 
+    /**
+     * The number of significant pivots – diagonal elements of [U] larger than {@link #getRankThreshold()}. That
+     * is the rank only if the matrix has full rank. For a rank deficient matrix it is, in exact arithmetic, a
+     * lower bound on the rank – 0 for a square shift matrix (ones on the superdiagonal, rank n-1) – and with
+     * rounding errors it can also be too high. Use {@link SingularValue} for the numerical rank.
+     */
+    @Override
+    default int getRank() {
+        return LDU.super.getRank();
+    }
+
     @Override
     default MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {
         return this.getSolution(rhs, this.preallocate(this, rhs));

@@ -33,6 +33,11 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
     public interface Binary extends BinaryFunction<Quaternion> {
 
         @Override
+        default UnaryFunction<Quaternion> first(final double arg1) {
+            return this.first(Quaternion.valueOf(arg1));
+        }
+
+        @Override
         default double invoke(final double arg1, final double arg2) {
             return this.invoke(Quaternion.valueOf(arg1), Quaternion.valueOf(arg2)).doubleValue();
         }
@@ -45,6 +50,11 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
         @Override
         default Quaternion invoke(final Quaternion arg1, final double arg2) {
             return this.invoke(arg1, Quaternion.valueOf(arg2));
+        }
+
+        @Override
+        default UnaryFunction<Quaternion> second(final double arg2) {
+            return this.second(Quaternion.valueOf(arg2));
         }
 
     }

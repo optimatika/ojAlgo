@@ -305,18 +305,26 @@ public class SparseQDLDLTest extends MatrixDecompositionTests {
     }
 
     /**
-     * Indefinite but well-scaled 2x2 system: factorisation should succeed but
-     * {@link SparseQDLDL#isSolvable()} should be {@code false} since not all diagonal entries in D are
-     * positive.
+     * Indefinite but well-scaled 2x2 system: D = [1, -3] has no (numerically) zero entry, so the
+     * factorisation completes and can be used to solve – {@link SparseQDLDL#isSolvable()} is {@code true}
+     * and matches {@link SparseQDLDL#getRank()}.
      */
     @Test
-    public void testIndefiniteTwoByTwoIsNotSolvable() {
+    public void testIndefiniteTwoByTwoIsSolvable() {
         // A = [[1, 2], [2, 1]] has eigenvalues 3 and -1 (indefinite) but is well scaled.
         R064CSC A = SparseQDLDLTest.cscFromUpperTriangle2x2(1.0, 2.0, 1.0);
 
         SparseQDLDL ldl = new SparseQDLDL();
         TestUtils.assertTrue(ldl.factor(A));
-        TestUtils.assertFalse(ldl.isSolvable());
+        TestUtils.assertTrue(ldl.isSolvable());
+        TestUtils.assertEquals(2, ldl.getRank());
+
+        double[] xTrue = { 1.0, -2.0 };
+        double[] b = SparseQDLDLTest.multiply(A, xTrue);
+        double[] x = ldl.solve(b);
+
+        TestUtils.assertEquals(xTrue[0], x[0], 1e-12);
+        TestUtils.assertEquals(xTrue[1], x[1], 1e-12);
     }
 
     /**
@@ -379,21 +387,20 @@ public class SparseQDLDLTest extends MatrixDecompositionTests {
 
     /**
      * Near-singular 2x2 system where one diagonal entry in D becomes effectively zero relative to the largest
-     * diagonal magnitude; factorisation is expected to fail with {@link IllegalStateException}.
+     * diagonal magnitude; the factorisation stops there.
      */
     @Test
     public void testNearSingularTwoByTwoFailsOnEffectivelyZeroDiagonal() {
-        // A = [[1, 1], [1, 1 - eps]] with eps chosen so that the system is close to singular but still
-        // factorisable with the current tolerance; we assert that the factorisation succeeds but the
-        // resulting system is not considered solvable.
-        double eps = 1.0e-14;
+        // A = [[1, 1], [1, 1 - eps]] gives D = [1, -eps] (apart from rounding), with eps below the tolerance
+        // 2 * 2.2e-16. With eps = 1e-14 it would factorise, and be solvable, like it is for LU.
+        double eps = 1.0e-16;
         int[] Ap = { 0, 1, 3 };
         int[] Ai = { 0, 0, 1 };
         double[] Ax = { 1.0, 1.0, 1.0 - eps };
         R064CSC A = new R064CSC(2, 2, Ax, Ai, Ap);
 
         SparseQDLDL ldl = new SparseQDLDL();
-        TestUtils.assertTrue(ldl.factor(A));
+        TestUtils.assertFalse(ldl.factor(A));
         TestUtils.assertFalse(ldl.isSolvable());
     }
 

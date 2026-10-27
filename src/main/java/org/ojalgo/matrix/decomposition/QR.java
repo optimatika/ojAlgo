@@ -106,6 +106,17 @@ public interface QR<N extends Comparable<N>> extends MatrixDecomposition.Updatab
 
     MatrixStore<N> getR();
 
+    /**
+     * The number of significant diagonal elements of [R] – larger than {@link #getRankThreshold()}. There is no
+     * column pivoting. That is the rank only if the matrix has full rank. For a rank deficient matrix it is, in
+     * exact arithmetic, a lower bound on the rank – 0 for a square shift matrix (ones on the superdiagonal, rank
+     * n-1) – and with rounding errors it can also be too high. Use {@link SingularValue} for the numerical rank.
+     */
+    @Override
+    default int getRank() {
+        return MatrixDecomposition.RankRevealing.super.getRank();
+    }
+
     @Override
     default MatrixStore<N> reconstruct() {
         MatrixStore<N> mtrxQ = this.getQ();

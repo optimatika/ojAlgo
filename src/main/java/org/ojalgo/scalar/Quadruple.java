@@ -69,6 +69,14 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
             return Quadruple.valueOf(value);
         }
 
+        /**
+         * 2<sup>-104</sup>
+         */
+        @Override
+        public double epsilon() {
+            return 0x1.0p-104;
+        }
+
         @Override
         public Quadruple one() {
             return ONE;

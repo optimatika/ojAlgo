@@ -38,6 +38,11 @@ public final class QuadrupleFunction extends FunctionSet<Quadruple> {
     public interface Binary extends BinaryFunction<Quadruple> {
 
         @Override
+        default UnaryFunction<Quadruple> first(final double arg1) {
+            return this.first(Quadruple.valueOf(arg1));
+        }
+
+        @Override
         default double invoke(final double arg1, final double arg2) {
             return this.invoke(Quadruple.valueOf(arg1), Quadruple.valueOf(arg2)).doubleValue();
         }
@@ -50,6 +55,11 @@ public final class QuadrupleFunction extends FunctionSet<Quadruple> {
         @Override
         default Quadruple invoke(final Quadruple arg1, final double arg2) {
             return this.invoke(arg1, Quadruple.valueOf(arg2));
+        }
+
+        @Override
+        default UnaryFunction<Quadruple> second(final double arg2) {
+            return this.second(Quadruple.valueOf(arg2));
         }
 
     }

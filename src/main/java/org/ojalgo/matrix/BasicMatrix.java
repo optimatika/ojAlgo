@@ -26,6 +26,7 @@ import java.util.Optional;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.algebra.NormedVectorSpace;
+import org.ojalgo.array.Array1D;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -47,6 +48,7 @@ import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
+import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
@@ -67,18 +69,20 @@ import org.ojalgo.type.context.NumberContext;
 public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix<N, M>>
         implements Matrix2D<N, M>, Structure2D.ReducibleTo1D<M>, NumberContext.Enforceable<M>, Access2D.Collectable<N, TransformableRegion<N>>,
         Provider2D.Inverse<M>, Provider2D.Condition, Provider2D.Rank, Provider2D.Symmetric, Provider2D.Hermitian, Provider2D.Trace<N>,
-        Provider2D.Determinant<N>, Provider2D.Solution<M>, Provider2D.Eigenpairs, Structure2D.Logical<Access2D<N>, M>, Operate2D<N, M> {
+        Provider2D.Determinant<N>, Provider2D.Solution<M>, Provider2D.Eigenpairs, Provider2D.Eigenvalues, Provider2D.SingularValues,
+        Structure2D.Logical<Access2D<N>, M>, Operate2D<N, M> {
 
     private static final NumberContext EQUALS = NumberContext.of(12, 14);
 
     /**
-     * The Frobenius norm is the square root of the sum of the squares of each element, or the square root of
-     * the sum of the square of the singular values.
+     * The Frobenius norm is the square root of the sum of the squared absolute values of the elements, or the
+     * square root of the sum of the squared singular values.
      *
      * @return The matrix' Frobenius norm
+     * @see #norm()
      */
     public static <M extends BasicMatrix<?, M>> double calculateFrobeniusNorm(final M matrix) {
-        return matrix.norm();
+        return NumberDefinition.doubleValue(matrix.aggregateAll(Aggregator.NORM2));
     }
 
     /**
@@ -358,6 +362,24 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     /**
+     * The eigenvalues, in descending order. They are complex numbers, also for real matrices. Uses the
+     * cached eigenvalue decomposition if there is one, otherwise computes the eigenvalues only (no
+     * eigenvectors).
+     *
+     * @return The matrix' eigenvalues.
+     * @see org.ojalgo.matrix.decomposition.Eigenvalue#getEigenvalues()
+     */
+    @Override
+    public Array1D<ComplexNumber> getEigenvalues() {
+
+        if (!this.isSquare()) {
+            throw new ProgrammingError("Only defined for square matrices!");
+        }
+
+        return this.getEigenvaluesProvider().getEigenvalues();
+    }
+
+    /**
      * The rank of a matrix is the (maximum) number of linearly independent rows or columns it contains. It is
      * also equal to the number of nonzero singular values of the matrix.
      *
@@ -372,6 +394,17 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     @Override
     public int getRowDim() {
         return mySupplier.getRowDim();
+    }
+
+    /**
+     * The singular values, in descending order.
+     *
+     * @return The matrix' singular values.
+     * @see org.ojalgo.matrix.decomposition.SingularValue#getSingularValues()
+     */
+    @Override
+    public Array1D<Double> getSingularValues() {
+        return this.getSingularValuesProvider().getSingularValues();
     }
 
     /**
@@ -520,11 +553,13 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     /**
-     * The Frobenius norm is the square root of the sum of the squares of each element, or the square root of
-     * the sum of the square of the singular values. This definition fits the requirements of
-     * {@linkplain NormedVectorSpace#norm()}.
+     * The Frobenius norm divided by the square root of the smaller dimension, min(m, n). For a vector (a single
+     * row or column) that is the Frobenius norm itself. The value lies between ||A||<sub>2</sub> / sqrt(min(m, n))
+     * and the 2-norm ||A||<sub>2</sub>, the largest singular value. This definition fits the requirements of
+     * {@linkplain NormedVectorSpace#norm()} and is the norm used by {@link #normalised()}.
      *
-     * @return The matrix' Frobenius norm
+     * @return The matrix' Frobenius norm divided by the square root of min(m, n)
+     * @see #calculateFrobeniusNorm(BasicMatrix)
      */
     @Override
     public double norm() {
@@ -812,6 +847,21 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
         return provider;
     }
 
+    /**
+     * A cached decomposition, if any, otherwise a values-only decomposition that is not cached.
+     */
+    private Provider2D.Eigenvalues getEigenvaluesProvider() {
+
+        if (myDecomposition instanceof Provider2D.Eigenvalues) {
+            return (Provider2D.Eigenvalues) myDecomposition;
+        }
+
+        Eigenvalue<N> provider = this.newEigenvalue(this.supplier());
+        provider.computeValuesOnly(this.supplier());
+
+        return provider;
+    }
+
     private Provider2D.Inverse<Optional<MatrixStore<N>>> getInverseProvider(final boolean safe) {
 
         if (safe ? myDecomposition instanceof SingularValue<?> : myDecomposition instanceof Provider2D.Inverse) {
@@ -831,18 +881,25 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
         if (!(myDecomposition instanceof Provider2D.Rank)) {
 
-            if (this.store().isTall()) {
-                myDecomposition = this.newQR(this.supplier());
-            } else if (this.store().isFat()) {
-                myDecomposition = this.newSingularValue(this.supplier());
-            } else {
-                myDecomposition = this.newLDU(this.supplier());
-            }
-
-            myDecomposition.decompose(this.supplier());
+            ElementsSupplier<N> supplier = this.supplier();
+            myDecomposition = this.newSingularValue(supplier);
+            myDecomposition.decompose(supplier);
         }
 
         return (Provider2D.Rank) myDecomposition;
+    }
+
+    private Provider2D.SingularValues getSingularValuesProvider() {
+
+        if (myDecomposition instanceof Provider2D.SingularValues) {
+            return (Provider2D.SingularValues) myDecomposition;
+        }
+
+        SingularValue<N> provider = this.newSingularValue(this.supplier());
+        provider.decompose(this.supplier());
+        myDecomposition = provider;
+
+        return provider;
     }
 
     private Provider2D.Solution<Optional<MatrixStore<N>>> getSolutionProvider(final boolean safe, final Access2D<?> rhs) {

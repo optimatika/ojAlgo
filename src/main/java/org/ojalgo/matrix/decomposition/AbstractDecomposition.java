@@ -21,8 +21,6 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import static org.ojalgo.function.constant.PrimitiveMath.MACHINE_EPSILON;
-
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.operation.COPY;
@@ -381,7 +379,7 @@ abstract class AbstractDecomposition<N extends Comparable<N>, M extends Physical
     }
 
     final double getDimensionalEpsilon() {
-        return this.getMaxDim() * MACHINE_EPSILON;
+        return this.getMaxDim() * this.scalar().epsilon();
     }
 
     final boolean isAspectRatioNormal() {

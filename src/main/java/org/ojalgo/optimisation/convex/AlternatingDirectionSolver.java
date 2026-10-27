@@ -1064,6 +1064,11 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
         state = Optimisation.State.UNEXPLORED;
         boolean approximate = false;
 
+        if (!myKKT.isFactorised()) {
+            state = Optimisation.State.FAILED;
+            return mySolution.compose(value, state, approximate);
+        }
+
         try {
 
             this.resetIterationsCount();

@@ -226,6 +226,11 @@ abstract class DenseCholesky<N extends Comparable<N>, M extends PhysicalStore<N>
 
     private double myMaxDiag = ONE;
     private double myMinDiag = ZERO;
+    /**
+     * The number of pivots computed – fewer than the dimension if the factorisation stopped at a
+     * non-positive one.
+     */
+    private int myNbPivots = 0;
     private boolean mySPD = false;
 
     protected DenseCholesky(final PhysicalStore.Factory<N, ? extends M> factory) {
@@ -310,7 +315,7 @@ abstract class DenseCholesky<N extends Comparable<N>, M extends PhysicalStore<N>
         PhysicalStore<N> internal = this.getInPlace();
 
         int significant = 0;
-        for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
+        for (int ij = 0; ij < myNbPivots; ij++) {
             if (internal.doubleValue(ij, ij) > minimum) {
                 significant++;
             }
@@ -533,6 +538,7 @@ abstract class DenseCholesky<N extends Comparable<N>, M extends PhysicalStore<N>
         boolean tmpPositiveDefinite = this.getRowDim() == this.getColDim();
         myMaxDiag = MACHINE_SMALLEST;
         myMinDiag = MACHINE_LARGEST;
+        myNbPivots = 0;
 
         // Check if hermitian, maybe
         if (tmpPositiveDefinite && checkHermitian) {
@@ -606,12 +612,14 @@ abstract class DenseCholesky<N extends Comparable<N>, M extends PhysicalStore<N>
     }
 
     /**
-     * The range of the pivots – the diagonal elements of [L], squared – of the first rows/columns.
+     * The number and range of the pivots – the diagonal elements of [L], squared – of the first
+     * rows/columns.
      */
     void updateDiagonalRange(final int limit) {
         PhysicalStore<N> inPlace = this.getInPlace();
         myMaxDiag = MACHINE_SMALLEST;
         myMinDiag = MACHINE_LARGEST;
+        myNbPivots = limit;
         for (int ij = 0; ij < limit; ij++) {
             double diagonal = inPlace.doubleValue(ij, ij);
             double pivot = diagonal * diagonal;

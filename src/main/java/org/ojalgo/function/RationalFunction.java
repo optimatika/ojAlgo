@@ -38,6 +38,11 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
     public interface Binary extends BinaryFunction<RationalNumber> {
 
         @Override
+        default UnaryFunction<RationalNumber> first(final double arg1) {
+            return this.first(RationalNumber.valueOf(arg1));
+        }
+
+        @Override
         default double invoke(final double arg1, final double arg2) {
             return this.invoke(RationalNumber.valueOf(arg1), RationalNumber.valueOf(arg2)).doubleValue();
         }
@@ -50,6 +55,11 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
         @Override
         default RationalNumber invoke(final RationalNumber arg1, final double arg2) {
             return this.invoke(arg1, RationalNumber.valueOf(arg2));
+        }
+
+        @Override
+        default UnaryFunction<RationalNumber> second(final double arg2) {
+            return this.second(RationalNumber.valueOf(arg2));
         }
 
     }

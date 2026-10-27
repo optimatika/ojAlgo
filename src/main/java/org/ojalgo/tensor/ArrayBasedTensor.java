@@ -160,6 +160,10 @@ abstract class ArrayBasedTensor<N extends Comparable<N>, T extends ArrayBasedTen
         receiver.fillMatching(left, myFunctionSet.add(), right);
     }
 
+    void conjugate(final Mutate1D.Fillable<N> receiver, final Access1D<N> argument) {
+        receiver.fillMatching(myFunctionSet.conjugate(), argument);
+    }
+
     void multiply(final Mutate1D.Fillable<N> receiver, final double left, final Access1D<N> right) {
         receiver.fillMatching(myFunctionSet.multiply().first(left), right);
     }

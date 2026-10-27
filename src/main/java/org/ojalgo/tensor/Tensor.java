@@ -46,6 +46,31 @@ public interface Tensor<N extends Comparable<N>, T extends Tensor<N, T>> extends
     }
 
     /**
+     * The conjugate of every element, with the order of the indices reversed:
+     *
+     * <pre>{@code
+     * conjugate(T)[i1, i2, ..., in] = conj(T[in, ..., i2, i1])
+     * }</pre>
+     *
+     * At the lower ranks this is the usual meaning of conjugate:
+     * <ul>
+     * <li>Rank 0, a scalar: the conjugate of a complex number or quaternion.
+     * <li>Rank 1, a vector: the conjugate of each element. Reversing the order of a single index changes
+     * nothing – a vector tensor is neither a row nor a column.
+     * <li>Rank 2, a matrix: the conjugate transpose.
+     * </ul>
+     * For real elements the conjugate changes nothing, and only the reversal of the indices remains – the
+     * transpose at rank 2.
+     * <p>
+     * For rank 3 and higher, the tensor product u ⊗ v ⊗ w becomes conj(w) ⊗ conj(v) ⊗ conj(u), the same
+     * reversal of order as in (AB)<sup>H</sup> = B<sup>H</sup>A<sup>H</sup>. It is not the adjoint of the
+     * tensor seen as a linear map between tensor spaces, as that depends on which indices are inputs and which
+     * are outputs.
+     */
+    @Override
+    T conjugate();
+
+    /**
      * The range of the indices that identify the scalar components. Each index of a tensor ranges over the
      * number of dimensions.
      */

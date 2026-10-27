@@ -120,11 +120,19 @@ public final class TensorFactory1D<N extends Comparable<N>, T extends Mutate1D> 
 
         T retVal = myFactory.make(dimensions);
 
+        boolean primitive = this.getMathType().isPrimitive();
+
         long offset = 0L;
         for (Access1D<N> vector : vectors) {
             long limit = vector.count();
-            for (int i = 0; i < limit; i++) {
-                retVal.set(offset + i, vector.doubleValue(i));
+            if (primitive) {
+                for (int i = 0; i < limit; i++) {
+                    retVal.set(offset + i, vector.doubleValue(i));
+                }
+            } else {
+                for (int i = 0; i < limit; i++) {
+                    retVal.set(offset + i, vector.get(i));
+                }
             }
             offset += limit;
         }

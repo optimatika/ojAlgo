@@ -23,6 +23,7 @@ package org.ojalgo.tensor;
 
 import java.util.Arrays;
 
+import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.scalar.Scalar.Factory;
@@ -69,6 +70,8 @@ public final class TensorFactoryAnyD<N extends Comparable<N>, T extends MutateAn
 
         T retVal = myFactory.make(structure);
 
+        boolean primitive = this.getMathType().isPrimitive();
+
         long[] offset = new long[rank];
         long[] outRef = new long[rank];
 
@@ -76,14 +79,16 @@ public final class TensorFactoryAnyD<N extends Comparable<N>, T extends MutateAn
 
             tensor.loopAllReferences(inRef -> {
 
-                double value = tensor.doubleValue(inRef);
-
                 System.arraycopy(offset, 0, outRef, 0, offset.length);
                 for (int i = 0; i < inRef.length; i++) {
                     outRef[i] += inRef[i];
                 }
 
-                retVal.set(outRef, value);
+                if (primitive) {
+                    retVal.set(outRef, tensor.doubleValue(inRef));
+                } else {
+                    retVal.set(outRef, tensor.get(inRef));
+                }
             });
 
             for (int i = 0; i < offset.length; i++) {
@@ -190,13 +195,30 @@ public final class TensorFactoryAnyD<N extends Comparable<N>, T extends MutateAn
 
         T retVal = myFactory.make(shape);
 
-        retVal.loopAllReferences(ref -> {
-            double val = 1.0;
-            for (int d = 0; d < ref.length; d++) {
-                val *= vectors[d].doubleValue(ref[d]);
-            }
-            retVal.set(ref, val);
-        });
+        if (this.getMathType().isPrimitive()) {
+
+            retVal.loopAllReferences(ref -> {
+                double val = 1.0;
+                for (int d = 0; d < ref.length; d++) {
+                    val *= vectors[d].doubleValue(ref[d]);
+                }
+                retVal.set(ref, val);
+            });
+
+        } else {
+
+            Scalar.Factory<N> scalar = this.scalar();
+            BinaryFunction<N> multiply = this.function().multiply();
+            N one = scalar.one().get();
+
+            retVal.loopAllReferences(ref -> {
+                N val = one;
+                for (int d = 0; d < ref.length; d++) {
+                    val = multiply.invoke(val, scalar.cast(vectors[d].get(ref[d])));
+                }
+                retVal.set(ref, val);
+            });
+        }
 
         return retVal;
     }
@@ -220,11 +242,19 @@ public final class TensorFactoryAnyD<N extends Comparable<N>, T extends MutateAn
 
         T retVal = myFactory.make(dimensions);
 
+        boolean primitive = this.getMathType().isPrimitive();
+
         long offset = 0L;
         for (Access1D<N> vector : vectors) {
             long limit = vector.count();
-            for (int i = 0; i < limit; i++) {
-                retVal.set(offset + i, vector.doubleValue(i));
+            if (primitive) {
+                for (int i = 0; i < limit; i++) {
+                    retVal.set(offset + i, vector.doubleValue(i));
+                }
+            } else {
+                for (int i = 0; i < limit; i++) {
+                    retVal.set(offset + i, vector.get(i));
+                }
             }
             offset += limit;
         }

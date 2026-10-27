@@ -116,7 +116,12 @@ public final class VectorTensor<N extends Comparable<N>> extends ArrayBasedTenso
 
     @Override
     public VectorTensor<N> conjugate() {
-        return this;
+
+        VectorTensor<N> retVal = this.newSameShape();
+
+        this.conjugate(retVal.getArray(), myArray);
+
+        return retVal;
     }
 
     @Override

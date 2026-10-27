@@ -21,6 +21,7 @@
  */
 package org.ojalgo.tensor;
 
+import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.scalar.Scalar.Factory;
@@ -130,7 +131,7 @@ public final class TensorFactory2D<N extends Comparable<N>, T extends Mutate2D> 
 
         T retVal = myFactory.make(dimensions, dimensions);
 
-        N one = this.scalar().cast(1.0);
+        N one = this.scalar().one().get();
 
         for (int ij = 0; ij < dimensions; ij++) {
             retVal.set(ij, ij, one);
@@ -155,20 +156,46 @@ public final class TensorFactory2D<N extends Comparable<N>, T extends Mutate2D> 
 
         long i, j;
 
-        for (long j1 = 0; j1 < cols1; j1++) {
-            for (long j2 = 0; j2 < cols2; j2++) {
-                j = j1 * cols2 + j2;
+        if (this.getMathType().isPrimitive()) {
 
-                for (long i1 = 0; i1 < rows1; i1++) {
+            for (long j1 = 0; j1 < cols1; j1++) {
+                for (long j2 = 0; j2 < cols2; j2++) {
+                    j = j1 * cols2 + j2;
 
-                    double val1 = matrix1.doubleValue(i1, j1);
+                    for (long i1 = 0; i1 < rows1; i1++) {
 
-                    for (long i2 = 0; i2 < rows2; i2++) {
-                        i = i1 * rows2 + i2;
+                        double val1 = matrix1.doubleValue(i1, j1);
 
-                        double val2 = matrix2.doubleValue(i2, j2);
+                        for (long i2 = 0; i2 < rows2; i2++) {
+                            i = i1 * rows2 + i2;
 
-                        retVal.set(i, j, val1 * val2);
+                            double val2 = matrix2.doubleValue(i2, j2);
+
+                            retVal.set(i, j, val1 * val2);
+                        }
+                    }
+                }
+            }
+
+        } else {
+
+            BinaryFunction<N> multiply = this.function().multiply();
+
+            for (long j1 = 0; j1 < cols1; j1++) {
+                for (long j2 = 0; j2 < cols2; j2++) {
+                    j = j1 * cols2 + j2;
+
+                    for (long i1 = 0; i1 < rows1; i1++) {
+
+                        N val1 = matrix1.get(i1, j1);
+
+                        for (long i2 = 0; i2 < rows2; i2++) {
+                            i = i1 * rows2 + i2;
+
+                            N val2 = matrix2.get(i2, j2);
+
+                            retVal.set(i, j, multiply.invoke(val1, val2));
+                        }
                     }
                 }
             }
@@ -201,9 +228,23 @@ public final class TensorFactory2D<N extends Comparable<N>, T extends Mutate2D> 
 
         T retVal = myFactory.make(rows, cols);
 
-        for (long j = 0; j < cols; j++) {
-            for (long i = 0; i < rows; i++) {
-                retVal.set(i, j, vector1.doubleValue(i) * vector2.doubleValue(j));
+        if (this.getMathType().isPrimitive()) {
+
+            for (long j = 0; j < cols; j++) {
+                for (long i = 0; i < rows; i++) {
+                    retVal.set(i, j, vector1.doubleValue(i) * vector2.doubleValue(j));
+                }
+            }
+
+        } else {
+
+            BinaryFunction<N> multiply = this.function().multiply();
+
+            for (long j = 0; j < cols; j++) {
+                N val2 = vector2.get(j);
+                for (long i = 0; i < rows; i++) {
+                    retVal.set(i, j, multiply.invoke(vector1.get(i), val2));
+                }
             }
         }
 

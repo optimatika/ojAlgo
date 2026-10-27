@@ -33,6 +33,11 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     public interface Binary extends BinaryFunction<ComplexNumber> {
 
         @Override
+        default UnaryFunction<ComplexNumber> first(final double arg1) {
+            return this.first(ComplexNumber.valueOf(arg1));
+        }
+
+        @Override
         default ComplexNumber invoke(final ComplexNumber arg1, final double arg2) {
             return this.invoke(arg1, ComplexNumber.valueOf(arg2));
         }
@@ -45,6 +50,11 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
         @Override
         default float invoke(final float arg1, final float arg2) {
             return this.invoke(ComplexNumber.valueOf(arg1), ComplexNumber.valueOf(arg2)).floatValue();
+        }
+
+        @Override
+        default UnaryFunction<ComplexNumber> second(final double arg2) {
+            return this.second(ComplexNumber.valueOf(arg2));
         }
 
     }

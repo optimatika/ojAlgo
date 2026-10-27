@@ -43,6 +43,11 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
     public interface Binary extends BinaryFunction<BigDecimal> {
 
         @Override
+        default UnaryFunction<BigDecimal> first(final double arg1) {
+            return this.first(BigDecimal.valueOf(arg1));
+        }
+
+        @Override
         default BigDecimal invoke(final BigDecimal arg1, final double arg2) {
             return this.invoke(arg1, BigDecimal.valueOf(arg2));
         }
@@ -55,6 +60,11 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
         @Override
         default float invoke(final float arg1, final float arg2) {
             return this.invoke(BigDecimal.valueOf(arg1), BigDecimal.valueOf(arg2)).floatValue();
+        }
+
+        @Override
+        default UnaryFunction<BigDecimal> second(final double arg2) {
+            return this.second(BigDecimal.valueOf(arg2));
         }
 
     }

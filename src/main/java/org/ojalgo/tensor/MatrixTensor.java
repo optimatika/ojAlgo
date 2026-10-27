@@ -137,6 +137,8 @@ public final class MatrixTensor<N extends Comparable<N>> extends ArrayBasedTenso
             }
         }
 
+        this.conjugate(array, array);
+
         return retVal;
     }
 

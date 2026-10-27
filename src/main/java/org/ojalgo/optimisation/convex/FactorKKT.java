@@ -310,7 +310,8 @@ final class FactorKKT implements InvertibleFactor<Double> {
 
     /**
      * Construct a {@link FactorKKT} instance for a specific quadratic programme: assemble and permute the KKT
-     * matrix, compute its QDLDL factorisation and prepare mappings for later updates.
+     * matrix, compute its QDLDL factorisation and prepare mappings for later updates. If the factorisation
+     * fails, {@link #isFactorised()} returns {@code false}.
      *
      * @param mtrxP quadratic objective matrix (upper-triangular part stored)
      * @param mtrxA constraint matrix
@@ -427,6 +428,14 @@ final class FactorKKT implements InvertibleFactor<Double> {
     @Override
     public int getRowDim() {
         return myKKT.getRowDim();
+    }
+
+    /**
+     * @return {@code true} if the latest numerical factorisation – the initial one, or one after an update –
+     *         succeeded
+     */
+    boolean isFactorised() {
+        return myQDLDL.isComputed();
     }
 
     /**

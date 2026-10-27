@@ -66,8 +66,8 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface Eigenvalue<N extends Comparable<N>>
-        extends MatrixDecomposition.Hermitian<N>, MatrixDecomposition.Determinant<N>, MatrixDecomposition.Values<N>, Provider2D.Eigenpairs {
+public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition.Hermitian<N>, MatrixDecomposition.Determinant<N>, MatrixDecomposition.Values<N>,
+        Provider2D.Eigenpairs, Provider2D.Eigenvalues {
 
     public static class Eigenpair implements Comparable<Eigenpair> {
 
@@ -582,6 +582,7 @@ public interface Eigenvalue<N extends Comparable<N>>
      *
      * @return The eigenvalues.
      */
+    @Override
     Array1D<ComplexNumber> getEigenvalues();
 
     /**

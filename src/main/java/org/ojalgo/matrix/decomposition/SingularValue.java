@@ -57,7 +57,7 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  */
 public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposition.Solver<N>, MatrixDecomposition.EconomySize<N>,
-        MatrixDecomposition.RankRevealing<N>, MatrixDecomposition.Values<N>, Provider2D.Condition {
+        MatrixDecomposition.RankRevealing<N>, MatrixDecomposition.Values<N>, Provider2D.Condition, Provider2D.SingularValues {
 
     interface Factory<N extends Comparable<N>> extends MatrixDecomposition.Factory<SingularValue<N>> {
 
@@ -324,6 +324,7 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
      *
      * @return The singular values.
      */
+    @Override
     Array1D<Double> getSingularValues();
 
     /**

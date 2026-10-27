@@ -23,7 +23,9 @@ package org.ojalgo.matrix;
 
 import java.util.List;
 
+import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.decomposition.Eigenvalue.Eigenpair;
+import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access2D;
 
 public interface Provider2D {
@@ -50,6 +52,13 @@ public interface Provider2D {
     }
 
     @FunctionalInterface
+    interface Eigenvalues extends Provider2D {
+
+        Array1D<ComplexNumber> getEigenvalues();
+
+    }
+
+    @FunctionalInterface
     interface Hermitian extends Provider2D {
 
         boolean isHermitian();
@@ -67,6 +76,13 @@ public interface Provider2D {
     interface Rank extends Provider2D {
 
         int getRank();
+
+    }
+
+    @FunctionalInterface
+    interface SingularValues extends Provider2D {
+
+        Array1D<Double> getSingularValues();
 
     }
 

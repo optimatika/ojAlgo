@@ -343,6 +343,25 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
         return eTree;
     }
 
+    /**
+     * The number of positive diagonal entries in D. A = L D L<sup>T</sup> is a congruence, so this is also
+     * the number of positive eigenvalues of A (Sylvester's law of inertia). If the factorisation completed,
+     * the remaining eigenvalues are negative. A quasi-definite matrix
+     *
+     * <pre>{@code
+     * [ H   A' ]
+     * [ A  -G  ]
+     * }</pre>
+     *
+     * with H (n×n) and G positive definite has exactly n positive eigenvalues.
+     * <p>
+     * If the factorisation stopped at a (numerically) zero entry in D, only the entries before that are
+     * counted.
+     */
+    public int countPositive() {
+        return myPositiveValuesInD;
+    }
+
     @Override
     public int countSignificant(final double threshold) {
         int significant = 0;
@@ -372,15 +391,13 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
      * <li>Symmetric, with only the upper/right triangle stored. The lower/left triangle is not ignored; any
      * explicitly stored non-zero entries there will cause the symbolic phase to fail.
      * <li>Sparse (not strictly required, but this implementation is optimised for sparse structure).
-     * <li>Quasi-definite for a fully solvable system: during factorisation the diagonal entries D[i] are
-     * classified relative to a small, scale-dependent tolerance derived from the largest |D[i]| seen so far
-     * and the dimensional epsilon. All D[i] must be classified as positive for {@link #isSolvable()} to
-     * return {@code true}.
+     * <li>Quasi-definite. There is no pivoting, and the factorisation exists if all leading principal
+     * submatrices are non-singular. For a quasi-definite matrix that holds with any symmetric ordering.
      * </ul>
-     * The underlying QDLDL-style algorithm will return false if any diagonal entry in D is classified as
-     * (numerically) zero. Indefinite or near-singular matrices may still factorise, but will typically yield
-     * {@code isSolvable() == false} and are not suitable for use as quasi-definite systems when solving or
-     * inverting.
+     * Returns false if a diagonal entry D[i] is (numerically) zero – not larger than the largest |D[i]| so
+     * far times the dimensional epsilon – and the factorisation stops there. {@link #isSolvable()} is true if
+     * the factorisation completed and all |D[i]| are larger than {@link #getRankThreshold()}, the same test as
+     * {@link #isFullRank()}.
      * <p>
      * This method performs both the symbolic analysis (elimination tree) and numeric factorisation. For
      * repeated factorisations with identical sparsity patterns and updated values, callers may instead use
@@ -439,11 +456,9 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
      * Determinant of the factorised matrix.
      * <p>
      * With no pivoting the determinant is computed as the product of the diagonal entries of D returned by
-     * the LDL factorisation. For a quasi-definite input (all diagonal entries classified as positive
-     * according to the internal tolerance) {@link #isSolvable()} is {@code true} and the determinant is
-     * strictly positive. For general symmetric or indefinite inputs the determinant may be negative or close
-     * to zero and should be interpreted with care. If the factorisation has not been computed this method
-     * returns NaN.
+     * the LDL factorisation. It is positive for a positive definite input. For indefinite inputs it may be
+     * negative or close to zero and should be interpreted with care. If the factorisation has not been
+     * computed this method returns NaN.
      */
     @Override
     public Double getDeterminant() {
@@ -592,7 +607,7 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
         int yNonZeros, baseIndex, patternIndex, nextColumn, eliminationCount, insertionIndex;
         double yAtPatternIndex;
 
-        int positiveValuesInD = 0;
+        myPositiveValuesInD = 0;
 
         mtrxLp[0] = 0;
         for (int i = 0; i < n; i++) {
@@ -609,7 +624,7 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
             return false;
         }
         if (diagVal[0] > ZERO) {
-            positiveValuesInD++;
+            myPositiveValuesInD++;
         }
         diagInv[0] = ONE / diagVal[0];
 
@@ -685,20 +700,18 @@ public final class SparseQDLDL extends AbstractDecomposition<Double, R064Store> 
                 return false;
             }
             if (diagVal[k] > tol) {
-                positiveValuesInD++;
+                myPositiveValuesInD++;
             }
 
             diagInv[k] = ONE / diagVal[k];
         }
-
-        myPositiveValuesInD = positiveValuesInD;
 
         return this.computed(true);
     }
 
     @Override
     protected boolean checkSolvability() {
-        return myD != null && myPositiveValuesInD == myD.size();
+        return this.isFullRank();
     }
 
 }
