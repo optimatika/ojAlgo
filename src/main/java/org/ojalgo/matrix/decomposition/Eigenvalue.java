@@ -64,6 +64,7 @@ import org.ojalgo.type.context.NumberContext;
  * determine the validity of [V][D][V]<sup>-1</sup>.)
  * <p>
  * The eigenvalues (and their corresponding eigenvectors) of a non-symmetric matrix could be complex.
+ * {@snippet class=org.ojalgo.matrix.decomposition.MatrixDecompositionSnippets region=eigenvalue}
  *
  * @author apete
  */

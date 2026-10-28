@@ -40,6 +40,7 @@ import org.ojalgo.type.context.NumberContext;
  * halves and merged with [L] (and/or [U]). We'll express it as [A] = [L][L]<sup>T</sup>.
  * <p>
  * A cholesky decomposition is still/also an LU decomposition where [P][L][D][U] => [L][L]<sup>T</sup>.
+ * {@snippet class=org.ojalgo.matrix.decomposition.MatrixDecompositionSnippets region=cholesky}
  *
  * @author apete
  */

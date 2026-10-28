@@ -47,10 +47,12 @@ import org.ojalgo.type.context.NumberContext;
  * You create instances of (some subclass of) this class by using one of the factories: {@linkplain #R064},
  * {@linkplain #R128}, {@linkplain #C128}, {@linkplain #H256} or {@linkplain #Q128}
  * <p>
- * The QR decompostion always exists, even if the matrix does not have full column rank, so the compute method
- * will never fail. The primary use of the QR decomposition is in the least squares solution of overdetermined
- * systems of simultaneous linear equations. This will fail if the matrix does not have full column rank. The
- * rank must be equal to the number of columns.
+ * The QR decomposition always exists, also when the matrix does not have full column rank, and
+ * {@link #decompose(Access2D.Collectable) decompose(..)} always succeeds. Its primary use is the least squares
+ * solution of overdetermined systems of simultaneous linear equations, which requires full column rank – the
+ * rank equal to the number of columns. {@link #compute(Access2D.Collectable) compute(..)} decomposes and then
+ * checks {@link #isSolvable() isSolvable()}, so it returns false when the rank is lower.
+ * {@snippet class=org.ojalgo.matrix.decomposition.MatrixDecompositionSnippets region=qr}
  *
  * @author apete
  */

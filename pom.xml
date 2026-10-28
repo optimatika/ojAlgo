@@ -157,6 +157,10 @@
                             <quiet>true</quiet>
                             <serialwarn>false</serialwarn>
                             <doclint>none</doclint>
+                            <additionalOptions>
+                                <additionalOption>--snippet-path</additionalOption>
+                                <additionalOption>${project.basedir}/src/test/java</additionalOption>
+                            </additionalOptions>
                         </configuration>
                         <goals>
                             <goal>jar</goal>

@@ -63,7 +63,12 @@ import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.type.math.MathType;
 
 /**
- * A {@code double} implementation of {@linkplain PhysicalStore}.
+ * A {@code double} implementation of {@linkplain PhysicalStore}: a dense, mutable matrix stored column by
+ * column in a {@code double[]}. Create instances with {@link #FACTORY}, and declare variables with the
+ * interfaces {@link PhysicalStore} (mutable) or {@link MatrixStore} (read access).
+ * {@snippet class=org.ojalgo.matrix.store.R064StoreSnippets region=introduction}
+ * The decompositions are in {@link org.ojalgo.matrix.decomposition}. For an immutable matrix that chooses
+ * and caches decompositions itself, see {@link org.ojalgo.matrix.MatrixR064}.
  *
  * @author apete
  */

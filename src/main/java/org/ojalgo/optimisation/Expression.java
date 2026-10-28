@@ -60,6 +60,7 @@ import org.ojalgo.type.context.NumberContext;
  * <p>
  * As a {@link ModelEntity}, it becomes a constraint when lower/upper limits are set, and contributes to the
  * objective function when a weight is set.
+ * {@snippet class=org.ojalgo.optimisation.ExpressionsBasedModelSnippets region=quadratic}
  *
  * @author apete
  */

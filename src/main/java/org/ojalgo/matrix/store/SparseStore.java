@@ -56,6 +56,9 @@ import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 import org.ojalgo.type.math.MathType;
 
 /**
+ * A sparse matrix: only the non-zero elements are stored. Create instances with the factories {@link #R064},
+ * {@link #R032}, {@link #R128}, {@link #C128}, {@link #H256} or {@link #Q128}.
+ * {@snippet class=org.ojalgo.matrix.store.SparseStoreSnippets region=introduction}
  * A sparse matrix (this implementation) is not thread safe. Mutating the matrix (in particular creating
  * new/more non-zero elements) from multiple threads will result in unpredictable behaviour (even if the
  * threads update different elements). To mutate the matrix in a concurrent/multi-threaded environment you

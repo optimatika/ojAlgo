@@ -76,10 +76,11 @@ import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
  * Typical workflow:
  * <ol>
  * <li>Create a model
- * <li>Add variables via {@link #addVariable(String)} with bounds and/or weights
- * <li>Add expressions via {@link #addExpression(String)} with coefficients, bounds, and/or weights
+ * <li>Add variables via {@link #newVariable(String)} with bounds and/or weights
+ * <li>Add expressions via {@link #newExpression(String)} with coefficients, bounds, and/or weights
  * <li>Solve with {@link #minimise()} or {@link #maximise()}
  * </ol>
+ * {@snippet class=org.ojalgo.optimisation.ExpressionsBasedModelSnippets region=introduction}
  * <p>
  * The model automatically selects and configures a suitable solver, applies presolve simplifications, and
  * scales parameters for numerical stability.
