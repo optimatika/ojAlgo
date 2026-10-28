@@ -1069,6 +1069,11 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
             return mySolution.compose(value, state, approximate);
         }
 
+        if (!myKKT.hasCorrectInertia()) {
+            state = Optimisation.State.INVALID;
+            return mySolution.compose(value, state, approximate);
+        }
+
         try {
 
             this.resetIterationsCount();

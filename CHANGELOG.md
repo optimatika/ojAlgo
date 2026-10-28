@@ -42,6 +42,16 @@ ojAlgo now requires Java 22 or later. The Foreign Function & Memory API, used fo
 - `Eigenvalue.R064.makeGeneralised(..)`: the reduction to a standard eigenvalue problem, and the recovery of the eigenvectors, call the native `dtrsm` and `dtrmm` when available.
 - Matrix products where an operand is the transpose of an `R064Store` – `transpose()` or `conjugate()` – call the native BLAS for large enough products, as products of the stores themselves do.
 
+#### org.ojalgo.optimisation
+
+- `ConvexSolver` with the ADMM algorithm returns state `INVALID`, without iterating, when the first factorisation of the KKT system does not have the inertia of a convex problem: n positive and m negative eigenvalues, which means P + σI + A<sup>T</sup>WA is not positive definite. Previously it iterated, and could report a stationary point of a non-convex problem as `OPTIMAL` – e.g. minimising -x<sup>2</sup> - y<sup>2</sup> + 0.1x + 0.1y subject to x + y <= 1.5 and 0 <= x, y <= 1 gave `OPTIMAL` 0.005 at (0.05, 0.05), while the minimum is about -1.1. Not every non-convex problem is detected: negative curvature that the constraints compensate for is not.
+
+### Fixed
+
+#### org.ojalgo.matrix
+
+- `SparseStore`, and its `Builder`, throw `IllegalArgumentException` when the number of rows times the number of columns exceeds `Integer.MAX_VALUE`. Previously the element positions overflowed and the matrix was corrupt – e.g. `SparseLU` threw `ArrayIndexOutOfBoundsException` for a 46341x46341 tridiagonal matrix.
+
 ### Removed
 
 #### org.ojalgo.array
