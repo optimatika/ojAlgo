@@ -12,7 +12,7 @@ import se.optimatika.optimisation.service.client.OptClientV1;
 class RemoteSolverTest extends OptimisationTests {
 
     private static final String HOST = System.getenv("SERVICE_HOST") != null ? System.getenv("SERVICE_HOST")
-            : "https://optimisation-test-service-840974723912.europe-north2.run.app";
+            : "https://service-api.optimatika.se";
 
     private static ExpressionsBasedModel buildDietModel(final Optimisation.Environment environment) {
 
