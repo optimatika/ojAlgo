@@ -161,18 +161,18 @@ public class RangeUpdateWarmStartTest extends OptimisationLinearTests {
     }
 
     private static final NumberContext ACCURACY = NumberContext.of(8);
-    private static final String COINS_GRID = "/optimisation/usersupplied/ChocoCoinsGridRangeUpdate.txt";
-    private static final String COINS_GRID_COLD = "/optimisation/usersupplied/ChocoCoinsGridCold.txt";
-    private static final String COINS_GRID_COLD_2 = "/optimisation/usersupplied/ChocoCoinsGridCold2.txt";
-    private static final String COINS_GRID_COLD_3 = "/optimisation/usersupplied/ChocoCoinsGridCold3.txt";
+    private static final String COINS_GRID = "/optimisation/rangeupdate/ChocoCoinsGridRangeUpdate.txt";
+    private static final String COINS_GRID_COLD = "/optimisation/rangeupdate/ChocoCoinsGridCold.txt";
+    private static final String COINS_GRID_COLD_2 = "/optimisation/rangeupdate/ChocoCoinsGridCold2.txt";
+    private static final String COINS_GRID_COLD_3 = "/optimisation/rangeupdate/ChocoCoinsGridCold3.txt";
     /**
      * Relative to the size of the terms of a row (at least 1), or to the bound of a range. Warm solves that
      * follow many range updates, on the dense store, have residuals up to about 1e-7 relative.
      */
     private static final NumberContext FEASIBILITY = NumberContext.of(7);
-    private static final String FM3_FAILED = "/optimisation/usersupplied/ChocoFm3RangeUpdate.txt";
-    private static final String FM3_TIGHTENING = "/optimisation/usersupplied/ChocoFm3RangeTightening.txt";
-    private static final String HC_PIZZA = "/optimisation/usersupplied/ChocoHCPizzaRangeUpdate.txt";
+    private static final String FM3_FAILED = "/optimisation/rangeupdate/ChocoFm3RangeUpdate.txt";
+    private static final String FM3_TIGHTENING = "/optimisation/rangeupdate/ChocoFm3RangeTightening.txt";
+    private static final String HC_PIZZA = "/optimisation/rangeupdate/ChocoHCPizzaRangeUpdate.txt";
     /**
      * The sum of the 1,000 optimal values of {@link #HC_PIZZA}, the same with every ojAlgo version since
      * 57.1.0.
@@ -184,10 +184,10 @@ public class RangeUpdateWarmStartTest extends OptimisationLinearTests {
      * limit of one day.
      */
     private static final int ITERATIONS_ABORT = 5_000;
-    private static final String MULTI_KNAPSACK = "/optimisation/usersupplied/ChocoMultiKnapsackRangeUpdate.txt";
-    private static final String MULTI_KNAPSACK_2 = "/optimisation/usersupplied/ChocoMultiKnapsackRangeUpdate2.txt";
-    private static final String MULTI_KNAPSACK_3 = "/optimisation/usersupplied/ChocoMultiKnapsackRangeUpdate3.txt";
-    private static final String STEINER = "/optimisation/usersupplied/ChocoSteinerRangeRelaxation.txt";
+    private static final String MULTI_KNAPSACK = "/optimisation/rangeupdate/ChocoMultiKnapsackRangeUpdate.txt";
+    private static final String MULTI_KNAPSACK_2 = "/optimisation/rangeupdate/ChocoMultiKnapsackRangeUpdate2.txt";
+    private static final String MULTI_KNAPSACK_3 = "/optimisation/rangeupdate/ChocoMultiKnapsackRangeUpdate3.txt";
+    private static final String STEINER = "/optimisation/rangeupdate/ChocoSteinerRangeRelaxation.txt";
 
     /**
      * The solution satisfies every row and range, by {@link #FEASIBILITY}.
