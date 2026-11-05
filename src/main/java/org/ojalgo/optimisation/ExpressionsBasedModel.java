@@ -49,6 +49,7 @@ import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.multiary.MultiaryFunction.Quadratic;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.netio.BasicJson;
 import org.ojalgo.netio.BasicLogger;
@@ -421,11 +422,8 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
             for (EntryPair.KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>> kp : modelState.getDualValues()) {
                 ModelEntity<?> entity = kp.getKey().getKey();
-                if (entity instanceof Expression) {
-                    Expression expression = (Expression) entity;
-                    if (expression.getLinearKeySet().contains(key)) {
-                        rc -= expression.doubleValue(key, false) * kp.doubleValue();
-                    }
+                if ((entity instanceof Expression expression) && expression.getLinearKeySet().contains(key)) {
+                    rc -= expression.doubleValue(key, false) * kp.doubleValue();
                 }
             }
 
@@ -679,11 +677,10 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
                 ModelEntity<?> entity = dual.getKey().left();
                 double value = dual.doubleValue();
 
-                if (!(entity instanceof Expression) || Math.abs(value) <= noise * largest) {
+                if (!(entity instanceof Expression expression) || Math.abs(value) <= noise * largest) {
                     continue;
                 }
 
-                Expression expression = (Expression) entity;
                 if (expression.isAnyQuadraticFactorNonZero()) {
                     return withoutCertificate;
                 }
@@ -1549,6 +1546,23 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
+     * If any any {@link Expression} has a {@link Quadratic} term this method returns the density of the
+     * generated/aggregated objective function. Otherwise it returns the average density of the the constraint
+     * {@link Expression}s.
+     */
+    public double density() {
+
+        if (this.isAnyExpressionQuadratic()) {
+
+            return this.objective().density();
+
+        } else {
+
+            return this.constraints().mapToDouble(Expression::density).average().orElse(PrimitiveMath.ZERO);
+        }
+    }
+
+    /**
      * Counts variables and expressions of different categories.
      */
     public Description describe() {
@@ -2383,51 +2397,44 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
         for (Simplifier<?, ?> simplifier : myEnvironment.getPresolvers()) {
 
-            if (simplifier instanceof VariableAnalyser) {
-                VariableAnalyser analyser = (VariableAnalyser) simplifier;
-
-                for (Variable tmpVar : myVariables) {
-                    if (analyser.isApplicable(tmpVar)) {
-                        analyser.simplify(tmpVar, this);
-                    }
-                }
-
-            } else if (simplifier instanceof ExpressionAnalyser) {
-                ExpressionAnalyser analyser = (ExpressionAnalyser) simplifier;
-
-                for (Expression tmpExpr : myExpressions.values()) {
-                    if (analyser.isApplicable(tmpExpr)) {
-                        analyser.simplify(tmpExpr, this);
-                    }
-                }
-
-            } else if (simplifier instanceof Presolver) {
-                Presolver presolver = (Presolver) simplifier;
-
-                for (Expression tmpExpr : myExpressions.values()) {
-                    if (tmpExpr.isSafeToPresolve() && presolver.isApplicable(tmpExpr)) {
-
-                        BigDecimal setValue = tmpExpr.calculateSetValue(fixedVariables);
-
-                        BigDecimal lower = tmpExpr.getCompensatedLowerLimit(setValue);
-                        BigDecimal upper = tmpExpr.getCompensatedUpperLimit(setValue);
-
-                        myTemporary.clear();
-                        myTemporary.addAll(tmpExpr.getLinearKeySet());
-                        myTemporary.removeAll(fixedVariables);
-                        if (tmpExpr.isDegenerate()) {
-                            myTemporary.removeIf(index -> options.degeneracy.isZero(tmpExpr.get(index)));
+            switch (simplifier) {
+                case VariableAnalyser analyser   -> {
+                    for (Variable tmpVar : myVariables) {
+                        if (analyser.isApplicable(tmpVar)) {
+                            analyser.simplify(tmpVar, this);
                         }
-
-                        presolver.simplify(tmpExpr, myTemporary, lower, upper, options.feasibility);
-
-                        myTemporary.clear();
                     }
                 }
+                case ExpressionAnalyser analyser -> {
+                    for (Expression tmpExpr : myExpressions.values()) {
+                        if (analyser.isApplicable(tmpExpr)) {
+                            analyser.simplify(tmpExpr, this);
+                        }
+                    }
+                }
+                case Presolver presolver         -> {
+                    for (Expression tmpExpr : myExpressions.values()) {
+                        if (tmpExpr.isSafeToPresolve() && presolver.isApplicable(tmpExpr)) {
 
-            } else {
+                            BigDecimal setValue = tmpExpr.calculateSetValue(fixedVariables);
 
-                throw new ProgrammingError("Unknown simplifier type: " + simplifier.getClass().getName());
+                            BigDecimal lower = tmpExpr.getCompensatedLowerLimit(setValue);
+                            BigDecimal upper = tmpExpr.getCompensatedUpperLimit(setValue);
+
+                            myTemporary.clear();
+                            myTemporary.addAll(tmpExpr.getLinearKeySet());
+                            myTemporary.removeAll(fixedVariables);
+                            if (tmpExpr.isDegenerate()) {
+                                myTemporary.removeIf(index -> options.degeneracy.isZero(tmpExpr.get(index)));
+                            }
+
+                            presolver.simplify(tmpExpr, myTemporary, lower, upper, options.feasibility);
+
+                            myTemporary.clear();
+                        }
+                    }
+                }
+                case null, default               -> throw new ProgrammingError("Unknown simplifier type: " + simplifier.getClass().getName());
             }
         }
 
@@ -2481,15 +2488,9 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     private void write(final FileFormat format, final OutputStream output) {
 
         switch (format) {
-            case MPS:
-                FileFormatMPS.write(this, output);
-                break;
-            case LP:
-                FileFormatLP.write(this, output);
-                break;
-            default:
-                FileFormatEBM.write(this, output);
-                break;
+            case MPS -> FileFormatMPS.write(this, output);
+            case LP  -> FileFormatLP.write(this, output);
+            default  -> FileFormatEBM.write(this, output);
         }
     }
 
