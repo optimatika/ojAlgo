@@ -26,7 +26,18 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - Optional native BLAS and LAPACK, through Java's Foreign Function & Memory API. When the JVM grants ojAlgo native access (`--enable-native-access=ojalgo` on the module path, `--enable-native-access=ALL-UNNAMED` on the class path) and a working library is found, large enough matrix multiplications, matrix-vector products, triangular solves and vector operations call it. ojAlgo looks for Accelerate on macOS; OpenBLAS, FlexiBLAS, MKL, BLIS or the reference BLAS on Linux; OpenBLAS or MKL on Windows. The system property `ojalgo.native.library` names the library file(s) to use instead, or switches native code off with `none`. Every operation still has a pure Java implementation, and without native access no native code is used. See the README.
 - The dense `double` decompositions call the native LAPACK routines, for large enough matrices: `LU` (`dgetrf2`, `dgetrs`), `Cholesky` (`dpotrf`, `dpotrs`), `QR` (`dgeqrf`, `dorgqr`, `dtrtrs`), `Tridiagonal` (`dsytrd`, `dorgtr`), `Hessenberg` (`dgehrd`, `dorghr`), `Bidiagonal` (`dgebrd`, `dorgbr`), `SingularValue` (`dgesdd`), and `Eigenvalue` – Hermitian (`dsyevd`) and general (`dgeev`) matrices, and the generalised problem (`dtrsm`, `dtrmm`, `dpotrf` and `dsyevd`). Routines the library does not have use the Java implementation. The other number types, the `Raw*` implementations and the sparse decompositions are pure Java. For example, with Accelerate the eigenvalue decomposition of a 1000x1000 symmetric matrix is about 10x faster than in pure Java.
 
+#### org.ojalgo.optimisation
+
+- `ExpressionsBasedModel.newRealVariable(String)`, `newIntegerVariable(String)` and `newBinaryVariable(String)`: the same as `newVariable(String)`, `newVariable(String).integer()` and `newVariable(String).binary()`. And `newConstraint(String)`, the same as `newExpression(String)`. They are named as in the Optimisation Service client's `OptModel`, so a model reads the same in both.
+- `ExpressionsBasedModel.getObjective()`: the expression named "OBJECTIVE", created with weight 1 if there is none – a way to write the objective function in one place, `model.getObjective().set(x, 3).set(y, 5)`. It complements the weights on variables and expressions, which work as before and add to it. Not to be confused with `objective()`, which still generates the complete objective function from all the weights.
+- `Optimisation.Result` implements `AccessScalar<Double>` for the objective function's value – `doubleValue()`, `get()`, `intValue()` and so on – alongside `Access1D<BigDecimal>` for the variables' values, `doubleValue(i)` and `get(i)`. And `isOptimal()` and `isFeasible()`, the same as `getState().isOptimal()` and `getState().isFeasible()`.
+- `Variable.doubleValue()`, `floatValue()`, `longValue()`, `intValue()`, `shortValue()` and `booleanValue()`: the value, 0 (or `false`) when there is none, rounded half to even to whole numbers, and `true` above 0.5.
+
 ### Changed
+
+#### org.ojalgo.optimisation
+
+- `ExpressionsBasedModel.submit(Sense)` writes the solution into the variables when the solve is done, as `minimise()` and `maximise()` do, and its result carries the objective function's value as the model has it. A solve that ended without a result – aborted on the Optimisation Service, say – completes the `Future` with a `FAILED` result, instead of failing it with a `NullPointerException`.
 
 ojAlgo now requires Java 22 or later. The Foreign Function & Memory API, used for the optional native BLAS and for off-heap arrays, is final from Java 22. ojAlgo no longer requires the `jdk.unsupported` module.
 

@@ -21,8 +21,7 @@
  */
 package org.ojalgo.optimisation;
 
-import static org.ojalgo.function.constant.BigMath.ONE;
-import static org.ojalgo.function.constant.BigMath.ZERO;
+import static org.ojalgo.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -32,6 +31,7 @@ import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.BigAggregator;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -91,9 +91,35 @@ public class Variable extends ModelEntity<Variable> {
         return this.lower(ZERO).upper(ONE).integer(true);
     }
 
+    /**
+     * The value, as a {@code boolean}: {@code true} when it is greater than 0.5, as for a binary variable set
+     * to 1. {@code false} when there is no value.
+     * <p>
+     * Redundant by design: named as in the Optimisation Service client's {@code OptModel}, so that a model
+     * reads the same in both.
+     *
+     * @see #getValue()
+     */
+    public final boolean booleanValue() {
+        BigDecimal value = this.getValue();
+        return value != null && value.compareTo(HALF) > 0;
+    }
+
     @Override
     public int compareTo(final Variable obj) {
         return this.getIndex().compareTo(obj.getIndex());
+    }
+
+    /**
+     * The value, as a {@code double}: 0 when there is none.
+     * <p>
+     * Redundant by design: named as in the Optimisation Service client's {@code OptModel}, so that a model
+     * reads the same in both.
+     *
+     * @see #getValue()
+     */
+    public final double doubleValue() {
+        return Scalar.doubleValue(this.getValue());
     }
 
     @Override
@@ -101,14 +127,22 @@ public class Variable extends ModelEntity<Variable> {
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj)) {
+        if (!super.equals(obj) || !(obj instanceof Variable other)) {
             return false;
         }
-        if (!(obj instanceof Variable)) {
-            return false;
-        }
-        Variable other = (Variable) obj;
         return Objects.equals(myIndex, other.myIndex) && myInteger == other.myInteger && Objects.equals(myValue, other.myValue);
+    }
+
+    /**
+     * The value, as a {@code float}: 0 when there is none.
+     * <p>
+     * Redundant by design: named as in the Optimisation Service client's {@code OptModel}, so that a model
+     * reads the same in both.
+     *
+     * @see #getValue()
+     */
+    public final float floatValue() {
+        return Scalar.floatValue(this.getValue());
     }
 
     public final IntIndex getIndex() {
@@ -188,6 +222,19 @@ public class Variable extends ModelEntity<Variable> {
     }
 
     /**
+     * The value, rounded to an {@code int}: 0 when there is none.
+     * <p>
+     * Redundant by design: named as in the Optimisation Service client's {@code OptModel}, so that a model
+     * reads the same in both.
+     *
+     * @see #getValue()
+     */
+    public final int intValue() {
+        BigDecimal value = this.getValue();
+        return value != null ? value.setScale(0, RoundingMode.HALF_EVEN).intValue() : 0;
+    }
+
+    /**
      * Variable can only be 0 or 1.
      */
     public final boolean isBinary() {
@@ -218,6 +265,19 @@ public class Variable extends ModelEntity<Variable> {
 
     public final boolean isValueSet() {
         return myValue != null;
+    }
+
+    /**
+     * The value, rounded to a {@code long}: 0 when there is none.
+     * <p>
+     * Redundant by design: named as in the Optimisation Service client's {@code OptModel}, so that a model
+     * reads the same in both.
+     *
+     * @see #getValue()
+     */
+    public final long longValue() {
+        BigDecimal value = this.getValue();
+        return value != null ? value.setScale(0, RoundingMode.HALF_EVEN).longValue() : 0L;
     }
 
     @Override
@@ -259,6 +319,19 @@ public class Variable extends ModelEntity<Variable> {
             }
         }
         myValue = tmpValue;
+    }
+
+    /**
+     * The value, rounded to a {@code short}: 0 when there is none.
+     * <p>
+     * Redundant by design: named as in the Optimisation Service client's {@code OptModel}, so that a model
+     * reads the same in both.
+     *
+     * @see #getValue()
+     */
+    public final short shortValue() {
+        BigDecimal value = this.getValue();
+        return value != null ? value.setScale(0, RoundingMode.HALF_EVEN).shortValue() : 0;
     }
 
     @Override

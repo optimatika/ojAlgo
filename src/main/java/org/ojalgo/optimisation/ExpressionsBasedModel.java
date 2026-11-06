@@ -1193,6 +1193,10 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     private static final String OBJ_FUNC_AS_CONSTR_KEY = UUID.randomUUID().toString();
     private static final String START_END = "############################################\n";
     static final String OBJECTIVE = "Generated/Aggregated Objective";
+    /**
+     * The name of the expression {@link #getObjective()} returns.
+     */
+    static final String OBJECTIVE_EXPRESSION = "OBJECTIVE";
 
     /**
      * Register a solver integration with the default environment. Models created with the no-arg constructor
@@ -1699,6 +1703,36 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
+     * The expression named {@code "OBJECTIVE"}, created with a contribution weight of 1 the first time it is
+     * asked for. A way to write the objective function in one place:
+     * {@code model.getObjective().set(x, 3).set(y, 5)}, then {@link #maximise()} or {@link #minimise()}.
+     * <p>
+     * It complements weights rather than replacing them. Like any expression with a weight, it contributes to
+     * the objective function, together with every other weighted variable and expression. An expression named
+     * {@code "OBJECTIVE"} that already exists – read from a file, say – is returned as it is, whatever its
+     * weight.
+     * <p>
+     * Not to be confused with {@link #objective()}, which generates the complete objective function from all
+     * the weights, this expression's included, and is not to be modified.
+     * <p>
+     * Redundant by design: the same as {@code newExpression("OBJECTIVE").weight(1)}, the first time. It writes
+     * the objective as the Optimisation Service client's {@code OptModel} does, and as many expect, so that a
+     * model reads the same in both.
+     *
+     * @return The expression to write the objective function in
+     */
+    public Expression getObjective() {
+
+        Expression retVal = myExpressions.get(OBJECTIVE_EXPRESSION);
+
+        if (retVal == null) {
+            retVal = this.newExpression(OBJECTIVE_EXPRESSION).weight(ONE);
+        }
+
+        return retVal;
+    }
+
+    /**
      * <ol>
      * <li>The default optimisation sense is {@link Optimisation.Sense#MIN}
      * <li>If this model was read from a file and that file format contained information about being a
@@ -1981,6 +2015,29 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
+     * A binary variable: integer, and between 0 and 1. The same as {@code newVariable(name).binary()}.
+     * <p>
+     * Redundant by design: named as in the Optimisation Service client's {@code OptModel}, so that a model
+     * reads the same in both.
+     */
+    public Variable newBinaryVariable(final String name) {
+        return this.newVariable(name).binary();
+    }
+
+    /**
+     * An expression meant as a constraint: give it a lower and/or upper limit. The same as
+     * {@link #newExpression(String)}.
+     * <p>
+     * Redundant by design: named as in the Optimisation Service client's {@code OptModel}, so that a model
+     * reads the same in both.
+     *
+     * @throws IllegalArgumentException if the model already contains an expression with that name
+     */
+    public Expression newConstraint(final String name) {
+        return this.newExpression(name);
+    }
+
+    /**
      * @throws IllegalArgumentException if the model already contains an expression with that name
      */
     public Expression newExpression(final String name) {
@@ -2003,6 +2060,28 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         return retVal;
     }
 
+    /**
+     * An integer variable, free – no lower and no upper bound – until it is given some. The same as
+     * {@code newVariable(name).integer()}.
+     * <p>
+     * Redundant by design: named as in the Optimisation Service client's {@code OptModel}, so that a model
+     * reads the same in both.
+     */
+    public Variable newIntegerVariable(final String name) {
+        return this.newVariable(name).integer();
+    }
+
+    /**
+     * A real (continuous) variable, free – no lower and no upper bound – until it is given some. The same as
+     * {@link #newVariable(String)}.
+     * <p>
+     * Redundant by design: named as in the Optimisation Service client's {@code OptModel}, so that a model
+     * reads the same in both.
+     */
+    public Variable newRealVariable(final String name) {
+        return this.newVariable(name);
+    }
+
     public Variable newVariable(final String name) {
         return this.newVariable(name, myEnvironment.getVariableFactory());
     }
@@ -2022,7 +2101,8 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      * This is generated on demand – you should not cache this. More specifically, modifications made to this
      * expression will not be part of the optimisation model. You define the objective by setting the
      * {@link Variable#weight(Comparable)}/{@link Expression#weight(Comparable)} on one or more variables
-     * and/or expressions.
+     * and/or expressions, or by writing it in the expression {@link #getObjective()} returns – which is one
+     * of those weighted expressions.
      *
      * @return The generated/aggregated objective function
      */
@@ -2177,6 +2257,17 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         return shallowCopy;
     }
 
+    /**
+     * Solves this model with the environment's remote solver – see
+     * {@link Optimisation.Environment#setRemoteSolver(Optimisation.ModelSubmitter, Optimisation.ResultPoller)}
+     * – or, without one, locally. Unlike {@link #minimise()} and {@link #maximise()}, it returns at once.
+     * <p>
+     * When the solve is done, its solution is written into the variables, as {@link #minimise()} and
+     * {@link #maximise()} do, and the {@link Future} completes. So the model is not to be changed while it is
+     * solved. A solve that ended without a result – it was aborted, say – completes the {@link Future} with a
+     * {@link Optimisation.State#FAILED} result. Cancelling the {@link Future} stops the waiting, not the
+     * remote solve.
+     */
     public Future<Optimisation.Result> submit(final Optimisation.Sense sense) {
         return this.submit(sense, myEnvironment.getModelSubmitter(), myEnvironment.getResultPoller());
     }
@@ -2351,19 +2442,15 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         }
     }
 
-    private Optimisation.Result optimise(final Optimisation.Sense sense, final Integration<?> forcedIntegration) {
+    /**
+     * What {@link #minimise()}, {@link #maximise()} and {@link #submit(Optimisation.Sense)} hand back, from
+     * the result of a solve: when it has a solution, that is written into the (non-fixed) variables, and the
+     * result then carries the variables' values and the objective function's value there. A solution that
+     * does not match the variables – the model was changed while it was solved – is not written.
+     */
+    private Optimisation.Result handleResult(final Optimisation.Result result) {
 
-        myForcedIntegration = forcedIntegration;
-
-        if (!myShallowCopy && myEnvironment.countPresolvers() > 0) {
-            this.scanEntities();
-        }
-
-        DefaultIntermediate prepared = this.prepare(sense, DefaultIntermediate::new);
-
-        Optimisation.Result result = prepared.solve(null);
-
-        if (result.getState().isApproximate()) {
+        if (result.getState().isApproximate() && result.size() == myVariables.size()) {
             for (int i = 0, limit = myVariables.size(); i < limit; i++) {
                 Variable tmpVariable = myVariables.get(i);
                 if (!tmpVariable.isFixed()) {
@@ -2376,9 +2463,26 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
         double retValue = this.objective().evaluate(retSolution).doubleValue();
 
+        return result.withSolution(retSolution).withValue(retValue);
+    }
+
+    private Optimisation.Result optimise(final Optimisation.Sense sense, final Integration<?> forcedIntegration) {
+
+        myForcedIntegration = forcedIntegration;
+
+        if (!myShallowCopy && myEnvironment.countPresolvers() > 0) {
+            this.scanEntities();
+        }
+
+        DefaultIntermediate prepared = this.prepare(sense, DefaultIntermediate::new);
+
+        Optimisation.Result result = prepared.solve(null);
+
+        Optimisation.Result retVal = this.handleResult(result);
+
         prepared.dispose();
 
-        return result.withSolution(retSolution).withValue(retValue);
+        return retVal;
     }
 
     private void scanEntities() {
@@ -2473,8 +2577,13 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
                     status = (String) response.get("status");
                 }
 
+                // DONE without a result: the solve was aborted, or stopped before it had one.
                 String resultString = (String) response.get("result");
-                future.complete(Optimisation.Result.parse(resultString));
+                Optimisation.Result result = resultString != null ? Optimisation.Result.parse(resultString) : Optimisation.Result.of(Optimisation.State.FAILED);
+
+                if (!future.isCancelled()) {
+                    future.complete(this.handleResult(result));
+                }
             } catch (Exception cause) {
                 future.completeExceptionally(cause);
             }
