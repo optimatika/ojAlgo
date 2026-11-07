@@ -282,6 +282,44 @@ public class IntegerProblems extends OptimisationIntegerTests {
     }
 
     /**
+     * https://github.com/optimatika/ojAlgo/issues/710
+     * <p>
+     * x0 - x1 = r with x0 in [0, 120] and x1 >= 0, x1 - x3 = 0 with x3 integer in [0, 12]. With r within 1e-9
+     * of 120 presolve fixed x1 at 5e-12 (the middle of [0, 120 - r], zero at the feasibility precision), and
+     * then the integer x3 at the same 5e-12. Integer rounding of the bounds of x3 gave [1, 0], and the model
+     * was reported INFEASIBLE. The optimum is 0, at x3 = 0.
+     */
+    @Test
+    public void testGitHub710() {
+
+        for (double rhs : new double[] { 120.0, 119.99999999, 119.999999999, 119.99999999999 }) {
+
+            ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+            Variable x0 = model.newVariable("x0").lower(ZERO).upper(120.0);
+            Variable x1 = model.newVariable("x1").lower(ZERO);
+            Variable x2 = model.newVariable("x2");
+            Variable x3 = model.newVariable("x3").lower(ZERO).upper(12.0).integer(true);
+            model.newVariable("x4").lower(ZERO).upper(ONE).integer(true).weight(NEG);
+
+            model.newExpression("r0").level(rhs).set(x0, ONE).set(x1, NEG);
+            model.newExpression("r1").level(248.0).set(x2, ONE);
+            model.newExpression("r2").level(ZERO).set(x1, ONE).set(x3, NEG);
+
+            Result result = model.maximise();
+
+            if (DEBUG) {
+                BasicLogger.debug("r={}: {}", rhs, result);
+            }
+
+            TestUtils.assertEquals(State.OPTIMAL, result.getState());
+            TestUtils.assertEquals(0.0, result.getValue(), NumberContext.of(12));
+            TestUtils.assertEquals(0.0, result.doubleValue(3), NumberContext.of(12));
+            TestUtils.assertTrue(model.validate(result));
+        }
+    }
+
+    /**
      * 20120227: Forgot to document what the problem was. Now I just check there is an optimal solution.
      */
     @Test

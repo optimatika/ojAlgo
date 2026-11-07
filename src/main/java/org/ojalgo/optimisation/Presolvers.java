@@ -653,6 +653,10 @@ public abstract class Presolvers {
                 Simplifier.markInfeasible(expression);
                 return false;
             }
+            if (variable.isInteger()) {
+                // Validated as integer at this precision - fix at that integer, not at the quotient
+                solution = precision.enforce(solution).setScale(0, RoundingMode.HALF_EVEN);
+            }
             if (!variable.isFixed()) {
                 Simplifier.fix(variable, solution);
                 return true;
