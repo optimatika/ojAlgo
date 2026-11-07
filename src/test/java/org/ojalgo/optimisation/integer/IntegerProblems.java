@@ -320,6 +320,40 @@ public class IntegerProblems extends OptimisationIntegerTests {
     }
 
     /**
+     * https://github.com/optimatika/ojAlgo/issues/711
+     * <p>
+     * max 1e200 x subject to x - 1e200 y <= 1e200, x >= 0, y integer in [0, 3] (and min -1e200 x). The
+     * optimum is at x = 4e200, y = 3, where the objective value, 4e400, overflows a double. Limiting the
+     * objective by that incumbent threw NumberFormatException. The result should be the same as for the LP
+     * relaxation: OPTIMAL with an infinite value.
+     */
+    @Test
+    public void testGitHub711() {
+
+        for (Optimisation.Sense sense : new Optimisation.Sense[] { Optimisation.Sense.MAX, Optimisation.Sense.MIN }) {
+
+            ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+            Variable x = model.newVariable("x").lower(ZERO).weight(sense == Optimisation.Sense.MAX ? 1e200 : -1e200);
+            Variable y = model.newVariable("y").lower(ZERO).upper(3.0).integer(true);
+
+            model.newExpression("row").upper(1e200).set(x, ONE).set(y, -1e200);
+
+            Result result = sense == Optimisation.Sense.MAX ? model.maximise() : model.minimise();
+
+            if (DEBUG) {
+                BasicLogger.debug("{}: {}", sense, result);
+            }
+
+            TestUtils.assertEquals(State.OPTIMAL, result.getState());
+            TestUtils.assertEquals(sense == Optimisation.Sense.MAX ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY, result.getValue());
+            TestUtils.assertEquals(4e200, result.doubleValue(0), NumberContext.of(12));
+            TestUtils.assertEquals(3.0, result.doubleValue(1), NumberContext.of(12));
+            TestUtils.assertTrue(model.validate(result));
+        }
+    }
+
+    /**
      * 20120227: Forgot to document what the problem was. Now I just check there is an optimal solution.
      */
     @Test

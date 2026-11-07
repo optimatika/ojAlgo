@@ -16,6 +16,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.optimisation
 
 - `ExpressionsBasedModel`: presolve could fix an integer variable at a value that is an integer only within the feasibility precision, such as 5e-12, and the subsequent rounding of its bounds gave [1, 0] – a feasible model was reported `INFEASIBLE`. Such a variable is now fixed at the integer value. (Issue [#710](https://github.com/optimatika/ojAlgo/issues/710))
+- `IntegerSolver`: an integer solution with an objective value that overflows a double threw a `NumberFormatException` – e.g. max 1e200 x with x - 1e200 y <= 1e200 and integer y in [0, 3], where the value is 4e400. The result is now `OPTIMAL` with an infinite value, the same as for a continuous model. (Issue [#711](https://github.com/optimatika/ojAlgo/issues/711))
 - `IntegerSolver`: integer variable bounds outside the `int` range were truncated to their low 32 bits in the branch-and-bound node bounds, and a different model was solved – e.g. min x with integer x in [3e9, 4e9] was reported `INFEASIBLE`. Strong branching restricted integer variables without bounds to the `int` range, which gave wrong `OPTIMAL` and `INFEASIBLE` results, and branching on a value outside the `int` range made no progress and ended with a `StackOverflowError`. Such bounds are now enforced on the variable only, and a model that needs branching on a value outside the `int` range ends `FAILED`, or `FEASIBLE` if a solution was found. (Issue [#708](https://github.com/optimatika/ojAlgo/issues/708))
 
 ## [57.6.2] – 2026-10-31

@@ -733,9 +733,15 @@ public final class IntegerSolver extends GenericSolver {
         }
 
         if (mySense != Optimisation.Sense.MAX) {
-            myIntegerModel.limitObjective(null, BigDecimal.valueOf(bestValue - nudge));
+            double limit = bestValue - nudge;
+            if (Double.isFinite(limit)) {
+                myIntegerModel.limitObjective(null, BigDecimal.valueOf(limit));
+            }
         } else {
-            myIntegerModel.limitObjective(BigDecimal.valueOf(bestValue + nudge), null);
+            double limit = bestValue + nudge;
+            if (Double.isFinite(limit)) {
+                myIntegerModel.limitObjective(BigDecimal.valueOf(limit), null);
+            }
         }
     }
 
