@@ -764,9 +764,8 @@ public interface Optimisation {
 
     /**
      * The result of a solve: its {@link #getState() state}, the objective function's value – as an
-     * {@link AccessScalar}: {@link #doubleValue()}, {@link #get()} – and the variables' values – as an
-     * {@link Access1D}: {@link #doubleValue(int)}, {@link #get(long)} – in the order the variables were
-     * created.
+     * {@link NumberDefinition}: {@link #doubleValue()} – and the variables' values – as an {@link Access1D}:
+     * {@link #doubleValue(int)}, {@link #get(long)} – in the order the variables were created.
      */
     public static final class Result implements Optimisation, Access1D<BigDecimal>, NumberDefinition, Comparable<Optimisation.Result> {
 
