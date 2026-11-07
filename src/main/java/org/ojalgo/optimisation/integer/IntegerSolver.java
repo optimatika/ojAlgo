@@ -42,6 +42,7 @@ import org.ojalgo.netio.CharacterRing.RingLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.Variable;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.TypeUtils;
@@ -376,8 +377,9 @@ public final class IntegerSolver extends GenericSolver {
                         int gi = myStrategy.getIndex(ii);
                         double v = rootResult.doubleValue(gi);
 
-                        int origLower = rootNode.getLowerBound(ii);
-                        int origUpper = rootNode.getUpperBound(ii);
+                        Variable variable = rootSolver.getVariable(gi);
+                        double origLower = variable.getLowerLimit(false, NEGATIVE_INFINITY);
+                        double origUpper = variable.getUpperLimit(false, POSITIVE_INFINITY);
 
                         long floorVal = IntegerSolver.branchFloor(v);
                         long ceilVal = IntegerSolver.branchCeil(v, floorVal);
@@ -424,18 +426,22 @@ public final class IntegerSolver extends GenericSolver {
 
                         if (downInfeasible) {
                             NodeKey prev = rootNode;
-                            rootNode = rootNode.withTightenedLower(ii, (int) ceilVal);
-                            if (prev != originalRootNode && prev != rootNode) {
-                                prev.dispose();
+                            rootNode = rootNode.withTightenedLower(ii, ceilVal);
+                            if (prev != rootNode) {
+                                if (prev != originalRootNode) {
+                                    prev.dispose();
+                                }
+                                rootNode.enforceBounds(rootSolver, ii, myStrategy);
                             }
-                            rootNode.enforceBounds(rootSolver, ii, myStrategy);
                         } else if (upInfeasible) {
                             NodeKey prev = rootNode;
-                            rootNode = rootNode.withTightenedUpper(ii, (int) floorVal);
-                            if (prev != originalRootNode && prev != rootNode) {
-                                prev.dispose();
+                            rootNode = rootNode.withTightenedUpper(ii, floorVal);
+                            if (prev != rootNode) {
+                                if (prev != originalRootNode) {
+                                    prev.dispose();
+                                }
+                                rootNode.enforceBounds(rootSolver, ii, myStrategy);
                             }
-                            rootNode.enforceBounds(rootSolver, ii, myStrategy);
                         }
                     }
 
@@ -921,6 +927,15 @@ public final class IntegerSolver extends GenericSolver {
                 }
             }
 
+            if (!NodeKey.isBranchable(variableValue)) {
+                if (nodePrinter != null && this.isLogDebug()) {
+                    nodePrinter.println("Can't branch on {} @ {} - outside the int range. Stop the search!", branchIntegerIndex, variableValue);
+                    IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
+                }
+                nodeSolver.dispose();
+                return myNodeStatistics.failed();
+            }
+
             NodeKey lowerBranch = nodeKey.createLowerBranch(branchIntegerIndex, variableValue, nodeValue);
             NodeKey upperBranch = nodeKey.createUpperBranch(branchIntegerIndex, variableValue, nodeValue);
 
@@ -957,8 +972,8 @@ public final class IntegerSolver extends GenericSolver {
 
         for (int i = 0, limit = strategy.countIntegerVariables(); i < limit; i++) {
 
-            int lower = nodeKey.getLowerBound(i);
-            int upper = nodeKey.getUpperBound(i);
+            double lower = nodeKey.getLowerBound(i);
+            double upper = nodeKey.getUpperBound(i);
 
             if (lower >= upper) {
                 continue;
@@ -972,27 +987,28 @@ public final class IntegerSolver extends GenericSolver {
 
             if (absRC > ZERO) {
                 if (Math.abs(value - lower) < 0.5) {
-                    // gap / absRC can exceed the int range - compare before converting
                     double maxSteps = Math.floor(gap / absRC);
-                    if (maxSteps < upper - (double) lower) {
-                        int newUpper = lower + (int) maxSteps;
+                    if (maxSteps < upper - lower) {
                         NodeKey prev = nodeKey;
-                        nodeKey = nodeKey.withTightenedUpper(i, newUpper);
-                        if (prev != original && prev != nodeKey) {
-                            prev.dispose();
+                        nodeKey = nodeKey.withTightenedUpper(i, lower + maxSteps);
+                        if (prev != nodeKey) {
+                            if (prev != original) {
+                                prev.dispose();
+                            }
+                            nodeKey.enforceBounds(nodeSolver, i, strategy);
                         }
-                        nodeKey.enforceBounds(nodeSolver, i, strategy);
                     }
                 } else if (Math.abs(value - upper) < 0.5) {
                     double maxSteps = Math.floor(gap / absRC);
-                    if (maxSteps < upper - (double) lower) {
-                        int newLower = upper - (int) maxSteps;
+                    if (maxSteps < upper - lower) {
                         NodeKey prev = nodeKey;
-                        nodeKey = nodeKey.withTightenedLower(i, newLower);
-                        if (prev != original && prev != nodeKey) {
-                            prev.dispose();
+                        nodeKey = nodeKey.withTightenedLower(i, upper - maxSteps);
+                        if (prev != nodeKey) {
+                            if (prev != original) {
+                                prev.dispose();
+                            }
+                            nodeKey.enforceBounds(nodeSolver, i, strategy);
                         }
-                        nodeKey.enforceBounds(nodeSolver, i, strategy);
                     }
                 }
             }
@@ -1008,11 +1024,13 @@ public final class IntegerSolver extends GenericSolver {
     /**
      * Should return the index of the (best) integer variable to branch on. Returning a negative index means
      * an integer solution has been found (no further branching). Does NOT return a global variable index -
-     * it's the index among the integer variable.
+     * it's the index among the integer variable. A variable with a value that can not be branched on (see
+     * {@link NodeKey#isBranchable(double)}) is returned only if there is no other candidate.
      */
     int identifyNonIntegerVariable(final Optimisation.Result nodeResult, final NodeKey nodeKey, final ModelStrategy strategy) {
 
         int retVal = -1;
+        int notBranchable = -1;
 
         double comparableScore = ZERO;
         double maxComparable = ZERO;
@@ -1027,18 +1045,24 @@ public final class IntegerSolver extends GenericSolver {
             double distanceUp = ONE - distanceDown; // in [0,1)
             double displacement = Math.min(distanceDown, distanceUp); // [0,0.5]
 
-            if (!strategy.getIntegralityTolerance().isZero(displacement)) {
-                // This variable not integer
-                comparableScore = strategy.scoreBranch(i, distanceDown, distanceUp, myBestResultSoFar != null);
+            if (strategy.getIntegralityTolerance().isZero(displacement)) {
+                continue;
+            }
 
-                if (comparableScore > maxComparable) {
-                    retVal = i;
-                    maxComparable = comparableScore;
-                }
+            if (!NodeKey.isBranchable(value)) {
+                notBranchable = i;
+                continue;
+            }
+
+            comparableScore = strategy.scoreBranch(i, distanceDown, distanceUp, myBestResultSoFar != null);
+
+            if (comparableScore > maxComparable) {
+                retVal = i;
+                maxComparable = comparableScore;
             }
         }
 
-        return retVal;
+        return retVal >= 0 ? retVal : notBranchable;
     }
 
     void tryRounding(final NodeKey nodeKey, final Optimisation.Result nodeResult, final ModelStrategy strategy) {
@@ -1053,11 +1077,11 @@ public final class IntegerSolver extends GenericSolver {
         for (int i = 0; i < nbInts; i++) {
             int globalIndex = strategy.getIndex(i);
             double value = nodeResult.doubleValue(globalIndex);
-            long lower = nodeKey.getLowerBound(i);
-            long upper = nodeKey.getUpperBound(i);
-            long intValue = Math.min(upper, Math.max(lower, Math.round(value)));
+            double lower = nodeKey.getLowerBound(i);
+            double upper = nodeKey.getUpperBound(i);
+            double intValue = Math.min(upper, Math.max(lower, Math.round(value)));
             maxDisplacement = Math.max(maxDisplacement, Math.abs(intValue - value));
-            rounded[globalIndex] = BigDecimal.valueOf(intValue);
+            rounded[globalIndex] = BigDecimal.valueOf((long) intValue);
         }
 
         if (maxDisplacement > QUARTER) {

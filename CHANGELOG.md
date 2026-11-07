@@ -11,6 +11,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Fixed
+
+#### org.ojalgo.optimisation
+
+- `IntegerSolver`: integer variable bounds outside the `int` range were truncated to their low 32 bits in the branch-and-bound node bounds, and a different model was solved – e.g. min x with integer x in [3e9, 4e9] was reported `INFEASIBLE`. Strong branching restricted integer variables without bounds to the `int` range, which gave wrong `OPTIMAL` and `INFEASIBLE` results, and branching on a value outside the `int` range made no progress and ended with a `StackOverflowError`. Such bounds are now enforced on the variable only, and a model that needs branching on a value outside the `int` range ends `FAILED`, or `FEASIBLE` if a solution was found. (Issue [#708](https://github.com/optimatika/ojAlgo/issues/708))
+
 ## [57.6.2] – 2026-10-31
 
 ### Added

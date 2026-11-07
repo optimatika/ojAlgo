@@ -83,9 +83,48 @@ public final class NodeKey implements Comparable<NodeKey> {
      */
     private static final NumberContext FEASIBILITY = NumberContext.of(8, 6);
 
+    private static final BigDecimal INT_MAX = BigDecimal.valueOf(Integer.MAX_VALUE);
+
+    private static final BigDecimal INT_MIN = BigDecimal.valueOf(Integer.MIN_VALUE);
+
     private static final AtomicLong SEQUENCE_GENERATOR = new AtomicLong();
 
     static final double MINIMUM_DISPLACEMENT = 1E-9;
+
+    /**
+     * The node lower bound for a variable lower limit: {@link Integer#MIN_VALUE} (unbounded) when there is no
+     * limit, or when it is not greater than {@link Integer#MIN_VALUE} or greater than
+     * {@link Integer#MAX_VALUE}. The variable itself keeps its limit, node bounds only ever tighten it.
+     */
+    private static int toLowerBound(final BigDecimal limit) {
+        if (limit != null && limit.compareTo(INT_MIN) > 0 && limit.compareTo(INT_MAX) <= 0) {
+            return limit.intValue();
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
+    /**
+     * The node upper bound for a variable upper limit: {@link Integer#MAX_VALUE} (unbounded) when there is no
+     * limit, or when it is less than {@link Integer#MIN_VALUE} or not less than {@link Integer#MAX_VALUE}.
+     * The variable itself keeps its limit, node bounds only ever tighten it.
+     */
+    private static int toUpperBound(final BigDecimal limit) {
+        if (limit != null && limit.compareTo(INT_MIN) >= 0 && limit.compareTo(INT_MAX) < 0) {
+            return limit.intValue();
+        } else {
+            return Integer.MAX_VALUE;
+        }
+    }
+
+    /**
+     * Branching on a variable at this value creates the bounds floor(value) and ceil(value). That is only
+     * possible when both fit the node bounds, strictly between {@link Integer#MIN_VALUE} and
+     * {@link Integer#MAX_VALUE}.
+     */
+    static boolean isBranchable(final double value) {
+        return Integer.MIN_VALUE < value && value < Integer.MAX_VALUE;
+    }
 
     /**
      * How far have we branched from the root
@@ -179,20 +218,8 @@ public final class NodeKey implements Comparable<NodeKey> {
 
         for (int i = 0; i < nbIntegerVariables; i++) {
             Variable variable = integerVariables.get(i);
-
-            BigDecimal lowerLimit = variable.getLowerLimit();
-            if (lowerLimit != null) {
-                myLowerBounds[i] = lowerLimit.intValue();
-            } else {
-                myLowerBounds[i] = Integer.MIN_VALUE;
-            }
-
-            BigDecimal upperLimit = variable.getUpperLimit();
-            if (upperLimit != null) {
-                myUpperBounds[i] = upperLimit.intValue();
-            } else {
-                myUpperBounds[i] = Integer.MAX_VALUE;
-            }
+            myLowerBounds[i] = NodeKey.toLowerBound(variable.getLowerLimit());
+            myUpperBounds[i] = NodeKey.toUpperBound(variable.getUpperLimit());
         }
 
         parent = sequence;
@@ -444,8 +471,9 @@ public final class NodeKey implements Comparable<NodeKey> {
      * Lower bound on the integer variable at {@code idx} (integer-local index), as a double. The
      * {@link Integer#MIN_VALUE} sentinel for "unbounded" is mapped to {@link Double#NEGATIVE_INFINITY}.
      */
-    int getLowerBound(final int idx) {
-        return myLowerBounds[idx];
+    double getLowerBound(final int idx) {
+        int bound = myLowerBounds[idx];
+        return bound != Integer.MIN_VALUE ? bound : Double.NEGATIVE_INFINITY;
     }
 
     double getMinimumDisplacement(final int idx, final double value) {
@@ -470,8 +498,9 @@ public final class NodeKey implements Comparable<NodeKey> {
      * Upper bound on the integer variable at {@code idx} (integer-local index), as a double. The
      * {@link Integer#MAX_VALUE} sentinel for "unbounded" is mapped to {@link Double#POSITIVE_INFINITY}.
      */
-    int getUpperBound(final int idx) {
-        return myUpperBounds[idx];
+    double getUpperBound(final int idx) {
+        int bound = myUpperBounds[idx];
+        return bound != Integer.MAX_VALUE ? bound : Double.POSITIVE_INFINITY;
     }
 
     boolean isLowerBranch() {
@@ -497,23 +526,31 @@ public final class NodeKey implements Comparable<NodeKey> {
         }
     }
 
-    NodeKey withTightenedLower(final int idx, final int newLower) {
-        if (newLower <= myLowerBounds[idx]) {
+    /**
+     * A node with the lower bound at {@code idx} raised to the integer {@code newLower}, or this node if that
+     * is not tighter or greater than {@link Integer#MAX_VALUE}.
+     */
+    NodeKey withTightenedLower(final int idx, final double newLower) {
+        if (newLower <= myLowerBounds[idx] || newLower > Integer.MAX_VALUE) {
             return this;
         }
         int[] lbs = this.copyLowerBounds();
         int[] ubs = this.copyUpperBounds();
-        lbs[idx] = newLower;
+        lbs[idx] = (int) newLower;
         return new NodeKey(this, lbs, ubs);
     }
 
-    NodeKey withTightenedUpper(final int idx, final int newUpper) {
-        if (newUpper >= myUpperBounds[idx]) {
+    /**
+     * A node with the upper bound at {@code idx} lowered to the integer {@code newUpper}, or this node if
+     * that is not tighter or less than {@link Integer#MIN_VALUE}.
+     */
+    NodeKey withTightenedUpper(final int idx, final double newUpper) {
+        if (newUpper >= myUpperBounds[idx] || newUpper < Integer.MIN_VALUE) {
             return this;
         }
         int[] lbs = this.copyLowerBounds();
         int[] ubs = this.copyUpperBounds();
-        ubs[idx] = newUpper;
+        ubs[idx] = (int) newUpper;
         return new NodeKey(this, lbs, ubs);
     }
 

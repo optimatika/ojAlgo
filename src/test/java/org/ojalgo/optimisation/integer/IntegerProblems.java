@@ -24,9 +24,12 @@ package org.ojalgo.optimisation.integer;
 import static org.ojalgo.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.Timeout.ThreadMode;
 import org.ojalgo.TestUtils;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
@@ -124,6 +127,158 @@ public class IntegerProblems extends OptimisationIntegerTests {
         }
 
         TestUtils.assertStateAndSolution(expected, actual);
+    }
+
+    /**
+     * https://github.com/optimatika/ojAlgo/issues/708
+     * <p>
+     * The branch-and-bound node bounds are int values. Variable bounds outside the int range were truncated
+     * to their low 32 bits: x in [-1e10, 1e10] was solved with x >= -1410065408, and x in [3e9, 4e9] became
+     * infeasible. It depended on whether presolve settled the variable before branch-and-bound. Such bounds
+     * are now left to the variable, the node has no bound.
+     */
+    @Test
+    public void testGitHub708BoundForms() {
+
+        NumberContext accuracy = NumberContext.of(12);
+
+        double[][] boxes = { { -1E10, 1E10 }, { 3E9, 4E9 } };
+
+        for (double[] box : boxes) {
+            for (boolean viaExpression : new boolean[] { false, true }) {
+                for (boolean withRow : new boolean[] { false, true }) {
+
+                    ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+                    Variable x = model.newVariable("x").integer(true).lower(box[0]).upper(box[1]);
+                    if (viaExpression) {
+                        model.newExpression("objective").weight(ONE).set(x, ONE);
+                    } else {
+                        x.weight(ONE);
+                    }
+                    if (withRow) {
+                        model.newExpression("row").upper(box[1]).set(x, ONE);
+                    }
+
+                    Result result = model.minimise();
+
+                    if (DEBUG) {
+                        BasicLogger.debug("[{}, {}] expression={} row={}: {}", box[0], box[1], viaExpression, withRow, result);
+                    }
+
+                    TestUtils.assertEquals(State.OPTIMAL, result.getState());
+                    TestUtils.assertEquals(box[0], result.getValue(), accuracy);
+                }
+            }
+        }
+    }
+
+    /**
+     * https://github.com/optimatika/ojAlgo/issues/708
+     * <p>
+     * max x + y, x + y <= 5e9, integer x in [0, 6e9], y in [0, 1]. The optimum is 5e9. The upper bound of x,
+     * 5e9 after presolve, was truncated to 705032704 in the node bounds, and the reported optimum was
+     * 705032705.
+     */
+    @Test
+    public void testGitHub708IntegerBounds() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x = model.newVariable("x").lower(ZERO).upper(6E9).integer(true).weight(ONE);
+        Variable y = model.newVariable("y").lower(ZERO).upper(ONE).weight(ONE);
+        model.newExpression("row").upper(5E9).set(x, ONE).set(y, ONE);
+
+        Result result = model.maximise();
+
+        if (DEBUG) {
+            BasicLogger.debug(result);
+        }
+
+        TestUtils.assertEquals(State.OPTIMAL, result.getState());
+        TestUtils.assertEquals(5E9, result.getValue(), NumberContext.of(12));
+        TestUtils.assertTrue(model.validate(result));
+    }
+
+    /**
+     * https://github.com/optimatika/ojAlgo/issues/708
+     * <p>
+     * min z, x - y - z = 0, b <= x + y <= b + 4, integer x and y without bounds, continuous z. With z in
+     * [0.2, 0.4] there is no integer solution, with z in [0.2, 1.4] the optimum is z = 1. The LP solution has
+     * x - y = 0.2, so x or y is fractional, near b / 2. When that is outside the int range there can be no
+     * node bounds for the branches, and the solver stops with FAILED. Previously it branched at the int
+     * limit, then created children identical to their parent, and ended with a StackOverflowError.
+     */
+    @Test
+    @Timeout(value = 10, unit = TimeUnit.SECONDS, threadMode = ThreadMode.SEPARATE_THREAD)
+    public void testGitHub708NotBranchable() {
+
+        for (double base : new double[] { 2E9, 6E9, -6E9 }) {
+            for (double zUpper : new double[] { 0.4, 1.4 }) {
+
+                ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+                Variable x = model.newVariable("x").integer(true);
+                Variable y = model.newVariable("y").integer(true);
+                Variable z = model.newVariable("z").lower(0.2).upper(zUpper).weight(ONE);
+                model.newExpression("difference").level(ZERO).set(x, ONE).set(y, NEG).set(z, NEG);
+                model.newExpression("sum").lower(base).upper(base + 4.0).set(x, ONE).set(y, ONE);
+
+                Result result = model.minimise();
+
+                if (DEBUG) {
+                    BasicLogger.debug("b={} z<={}: {}", base, zUpper, result);
+                }
+
+                if (Math.abs(base) >= Integer.MAX_VALUE) {
+                    TestUtils.assertEquals(State.FAILED, result.getState());
+                } else if (zUpper < 1.0) {
+                    TestUtils.assertEquals(State.INFEASIBLE, result.getState());
+                } else {
+                    TestUtils.assertEquals(State.OPTIMAL, result.getState());
+                    TestUtils.assertEquals(1.0, result.getValue(), NumberContext.of(8));
+                }
+            }
+        }
+    }
+
+    /**
+     * https://github.com/optimatika/ojAlgo/issues/708
+     * <p>
+     * Integer x without bounds, integer y >= 0. min y subject to 2x - y = r has the optimum y = 1, and min y
+     * subject to r <= 2x - y, 2x <= r + 3 has the optimum y = 0. Strong branching at the root used the int
+     * range limits, the node representation of "no bound", as actual bounds on x, and a bound derived from an
+     * infeasible probe was converted from long to int and wrapped. With |r| > 2^32 three of the four results
+     * were wrong: INFEASIBLE twice, and OPTIMAL at y = 8589934593.
+     */
+    @Test
+    public void testGitHub708UnboundedVariables() {
+
+        for (double rhs : new double[] { 2E9 + 1.0, -2E9 - 1.0, 6E9 + 1.0, -6E9 - 1.0 }) {
+            for (boolean equality : new boolean[] { false, true }) {
+
+                ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+                Variable x = model.newVariable("x").integer(true);
+                Variable y = model.newVariable("y").integer(true).lower(ZERO).weight(ONE);
+                if (equality) {
+                    model.newExpression("row").level(rhs).set(x, TWO).set(y, NEG);
+                } else {
+                    model.newExpression("row").lower(rhs).set(x, TWO).set(y, NEG);
+                    model.newExpression("cap").upper(rhs + 3.0).set(x, TWO);
+                }
+
+                Result result = model.minimise();
+
+                if (DEBUG) {
+                    BasicLogger.debug("r={} equality={}: {}", rhs, equality, result);
+                }
+
+                TestUtils.assertEquals(State.OPTIMAL, result.getState());
+                TestUtils.assertEquals(equality ? 1.0 : 0.0, result.getValue(), NumberContext.of(12));
+                TestUtils.assertTrue(model.validate(result));
+            }
+        }
     }
 
     /**
