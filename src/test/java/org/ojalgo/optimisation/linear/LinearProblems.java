@@ -24,8 +24,11 @@ package org.ojalgo.optimisation.linear;
 import static org.ojalgo.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.Timeout.ThreadMode;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.ArrayR256;
 import org.ojalgo.function.constant.BigMath;
@@ -152,6 +155,73 @@ public class LinearProblems extends OptimisationLinearTests {
     @Test
     public void testGitHub546() {
         LinearProblems.makeGitHub546().assertResult();
+    }
+
+    /**
+     * https://github.com/optimatika/ojAlgo/issues/707
+     * <p>
+     * Minimise c x subject to a x >= 1 and x >= 0. The solution x = 1 / a is an ordinary number, but the dual
+     * ratio c / a overflows. No candidate passed the ratio test and it never returned.
+     */
+    @Test
+    @Timeout(value = 10, unit = TimeUnit.SECONDS, threadMode = ThreadMode.SEPARATE_THREAD)
+    public void testGitHub707OverflowingRatio() {
+
+        double[][] coefficients = { { 1E306, 1E-4 }, { 1E300, 1E-10 }, { 1E308, 0.1 }, { 1E308, 0.01 }, { 1E308, 0.5 } };
+
+        for (Boolean sparse : new Boolean[] { Boolean.FALSE, Boolean.TRUE }) {
+            for (double[] pair : coefficients) {
+
+                Optimisation.Options options = new Optimisation.Options();
+                options.sparse = sparse;
+
+                LinearSolver.Builder builder = LinearSolver.newGeneralBuilder(new double[] { pair[0] });
+                builder.inequality(-1.0, new double[] { -pair[1] });
+                builder.lower(new double[] { 0.0 });
+                builder.upper(new double[] { Double.POSITIVE_INFINITY });
+
+                Result result = builder.build(options).solve(null);
+
+                TestUtils.assertEquals(State.OPTIMAL, result.getState());
+                TestUtils.assertEquals(1.0 / pair[1], result.doubleValue(0), ACCURACY);
+                TestUtils.assertTrue(Double.isInfinite(result.getValue()));
+            }
+        }
+    }
+
+    /**
+     * https://github.com/optimatika/ojAlgo/issues/707
+     * <p>
+     * The solution is x = 10, y = 0, but the dual value of the second constraint, 1E312, overflows. The
+     * tableau is then left with reduced costs that are NaN, so no candidate can enter. That must end the
+     * solve as failed. First the ratio test never returned, and without that the iterations went round
+     * without being counted. The revised simplex recomputes the reduced costs and finds the solution.
+     */
+    @Test
+    @Timeout(value = 10, unit = TimeUnit.SECONDS, threadMode = ThreadMode.SEPARATE_THREAD)
+    public void testGitHub707UndefinedRatio() {
+
+        for (Boolean sparse : new Boolean[] { Boolean.FALSE, Boolean.TRUE }) {
+
+            Optimisation.Options options = new Optimisation.Options();
+            options.sparse = sparse;
+
+            LinearSolver.Builder builder = LinearSolver.newGeneralBuilder(new double[] { 0.0, -1E305 });
+            builder.inequality(-1.0, new double[] { -0.1, -1E-7 });
+            builder.inequality(0.0, new double[] { 0.0, 1E-7 });
+            builder.lower(new double[] { 0.0, 0.0 });
+            builder.upper(new double[] { Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY });
+
+            Result result = builder.build(options).solve(null);
+
+            if (sparse.booleanValue()) {
+                TestUtils.assertEquals(State.OPTIMAL, result.getState());
+                TestUtils.assertEquals(10.0, result.doubleValue(0), ACCURACY);
+                TestUtils.assertEquals(0.0, result.doubleValue(1), ACCURACY);
+            } else {
+                TestUtils.assertEquals(State.FAILED, result.getState());
+            }
+        }
     }
 
     @Test
@@ -516,6 +586,65 @@ public class LinearProblems extends OptimisationLinearTests {
         TestUtils.assertEquals(expected, solution);
 
         TestUtils.assertStateNotLessThanOptimal(solution);
+    }
+
+    /**
+     * Found by fuzzing, while looking into https://github.com/optimatika/ojAlgo/issues/707
+     * <p>
+     * x2 enters with a bound flip over its range, 356331. The element of x3, and later x4, in x2's column is
+     * too small to be a pivot, so it does not limit the step, but over that range it takes the variable out
+     * of its bounds. The dual simplex brings it back, the primal simplex flips again, and so on. The sparse
+     * store went round forever, and the dense store reported OPTIMAL with x4 = -1.1e-4. Whatever the state,
+     * the solution must be within the bounds and satisfy the constraints. The optimum is 0.39491859...
+     */
+    @Test
+    @Timeout(value = 10, unit = TimeUnit.SECONDS, threadMode = ThreadMode.SEPARATE_THREAD)
+    public void testPrimalBoundFlipCycle() {
+
+        double[] c = { -1.419051247930093E-8, 0.0, 0.0015114711587145223, 197037.15723156036, 0.0 };
+        double[][] a = { { 0.0, 3.67494795234008E-4, -0.003828243808149872, 0.0, 0.104682991481246 },
+                { 0.003081735838449668, -0.19032054886173633, 0.0, -5.448601027569494E-7, 3.4400158486544325E-7 },
+                { -0.023935414898928475, -6.348950784136911E-8, 5.15606884292762E-9, -8.099317167025764E8, 3.674234116022251E7 } };
+        double[] b = { -1.0, 0.0, -1.0 };
+        double[] lower = { Double.NEGATIVE_INFINITY, -8.707076491882005E7, 0.0, 0.0, 0.0 };
+        double[] upper = { Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, 356331.5203991972, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY };
+
+        for (Boolean sparse : new Boolean[] { Boolean.FALSE, Boolean.TRUE }) {
+
+            Optimisation.Options options = new Optimisation.Options();
+            options.sparse = sparse;
+
+            LinearSolver.Builder builder = LinearSolver.newGeneralBuilder(c);
+            for (int i = 0; i < a.length; i++) {
+                builder.inequality(b[i], a[i]);
+            }
+            builder.lower(lower);
+            builder.upper(upper);
+
+            Result result = builder.build(options).solve(null);
+
+            TestUtils.assertTrue(result.getState().isFeasible());
+
+            for (int j = 0; j < c.length; j++) {
+                double x = result.doubleValue(j);
+                TestUtils.assertTrue(x >= lower[j] - 1E-8);
+                TestUtils.assertTrue(x <= upper[j] + 1E-8);
+            }
+
+            for (int i = 0; i < a.length; i++) {
+                double activity = 0.0;
+                double terms = 1.0;
+                for (int j = 0; j < c.length; j++) {
+                    activity += a[i][j] * result.doubleValue(j);
+                    terms += Math.abs(a[i][j] * result.doubleValue(j));
+                }
+                TestUtils.assertTrue(activity - b[i] <= 1E-8 * terms);
+            }
+
+            if (result.getState().isOptimal()) {
+                TestUtils.assertEquals(0.39491859279821495, result.getValue(), ACCURACY);
+            }
+        }
     }
 
 }

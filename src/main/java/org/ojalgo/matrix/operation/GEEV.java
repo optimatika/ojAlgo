@@ -42,8 +42,8 @@ import org.ojalgo.array.operation.SCAL;
  * real eigenvalues, and [wr(j), wi(j); -wi(j), wr(j)] for each complex pair. Each eigenvector has Euclidean
  * norm 1, and its largest component is real.
  * <p>
- * A is reduced to Hessenberg form ({@link GEHRD}, {@link ORGHR}), and the Schur form ({@link HSEQR}) and
- * the eigenvectors ({@link TREVC}) are computed, without balancing.
+ * A is reduced to Hessenberg form ({@link GEHRD}, {@link ORGHR}), and the Schur form ({@link HSEQR}) and the
+ * eigenvectors ({@link TREVC}) are computed, without balancing.
  */
 public abstract class GEEV implements LAPACK {
 

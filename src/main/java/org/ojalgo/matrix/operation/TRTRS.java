@@ -119,8 +119,8 @@ public abstract class TRTRS implements LAPACK {
     }
 
     /**
-     * More right hand sides than this are solved for together. Fewer are solved for one at a time, each with a
-     * call to {@link TRSV}.
+     * More right hand sides than this are solved for together. Fewer are solved for one at a time, each with
+     * a call to {@link TRSV}.
      */
     private static final int COLUMNS_THRESHOLD = 3;
 

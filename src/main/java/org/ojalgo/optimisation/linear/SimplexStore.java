@@ -849,12 +849,8 @@ abstract class SimplexStore {
      * Recompute the values of the basic variables, from the right-hand side and the values of the non-basic
      * variables, with the current basis representation. The default does nothing: a tableau has no other
      * source for them.
-     *
-     * @return true if they were recomputed
      */
-    boolean recomputeBasicSolution() {
-        return false;
-    }
+    void recomputeBasicSolution() {}
 
     /**
      * Refactorise the basis, if it has been updated since it was last factorised, and recompute the basic

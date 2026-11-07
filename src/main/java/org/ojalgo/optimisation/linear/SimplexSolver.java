@@ -375,6 +375,11 @@ abstract class SimplexSolver extends LinearSolver {
      */
     private static final NumberContext PIVOT_GROWTH = NumberContext.ofPrecision(10);
     /**
+     * The most times {@link #iterateToOptimal(IterDescr, boolean)} follows dual iterations, that ended primal
+     * feasible but not dual feasible, with primal iterations. After that the state stays FEASIBLE.
+     */
+    private static final int PRIMAL_ROUNDS = 10;
+    /**
      * Slack added to the primal ratio-test numerators, bounding how far a basic variable may drift outside
      * its bounds in a single pivot. Distinct from {@link #INFEASIBILITY}, which decides whether such a drift
      * counts as infeasible at all.
@@ -1517,10 +1522,12 @@ abstract class SimplexSolver extends LinearSolver {
      * initially the infeasibility of the exit variable, by sum(|a_j| r_j), where a_j are the elements and r_j
      * the ranges of the candidates. In the first bunch that would make the slope non-positive, the candidate
      * with the largest element enters, and the candidates of the bunches before it switch bounds, see
-     * {@link #flipBounds()}. Those are first in the cache.
+     * {@link #flipBounds()}. Those are first in the cache. Ratios that overflow are in the last bunch, and
+     * candidates with a ratio or element that is not a number can not enter.
      *
      * @param force What to do if every bunch can be passed: true to let the last one decide the entering
      *              variable anyway, false to return false
+     * @return true if a candidate enters
      */
     private boolean walkDualEnter(final EnterInfo enter, final int count, final double infeasibility, final boolean force) {
 
@@ -1533,7 +1540,7 @@ abstract class SimplexSolver extends LinearSolver {
 
         while (first < count) {
 
-            double thetaMax = MACHINE_LARGEST;
+            double thetaMax = POSITIVE_INFINITY;
             for (int k = first; k < count; k++) {
                 double relaxed = myRatioCacheRelaxed[k];
                 if (relaxed < thetaMax) {
@@ -1557,6 +1564,10 @@ abstract class SimplexSolver extends LinearSolver {
                     }
                     limit++;
                 }
+            }
+
+            if (best < 0) {
+                return false;
             }
 
             if (slope - reduction > ZERO && (limit < count || !force)) {
@@ -1649,6 +1660,9 @@ abstract class SimplexSolver extends LinearSolver {
                     } else {
                         double infeasibility = Math.abs(mySimplex.getInfeasibility(iteration.exit.index));
                         pivot = this.walkDualEnter(iteration.enter, myFallbackCount, infeasibility, true);
+                        if (!pivot) {
+                            state = State.FAILED;
+                        }
                     }
                 }
 
@@ -1896,15 +1910,16 @@ abstract class SimplexSolver extends LinearSolver {
 
     /**
      * When the state is OPTIMAL and {@link #myIncrementallyUpdated}: the values of the basic variables are
-     * recomputed. Are they then outside their bounds (by {@link Optimisation.Options#feasibility})? If so the
-     * state is set to APPROXIMATE.
+     * recomputed, if the store can, see {@link SimplexStore#recomputeBasicSolution()}. Are they outside their
+     * bounds (by {@link Optimisation.Options#feasibility})? If so the state is set to APPROXIMATE.
      */
     final boolean isRecomputedInfeasible() {
 
-        if (!state.isOptimal() || !myIncrementallyUpdated || !mySimplex.recomputeBasicSolution()) {
+        if (!state.isOptimal() || !myIncrementallyUpdated) {
             return false;
         }
 
+        mySimplex.recomputeBasicSolution();
         myIncrementallyUpdated = false;
 
         if (this.verifyPrimalFeasibility()) {
@@ -1917,11 +1932,12 @@ abstract class SimplexSolver extends LinearSolver {
 
     /**
      * Dual iterations, and when they end primal feasible, primal iterations unless the basis is already dual
-     * feasible. Repeated while {@link #isRecomputedInfeasible()}.
+     * feasible, at most {@link #PRIMAL_ROUNDS} times. Repeated while {@link #isRecomputedInfeasible()}.
      */
     final void iterateToOptimal(final IterDescr iteration, final boolean resetEdgeWeights) {
 
         boolean reset = resetEdgeWeights;
+        int nbPrimalRounds = 0;
 
         do {
 
@@ -1931,7 +1947,7 @@ abstract class SimplexSolver extends LinearSolver {
             if (state.isFeasible()) {
                 if (this.isDualFeasible()) {
                     state = State.OPTIMAL;
-                } else {
+                } else if (nbPrimalRounds++ < PRIMAL_ROUNDS) {
                     // Primal feasible but (marginally) not dual feasible - finish with primal iterations
                     // rather than reporting a merely FEASIBLE point
                     this.doPrimalIterations(iteration, true);
