@@ -354,8 +354,71 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
     }
 
     /**
-     * Verify that non-zero shifts correctly adjust the cut RHS (lower-bound case). A shifted variable with
-     * finite range triggers the {@code limit += tmpVal * shift} path in
+     * A non-basic variable with a non-zero element must be at a finite bound, so that x' = x - l, or x' = u -
+     * x, is non-negative. A free variable, or one at an infinite bound, gives no cut. With a zero element it
+     * does not matter.
+     */
+    @Test
+    public void testInfiniteBoundNoCut() {
+
+        int index = 0;
+        double rhs = 2.3;
+        double fractionality = PrimitiveMath.ELEVENTH;
+        int[] excluded = { 1, 2 };
+        boolean[] integer = { true, true, false };
+
+        Primitive1D body = Primitive1D.of(1.0, 1.5, -0.5);
+
+        double[] lowerFree = { 0, 0, Double.NEGATIVE_INFINITY };
+        double[] upperFree = { Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY };
+        boolean[] atLower = { false, false, false };
+        Assertions
+                .assertNull(TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lowerFree, upperFree, atLower, false));
+
+        boolean[] atUpper = { false, false, true };
+        Assertions
+                .assertNull(TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lowerFree, upperFree, atUpper, false));
+
+        double[] upperFinite = { Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, 4.0 };
+        Assertions.assertNotNull(
+                TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lowerFree, upperFinite, atUpper, false));
+
+        Primitive1D zero = Primitive1D.of(1.0, 1.5, 0.0);
+        Assertions.assertNotNull(
+                TableauCutGenerator.doGomoryMixedInteger(zero, index, rhs, fractionality, excluded, integer, lowerFree, upperFree, atLower, false));
+    }
+
+    /**
+     * A shifted variable at its lower bound, with no upper bound, has its shift taken back like any other:
+     * the limit increases by c (l + s). Here l = 0 and s = -5, the variable's lower bound.
+     */
+    @Test
+    public void testNonZeroShiftInfiniteRange() {
+
+        Primitive1D body = Primitive1D.of(1.0, 1.5, -0.5);
+        int index = 0;
+        double rhs = 2.3;
+        double fractionality = PrimitiveMath.ELEVENTH;
+        int[] excluded = { 1, 2 };
+        boolean[] integer = { true, true, false };
+
+        double[] lower = { 0, 0, 0 };
+        double[] upper = { Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY };
+        boolean[] atUpper = { false, false, false };
+
+        Equation baseline = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lower, upper, atUpper, false);
+
+        Equation shifted = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lower, upper, atUpper, false);
+        double[] shift1 = { 0, -5.0, 0 };
+        TableauCutGenerator.applyShiftBackConversion(shifted, excluded, lower, upper, shift1, atUpper, integer.length);
+
+        TestUtils.assertEquals(baseline.getRHS() + baseline.doubleValue(1) * -5.0, shifted.getRHS());
+        TestUtils.assertEquals(baseline.getBody(), shifted.getBody());
+    }
+
+    /**
+     * Verify that non-zero shifts correctly adjust the cut RHS (lower-bound case). A shifted variable at its
+     * lower bound triggers the {@code limit += tmpVal * (lowers[j] + shifts[j])} path in
      * {@link TableauCutGenerator#applyShiftBackConversion}.
      */
     @Test
@@ -378,9 +441,9 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
         // Apply shift back-conversion with shift of 3.0 on x1
         Equation shifted = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lower0, upper0, atUpper, false);
         double[] shift1 = { 0, 3.0, 0 };
-        TableauCutGenerator.applyShiftBackConversion(shifted, excluded, lower0, upper0, shift1, atUpper);
+        TableauCutGenerator.applyShiftBackConversion(shifted, excluded, lower0, upper0, shift1, atUpper, integer.length);
 
-        // x2 has infinite range, so shift has no effect on it
+        // x2 is not shifted, and at its lower bound 0, so the conversion has no effect on it
         TestUtils.assertEquals(baseline.doubleValue(2), shifted.doubleValue(2));
 
         // The RHS should differ: shifted limit = baseline limit + cut[1] * shift
@@ -390,7 +453,7 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
 
     /**
      * Verify that non-zero shifts correctly adjust the cut when the variable is at its upper bound. This
-     * triggers the {@code limit -= tmpVal * shift; eq.set(j, -tmpVal)} path in
+     * triggers the {@code limit -= tmpVal * (uppers[j] + shifts[j]); eq.set(j, -tmpVal)} path in
      * {@link TableauCutGenerator#applyShiftBackConversion}.
      */
     @Test
@@ -413,9 +476,9 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
         // Apply shift back-conversion with shift of -2.0 on x1
         Equation shifted = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lower, upper, atUpper, false);
         double[] shift1 = { 0, -2.0, 0 };
-        TableauCutGenerator.applyShiftBackConversion(shifted, excluded, lower, upper, shift1, atUpper);
+        TableauCutGenerator.applyShiftBackConversion(shifted, excluded, lower, upper, shift1, atUpper, integer.length);
 
-        // For an at-upper variable: limit -= tmpVal * shift, and coeff = -tmpVal
+        // For an at-upper variable: limit -= tmpVal * (upper + shift), here upper = 0, and coeff = -tmpVal
         double expectedRHS = baseline.getRHS() - baseline.doubleValue(1) * (-2.0);
         TestUtils.assertEquals(expectedRHS, shifted.getRHS());
 
@@ -474,6 +537,35 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
     }
 
     /**
+     * Only the model variables are converted. The slack variables keep their coefficients, here x2, a slack
+     * stored as (-inf, 0] and at its upper bound.
+     */
+    @Test
+    public void testSlackCoefficientsUnchanged() {
+
+        Primitive1D body = Primitive1D.of(1.0, 1.5, -0.5);
+        int index = 0;
+        double rhs = 2.3;
+        double fractionality = PrimitiveMath.ELEVENTH;
+        int[] excluded = { 1, 2 };
+        boolean[] integer = { true, true, false };
+
+        double[] lower = { 0, 0, Double.NEGATIVE_INFINITY };
+        double[] upper = { Double.POSITIVE_INFINITY, 10, 0 };
+        boolean[] atUpper = { false, false, true };
+
+        Equation plain = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lower, upper, atUpper, false);
+
+        Equation converted = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lower, upper, atUpper, false);
+        double[] shift = { 0, 3.0, 0 };
+        TableauCutGenerator.applyShiftBackConversion(converted, excluded, lower, upper, shift, atUpper, 2);
+
+        TestUtils.assertEquals(plain.doubleValue(1), converted.doubleValue(1));
+        TestUtils.assertEquals(plain.doubleValue(2), converted.doubleValue(2));
+        TestUtils.assertEquals(plain.getRHS() + plain.doubleValue(1) * 3.0, converted.getRHS());
+    }
+
+    /**
      * A few examples from: Generating Gomory's Cuts for linear integer programming problems: the HOW and WHY
      * <p>
      * http://www.ms.unimelb.edu.au/~moshe/620-362/gomory/index.html
@@ -522,11 +614,12 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
     }
 
     /**
-     * Verify that applying shift back-conversion with zero shifts produces the same result as no
-     * back-conversion. Uses mixed integer/continuous variables and includes a variable at its upper bound.
+     * With zero shifts, and the variables at bounds that are 0, the limit is unchanged. A variable at its
+     * upper bound has its coefficient negated, x' = u - x, also when the shift is zero. Uses mixed
+     * integer/continuous variables.
      */
     @Test
-    public void testZeroShiftBackConversionIsNoOp() {
+    public void testZeroShiftBackConversion() {
 
         Primitive1D body = Primitive1D.of(1.0, 1.5, -0.5, 2.3);
         int index = 0;
@@ -543,10 +636,13 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
 
         Equation withZeroShift = TableauCutGenerator.doGomoryMixedInteger(body, index, rhs, fractionality, excluded, integer, lower, upper, atUpper, false);
         double[] shift = { 0, 0, 0, 0 };
-        TableauCutGenerator.applyShiftBackConversion(withZeroShift, excluded, lower, upper, shift, atUpper);
+        TableauCutGenerator.applyShiftBackConversion(withZeroShift, excluded, lower, upper, shift, atUpper, integer.length);
 
         TestUtils.assertEquals(plain.index, withZeroShift.index);
         TestUtils.assertEquals(plain.getRHS(), withZeroShift.getRHS());
-        TestUtils.assertEquals(plain.getBody(), withZeroShift.getBody());
+        for (int j = 0; j < 3; j++) {
+            TestUtils.assertEquals(plain.doubleValue(j), withZeroShift.doubleValue(j));
+        }
+        TestUtils.assertEquals(-plain.doubleValue(3), withZeroShift.doubleValue(3));
     }
 }

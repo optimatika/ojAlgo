@@ -361,25 +361,64 @@ abstract class SimplexSolver extends LinearSolver {
     /**
      * Elements of the pivot row (dual simplex) or column (primal simplex) this small are not pivots. In the
      * dual simplex such an element still enters, if there are no others, when together with the other small
-     * elements it can remove the infeasibility, see {@link #judgeInfeasibility(ExitInfo)}.
+     * elements it can remove the infeasibility, see {@link #judgeInfeasibility(ExitInfo)}. In the primal
+     * simplex such an element still bounds a step of (almost) zero length, if no other element bounds the
+     * step, see {@link #PIVOT_GROWTH}, and a step that would otherwise take its basic variable past its
+     * bound, see {@link #PIVOT_BLOCKING}.
      */
     private static final NumberContext PIVOT = NumberContext.of(6);
     /**
-     * A pivot must also be large relative to the largest element of the pivot row (dual simplex) or column
-     * (primal simplex), 1e-9 relative, no absolute tolerance. Smaller elements neither limit the step nor
-     * become pivots, and in the dual simplex they count as zero. Without a regular dual candidate the basis
-     * is refactorised (if it has been updated) and the iteration repeated, before anything else is done (see
-     * {@link SimplexStore#refactorise()}). If this rejects all the primal rows that bound the step, the basis
-     * is refactorised the same way, and if it had not been updated those rows are accepted after all: this
-     * limit never turns a bounded step into an unbounded one.
+     * A row of the primal pivot column, with an element small by {@link #PIVOT} but not small by this
+     * relative to the largest element of the column (1e-8 relative), and not smaller than
+     * {@link #PIVOT_FLOOR}, still bounds the step if the step that the other rows and the range of the
+     * entering variable allow would take its basic variable past its bound by more than
+     * {@link Optimisation.Options#feasibility}, as an unbounded step always does. The step it allows itself
+     * must not be negative beyond the {@link #RATIO_RELAX} tolerance. When no other row bounds the step, it
+     * must also not take a row whose element is too small to bound the step by these rules, and whose basic
+     * variable is not already past its bound, past that bound by more than the feasibility tolerance.
+     */
+    private static final NumberContext PIVOT_BLOCKING = NumberContext.ofPrecision(9);
+    /**
+     * Elements of the primal pivot column smaller than this never bound the step, see {@link #PIVOT_GROWTH}.
+     * {@link SparseDecomposition} considers a basis with a smaller pivot singular.
+     */
+    private static final double PIVOT_FLOOR = 1E-11;
+    /**
+     * A pivot must also be large relative to the largest element of the pivot column (primal simplex), or
+     * relative to the largest element among the dual candidates, those that move the leaving variable towards
+     * its bound (dual simplex), 1e-9 relative, no absolute tolerance. A dual candidate whose element is small
+     * by {@link #PIVOT} must be large relative to the largest element of the whole pivot row. Smaller
+     * elements neither limit the step nor become pivots, and in the dual simplex they count as zero. Without
+     * a regular dual candidate the basis is refactorised (if it has been updated) and the iteration repeated,
+     * before anything else is done (see {@link SimplexStore#refactorise()}). If this or {@link #PIVOT}
+     * rejects all the primal rows that bound the step, the basis is refactorised the same way, and if it had
+     * not been updated those rows are accepted after all. A row with an element small by {@link #PIVOT} is
+     * accepted only if its element is not small by this as well, not smaller than {@link #PIVOT_FLOOR}, and
+     * the step it allows (negative if its basic variable is already past the bound it exits to) is within the
+     * {@link #RATIO_RELAX} tolerance of zero.
      */
     private static final NumberContext PIVOT_GROWTH = NumberContext.ofPrecision(10);
+    /**
+     * The most times {@link #iterateToOptimal(IterDescr, boolean)} follows dual iterations, that ended primal
+     * feasible but not dual feasible, with primal iterations. After that the state stays FEASIBLE.
+     */
+    private static final int PRIMAL_ROUNDS = 10;
     /**
      * Slack added to the primal ratio-test numerators, bounding how far a basic variable may drift outside
      * its bounds in a single pivot. Distinct from {@link #INFEASIBILITY}, which decides whether such a drift
      * counts as infeasible at all.
      */
     private static final NumberContext RATIO_RELAX = NumberContext.of(9);
+    /**
+     * The number of most recent states, see {@link SimplexStore#getStateHash()}, that the dual and primal
+     * iteration loops remember, see {@link #isCycling()}.
+     */
+    private static final int RECENT_STATES = 32;
+    /**
+     * The dual and primal iteration loops end with state FAILED when more than this many of their iterations
+     * ended in a state they had recently been in, see {@link #isCycling()}.
+     */
+    private static final int REPEATED_STATES = 100;
     /**
      * The dual iterations perturb the costs, see {@link #perturbCosts()}, once this many pivots have not
      * moved the dual objective forward. In phase 1 the limit is at least the number of constraints.
@@ -637,11 +676,6 @@ abstract class SimplexSolver extends LinearSolver {
      */
     private int myFlipCount = 0;
     /**
-     * Set by {@link #testPrimalExitRatio}: the step is unbounded only because {@link #PIVOT_GROWTH} rejected
-     * the rows that bound it.
-     */
-    private boolean myGrowthLimited = false;
-    /**
      * The values of the basic variables have been updated by primal iterations, or for variables that
      * switched bounds in dual iterations, since they were last recomputed, see
      * {@link #isRecomputedInfeasible()}.
@@ -654,6 +688,16 @@ abstract class SimplexSolver extends LinearSolver {
      * Lazily created on first use.
      */
     private IterDescr myIteration = null;
+    /**
+     * See {@link #isCycling()} and {@link #forgetStates()}.
+     */
+    private int myNbRepeatedStates = 0;
+    private long myNbStates = 0L;
+    /**
+     * Set by {@link #testPrimalExitRatio}: the step is unbounded only because {@link #PIVOT} or
+     * {@link #PIVOT_GROWTH} rejected rows that bound it, rows that are accepted when the test is not strict.
+     */
+    private boolean myPivotLimited = false;
     /**
      * Scratch storage shared between the two passes of the Harris ratio tests. Pass 1 fills these arrays for
      * every valid candidate; pass 2 reads them sequentially. {@code myRatioCacheRelaxed} is used to apply the
@@ -670,6 +714,10 @@ abstract class SimplexSolver extends LinearSolver {
     private double[] myRatioCacheScale;
     private ColumnState[] myRatioCacheState;
     private double[] myRatioCacheTrueRatio;
+    /**
+     * The {@link #RECENT_STATES} most recent states, see {@link #isCycling()}, as a ring buffer.
+     */
+    private final long[] myRecentStates = new long[RECENT_STATES];
 
     /**
      * The simplex data structure (tableau) the algorithm operates on.
@@ -806,6 +854,14 @@ abstract class SimplexSolver extends LinearSolver {
         if (myFlipCount > 0 && this.isLogDebug()) {
             this.log("Switched bounds of {} candidates", myFlipCount);
         }
+    }
+
+    /**
+     * Called when an iteration loop starts: no states are recent, and none have been repeated.
+     */
+    private void forgetStates() {
+        myNbRepeatedStates = 0;
+        myNbStates = 0L;
     }
 
     private boolean getDualExitCandidate(final IterDescr iteration) {
@@ -965,6 +1021,30 @@ abstract class SimplexSolver extends LinearSolver {
         }
 
         return retVal;
+    }
+
+    /**
+     * Called after each counted iteration of the dual and primal iteration loops. The current state, see
+     * {@link SimplexStore#getStateHash()}, is compared with the {@link #RECENT_STATES} most recent ones, and
+     * then becomes one of them.
+     *
+     * @return true if, since the loop started, more than {@link #REPEATED_STATES} iterations ended in a state
+     *         that was among the recent ones
+     */
+    private boolean isCycling() {
+
+        long hash = mySimplex.getStateHash();
+
+        for (int k = 0, limit = (int) Math.min(myNbStates, RECENT_STATES); k < limit; k++) {
+            if (myRecentStates[k] == hash) {
+                myNbRepeatedStates++;
+                break;
+            }
+        }
+
+        myRecentStates[(int) (myNbStates++ % RECENT_STATES)] = hash;
+
+        return myNbRepeatedStates > REPEATED_STATES;
     }
 
     /**
@@ -1154,11 +1234,12 @@ abstract class SimplexSolver extends LinearSolver {
 
         this.ensureRatioCacheCapacity(excluded.length);
 
-        // Pass 1: find the largest element of the row, and cache the candidates that move the exit variable
-        // towards its bound (idx, scale, relaxed ratio, trueRatio, state), where the relaxed ratio is (gap +
-        // tolerance) / |denom|.
+        // Pass 1: cache the candidates that move the exit variable towards its bound (idx, scale, relaxed
+        // ratio, trueRatio, state), where the relaxed ratio is (gap + tolerance) / |denom|, and find the
+        // largest of their elements as well as the largest element of the row.
         int cachedCount = 0;
         double largest = ZERO;
+        double largestInRow = ZERO;
 
         for (int k = 0; k < nbCandidates; k++) {
             int je = candidates != null ? candidates[k] : k;
@@ -1174,7 +1255,7 @@ abstract class SimplexSolver extends LinearSolver {
 
             double denom = mySimplex.getCurrentElement(exit, je);
             double scale = Math.abs(denom);
-            largest = Math.max(largest, scale);
+            largestInRow = Math.max(largestInRow, scale);
             if (denom == ZERO) {
                 continue;
             }
@@ -1221,6 +1302,8 @@ abstract class SimplexSolver extends LinearSolver {
                 this.log(1, "{}({}) relaxed = {}", j, je, relaxed);
             }
 
+            largest = Math.max(largest, scale);
+
             myRatioCacheIdx[cachedCount] = je;
             myRatioCacheRelaxed[cachedCount] = relaxed;
             myRatioCacheScale[cachedCount] = scale;
@@ -1239,7 +1322,7 @@ abstract class SimplexSolver extends LinearSolver {
         }
         int nbUsable = nbRegular;
         for (int k = nbRegular; k < cachedCount; k++) {
-            if (!PIVOT_GROWTH.isSmall(largest, myRatioCacheScale[k])) {
+            if (!PIVOT_GROWTH.isSmall(largestInRow, myRatioCacheScale[k])) {
                 this.swapRatioCache(k, nbUsable++);
             }
         }
@@ -1267,9 +1350,11 @@ abstract class SimplexSolver extends LinearSolver {
     }
 
     /**
-     * @param limitGrowth Whether to apply {@link #PIVOT_GROWTH}
+     * @param strict true: rows with elements small by {@link #PIVOT} or by {@link #PIVOT_GROWTH} do not bound
+     *               the step, except as described at {@link #PIVOT_BLOCKING}; false: some more of them do,
+     *               see {@link #PIVOT_GROWTH}
      */
-    private boolean testPrimalExitRatio(final IterDescr iteration, final boolean limitGrowth) {
+    private boolean testPrimalExitRatio(final IterDescr iteration, final boolean strict) {
 
         if (this.isLogDebug()) {
             this.log();
@@ -1301,7 +1386,7 @@ abstract class SimplexSolver extends LinearSolver {
             double denom = mySimplex.getCurrentElement(ji, enter);
             double scale = Math.abs(denom);
             largest = Math.max(largest, scale);
-            if (PIVOT.isZero(denom)) {
+            if (denom == ZERO) {
                 continue;
             }
 
@@ -1343,15 +1428,63 @@ abstract class SimplexSolver extends LinearSolver {
             cachedCount++;
         }
 
-        // Keep the cached candidates that pass the growth limit (relative to the largest element of the
-        // column), and compute the relaxed minimum theta_max over them, capped at the entering variable's range.
+        // The relaxed step that the rows passing both pivot limits allow, capped at the entering variable's range
+        double thetaRegular = range;
+        for (int k = 0; k < cachedCount; k++) {
+            double scale = myRatioCacheScale[k];
+            if (!PIVOT.isZero(scale) && !PIVOT_GROWTH.isSmall(largest, scale) && myRatioCacheRelaxed[k] < thetaRegular) {
+                thetaRegular = myRatioCacheRelaxed[k];
+            }
+        }
+        double feasibility = options.feasibility.epsilon();
+
+        // Without a regular row that bounds the step, the step that a row with a small element allows can be
+        // very long. It must not take a row that is not past its bound, but whose element is too small to bound
+        // the step, past its bound.
+        double thetaIgnored = POSITIVE_INFINITY;
+        if (!Double.isFinite(thetaRegular)) {
+            for (int k = 0; k < cachedCount; k++) {
+                double scale = myRatioCacheScale[k];
+                if (PIVOT.isZero(scale) && (scale < PIVOT_FLOOR || PIVOT_GROWTH.isSmall(largest, scale) || PIVOT_BLOCKING.isSmall(largest, scale))) {
+                    double infeasibility = mySimplex.getInfeasibility(myRatioCacheIdx[k]);
+                    double past = myRatioCacheExitDirection[k] ? infeasibility : -infeasibility;
+                    if (past <= ZERO) {
+                        thetaIgnored = Math.min(thetaIgnored, myRatioCacheTrueRatio[k] + feasibility / scale);
+                    }
+                }
+            }
+        }
+
+        // Keep the cached candidates that pass the pivot limits (PIVOT absolute, PIVOT_GROWTH relative to the
+        // largest element of the column), or that PIVOT_BLOCKING keeps, and compute the relaxed minimum
+        // theta_max over them, capped at the entering variable's range.
         double thetaMax = range;
         int nbKept = 0;
         boolean rejectedBounding = false;
 
         for (int k = 0; k < cachedCount; k++) {
             double relaxed = myRatioCacheRelaxed[k];
-            if (limitGrowth && PIVOT_GROWTH.isSmall(largest, myRatioCacheScale[k])) {
+            double scale = myRatioCacheScale[k];
+            boolean small = PIVOT.isZero(scale);
+            boolean growth = PIVOT_GROWTH.isSmall(largest, scale);
+            boolean blocking = false;
+            if (small) {
+                if (growth || scale < PIVOT_FLOOR) {
+                    continue;
+                }
+                // The step, negative if the exit variable is already past the bound it exits to (gaps are >= 0)
+                double infeasibility = mySimplex.getInfeasibility(myRatioCacheIdx[k]);
+                double past = myRatioCacheExitDirection[k] ? infeasibility : -infeasibility;
+                double step = myRatioCacheTrueRatio[k] - past / scale;
+                // Would the step the other rows allow, infinite if none of them bounds it, take the exit variable
+                // past its bound?
+                blocking = step >= -tolerance && !PIVOT_BLOCKING.isSmall(largest, scale) && (thetaRegular - myRatioCacheTrueRatio[k]) * scale > feasibility
+                        && myRatioCacheTrueRatio[k] <= thetaIgnored;
+                if (!blocking && Math.abs(step) > tolerance) {
+                    continue;
+                }
+            }
+            if (strict && (small || growth) && !blocking) {
                 rejectedBounding |= Double.isFinite(relaxed);
                 continue;
             }
@@ -1364,7 +1497,7 @@ abstract class SimplexSolver extends LinearSolver {
             myRatioCacheExitDirection[nbKept] = myRatioCacheExitDirection[k];
             nbKept++;
         }
-        myGrowthLimited = rejectedBounding && !Double.isFinite(thetaMax);
+        myPivotLimited = rejectedBounding && !Double.isFinite(thetaMax);
 
         if (thetaMax >= range) {
 
@@ -1517,10 +1650,12 @@ abstract class SimplexSolver extends LinearSolver {
      * initially the infeasibility of the exit variable, by sum(|a_j| r_j), where a_j are the elements and r_j
      * the ranges of the candidates. In the first bunch that would make the slope non-positive, the candidate
      * with the largest element enters, and the candidates of the bunches before it switch bounds, see
-     * {@link #flipBounds()}. Those are first in the cache.
+     * {@link #flipBounds()}. Those are first in the cache. Ratios that overflow are in the last bunch, and
+     * candidates with a ratio or element that is not a number can not enter.
      *
      * @param force What to do if every bunch can be passed: true to let the last one decide the entering
      *              variable anyway, false to return false
+     * @return true if a candidate enters
      */
     private boolean walkDualEnter(final EnterInfo enter, final int count, final double infeasibility, final boolean force) {
 
@@ -1533,7 +1668,7 @@ abstract class SimplexSolver extends LinearSolver {
 
         while (first < count) {
 
-            double thetaMax = MACHINE_LARGEST;
+            double thetaMax = POSITIVE_INFINITY;
             for (int k = first; k < count; k++) {
                 double relaxed = myRatioCacheRelaxed[k];
                 if (relaxed < thetaMax) {
@@ -1557,6 +1692,10 @@ abstract class SimplexSolver extends LinearSolver {
                     }
                     limit++;
                 }
+            }
+
+            if (best < 0) {
+                return false;
             }
 
             if (slope - reduction > ZERO && (limit < count || !force)) {
@@ -1593,7 +1732,8 @@ abstract class SimplexSolver extends LinearSolver {
 
     /**
      * If the iterations stall the costs are perturbed, see {@link #perturbCosts()}. Original costs are back
-     * in place on return, phase-1 costs remain perturbed.
+     * in place on return, phase-1 costs remain perturbed. If they cycle, see {@link #isCycling()}, the costs
+     * are perturbed, and if they still cycle the state is set to FAILED.
      */
     final void doDualIterations(final IterDescr iteration, final boolean resetEdgeWeights) {
 
@@ -1609,6 +1749,8 @@ abstract class SimplexSolver extends LinearSolver {
         boolean installed = false;
         int nbStalled = 0;
         int stallLimit = mySimplex.isPhase1() ? Math.max(STALLED_PIVOTS, mySimplex.m) : STALLED_PIVOTS;
+
+        this.forgetStates();
 
         boolean done = false;
         while (this.isIterationAllowed() && !done) {
@@ -1649,6 +1791,9 @@ abstract class SimplexSolver extends LinearSolver {
                     } else {
                         double infeasibility = Math.abs(mySimplex.getInfeasibility(iteration.exit.index));
                         pivot = this.walkDualEnter(iteration.enter, myFallbackCount, infeasibility, true);
+                        if (!pivot) {
+                            state = State.FAILED;
+                        }
                     }
                 }
 
@@ -1686,6 +1831,16 @@ abstract class SimplexSolver extends LinearSolver {
                     this.update(iteration);
 
                     this.incrementIterationsCount();
+
+                    if (this.isCycling()) {
+                        if (perturbed) {
+                            state = State.FAILED;
+                        } else {
+                            // Perturb the costs, at the next iteration, before giving up
+                            nbStalled = stallLimit;
+                            this.forgetStates();
+                        }
+                    }
                 }
 
             } else {
@@ -1709,6 +1864,9 @@ abstract class SimplexSolver extends LinearSolver {
         }
     }
 
+    /**
+     * If the iterations cycle, see {@link #isCycling()}, the state is set to FAILED.
+     */
     final void doPrimalIterations(final IterDescr iteration, final boolean resetEdgeWeights) {
 
         if (options.validate) {
@@ -1718,6 +1876,8 @@ abstract class SimplexSolver extends LinearSolver {
         if (resetEdgeWeights) {
             mySimplex.resetEdgeWeights();
         }
+
+        this.forgetStates();
 
         boolean done = false;
         while (this.isIterationAllowed() && !done) {
@@ -1733,7 +1893,7 @@ abstract class SimplexSolver extends LinearSolver {
                 mySimplex.calculatePrimalDirection(iteration.enter);
 
                 boolean bounded = this.testPrimalExitRatio(iteration, true);
-                if (!bounded && myGrowthLimited && !mySimplex.refactorise()) {
+                if (!bounded && myPivotLimited && !mySimplex.refactorise()) {
                     bounded = this.testPrimalExitRatio(iteration, false);
                 }
 
@@ -1754,7 +1914,11 @@ abstract class SimplexSolver extends LinearSolver {
 
                     this.incrementIterationsCount();
 
-                } else if (!myGrowthLimited) {
+                    if (this.isCycling()) {
+                        state = State.FAILED;
+                    }
+
+                } else if (!myPivotLimited) {
 
                     state = State.UNBOUNDED;
                 }
@@ -1896,15 +2060,16 @@ abstract class SimplexSolver extends LinearSolver {
 
     /**
      * When the state is OPTIMAL and {@link #myIncrementallyUpdated}: the values of the basic variables are
-     * recomputed. Are they then outside their bounds (by {@link Optimisation.Options#feasibility})? If so the
-     * state is set to APPROXIMATE.
+     * recomputed, if the store can, see {@link SimplexStore#recomputeBasicSolution()}. Are they outside their
+     * bounds (by {@link Optimisation.Options#feasibility})? If so the state is set to APPROXIMATE.
      */
     final boolean isRecomputedInfeasible() {
 
-        if (!state.isOptimal() || !myIncrementallyUpdated || !mySimplex.recomputeBasicSolution()) {
+        if (!state.isOptimal() || !myIncrementallyUpdated) {
             return false;
         }
 
+        mySimplex.recomputeBasicSolution();
         myIncrementallyUpdated = false;
 
         if (this.verifyPrimalFeasibility()) {
@@ -1917,11 +2082,12 @@ abstract class SimplexSolver extends LinearSolver {
 
     /**
      * Dual iterations, and when they end primal feasible, primal iterations unless the basis is already dual
-     * feasible. Repeated while {@link #isRecomputedInfeasible()}.
+     * feasible, at most {@link #PRIMAL_ROUNDS} times. Repeated while {@link #isRecomputedInfeasible()}.
      */
     final void iterateToOptimal(final IterDescr iteration, final boolean resetEdgeWeights) {
 
         boolean reset = resetEdgeWeights;
+        int nbPrimalRounds = 0;
 
         do {
 
@@ -1931,7 +2097,7 @@ abstract class SimplexSolver extends LinearSolver {
             if (state.isFeasible()) {
                 if (this.isDualFeasible()) {
                     state = State.OPTIMAL;
-                } else {
+                } else if (nbPrimalRounds++ < PRIMAL_ROUNDS) {
                     // Primal feasible but (marginally) not dual feasible - finish with primal iterations
                     // rather than reporting a merely FEASIBLE point
                     this.doPrimalIterations(iteration, true);

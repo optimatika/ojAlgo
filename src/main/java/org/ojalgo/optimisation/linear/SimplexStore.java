@@ -110,6 +110,22 @@ abstract class SimplexStore {
     static final NumberContext DEVEX_PIVOT = NumberContext.ofScale(9);
 
     /**
+     * The term of the variable at {@code index} in {@link #getStateHash()}: 0 if it is basic, otherwise the
+     * SplitMix64 finaliser applied to 4 * index + {@link ColumnState#ordinal()}.
+     */
+    private static long hashState(final int index, final ColumnState state) {
+
+        if (state == ColumnState.BASIS) {
+            return 0L;
+        }
+
+        long hash = (4L * index + state.ordinal()) * 0x9E3779B97F4A7C15L;
+        hash = (hash ^ hash >>> 30) * 0xBF58476D1CE4E5B9L;
+        hash = (hash ^ hash >>> 27) * 0x94D049BB133111EBL;
+        return hash ^ hash >>> 31;
+    }
+
+    /**
      * Unless {@link Options#sparse} says otherwise, chooses between the revised simplex
      * ({@link RevisedStore}) and the dense tableau ({@link DenseTableau}) based on the problem size (m*n) and
      * ratio (n/m), where m is the number of constraints and n the total number of variables (including slacks
@@ -158,6 +174,10 @@ abstract class SimplexStore {
     private final double[] myLowerBounds;
     private final EnumPartition<SimplexStore.ColumnState> myPartition;
     private int myRemainingArtificials;
+    /**
+     * See {@link #getStateHash()}. Initially every variable is basic, and the hash is 0.
+     */
+    private long myStateHash = 0L;
     private final List<String> myToStringList = new ArrayList<>();
     private final double[] myUpperBounds;
 
@@ -225,7 +245,7 @@ abstract class SimplexStore {
     }
 
     private final SimplexStore basis(final int index) {
-        myPartition.update(index, ColumnState.BASIS);
+        this.setState(index, ColumnState.BASIS);
         return this;
     }
 
@@ -254,6 +274,14 @@ abstract class SimplexStore {
             solver.basis(basis);
         }
         return solver;
+    }
+
+    /**
+     * Sets the state of the variable at {@code index}, and updates {@link #getStateHash()}.
+     */
+    private void setState(final int index, final ColumnState state) {
+        myStateHash ^= SimplexStore.hashState(index, myPartition.get(index)) ^ SimplexStore.hashState(index, state);
+        myPartition.update(index, state);
     }
 
     /**
@@ -711,6 +739,15 @@ abstract class SimplexStore {
 
     abstract double getReducedCost(int je);
 
+    /**
+     * A hash of the partition: which variables are basic, and the state of each non-basic variable. The XOR
+     * over all variables of a pseudo-random term per variable and state, 0 for basic variables. Equal
+     * partitions have equal hashes.
+     */
+    final long getStateHash() {
+        return myStateHash;
+    }
+
     final double getUpperBound(final int index) {
         return myUpperBounds[index];
     }
@@ -800,7 +837,7 @@ abstract class SimplexStore {
     }
 
     final SimplexStore lower(final int index) {
-        myPartition.update(index, ColumnState.LOWER);
+        this.setState(index, ColumnState.LOWER);
         return this;
     }
 
@@ -849,12 +886,8 @@ abstract class SimplexStore {
      * Recompute the values of the basic variables, from the right-hand side and the values of the non-basic
      * variables, with the current basis representation. The default does nothing: a tableau has no other
      * source for them.
-     *
-     * @return true if they were recomputed
      */
-    boolean recomputeBasicSolution() {
-        return false;
-    }
+    void recomputeBasicSolution() {}
 
     /**
      * Refactorise the basis, if it has been updated since it was last factorised, and recompute the basic
@@ -879,9 +912,13 @@ abstract class SimplexStore {
         }
 
         myPartition.reset(ColumnState.LOWER);
+        myStateHash = 0L;
+        for (int j = 0; j < n; j++) {
+            myStateHash ^= SimplexStore.hashState(j, ColumnState.LOWER);
+        }
 
         for (int i = 0; i < newBasis.length; i++) {
-            myPartition.update(newBasis[i], ColumnState.BASIS);
+            this.setState(newBasis[i], ColumnState.BASIS);
             included[i] = newBasis[i];
         }
 
@@ -947,7 +984,7 @@ abstract class SimplexStore {
     abstract Primitive1D sliceInverseRow(int row);
 
     final SimplexStore unbounded(final int index) {
-        myPartition.update(index, ColumnState.UNBOUNDED);
+        this.setState(index, ColumnState.UNBOUNDED);
         return this;
     }
 
@@ -1079,7 +1116,7 @@ abstract class SimplexStore {
     abstract boolean updateRange(int index, double lower, double upper);
 
     final SimplexStore upper(final int index) {
-        myPartition.update(index, ColumnState.UPPER);
+        this.setState(index, ColumnState.UPPER);
         return this;
     }
 

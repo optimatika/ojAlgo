@@ -66,8 +66,14 @@ public class TestBasicMachine extends MachineTests {
         TestUtils.assertEquals("5MB/1thread", new BasicMachine(5_242_896L, 1).toString());
         TestUtils.assertEquals("0kB/6threads", new BasicMachine(-1L, 6).toString());
         TestUtils.assertEquals("0kB/1thread", new BasicMachine(0L, 1).toString());
-        TestUtils.assertEquals("2GB/1thread", new BasicMachine(3_000_000_737L, 1).toString());
-        TestUtils.assertEquals("2GB/17threads", new BasicMachine(3_000_000_737L, 17).toString());
+        TestUtils.assertEquals("2.8GB/1thread", new BasicMachine(3_000_000_737L, 1).toString());
+        TestUtils.assertEquals("2.8GB/17threads", new BasicMachine(3_000_000_737L, 17).toString());
+        TestUtils.assertEquals("1.5GB/4threads", new BasicMachine(1_610_612_736L, 4).toString());
+        TestUtils.assertEquals("16GB/8threads", new BasicMachine(17_179_869_184L, 8).toString());
+        TestUtils.assertEquals("5.8GB/8threads", new BasicMachine(6_264_979_456L, 8).toString());
+        TestUtils.assertEquals("1.5kB/1thread", new BasicMachine(1_536L, 1).toString());
+        TestUtils.assertEquals("1GB/1thread", new BasicMachine(1_073_741_823L, 1).toString());
+        TestUtils.assertEquals("1023.9MB/1thread", new BasicMachine(1_073_636_966L, 1).toString());
         TestUtils.assertEquals("10737418291776bytes/1thread", new BasicMachine(10_737_418_291_776L, 1).toString());
         TestUtils.assertEquals("10737418291776bytes/9threads", new BasicMachine(10_737_418_291_776L, 9).toString());
     }

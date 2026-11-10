@@ -20,6 +20,17 @@ public class PresolveTest extends OptimisationTests {
     }
 
     /**
+     * max 2e20 x + z subject to 1e20 x + z <= 2, 0 <= x <= upper and 0 <= z <= 1
+     */
+    private static ExpressionsBasedModel makeModel709(final double upper) {
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+        Variable x = model.newVariable("x").lower(0).upper(upper).weight(2e20);
+        Variable z = model.newVariable("z").lower(0).upper(1).weight(1);
+        model.newExpression("ROW").set(x, 1e20).set(z, 1).upper(2);
+        return model;
+    }
+
+    /**
      * https://github.com/optimatika/ojAlgo/issues/663
      * <p>
      * Was a problem with the pre-solve logic. A purely quadratic expression was passed to a pre-solver that
@@ -75,6 +86,42 @@ public class PresolveTest extends OptimisationTests {
         model.simplify();
 
         TestUtils.assertFalse(model.isInfeasible());
+    }
+
+    /**
+     * https://github.com/optimatika/ojAlgo/issues/709
+     * <p>
+     * Presolve derives x <= 2e-20 from the constraint, and fixes x at 1e-20 since that range is within the
+     * feasibility tolerance. With the coefficients 1e20 and 2e20 the range is worth 2 in the constraint and 4
+     * in the objective – the optimum is 4 at (2e-20, 0), but 3 at (1e-20, 1) is reported. That is accepted
+     * (the model is badly scaled), but presolve should print a warning. It does so regardless of whether the
+     * small range is given (upper = 3e-20) or derived (upper = 1). A small range that is negligible also when
+     * multiplied by the coefficients does not give a warning.
+     */
+    @Test
+    void testGitHubIssue709() {
+
+        for (double upper : new double[] { 3e-20, 1 }) {
+
+            ExpressionsBasedModel model = PresolveTest.makeModel709(upper);
+
+            TestUtils.assertTrue(model.isScalingWarningPending());
+
+            model.simplify();
+
+            TestUtils.assertTrue(model.getVariable(0).isFixed());
+            TestUtils.assertFalse(model.isScalingWarningPending());
+        }
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+        Variable x = model.newVariable("x").lower(0).upper(1).weight(1);
+        Variable z = model.newVariable("z").lower(0).upper(1).weight(1);
+        model.newExpression("ROW").set(x, 1).set(z, 1).upper(2e-12);
+
+        model.simplify();
+
+        TestUtils.assertTrue(x.isFixed());
+        TestUtils.assertTrue(model.isScalingWarningPending());
     }
 
     /**

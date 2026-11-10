@@ -16,6 +16,20 @@ public class BasicMachine {
     private static final String THREAD = "thread";
     private static final String THREADS = "threads";
 
+    /**
+     * Rounded to one decimal, with the decimal omitted when it is zero: 1.5, 2, 1024.
+     */
+    private static String toOneDecimal(final double value) {
+
+        long tenths = Math.round(value * 10.0);
+
+        if (tenths % 10L == 0L) {
+            return Long.toString(tenths / 10L);
+        } else {
+            return (tenths < 0L ? "-" : "") + Math.abs(tenths / 10L) + "." + Math.abs(tenths % 10L);
+        }
+    }
+
     public final long memory;
     public final int threads;
 
@@ -58,26 +72,29 @@ public class BasicMachine {
     public String toString() {
 
         int prefix = 1;
-        long measure = memory / CommonMachine.K;
+        double measure = memory / (double) CommonMachine.K;
 
-        while ((measure / CommonMachine.K) > 0) {
+        // Step up a unit when the value, rounded to one decimal, reaches 1024
+        while (Math.round(measure * 10.0) >= CommonMachine.K * 10L) {
             prefix++;
             measure /= CommonMachine.K;
         }
+
+        String number = BasicMachine.toOneDecimal(measure);
 
         switch (prefix) {
 
             case 1:
 
-                return measure + KILO + threads + ((threads == 1) ? THREAD : THREADS);
+                return number + KILO + threads + ((threads == 1) ? THREAD : THREADS);
 
             case 2:
 
-                return measure + MEGA + threads + ((threads == 1) ? THREAD : THREADS);
+                return number + MEGA + threads + ((threads == 1) ? THREAD : THREADS);
 
             case 3:
 
-                return measure + GIGA + threads + ((threads == 1) ? THREAD : THREADS);
+                return number + GIGA + threads + ((threads == 1) ? THREAD : THREADS);
 
             default:
 

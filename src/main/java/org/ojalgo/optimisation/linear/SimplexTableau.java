@@ -24,6 +24,7 @@ package org.ojalgo.optimisation.linear;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -69,6 +70,15 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
      * updating those rows).
      */
     static final NumberContext PRECISION = NumberContext.of(15);
+
+    private static boolean isZero(final Equation equation, final int[] indices) {
+        for (int k = 0; k < indices.length; k++) {
+            if (equation.doubleValue(indices[k]) != ZERO) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     static Function<LinearStructure, SimplexTableau> newTableauFactory(final Optimisation.Options options) {
 
@@ -117,6 +127,42 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
     @Override
     public String toString() {
         return super.toString();
+    }
+
+    /**
+     * The indices of both parts of every model variable x = x+ - x- that is split in a positive part x+ and a
+     * negative part x-, with both parts non-basic.
+     */
+    private int[] getNonBasicSplitParts() {
+
+        int nbPositive = structure.positivePartVariables.length;
+        int nbNegative = structure.negativePartVariables.length;
+
+        int nbModelEntities = 0;
+        for (int jp = 0; jp < nbPositive; jp++) {
+            nbModelEntities = Math.max(nbModelEntities, structure.positivePartVariables[jp] + 1);
+        }
+
+        int[] positivePart = new int[nbModelEntities];
+        Arrays.fill(positivePart, -1);
+        for (int jp = 0; jp < nbPositive; jp++) {
+            positivePart[structure.positivePartVariables[jp]] = jp;
+        }
+
+        int[] retVal = new int[2 * nbNegative];
+        int count = 0;
+
+        for (int k = 0; k < nbNegative; k++) {
+            int mj = structure.negativePartVariables[k];
+            int jp = mj < nbModelEntities ? positivePart[mj] : -1;
+            int jn = nbPositive + k;
+            if (jp >= 0 && this.isExcluded(jp) && this.isExcluded(jn)) {
+                retVal[count++] = jp;
+                retVal[count++] = jn;
+            }
+        }
+
+        return Arrays.copyOf(retVal, count);
     }
 
     /**
@@ -307,7 +353,7 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
                 }
                 shifts = myCachedScaledShifts;
             }
-            TableauCutGenerator.applyShiftBackConversion(eq, excluded, lowers, uppers, shifts, atUpper);
+            TableauCutGenerator.applyShiftBackConversion(eq, excluded, lowers, uppers, shifts, atUpper, structure.countModelVariables());
         }
 
         return eq;
@@ -317,6 +363,10 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
      * Simplified version of {@link SimplexStore#generateCutCandidates(boolean[], NumberContext, double)} for
      * specific use with {@link SimplexTableauSolver}. {@link SimplexSolver} and {@link SimplexTableauSolver}
      * can both use {@link SimplexTableau}, but they use them differently.
+     * <p>
+     * A model variable x = x+ - x-, split in a positive and a negative part with both parts non-basic (x =
+     * 0), that has a non-zero coefficient in the cut gives no cut. The cut term c+ x+ + c- x- is c+ max(x, 0)
+     * + c- max(-x, 0) in x, which is not linear.
      */
     final Collection<Equation> generateSimpleCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality,
             final boolean relaxation) {
@@ -331,6 +381,8 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
             BasicLogger.debug("generateCutCandidates: integer.length != structure.countVariables()");
         }
 
+        int[] splitParts = this.getNonBasicSplitParts();
+
         List<Equation> retVal = new ArrayList<>();
 
         for (int i = 0; i < m; i++) {
@@ -342,7 +394,7 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
 
                 Equation maybe = TableauCutGenerator.doGomoryMixedInteger(this.sliceBodyRow(i), j, rhs, fractionality, excluded, integer, relaxation);
 
-                if (maybe != null) {
+                if (maybe != null && SimplexTableau.isZero(maybe, splitParts)) {
                     retVal.add(maybe);
                 }
             }

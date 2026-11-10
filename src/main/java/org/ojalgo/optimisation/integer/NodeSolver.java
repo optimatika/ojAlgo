@@ -596,12 +596,16 @@ public final class NodeSolver extends IntermediateSolver {
         return retVal;
     }
 
+    /**
+     * The reduced gradient of the solved relaxation, or 0 if it is not solved, as after a bound update that
+     * the solver could not apply in place.
+     */
     double getReducedGradient(final int globalModelIndex) {
 
-        UpdatableSolver solver = this.getUpdatableSolver();
-        if (solver != null && this.isSolved()) {
+        if (this.isSolved()) {
+            UpdatableSolver solver = this.getUpdatableSolver();
             int indexInSolver = this.getIndexInSolver(globalModelIndex);
-            if (indexInSolver >= 0) {
+            if (solver != null && indexInSolver >= 0) {
                 return solver.getReducedGradient(indexInSolver);
             }
         }

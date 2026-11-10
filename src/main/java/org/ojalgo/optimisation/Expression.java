@@ -1173,7 +1173,9 @@ public class Expression extends ModelEntity<Expression> {
     }
 
     /**
-     * Detects whether all referenced variables are integer and, if so, tightens the lower/upper limits.
+     * Detects whether all referenced variables are integer and, if so, tightens the lower/upper limits to
+     * multiples of the integer step – to the nearest multiple if a limit is equal to it at the model's
+     * feasibility precision.
      */
     @Override
     final void doIntegerRounding() {
@@ -1211,19 +1213,19 @@ public class Expression extends ModelEntity<Expression> {
             }
         }
 
+        NumberContext precision = myModel.options.feasibility;
+
         BigDecimal newLower = null, newUpper = null;
 
         if (lower != null) {
-            BigDecimal tmpVal = lower.divide(divisor, 0, RoundingMode.CEILING);
-            newLower = tmpVal.multiply(divisor);
+            newLower = Presolvers.ceiling(lower, divisor, precision);
             if (full) {
                 this.lower(newLower);
             }
         }
 
         if (upper != null) {
-            BigDecimal tmpVal = upper.divide(divisor, 0, RoundingMode.FLOOR);
-            newUpper = tmpVal.multiply(divisor);
+            newUpper = Presolvers.floor(upper, divisor, precision);
             if (full) {
                 this.upper(newUpper);
             }

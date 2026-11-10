@@ -385,15 +385,11 @@ public class Variable extends ModelEntity<Variable> {
 
         boolean retVal = super.validate(value, context, appender);
 
-        if (retVal && !relaxed && myInteger) {
-            try {
-                context.enforce(value).longValueExact();
-            } catch (final ArithmeticException ex) {
-                if (appender != null) {
-                    appender.println(value + " ! Integer: " + this.getName());
-                }
-                retVal = false;
+        if (retVal && !relaxed && myInteger && context.enforce(value).stripTrailingZeros().scale() > 0) {
+            if (appender != null) {
+                appender.println(value + " ! Integer: " + this.getName());
             }
+            retVal = false;
         }
 
         return retVal;

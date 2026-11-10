@@ -717,9 +717,8 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
-    boolean recomputeBasicSolution() {
+    void recomputeBasicSolution() {
         this.refreshBasicSolution();
-        return true;
     }
 
     @Override

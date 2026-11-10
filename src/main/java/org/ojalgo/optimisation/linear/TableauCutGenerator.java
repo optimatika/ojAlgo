@@ -49,31 +49,32 @@ abstract class TableauCutGenerator {
     }
 
     /**
-     * Applies shift back-conversion to a GMI cut equation produced by
-     * {@link #doGomoryMixedInteger(Primitive1D, int, double, double, int[], boolean[], double[], double[], boolean[], boolean)}.
-     * Used by {@link SimplexTableau} which shifts variables so the current bound = 0.
+     * Converts a GMI cut equation produced by
+     * {@link #doGomoryMixedInteger(Primitive1D, int, double, double, int[], boolean[], double[], double[], boolean[], boolean)}
+     * to the original variables. That cut has coefficients c on x' = y - l (at lower) or x' = u - y (at
+     * upper), where y = x - s is the variable of {@link SimplexTableau}, x shifted by s, with bounds l and u.
+     * A term c x' at lower becomes c x, with c (l + s) added to the limit. A term c x' at upper becomes -c x,
+     * with c (u + s) subtracted from the limit. Only the first nbModelVariables variables are converted, the
+     * slack variables keep their coefficients.
      */
     static void applyShiftBackConversion(final Equation eq, final int[] excluded, final double[] lowers, final double[] uppers, final double[] shifts,
-            final boolean[] atUpper) {
+            final boolean[] atUpper, final int nbModelVariables) {
 
-        int nbVariables = lowers.length;
         double limit = eq.getRHS();
 
         for (int je = 0; je < excluded.length; je++) {
             int j = excluded[je];
 
-            if (j < nbVariables) {
-                double range = uppers[j] - lowers[j];
-                double shift = shifts[j];
-                if (Double.isFinite(range) && !ACCURACY.isZero(shift)) {
+            if (j < nbModelVariables) {
 
-                    double tmpVal = eq.doubleValue(j);
+                double tmpVal = eq.doubleValue(j);
 
+                if (tmpVal != ZERO) {
                     if (atUpper[j]) {
-                        limit -= tmpVal * shift;
+                        limit -= tmpVal * (uppers[j] + shifts[j]);
                         eq.set(j, -tmpVal);
                     } else {
-                        limit += tmpVal * shift;
+                        limit += tmpVal * (lowers[j] + shifts[j]);
                     }
                 }
             }
@@ -242,7 +243,9 @@ abstract class TableauCutGenerator {
 
     /**
      * No-shift variant for stores that do not shift variables (e.g. {@link RevisedStore}). Coefficients are
-     * returned in surplus/slack space (same as the shift-aware overload with zero shifts).
+     * returned in surplus/slack space (same as the shift-aware overload with zero shifts). There is no cut,
+     * null, if a non-basic variable with a non-zero element has an infinite bound where it is, lower or
+     * upper.
      *
      * @param atUpper Which non-basic variables are at their upper bound in the current simplex basis.
      */
@@ -277,6 +280,10 @@ abstract class TableauCutGenerator {
                 }
 
                 if (!ACCURACY.isZero(aj)) {
+
+                    if (!Double.isFinite(negVar ? uppers[j] : lowers[j])) {
+                        return null;
+                    }
 
                     if (integers[j]) {
 

@@ -523,6 +523,10 @@ public interface Optimisation {
          * Tolerance for feasibility checks: are variables within bounds, are constraints satisfied, are
          * variable values integer? Used by presolvers and by {@link ExpressionsBasedModel} to validate solver
          * results. Not used as part of internal solver logic.
+         * <p>
+         * Presolve fixes a variable when its lower and upper limits are equal at this tolerance. If the range
+         * is not negligible when multiplied by the variable's largest constraint or objective coefficient, a
+         * warning is printed to standard error, at most once per model.
          */
         public NumberContext feasibility = DEFAULT_FEASIBILITY;
 

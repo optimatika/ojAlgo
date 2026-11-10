@@ -149,17 +149,6 @@ final class SimplexTableauSolver extends LinearSolver {
         List<Variable> negVariables = model.getNegativeVariables();
         Set<IntIndex> fixedVariables = model.getFixedVariables();
 
-        for (Variable pos : posVariables) {
-            if (pos.isEqualityConstraint()) {
-                BasicLogger.debug(pos);
-            }
-        }
-        for (Variable neg : negVariables) {
-            if (neg.isEqualityConstraint()) {
-                BasicLogger.debug(neg);
-            }
-        }
-
         List<Variable> bounds = model.bounds().collect(Collectors.toList());
 
         List<Variable> varsPosUp = new ArrayList<>();
