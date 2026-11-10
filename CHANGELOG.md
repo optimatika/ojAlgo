@@ -11,10 +11,20 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.optimisation
+
+- `ExpressionsBasedModel.newRealVariable(String)`, `newIntegerVariable(String)` and `newBinaryVariable(String)`: the same as `newVariable(String)`, `newVariable(String).integer()` and `newVariable(String).binary()`. And `newConstraint(String)`, the same as `newExpression(String)`. They are named as in the Optimisation Service client's `OptModel`, so a model reads the same in both.
+- `ExpressionsBasedModel.getObjective()`: the expression named "OBJECTIVE", created with weight 1 if there is none – a way to write the objective function in one place, `model.getObjective().set(x, 3).set(y, 5)`. It complements the weights on variables and expressions, which work as before and add to it. Not to be confused with `objective()`, which still generates the complete objective function from all the weights.
+- `Optimisation.Result` implements `AccessScalar<Double>` for the objective function's value – `doubleValue()`, `get()`, `intValue()` and so on – alongside `Access1D<BigDecimal>` for the variables' values, `doubleValue(i)` and `get(i)`. And `isOptimal()` and `isFeasible()`, the same as `getState().isOptimal()` and `getState().isFeasible()`.
+- `Variable.doubleValue()`, `floatValue()`, `longValue()`, `intValue()`, `shortValue()` and `booleanValue()`: the value, 0 (or `false`) when there is none, rounded half to even to whole numbers, and `true` above 0.5.
+
 ### Changed
 
 #### org.ojalgo.optimisation
 
+- `ExpressionsBasedModel.submit(Sense)` writes the solution into the variables when the solve is done, as `minimise()` and `maximise()` do, and its result carries the objective function's value as the model has it. A solve that ended without a result – aborted on the Optimisation Service, say – completes the `Future` with a `FAILED` result, instead of failing it with a `NullPointerException`.
 - `ExpressionsBasedModel`: presolve prints a warning to standard error, at most once per model, when it fixes a variable whose range is within the feasibility tolerance, but not when multiplied by the variable's largest constraint or objective coefficient – e.g. max 2e20 x + z subject to 1e20 x + z <= 2, x in [0, 3e-20] and z in [0, 1], where x is fixed at 1e-20 and 3 is reported, while the optimum is 4. Such a model is badly scaled. The result is unchanged. (Issue [#709](https://github.com/optimatika/ojAlgo/issues/709))
 - `NodeKey`: `MIN_OBJECTIVE` and `MAX_OBJECTIVE` break ties in the objective function value by depth, the smallest first, before displacement. Ties are common, as both children of a node have its objective function value. Ordered by displacement only, the nodes of some deep branches always came first, and with a single worker, `parallelism(1)`, the search could continue until the time limit, never reaching the nodes that would have ended it.
 

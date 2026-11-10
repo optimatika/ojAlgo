@@ -43,28 +43,6 @@ import org.ojalgo.type.context.NumberContext;
 class ExpressionsBasedModelTest extends OptimisationTests {
 
     @Test
-    void testDuplicateExpressionNamesNotAllowed() {
-
-        ExpressionsBasedModel model = new ExpressionsBasedModel();
-
-        model.newExpression("c");
-        TestUtils.assertThrows(IllegalArgumentException.class, () -> model.newExpression("c"));
-        TestUtils.assertEquals(1, model.countExpressions());
-
-        // Generated names must not clash with existing ones
-        model.newExpression("EXPR2");
-        model.addExpression();
-        model.removeExpression("c");
-        model.addExpression();
-        TestUtils.assertEquals(3, model.countExpressions());
-
-        // A removed name can be used again, and a copy keeps enforcing uniqueness
-        model.newExpression("c");
-        ExpressionsBasedModel copy = model.copy();
-        TestUtils.assertThrows(IllegalArgumentException.class, () -> copy.newExpression("c"));
-    }
-
-    @Test
     void testAddingVariableToExpression() {
         ExpressionsBasedModel model = new ExpressionsBasedModel();
         Variable x1 = model.newVariable("x1").lower(0).upper(20).weight(1);
@@ -172,6 +150,28 @@ class ExpressionsBasedModelTest extends OptimisationTests {
     }
 
     @Test
+    void testDuplicateExpressionNamesNotAllowed() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        model.newExpression("c");
+        TestUtils.assertThrows(IllegalArgumentException.class, () -> model.newExpression("c"));
+        TestUtils.assertEquals(1, model.countExpressions());
+
+        // Generated names must not clash with existing ones
+        model.newExpression("EXPR2");
+        model.addExpression();
+        model.removeExpression("c");
+        model.addExpression();
+        TestUtils.assertEquals(3, model.countExpressions());
+
+        // A removed name can be used again, and a copy keeps enforcing uniqueness
+        model.newExpression("c");
+        ExpressionsBasedModel copy = model.copy();
+        TestUtils.assertThrows(IllegalArgumentException.class, () -> copy.newExpression("c"));
+    }
+
+    @Test
     void testExpressionSetAdd() {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
@@ -227,6 +227,49 @@ class ExpressionsBasedModelTest extends OptimisationTests {
         TestUtils.assertEquals(0.5, maxResult.doubleValue(0), PrimitiveMath.MACHINE_EPSILON);
         TestUtils.assertEquals(2.0, maxResult.doubleValue(1), PrimitiveMath.MACHINE_EPSILON);
         TestUtils.assertEquals(0.0, maxResult.doubleValue(2), PrimitiveMath.MACHINE_EPSILON);
+    }
+
+    /**
+     * {@link ExpressionsBasedModel#getObjective()} is one expression, created once with weight 1, and its
+     * terms add to those of any other weights – linear and quadratic alike.
+     */
+    @Test
+    void testGetObjective() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x = model.newRealVariable("x").lower(0).upper(4);
+        Variable y = model.newRealVariable("y").lower(0).upper(1).weight(2);
+
+        Expression objective = model.getObjective().set(x, 3);
+
+        TestUtils.assertTrue(objective == model.getObjective());
+        TestUtils.assertTrue(objective == model.getExpression("OBJECTIVE"));
+        TestUtils.assertEquals(1.0, objective.getContributionWeight().doubleValue());
+        TestUtils.assertFalse(objective.isConstraint());
+
+        TestUtils.assertEquals(14.0, model.maximise().getValue()); // 3 * 4 + 2 * 1
+
+        ExpressionsBasedModel quadratic = new ExpressionsBasedModel();
+        Variable z = quadratic.newRealVariable("z");
+        quadratic.getObjective().set(z, z, 1).set(z, -2); // z² - 2z
+        TestUtils.assertEquals(-1.0, quadratic.minimise().getValue());
+        TestUtils.assertEquals(1.0, z.doubleValue());
+    }
+
+    /**
+     * An expression named "OBJECTIVE" that already exists is what
+     * {@link ExpressionsBasedModel#getObjective()} returns, as it is.
+     */
+    @Test
+    void testGetObjectiveExisting() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Expression existing = model.newExpression("OBJECTIVE").weight(-1);
+
+        TestUtils.assertTrue(existing == model.getObjective());
+        TestUtils.assertEquals(-1.0, model.getObjective().getContributionWeight().doubleValue());
     }
 
     /**
@@ -358,6 +401,26 @@ class ExpressionsBasedModelTest extends OptimisationTests {
         TestUtils.assertFalse(tmpModel.validate());
     }
 
+    /**
+     * {@link ExpressionsBasedModel#newConstraint(String)} makes an expression like
+     * {@link ExpressionsBasedModel#newExpression(String)} does, under the same rule for names, and it
+     * constrains once it has a limit.
+     */
+    @Test
+    void testNewConstraint() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x = model.newRealVariable("x").lower(0).weight(1);
+        Expression limit = model.newConstraint("limit").set(x, 2).upper(10);
+
+        TestUtils.assertTrue(limit == model.getExpression("limit"));
+        TestUtils.assertTrue(limit.isConstraint());
+        TestUtils.assertEquals(5.0, model.maximise().getValue());
+
+        TestUtils.assertThrows(IllegalArgumentException.class, () -> model.newConstraint("limit"));
+    }
+
     @Test
     void testPresolverCase2() {
 
@@ -397,6 +460,38 @@ class ExpressionsBasedModelTest extends OptimisationTests {
 
         TestUtils.assertEquals(TWO, varZ.getLowerLimit(), precision);
 
+    }
+
+    /**
+     * A {@link Optimisation.Result} is the objective function's value as an
+     * {@link org.ojalgo.structure.AccessScalar}, and the variables' values as an
+     * {@link org.ojalgo.structure.Access1D}, and says whether it is optimal and feasible.
+     */
+    @Test
+    void testResultAccessors() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x = model.newRealVariable("x").lower(0).upper(3);
+        Variable y = model.newRealVariable("y").lower(0).upper(2);
+        model.getObjective().set(x, 2).set(y, 1);
+
+        Optimisation.Result result = model.maximise();
+
+        TestUtils.assertTrue(result.isOptimal());
+        TestUtils.assertTrue(result.isFeasible());
+
+        TestUtils.assertEquals(8.0, result.doubleValue());
+        TestUtils.assertEquals(8, result.intValue());
+        TestUtils.assertEquals(result.getValue(), result.doubleValue());
+
+        TestUtils.assertEquals(3.0, result.doubleValue(0));
+        TestUtils.assertEquals(2.0, result.doubleValue(1));
+        TestUtils.assertEquals(3, result.intValue(0));
+        TestUtils.assertEquals(0, BigDecimal.valueOf(2).compareTo(result.get(1)));
+
+        TestUtils.assertFalse(Optimisation.Result.of(Optimisation.State.INFEASIBLE).isFeasible());
+        TestUtils.assertFalse(Optimisation.Result.of(Optimisation.State.FEASIBLE).isOptimal());
     }
 
     @Test
@@ -538,6 +633,57 @@ class ExpressionsBasedModelTest extends OptimisationTests {
         TestUtils.assertEquals(2, maxResult.doubleValue(0), precision);
         TestUtils.assertEquals(3, maxResult.doubleValue(1), precision);
         TestUtils.assertEquals(1, maxResult.doubleValue(2), precision);
+    }
+
+    /**
+     * The typed factories make the same variables as {@link ExpressionsBasedModel#newVariable(String)}: real
+     * and integer ones free, binary ones between 0 and 1.
+     */
+    @Test
+    void testTypedVariableFactories() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x = model.newRealVariable("x");
+        Variable n = model.newIntegerVariable("n");
+        Variable b = model.newBinaryVariable("b");
+
+        TestUtils.assertFalse(x.isInteger());
+        TestUtils.assertFalse(x.isLowerLimitSet());
+        TestUtils.assertFalse(x.isUpperLimitSet());
+
+        TestUtils.assertTrue(n.isInteger());
+        TestUtils.assertFalse(n.isLowerLimitSet());
+        TestUtils.assertFalse(n.isUpperLimitSet());
+
+        TestUtils.assertTrue(b.isBinary());
+
+        TestUtils.assertEquals(3, model.countVariables());
+    }
+
+    /**
+     * The typed value accessors read {@link Variable#getValue()}, rounding to whole numbers half to even,
+     * with 0 (or {@code false}) for no value – and after a solve, the solution.
+     */
+    @Test
+    void testVariableValueAccessors() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x = model.newRealVariable("x").lower(0).upper(2.5).weight(1);
+
+        TestUtils.assertEquals(0.0, x.doubleValue());
+        TestUtils.assertEquals(0, x.intValue());
+        TestUtils.assertEquals(false, x.booleanValue());
+
+        TestUtils.assertTrue(model.maximise().getState().isOptimal());
+
+        TestUtils.assertEquals(2.5, x.doubleValue());
+        TestUtils.assertEquals(2.5, x.floatValue());
+        TestUtils.assertEquals(2, x.intValue());
+        TestUtils.assertEquals(2L, x.longValue());
+        TestUtils.assertEquals(2, x.shortValue());
+        TestUtils.assertEquals(true, x.booleanValue());
     }
 
 }

@@ -51,9 +51,11 @@ import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.optimisation.integer.IntegerStrategy;
 import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.AccessScalar;
 import org.ojalgo.structure.Primitive1D;
 import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.CalendarDateUnit;
+import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.keyvalue.EntryPair;
@@ -768,7 +770,12 @@ public interface Optimisation {
 
     }
 
-    public static final class Result implements Optimisation, Access1D<BigDecimal>, Comparable<Optimisation.Result> {
+    /**
+     * The result of a solve: its {@link #getState() state}, the objective function's value – as an
+     * {@link NumberDefinition}: {@link #doubleValue()} – and the variables' values – as an {@link Access1D}:
+     * {@link #doubleValue(int)}, {@link #get(long)} – in the order the variables were created.
+     */
+    public static final class Result implements Optimisation, Access1D<BigDecimal>, NumberDefinition, Comparable<Optimisation.Result> {
 
         public static Result of(final double value, final Optimisation.State state, final double... solution) {
             return new Result(state, value, ArrayR064.wrap(solution));
@@ -847,6 +854,17 @@ public interface Optimisation {
         @Override
         public long count() {
             return mySolution.count();
+        }
+
+        /**
+         * The objective function's value, the same as {@link #getValue()}.
+         * <p>
+         * Redundant by design: with {@link #get()} it is this result as an {@link AccessScalar}, read as the
+         * Optimisation Service client's {@code OptResult} is, so that code reads the same with both.
+         */
+        @Override
+        public double doubleValue() {
+            return myValue;
         }
 
         @Override
@@ -999,6 +1017,26 @@ public interface Optimisation {
             result = prime * result + (myState == null ? 0 : myState.hashCode());
             long temp = Double.doubleToLongBits(myValue);
             return prime * result + (int) (temp ^ temp >>> 32);
+        }
+
+        /**
+         * The same as {@code getState().isFeasible()}.
+         * <p>
+         * Redundant by design: named as in the Optimisation Service client's {@code OptResult}, so that code
+         * reads the same with both.
+         */
+        public boolean isFeasible() {
+            return myState.isFeasible();
+        }
+
+        /**
+         * The same as {@code getState().isOptimal()}.
+         * <p>
+         * Redundant by design: named as in the Optimisation Service client's {@code OptResult}, so that code
+         * reads the same with both.
+         */
+        public boolean isOptimal() {
+            return myState.isOptimal();
         }
 
         /**

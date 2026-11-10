@@ -50,9 +50,17 @@ public enum Parallelism implements ParallelismSupplier {
      */
     EIGHT(() -> 8),
     /**
+     * 6
+     */
+    SIX(() -> 6),
+    /**
      * 4
      */
     FOUR(() -> 4),
+    /**
+     * 3
+     */
+    THREE(() -> 3),
     /**
      * 2
      */
