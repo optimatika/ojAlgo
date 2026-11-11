@@ -10,7 +10,7 @@ oj! Algorithms - ojAlgo - is a pure Java library, with zero dependencies, for ma
 
 ## High Performance on a Rich Feature Set with Zero Dependencies
 
-- Optimisation (mathematical programming): LP, QP and MIP solvers with a modelling API, `ExpressionsBasedModel` – pure Java with zero dependencies. The same models can also run on native solvers such as Gurobi, CPLEX, MOSEK, COPT, Xpress, HiGHS, SCIP and CP-SAT, through integration modules on Maven Central.
+- Optimisation (mathematical programming): LP, QP and MIP solvers with a modelling API, `ExpressionsBasedModel` – pure Java with zero dependencies. The same models can also run on native solvers such as Gurobi, CPLEX, MOSEK, COPT, Xpress, HiGHS, SCIP and CP-SAT, through integration modules on Maven Central. For models that need more solving power, Optimatika's [Optimisation Service](https://www.optimatika.se/optimisation-service/) solves the same model on a best-of-breed suite of solvers, with no native code in your application – try it on the public shared instance, free and without sign-up.
 - Linear algebra: dense and sparse matrices, LU, QR, Cholesky, LDL, singular value and eigenvalue decompositions, equation solvers, least squares and iterative solvers. ojAlgo is the fastest pure Java linear algebra library available. That statement is backed by the latest Java Matrix Benchmark results – that’s a third party independent benchmark (not written by anyone associated with ojAlgo).
 - A collection of “array” classes that can be sparse or dense and arbitrarily large. They can be used as 1-, 2- or N/Any-dimensional arrays, and may contain/handle a multitude of different number types including complex numbers, rational numbers and quaternions. The memory for the arrays can alternatively be allocated off heap or in a file. The linear algebra part of ojAlgo builds on these arrays – they’re fast and efficient.
 - A growing collection of utilities for data science, including Artificial Neural Networks, clustering and a collection of tools for reading/writing/processing data
@@ -25,7 +25,7 @@ ojAlgo is available at [The Central (Maven) Repository](https://mvnrepository.co
 | Java | Released | ojAlgo |
 |------|----------|--------|
 | 22+ | Future | on the `develop` branch |
-| 11 | 2026-10-28 | 57.6.1 |
+| 11 | 2026-11-11 | 57.7.0 |
 | 8 | 2022-08-26 | 51.4.1 |
 | 7 | 2015-08-21 | 37.1.1 |
 | 6 | 2011-12-05 | 31.0 |
@@ -46,7 +46,6 @@ The latest version is shown in the Maven Central badge at the top of this page.
 A chair earns a profit of 45 and a table 80. Decide how many of each to make to maximise total profit, with 400 machine hours available:
 
 ```java
-import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
@@ -57,27 +56,28 @@ public class FirstModel {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        // Variables: bounds, and a weight. The weight is the objective coefficient,
-        // here the profit per unit.
-        Variable chairs = model.newVariable("Chairs").lower(0).upper(100).weight(45);
-        Variable tables = model.newVariable("Tables").lower(0).upper(40).weight(80);
+        // Variables, with bounds
+        Variable chairs = model.newRealVariable("Chairs").lower(0).upper(100);
+        Variable tables = model.newRealVariable("Tables").lower(0).upper(40);
 
         // A constraint: 2 hours per chair + 5 hours per table <= 400 hours
-        Expression hours = model.newExpression("Machine hours").upper(400);
-        hours.set(chairs, 2).set(tables, 5);
+        model.newConstraint("Machine hours").upper(400).set(chairs, 2).set(tables, 5);
+
+        // The objective: the profit per unit
+        model.getObjective().set(chairs, 45).set(tables, 80);
 
         Optimisation.Result result = model.maximise();
 
-        if (result.getState().isOptimal()) {
-            System.out.println("Profit: " + result.getValue());
-            System.out.println("Chairs: " + chairs.getValue().toPlainString());
-            System.out.println("Tables: " + tables.getValue().toPlainString());
+        if (result.isOptimal()) {
+            System.out.println("Profit: " + result.doubleValue());
+            System.out.println("Chairs: " + chairs.doubleValue());
+            System.out.println("Tables: " + tables.doubleValue());
         }
     }
 }
 ```
 
-The same pattern covers LP, QP and MIP: call `integer()` or `binary()` on a variable for integer models, and set quadratic terms on an expression for quadratic ones. The [Optimisation Cookbook](https://www.ojalgo.org/optimisation-cookbook/) has complete, runnable models for common problem shapes – assignment, bin packing, shift scheduling, blending, facility location, portfolio optimisation and more.
+The same pattern covers LP, QP and MIP: create variables with `newIntegerVariable(name)` or `newBinaryVariable(name)` for integer models, and set quadratic terms on the objective, `getObjective().set(x, y, coefficient)`, for quadratic ones. These names are shared with the Optimisation Service client's `OptModel`, so a model reads the same in both. The [Optimisation Cookbook](https://www.ojalgo.org/optimisation-cookbook/) has complete, runnable models for common problem shapes – assignment, bin packing, shift scheduling, blending, facility location, portfolio optimisation and more.
 
 ### A First Linear Algebra Example
 
@@ -151,7 +151,7 @@ Where to ask questions and report bugs is covered in [SUPPORT.md](SUPPORT.md). I
 
 ### Commercial Support
 
-The [Optimatika subscription](https://www.optimatika.se/subscription/) gives you priority support, access to the source repositories of the solver integrations, and the right to request new builds of them.
+The [Optimatika subscription](https://www.optimatika.se/subscription/) gives you support from the maintainers, the [Optimisation Service](https://www.optimatika.se/optimisation-service/) licence, and the right to request new releases of any artifact – ojAlgo, the solver integrations or the Service client.
 
 ## Building from Source
 

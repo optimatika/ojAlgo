@@ -153,7 +153,7 @@ public class Expression extends ModelEntity<Expression> {
      * Expression expr1 = model.newExpression("Expr1");
      * Expression expr2 = model.newExpression("Expr2");
      * ...
-     * model.newExpression("Expr3").add(2.0, expr1).add(-3.0, expr2).lower(0.0);
+     * model.newConstraint("Expr3").add(2.0, expr1).add(-3.0, expr2).lower(0.0);
      * }</pre>
      */
     public final Expression add(final Comparable<?> scale, final Expression values) {

@@ -219,7 +219,7 @@ public interface NumberDefinition {
     /**
      * Similar to {@link #parseDouble(CharSequence)} but for float, and thus limited to 7 digits after the
      * decimal point. It is almost 10 times faster than {@link Float#parseFloat(String)}.
-     * 
+     *
      * @see #parseDouble(CharSequence)
      */
     static float parseFloat(final CharSequence sequence) {
@@ -286,7 +286,7 @@ public interface NumberDefinition {
 
     /**
      * Similar to {@link #parseDouble(CharSequence)} and {@link #parseLong(CharSequence)} but for int.
-     * 
+     *
      * @see #parseDouble(CharSequence)
      * @see #parseLong(CharSequence)
      */
@@ -322,7 +322,7 @@ public interface NumberDefinition {
     /**
      * Similar to {@link #parseDouble(CharSequence)} but for long. Performs roughly the same as
      * {@link Long#parseLong(String)}, but takes a {@link CharSequence}, rather than {@link String}, as input.
-     * 
+     *
      * @see #parseDouble(CharSequence)
      */
     static long parseLong(final CharSequence sequence) {
@@ -356,7 +356,7 @@ public interface NumberDefinition {
 
     /**
      * Similar to {@link #parseDouble(CharSequence)} and {@link #parseLong(CharSequence)} but for short.
-     * 
+     *
      * @see #parseDouble(CharSequence)
      * @see #parseLong(CharSequence)
      */

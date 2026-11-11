@@ -77,8 +77,10 @@ import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
  * Typical workflow:
  * <ol>
  * <li>Create a model
- * <li>Add variables via {@link #newVariable(String)} with bounds and/or weights
- * <li>Add expressions via {@link #newExpression(String)} with coefficients, bounds, and/or weights
+ * <li>Add variables via {@link #newRealVariable(String)}, {@link #newIntegerVariable(String)} or
+ * {@link #newBinaryVariable(String)}, with bounds
+ * <li>Add constraints via {@link #newConstraint(String)}, with coefficients and bounds
+ * <li>Write the objective function in {@link #getObjective()} – or as weights on variables and expressions
  * <li>Solve with {@link #minimise()} or {@link #maximise()}
  * </ol>
  * <p>
@@ -1719,9 +1721,9 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      * Not to be confused with {@link #objective()}, which generates the complete objective function from all
      * the weights, this expression's included, and is not to be modified.
      * <p>
-     * Redundant by design: the same as {@code newExpression("OBJECTIVE").weight(1)}, the first time. It writes
-     * the objective as the Optimisation Service client's {@code OptModel} does, and as many expect, so that a
-     * model reads the same in both.
+     * Redundant by design: the same as {@code newExpression("OBJECTIVE").weight(1)}, the first time. It
+     * writes the objective as the Optimisation Service client's {@code OptModel} does, and as many expect, so
+     * that a model reads the same in both.
      *
      * @return The expression to write the objective function in
      */

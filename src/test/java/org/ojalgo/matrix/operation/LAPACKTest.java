@@ -1230,6 +1230,47 @@ public class LAPACKTest {
         BLASLevel3Test.assertArray(message, expected, actual);
     }
 
+    /**
+     * The inverse, in the triangle that held the factor, multiplied by A gives the identity. The other
+     * triangle (NaN), and everything outside A, is left untouched.
+     */
+    static void doTestPOTRI(final Implementation implementation, final boolean tight, final boolean upper, final int n) {
+
+        Storage a = LAPACKTest.newSPD(new Random(n), n, upper, tight);
+        double[] original = a.data.clone();
+        POTRF.JVM.invoke(upper, n, a.data, a.offset, a.ld);
+        double[] factor = a.data.clone();
+
+        int info;
+        switch (implementation) {
+            case JAVA:
+                info = POTRI.JVM.invoke(upper, n, a.data, a.offset, a.ld);
+                break;
+            default:
+                info = POTRI.invoke(upper, n, a.data, a.offset, a.ld);
+                break;
+        }
+
+        String message = "POTRI " + implementation + " tight=" + tight + " upper=" + upper + " " + n;
+        TestUtils.assertEquals(message + " info", 0, info);
+
+        double[] expected = factor.clone();
+        double[] actual = a.data.clone();
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i < n; i++) {
+                if (upper ? i <= j : i >= j) {
+                    double sum = 0.0;
+                    for (int k = 0; k < n; k++) {
+                        sum += LAPACKTest.symmetric(a.data, a, upper, i, k) * LAPACKTest.symmetric(original, a, upper, k, j);
+                    }
+                    expected[a.index(i, j)] = i == j ? 1.0 : 0.0;
+                    actual[a.index(i, j)] = sum;
+                }
+            }
+        }
+        BLASLevel3Test.assertArray(message, expected, actual);
+    }
+
     static void doTestPOTRS(final Implementation implementation, final boolean tight, final boolean upper, final int n, final int nrhs) {
 
         Random random = new Random(n + 31 * nrhs);
@@ -1312,6 +1353,87 @@ public class LAPACKTest {
     /**
      * With separate, the overload that leaves A unchanged and writes the eigenvectors to a separate Z.
      */
+    /**
+     * T, symmetric tridiagonal with the diagonal and the subdiagonal given: with the rotations applied to Z =
+     * I, T*Z = Z*diag(d) and Z is orthogonal. The eigenvalues only are the same, exactly, and the trace and
+     * Frobenius norm are those of T (scaled, so that the squares neither overflow nor underflow).
+     */
+    static void doTestSTEQR(final String message, final double[] diagonal, final double[] subdiagonal) {
+
+        int n = diagonal.length;
+
+        double[] e = new double[n];
+        System.arraycopy(subdiagonal, 0, e, 0, n - 1);
+        double[] d = diagonal.clone();
+        double[] z = new double[n * n];
+        for (int j = 0; j < n; j++) {
+            z[j + j * n] = 1.0;
+        }
+
+        STEQR.invoke(d, e, (low, high, cos, sin) -> {
+            for (int r = 0; r < n; r++) {
+                double zLow = z[r + low * n];
+                double zHigh = z[r + high * n];
+                z[r + low * n] = cos * zLow - sin * zHigh;
+                z[r + high * n] = sin * zLow + cos * zHigh;
+            }
+        });
+
+        double[] valuesOnly = diagonal.clone();
+        double[] work = new double[n];
+        System.arraycopy(subdiagonal, 0, work, 0, n - 1);
+        STEQR.invoke(valuesOnly, work, RotateColumns.NULL);
+        TestUtils.assertTrue(message + " values only", Arrays.equals(d, valuesOnly));
+
+        double scale = Double.MIN_NORMAL;
+        for (int i = 0; i < n; i++) {
+            scale = Math.max(scale, Math.abs(diagonal[i]));
+            if (i + 1 < n) {
+                scale = Math.max(scale, Math.abs(subdiagonal[i]));
+            }
+        }
+        double trace = 0.0;
+        double sumOfSquares = 0.0;
+        double sumOfValues = 0.0;
+        double sumOfSquaredValues = 0.0;
+        for (int i = 0; i < n; i++) {
+            trace += diagonal[i] / scale;
+            sumOfSquares += (diagonal[i] / scale) * (diagonal[i] / scale);
+            if (i + 1 < n) {
+                sumOfSquares += 2.0 * (subdiagonal[i] / scale) * (subdiagonal[i] / scale);
+            }
+            sumOfValues += d[i] / scale;
+            sumOfSquaredValues += (d[i] / scale) * (d[i] / scale);
+        }
+        BLASLevel3Test.assertArray(message + " trace and norm", new double[] { trace, sumOfSquares }, new double[] { sumOfValues, sumOfSquaredValues });
+
+        double[] identity = new double[n * n];
+        double[] product = new double[n * n];
+        double[] expected = new double[n * n];
+        double[] actual = new double[n * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i < n; i++) {
+                double ztz = 0.0;
+                for (int p = 0; p < n; p++) {
+                    ztz += z[p + i * n] * z[p + j * n];
+                }
+                double tz = diagonal[i] * z[i + j * n];
+                if (i > 0) {
+                    tz += subdiagonal[i - 1] * z[i - 1 + j * n];
+                }
+                if (i + 1 < n) {
+                    tz += subdiagonal[i] * z[i + 1 + j * n];
+                }
+                identity[i + j * n] = i == j ? 1.0 : 0.0;
+                product[i + j * n] = ztz;
+                expected[i + j * n] = z[i + j * n] * d[j];
+                actual[i + j * n] = tz;
+            }
+        }
+        BLASLevel3Test.assertArray(message + " Z^T*Z", identity, product);
+        BLASLevel3Test.assertArray(message + " T*Z", expected, actual);
+    }
+
     static void doTestSYEVD(final Implementation implementation, final boolean tight, final boolean vectors, final boolean separate, final int n) {
 
         // Symmetric indefinite, stored in the lower triangle (the upper triangle is NaN)
@@ -2099,6 +2221,51 @@ public class LAPACKTest {
     }
 
     @Test
+    public void testPOTRI() {
+        for (Implementation implementation : Implementation.values()) {
+            for (boolean tight : BOOLEANS) {
+                for (boolean upper : BOOLEANS) {
+                    for (int n : SIZES_SPD) {
+                        LAPACKTest.doTestPOTRI(implementation, tight, upper, n);
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testPOTRIArgumentChecks() {
+
+        double[] data = new double[16];
+
+        TestUtils.assertThrows(IllegalArgumentException.class, () -> POTRI.invoke(false, -1, data, 0, 1));
+        TestUtils.assertThrows(IllegalArgumentException.class, () -> POTRI.invoke(true, 4, data, 0, 3));
+
+        // Nothing to invert, nothing is accessed
+        TestUtils.assertEquals(0, POTRI.invoke(false, 0, new double[0], 0, 1));
+    }
+
+    /**
+     * A zero on the diagonal of the factor is reported, and A left unchanged.
+     */
+    @Test
+    public void testPOTRISingular() {
+        for (boolean upper : BOOLEANS) {
+            for (int n : new int[] { 12, 60 }) {
+
+                Storage a = LAPACKTest.newSPD(new Random(n), n, upper, false);
+                POTRF.JVM.invoke(upper, n, a.data, a.offset, a.ld);
+                a.set(3, 3, 0.0);
+                double[] before = a.data.clone();
+
+                String message = "POTRI upper=" + upper + " " + n;
+                TestUtils.assertEquals(message, 4, POTRI.invoke(upper, n, a.data, a.offset, a.ld));
+                BLASLevel3Test.assertUnchanged(message, before, a.data);
+            }
+        }
+    }
+
+    @Test
     public void testPOTRS() {
         for (Implementation implementation : Implementation.values()) {
             for (boolean tight : BOOLEANS) {
@@ -2145,6 +2312,76 @@ public class LAPACKTest {
                 }
             }
         }
+    }
+
+    @Test
+    public void testSTEQR() {
+        for (int n : new int[] { 1, 2, 3, 7, 17, 40, 150 }) {
+            Random random = new Random(n);
+            double[] d = new double[n];
+            double[] e = new double[n];
+            for (int i = 0; i < n; i++) {
+                d[i] = 2.0 * random.nextDouble() - 1.0;
+                e[i] = i + 1 < n ? 2.0 * random.nextDouble() - 1.0 : 0.0;
+            }
+            LAPACKTest.doTestSTEQR("STEQR " + n, d, e);
+        }
+    }
+
+    /**
+     * Blocks that split off as 2-by-2, solved in closed form: random ones, and with a = c, a = -c, a = c = 0,
+     * a tiny b, negative and mixed signs.
+     */
+    @Test
+    public void testSTEQR2x2() {
+
+        double[][] blocks = { { 0.3, -0.7, 0.9 }, { 0.5, 0.25, 0.5 }, { -0.4, 0.6, 0.4 }, { 0.0, 1.0, 0.0 }, { 1.0, 1E-9, 2.0 }, { -2.0, -0.5, -1.0 },
+                { 3.0, -2.0, -1.0 }, { -1.0, 4.0, 3.0 }, { 2.0, 1E-15, 2.0 }, { -0.1, 0.1, -0.1 } };
+
+        for (double[] block : blocks) {
+            LAPACKTest.doTestSTEQR("STEQR 2x2 " + Arrays.toString(block), new double[] { block[0], block[2] }, new double[] { block[1], 0.0 });
+        }
+
+        // All of them, as the diagonal blocks of one matrix: each splits off in turn
+        int n = 2 * blocks.length;
+        double[] d = new double[n];
+        double[] e = new double[n];
+        for (int k = 0; k < blocks.length; k++) {
+            d[2 * k] = blocks[k][0];
+            e[2 * k] = blocks[k][1];
+            d[2 * k + 1] = blocks[k][2];
+        }
+        LAPACKTest.doTestSTEQR("STEQR 2x2 blocks", d, e);
+    }
+
+    /**
+     * Scaled to where the squares in the plane rotations overflow or underflow, around their square roots,
+     * and with elements of very different magnitude.
+     */
+    @Test
+    public void testSTEQRScaled() {
+
+        int n = 17;
+
+        for (double scale : new double[] { 1E-300, 1E-154, 1E154, 1E300 }) {
+            Random random = new Random(n);
+            double[] d = new double[n];
+            double[] e = new double[n];
+            for (int i = 0; i < n; i++) {
+                d[i] = scale * (2.0 * random.nextDouble() - 1.0);
+                e[i] = i + 1 < n ? scale * (2.0 * random.nextDouble() - 1.0) : 0.0;
+            }
+            LAPACKTest.doTestSTEQR("STEQR scale " + scale, d, e);
+        }
+
+        Random random = new Random(n);
+        double[] d = new double[n];
+        double[] e = new double[n];
+        for (int i = 0; i < n; i++) {
+            d[i] = Math.pow(10.0, 16 * i - 130) * (2.0 * random.nextDouble() - 1.0);
+            e[i] = i + 1 < n ? Math.pow(10.0, 16 * i - 122) * (2.0 * random.nextDouble() - 1.0) : 0.0;
+        }
+        LAPACKTest.doTestSTEQR("STEQR graded", d, e);
     }
 
     @Test

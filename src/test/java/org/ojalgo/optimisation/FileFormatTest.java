@@ -23,8 +23,12 @@ package org.ojalgo.optimisation;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.Timeout.ThreadMode;
 import org.ojalgo.TestUtils;
 import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
 import org.ojalgo.optimisation.Optimisation.Result;
@@ -74,6 +78,22 @@ class FileFormatTest extends OptimisationTests {
             TestUtils.assertStateNotLessThanOptimal(parsedMin);
             TestUtils.assertEquals(format + " round-trip: min value", minResult.getValue(), parsedMin.getValue(), ACCURACY);
         }
+    }
+
+    /**
+     * The LP text is refused, with an error that names the line and says what is wrong.
+     */
+    private static void assertRefused(final String lp, final int line, final String expected) {
+
+        IllegalArgumentException refused = TestUtils.assertThrows(IllegalArgumentException.class, () -> FileFormatTest.parseLP(lp));
+
+        String message = refused.getMessage();
+        TestUtils.assertTrue(message, message.startsWith("Line " + line + ": "));
+        TestUtils.assertTrue(message, message.contains(expected));
+    }
+
+    private static ExpressionsBasedModel parseLP(final String lp) {
+        return ExpressionsBasedModel.parse(new ByteArrayInputStream(lp.getBytes()), FileFormat.LP);
     }
 
     private static byte[] writeToBytes(final ExpressionsBasedModel model, final FileFormat format) {
@@ -278,6 +298,96 @@ class FileFormatTest extends OptimisationTests {
         Result result = model.minimise();
         TestUtils.assertStateNotLessThanOptimal(result);
         TestUtils.assertEquals(1.0, result.getValue(), ACCURACY);
+    }
+
+    /**
+     * Whatever is changed in a valid model, reading it ends: with a model, or with an error saying why not.
+     */
+    @Test
+    @Timeout(value = 30, unit = TimeUnit.SECONDS, threadMode = ThreadMode.SEPARATE_THREAD)
+    void testLPReadEndsWhateverTheInput() {
+
+        String valid = "\\ A comment\nMaximize\n obj: 3 x + 5 y - z + [ x ^2 + 2 x * y ] / 2\nSubject To\n c1: x + y + z <= 10\n c2: -4 <= x - 2 y <= 8\n"
+                + " c3: x + [ y ^2 ] >= 1\nBounds\n x <= 8\n -inf <= z <= 3\n y free\nGeneral\n x\nBinary\n z\nEnd\n";
+        String inserted = "+-*/^=:[]<>()., x7e3\n";
+
+        Random random = new Random(20261111L);
+
+        for (int i = 0; i < 5_000; i++) {
+
+            StringBuilder mutated = new StringBuilder(valid);
+
+            for (int change = 1 + random.nextInt(3); change > 0; change--) {
+                int at = random.nextInt(mutated.length());
+                if (random.nextBoolean()) {
+                    mutated.deleteCharAt(at);
+                } else {
+                    mutated.insert(at, inserted.charAt(random.nextInt(inserted.length())));
+                }
+            }
+
+            try {
+                FileFormatTest.parseLP(mutated.toString());
+            } catch (IllegalArgumentException refused) {
+                TestUtils.assertTrue(refused.getMessage(), refused.getMessage() != null && !refused.getMessage().isBlank());
+            }
+        }
+    }
+
+    /**
+     * Mistakes made writing LP by hand: each is an error naming its line, rather than a different model, or
+     * no answer at all.
+     */
+    @Test
+    @Timeout(value = 10, unit = TimeUnit.SECONDS, threadMode = ThreadMode.SEPARATE_THREAD)
+    void testLPReadRefusesWhatIsNotLP() {
+
+        String constraints = "Subject To\n c1: x + y <= 10\nEnd\n";
+
+        FileFormatTest.assertRefused("Maximize\n obj: 3*x + 5 y\n" + constraints, 2, "'3 x'");
+        FileFormatTest.assertRefused("Maximize\n obj: x / 2 + y\n" + constraints, 2, "division");
+        FileFormatTest.assertRefused("Maximize\n obj: 3 (x + y)\n" + constraints, 2, "parentheses");
+        FileFormatTest.assertRefused("Maximize\n obj: x(1) + y\n" + constraints, 2, "parentheses");
+        FileFormatTest.assertRefused("Maximize\n obj: x ^2 + y\n" + constraints, 2, "square brackets");
+        FileFormatTest.assertRefused("Maximize\n obj: x + y\nSubject To\n c1: x <= 10 - y\nEnd\n", 4, "right-hand side");
+        FileFormatTest.assertRefused("Maximize\n obj: x + y\nSubject To\n c1: x + y <= z\nEnd\n", 4, "right-hand side");
+        FileFormatTest.assertRefused("Maximize\n obj: x + y\nSubject To\n c1: x + y + 2 <= 10\nEnd\n", 4, "right-hand side");
+        FileFormatTest.assertRefused("Maximize\n obj: x + y\nSubject To\n c1: x + y <= 10\n c1: x - y <= 2\nEnd\n", 5, "already");
+        FileFormatTest.assertRefused("Maximize\n obj: x + y\nSubject To\n c1: x + y <= 10\nBinary\n x, y\nEnd\n", 6, "','");
+        FileFormatTest.assertRefused("Maximize\n obj: x + y\nSubject To\n c1: x + y <= 10\nEnd\nGeneral\n x\n", 6, "End");
+        FileFormatTest.assertRefused("hello world", 1, "Minimize or Maximize");
+
+        String headings = "Subject To, Bounds, General, Binary and End";
+        FileFormatTest.assertRefused("Maximize\n obj: 3 x + 5 y\nSubjet To\n c1: x + y <= 10\nEnd\n", 3, headings);
+        FileFormatTest.assertRefused("Maximize\n obj: x + y\nSubject To\n c1: x + y <= 10\nBounds\n x <= 8\nIntegers\n x\nEnd\n", 7, headings);
+        FileFormatTest.assertRefused("Maximize\n obj: x + y\nSubject To\n c1: x + y <= 10\nIntegers\n x\nEnd\n", 5, headings);
+    }
+
+    /**
+     * What is read beyond the bare format, as CPLEX reads it: =< and => for <= and >=, a constant in the
+     * objective function, and a bound before the expression, on either side. A variable named twice in an
+     * expression has the coefficients added.
+     */
+    @Test
+    void testLPReadVariants() {
+
+        ExpressionsBasedModel model = FileFormatTest.parseLP("Maximize\n obj: 3 x + 5 y + 100\nSubject To\n c1: x + y =< 10\n c2: -4 =< x - 2 y\n"
+                + " c3: 2 x => -50\n c4: 20 >= x + x + y\nBounds\n x <= 8\nEnd\n");
+
+        TestUtils.assertEquals(10.0, model.getExpression("c1").getUpperLimit().doubleValue(), ACCURACY);
+        TestUtils.assertEquals(-4.0, model.getExpression("c2").getLowerLimit().doubleValue(), ACCURACY);
+        TestUtils.assertEquals(-50.0, model.getExpression("c3").getLowerLimit().doubleValue(), ACCURACY);
+        TestUtils.assertEquals(20.0, model.getExpression("c4").getUpperLimit().doubleValue(), ACCURACY);
+        TestUtils.assertFalse(model.getExpression("c4").isLowerLimitSet());
+
+        Result result = model.maximise();
+        TestUtils.assertStateNotLessThanOptimal(result);
+        TestUtils.assertEquals(100.0 + 118.0 / 3.0, result.getValue(), ACCURACY);
+
+        FileFormatTest.assertRoundTrip(model, FileFormat.LP);
+
+        ExpressionsBasedModel twice = FileFormatTest.parseLP("Maximize\n obj: x\nSubject To\n c1: x + x <= 10\nEnd\n");
+        TestUtils.assertEquals(5.0, twice.maximise().getValue(), ACCURACY);
     }
 
     @Test

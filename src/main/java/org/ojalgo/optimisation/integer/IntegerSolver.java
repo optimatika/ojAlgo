@@ -524,7 +524,7 @@ public final class IntegerSolver extends GenericSolver {
 
         for (int i = 0, limit = strategy.countIntegerVariables(); i < limit; i++) {
             int globalIndex = strategy.getIndex(i);
-            snapped[globalIndex] = BigDecimal.valueOf(Math.rint(relaxed.doubleValue(globalIndex)));
+            snapped[globalIndex] = new BigDecimal(Math.rint(relaxed.doubleValue(globalIndex))); // Exact, and scale 0
         }
 
         for (int j = 0; j < nbVars; j++) {
@@ -1178,7 +1178,7 @@ public final class IntegerSolver extends GenericSolver {
                 // Too far, or not a number
                 return;
             }
-            rounded[globalIndex] = BigDecimal.valueOf(intValue);
+            rounded[globalIndex] = new BigDecimal(intValue); // Exact, and scale 0
         }
 
         if (nbVars > nbInts) {

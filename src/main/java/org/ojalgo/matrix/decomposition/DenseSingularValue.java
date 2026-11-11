@@ -379,6 +379,52 @@ abstract class DenseSingularValue<N extends Comparable<N>, M extends PhysicalSto
                     vectors ? v.data : null, 0, Math.max(1, n));
         }
 
+        /**
+         * x = V * S<sup>-1</sup> * U<sup>T</sup> * b, over the rank – the singular values are in descending
+         * order, the significant ones first. When rhs is an m-by-1 and preallocated an n-by-1
+         * {@link R064Store}, possibly the same one.
+         */
+        @Override
+        boolean solveColumn(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated, final double[] values,
+                final R064Store u, final R064Store v) {
+
+            int m = this.getRowDim();
+            int n = this.getColDim();
+
+            if (!(rhs instanceof R064Store) || !(preallocated instanceof R064Store)) {
+                return false;
+            }
+            R064Store column = (R064Store) rhs;
+            R064Store solution = (R064Store) preallocated;
+            if (column.getRowDim() != m || column.getColDim() != 1 || solution.getRowDim() != n || solution.getColDim() != 1) {
+                return false;
+            }
+
+            int rank = this.getRank();
+
+            // All of S^-1 * U^T * b before x is written, since b and x may be the same column
+            double[] b = column.data;
+            double[] work = new double[rank];
+            for (int j = 0; j < rank; j++) {
+                double sum = ZERO;
+                for (int i = 0, ij = j * m; i < m; i++, ij++) {
+                    sum += u.data[ij] * b[i];
+                }
+                work[j] = sum / values[j];
+            }
+
+            double[] x = solution.data;
+            java.util.Arrays.fill(x, 0, n, ZERO);
+            for (int j = 0; j < rank; j++) {
+                double factor = work[j];
+                for (int i = 0, ij = j * n; i < n; i++, ij++) {
+                    x[i] += v.data[ij] * factor;
+                }
+            }
+
+            return true;
+        }
+
     }
 
     static final class R128 extends Generic<Quadruple> {
@@ -634,6 +680,10 @@ abstract class DenseSingularValue<N extends Comparable<N>, M extends PhysicalSto
     @Override
     public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
 
+        if (myInverse == null && this.isComputed() && !myValuesOnly && this.solveColumn(rhs, preallocated, s, myU, myV)) {
+            return preallocated;
+        }
+
         MatrixStore<N> mRHS = this.collect(rhs);
 
         if (myInverse != null) {
@@ -815,5 +865,15 @@ abstract class DenseSingularValue<N extends Comparable<N>, M extends PhysicalSto
      * @return 0 if successful
      */
     abstract int compute(Collectable<N, ? super TransformableRegion<N>> matrix, double[] values, M u, M v, boolean fullSize);
+
+    /**
+     * The minimum norm solution for a single right-hand side, directly on the arrays of the factors, if the
+     * implementation can, and rhs and preallocated are columns that it handles.
+     *
+     * @return true if the solution is in preallocated, false if it has not been touched
+     */
+    boolean solveColumn(final Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated, final double[] values, final M u, final M v) {
+        return false;
+    }
 
 }

@@ -51,10 +51,11 @@ import org.ojalgo.type.context.NumberContext;
  * {@link #compute(Access2D.Collectable) compute(..)} decomposes and then checks {@link #isSolvable()
  * isSolvable()}, so it returns false for any other matrix.
  * <p>
- * Singularity, {@link #isSolvable()} and the rank, is judged from the size of the pivots – the smallest
- * relative to the largest. With partial pivoting that is not a reliable test: a matrix that is singular apart
- * from rounding errors may still be reported as solvable, and then solutions and inverses contain huge
- * meaningless values. If that's a concern, check the condition number or use {@link SingularValue}.
+ * Singularity, {@link #isSolvable() isSolvable()} and the rank, is judged from the size of the pivots – the
+ * smallest relative to the largest. With partial pivoting that is not a reliable test: a matrix that is
+ * singular apart from rounding errors may still be reported as solvable, and then solutions and inverses
+ * contain huge meaningless values. If that's a concern, check the condition number or use
+ * {@link SingularValue}.
  *
  * @author apete
  */

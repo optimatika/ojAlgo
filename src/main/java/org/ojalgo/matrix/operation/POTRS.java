@@ -184,6 +184,12 @@ public abstract class POTRS implements LAPACK {
      */
     private static final int COLUMNS_THRESHOLD = 3;
     /**
+     * Up to this order the pure Java inverse is calculated by {@link POTRI}: single-threaded, but with no
+     * right hand side to set up and every inner loop down a column, that is faster (1.5 times for n = 16).
+     * Above it, the columns of the inverse are solved for in parallel.
+     */
+    private static final int INVERT_THRESHOLD = 75;
+    /**
      * The block size (rows and columns) of the copy of the lower triangle of the inverse to its upper
      * triangle.
      */
@@ -249,8 +255,9 @@ public abstract class POTRS implements LAPACK {
      * <p>
      * A and B are column-major, stored in their arrays from an offset with a leading dimension. A holds the
      * factor, L or U, as returned by {@link POTRF}; it is not changed, and the other triangle is not
-     * referenced. B need not be set on entry. X is exactly symmetric: its upper triangle is a copy of its
-     * lower.
+     * referenced. B need not be set on entry. X is exactly symmetric: one triangle is a copy of the other.
+     * <p>
+     * Up to order {@link #INVERT_THRESHOLD}, the factor is copied to B and inverted there by {@link POTRI}.
      *
      * @param upper A = U<sup>T</sup>*U if true, otherwise A = L*L<sup>T</sup>
      * @param n     The order of A and B
@@ -266,7 +273,9 @@ public abstract class POTRS implements LAPACK {
             return;
         }
 
-        JVM.invokeIdentity(upper, n, a, offsetA, lda, b, offsetB, ldb);
+        if (n > INVERT_THRESHOLD || !POTRS.invert(upper, n, a, offsetA, lda, b, offsetB, ldb)) {
+            JVM.invokeIdentity(upper, n, a, offsetA, lda, b, offsetB, ldb);
+        }
     }
 
     /**
@@ -322,6 +331,54 @@ public abstract class POTRS implements LAPACK {
                 }
             }
         }
+    }
+
+    /**
+     * Copies the strictly upper triangle of the n-by-n matrix B to its lower triangle, in square blocks of
+     * {@link #MIRROR_BLOCK} rows and columns.
+     */
+    private static void copyUpperToLower(final int n, final double[] b, final int offsetB, final int ldb) {
+        for (int jj = 0; jj < n; jj += MIRROR_BLOCK) {
+            int jLimit = Math.min(n, jj + MIRROR_BLOCK);
+            for (int ii = 0; ii <= jj; ii += MIRROR_BLOCK) {
+                int iLimit = Math.min(n, ii + MIRROR_BLOCK);
+                for (int j = jj; j < jLimit; j++) {
+                    for (int i = ii, limit = Math.min(iLimit, j); i < limit; i++) {
+                        b[offsetB + j + i * ldb] = b[offsetB + i + j * ldb];
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * The inverse of A written to B by {@link POTRI}: the factor's triangle copied to B, inverted there, and
+     * mirrored to the other triangle.
+     *
+     * @return false if the factor has a zero on its diagonal – nothing is inverted then
+     */
+    private static boolean invert(final boolean upper, final int n, final double[] a, final int offsetA, final int lda, final double[] b, final int offsetB,
+            final int ldb) {
+
+        for (int j = 0; j < n; j++) {
+            if (upper) {
+                System.arraycopy(a, offsetA + j * lda, b, offsetB + j * ldb, j + 1);
+            } else {
+                System.arraycopy(a, offsetA + j + j * lda, b, offsetB + j + j * ldb, n - j);
+            }
+        }
+
+        if (POTRI.invoke(upper, n, b, offsetB, ldb) != 0) {
+            return false;
+        }
+
+        if (upper) {
+            POTRS.copyUpperToLower(n, b, offsetB, ldb);
+        } else {
+            POTRS.copyLowerToUpper(n, b, offsetB, ldb);
+        }
+
+        return true;
     }
 
     /**

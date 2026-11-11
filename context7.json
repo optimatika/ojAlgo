@@ -11,13 +11,13 @@
     "CHANGELOG.md"
   ],
   "rules": [
-    "Build optimisation models with ExpressionsBasedModel: newVariable(name) with lower/upper/weight (weight is the objective coefficient), newExpression(name) with lower/upper/level and set(variable, coefficient) per term, then minimise() or maximise().",
-    "Always check result.getState().isOptimal() - or isFeasible() when a time limit is set - before reading values. After an INFEASIBLE or UNBOUNDED result Variable.getValue() returns null.",
-    "Read binary and integer variable values by rounding (getValue().doubleValue() > 0.5, Math.round), never with ==.",
-    "Give every expression a unique name. Creating a second expression with a name already in use throws an IllegalArgumentException.",
+    "Build optimisation models with ExpressionsBasedModel: newRealVariable(name), newIntegerVariable(name) or newBinaryVariable(name) with lower/upper bounds (real and integer variables are free until given bounds), newConstraint(name) with lower/upper/level and set(variable, coefficient) per term, getObjective().set(variable, coefficient) for the objective, then minimise() or maximise(). These names (ojAlgo 57.7 or later) are shared with the Optimisation Service client's OptModel; the older newVariable(name), newExpression(name) and weight(..) still work, and weights add to getObjective().",
+    "Always check result.isOptimal() - or result.isFeasible() when a time limit is set - before reading values. After an INFEASIBLE or UNBOUNDED result Variable.getValue() returns null and Variable.doubleValue() returns 0.",
+    "Read binary and integer variable values rounded - booleanValue() is true above 0.5, intValue() and longValue() round - never compare with ==.",
+    "Give every constraint a unique name. Creating a second constraint (or expression) with a name already in use throws an IllegalArgumentException.",
     "Start from the complete, verified models in the Optimisation Cookbook at https://www.ojalgo.org/optimisation-cookbook/ rather than writing a model from scratch.",
     "ojAlgo is one Maven dependency (org.ojalgo:ojalgo) with no native code. Do not add JNI or native solver dependencies unless asked to.",
     "Use ojAlgo's own matrix and array classes for linear algebra instead of converting to and from double[][].",
-    "Do not use old names that no longer compile: Variable.make and addVariable(Variable) are now model.newVariable(name); PrimitiveMatrix and Primitive64Matrix are MatrixR064; PrimitiveDenseStore and Primitive64Store are R064Store. See https://www.ojalgo.org/updating-old-code/"
+    "Do not use old names that no longer compile: Variable.make and addVariable(Variable) are now model.newRealVariable(name); PrimitiveMatrix and Primitive64Matrix are MatrixR064; PrimitiveDenseStore and Primitive64Store are R064Store. See https://www.ojalgo.org/updating-old-code/"
   ]
 }
