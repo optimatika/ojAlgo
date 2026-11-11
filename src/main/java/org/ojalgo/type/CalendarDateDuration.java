@@ -145,11 +145,8 @@ public final class CalendarDateDuration implements TemporalAmount, CalendarDate.
         if (this == obj) {
             return true;
         }
-        if ((obj == null) || !(obj instanceof CalendarDateDuration)) {
-            return false;
-        }
-        CalendarDateDuration other = (CalendarDateDuration) obj;
-        if ((Double.doubleToLongBits(measure) != Double.doubleToLongBits(other.measure)) || (unit != other.unit)) {
+        if ((obj == null) || !(obj instanceof CalendarDateDuration other) || (Double.doubleToLongBits(measure) != Double.doubleToLongBits(other.measure))
+                || (unit != other.unit)) {
             return false;
         }
         return true;

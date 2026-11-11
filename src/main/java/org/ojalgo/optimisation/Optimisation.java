@@ -252,16 +252,12 @@ public interface Optimisation {
 
         public ExpressionsBasedModel parse(final InputStream input, final FileFormat format) {
 
-            switch (format) {
-                case MPS:
-                    return FileFormatMPS.read(input, this::newModel);
-                case EBM:
-                    return FileFormatEBM.read(input, this::newModel);
-                case LP:
-                    return FileFormatLP.read(input, this::newModel);
-                default:
-                    throw new IllegalArgumentException();
-            }
+            return switch (format) {
+                case MPS -> FileFormatMPS.read(input, this::newModel);
+                case EBM -> FileFormatEBM.read(input, this::newModel);
+                case LP  -> FileFormatLP.read(input, this::newModel);
+                default  -> throw new IllegalArgumentException();
+            };
         }
 
         /**

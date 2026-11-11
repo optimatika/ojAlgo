@@ -21,10 +21,19 @@
  */
 package org.ojalgo.matrix.operation;
 
+import static java.lang.foreign.ValueLayout.*;
 import static org.ojalgo.function.constant.PrimitiveMath.ONE;
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.MemorySegment;
+import java.lang.invoke.MethodHandle;
+import java.util.Objects;
+
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.operation.ArrayOperation;
+import org.ojalgo.array.operation.NativeLibrary;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -51,11 +60,15 @@ import org.ojalgo.scalar.Scalar;
  * only a pure Java implementation for those.
  * <p>
  * {@link ORGHR} forms Q explicitly.
+ *
+ * @see NativeLibrary
  */
 public abstract class GEHRD implements LAPACK {
 
     /**
-     * The pure Java implementations.
+     * The pure Java implementations. Everything they call is pure Java as well – the {@code JVM}
+     * implementations of other operations, never their dispatching {@code invoke} methods (that may call
+     * native code).
      * <p>
      * Unblocked: for each column, the reflector that zeroes the elements below the first subdiagonal is
      * generated, as by {@link GEQRF}, and applied from the right to all rows, as by {@link GEBRD}, and from
@@ -123,6 +136,62 @@ public abstract class GEHRD implements LAPACK {
     }
 
     /**
+     * Native {@code dgehrd}, initialised only when {@link NativeLibrary#isAvailable()}. All arguments are
+     * passed by reference, as to any Fortran routine. It is not linked as critical: it is passed a copy of
+     * the matrix in native memory, and the JVM can reach safepoints (and collect garbage) during the call.
+     */
+    static final class Native {
+
+        static final MethodHandle DGEHRD_OFF_HEAP = NativeLibrary.downcall("dgehrd_",
+                FunctionDescriptor.ofVoid(ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS), false);
+
+        /**
+         * Copies A to native memory, asks {@link #DGEHRD_OFF_HEAP} for the optimal workspace size, calls it
+         * and copies A and tau back. Requires n > 0.
+         */
+        static void invoke(final int n, final double[] a, final int offsetA, final int lda, final double[] tau, final int offsetTau) {
+
+            Objects.checkFromIndexSize(offsetTau, n - 1, tau.length);
+
+            try (Arena arena = Arena.ofConfined()) {
+
+                int copyLDA = CBLAS.leadingDimensionOfCopy(n);
+
+                MemorySegment segmentN = arena.allocateFrom(JAVA_INT, n);
+                MemorySegment segmentILO = arena.allocateFrom(JAVA_INT, 1);
+                MemorySegment segmentA = CBLAS.copyOfMatrix(arena, a, offsetA, n, n, lda, copyLDA);
+                MemorySegment segmentLDA = arena.allocateFrom(JAVA_INT, copyLDA);
+                MemorySegment segmentTau = arena.allocate(JAVA_DOUBLE, Math.max(1, n - 1));
+                MemorySegment segmentInfo = arena.allocate(JAVA_INT);
+
+                MemorySegment query = arena.allocate(JAVA_DOUBLE);
+                DGEHRD_OFF_HEAP.invokeExact(segmentN, segmentILO, segmentN, segmentA, segmentLDA, segmentTau, query, arena.allocateFrom(JAVA_INT, -1),
+                        segmentInfo);
+                int lwork = Math.max(n, (int) query.get(JAVA_DOUBLE, 0L));
+
+                DGEHRD_OFF_HEAP.invokeExact(segmentN, segmentILO, segmentN, segmentA, segmentLDA, segmentTau, arena.allocate(JAVA_DOUBLE, lwork),
+                        arena.allocateFrom(JAVA_INT, lwork), segmentInfo);
+
+                CBLAS.copyBackMatrix(segmentA, copyLDA, a, offsetA, n, n, lda);
+                MemorySegment.copy(segmentTau, JAVA_DOUBLE, 0L, tau, offsetTau, n - 1);
+
+            } catch (RuntimeException | Error cause) {
+                throw cause;
+            } catch (Throwable cause) {
+                throw new ProgrammingError(cause);
+            }
+        }
+
+    }
+
+    /**
+     * The native implementation is used, if there is one, when n*n*n is larger than this.
+     */
+    private static final double NATIVE_THRESHOLD = 750_000;
+
+    static final boolean NATIVE = NativeLibrary.isAvailable() && Native.DGEHRD_OFF_HEAP != null;
+
+    /**
      * {@code dgehrd} with ILO = 1 and IHI = n: Q<sup>T</sup>*A*Q = H, H and the reflectors that make Q
      * overwrite A
      * <p>
@@ -140,7 +209,11 @@ public abstract class GEHRD implements LAPACK {
             return;
         }
 
-        JVM.invoke(n, a, offsetA, lda, tau, offsetTau);
+        if (GEHRD.isNative(n)) {
+            Native.invoke(n, a, offsetA, lda, tau, offsetTau);
+        } else {
+            JVM.invoke(n, a, offsetA, lda, tau, offsetTau);
+        }
     }
 
     /**
@@ -158,6 +231,14 @@ public abstract class GEHRD implements LAPACK {
         }
 
         JVM.invoke(n, a, offsetA, lda, tau, offsetTau, scalar);
+    }
+
+    /**
+     * Whether to use the native implementation: there is one, and n*n*n is larger than
+     * {@link #NATIVE_THRESHOLD}.
+     */
+    static boolean isNative(final double n) {
+        return NATIVE && n * n * n > NATIVE_THRESHOLD;
     }
 
 }

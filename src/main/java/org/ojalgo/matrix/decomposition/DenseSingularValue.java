@@ -391,10 +391,9 @@ abstract class DenseSingularValue<N extends Comparable<N>, M extends PhysicalSto
             int m = this.getRowDim();
             int n = this.getColDim();
 
-            if (!(rhs instanceof R064Store) || !(preallocated instanceof R064Store)) {
+            if (!(rhs instanceof R064Store column) || !(preallocated instanceof R064Store)) {
                 return false;
             }
-            R064Store column = (R064Store) rhs;
             R064Store solution = (R064Store) preallocated;
             if (column.getRowDim() != m || column.getColDim() != 1 || solution.getRowDim() != n || solution.getColDim() != 1) {
                 return false;

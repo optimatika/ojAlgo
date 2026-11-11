@@ -40,6 +40,7 @@ import org.ojalgo.type.context.NumberContext;
  * A decision variable in an {@link ExpressionsBasedModel}. Each variable has a unique index and can be
  * continuous, integer, or binary. As a {@link ModelEntity}, it can define constraints (via lower/upper
  * bounds) and contribute to the objective function (via a contribution weight).
+ * {@snippet class = org.ojalgo.optimisation.ExpressionsBasedModelSnippets region = integer}
  *
  * @author apete
  */
@@ -126,13 +127,9 @@ public class Variable extends ModelEntity<Variable> {
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj)) {
+        if (!super.equals(obj) || !(obj instanceof Variable other)) {
             return false;
         }
-        if (!(obj instanceof Variable)) {
-            return false;
-        }
-        Variable other = (Variable) obj;
         return Objects.equals(myIndex, other.myIndex) && myInteger == other.myInteger && Objects.equals(myValue, other.myValue);
     }
 

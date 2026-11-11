@@ -83,6 +83,7 @@ import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
  * <li>Write the objective function in {@link #getObjective()} – or as weights on variables and expressions
  * <li>Solve with {@link #minimise()} or {@link #maximise()}
  * </ol>
+ * {@snippet class = org.ojalgo.optimisation.ExpressionsBasedModelSnippets region = introduction}
  * <p>
  * The model automatically selects and configures a suitable solver, applies presolve simplifications, and
  * scales parameters for numerical stability.
@@ -423,11 +424,8 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
             for (EntryPair.KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>> kp : modelState.getDualValues()) {
                 ModelEntity<?> entity = kp.getKey().getKey();
-                if (entity instanceof Expression) {
-                    Expression expression = (Expression) entity;
-                    if (expression.getLinearKeySet().contains(key)) {
-                        rc -= expression.doubleValue(key, false) * kp.doubleValue();
-                    }
+                if ((entity instanceof Expression expression) && expression.getLinearKeySet().contains(key)) {
+                    rc -= expression.doubleValue(key, false) * kp.doubleValue();
                 }
             }
 
@@ -681,11 +679,10 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
                 ModelEntity<?> entity = dual.getKey().left();
                 double value = dual.doubleValue();
 
-                if (!(entity instanceof Expression) || Math.abs(value) <= noise * largest) {
+                if (!(entity instanceof Expression expression) || Math.abs(value) <= noise * largest) {
                     continue;
                 }
 
-                Expression expression = (Expression) entity;
                 if (expression.isAnyQuadraticFactorNonZero()) {
                     return withoutCertificate;
                 }
@@ -2507,51 +2504,44 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
         for (Simplifier<?, ?> simplifier : myEnvironment.getPresolvers()) {
 
-            if (simplifier instanceof VariableAnalyser) {
-                VariableAnalyser analyser = (VariableAnalyser) simplifier;
-
-                for (Variable tmpVar : myVariables) {
-                    if (analyser.isApplicable(tmpVar)) {
-                        analyser.simplify(tmpVar, this);
-                    }
-                }
-
-            } else if (simplifier instanceof ExpressionAnalyser) {
-                ExpressionAnalyser analyser = (ExpressionAnalyser) simplifier;
-
-                for (Expression tmpExpr : myExpressions.values()) {
-                    if (analyser.isApplicable(tmpExpr)) {
-                        analyser.simplify(tmpExpr, this);
-                    }
-                }
-
-            } else if (simplifier instanceof Presolver) {
-                Presolver presolver = (Presolver) simplifier;
-
-                for (Expression tmpExpr : myExpressions.values()) {
-                    if (tmpExpr.isSafeToPresolve() && presolver.isApplicable(tmpExpr)) {
-
-                        BigDecimal setValue = tmpExpr.calculateSetValue(fixedVariables);
-
-                        BigDecimal lower = tmpExpr.getCompensatedLowerLimit(setValue);
-                        BigDecimal upper = tmpExpr.getCompensatedUpperLimit(setValue);
-
-                        myTemporary.clear();
-                        myTemporary.addAll(tmpExpr.getLinearKeySet());
-                        myTemporary.removeAll(fixedVariables);
-                        if (tmpExpr.isDegenerate()) {
-                            myTemporary.removeIf(index -> options.degeneracy.isZero(tmpExpr.get(index)));
+            switch (simplifier) {
+                case VariableAnalyser analyser   -> {
+                    for (Variable tmpVar : myVariables) {
+                        if (analyser.isApplicable(tmpVar)) {
+                            analyser.simplify(tmpVar, this);
                         }
-
-                        presolver.simplify(tmpExpr, myTemporary, lower, upper, options.feasibility);
-
-                        myTemporary.clear();
                     }
                 }
+                case ExpressionAnalyser analyser -> {
+                    for (Expression tmpExpr : myExpressions.values()) {
+                        if (analyser.isApplicable(tmpExpr)) {
+                            analyser.simplify(tmpExpr, this);
+                        }
+                    }
+                }
+                case Presolver presolver         -> {
+                    for (Expression tmpExpr : myExpressions.values()) {
+                        if (tmpExpr.isSafeToPresolve() && presolver.isApplicable(tmpExpr)) {
 
-            } else {
+                            BigDecimal setValue = tmpExpr.calculateSetValue(fixedVariables);
 
-                throw new ProgrammingError("Unknown simplifier type: " + simplifier.getClass().getName());
+                            BigDecimal lower = tmpExpr.getCompensatedLowerLimit(setValue);
+                            BigDecimal upper = tmpExpr.getCompensatedUpperLimit(setValue);
+
+                            myTemporary.clear();
+                            myTemporary.addAll(tmpExpr.getLinearKeySet());
+                            myTemporary.removeAll(fixedVariables);
+                            if (tmpExpr.isDegenerate()) {
+                                myTemporary.removeIf(index -> options.degeneracy.isZero(tmpExpr.get(index)));
+                            }
+
+                            presolver.simplify(tmpExpr, myTemporary, lower, upper, options.feasibility);
+
+                            myTemporary.clear();
+                        }
+                    }
+                }
+                case null, default               -> throw new ProgrammingError("Unknown simplifier type: " + simplifier.getClass().getName());
             }
         }
 
@@ -2610,15 +2600,9 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     private void write(final FileFormat format, final OutputStream output) {
 
         switch (format) {
-            case MPS:
-                FileFormatMPS.write(this, output);
-                break;
-            case LP:
-                FileFormatLP.write(this, output);
-                break;
-            default:
-                FileFormatEBM.write(this, output);
-                break;
+            case MPS -> FileFormatMPS.write(this, output);
+            case LP  -> FileFormatLP.write(this, output);
+            default  -> FileFormatEBM.write(this, output);
         }
     }
 

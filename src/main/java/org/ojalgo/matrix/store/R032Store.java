@@ -148,8 +148,8 @@ public final class R032Store extends ArrayR032 implements PhysicalStore<Double>,
      * If the matrix is the transpose of an {@link R032Store}, that store, otherwise null.
      */
     static R032Store transposed(final Access1D<?> matrix) {
-        if (matrix instanceof TransjugatedStore<?> && ((TransjugatedStore<?>) matrix).getOriginal() instanceof R032Store) {
-            return (R032Store) ((TransjugatedStore<?>) matrix).getOriginal();
+        if (matrix instanceof TransjugatedStore<?> transjugated && transjugated.getOriginal() instanceof R032Store original) {
+            return original;
         }
         return null;
     }

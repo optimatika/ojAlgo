@@ -149,10 +149,9 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof ModelEntity)) {
+        if (!(obj instanceof ModelEntity other)) {
             return false;
         }
-        ModelEntity other = (ModelEntity) obj;
         return Objects.equals(myContributionWeight, other.myContributionWeight) && Objects.equals(myLowerLimit, other.myLowerLimit)
                 && Objects.equals(myName, other.myName) && Objects.equals(myUpperLimit, other.myUpperLimit);
     }

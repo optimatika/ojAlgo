@@ -197,25 +197,19 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution {
                 }
             }
 
-            switch (this) {
-                case WEEK:
-                    return retVal.minus(2L, ChronoUnit.DAYS).with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
-                case MONTH:
-                    return retVal.with(TemporalAdjusters.lastDayOfMonth());
-                case QUARTER:
+            return switch (this) {
+                case WEEK      -> retVal.minus(2L, ChronoUnit.DAYS).with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
+                case MONTH     -> retVal.with(TemporalAdjusters.lastDayOfMonth());
+                case QUARTER   -> {
                     int lastMonth = 3 + 3 * ((retVal.get(ChronoField.MONTH_OF_YEAR) - 1) / 3);
-                    return retVal.with(ChronoField.MONTH_OF_YEAR, lastMonth).with(TemporalAdjusters.lastDayOfMonth());
-                case YEAR:
-                    return retVal.with(TemporalAdjusters.lastDayOfYear());
-                case DECADE:
-                    return CalendarDateUnit.lastDayOfPeriod(retVal, 10L);
-                case CENTURY:
-                    return CalendarDateUnit.lastDayOfPeriod(retVal, 100L);
-                case MILLENIUM:
-                    return CalendarDateUnit.lastDayOfPeriod(retVal, 1000L);
-                default:
-                    return retVal;
-            }
+                    yield retVal.with(ChronoField.MONTH_OF_YEAR, lastMonth).with(TemporalAdjusters.lastDayOfMonth());
+                }
+                case YEAR      -> retVal.with(TemporalAdjusters.lastDayOfYear());
+                case DECADE    -> CalendarDateUnit.lastDayOfPeriod(retVal, 10L);
+                case CENTURY   -> CalendarDateUnit.lastDayOfPeriod(retVal, 100L);
+                case MILLENIUM -> CalendarDateUnit.lastDayOfPeriod(retVal, 1000L);
+                default        -> retVal;
+            };
         }
     }
 

@@ -81,8 +81,8 @@ public class MultiplicationTest extends MatrixStoreTests {
     /**
      * Products with operands that are plain, transposed or conjugated (a transposed array, that GEMM takes
      * with a transpose flag), or a transposed triangular view (a structured operand), in all combinations,
-     * compared to a naive implementation. The shapes cover the special-size kernels, the switch to GEMM and
-     * the multi-threaded Java implementation.
+     * compared to a naive implementation. The shapes cover the special-size kernels, the switch to GEMM, the
+     * native threshold and the multi-threaded Java implementation.
      */
     @SuppressWarnings("unchecked")
     private static <I extends PhysicalStore<Double> & Factory2D.Builder<I>> void doTestTransposedProducts(final Factory<Double, I> factory,

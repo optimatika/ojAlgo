@@ -24,7 +24,7 @@ ojAlgo is available at [The Central (Maven) Repository](https://mvnrepository.co
 
 | Java | Released | ojAlgo |
 |------|----------|--------|
-| 22+ | Future | on the `develop` branch |
+| 22 | 2026-11-11 | 58.0.0 |
 | 11 | 2026-11-11 | 57.7.0 |
 | 8 | 2022-08-26 | 51.4.1 |
 | 7 | 2015-08-21 | 37.1.1 |
@@ -115,8 +115,6 @@ For full control – mutable matrices filled and updated in place, reused memory
 
 ### Optional Native BLAS and LAPACK
 
-> Not yet in a released version – only in the development version, on the `develop` branch.
-
 ojAlgo is pure Java and needs nothing else, but it can also call a native BLAS/LAPACK library – Accelerate on macOS, or for example OpenBLAS on Linux and Windows – for the larger matrix operations and the dense `double` decompositions (`LU`, `Cholesky`, `QR`, `SingularValue`, `Eigenvalue` and more). This is opt-in: native code is used only when the JVM grants ojAlgo native access,
 
 ```bash
@@ -155,13 +153,14 @@ The [Optimatika subscription](https://www.optimatika.se/subscription/) gives you
 
 ## Building from Source
 
-ojAlgo requires Java 11+ and uses the Maven Wrapper, so no separate Maven install is needed.
+ojAlgo requires Java 22+ and uses the Maven Wrapper, so no separate Maven install is needed.
 
 ```bash
 git clone https://github.com/optimatika/ojAlgo.git
 cd ojAlgo
 ./mvnw compile              # Compile
-./mvnw test                 # Run tests
+./mvnw test                 # Run tests (pure Java)
+./mvnw test -DargLine=--enable-native-access=ojalgo,ALL-UNNAMED  # Run tests with native BLAS/LAPACK
 ./mvnw package -DskipTests  # Build JAR without tests
 ```
 

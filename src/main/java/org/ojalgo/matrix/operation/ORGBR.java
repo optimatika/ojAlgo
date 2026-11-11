@@ -21,12 +21,20 @@
  */
 package org.ojalgo.matrix.operation;
 
+import static java.lang.foreign.ValueLayout.*;
 import static org.ojalgo.function.constant.PrimitiveMath.ONE;
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.MemorySegment;
+import java.lang.invoke.MethodHandle;
 import java.util.Arrays;
+import java.util.Objects;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.operation.ArrayOperation;
+import org.ojalgo.array.operation.NativeLibrary;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -44,11 +52,15 @@ import org.ojalgo.scalar.Scalar;
  * <p>
  * For other number types Q and P are unitary, and P<sup>H</sup> is generated in place of P<sup>T</sup>. There
  * is only a pure Java implementation for those.
+ *
+ * @see NativeLibrary
  */
 public abstract class ORGBR implements LAPACK {
 
     /**
-     * The pure Java implementation.
+     * The pure Java implementation. Everything it calls is pure Java as well – the {@code JVM}
+     * implementations of other operations, never their dispatching {@code invoke} methods (that may call
+     * native code).
      * <p>
      * Q is formed by {@link ORGQR}. P (not P<sup>T</sup>) is formed by {@link ORGQR} as well, from the
      * reflectors transposed to the columns of a separate matrix, moved one row down and one column to the
@@ -169,6 +181,68 @@ public abstract class ORGBR implements LAPACK {
     }
 
     /**
+     * Native {@code dorgbr}, initialised only when {@link NativeLibrary#isAvailable()}. All arguments are
+     * passed by reference, as to any Fortran routine, followed by the length of the character argument. It is
+     * not linked as critical: it is passed a copy of the matrix in native memory, and the JVM can reach
+     * safepoints (and collect garbage) during the call.
+     */
+    static final class Native {
+
+        static final MethodHandle DORGBR_OFF_HEAP = NativeLibrary.downcall("dorgbr_",
+                FunctionDescriptor.ofVoid(ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, JAVA_LONG), false);
+
+        /**
+         * Copies A and tau to native memory, asks {@link #DORGBR_OFF_HEAP} for the optimal workspace size,
+         * calls it and copies Q or P<sup>T</sup> back. Requires m, n > 0.
+         */
+        static void invoke(final boolean q, final int m, final int n, final int k, final double[] a, final int offsetA, final int lda, final double[] tau,
+                final int offsetTau) {
+
+            int count = Math.min(q ? m : n, k);
+            Objects.checkFromIndexSize(offsetTau, count, tau.length);
+
+            try (Arena arena = Arena.ofConfined()) {
+
+                int copyLDA = CBLAS.leadingDimensionOfCopy(m);
+
+                MemorySegment segmentVect = arena.allocateFrom(JAVA_BYTE, (byte) (q ? 'Q' : 'P'));
+                MemorySegment segmentA = CBLAS.copyOfMatrix(arena, a, offsetA, m, n, lda, copyLDA);
+                MemorySegment segmentTau = count > 0
+                        ? arena.allocateFrom(JAVA_DOUBLE, MemorySegment.ofArray(tau), JAVA_DOUBLE, JAVA_DOUBLE.byteSize() * offsetTau, count)
+                        : arena.allocate(JAVA_DOUBLE);
+                MemorySegment segmentInfo = arena.allocate(JAVA_INT);
+                MemorySegment segmentM = arena.allocateFrom(JAVA_INT, m);
+                MemorySegment segmentN = arena.allocateFrom(JAVA_INT, n);
+                MemorySegment segmentK = arena.allocateFrom(JAVA_INT, k);
+                MemorySegment segmentLDA = arena.allocateFrom(JAVA_INT, copyLDA);
+
+                MemorySegment query = arena.allocate(JAVA_DOUBLE);
+                DORGBR_OFF_HEAP.invokeExact(segmentVect, segmentM, segmentN, segmentK, segmentA, segmentLDA, segmentTau, query,
+                        arena.allocateFrom(JAVA_INT, -1), segmentInfo, 1L);
+                int lwork = Math.max(Math.min(m, n), (int) query.get(JAVA_DOUBLE, 0L));
+
+                DORGBR_OFF_HEAP.invokeExact(segmentVect, segmentM, segmentN, segmentK, segmentA, segmentLDA, segmentTau, arena.allocate(JAVA_DOUBLE, lwork),
+                        arena.allocateFrom(JAVA_INT, lwork), segmentInfo, 1L);
+
+                CBLAS.copyBackMatrix(segmentA, copyLDA, a, offsetA, m, n, lda);
+
+            } catch (RuntimeException | Error cause) {
+                throw cause;
+            } catch (Throwable cause) {
+                throw new ProgrammingError(cause);
+            }
+        }
+
+    }
+
+    /**
+     * The native implementation is used, if there is one, when m*n*n is larger than this.
+     */
+    private static final double NATIVE_THRESHOLD = 1_200_000;
+
+    static final boolean NATIVE = NativeLibrary.isAvailable() && Native.DORGBR_OFF_HEAP != null;
+
+    /**
      * {@code dorgbr}: Q (q = true) or P<sup>T</sup> (q = false) overwrites A
      * <p>
      * A is column-major, stored in its array from an offset with a leading dimension. On entry, it holds the
@@ -194,7 +268,11 @@ public abstract class ORGBR implements LAPACK {
             return;
         }
 
-        JVM.invoke(q, m, n, k, a, offsetA, lda, tau, offsetTau);
+        if (ORGBR.isNative(m, n)) {
+            Native.invoke(q, m, n, k, a, offsetA, lda, tau, offsetTau);
+        } else {
+            JVM.invoke(q, m, n, k, a, offsetA, lda, tau, offsetTau);
+        }
     }
 
     /**
@@ -215,6 +293,14 @@ public abstract class ORGBR implements LAPACK {
         }
 
         JVM.invoke(q, m, n, k, a, offsetA, lda, tau, offsetTau, scalar);
+    }
+
+    /**
+     * Whether to use the native implementation: there is one, and m*n*n is larger than
+     * {@link #NATIVE_THRESHOLD}.
+     */
+    static boolean isNative(final double m, final double n) {
+        return NATIVE && m * n * n > NATIVE_THRESHOLD;
     }
 
 }

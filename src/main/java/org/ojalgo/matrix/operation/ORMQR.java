@@ -50,7 +50,9 @@ import org.ojalgo.scalar.Scalar;
 public abstract class ORMQR implements LAPACK {
 
     /**
-     * The pure Java implementation.
+     * The pure Java implementation. Everything it calls is pure Java as well – the {@code JVM}
+     * implementations of other operations, never their dispatching {@code invoke} methods (that may call
+     * native code).
      * <p>
      * The reflectors are applied one at a time, in reverse order for Q*C. The columns of C are split into
      * parts, done in parallel, when that is large, see {@link ORMQR#THRESHOLD}.

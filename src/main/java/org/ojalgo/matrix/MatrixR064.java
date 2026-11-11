@@ -44,6 +44,7 @@ import org.ojalgo.structure.Structure2D;
  * Immutable: every operation returns a new matrix. The decompositions needed to solve, invert or calculate
  * the determinant, rank or eigenvalues are chosen, cached and reused internally. A vector is a matrix with a
  * single column or row.
+ * {@snippet class = org.ojalgo.matrix.MatrixR064Snippets region = introduction}
  * For mutable matrices and explicitly chosen decompositions use {@link org.ojalgo.matrix.store.R064Store} and
  * the decompositions in {@link org.ojalgo.matrix.decomposition}.
  *

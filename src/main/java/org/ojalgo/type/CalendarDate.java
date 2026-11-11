@@ -461,11 +461,7 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
         if (this == obj) {
             return true;
         }
-        if (obj == null || !(obj instanceof CalendarDate)) {
-            return false;
-        }
-        CalendarDate other = (CalendarDate) obj;
-        if (millis != other.millis) {
+        if (obj == null || !(obj instanceof CalendarDate other) || (millis != other.millis)) {
             return false;
         }
         return true;

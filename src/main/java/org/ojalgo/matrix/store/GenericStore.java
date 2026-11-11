@@ -731,8 +731,8 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
      * otherwise null.
      */
     private GenericStore<N> transposed(final Access1D<?> matrix) {
-        if (matrix instanceof TransposedStore<?> && ((TransposedStore<?>) matrix).getOriginal() instanceof GenericStore<?>) {
-            return (GenericStore<N>) ((TransposedStore<?>) matrix).getOriginal();
+        if (matrix instanceof TransposedStore<?> transposed && transposed.getOriginal() instanceof GenericStore<?> original) {
+            return (GenericStore<N>) original;
         }
         return null;
     }

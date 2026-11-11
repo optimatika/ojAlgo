@@ -226,18 +226,11 @@ abstract class FileFormatLP {
      * The comparison a token means, as one of {@code <=}, {@code >=} and {@code =}.
      */
     private static String comparison(final String token) {
-        switch (token) {
-            case "<=":
-            case "<":
-            case "=<":
-                return "<=";
-            case ">=":
-            case ">":
-            case "=>":
-                return ">=";
-            default:
-                return "=";
-        }
+        return switch (token) {
+            case "<=", "<", "=<" -> "<=";
+            case ">=", ">", "=>" -> ">=";
+            default              -> "=";
+        };
     }
 
     private static String formatNumber(final BigDecimal value) {
@@ -266,18 +259,10 @@ abstract class FileFormatLP {
     }
 
     private static boolean isComparison(final String token) {
-        switch (token) {
-            case "<=":
-            case "<":
-            case "=<":
-            case ">=":
-            case ">":
-            case "=>":
-            case "=":
-                return true;
-            default:
-                return false;
-        }
+        return switch (token) {
+            case "<=", "<", "=<", ">=", ">", "=>", "=" -> true;
+            default                                    -> false;
+        };
     }
 
     private static boolean isConstraintSection(final String lower) {
@@ -358,15 +343,9 @@ abstract class FileFormatLP {
      */
     private static void limit(final ModelEntity<?> entity, final String comparison, final BigDecimal value) {
         switch (comparison) {
-            case "<=":
-                entity.upper(value);
-                break;
-            case ">=":
-                entity.lower(value);
-                break;
-            default:
-                entity.level(value);
-                break;
+            case "<=" -> entity.upper(value);
+            case ">=" -> entity.lower(value);
+            default   -> entity.level(value);
         }
     }
 
@@ -674,14 +653,11 @@ abstract class FileFormatLP {
      * The comparison that holds with its two sides swapped.
      */
     private static String reversed(final String comparison) {
-        switch (comparison) {
-            case "<=":
-                return ">=";
-            case ">=":
-                return "<=";
-            default:
-                return comparison;
-        }
+        return switch (comparison) {
+            case "<=" -> ">=";
+            case ">=" -> "<=";
+            default   -> comparison;
+        };
     }
 
     /**
@@ -818,21 +794,15 @@ abstract class FileFormatLP {
      * What to say about a token that cannot be where it is.
      */
     private static String unexpected(final String token) {
-        switch (token) {
-            case "":
-                return "The model ends where more was expected";
-            case "*":
-                return "Unexpected '*': a coefficient and its variable are written with a space between them, as in 3 x, and products of variables go in square brackets, as in [ x * y ]";
-            case "/":
-                return "Unexpected '/': the LP format has no division – write 0.5 x, not x / 2";
-            case "^":
-                return "Unexpected '^': squares go in square brackets, as in [ x ^2 ]";
-            case "(":
-            case ")":
-                return "Unexpected '" + token + "': the LP format has no parentheses – multiply out";
-            default:
-                return FileFormatLP.isComparison(token) ? "A term expected before '" + token + "'" : "Unexpected '" + token + "'";
-        }
+        return switch (token) {
+            case ""       -> "The model ends where more was expected";
+            case "*"      ->
+                "Unexpected '*': a coefficient and its variable are written with a space between them, as in 3 x, and products of variables go in square brackets, as in [ x * y ]";
+            case "/"      -> "Unexpected '/': the LP format has no division – write 0.5 x, not x / 2";
+            case "^"      -> "Unexpected '^': squares go in square brackets, as in [ x ^2 ]";
+            case "(", ")" -> "Unexpected '" + token + "': the LP format has no parentheses – multiply out";
+            default       -> FileFormatLP.isComparison(token) ? "A term expected before '" + token + "'" : "Unexpected '" + token + "'";
+        };
     }
 
     private static void writeBound(final BufferedWriter writer, final Variable var) throws IOException {

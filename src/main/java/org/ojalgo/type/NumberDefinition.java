@@ -138,19 +138,13 @@ public interface NumberDefinition {
             char digit = sequence.charAt(i);
 
             switch (digit) {
-                case '+':
-                    negative = false;
-                    break;
-                case '-':
-                    negative = true;
-                    break;
-                case '.':
-                    decimalplaces = 0;
-                    break;
-                default:
+                case '+' -> negative = false;
+                case '-' -> negative = true;
+                case '.' -> decimalplaces = 0;
+                default  -> {
                     unscaled = 10L * unscaled + digit - '0';
                     decimalplaces++;
-                    break;
+                }
             }
         }
 
@@ -233,19 +227,13 @@ public interface NumberDefinition {
             char digit = sequence.charAt(i);
 
             switch (digit) {
-                case '+':
-                    negative = false;
-                    break;
-                case '-':
-                    negative = true;
-                    break;
-                case '.':
-                    decimalplaces = 0;
-                    break;
-                default:
+                case '+' -> negative = false;
+                case '-' -> negative = true;
+                case '.' -> decimalplaces = 0;
+                default  -> {
                     unscaled = 10 * unscaled + digit - '0';
                     decimalplaces++;
-                    break;
+                }
             }
         }
 
@@ -300,15 +288,9 @@ public interface NumberDefinition {
             char digit = sequence.charAt(i);
 
             switch (digit) {
-                case '+':
-                    negative = false;
-                    break;
-                case '-':
-                    negative = true;
-                    break;
-                default:
-                    retVal = 10 * retVal + digit - '0';
-                    break;
+                case '+' -> negative = false;
+                case '-' -> negative = true;
+                default  -> retVal = 10 * retVal + digit - '0';
             }
         }
 
@@ -335,15 +317,9 @@ public interface NumberDefinition {
             char digit = sequence.charAt(i);
 
             switch (digit) {
-                case '+':
-                    negative = false;
-                    break;
-                case '-':
-                    negative = true;
-                    break;
-                default:
-                    retVal = 10L * retVal + digit - '0';
-                    break;
+                case '+' -> negative = false;
+                case '-' -> negative = true;
+                default  -> retVal = 10L * retVal + digit - '0';
             }
         }
 

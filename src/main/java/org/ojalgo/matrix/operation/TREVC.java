@@ -44,7 +44,9 @@ import org.ojalgo.array.operation.ArrayOperation;
 public abstract class TREVC implements LAPACK {
 
     /**
-     * The pure Java implementation.
+     * The pure Java implementation. Everything it calls is pure Java as well – the {@code JVM}
+     * implementations of other operations, never their dispatching {@code invoke} methods (that may call
+     * native code).
      * <p>
      * X is upper triangular, and Z*X is formed by {@link TRMM}.
      */
