@@ -133,7 +133,7 @@ or with `Enable-Native-Access: ALL-UNNAMED` in the manifest of an executable JAR
 - Accelerate's dot product doesn't always give the same last digits from one run to the next.
 - The library must use 32-bit integers (the standard LP64 interface). One with 64-bit integers (ILP64) is detected and not used.
 
-### Documentation and Support
+### Documentation
 
 - [Optimisation Cookbook](https://www.ojalgo.org/optimisation-cookbook/) – complete models to copy and adapt, and the rules every model should follow
 - [Documentation](https://www.ojalgo.org/documentation/) – a curated reading order through the articles: optimisation, linear algebra, arrays and data
@@ -145,11 +145,13 @@ ojAlgo is Open Source, and you are strongly encouraged to clone or fork this rep
 
 All example code (from the blog posts) in a multi-file gist: https://gist.github.com/apete/b3278dc2f8c2db6a00369c211ba321db
 
-Where to ask questions and report bugs is covered in [SUPPORT.md](SUPPORT.md). If you'd like to contribute, see [CONTRIBUTING.md](CONTRIBUTING.md).
+### Support
 
-### Commercial Support
+- Bugs: [GitHub Issues](https://github.com/optimatika/ojAlgo/issues) – open to everyone, and every credible report is looked into.
+- Questions: [GitHub Discussions](https://github.com/optimatika/ojAlgo/discussions) – answered for those who contribute something: code, tests, documentation, a good bug report, or an open source project of their own.
+- Is ojAlgo part of your business? Then pay for support. The [Optimatika Subscription](https://www.optimatika.se/subscription/) gives private answers from the maintainers, the [Optimisation Service](https://www.optimatika.se/optimisation-service/) licence, and the right to request new releases of any artifact – ojAlgo, the solver integrations or the Service client.
 
-The [Optimatika subscription](https://www.optimatika.se/subscription/) gives you support from the maintainers, the [Optimisation Service](https://www.optimatika.se/optimisation-service/) licence, and the right to request new releases of any artifact – ojAlgo, the solver integrations or the Service client.
+More in [SUPPORT.md](https://github.com/optimatika/.github/blob/master/SUPPORT.md). If you'd like to contribute, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Building from Source
 
