@@ -22,10 +22,6 @@
 package org.ojalgo.optimisation.integer;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
@@ -268,92 +264,6 @@ public class DesignCase extends OptimisationIntegerTests {
         TestUtils.assertEquals(1.0, result.doubleValue(1));
         TestUtils.assertEquals(1.0, result.doubleValue(2));
         TestUtils.assertEquals(1.0, result.doubleValue(3));
-    }
-
-    /**
-     * Essentilly this test case just verifies that the SOS presolver doesn't screw things up.
-     */
-    @Test
-    public void testSOS() {
-
-        ExpressionsBasedModel model = new ExpressionsBasedModel();
-
-        List<Variable> starts1 = new ArrayList<>();
-        List<Variable> works1 = new ArrayList<>();
-
-        List<Variable> starts2 = new ArrayList<>();
-        List<Variable> works2 = new ArrayList<>();
-
-        Set<Variable> orderedSet1 = new HashSet<>();
-
-        Set<Variable> orderedSet2 = new HashSet<>();
-
-        for (int h = 0; h < 24; h++) {
-
-            Variable start1 = model.newVariable("Start activity A at " + h).binary();
-            starts1.add(start1);
-
-            Variable start2 = model.newVariable("Start activity B at " + h).binary();
-            starts2.add(start2);
-
-            Variable work1 = model.newVariable("Activity A ongoing at " + h).binary().weight(Math.random());
-            works1.add(work1);
-
-            orderedSet1.add(work1);
-
-            Variable work2 = model.newVariable("Activity B ongoing at " + h).binary().weight(Math.random());
-            works2.add(work2);
-
-            orderedSet2.add(work2);
-
-            model.newExpression("Maximum one ongoing activity at " + h).upper(1).set(work1, 1).set(work2, 1);
-        }
-
-        model.addSpecialOrderedSet(orderedSet1, 3, 3);
-        model.addSpecialOrderedSet(orderedSet2, 3, 3);
-
-        for (int h = 0; h < 21; h++) {
-
-            Expression expr1 = model.newExpression("Finish A when started at " + h);
-            expr1.upper(0);
-
-            expr1.set(starts1.get(h), 3);
-
-            expr1.set(works1.get(h), -1);
-            expr1.set(works1.get(h + 1), -1);
-            expr1.set(works1.get(h + 2), -1);
-
-            Expression expr2 = model.newExpression("Finish B when started at " + h);
-            expr2.upper(0);
-
-            expr2.set(starts2.get(h), 3);
-
-            expr2.set(works2.get(h), -1);
-            expr2.set(works2.get(h + 1), -1);
-            expr2.set(works2.get(h + 2), -1);
-
-        }
-        for (int h = 21; h < 24; h++) {
-            starts1.get(h).level(0);
-            starts2.get(h).level(0);
-        }
-
-        model.newExpression("Only start activity A once").level(1).setLinearFactorsSimple(starts1);
-        model.newExpression("Only start activity B once").level(1).setLinearFactorsSimple(starts2);
-
-        Result resultMin = model.minimise();
-
-        TestUtils.assertStateNotLessThanOptimal(resultMin);
-        TestUtils.assertTrue(resultMin.getValue() >= 0.0);
-        TestUtils.assertTrue(resultMin.getValue() <= 6.0);
-
-        Result resultMax = model.maximise();
-
-        TestUtils.assertStateNotLessThanOptimal(resultMax);
-        TestUtils.assertTrue(resultMax.getValue() >= 0.0);
-        TestUtils.assertTrue(resultMax.getValue() <= 6.0);
-
-        TestUtils.assertTrue(resultMin.getValue() <= resultMax.getValue());
     }
 
 }

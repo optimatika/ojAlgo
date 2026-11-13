@@ -11,6 +11,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Removed
+
+#### org.ojalgo.optimisation
+
+- `ExpressionsBasedModel.addSpecialOrderedSet(...)` (both variants) and the presolver behind them. They never enforced the SOS ordering – the presolver bailed out whenever any set member was fixed, and presolvers are not run at branch-and-bound nodes – so special ordered sets were never actually supported. To limit how many binary variables are "ON", add the corresponding constraint (an expression summing the variables) instead.
+
 ## [58.0.0] – 2026-11-11
 
 ### Added
