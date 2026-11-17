@@ -25,6 +25,8 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -566,7 +568,10 @@ public abstract class ConvexSolver extends GenericSolver {
          * {@link MatrixDecomposition.Solver#isSolvable()} returns false a small constant is added to the
          * diagonal.
          * <p>
-         * The small constant will be the largest absolute element times this small diagonal factor.
+         * The small constant will be the largest absolute element times this small diagonal factor. If that
+         * is not enough, [Q] has negative curvature, the constant is increased (4 times at a time) up to the
+         * largest absolute element times the square root of this factor. If not even that makes [Q] positive
+         * definite the problem is not convex, and a solution is at best {@link Optimisation.State#FEASIBLE}.
          * <p>
          * This is only meant to handle minor, unexpected, deficiencies.
          */
@@ -691,6 +696,10 @@ public abstract class ConvexSolver extends GenericSolver {
      */
     private static final boolean ADJUSTED_OBJECTIVE = true;
 
+    /**
+     * Equality constraints that are linear combinations of the others, and consistent with them, are left
+     * out. [AE] then has full row rank, and those constraints have no dual values.
+     */
     public static <N extends Comparable<N>> ConvexData<N> copy(final ExpressionsBasedModel model, final PhysicalStore.Factory<N, ?> factory) {
 
         List<Variable> freeVariables = model.getFreeVariables();
@@ -698,8 +707,9 @@ public abstract class ConvexSolver extends GenericSolver {
 
         int nbVariables = freeVariables.size();
 
-        List<Expression> tmpEqExpr = model.constraints().filter((final Expression c) -> c.isEqualityConstraint() && !c.isAnyQuadraticFactorNonZero())
-                .collect(Collectors.toList());
+        List<Expression> tmpEqExpr = ConvexSolver.selectIndependent(model, nbVariables,
+                model.constraints().filter((final Expression c) -> c.isEqualityConstraint() && !c.isAnyQuadraticFactorNonZero())
+                        .map(c -> c.compensate(fixedVariables)).collect(Collectors.toList()));
         int nbEqExpr = tmpEqExpr.size();
 
         List<Expression> tmpUpExpr = model.constraints().filter(e -> e.isUpperConstraint() && !e.isAnyQuadraticFactorNonZero()).collect(Collectors.toList());
@@ -727,7 +737,6 @@ public abstract class ConvexSolver extends GenericSolver {
 
         Expression tmpObjExpr = model.objective().compensate(fixedVariables);
         boolean max = model.getOptimisationSense() == Optimisation.Sense.MAX;
-        boolean didSet = false;
 
         retVal.setObjectiveAdjustmentFactor(ADJUSTED_OBJECTIVE ? tmpObjExpr.getAdjustmentFactor() : ONE);
 
@@ -741,7 +750,6 @@ public abstract class ConvexSolver extends GenericSolver {
 
                 retVal.addObjective(row, col, factor);
                 retVal.addObjective(col, row, factor);
-                didSet = true;
             }
         }
 
@@ -750,24 +758,11 @@ public abstract class ConvexSolver extends GenericSolver {
             if (max) {
                 for (IntIndex key : tmpObjExpr.getLinearKeySet()) {
                     retVal.setObjective(model.indexOfFreeVariable(key.index), tmpObjExpr.get(key, ADJUSTED_OBJECTIVE));
-                    didSet = true;
                 }
             } else {
                 for (IntIndex key : tmpObjExpr.getLinearKeySet()) {
                     retVal.setObjective(model.indexOfFreeVariable(key.index), tmpObjExpr.get(key, ADJUSTED_OBJECTIVE).negate());
-                    didSet = true;
                 }
-            }
-        }
-
-        if (!didSet) {
-            // In some very rare case the model was verified to be a quadratic
-            // problem, but then the presolver eliminated/fixed all variables
-            // part of the objective function - then we would end up here.
-            // Rather than always having to do very expensive checks we simply
-            // generate a well-behaved objective function here.
-            for (int ij = 0; ij < nbVariables; ij++) {
-                retVal.setObjective(ij, ij, BigMath.ONE);
             }
         }
 
@@ -775,7 +770,7 @@ public abstract class ConvexSolver extends GenericSolver {
 
         for (int i = 0; i < nbEqExpr; i++) {
 
-            Expression expression = tmpEqExpr.get(i).compensate(fixedVariables);
+            Expression expression = tmpEqExpr.get(i);
 
             for (IntIndex key : expression.getLinearKeySet()) {
                 retVal.setAE(i, model.indexOfFreeVariable(key.index), expression.get(key, ADJUSTED_CONSTRAINTS));
@@ -862,6 +857,104 @@ public abstract class ConvexSolver extends GenericSolver {
      */
     static boolean isDualMeaningful(final Optimisation.State state) {
         return state.isSuccess() && state.isApproximate();
+    }
+
+    /**
+     * The equality constraints, in order, without those that are linear combinations of the ones before –
+     * found with a Cholesky decomposition of [A][A]<sup>T</sup>, extended one row/column at a time. A row
+     * that can't be added is [a]<sub>k</sub> = [c]<sup>T</sup>[A] with [c] =
+     * ([A][A]<sup>T</sup>)<sup>-1</sup> [A][a]<sub>k</sub><sup>T</sup>, and it is consistent if b<sub>k</sub>
+     * = [c]<sup>T</sup>[b]. If any such row is not consistent, the problem is infeasible, and all rows are
+     * returned.
+     */
+    private static List<Expression> selectIndependent(final ExpressionsBasedModel model, final int nbVariables, final List<Expression> equalities) {
+
+        int nbEqus = equalities.size();
+
+        if (nbEqus <= 1) {
+            return equalities;
+        }
+
+        int[][] indices = new int[nbEqus][];
+        double[][] values = new double[nbEqus][];
+        double[] rhs = new double[nbEqus];
+
+        for (int i = 0; i < nbEqus; i++) {
+
+            Expression expression = equalities.get(i);
+            Set<IntIndex> keys = expression.getLinearKeySet();
+
+            indices[i] = new int[keys.size()];
+            values[i] = new double[keys.size()];
+
+            int k = 0;
+            for (IntIndex key : keys) {
+                indices[i][k] = model.indexOfFreeVariable(key.index);
+                values[i][k] = expression.get(key, ADJUSTED_CONSTRAINTS).doubleValue();
+                k++;
+            }
+
+            rhs[i] = expression.getUpperLimit(ADJUSTED_CONSTRAINTS, BigMath.SMALLEST_POSITIVE_INFINITY).doubleValue();
+        }
+
+        Cholesky<Double> gram = Cholesky.R064.make(0, 0);
+        int[] kept = new int[nbEqus];
+        int nbKept = 0;
+        boolean consistent = true;
+
+        double[] row = new double[nbVariables];
+
+        for (int i = 0; i < nbEqus; i++) {
+
+            for (int k = 0; k < indices[i].length; k++) {
+                row[indices[i][k]] = values[i][k];
+            }
+
+            // The new column of [A][A]^T, with the diagonal element last
+            double[] column = new double[nbKept + 1];
+            for (int p = 0; p <= nbKept; p++) {
+                int other = p < nbKept ? kept[p] : i;
+                double dot = ZERO;
+                for (int k = 0; k < indices[other].length; k++) {
+                    dot += values[other][k] * row[indices[other][k]];
+                }
+                column[p] = dot;
+            }
+
+            if (gram.appendColumn(ArrayR064.wrap(column))) {
+
+                kept[nbKept++] = i;
+
+            } else {
+
+                double combination = ZERO;
+                if (nbKept > 0) {
+                    double[] coefficients = Arrays.copyOf(column, nbKept);
+                    gram.ftran(coefficients);
+                    for (int p = 0; p < nbKept; p++) {
+                        combination += coefficients[p] * rhs[kept[p]];
+                    }
+                }
+
+                if (model.options.feasibility.isDifferent(rhs[i], combination)) {
+                    consistent = false;
+                }
+            }
+
+            for (int k = 0; k < indices[i].length; k++) {
+                row[indices[i][k]] = ZERO;
+            }
+        }
+
+        if (nbKept == nbEqus || !consistent) {
+            return equalities;
+        }
+
+        List<Expression> retVal = new ArrayList<>(nbKept);
+        for (int p = 0; p < nbKept; p++) {
+            retVal.add(equalities.get(kept[p]));
+        }
+        return retVal;
     }
 
     protected ConvexSolver(final Optimisation.Options optimisationOptions) {

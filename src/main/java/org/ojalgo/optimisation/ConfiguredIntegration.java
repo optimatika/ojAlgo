@@ -52,6 +52,11 @@ final class ConfiguredIntegration<S extends Optimisation.Solver> extends Express
     }
 
     @Override
+    public Result prepareSolverCandidate(final Result candidateModelState, final ExpressionsBasedModel model) {
+        return myDelegate.prepareSolverCandidate(candidateModelState, model);
+    }
+
+    @Override
     public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
         return myDelegate.toModelState(solverState, model);
     }
@@ -59,6 +64,11 @@ final class ConfiguredIntegration<S extends Optimisation.Solver> extends Express
     @Override
     public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
         return myDelegate.toSolverState(modelState, model);
+    }
+
+    @Override
+    protected int getIndexInSolver(final ExpressionsBasedModel model, final Variable variable) {
+        return myDelegate.getIndexInSolver(model, variable);
     }
 
     @Override

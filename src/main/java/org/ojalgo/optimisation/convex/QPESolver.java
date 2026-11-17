@@ -54,7 +54,17 @@ final class QPESolver extends ConstrainedSolver {
 
         boolean ok = super.initialise(kickStarter);
 
-        if (kickStarter != null && kickStarter.getState().isFeasible()) {
+        if (this.isZeroQ()) {
+            // An LP - its solution is the solution, there are no iterations
+
+            state = this.initialiseFromLP().getState();
+            myFeasible = state.isFeasible();
+
+            if (!myFeasible) {
+                this.getSolutionX().fillAll(ZERO);
+            }
+
+        } else if (kickStarter != null && kickStarter.getState().isFeasible()) {
 
             this.getSolutionX().fillMatching(kickStarter);
             myFeasible = true;
@@ -68,6 +78,11 @@ final class QPESolver extends ConstrainedSolver {
         }
 
         return ok;
+    }
+
+    @Override
+    protected boolean isIteratingPossible() {
+        return !this.isZeroQ();
     }
 
     @Override

@@ -231,8 +231,8 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
         static final NumberContext APPROXIMATE = NumberContext.of(4);
 
         /**
-         * Tolerance for the primal infeasibility certificate – stricter than {@link #ACCURACY}, to not
-         * conclude infeasibility too easily.
+         * Tolerance for the infeasibility certificates – stricter than {@link #ACCURACY}, to not conclude
+         * infeasibility (or unboundedness) too easily.
          */
         static final NumberContext INFEASIBILITY = NumberContext.of(12, 8);
 
@@ -1191,7 +1191,7 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
         if (dualResidual < dualTolerance) {
             iterationDualFeasible = true;
         } else {
-            problemDualInfeasible = this.isDualInfeasible(Configuration.APPROXIMATE);
+            problemDualInfeasible = this.isDualInfeasible(approximate ? Configuration.APPROXIMATE : Configuration.INFEASIBILITY);
         }
 
         if (iterationPrimalFeasible && iterationDualFeasible) {
@@ -1288,7 +1288,8 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
 
     /**
      * Tests dual infeasibility by checking if Δx certifies an unbounded ray: q'Δx < 0 with P Δx ≈ 0 and A Δx
-     * respecting bound structure.
+     * respecting bound structure. The tests are relative to the size of Δx – they are the same for Δx scaled
+     * to unit length.
      *
      * @param tolerance infeasibility tolerance
      * @return {@code true} if the problem is certified dual infeasible
@@ -1299,7 +1300,7 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
 
         if (!tolerance.isZero(normDeltaX)) {
 
-            double error = tolerance.error(normDeltaX);
+            double error = tolerance.error(PrimitiveMath.ONE) * normDeltaX;
 
             if (DOT.invoke(myData.q, myWork.xd) < -error) {
 
@@ -1351,7 +1352,11 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
 
             double lhs = 0.0;
             for (int i = 0, m = myData.getRowDim(); i < m; i++) {
-                lhs += myData.u[i] * Math.max(myWork.yd[i], 0) + myData.l[i] * Math.min(myWork.yd[i], 0);
+                if (myWork.yd[i] > 0.0) {
+                    lhs += myData.u[i] * myWork.yd[i];
+                } else if (myWork.yd[i] < 0.0) {
+                    lhs += myData.l[i] * myWork.yd[i];
+                }
             }
 
             if (lhs < -error) {

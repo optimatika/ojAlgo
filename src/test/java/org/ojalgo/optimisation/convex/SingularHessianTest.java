@@ -167,6 +167,59 @@ public class SingularHessianTest extends OptimisationConvexTests {
     }
 
     /**
+     * Cash and two assets with correlation 0.99997, long-short and fully invested: min 1/2
+     * [x]<sup>T</sup>[Σ][x] - [μ]<sup>T</sup>[x] when cash + a1 + a2 = 1. [Q] is singular (no cash variance),
+     * and along (0, 1, -1) its eigenvalue is small, 0.04 * 3E-5, but 2000 times larger than the patch. The
+     * problem is bounded, with a large solution: [a] = [Σ]<sup>-1</sup>[μ] for the assets, about ±83333, and
+     * cash = 1. That used to be reported as UNBOUNDED – the curvature along the solution direction was
+     * compared to sqrt(smallDiagonal) * max|Q|, not to the patch. With a (not active) lower bound on cash it
+     * is also an inequality constrained problem.
+     */
+    @Test
+    public void testIllConditionedBounded() {
+
+        double variance = 0.04;
+        double covariance = 0.99997 * variance;
+        double[] returns = { 0.0, 0.1, -0.1 };
+
+        double determinant = variance * variance - covariance * covariance;
+        double expected1 = (variance * returns[1] - covariance * returns[2]) / determinant;
+        double expected2 = (variance * returns[2] - covariance * returns[1]) / determinant;
+        double expectedCash = 1.0 - expected1 - expected2;
+
+        Integration<?>[] activeSet = { ConfiguredIntegration.ASET_PLAIN_D, ConfiguredIntegration.ASET_PLAIN_S, ConfiguredIntegration.ASET_PROJ_D,
+                ConfiguredIntegration.ASET_PROJ_S };
+
+        for (boolean inequality : new boolean[] { false, true }) {
+
+            for (int v = 0; v < activeSet.length; v++) {
+
+                String id = (inequality ? "Inequality " : "Equality ") + v;
+
+                ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+                Variable cash = model.newVariable("Cash").weight(-returns[0]);
+                Variable a1 = model.newVariable("A1").weight(-returns[1]);
+                Variable a2 = model.newVariable("A2").weight(-returns[2]);
+
+                model.newExpression("Risk").weight(0.5).set(a1, a1, variance).set(a1, a2, covariance).set(a2, a1, covariance).set(a2, a2, variance);
+                model.newExpression("Budget").level(1.0).set(cash, 1.0).set(a1, 1.0).set(a2, 1.0);
+
+                if (inequality) {
+                    cash.lower(0.0);
+                }
+
+                Optimisation.Result result = model.minimise(activeSet[v]);
+
+                TestUtils.assertStateNotLessThanOptimal(result);
+                TestUtils.assertEquals(id, expectedCash, result.doubleValue(0), NumberContext.of(6));
+                TestUtils.assertEquals(id, expected1, result.doubleValue(1), NumberContext.of(6));
+                TestUtils.assertEquals(id, expected2, result.doubleValue(2), NumberContext.of(6));
+            }
+        }
+    }
+
+    /**
      * The patch (a small constant added to the diagonal of [Q]) makes the solution violate the original
      * optimality conditions by an amount proportional to the size of the solution. With large solutions that
      * used to be clearly visible - here x0 = 0.0149 (exact 0.0) and x2 = -0.070 (exact -0.1), with similarly

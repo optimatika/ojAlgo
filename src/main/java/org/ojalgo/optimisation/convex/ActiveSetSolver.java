@@ -59,6 +59,10 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
      * towards the constraint boundary.
      */
     private static final double NOISE_FACTOR = TEN;
+    /**
+     * A multiplier is considered zero, when looking for a constraint to exclude, if it is zero in this
+     * context after division by {@link #myLagrangeScale}.
+     */
     private static final NumberContext LAGRANGE = NumberContext.of(12, 6).withMode(RoundingMode.HALF_DOWN);
     private static final NumberContext SLACK = NumberContext.of(6, 10).withMode(RoundingMode.HALF_DOWN);
     private static final NumberContext SOLUTION = NumberContext.of(6).withMode(RoundingMode.HALF_DOWN);
@@ -93,6 +97,11 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     private transient int[] myIncluded = null;
     private MatrixStore<Double> myInvQC;
     private final R064Store myIterationX;
+    /**
+     * The largest (absolute) element of [Q] and [C], if less than 1, otherwise 1. The multipliers scale with
+     * the objective function.
+     */
+    private double myLagrangeScale = ONE;
     private transient double[] myRowNormsAE = null;
     private transient double[] myRowNormsAI = null;
     private boolean myShrinkSwitch = true;
@@ -468,9 +477,15 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         boolean ok = super.initialise(kickStarter);
 
+        double largestQ = this.getMatrixQ().aggregateAll(Aggregator.LARGEST).doubleValue();
+        double largestC = this.getMatrixC().aggregateAll(Aggregator.LARGEST).doubleValue();
+        double largest = Math.max(largestQ, largestC);
+        myLagrangeScale = largest > ZERO ? Math.min(ONE, largest) : ONE;
+
         myInvQC = this.getSolutionQ(this.getIterationC());
 
-        boolean usableKickStarter = kickStarter != null && kickStarter.getState().isApproximate();
+        // With [Q] zero there are no iterations - the LP is solved regardless of any kick-starter
+        boolean usableKickStarter = kickStarter != null && kickStarter.getState().isApproximate() && !this.isZeroQ();
 
         if (usableKickStarter) {
             this.getSolutionX().fillMatching(kickStarter);
@@ -483,10 +498,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         if (!state.isFeasible()) {
 
-            Result resultLP = this.solveLP();
-
-            this.getSolutionX().fillMatching(resultLP);
-            this.getSolutionL().fillAll(ZERO);
+            Result resultLP = this.initialiseFromLP();
 
             if (resultLP.getState().isFeasible()) {
                 state = resultLP.getState();
@@ -619,7 +631,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                 tmpVal = soluL.doubleValue(nbEqus + included[i], 0);
 
-                if (tmpVal < tmpMin && !LAGRANGE.isZero(tmpVal)) {
+                if (tmpVal < tmpMin && !LAGRANGE.isZero(tmpVal / myLagrangeScale)) {
                     tmpMin = tmpVal;
                     retVal = i;
                     if (this.isLogDebug()) {
@@ -637,7 +649,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             tmpVal = soluL.doubleValue(nbEqus + included[indexOfLastIncluded], 0);
 
-            if (tmpVal < tmpMin && !LAGRANGE.isZero(tmpVal)) {
+            if (tmpVal < tmpMin && !LAGRANGE.isZero(tmpVal / myLagrangeScale)) {
                 tmpMin = tmpVal;
                 retVal = indexOfLastIncluded;
                 if (this.isLogProgress()) {

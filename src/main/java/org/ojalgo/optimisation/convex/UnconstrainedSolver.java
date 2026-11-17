@@ -23,6 +23,7 @@ package org.ojalgo.optimisation.convex;
 
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.optimisation.Optimisation;
 
@@ -64,7 +65,17 @@ final class UnconstrainedSolver extends BasePrimitiveSolver {
 
         boolean solved = false;
 
-        if (solved = this.isSolvableQ()) {
+        if (this.isIndefiniteQ()) {
+            // Negative curvature, and no constraints - unbounded below
+
+        } else if (this.isZeroQ()) {
+            // Bounded, with every solution optimal, only if [C] is zero too
+
+            if (solved = this.getMatrixC().aggregateAll(Aggregator.LARGEST).doubleValue() == ZERO) {
+                this.getSolutionX().fillAll(ZERO);
+            }
+
+        } else if (solved = this.isSolvableQ()) {
             // Q is SPD
 
             this.getSolutionQ(this.getMatrixC(), this.getSolutionX());
@@ -74,7 +85,7 @@ final class UnconstrainedSolver extends BasePrimitiveSolver {
         }
 
         if (solved) {
-            state = State.DISTINCT;
+            state = this.isZeroQ() ? State.OPTIMAL : State.DISTINCT;
         } else {
             state = State.UNBOUNDED;
             this.getSolutionX().fillAll(ZERO);

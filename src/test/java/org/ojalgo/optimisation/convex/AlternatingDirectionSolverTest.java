@@ -46,6 +46,53 @@ public class AlternatingDirectionSolverTest extends OptimisationConvexTests {
     }
 
     /**
+     * min x^2 subject to x <= -1 and -x <= -1 (x >= 1) is infeasible. Built by {@link ConvexSolver.Builder}
+     * the inequality rows have lower limit -Infinity. The primal infeasibility test summed u * max(Δy, 0) + l
+     * * min(Δy, 0), and -Infinity * 0 = NaN, so the problem was never certified infeasible – it ended
+     * APPROXIMATE.
+     */
+    @Test
+    public void testInfeasibleWithInfiniteLimit() {
+
+        ConvexSolver.Builder builder = ConvexSolver.newBuilder(1).objective(0, 0, 1.0).inequality(-1.0, 1.0).inequality(-1.0, -1.0);
+
+        AlternatingDirectionSolver solver = new AlternatingDirectionSolver(builder.getADProblem(), new Optimisation.Options());
+
+        Result result = solver.solve();
+
+        TestUtils.assertEquals(Optimisation.State.INFEASIBLE, result.getState());
+    }
+
+    /**
+     * Minimising (x^2 + y^2) / 2 subject to x + y <= 1 and x, y >= 0 gives x = y = 0. Updating the range of x
+     * to [2, +Infinity), as when branching, makes the problem infeasible. The upper limit of x's bound row is
+     * then +Infinity, and (as with {@link #testInfeasibleWithInfiniteLimit()}) the problem was never
+     * certified infeasible.
+     */
+    @Test
+    public void testInfeasibleWithInfiniteRangeUpdate() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x = model.addVariable("x").lower(0);
+        Variable y = model.addVariable("y").lower(0);
+
+        model.addExpression("objective").weight(1).set(x, x, 0.5).set(y, y, 0.5);
+        model.addExpression("constraint").set(x, 1).set(y, 1).upper(1);
+
+        AlternatingDirectionSolver.Composer<Double> composer = AlternatingDirectionSolver.build(model, R064Store.FACTORY);
+        AlternatingDirectionSolver solver = new AlternatingDirectionSolver(composer.toProblem(), new Optimisation.Options(), composer.getStructure());
+
+        TestUtils.assertStateNotLessThanOptimal(solver.solve());
+
+        TestUtils.assertTrue(solver.updateRange(0, 2.0, Double.POSITIVE_INFINITY));
+
+        Result updated = solver.solve();
+
+        TestUtils.assertEquals(Optimisation.State.INFEASIBLE, updated.getState());
+    }
+
+    /**
      * Minimising -x^2 - y^2 + 0.1x + 0.1y subject to x + y <= 1.5 and 0 <= x, y <= 1 is not a convex problem
      * (P = -2I). With the initial rho the KKT matrix does not have n positive eigenvalues, and the solver
      * returns INVALID rather than iterate to a stationary point and report that as OPTIMAL (it did, with x =
@@ -153,6 +200,55 @@ public class AlternatingDirectionSolverTest extends OptimisationConvexTests {
         TestUtils.assertStateNotLessThanOptimal(updated);
         TestUtils.assertEquals(200.0, updated.doubleValue(0), accuracy);
         TestUtils.assertEquals(800.0, updated.doubleValue(1), accuracy);
+    }
+
+    /**
+     * Minimising ε x^2 - x subject to x >= -1 gives x = 1 / (2ε). The unboundedness (dual infeasibility) test
+     * used a relative tolerance of 1E-3, from the first iteration, and any direction with less curvature than
+     * that counted as an unbounded ray. With ε = 1E-4 (x = 5000) the problem was reported UNBOUNDED.
+     */
+    @Test
+    public void testWeakCurvatureOneVariable() {
+
+        double epsilon = 1E-4;
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x = model.addVariable("x").lower(-1);
+
+        model.addExpression("objective").weight(1).set(x, x, epsilon).set(x, -1);
+
+        Result result = model.minimise(ConfiguredIntegration.ADMM);
+
+        TestUtils.assertStateNotLessThanOptimal(result);
+        TestUtils.assertEquals(0.5 / epsilon, result.doubleValue(0), NumberContext.of(6));
+    }
+
+    /**
+     * Two highly correlated assets, long-short: minimising [x]<sup>T</sup>[P][x] / 2 - x1 with [P] = [[1,
+     * 1-δ], [1-δ, 1]], x1 >= -1 and x2 free. Along (1, -1) the curvature is δ, and with δ = 1E-4 the solution
+     * is about (5000, -5000). That was reported UNBOUNDED – see {@link #testWeakCurvatureOneVariable()}. Row
+     * and column scaling can't change the curvature along (1, -1).
+     */
+    @Test
+    public void testWeakCurvatureTwoVariables() {
+
+        double delta = 1E-4;
+
+        double determinant = 1.0 - (1.0 - delta) * (1.0 - delta);
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x1 = model.addVariable("x1").lower(-1);
+        Variable x2 = model.addVariable("x2");
+
+        model.addExpression("objective").weight(1).set(x1, x1, 0.5).set(x2, x2, 0.5).set(x1, x2, 1.0 - delta).set(x1, -1);
+
+        Result result = model.minimise(ConfiguredIntegration.ADMM);
+
+        TestUtils.assertStateNotLessThanOptimal(result);
+        TestUtils.assertEquals(1.0 / determinant, result.doubleValue(0), NumberContext.of(6));
+        TestUtils.assertEquals(-(1.0 - delta) / determinant, result.doubleValue(1), NumberContext.of(6));
     }
 
 }

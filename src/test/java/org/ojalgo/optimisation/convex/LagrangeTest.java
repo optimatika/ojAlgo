@@ -480,4 +480,40 @@ public class LagrangeTest extends OptimisationConvexTests {
         }
     }
 
+    /**
+     * min ε Σ (x<sub>i</sub> - 2)<sup>2</sup> with 0 <= x<sub>i</sub> <= 3, built with {@link Builder} (no
+     * scaling). The optimum is x<sub>i</sub> = 2. At x<sub>i</sub> = 0 the multiplier of the lower bound is
+     * -4ε. Multipliers smaller than 5E-7 in magnitude counted as zero, also when the whole objective was that
+     * small, and with ε <= 1E-7 some of the variables were left at 0 – reported OPTIMAL.
+     */
+    @Test
+    public void testSmallScaledObjective() {
+
+        int n = 4;
+
+        for (double epsilon : new double[] { 1.0, 1E-6, 1E-7, 1E-8, 1E-10 }) {
+
+            R064Store mtrxQ = R064Store.FACTORY.make(n, n);
+            R064Store mtrxC = R064Store.FACTORY.make(n, 1);
+            R064Store mtrxAI = R064Store.FACTORY.make(2 * n, n);
+            R064Store mtrxBI = R064Store.FACTORY.make(2 * n, 1);
+
+            for (int i = 0; i < n; i++) {
+                mtrxQ.set(i, i, 2.0 * epsilon);
+                mtrxC.set(i, 4.0 * epsilon);
+                mtrxAI.set(i, i, 1.0);
+                mtrxBI.set(i, 3.0);
+                mtrxAI.set(n + i, i, -1.0);
+                mtrxBI.set(n + i, 0.0);
+            }
+
+            Result result = ConvexSolver.newBuilder(n).objective(mtrxQ, mtrxC).inequalities(mtrxAI, mtrxBI).build().solve();
+
+            TestUtils.assertStateNotLessThanOptimal(result);
+            for (int i = 0; i < n; i++) {
+                TestUtils.assertEquals("ε = " + epsilon, 2.0, result.doubleValue(i), NumberContext.of(8));
+            }
+        }
+    }
+
 }

@@ -287,7 +287,8 @@ final class IterativeASS extends ActiveSetSolver {
         myS.clear();
         int[] incl = this.getIncluded();
 
-        if (nbEqus + incl.length > 0) {
+        // With [Q] zero there is no Schur complement, and no iterations - the multipliers are the LP's
+        if (!this.isZeroQ() && nbEqus + incl.length > 0) {
 
             MatrixStore<Double> iterA = this.getIterationA();
             MatrixStore<Double> iterB = this.getIterationB();

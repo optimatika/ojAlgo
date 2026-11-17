@@ -260,7 +260,8 @@ public class GitHubIssue24 extends FinancePortfolioTests {
             BasicLogger.debug(tmpMeanReturn);
         }
 
-        TestUtils.assertTrue(markowitzModel.optimiser().getState().isOptimal()); // Won't reach here...
+        // Not cleaned, the covariance matrix is not positive semidefinite - the solution is FEASIBLE, not OPTIMAL
+        TestUtils.assertTrue(markowitzModel.optimiser().getState().isFeasible()); // Won't reach here...
     }
 
     @Test

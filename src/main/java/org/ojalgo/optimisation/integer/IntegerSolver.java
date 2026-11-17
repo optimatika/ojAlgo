@@ -346,7 +346,7 @@ public final class IntegerSolver extends GenericSolver {
             Optimisation.Result rootResult = rootSolver.solve(this.getBestEstimate());
 
             if (rootSolver.generateCuts(myStrategy, myCutStatistics, true)) {
-                rootResult = rootSolver.solve(rootResult);
+                rootResult = rootSolver.solve(rootResult.withState(Optimisation.State.APPROXIMATE));
             }
 
             if (rootResult.getState().isOptimal() && rootSolver.isInPlaceBoundUpdateSafe()) {

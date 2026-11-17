@@ -76,7 +76,7 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
 
                 Boolean projection = options.convex().getProjection();
 
-                if (nbEqus > 0 && nbInes > 0 && nbEqus <= nbVars
+                if (nbEqus > 0 && nbInes > 0 && nbEqus < nbVars
                         && (Boolean.TRUE.equals(projection) || (projection == null && BasePrimitiveSolver.isProjectionPreferred(nbVars, nbEqus)))) {
 
                     return new NullSpaceASS(options, data);
@@ -208,6 +208,12 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
      * The constant added to the diagonal of [Q] (to make it positive definite), or 0.0 if [Q] was not patched
      */
     private double myDiagonalPatch = ZERO;
+    /**
+     * [Q] is not positive semidefinite, not even within the tolerance: no patch up to sqrt(smallDiagonal)
+     * times the largest absolute element makes it positive definite (see
+     * {@link ConvexSolver.Configuration#smallDiagonal(double)}).
+     */
+    private boolean myIndefiniteQ = false;
     private final ConvexData<Double> myMatrices;
     private final R064Store mySolutionX;
     private final MatrixDecomposition.Solver<Double> mySolverGeneral;
@@ -323,8 +329,9 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
      * <ol>
      * <li>The solution is larger than the problem data suggests - closer, in log scale, to the size implied
      * by the patch than to the natural size, |[C]| / |[Q]|.
-     * <li>The solution direction is an unbounded direction of the original problem: [Q][d] = 0, [AE][d] = 0,
-     * [AI][d] <= 0 and [C]<sup>T</sup>[d] > 0.
+     * <li>The solution direction is an unbounded direction of the original problem: [AE][d] = 0, [AI][d] <=
+     * 0, [C]<sup>T</sup>[d] > 0, and the curvature of the original [Q] along it is not larger than the patch,
+     * p: [d]<sup>T</sup>[Q][d] / [d]<sup>T</sup>[d] <= p.
      * </ol>
      */
     private boolean isUnbounded() {
@@ -347,9 +354,9 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
             return false;
         }
 
-        double largestQ = myDiagonalPatch / options.convex().smallDiagonal();
-        MatrixStore<Double> originalQd = this.getMatrixQ().multiply(d).subtract(d.multiply(myDiagonalPatch));
-        if (originalQd.aggregateAll(Aggregator.LARGEST).doubleValue() > tolerance * largestQ) {
+        double dd = d.dot(d);
+        double curvature = d.dot(this.getMatrixQ().multiply(d)) / dd - myDiagonalPatch;
+        if (curvature > myDiagonalPatch) {
             return false;
         }
 
@@ -427,7 +434,12 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
 
             this.iterate();
 
-            if (myDiagonalPatch > ZERO && state.isFeasible() && state != State.UNBOUNDED) {
+            if (myIndefiniteQ) {
+                // Not convex - a stationary point, not proven to be optimal
+                if (state.isOptimal()) {
+                    state = State.FEASIBLE;
+                }
+            } else if (myDiagonalPatch > ZERO && state.isFeasible() && state != State.UNBOUNDED) {
                 if (this.isUnbounded()) {
                     state = State.UNBOUNDED;
                 } else if (this.isBiased()) {
@@ -570,17 +582,38 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
             this.log(Q_NOT_SYMMETRIC, matrixQ);
         }
 
-        if (!mySolverQ.isComputed()) {
-            // Only when (re)computing - a re-initialisation, re-using the decomposition, keeps the patch
-            myDiagonalPatch = ZERO;
+        if (!mySolverQ.isComputed() && myDiagonalPatch == ZERO) {
+            // Once - a re-initialisation keeps the decomposition, and the patch is never added again
             myZeroQ = false;
             if (!mySolverQ.compute(matrixQ)) {
                 double largest = matrixQ.aggregateAll(Aggregator.LARGEST).doubleValue();
                 double small = options.convex().smallDiagonal();
                 if (largest > small) {
-                    myDiagonalPatch = small * largest;
-                    matrixQ.modifyDiagonal(ADD.by(myDiagonalPatch));
-                    mySolverQ.compute(matrixQ);
+
+                    double smallest = small * largest;
+                    double limit = SQRT.invoke(small) * largest;
+
+                    double patch = smallest;
+                    matrixQ.modifyDiagonal(ADD.by(patch));
+                    boolean definite = mySolverQ.compute(matrixQ);
+
+                    // Negative curvature, more than the patch - increase it, up to the tolerance
+                    while (!definite && patch < limit) {
+                        double next = Math.min(FOUR * patch, limit);
+                        matrixQ.modifyDiagonal(ADD.by(next - patch));
+                        patch = next;
+                        definite = mySolverQ.compute(matrixQ);
+                    }
+
+                    if (!definite) {
+                        // Not positive semidefinite, not even within the tolerance - back to the smallest patch
+                        matrixQ.modifyDiagonal(ADD.by(smallest - patch));
+                        patch = smallest;
+                        myIndefiniteQ = true;
+                    }
+
+                    myDiagonalPatch = patch;
+
                 } else {
                     myZeroQ = true;
                 }
@@ -697,6 +730,10 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
 
     ConvexData<Double> getConvexData() {
         return myMatrices;
+    }
+
+    boolean isIndefiniteQ() {
+        return myIndefiniteQ;
     }
 
     boolean isPatchedQ() {

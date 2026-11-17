@@ -21,6 +21,8 @@
  */
 package org.ojalgo.optimisation.convex;
 
+import static org.ojalgo.function.constant.PrimitiveMath.HALF;
+
 import org.ojalgo.function.multiary.LinearFunction;
 import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.function.multiary.PureQuadraticFunction;
@@ -30,7 +32,10 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 
 /**
- * 1/2 [x]<sup>T</sup>[Q][x] - [l]<sup>T</sup>[x]
+ * 1/2 [x]<sup>T</sup>[Q][x] - [l]<sup>T</sup>[x] + c
+ * <p>
+ * The gradient is 1/2 ([Q] + [Q]<sup>H</sup>)[x] - [l], and the Hessian 1/2 ([Q] + [Q]<sup>H</sup>) – [Q] and
+ * [Q][x] - [l] when [Q] is symmetric.
  *
  * @author apete
  */
@@ -67,11 +72,11 @@ public final class ConvexObjectiveFunction<N extends Comparable<N>> implements M
     }
 
     public MatrixStore<N> getGradient(final Access1D<N> point) {
-        return myPureQuadratic.getGradient(point).subtract(myLinear.getGradient(point));
+        return myPureQuadratic.getGradient(point).multiply(HALF).subtract(myLinear.getGradient(point));
     }
 
     public MatrixStore<N> getHessian(final Access1D<N> point) {
-        return myPureQuadratic.getHessian(point);
+        return myPureQuadratic.getHessian(point).multiply(HALF);
     }
 
     public MatrixStore<N> getLinearFactors(final boolean negated) {
@@ -85,9 +90,9 @@ public final class ConvexObjectiveFunction<N extends Comparable<N>> implements M
         Scalar<N> one = myScalarFactory.one();
         Scalar<N> two = one.add(one);
 
-        Scalar<N> retVal = zero.add(myPureQuadratic.invoke(arg)).divide(two);
+        Scalar<N> retVal = zero.add(this.quadratic().multiplyBoth(arg)).divide(two);
         retVal = retVal.subtract(myLinear.invoke(arg));
-        retVal.add(this.getConstant());
+        retVal = retVal.add(this.getConstant());
         return retVal.get();
     }
 

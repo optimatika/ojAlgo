@@ -209,7 +209,10 @@ final class IterativeRefinementSolver extends ConvexSolver {
 
         data = IterativeRefinementSolver.getDoubleConvexData(data, Q, C, Ae, Be, Ai, Bi);
 
-        Optimisation.Result x_y_double = BasePrimitiveSolver.newSolver(data, options).solve();
+        BasePrimitiveSolver initialSolver = BasePrimitiveSolver.newSolver(data, options);
+        Optimisation.Result x_y_double = initialSolver.solve();
+        // Not convex - small residuals only mean a stationary point
+        boolean convex = !initialSolver.isIndefiniteQ();
         this.incrementIterationsCount();
         if (x_y_double.getState() == Optimisation.State.INFEASIBLE || x_y_double.getState() == Optimisation.State.UNBOUNDED) {
             //         trust solver and abort if infeasible or unbounded.
@@ -349,6 +352,9 @@ final class IterativeRefinementSolver extends ConvexSolver {
             y0 = y1;
 
             this.incrementIterationsCount();
+        }
+        if (!convex && exitState.isOptimal()) {
+            exitState = State.FEASIBLE;
         }
         Result result = IterativeRefinementSolver.buildResult(Q, C, x0, y0, exitState);
         double improvement = (initialSolutionValue - result.getValue()) / initialSolutionValue;

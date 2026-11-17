@@ -149,6 +149,14 @@ class NullSpaceProjection {
     }
 
     /**
+     * Do the equality constraints have full row rank? The QR decomposition of [AE]<sup>T</sup> is without
+     * column pivoting – if not, [Z] is not a basis for the null space of [AE].
+     */
+    boolean isFullRowRank() {
+        return myDecomposition.getRank() == myOriginal.countEqualityConstraints();
+    }
+
+    /**
      * Is the reduced Hessian, [Z]<sup>T</sup>[Q][Z], negligible compared to the original [Q]? Then the
      * reduced problem is effectively an LP - [Q] is zero in the null space of the equality constraints. With
      * rounding errors the reduced Hessian may still be (numerically) positive definite, but tiny, and would

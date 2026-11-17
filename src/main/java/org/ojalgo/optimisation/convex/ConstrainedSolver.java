@@ -21,6 +21,10 @@
  */
 package org.ojalgo.optimisation.convex;
 
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+
+import java.util.function.Supplier;
+
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
@@ -107,6 +111,25 @@ abstract class ConstrainedSolver extends BasePrimitiveSolver {
         }
 
         return spdQ;
+    }
+
+    /**
+     * Solves the LP, see {@link #solveLP()}, and initialises the solution from it. When [Q] is zero the LP is
+     * the problem, and its dual values are the multipliers – otherwise the multipliers are 0.
+     */
+    protected Result initialiseFromLP() {
+
+        Result resultLP = this.solveLP();
+
+        this.getSolutionX().fillMatching(resultLP);
+
+        if (this.isZeroQ() && ConvexSolver.isDualMeaningful(resultLP.getState())) {
+            resultLP.getDualSolution().map(Supplier::get).ifPresentOrElse(mySolutionL::fillMatching, () -> mySolutionL.fillAll(ZERO));
+        } else {
+            mySolutionL.fillAll(ZERO);
+        }
+
+        return resultLP;
     }
 
     @Override

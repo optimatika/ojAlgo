@@ -506,6 +506,11 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
         CuteMarosMeszarosCase.doTest("TAME.SIF");
     }
 
+    /**
+     * As distributed [Q] is not positive semidefinite: the smallest eigenvalue is about -1.3E-5, with max|Q|
+     * = 1. [Q] is a sampled Gaussian kernel, positive definite, cut to a band and rounded to 6 decimals.
+     * That's within the tolerance, and the problem is solved as a convex one.
+     */
     @Test
     public void testVALUES() {
         CuteMarosMeszarosCase.doTest("VALUES.SIF");
