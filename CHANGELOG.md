@@ -11,6 +11,19 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Changed
+
+#### org.ojalgo.optimisation
+
+- `ExpressionsBasedModel.getObjective()` now names its expression `obj`, not `OBJECTIVE`. `obj` is the name CPLEX gives an objective function that has none, and the LP and MPS formats now use it for such an objective too – so the objective function of a model written and read back is again the expression `getObjective()` returns.
+
+### Fixed
+
+#### org.ojalgo.optimisation
+
+- Changing the objective after solving a model had no effect on the next solve. The `LINEAR_OBJECTIVE` presolver moved a linear objective expression's weights onto the variables, in the model itself, so the expression – the one `getObjective()` returns, say – was no longer part of the objective function. It is no longer one of the default presolvers, and solving leaves the objective expressions as they are.
+- The objective function's name disappeared when a model was read from one file format and written to another (or the same): it always came out as `obj`. An objective function that has its own name – `profit` in an LP file's `Maximize profit: …`, or an MPS file's objective row – now keeps it (in MPS where it fits the 8-character field). A constraint may no longer take the objective function's name in an LP file.
+
 ### Removed
 
 #### org.ojalgo.optimisation

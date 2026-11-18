@@ -110,6 +110,11 @@ public abstract class Presolvers {
     /**
      * If the expression is linear and contributes to the objective function, then the contributions are
      * transferred to the variables and the weight of the expression set to null.
+     * <p>
+     * Not one of the default presolvers. It changes the model itself: afterwards the expression is no longer
+     * part of the objective function, so changes to it – to {@link ExpressionsBasedModel#getObjective()}, say
+     * – no longer count when the model is solved again, and the objective function loses its name when the
+     * model is written to a file.
      */
     public static final ExpressionsBasedModel.ExpressionAnalyser LINEAR_OBJECTIVE = new ExpressionsBasedModel.ExpressionAnalyser(10) {
 

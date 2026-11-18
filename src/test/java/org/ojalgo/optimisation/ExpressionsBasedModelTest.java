@@ -244,7 +244,7 @@ class ExpressionsBasedModelTest extends OptimisationTests {
         Expression objective = model.getObjective().set(x, 3);
 
         TestUtils.assertTrue(objective == model.getObjective());
-        TestUtils.assertTrue(objective == model.getExpression("OBJECTIVE"));
+        TestUtils.assertTrue(objective == model.getExpression("obj"));
         TestUtils.assertEquals(1.0, objective.getContributionWeight().doubleValue());
         TestUtils.assertFalse(objective.isConstraint());
 
@@ -258,7 +258,29 @@ class ExpressionsBasedModelTest extends OptimisationTests {
     }
 
     /**
-     * An expression named "OBJECTIVE" that already exists is what
+     * Solving leaves the objective expression as it is, so a change to it after one solve counts in the next.
+     */
+    @Test
+    void testGetObjectiveChangedAfterSolve() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x = model.newRealVariable("x").lower(0).upper(10);
+        Variable y = model.newRealVariable("y").lower(0).upper(10);
+        model.newExpression("capacity").set(x, 1).set(y, 1).upper(10);
+
+        model.getObjective().set(x, 1).set(y, 2);
+        TestUtils.assertEquals(20.0, model.maximise().getValue()); // y = 10
+
+        model.getObjective().set(x, 5);
+        TestUtils.assertEquals(50.0, model.maximise().getValue()); // x = 10
+
+        TestUtils.assertEquals(1.0, model.getObjective().getContributionWeight().doubleValue());
+        TestUtils.assertFalse(x.isObjective());
+    }
+
+    /**
+     * An expression named "obj" that already exists is what
      * {@link ExpressionsBasedModel#getObjective()} returns, as it is.
      */
     @Test
@@ -266,7 +288,7 @@ class ExpressionsBasedModelTest extends OptimisationTests {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        Expression existing = model.newExpression("OBJECTIVE").weight(-1);
+        Expression existing = model.newExpression("obj").weight(-1);
 
         TestUtils.assertTrue(existing == model.getObjective());
         TestUtils.assertEquals(-1.0, model.getObjective().getContributionWeight().doubleValue());

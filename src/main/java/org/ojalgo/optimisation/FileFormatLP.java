@@ -439,8 +439,10 @@ abstract class FileFormatLP {
             if (FileFormatLP.isLabel(tokens)) {
                 name = tokens.next();
                 tokens.skip(1);
-                if (model.getExpression(name) != null) {
-                    throw tokens.errorAt(start, "There is already a constraint named '" + name + "'");
+                Expression existing = model.getExpression(name);
+                if (existing != null) {
+                    throw tokens.errorAt(start, existing.isObjective() ? "'" + name + "' is already the objective function's name"
+                            : "There is already a constraint named '" + name + "'");
                 }
             } else {
                 do {
@@ -1005,12 +1007,13 @@ abstract class FileFormatLP {
         }
         tokens.skip(1);
 
+        String name = ExpressionsBasedModel.OBJECTIVE_EXPRESSION;
         if (FileFormatLP.isLabel(tokens)) {
-            tokens.skip(2);
+            name = tokens.next();
+            tokens.skip(1);
         }
 
-        Expression objective = model.newExpression("obj");
-        objective.weight(ONE);
+        Expression objective = model.getObjective(name);
         BigDecimal constant = FileFormatLP.parseExpression(tokens, model, variables, objective, true);
         if (constant.signum() != 0) {
             objective.addObjectiveConstant(constant);
@@ -1066,7 +1069,10 @@ abstract class FileFormatLP {
             writer.newLine();
 
             // Objective
-            writer.write("  obj:");
+            String name = model.getObjectiveName();
+            writer.write("  ");
+            writer.write(name != null ? name : ExpressionsBasedModel.OBJECTIVE_EXPRESSION);
+            writer.write(":");
             FileFormatLP.writeLinearTerms(writer, variables, objective);
             if (objective.isAnyQuadraticFactorNonZero()) {
                 FileFormatLP.writeQuadraticTerms(writer, variables, objective, true);

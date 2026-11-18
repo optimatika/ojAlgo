@@ -462,6 +462,48 @@ class FileFormatTest extends OptimisationTests {
         TestUtils.assertEquals(0.0, result.getValue(), ACCURACY);
     }
 
+    /**
+     * The objective function keeps its own name through LP and MPS, both ways. Without one it is written as
+     * obj, and a constraint may not take the objective's name.
+     */
+    @Test
+    void testObjectiveNameKept() {
+
+        ExpressionsBasedModel model = FileFormatTest.parseLP("Maximize\n profit: 45 chairs + 80 tables\nSubject To\n hours: 2 chairs + 5 tables <= 400\nEnd\n");
+        TestUtils.assertTrue(model.getObjective("profit") == model.getExpression("profit"));
+
+        String lp = new String(FileFormatTest.writeToBytes(model, FileFormat.LP));
+        TestUtils.assertTrue(lp, lp.contains("  profit:"));
+
+        String mps = new String(FileFormatTest.writeToBytes(model, FileFormat.MPS));
+        TestUtils.assertTrue(mps, mps.contains(" N  profit"));
+
+        ExpressionsBasedModel fromMPS = ExpressionsBasedModel.parse(new ByteArrayInputStream(mps.getBytes()), FileFormat.MPS);
+        String back = new String(FileFormatTest.writeToBytes(fromMPS, FileFormat.LP));
+        TestUtils.assertTrue(back, back.contains("  profit:"));
+        TestUtils.assertEquals(45.0 * 200.0, fromMPS.maximise().getValue(), ACCURACY);
+
+        ExpressionsBasedModel unnamed = FileFormatTest.parseLP("Maximize\n 45 chairs + 80 tables\nSubject To\n hours: 2 chairs + 5 tables <= 400\nEnd\n");
+        TestUtils.assertTrue(new String(FileFormatTest.writeToBytes(unnamed, FileFormat.MPS)).contains(" N  obj"));
+
+        ExpressionsBasedModel weighted = new ExpressionsBasedModel();
+        Variable x = weighted.newVariable("x").lower(0).weight(3);
+        weighted.newExpression("cap").set(x, 1).upper(10);
+        TestUtils.assertTrue(new String(FileFormatTest.writeToBytes(weighted, FileFormat.LP)).contains("  obj:"));
+
+        FileFormatTest.assertRefused("Maximize\n profit: x\nSubject To\n profit: x <= 1\nEnd\n", 4, "'profit' is already the objective function's name");
+
+        ExpressionsBasedModel built = new ExpressionsBasedModel();
+        Variable z = built.newVariable("z").lower(0).upper(4);
+        built.getObjective().set(z, 2);
+        for (FileFormat format : new FileFormat[] { FileFormat.LP, FileFormat.MPS }) {
+            ExpressionsBasedModel read = ExpressionsBasedModel.parse(new ByteArrayInputStream(FileFormatTest.writeToBytes(built, format)), format);
+            TestUtils.assertTrue(format + ": getObjective() is the objective read back", read.getObjective() == read.getExpression("obj"));
+            TestUtils.assertEquals(1, read.getExpressions().stream().filter(Expression::isObjective).count());
+            TestUtils.assertEquals(8.0, read.maximise().getValue(), ACCURACY);
+        }
+    }
+
     @Test
     void testQuadraticObjective() {
 

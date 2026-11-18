@@ -252,13 +252,12 @@ final class FileFormatMPS {
 
             super();
 
-            myExpression = myModel.newExpression(name);
-
             myType = rowType;
 
             if (myType == RowType.N && name.equals(objName)) {
-                myExpression.weight(ONE);
+                myExpression = myModel.getObjective(name);
             } else {
+                myExpression = myModel.newExpression(name);
                 myExpression.weight(null);
                 // 0.0 is the default RHS value
                 this.rhs(ZERO);
@@ -535,7 +534,11 @@ final class FileFormatMPS {
                 }
             }
 
-            String objRow = "obj";
+            // The objective keeps its own name where it has one that fits in the 8-character field
+            String objName = model.getObjectiveName();
+            boolean fits = objName != null && !objName.isEmpty() && objName.length() <= 8 && objName.chars().noneMatch(Character::isWhitespace)
+                    && !Arrays.asList("rhs", "bnd", "rng").contains(objName);
+            String objRow = fits ? objName : ExpressionsBasedModel.OBJECTIVE_EXPRESSION;
             String rhsId = "rhs";
             String bndId = "bnd";
             String rngId = "rng";

@@ -1196,9 +1196,10 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     private static final String START_END = "############################################\n";
     static final String OBJECTIVE = "Generated/Aggregated Objective";
     /**
-     * The name of the expression {@link #getObjective()} returns.
+     * The name of the expression {@link #getObjective()} returns, and the objective function's name in the
+     * file formats when it has none of its own – as CPLEX names it.
      */
-    static final String OBJECTIVE_EXPRESSION = "OBJECTIVE";
+    static final String OBJECTIVE_EXPRESSION = "obj";
 
     /**
      * Register a solver integration with the default environment. Models created with the no-arg constructor
@@ -1638,33 +1639,26 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
-     * The expression named {@code "OBJECTIVE"}, created with a contribution weight of 1 the first time it is
+     * The expression named {@code "obj"}, created with a contribution weight of 1 the first time it is
      * asked for. A way to write the objective function in one place:
      * {@code model.getObjective().set(x, 3).set(y, 5)}, then {@link #maximise()} or {@link #minimise()}.
      * <p>
      * It complements weights rather than replacing them. Like any expression with a weight, it contributes to
      * the objective function, together with every other weighted variable and expression. An expression named
-     * {@code "OBJECTIVE"} that already exists – read from a file, say – is returned as it is, whatever its
+     * {@code "obj"} that already exists – read from a file, say – is returned as it is, whatever its
      * weight.
      * <p>
      * Not to be confused with {@link #objective()}, which generates the complete objective function from all
      * the weights, this expression's included, and is not to be modified.
      * <p>
-     * Redundant by design: the same as {@code newExpression("OBJECTIVE").weight(1)}, the first time. It
+     * Redundant by design: the same as {@code newExpression("obj").weight(1)}, the first time. It
      * writes the objective as the Optimisation Service client's {@code OptModel} does, and as many expect, so
      * that a model reads the same in both.
      *
      * @return The expression to write the objective function in
      */
     public Expression getObjective() {
-
-        Expression retVal = myExpressions.get(OBJECTIVE_EXPRESSION);
-
-        if (retVal == null) {
-            retVal = this.newExpression(OBJECTIVE_EXPRESSION).weight(ONE);
-        }
-
-        return retVal;
+        return this.getObjective(OBJECTIVE_EXPRESSION);
     }
 
     /**
@@ -2604,12 +2598,60 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         return retVal;
     }
 
+    /**
+     * As {@link #getObjective()}, with a name of your choice instead of {@code "obj"}: the expression
+     * with that name, created with a contribution weight of 1 the first time it is asked for, and returned as
+     * it is after that. The file formats give the objective function the name its file has for it, and keep
+     * it when a model is written – also in another format.
+     *
+     * @param name The objective function's name
+     * @return The expression to write the objective function in
+     */
+    Expression getObjective(final String name) {
+
+        Expression retVal = myExpressions.get(name);
+
+        if (retVal == null) {
+            retVal = this.newExpression(name).weight(ONE);
+        }
+
+        return retVal;
+    }
+
     BigDecimal getObjectiveAdjustment() {
         return myObjectiveAdjustment;
     }
 
     BigDecimal getObjectiveConstant() {
         return myObjectiveConstant;
+    }
+
+    /**
+     * The objective function's own name, for the file formats to write: the name of the one expression that
+     * is the objective, when that expression is nothing else – no variable carries a weight of its own, and
+     * the expression is not also a constraint.
+     *
+     * @return The name, or null when the objective has none of its own
+     */
+    String getObjectiveName() {
+
+        for (Variable variable : myVariables) {
+            if (variable.isObjective()) {
+                return null;
+            }
+        }
+
+        Expression retVal = null;
+        for (Expression expression : myExpressions.values()) {
+            if (expression.isObjective()) {
+                if (retVal != null) {
+                    return null;
+                }
+                retVal = expression;
+            }
+        }
+
+        return retVal != null && !retVal.isConstraint() ? retVal.getName() : null;
     }
 
     Set<IntIndex> getReferences() {

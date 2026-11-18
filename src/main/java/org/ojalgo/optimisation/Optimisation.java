@@ -295,7 +295,6 @@ public interface Optimisation {
             this.clearPresolvers();
 
             this.addPresolver(Presolvers.DEGENERATE); // -10
-            this.addPresolver(Presolvers.LINEAR_OBJECTIVE); // 10
             this.addPresolver(Presolvers.UNREFERENCED); // 30
             this.addPresolver(Presolvers.ZERO_ONE_TWO); // 50
             this.addPresolver(Presolvers.INTEGER); // 70
