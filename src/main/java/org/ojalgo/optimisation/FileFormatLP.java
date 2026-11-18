@@ -500,6 +500,10 @@ abstract class FileFormatLP {
                 if (!FileFormatLP.isName(tokens.peek()) && !FileFormatLP.isNumber(tokens.peek()) && !"[".equals(tokens.peek())) {
                     throw tokens.error(FileFormatLP.unexpected(tokens.peek()));
                 }
+                if ("[".equals(tokens.peek()) && FileFormatLP.isNumber(tokens.peek(-1))) {
+                    throw tokens.errorAt(tokens.position() - 1,
+                            "A number in front of '[' – each coefficient goes inside the brackets, with its term, as in [ " + tokens.peek(-1) + " x ^2 ]");
+                }
                 int at = tokens.position();
                 int index = !tokens.isNextOnSameLine() && tokens.isOnlyWords(at - 1) ? at - 1 : at;
                 throw tokens.errorAt(index, "+ or - missing between '" + tokens.peek(-1) + "' and '" + tokens.peek() + "'");
@@ -524,6 +528,9 @@ abstract class FileFormatLP {
 
                 if (FileFormatLP.isVariableNameAt(tokens)) {
                     expression.add(FileFormatLP.parseVariable(tokens, model, variables), value);
+                } else if ("*".equals(tokens.peek()) && FileFormatLP.isNumber(tokens.peek(1))) {
+                    throw tokens.errorAt(at, "Each variable has one number in front – write '" + token + " * " + tokens.peek(1) + "' as "
+                            + FileFormatLP.product(token, tokens.peek(1)));
                 } else if ("*".equals(tokens.peek())) {
                     throw tokens.error("A coefficient and its variable are written with a space between them, as in '3 x', not '3 * x'");
                 } else if (objective) {
@@ -586,6 +593,14 @@ abstract class FileFormatLP {
                 value = value.multiply(FileFormatLP.number(tokens));
             }
 
+            if ("*".equals(tokens.peek()) && FileFormatLP.isNumber(tokens.peek(-1))) {
+                if (FileFormatLP.isNumber(tokens.peek(1))) {
+                    throw tokens.errorAt(tokens.position() - 1, "Inside [ ], each term has one number in front – write '" + tokens.peek(-1) + " * "
+                            + tokens.peek(1) + "' as " + FileFormatLP.product(tokens.peek(-1), tokens.peek(1)));
+                }
+                throw tokens.errorAt(tokens.position() - 1,
+                        "Inside [ ], a number and its term are written with a space between them, as in 3 x ^2 or 3 x * y, not 3 * x");
+            }
             if (!FileFormatLP.isVariableNameAt(tokens)) {
                 throw tokens.error("Inside [ ], a term is a square, as in 3 x ^2, or a product, as in 3 x * y – not '" + tokens.peek() + "'");
             }
@@ -654,6 +669,17 @@ abstract class FileFormatLP {
     /**
      * The comparison that holds with its two sides swapped.
      */
+    /**
+     * Two numbers multiplied, as one: what to write instead of {@code 2 * 0.002}.
+     */
+    private static String product(final String left, final String right) {
+        try {
+            return new BigDecimal(left).multiply(new BigDecimal(right)).stripTrailingZeros().toPlainString();
+        } catch (NumberFormatException cause) {
+            return "a single number";
+        }
+    }
+
     private static String reversed(final String comparison) {
         return switch (comparison) {
             case "<=" -> ">=";

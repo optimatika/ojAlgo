@@ -357,6 +357,13 @@ class FileFormatTest extends OptimisationTests {
         FileFormatTest.assertRefused("Maximize\n obj: x + y\nSubject To\n c1: x + y <= 10\nEnd\nGeneral\n x\n", 6, "End");
         FileFormatTest.assertRefused("hello world", 1, "Minimize or Maximize");
 
+        // The ways an assistant has got the quadratic terms wrong
+        String budget = "Subject To\n budget: b + p = 1\nEnd\n";
+        FileFormatTest.assertRefused("Minimize\n risk: 0.010 [ b ^2 ] + 0.030 [ p ^2 ]\n" + budget, 2, "inside the brackets, with its term, as in [ 0.010 x ^2 ]");
+        FileFormatTest.assertRefused("Minimize\n risk: [ 0.010 b ^2 + 2 * 0.002 b * p ]\n" + budget, 2, "write '2 * 0.002' as 0.004");
+        FileFormatTest.assertRefused("Minimize\n risk: [ 3 * b ^2 ]\n" + budget, 2, "not 3 * x");
+        FileFormatTest.assertRefused("Maximize\n obj: 2 * 0.5 x + y\n" + constraints, 2, "write '2 * 0.5' as 1");
+
         String headings = "Subject To, Bounds, General, Binary and End";
         FileFormatTest.assertRefused("Maximize\n obj: 3 x + 5 y\nSubjet To\n c1: x + y <= 10\nEnd\n", 3, headings);
         FileFormatTest.assertRefused("Maximize\n obj: x + y\nSubject To\n c1: x + y <= 10\nBounds\n x <= 8\nIntegers\n x\nEnd\n", 7, headings);

@@ -16,6 +16,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.optimisation
 
 - `ExpressionsBasedModel.getObjective()` now names its expression `obj`, not `OBJECTIVE`. `obj` is the name CPLEX gives an objective function that has none, and the LP and MPS formats now use it for such an objective too – so the objective function of a model written and read back is again the expression `getObjective()` returns.
+- Clearer errors from the LP reader for quadratic terms written the wrong way: a number in front of the brackets (`0.010 [ x ^2 ]`) is told to go inside them, and two numbers multiplied (`2 * 0.002 x * y`) are given as the one number to write instead (`0.004`).
 
 ### Fixed
 
