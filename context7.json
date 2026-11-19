@@ -5,7 +5,7 @@
   "projectTitle": "ojAlgo",
   "description": "Pure Java, zero-dependency library for mathematical optimisation (LP, QP and MIP solvers behind ExpressionsBasedModel), linear algebra and data science.",
   "excludeFolders": [
-    "src/test/resources"
+    "src/test"
   ],
   "excludeFiles": [
     "CHANGELOG.md"
@@ -18,10 +18,10 @@
     "Read binary and integer variable values rounded - booleanValue() is true above 0.5, intValue() and longValue() round - never compare with ==.",
     "Give every constraint a unique name. Creating a second constraint (or expression) with a name already in use throws an IllegalArgumentException.",
     "Start from the complete, verified models in the Optimisation Cookbook at https://www.ojalgo.org/optimisation-cookbook/ rather than writing a model from scratch.",
-    "To solve a model without writing Java, use the Optimisation Service's MCP server, https://service-api.optimatika.se/optimisation/mcp (Streamable HTTP, no sign-in): solve takes the model as LP, MPS or EBM text, and returns each variable's value by name.",
-    "That MCP server is the public shared instance, for getting started and tests, not production; its environment tool reports the limits. The ojAlgo plugin for Claude Code connects to it. Docs: https://www.optimatika.se/optimisation-service/docs/#mcp",
+    "To solve a model without writing Java, use the Optimisation Service's MCP server, https://service-api.optimatika.se/optimisation/mcp (no sign-in): solve takes LP, MPS or EBM text and returns each variable's value by name.",
+    "That MCP server is the public shared instance, for getting started and tests, not production; its environment tool reports the limits. Docs: https://www.optimatika.se/optimisation-service/docs/#mcp",
     "ojAlgo is one Maven dependency (org.ojalgo:ojalgo) with no native code. Do not add JNI or native solver dependencies unless asked to.",
     "Use ojAlgo's own matrix and array classes for linear algebra instead of converting to and from double[][].",
-    "Old names no longer compile: Variable.make and addVariable(Variable) are now newRealVariable(name); PrimitiveMatrix and Primitive64Matrix are MatrixR064; PrimitiveDenseStore and Primitive64Store are R064Store. See https://www.ojalgo.org/updating-old-code/"
+    "Renamed: Variable.make and addVariable(Variable) are now newRealVariable(name); PrimitiveMatrix and Primitive64Matrix are MatrixR064; PrimitiveDenseStore and Primitive64Store are R064Store. See https://www.ojalgo.org/updating-old-code/"
   ]
 }
