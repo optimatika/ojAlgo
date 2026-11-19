@@ -536,6 +536,12 @@ public interface Optimisation {
          * Soft iteration limit. If a feasible solution has been found, the solver may stop after this many
          * iterations. If no feasible solution exists yet, iterations continue until
          * {@link #iterations_abort}. Primarily useful with {@link IntegerSolver}.
+         * <p>
+         * With the {@link IntegerSolver} the limit also applies to each node relaxation (LP or QP) on its own,
+         * counting the relaxation's iterations rather than nodes: a relaxation that needs more iterations
+         * than this may stop before it is solved to optimality, and then the search stops – with the best
+         * integer solution found so far, or with state {@link Optimisation.State#FAILED} if there is none.
+         * Keep the limit well above the number of iterations a single relaxation needs.
          */
         public int iterations_suffice = Integer.MAX_VALUE;
 
@@ -588,6 +594,12 @@ public interface Optimisation {
          * Soft time limit in milliseconds. If a feasible solution has been found, the solver may stop after
          * this duration. If no feasible solution exists yet, execution continues until {@link #time_abort}.
          * Primarily useful with {@link IntegerSolver}.
+         * <p>
+         * With the {@link IntegerSolver} the limit also applies to each node relaxation (LP or QP) on its own:
+         * a relaxation that runs longer than this may stop before it is solved to optimality, and then the
+         * search stops – with the best integer solution found so far, or with state
+         * {@link Optimisation.State#FAILED} if there is none. Keep the limit well above the time a single
+         * relaxation takes.
          */
         public long time_suffice = CalendarDateUnit.HOUR.toDurationInMillis();
 
