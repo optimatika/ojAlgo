@@ -644,7 +644,10 @@ public abstract class GEMM implements BLAS3 {
 
         /**
          * Copies the matrices to native memory, calls {@link #DGEMM_OFF_HEAP} and copies C back. When beta is
-         * 0, C is not copied to native memory. Requires m, n, k > 0.
+         * 0, C is not copied to native memory. When A and B are the same matrix (A<sup>T</sup>*A,
+         * A*A<sup>T</sup>…) it is copied once, and passed as both: Accelerate's dgemm recognises
+         * A<sup>T</sup>*A and A*A<sup>T</sup> only when A and B are the same memory, and then computes them
+         * about twice as fast. Requires m, n, k > 0.
          */
         private static void invokeOffHeap(final boolean transposeA, final boolean transposeB, final int m, final int n, final int k, final double alpha,
                 final double[] a, final int offsetA, final int lda, final double[] b, final int offsetB, final int ldb, final double beta, final double[] c,
@@ -652,14 +655,19 @@ public abstract class GEMM implements BLAS3 {
 
             try (Arena arena = Arena.ofConfined()) {
 
-                int copyLDA = CBLAS.leadingDimensionOfCopy(transposeA ? k : m);
-                int copyLDB = CBLAS.leadingDimensionOfCopy(transposeB ? n : k);
+                int rowsA = transposeA ? k : m;
+                int columnsA = transposeA ? m : k;
+                int rowsB = transposeB ? n : k;
+                int columnsB = transposeB ? k : n;
+
+                int copyLDA = CBLAS.leadingDimensionOfCopy(rowsA);
+                int copyLDB = CBLAS.leadingDimensionOfCopy(rowsB);
                 int copyLDC = CBLAS.leadingDimensionOfCopy(m);
 
-                MemorySegment segmentA = transposeA ? CBLAS.copyOfMatrix(arena, a, offsetA, k, m, lda, copyLDA)
-                        : CBLAS.copyOfMatrix(arena, a, offsetA, m, k, lda, copyLDA);
-                MemorySegment segmentB = transposeB ? CBLAS.copyOfMatrix(arena, b, offsetB, n, k, ldb, copyLDB)
-                        : CBLAS.copyOfMatrix(arena, b, offsetB, k, n, ldb, copyLDB);
+                boolean same = b == a && offsetB == offsetA && ldb == lda && rowsB == rowsA && columnsB == columnsA;
+
+                MemorySegment segmentA = CBLAS.copyOfMatrix(arena, a, offsetA, rowsA, columnsA, lda, copyLDA);
+                MemorySegment segmentB = same ? segmentA : CBLAS.copyOfMatrix(arena, b, offsetB, rowsB, columnsB, ldb, copyLDB);
                 MemorySegment segmentC = beta == ZERO ? CBLAS.allocateMatrix(arena, m, n, copyLDC) : CBLAS.copyOfMatrix(arena, c, offsetC, m, n, ldc, copyLDC);
 
                 DGEMM_OFF_HEAP.invokeExact(CBLAS.COLUMN_MAJOR, CBLAS.transpose(transposeA), CBLAS.transpose(transposeB), m, n, k, alpha, segmentA, copyLDA,
@@ -698,6 +706,20 @@ public abstract class GEMM implements BLAS3 {
      */
     private static final double NATIVE_THRESHOLD = 2_500;
     /**
+     * A<sup>T</sup>*A and A*A<sup>T</sup> are computed with SYRK when ldc is a multiple of this, see
+     * {@link #isSymmetricRankK(boolean, boolean, int, int, int, double[], int, int, double[], int, int, double, int)}.
+     */
+    private static final int RANK_K_ALIGNMENT = 128;
+    /**
+     * A<sup>T</sup>*A and A*A<sup>T</sup> are computed with SYRK only when n and k are at least this, see
+     * {@link #isSymmetricRankK(boolean, boolean, int, int, int, double[], int, int, double[], int, int, double, int)}.
+     */
+    private static final int RANK_K_DIMENSION = 256;
+    /**
+     * The tile size (rows and columns) used to fill the lower triangle of C from the upper.
+     */
+    private static final int RANK_K_TILE = 16;
+    /**
      * The block size (rows and columns of A) used when the Java implementation is cache blocked.
      */
     static int BLOCK_SIZE = 512;
@@ -721,6 +743,24 @@ public abstract class GEMM implements BLAS3 {
      * cubed. Each part then gets more than half of that.
      */
     static int THRESHOLD = 70;
+
+    /**
+     * Fills the strict lower triangle of the n-by-n matrix C from its upper triangle, in tiles, since the
+     * upper triangle is read along its rows.
+     */
+    private static void fillLowerFromUpper(final int n, final double[] c, final int offsetC, final int ldc) {
+        for (int firstJ = 0; firstJ < n; firstJ += RANK_K_TILE) {
+            int limitJ = Math.min(firstJ + RANK_K_TILE, n);
+            for (int firstI = firstJ; firstI < n; firstI += RANK_K_TILE) {
+                int limitI = Math.min(firstI + RANK_K_TILE, n);
+                for (int j = firstJ; j < limitJ; j++) {
+                    for (int i = Math.max(firstI, j + 1); i < limitI; i++) {
+                        c[offsetC + i + j * ldc] = c[offsetC + j + i * ldc];
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * {@code dgemm}: C := alpha*op(A)*op(B) + beta*C
@@ -752,7 +792,13 @@ public abstract class GEMM implements BLAS3 {
 
         // With alpha 0, A and B are not read and the Java implementation does what remains
         if (alpha != ZERO && GEMM.isNative(m, n, k)) {
-            Native.invoke(transposeA, transposeB, m, n, k, alpha, a, offsetA, lda, b, offsetB, ldb, beta, c, offsetC, ldc);
+            if (GEMM.isSymmetricRankK(transposeA, transposeB, m, n, k, a, offsetA, lda, b, offsetB, ldb, beta, ldc)) {
+                // C := alpha*A^T*A (transposeA) or alpha*A*A^T – the upper triangle, then the lower from it
+                SYRK.invoke(true, transposeA, n, k, alpha, a, offsetA, lda, ZERO, c, offsetC, ldc);
+                GEMM.fillLowerFromUpper(n, c, offsetC, ldc);
+            } else {
+                Native.invoke(transposeA, transposeB, m, n, k, alpha, a, offsetA, lda, b, offsetB, ldb, beta, c, offsetC, ldc);
+            }
         } else {
             JVM.invoke(transposeA, transposeB, m, n, k, alpha, a, offsetA, lda, b, offsetB, ldb, beta, c, offsetC, ldc);
         }
@@ -772,6 +818,24 @@ public abstract class GEMM implements BLAS3 {
      */
     static boolean isOffHeap(final double m, final double n, final double k) {
         return m * n * k > OFF_HEAP_THRESHOLD && Math.min(m, Math.min(n, k)) > OFF_HEAP_DIMENSION;
+    }
+
+    /**
+     * Whether to compute C := alpha*A<sup>T</sup>*A or C := alpha*A*A<sup>T</sup> natively with SYRK, and
+     * fill the lower triangle of C from the upper, rather than with dgemm: B is the same matrix as A, in the
+     * same array, beta is 0, the call would be critical (not {@link #isOffHeap(double, double, double)}), n
+     * and k are at least {@link #RANK_K_DIMENSION}, and ldc is a multiple of {@link #RANK_K_ALIGNMENT}.
+     * <p>
+     * Accelerate's dgemm recognises A<sup>T</sup>*A and A*A<sup>T</sup> when it is passed the same memory as
+     * A and B, and then computes them about twice as fast – but only half as fast when ldc is a multiple of
+     * 128, from 256. There dsyrk, the lower triangle filled included, is 1.2-1.6 times faster than dgemm;
+     * elsewhere dgemm is a few percent faster (measured n = k = 64-1536). Off-heap calls are passed a copy of
+     * C with a leading dimension that avoids this, see {@link CBLAS#leadingDimensionOfCopy(int)}.
+     */
+    static boolean isSymmetricRankK(final boolean transposeA, final boolean transposeB, final int m, final int n, final int k, final double[] a,
+            final int offsetA, final int lda, final double[] b, final int offsetB, final int ldb, final double beta, final int ldc) {
+        return transposeA != transposeB && b == a && offsetB == offsetA && ldb == lda && m == n && beta == ZERO && ldc % RANK_K_ALIGNMENT == 0
+                && Math.min(n, k) >= RANK_K_DIMENSION && SYRK.isNative(n, n, k) && !GEMM.isOffHeap(m, n, k);
     }
 
 }

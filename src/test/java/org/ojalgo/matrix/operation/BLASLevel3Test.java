@@ -117,6 +117,18 @@ public class BLASLevel3Test {
             }
         }
 
+        /**
+         * With leading dimension {@code ld}, stored from {@code offset}.
+         */
+        Storage(final Random random, final int rows, final int columns, final int ld, final int offset) {
+            this.offset = offset;
+            this.ld = Math.max(1, Math.max(rows, ld));
+            data = new double[offset + this.ld * columns];
+            for (int p = 0; p < data.length; p++) {
+                data[p] = random.nextDouble() - 0.5;
+            }
+        }
+
         double get(final int row, final int col) {
             return data[this.index(row, col)];
         }
@@ -666,6 +678,109 @@ public class BLASLevel3Test {
 
         } finally {
             GEMM.THRESHOLD = threshold;
+        }
+    }
+
+    /**
+     * B the same matrix as A, in the same array: A<sup>T</sup>*A and A*A<sup>T</sup>, and A*A and
+     * A<sup>T</sup>*A<sup>T</sup> for a square A. Natively, off-heap, A is copied once and passed as both A
+     * and B. Dispatched, with beta 0 and ldc a multiple of 128, A<sup>T</sup>*A and A*A<sup>T</sup> are
+     * computed with SYRK and the lower triangle filled from the upper, see
+     * {@link GEMM#isSymmetricRankK(boolean, boolean, int, int, int, double[], int, int, double[], int, int, double, int)}.
+     */
+    @Test
+    public void testGEMMSameMatrix() {
+
+        double[] dummy = new double[256 * 300];
+        if (GEMM.NATIVE && SYRK.NATIVE) {
+            TestUtils.assertTrue(GEMM.isSymmetricRankK(true, false, 256, 256, 256, dummy, 0, 256, dummy, 0, 256, 0.0, 256));
+            TestUtils.assertTrue(GEMM.isSymmetricRankK(false, true, 256, 256, 300, dummy, 0, 256, dummy, 0, 256, 0.0, 384));
+        }
+        TestUtils.assertFalse(GEMM.isSymmetricRankK(true, false, 256, 256, 256, dummy, 0, 256, dummy, 0, 256, 0.0, 258));
+        TestUtils.assertFalse(GEMM.isSymmetricRankK(true, false, 256, 256, 256, dummy, 0, 256, dummy, 0, 256, 1.0, 256));
+        TestUtils.assertFalse(GEMM.isSymmetricRankK(true, false, 256, 256, 256, dummy, 0, 256, dummy.clone(), 0, 256, 0.0, 256));
+        TestUtils.assertFalse(GEMM.isSymmetricRankK(true, false, 256, 256, 256, dummy, 0, 256, dummy, 1, 256, 0.0, 256));
+        TestUtils.assertFalse(GEMM.isSymmetricRankK(false, false, 256, 256, 256, dummy, 0, 256, dummy, 0, 256, 0.0, 256));
+        TestUtils.assertFalse(GEMM.isSymmetricRankK(true, false, 128, 128, 128, dummy, 0, 128, dummy, 0, 128, 0.0, 128));
+
+        // n, k, lda, offsetA, ldc, offsetC – A^T*A and A*A^T, C n-by-n
+        int[][] rankK = { { 256, 256, 256, 0, 256, 0 }, { 256, 300, 302, 3, 384, 5 }, { 260, 256, 256, 0, 260, 0 }, { 33, 40, 42, 1, 35, 2 } };
+        for (int[] size : rankK) {
+            for (boolean transposeA : BOOLEANS) {
+                BLASLevel3Test.doTestGEMMSameMatrix(transposeA, !transposeA, size[0], size[1], size[2], size[3], size[4], size[5]);
+            }
+        }
+
+        // n, lda, offsetA, ldc, offsetC – A*A and A^T*A^T, A and C n-by-n
+        int[][] square = { { 256, 256, 0, 256, 0 }, { 37, 39, 2, 41, 1 } };
+        for (int[] size : square) {
+            for (boolean transpose : BOOLEANS) {
+                BLASLevel3Test.doTestGEMMSameMatrix(transpose, transpose, size[0], size[0], size[1], size[2], size[3], size[4]);
+            }
+        }
+    }
+
+    /**
+     * C := alpha*op(A)*op(A) + beta*C, for all implementations, the alphas (not 0) and betas, with A and C
+     * stored as given; n-by-n C, and k the other dimension of A.
+     */
+    private static void doTestGEMMSameMatrix(final boolean transposeA, final boolean transposeB, final int n, final int k, final int lda, final int offsetA,
+            final int ldc, final int offsetC) {
+
+        Random random = new Random(n + 31 * k + 961 * ldc);
+
+        int rowsA = transposeA ? k : n;
+        Storage a = new Storage(random, rowsA, transposeA ? n : k, lda, offsetA);
+
+        double[] product = new double[n * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i < n; i++) {
+                double sum = 0.0;
+                for (int l = 0; l < k; l++) {
+                    sum += (transposeA ? a.get(l, i) : a.get(i, l)) * (transposeB ? a.get(j, l) : a.get(l, j));
+                }
+                product[i + j * n] = sum;
+            }
+        }
+
+        double[] aBefore = a.data.clone();
+
+        for (Implementation implementation : Implementation.values()) {
+            if (BLASLevel3Test.isAvailable(implementation, GEMM.NATIVE)) {
+                for (double alpha : new double[] { 1.0, 0.7 }) {
+                    for (double beta : BETAS) {
+
+                        Storage c = new Storage(random, n, n, ldc, offsetC);
+                        double[] expected = c.data.clone();
+                        for (int j = 0; j < n; j++) {
+                            for (int i = 0; i < n; i++) {
+                                expected[c.index(i, j)] = alpha * product[i + j * n] + (beta == 0.0 ? 0.0 : beta * c.get(i, j));
+                                if (beta == 0.0) {
+                                    c.set(i, j, Double.NaN);
+                                }
+                            }
+                        }
+
+                        switch (implementation) {
+                            case JAVA             -> GEMM.JVM.invoke(transposeA, transposeB, n, n, k, alpha, a.data, a.offset, a.ld, a.data, a.offset, a.ld,
+                                    beta, c.data, c.offset, c.ld);
+                            case NATIVE, OFF_HEAP -> {
+                                try (OffHeapLimits limits = OffHeapLimits.of(implementation)) {
+                                    GEMM.Native.invoke(transposeA, transposeB, n, n, k, alpha, a.data, a.offset, a.ld, a.data, a.offset, a.ld, beta, c.data,
+                                            c.offset, c.ld);
+                                }
+                            }
+                            default               -> GEMM.invoke(transposeA, transposeB, n, n, k, alpha, a.data, a.offset, a.ld, a.data, a.offset, a.ld, beta,
+                                    c.data, c.offset, c.ld);
+                        }
+
+                        String message = "GEMM same matrix " + implementation + " transA=" + transposeA + " transB=" + transposeB + " n=" + n + " k=" + k
+                                + " lda=" + a.ld + " ldc=" + c.ld + " alpha=" + alpha + " beta=" + beta;
+                        BLASLevel3Test.assertArray(message, expected, c.data);
+                        BLASLevel3Test.assertUnchanged(message, aBefore, a.data);
+                    }
+                }
+            }
         }
     }
 

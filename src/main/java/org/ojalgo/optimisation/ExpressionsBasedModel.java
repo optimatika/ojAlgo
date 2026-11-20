@@ -1639,21 +1639,20 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
-     * The expression named {@code "obj"}, created with a contribution weight of 1 the first time it is
-     * asked for. A way to write the objective function in one place:
+     * The expression named {@code "obj"}, created with a contribution weight of 1 the first time it is asked
+     * for. A way to write the objective function in one place:
      * {@code model.getObjective().set(x, 3).set(y, 5)}, then {@link #maximise()} or {@link #minimise()}.
      * <p>
      * It complements weights rather than replacing them. Like any expression with a weight, it contributes to
      * the objective function, together with every other weighted variable and expression. An expression named
-     * {@code "obj"} that already exists – read from a file, say – is returned as it is, whatever its
-     * weight.
+     * {@code "obj"} that already exists – read from a file, say – is returned as it is, whatever its weight.
      * <p>
      * Not to be confused with {@link #objective()}, which generates the complete objective function from all
      * the weights, this expression's included, and is not to be modified.
      * <p>
-     * Redundant by design: the same as {@code newExpression("obj").weight(1)}, the first time. It
-     * writes the objective as the Optimisation Service client's {@code OptModel} does, and as many expect, so
-     * that a model reads the same in both.
+     * Redundant by design: the same as {@code newExpression("obj").weight(1)}, the first time. It writes the
+     * objective as the Optimisation Service client's {@code OptModel} does, and as many expect, so that a
+     * model reads the same in both.
      *
      * @return The expression to write the objective function in
      */
@@ -2599,10 +2598,10 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
-     * As {@link #getObjective()}, with a name of your choice instead of {@code "obj"}: the expression
-     * with that name, created with a contribution weight of 1 the first time it is asked for, and returned as
-     * it is after that. The file formats give the objective function the name its file has for it, and keep
-     * it when a model is written – also in another format.
+     * As {@link #getObjective()}, with a name of your choice instead of {@code "obj"}: the expression with
+     * that name, created with a contribution weight of 1 the first time it is asked for, and returned as it
+     * is after that. The file formats give the objective function the name its file has for it, and keep it
+     * when a model is written – also in another format.
      *
      * @param name The objective function's name
      * @return The expression to write the objective function in

@@ -280,8 +280,8 @@ class ExpressionsBasedModelTest extends OptimisationTests {
     }
 
     /**
-     * An expression named "obj" that already exists is what
-     * {@link ExpressionsBasedModel#getObjective()} returns, as it is.
+     * An expression named "obj" that already exists is what {@link ExpressionsBasedModel#getObjective()}
+     * returns, as it is.
      */
     @Test
     void testGetObjectiveExisting() {

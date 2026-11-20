@@ -359,7 +359,8 @@ class FileFormatTest extends OptimisationTests {
 
         // The ways an assistant has got the quadratic terms wrong
         String budget = "Subject To\n budget: b + p = 1\nEnd\n";
-        FileFormatTest.assertRefused("Minimize\n risk: 0.010 [ b ^2 ] + 0.030 [ p ^2 ]\n" + budget, 2, "inside the brackets, with its term, as in [ 0.010 x ^2 ]");
+        FileFormatTest.assertRefused("Minimize\n risk: 0.010 [ b ^2 ] + 0.030 [ p ^2 ]\n" + budget, 2,
+                "inside the brackets, with its term, as in [ 0.010 x ^2 ]");
         FileFormatTest.assertRefused("Minimize\n risk: [ 0.010 b ^2 + 2 * 0.002 b * p ]\n" + budget, 2, "write '2 * 0.002' as 0.004");
         FileFormatTest.assertRefused("Minimize\n risk: [ 3 * b ^2 ]\n" + budget, 2, "not 3 * x");
         FileFormatTest.assertRefused("Maximize\n obj: 2 * 0.5 x + y\n" + constraints, 2, "write '2 * 0.5' as 1");
