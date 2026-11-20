@@ -838,7 +838,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
             return (Provider2D.Eigenpairs) myDecomposition;
         }
 
-        Eigenvalue<N> provider = this.newEigenvalue(this.supplier());
+        Eigenvalue<N> provider = this.newEigenvalue(this.supplier(), false);
         provider.decompose(this.supplier());
         myDecomposition = provider;
 
@@ -846,7 +846,8 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     /**
-     * A cached decomposition, if any, otherwise a values-only decomposition that is not cached.
+     * A cached decomposition, if any, otherwise a values-only decomposition that is not cached – it is made
+     * with {@link Eigenvalue.Factory#makeValuesOnly(Structure2D, boolean)}, and may not provide eigenpairs.
      */
     private Provider2D.Eigenvalues getEigenvaluesProvider() {
 
@@ -854,7 +855,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
             return (Provider2D.Eigenvalues) myDecomposition;
         }
 
-        Eigenvalue<N> provider = this.newEigenvalue(this.supplier());
+        Eigenvalue<N> provider = this.newEigenvalue(this.supplier(), true);
         provider.computeValuesOnly(this.supplier());
 
         return provider;
@@ -919,7 +920,11 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
     abstract DeterminantTask<N> newDeterminantTask(Structure2D template);
 
-    abstract Eigenvalue<N> newEigenvalue(Structure2D typical);
+    /**
+     * @param valuesOnly Whether only the eigenvalues will be computed – if true, only what is guaranteed by
+     *                   {@link Eigenvalue.Factory#makeValuesOnly(Structure2D, boolean)} may then be used
+     */
+    abstract Eigenvalue<N> newEigenvalue(Structure2D typical, boolean valuesOnly);
 
     abstract M newInstance(ElementsSupplier<N> store);
 

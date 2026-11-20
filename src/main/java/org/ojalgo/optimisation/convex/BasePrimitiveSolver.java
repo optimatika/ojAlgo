@@ -624,7 +624,7 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
         if (options.validate && !mySolverQ.isSolvable()) {
             // Not symmetric positive definite. Check if at least positive semidefinite.
 
-            Eigenvalue<Double> decompEvD = Eigenvalue.R064.make(matrixQ, true);
+            Eigenvalue<Double> decompEvD = Eigenvalue.R064.makeValuesOnly(matrixQ, true);
             decompEvD.computeValuesOnly(matrixQ);
             Array1D<ComplexNumber> eigenvalues = decompEvD.getEigenvalues();
             decompEvD.reset();

@@ -2638,6 +2638,30 @@ public class LAPACKTest {
         }
     }
 
+    /**
+     * The multi-threaded Java implementation, with the threshold lowered so that A*v and the update are split
+     * in many parts at test sizes.
+     */
+    @Test
+    public void testSYTRDParallel() {
+
+        int threshold = SYTRD.THRESHOLD;
+
+        try {
+
+            SYTRD.THRESHOLD = 4;
+
+            for (boolean tight : BOOLEANS) {
+                for (int n : new int[] { 7, 17, 40, 150 }) {
+                    LAPACKTest.doTestSYTRD(Implementation.JAVA, tight, n);
+                }
+            }
+
+        } finally {
+            SYTRD.THRESHOLD = threshold;
+        }
+    }
+
     @Test
     public void testSYTRDArgumentChecks() {
 

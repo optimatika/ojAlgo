@@ -147,8 +147,8 @@ public final class MatrixC128 extends BasicMatrix<ComplexNumber, MatrixC128> {
     }
 
     @Override
-    Eigenvalue<ComplexNumber> newEigenvalue(final Structure2D typical) {
-        return Eigenvalue.C128.make(typical, this.isHermitian());
+    Eigenvalue<ComplexNumber> newEigenvalue(final Structure2D typical, final boolean valuesOnly) {
+        return valuesOnly ? Eigenvalue.C128.makeValuesOnly(typical, this.isHermitian()) : Eigenvalue.C128.make(typical, this.isHermitian());
     }
 
     @Override

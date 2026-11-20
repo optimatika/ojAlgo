@@ -28,6 +28,7 @@ import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
 import java.lang.invoke.MethodHandle;
+import java.util.Arrays;
 import java.util.Objects;
 
 import org.ojalgo.ProgrammingError;
@@ -114,22 +115,50 @@ public abstract class SYTRD implements LAPACK {
         }
 
         /**
-         * w(i) = (A*v)(i) for the rows from (inclusive) to (exclusive), reading the lower triangle of the
-         * trailing part of A, from row and column first. v(first) to v(n-1) are stored from
+         * w(i) = (A*v)(i), for i = first to n-1, reading the lower triangle of the trailing part of A, from
+         * row and column first, along its columns – each element once, both for the dot product with v that
+         * makes w(j) and for the multiply-add of v(j) to the w(i) below. v(first) to v(n-1) are stored from
          * {@code v[offsetV]}.
+         */
+        private static void symvColumns(final int n, final double[] a, final int offsetA, final int lda, final double[] v, final int offsetV, final double[] w,
+                final int first) {
+            Arrays.fill(w, first, n, ZERO);
+            for (int j = first; j < n; j++) {
+                int column = offsetA + j * lda;
+                double vj = v[offsetV + j - first];
+                double sum = a[column + j] * vj;
+                for (int i = j + 1; i < n; i++) {
+                    double aij = a[column + i];
+                    w[i] += aij * vj;
+                    sum += aij * v[offsetV + i - first];
+                }
+                w[j] += sum;
+            }
+        }
+
+        /**
+         * w(i) = (A*v)(i) for the rows from (inclusive) to (exclusive), reading the lower triangle of the
+         * trailing part of A, from row and column first, along its columns: the parts of the rows left of the
+         * diagonal as segments of the columns before them, and the rest of row i as column i from the
+         * diagonal down. v(first) to v(n-1) are stored from {@code v[offsetV]}.
          */
         private static void symvRows(final int n, final double[] a, final int offsetA, final int lda, final double[] v, final int offsetV, final double[] w,
                 final int first, final int from, final int to) {
-            for (int i = from; i < to; i++) {
-                double sum = ZERO;
-                for (int c = first; c < i; c++) {
-                    sum += a[offsetA + i + c * lda] * v[offsetV + c - first];
+            Arrays.fill(w, from, to, ZERO);
+            for (int c = first; c < to - 1; c++) {
+                int column = offsetA + c * lda;
+                double vc = v[offsetV + c - first];
+                for (int i = Math.max(from, c + 1); i < to; i++) {
+                    w[i] += a[column + i] * vc;
                 }
+            }
+            for (int i = from; i < to; i++) {
                 int column = offsetA + i * lda;
+                double sum = ZERO;
                 for (int c = i; c < n; c++) {
                     sum += a[column + c] * v[offsetV + c - first];
                 }
-                w[i] = sum;
+                w[i] += sum;
             }
         }
 
@@ -165,7 +194,7 @@ public abstract class SYTRD implements LAPACK {
             if (divide) {
                 DIVIDER_ROWS.threshold(chunk).divide(first, n, (from, to) -> JVM.symvRows(n, a, offsetA, lda, a, offsetV, w, first, from, to));
             } else {
-                JVM.symvRows(n, a, offsetA, lda, a, offsetV, w, first, first, n);
+                JVM.symvColumns(n, a, offsetA, lda, a, offsetV, w, first);
             }
 
             double scale = ZERO;

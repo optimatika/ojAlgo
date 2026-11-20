@@ -27,11 +27,13 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.array.Array1D;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.Eigenvalue.Eigenpair;
 import org.ojalgo.random.Uniform;
+import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access2D.ColumnView;
 import org.ojalgo.structure.Access2D.RowView;
@@ -377,6 +379,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
                 for (int i = 0; i < expected.size(); i++) {
                     TestUtils.assertEquals(factory.getClass().toString(), expected.get(i).value, actual.get(i).value, ACCURACY);
+                }
+
+                // Values only, on a copy without a cached decomposition
+                Array1D<ComplexNumber> valuesOnly = factory.copy(mtrxA).getEigenvalues();
+
+                for (int i = 0; i < expected.size(); i++) {
+                    TestUtils.assertEquals(factory.getClass().toString() + " values only", expected.get(i).value, valuesOnly.get(i), ACCURACY);
                 }
             }
         }

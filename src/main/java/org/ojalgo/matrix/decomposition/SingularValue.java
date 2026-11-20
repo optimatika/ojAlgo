@@ -73,6 +73,67 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
 
         SingularValue<N> make(Structure2D typical, boolean fullSize);
 
+        /**
+         * As {@link #makeValuesOnly(Structure2D)}, with nbRows-by-nbCols as the typical size. The same
+         * guarantees, and limitations, apply.
+         */
+        default SingularValue<N> makeValuesOnly(final int nbRows, final int nbCols) {
+            return this.makeValuesOnly(new Structure2D() {
+
+                @Override
+                public int getColDim() {
+                    return nbCols;
+                }
+
+                @Override
+                public int getRowDim() {
+                    return nbRows;
+                }
+
+            });
+        }
+
+        /**
+         * As {@link #make(Structure2D)}, but for computing the singular values only. You declare that you
+         * will not need the singular vectors, or anything else that requires the full decomposition. That
+         * allows the factory to return an implementation that computes singular values but cannot produce
+         * singular vectors at all, such as the dqds algorithm (LAPACK's {@code ?lasq1}). If you need more
+         * than listed as guaranteed below, use {@link #make(Structure2D)} instead – that instance can also
+         * compute the singular values only.
+         * <p>
+         * {@code typical} indicates the sizes you expect, and may influence the choice of implementation. It
+         * is not a limit – matrices of any size and shape are handled.
+         * <p>
+         * Guaranteed to work:
+         * <ul>
+         * <li>{@link MatrixDecomposition.Values#computeValuesOnly(org.ojalgo.structure.Access2D.Collectable)}
+         * – as many times as you like, with matrices of different sizes and shapes.
+         * <li>After it returned {@code true}: {@link SingularValue#getSingularValues()},
+         * {@link SingularValue#getSingularValues(double[])}, {@link SingularValue#getCondition()},
+         * {@link MatrixDecomposition.RankRevealing#getRank()},
+         * {@link MatrixDecomposition.RankRevealing#isFullRank()},
+         * {@link MatrixDecomposition.RankRevealing#countSignificant(double)},
+         * {@link MatrixDecomposition.RankRevealing#getRankThreshold()},
+         * {@link SingularValue#getOperatorNorm()}, {@link SingularValue#getFrobeniusNorm()},
+         * {@link SingularValue#getTraceNorm()} and {@link SingularValue#getKyFanNorm(int)}. The singular
+         * values are in descending order, as from a full decomposition, and the same to within numerical
+         * accuracy – not necessarily bit for bit, as a different algorithm may be used.
+         * <li>{@link MatrixDecomposition#isComputed()} and {@link MatrixDecomposition#reset()}.
+         * </ul>
+         * Not guaranteed – do not use these, as they may throw an exception or return incorrect results:
+         * <ul>
+         * <li>{@code decompose(...)}, {@code compute(...)}, and everything that needs a full decomposition:
+         * {@link SingularValue#getU()}, {@link SingularValue#getV()}, {@link SingularValue#getS()},
+         * {@link SingularValue#getCovariance()}, solving, inverting and {@code reconstruct()}.
+         * <li>Any other method not listed as guaranteed above.
+         * <li>The class of the returned instance. It may differ from what {@link #make(Structure2D)} returns,
+         * and between versions of ojAlgo, so do not cast it.
+         * </ul>
+         */
+        default SingularValue<N> makeValuesOnly(final Structure2D typical) {
+            return this.make(typical, false);
+        }
+
     }
 
     Factory<ComplexNumber> C128 = (typical, fullSize) -> new DenseSingularValue.C128(fullSize);
@@ -90,6 +151,43 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
     };
 
     Factory<Quadruple> R128 = (typical, fullSize) -> new DenseSingularValue.R128(fullSize);
+
+    /**
+     * The columns of [U], [S] and [V] with the k largest singular values, in descending order.
+     */
+    private static int[] getColumns(final SingularValue<?> decomposition, final int k) {
+
+        int[] retVal = new int[k];
+
+        SortOrder order = decomposition.getOrder();
+
+        if (order == SortOrder.DESCENDING) {
+
+            Arrays.setAll(retVal, j -> j);
+
+        } else {
+
+            MatrixStore<?> mtrxS = decomposition.getS();
+            int size = Math.toIntExact(Math.min(mtrxS.countRows(), mtrxS.countColumns()));
+
+            if (order == SortOrder.ASCENDING) {
+
+                Arrays.setAll(retVal, j -> size - 1 - j);
+
+            } else {
+
+                Integer[] columns = new Integer[size];
+                Arrays.setAll(columns, j -> j);
+                Arrays.sort(columns, (j1, j2) -> Double.compare(mtrxS.doubleValue(j2, j2), mtrxS.doubleValue(j1, j1)));
+
+                for (int j = 0; j < k; j++) {
+                    retVal[j] = columns[j];
+                }
+            }
+        }
+
+        return retVal;
+    }
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final SingularValue<N> decomposition, final NumberContext context) {
 
@@ -153,43 +251,6 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
             } else if (retVal && order == SortOrder.ASCENDING) {
                 for (int ij = 1; retVal && ij < tmpD.countRows(); ij++) {
                     retVal &= tmpD.doubleValue(ij - 1, ij - 1) <= tmpD.doubleValue(ij, ij);
-                }
-            }
-        }
-
-        return retVal;
-    }
-
-    /**
-     * The columns of [U], [S] and [V] with the k largest singular values, in descending order.
-     */
-    private static int[] getColumns(final SingularValue<?> decomposition, final int k) {
-
-        int[] retVal = new int[k];
-
-        SortOrder order = decomposition.getOrder();
-
-        if (order == SortOrder.DESCENDING) {
-
-            Arrays.setAll(retVal, j -> j);
-
-        } else {
-
-            MatrixStore<?> mtrxS = decomposition.getS();
-            int size = Math.toIntExact(Math.min(mtrxS.countRows(), mtrxS.countColumns()));
-
-            if (order == SortOrder.ASCENDING) {
-
-                Arrays.setAll(retVal, j -> size - 1 - j);
-
-            } else {
-
-                Integer[] columns = new Integer[size];
-                Arrays.setAll(columns, j -> j);
-                Arrays.sort(columns, (j1, j2) -> Double.compare(mtrxS.doubleValue(j2, j2), mtrxS.doubleValue(j1, j1)));
-
-                for (int j = 0; j < k; j++) {
-                    retVal[j] = columns[j];
                 }
             }
         }

@@ -118,8 +118,8 @@ public final class MatrixQ128 extends BasicMatrix<RationalNumber, MatrixQ128> {
     }
 
     @Override
-    Eigenvalue<RationalNumber> newEigenvalue(final Structure2D typical) {
-        return Eigenvalue.Q128.make(typical, this.isHermitian());
+    Eigenvalue<RationalNumber> newEigenvalue(final Structure2D typical, final boolean valuesOnly) {
+        return valuesOnly ? Eigenvalue.Q128.makeValuesOnly(typical, this.isHermitian()) : Eigenvalue.Q128.make(typical, this.isHermitian());
     }
 
     @Override

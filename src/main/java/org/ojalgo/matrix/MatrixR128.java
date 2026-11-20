@@ -118,8 +118,8 @@ public final class MatrixR128 extends BasicMatrix<Quadruple, MatrixR128> {
     }
 
     @Override
-    Eigenvalue<Quadruple> newEigenvalue(final Structure2D typical) {
-        return Eigenvalue.R128.make(typical, this.isHermitian());
+    Eigenvalue<Quadruple> newEigenvalue(final Structure2D typical, final boolean valuesOnly) {
+        return valuesOnly ? Eigenvalue.R128.makeValuesOnly(typical, this.isHermitian()) : Eigenvalue.R128.make(typical, this.isHermitian());
     }
 
     @Override

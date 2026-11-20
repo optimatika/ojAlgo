@@ -92,10 +92,9 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
             if (this == obj) {
                 return true;
             }
-            if (obj == null || !(obj instanceof Eigenpair)) {
+            if (obj == null || !(obj instanceof final Eigenpair other)) {
                 return false;
             }
-            final Eigenpair other = (Eigenpair) obj;
             if (value == null) {
                 if (other.value != null) {
                     return false;
@@ -125,12 +124,11 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
 
     interface Factory<N extends Comparable<N>> extends MatrixDecomposition.Factory<Eigenvalue<N>> {
 
-        default Eigenvalue<N> make(final boolean hermitian) {
-            return this.make(TYPICAL, hermitian);
-        }
-
-        default Eigenvalue<N> make(final int dimension, final boolean hermitian) {
-            return this.make(new Structure2D() {
+        /**
+         * A square structure, dimension-by-dimension.
+         */
+        private static Structure2D square(final int dimension) {
+            return new Structure2D() {
 
                 @Override
                 public int getColDim() {
@@ -142,7 +140,15 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
                     return dimension;
                 }
 
-            }, hermitian);
+            };
+        }
+
+        default Eigenvalue<N> make(final boolean hermitian) {
+            return this.make(TYPICAL, hermitian);
+        }
+
+        default Eigenvalue<N> make(final int dimension, final boolean hermitian) {
+            return this.make(Factory.square(dimension), hermitian);
         }
 
         @Override
@@ -179,6 +185,57 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
 
         default Eigenvalue.Spectral<N> makeSpectral(final int typical) {
             return (Spectral<N>) this.make(typical, true);
+        }
+
+        /**
+         * As {@link #makeValuesOnly(Structure2D, boolean)}, with the dimension as the typical size. The same
+         * guarantees, and limitations, apply.
+         */
+        default Eigenvalue<N> makeValuesOnly(final int dimension, final boolean hermitian) {
+            return this.makeValuesOnly(Factory.square(dimension), hermitian);
+        }
+
+        /**
+         * As {@link #make(Structure2D, boolean)}, but for computing the eigenvalues only. You declare that
+         * you will not need the eigenvectors, or anything else that requires the full decomposition. That
+         * allows the factory to return an implementation that computes eigenvalues but cannot produce
+         * eigenvectors at all, such as a root-free QL iteration (LAPACK's {@code ?sterf}) or bisection. If
+         * you need more than listed as guaranteed below, use {@link #make(Structure2D, boolean)} instead –
+         * that instance can also compute the eigenvalues only.
+         * <p>
+         * The arguments:
+         * <ul>
+         * <li>{@code typical} indicates the sizes you expect, and may influence the choice of implementation.
+         * It is not a limit – square matrices of any size are handled.
+         * <li>{@code hermitian} is a promise: if {@code true}, every matrix you compute must be hermitian (if
+         * one is not, the results are unspecified). If {@code false}, any square matrix is handled, hermitian
+         * or not.
+         * </ul>
+         * Guaranteed to work:
+         * <ul>
+         * <li>{@link MatrixDecomposition.Values#computeValuesOnly(org.ojalgo.structure.Access2D.Collectable)}
+         * – as many times as you like, with matrices of different sizes.
+         * <li>After it returned {@code true}: {@link Eigenvalue#getEigenvalues()},
+         * {@link Eigenvalue#getEigenvalues(double[], Optional)}, {@link Eigenvalue#getTrace()} and
+         * {@link MatrixDecomposition.Determinant#getDeterminant()}. The eigenvalues are in the same order as
+         * from a full decomposition (descending, as defined by {@link Eigenvalue#DESCENDING_NORM}), and the
+         * same to within numerical accuracy – not necessarily bit for bit, as a different algorithm may be
+         * used.
+         * <li>{@link MatrixDecomposition#isComputed()} and {@link MatrixDecomposition#reset()}.
+         * </ul>
+         * Not guaranteed – do not use these, as they may throw an exception or return incorrect results:
+         * <ul>
+         * <li>{@code decompose(...)}, and everything that needs a full decomposition:
+         * {@link Eigenvalue#getD()}, {@link Eigenvalue#getV()}, the eigenvectors, the eigenpairs and
+         * {@code reconstruct()}.
+         * <li>Any other method not listed as guaranteed above.
+         * <li>The class of the returned instance. It may differ from what {@link #make(Structure2D, boolean)}
+         * returns, and between versions of ojAlgo, so do not cast it (to {@link Eigenvalue.Spectral}, for
+         * instance).
+         * </ul>
+         */
+        default Eigenvalue<N> makeValuesOnly(final Structure2D typical, final boolean hermitian) {
+            return this.make(typical, hermitian);
         }
     }
 
@@ -342,8 +399,35 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
 
         @Override
         public Eigenvalue<Double> make(final Structure2D typical, final boolean hermitian) {
+            return this.make(typical, hermitian, true);
+        }
+
+        @Override
+        public Eigenvalue.Generalised<Double> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
+
+            Cholesky<Double> cholesky = Cholesky.R064.make(typical);
+            Eigenvalue<Double> eigenvalue = this.make(typical, true);
+
+            return new GeneralisedEvD.R064(cholesky, eigenvalue, type);
+        }
+
+        /**
+         * For only the eigenvalues of a symmetric matrix, {@link HermitianEvD} (SYEVD) is chosen only when it
+         * calls native code for that, which it does from a larger size than with the eigenvectors. Between
+         * those sizes, {@link RawEigenvalue} computes the eigenvalues faster than SYEVD's pure Java
+         * implementation.
+         */
+        @Override
+        public Eigenvalue<Double> makeValuesOnly(final Structure2D typical, final boolean hermitian) {
+            return this.make(typical, hermitian, false);
+        }
+
+        /**
+         * @param vectors Whether the eigenvectors may be computed, or only the eigenvalues
+         */
+        private Eigenvalue<Double> make(final Structure2D typical, final boolean hermitian, final boolean vectors) {
             if (hermitian) {
-                if ((8192L < typical.countColumns() || SYEVD.isNative(true, typical.countColumns())) && typical.count() <= PlainArray.MAX_SIZE) {
+                if ((8192L < typical.countColumns() || SYEVD.isNative(vectors, typical.countColumns())) && typical.count() <= PlainArray.MAX_SIZE) {
                     return new HermitianEvD.R064();
                 } else {
                     return new RawEigenvalue.Symmetric();
@@ -355,15 +439,6 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
                     return new RawEigenvalue.General();
                 }
             }
-        }
-
-        @Override
-        public Eigenvalue.Generalised<Double> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
-
-            Cholesky<Double> cholesky = Cholesky.R064.make(typical);
-            Eigenvalue<Double> eigenvalue = this.make(typical, true);
-
-            return new GeneralisedEvD.R064(cholesky, eigenvalue, type);
         }
 
     };

@@ -118,8 +118,8 @@ public final class MatrixH256 extends BasicMatrix<Quaternion, MatrixH256> {
     }
 
     @Override
-    Eigenvalue<Quaternion> newEigenvalue(final Structure2D typical) {
-        return Eigenvalue.H256.make(typical, this.isHermitian());
+    Eigenvalue<Quaternion> newEigenvalue(final Structure2D typical, final boolean valuesOnly) {
+        return valuesOnly ? Eigenvalue.H256.makeValuesOnly(typical, this.isHermitian()) : Eigenvalue.H256.make(typical, this.isHermitian());
     }
 
     @Override

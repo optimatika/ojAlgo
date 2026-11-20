@@ -522,6 +522,11 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
 
     /**
      * Eigenvalue and Singular Value decompositions can calculate the "values" only.
+     * <p>
+     * Any instance can do this, but an instance made with
+     * {@link Eigenvalue.Factory#makeValuesOnly(Structure2D, boolean)} or
+     * {@link SingularValue.Factory#makeValuesOnly(Structure2D)} can only do this – see those methods for what
+     * is then guaranteed to work.
      *
      * @author apete
      */

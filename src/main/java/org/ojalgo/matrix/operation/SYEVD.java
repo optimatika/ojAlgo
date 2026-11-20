@@ -325,9 +325,11 @@ public abstract class SYEVD implements LAPACK {
     private static final double NATIVE_THRESHOLD = 750_000;
     /**
      * The native implementation is used, if there is one, when n*n*n is larger than this and only the
-     * eigenvalues are computed.
+     * eigenvalues are computed: from n = 152. Measured with Accelerate, the native implementation then is as
+     * fast as the other pure Java implementation, {@code RawEigenvalue}'s, and faster than the one here –
+     * about 2.5 times as fast as both at n = 500.
      */
-    private static final double NATIVE_THRESHOLD_VALUES = 300_000_000;
+    private static final double NATIVE_THRESHOLD_VALUES = 3_500_000;
 
     static final boolean NATIVE = NativeLibrary.isAvailable() && Native.DSYEVD_OFF_HEAP != null;
 

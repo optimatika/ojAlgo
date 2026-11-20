@@ -41,10 +41,12 @@ import org.ojalgo.array.Array2D;
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.P20050125Case;
 import org.ojalgo.matrix.P20061119Case;
 import org.ojalgo.matrix.decomposition.Eigenvalue.Eigenpair;
 import org.ojalgo.matrix.decomposition.Eigenvalue.Generalisation;
+import org.ojalgo.matrix.operation.SYEVD;
 import org.ojalgo.matrix.store.DiagonalStore;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -742,6 +744,66 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
                 TestUtils.assertEquals(expected, actual, evaluationContext);
             }
         }
+    }
+
+    /**
+     * {@link Eigenvalue.Factory#makeValuesOnly(int, boolean)}: for a symmetric matrix, R064 chooses
+     * {@link HermitianEvD} when SYEVD calls native code for the eigenvalues only, otherwise
+     * {@link RawEigenvalue} – also at the sizes where {@link Eigenvalue.Factory#make(int, boolean)} chooses
+     * HermitianEvD, as SYEVD calls native code with the eigenvectors. The eigenvalues, the trace and the
+     * determinant are the same. Only those are tested for the values-only instance – the rest is outside its
+     * contract. The other factories choose as make does.
+     */
+    @Test
+    public void testValuesOnlyFactory() {
+
+        NumberContext accuracy = NumberContext.of(10);
+
+        if (SYEVD.isNative(true, 100) && !SYEVD.isNative(false, 100)) {
+            TestUtils.assertTrue(Eigenvalue.R064.make(100, true) instanceof HermitianEvD);
+            TestUtils.assertTrue(Eigenvalue.R064.makeValuesOnly(100, true) instanceof RawEigenvalue.Symmetric);
+        }
+
+        // The typical size is not a limit – this instance is reused for all sizes
+        Eigenvalue<Double> reused = Eigenvalue.R064.makeValuesOnly(10, true);
+
+        for (int dim : new int[] { 10, 91, 100, 151, 152, 200 }) {
+
+            R064Store matrix = R064Store.FACTORY.makeSPD(dim);
+
+            Eigenvalue<Double> full = Eigenvalue.R064.make(dim, true);
+            Eigenvalue<Double> valuesOnly = Eigenvalue.R064.makeValuesOnly(dim, true);
+
+            TestUtils.assertEquals("make " + dim, SYEVD.isNative(true, dim), full instanceof HermitianEvD);
+            TestUtils.assertEquals("makeValuesOnly " + dim, SYEVD.isNative(false, dim), valuesOnly instanceof HermitianEvD);
+
+            full.computeValuesOnly(matrix);
+            TestUtils.assertTrue(valuesOnly.computeValuesOnly(matrix));
+            TestUtils.assertTrue(valuesOnly.isComputed());
+            TestUtils.assertEquals("eigenvalues " + dim, full.getEigenvalues(), valuesOnly.getEigenvalues(), accuracy);
+            TestUtils.assertEquals("trace " + dim, full.getTrace(), valuesOnly.getTrace(), accuracy);
+            TestUtils.assertEquals("determinant " + dim, full.getDeterminant(), valuesOnly.getDeterminant(), accuracy);
+
+            double[] realParts = new double[dim];
+            double[] imaginaryParts = new double[dim];
+            valuesOnly.getEigenvalues(realParts, Optional.of(imaginaryParts));
+            for (int i = 0; i < dim; i++) {
+                TestUtils.assertEquals("real part " + dim, full.getEigenvalues().get(i).getReal(), realParts[i], accuracy);
+                TestUtils.assertEquals("imaginary part " + dim, full.getEigenvalues().get(i).getImaginary(), imaginaryParts[i], accuracy);
+            }
+
+            TestUtils.assertTrue(reused.computeValuesOnly(matrix));
+            TestUtils.assertEquals("reused " + dim, full.getEigenvalues(), reused.getEigenvalues(), accuracy);
+
+            valuesOnly.reset();
+            TestUtils.assertFalse(valuesOnly.isComputed());
+
+            // BasicMatrix computes the eigenvalues only (without a cached decomposition) with makeValuesOnly
+            TestUtils.assertEquals("BasicMatrix " + dim, full.getEigenvalues(), MatrixR064.FACTORY.copy(matrix).getEigenvalues(), accuracy);
+        }
+
+        TestUtils.assertEquals(Eigenvalue.C128.make(10, true).getClass(), Eigenvalue.C128.makeValuesOnly(10, true).getClass());
+        TestUtils.assertEquals(Eigenvalue.R064.make(10, false).getClass(), Eigenvalue.R064.makeValuesOnly(10, false).getClass());
     }
 
     @Test

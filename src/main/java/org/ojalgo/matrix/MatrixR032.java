@@ -115,8 +115,8 @@ public final class MatrixR032 extends BasicMatrix<Double, MatrixR032> {
     }
 
     @Override
-    Eigenvalue<Double> newEigenvalue(final Structure2D typical) {
-        return Eigenvalue.R064.make(typical, this.isHermitian());
+    Eigenvalue<Double> newEigenvalue(final Structure2D typical, final boolean valuesOnly) {
+        return valuesOnly ? Eigenvalue.R064.makeValuesOnly(typical, this.isHermitian()) : Eigenvalue.R064.make(typical, this.isHermitian());
     }
 
     @Override

@@ -533,4 +533,64 @@ public class CaseSingularValue extends MatrixDecompositionTests {
         }
     }
 
+    /**
+     * {@link SingularValue.Factory#makeValuesOnly(int, int)}: for square, tall and fat matrices – also of
+     * deficient rank – the singular values, and what follows from them (the contract), are the same as from a
+     * full decomposition. The other factories also choose as make does.
+     */
+    @Test
+    public void testValuesOnlyFactory() {
+
+        NumberContext accuracy = NumberContext.of(10);
+
+        // The typical size is not a limit – this instance is reused for all sizes and shapes
+        SingularValue<Double> reused = SingularValue.R064.makeValuesOnly(10, 10);
+
+        for (int[] shape : new int[][] { { 10, 10 }, { 30, 20 }, { 20, 30 }, { 100, 100 }, { 150, 90 } }) {
+
+            int m = shape[0], n = shape[1];
+            for (int rank : new int[] { Math.min(m, n), Math.min(m, n) / 2 }) {
+
+                R064Store matrix = R064Store.FACTORY.makeFilled(m, rank, new Normal()).multiply(R064Store.FACTORY.makeFilled(rank, n, new Normal()))
+                        .collect(R064Store.FACTORY);
+
+                SingularValue<Double> full = SingularValue.R064.make(m, n);
+                SingularValue<Double> valuesOnly = SingularValue.R064.makeValuesOnly(m, n);
+
+                full.decompose(matrix);
+                TestUtils.assertTrue(valuesOnly.computeValuesOnly(matrix));
+                TestUtils.assertTrue(valuesOnly.isComputed());
+
+                String message = m + "x" + n + " rank " + rank;
+                TestUtils.assertEquals(message, full.getSingularValues(), valuesOnly.getSingularValues(), accuracy);
+                double[] values = new double[Math.min(m, n)];
+                valuesOnly.getSingularValues(values);
+                for (int i = 0; i < values.length; i++) {
+                    TestUtils.assertEquals(message, full.getSingularValues().doubleValue(i), values[i], accuracy);
+                }
+                TestUtils.assertEquals(message, full.getRank(), valuesOnly.getRank());
+                TestUtils.assertEquals(message, full.isFullRank(), valuesOnly.isFullRank());
+                TestUtils.assertEquals(message, rank == Math.min(m, n), valuesOnly.isFullRank());
+                TestUtils.assertEquals(message, full.getRankThreshold(), valuesOnly.getRankThreshold(), accuracy);
+                TestUtils.assertEquals(message, full.getOperatorNorm(), valuesOnly.getOperatorNorm(), accuracy);
+                TestUtils.assertEquals(message, full.getFrobeniusNorm(), valuesOnly.getFrobeniusNorm(), accuracy);
+                TestUtils.assertEquals(message, full.getTraceNorm(), valuesOnly.getTraceNorm(), accuracy);
+                TestUtils.assertEquals(message, full.getKyFanNorm(3), valuesOnly.getKyFanNorm(3), accuracy);
+                if (rank == Math.min(m, n)) {
+                    TestUtils.assertEquals(message, full.getCondition(), valuesOnly.getCondition(), NumberContext.of(6));
+                }
+
+                TestUtils.assertTrue(reused.computeValuesOnly(matrix));
+                TestUtils.assertEquals(message, full.getSingularValues(), reused.getSingularValues(), accuracy);
+                TestUtils.assertEquals(message, full.getRank(), reused.getRank());
+
+                valuesOnly.reset();
+                TestUtils.assertFalse(valuesOnly.isComputed());
+            }
+        }
+
+        TestUtils.assertEquals(SingularValue.C128.make(10, 10).getClass(), SingularValue.C128.makeValuesOnly(10, 10).getClass());
+        TestUtils.assertEquals(SingularValue.R064.make(10, 10).getClass(), SingularValue.R064.makeValuesOnly(10, 10).getClass());
+    }
+
 }
