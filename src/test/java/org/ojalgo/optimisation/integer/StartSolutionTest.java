@@ -57,52 +57,11 @@ public class StartSolutionTest extends OptimisationIntegerTests {
         }
 
         @Override
-        protected void initialise() {
-            delegate.initialise();
-        }
-
-        @Override
-        protected boolean isCutRatherThanBranch(final NodeKey nodeKey, final int branchIntegerIndex, final double variableValue, final double nodeValue,
-                final Optimisation.Result bestResultSoFar) {
-            return delegate.isCutRatherThanBranch(nodeKey, branchIntegerIndex, variableValue, nodeValue, bestResultSoFar);
-        }
-
-        @Override
-        protected void markInfeasible(final NodeKey key, final boolean found, final double incumbentValue) {
-            delegate.markInfeasible(key, found, incumbentValue);
-        }
-
-        @Override
         protected void markInteger(final NodeKey key, final Optimisation.Result result) {
             if (key == null) {
                 myStarts.add(result);
             }
-            delegate.markInteger(key, result);
-        }
-
-        @Override
-        protected void observeBranch(final int idx, final boolean upper, final double observation) {
-            delegate.observeBranch(idx, upper, observation);
-        }
-
-        @Override
-        protected void onCutFailure() {
-            delegate.onCutFailure();
-        }
-
-        @Override
-        protected void onCutSuccess(final NodeKey nodeKey) {
-            delegate.onCutSuccess(nodeKey);
-        }
-
-        @Override
-        protected void onNodeSolved(final NodeKey key, final Optimisation.Result child, final double childObj, final boolean minimisation) {
-            delegate.onNodeSolved(key, child, childObj, minimisation);
-        }
-
-        @Override
-        protected double scoreBranch(final int idx, final double distanceDown, final double distanceUp, final boolean found) {
-            return delegate.scoreBranch(idx, distanceDown, distanceUp, found);
+            super.markInteger(key, result);
         }
 
     }

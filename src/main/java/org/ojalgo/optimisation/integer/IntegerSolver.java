@@ -782,6 +782,10 @@ public final class IntegerSolver extends GenericSolver {
             myBestResultSoFar = result;
         }
 
+        if (myBestResultSoFar != previouslyTheBest && options.incumbent() != null) {
+            options.incumbent().accept(myBestResultSoFar);
+        }
+
         strategy.markInteger(key, result);
 
         double bestValue = myBestResultSoFar.getValue();

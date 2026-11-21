@@ -37,6 +37,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
@@ -256,6 +257,7 @@ public interface Optimisation {
                 case MPS -> FileFormatMPS.read(input, this::newModel);
                 case EBM -> FileFormatEBM.read(input, this::newModel);
                 case LP  -> FileFormatLP.read(input, this::newModel);
+                case FZN -> FileFormatFZN.read(input, this::newModel);
                 default  -> throw new IllegalArgumentException();
             };
         }
@@ -611,6 +613,8 @@ public interface Optimisation {
 
         private ConvexSolver.Configuration myConvexConfiguration = new ConvexSolver.Configuration();
 
+        private Consumer<Optimisation.Result> myIncumbentListener = null;
+
         private IntegerStrategy myIntegerStrategy = IntegerStrategy.DEFAULT;
 
         private LinearSolver.Configuration myLinearConfiguration = new LinearSolver.Configuration();
@@ -693,6 +697,24 @@ public interface Optimisation {
          */
         public int getParallelism() {
             return myParallelism;
+        }
+
+        /**
+         * @see #incumbent(Consumer)
+         */
+        public Consumer<Optimisation.Result> incumbent() {
+            return myIncumbentListener;
+        }
+
+        /**
+         * To be told about each new best solution (the incumbent) the {@link IntegerSolver} finds, as it finds
+         * it – to report progress, or to use a solution before the solver is done. It is called from the
+         * solver's worker threads, one call at a time, with the solution in the model's variables. It should
+         * return quickly, as the search waits for it. Null (the default) for no listener.
+         */
+        public Options incumbent(final Consumer<Optimisation.Result> listener) {
+            myIncumbentListener = listener;
+            return this;
         }
 
         public IntegerStrategy integer() {

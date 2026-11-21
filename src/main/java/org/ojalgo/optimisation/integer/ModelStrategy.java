@@ -48,12 +48,19 @@ public abstract class ModelStrategy implements IntegerStrategy {
 
     /**
      * When implementing your own {@link ModelStrategy} extending this abstract class is a good starting
-     * point. It gives you access to the default implementation as a delegate.
+     * point. Every hook forwards to the default implementation, so override only what you want to change,
+     * and call {@code super} (e.g. {@code super.scoreBranch(...)}) where you want the default behaviour.
+     * <p>
+     * Use {@code super} rather than {@link #delegate} – the hooks are protected, so outside this package they
+     * can't be called on the delegate.
      *
      * @author apete
      */
     public static abstract class AbstractStrategy extends ModelStrategy {
 
+        /**
+         * The default implementation that all hooks forward to.
+         */
         protected final ModelStrategy delegate;
 
         protected AbstractStrategy(final ExpressionsBasedModel model, final IntegerStrategy strategy) {
@@ -61,6 +68,52 @@ public abstract class ModelStrategy implements IntegerStrategy {
             super(model, strategy);
 
             delegate = new DefaultStrategy(model, strategy);
+        }
+
+        @Override
+        protected void initialise() {
+            delegate.initialise();
+        }
+
+        @Override
+        protected boolean isCutRatherThanBranch(final NodeKey nodeKey, final int branchIntegerIndex, final double variableValue, final double nodeValue,
+                final Optimisation.Result bestResultSoFar) {
+            return delegate.isCutRatherThanBranch(nodeKey, branchIntegerIndex, variableValue, nodeValue, bestResultSoFar);
+        }
+
+        @Override
+        protected void markInfeasible(final NodeKey key, final boolean found, final double incumbentValue) {
+            delegate.markInfeasible(key, found, incumbentValue);
+        }
+
+        @Override
+        protected void markInteger(final NodeKey key, final Optimisation.Result result) {
+            delegate.markInteger(key, result);
+        }
+
+        @Override
+        protected void observeBranch(final int idx, final boolean upper, final double observation) {
+            delegate.observeBranch(idx, upper, observation);
+        }
+
+        @Override
+        protected void onCutFailure() {
+            delegate.onCutFailure();
+        }
+
+        @Override
+        protected void onCutSuccess(final NodeKey nodeKey) {
+            delegate.onCutSuccess(nodeKey);
+        }
+
+        @Override
+        protected void onNodeSolved(final NodeKey key, final Optimisation.Result child, final double childObj, final boolean minimisation) {
+            delegate.onNodeSolved(key, child, childObj, minimisation);
+        }
+
+        @Override
+        protected double scoreBranch(final int idx, final double distanceDown, final double distanceUp, final boolean found) {
+            return delegate.scoreBranch(idx, distanceDown, distanceUp, found);
         }
 
     }
