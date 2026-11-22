@@ -26,10 +26,12 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.integer.ModelStrategy.DefaultStrategy;
 import org.ojalgo.type.context.NumberContext;
 
@@ -44,11 +46,13 @@ public interface IntegerStrategy {
         private final CutConfiguration myCutConfiguration;
         private final BiFunction<ExpressionsBasedModel, IntegerStrategy, ModelStrategy> myFactory;
         private final NumberContext myGapTolerance;
+        private final Consumer<Optimisation.Result> myIncumbentListener;
         private final NumberContext myIntegralityTolerance;
         private final Comparator<NodeKey>[] myPriorityDefinitions;
 
         ConfigurableStrategy(final Comparator<NodeKey>[] definitions, final NumberContext integrality, final NumberContext gap,
-                final BiFunction<ExpressionsBasedModel, IntegerStrategy, ModelStrategy> factory, final CutConfiguration cutConfiguration) {
+                final BiFunction<ExpressionsBasedModel, IntegerStrategy, ModelStrategy> factory, final CutConfiguration cutConfiguration,
+                final Consumer<Optimisation.Result> incumbentListener) {
 
             super();
 
@@ -57,6 +61,7 @@ public interface IntegerStrategy {
             myGapTolerance = gap;
             myFactory = factory;
             myCutConfiguration = cutConfiguration;
+            myIncumbentListener = incumbentListener;
         }
 
         /**
@@ -75,7 +80,7 @@ public interface IntegerStrategy {
                 totalDefinitions[additionalDefinitions.length + i] = myPriorityDefinitions[i];
             }
 
-            return new ConfigurableStrategy(totalDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myCutConfiguration);
+            return new ConfigurableStrategy(totalDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myCutConfiguration, myIncumbentListener);
         }
 
         @Override
@@ -115,7 +120,9 @@ public interface IntegerStrategy {
 
         @Override
         public ModelStrategy newModelStrategy(final ExpressionsBasedModel model) {
-            return myFactory.apply(model, this);
+            ModelStrategy retVal = myFactory.apply(model, this);
+            retVal.setIncumbentListener(myIncumbentListener);
+            return retVal;
         }
 
         /**
@@ -124,28 +131,40 @@ public interface IntegerStrategy {
          * ({@link CutConfiguration#withTypes(CutType...)} with no arguments).
          */
         public ConfigurableStrategy withCutConfiguration(final CutConfiguration newConfiguration) {
-            return new ConfigurableStrategy(myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, newConfiguration);
+            return new ConfigurableStrategy(myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, newConfiguration, myIncumbentListener);
         }
 
         /**
          * Change the MIP gap
          */
         public ConfigurableStrategy withGapTolerance(final NumberContext newTolerance) {
-            return new ConfigurableStrategy(myPriorityDefinitions, myIntegralityTolerance, newTolerance, myFactory, myCutConfiguration);
+            return new ConfigurableStrategy(myPriorityDefinitions, myIntegralityTolerance, newTolerance, myFactory, myCutConfiguration, myIncumbentListener);
+        }
+
+        /**
+         * To be told about each new best solution (the incumbent) the {@link IntegerSolver} finds, as it
+         * finds it – to report progress, or to use a solution before the solver is done. Each is better than
+         * the one before. The listener is called with the solution in the model's variables, from the
+         * solver's worker threads, one call at a time; it should return quickly, as the search waits for it.
+         * It is {@link ModelStrategy#markInteger(NodeKey, Optimisation.Result)} that calls it, so a custom
+         * {@link ModelStrategy} overriding that should call {@code super}. Default null, no listener.
+         */
+        public ConfigurableStrategy withIncumbentListener(final Consumer<Optimisation.Result> newListener) {
+            return new ConfigurableStrategy(myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myCutConfiguration, newListener);
         }
 
         /**
          * Create a sub-class of {@link ModelStrategy} and provide a factory method for it here.
          */
         public ConfigurableStrategy withModelStrategyFactory(final BiFunction<ExpressionsBasedModel, IntegerStrategy, ModelStrategy> newFactory) {
-            return new ConfigurableStrategy(myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, newFactory, myCutConfiguration);
+            return new ConfigurableStrategy(myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, newFactory, myCutConfiguration, myIncumbentListener);
         }
 
         /**
          * Replace the priority definitions with these ones.
          */
         public ConfigurableStrategy withPriorityDefinitions(final Comparator<NodeKey>... newDefinitions) {
-            return new ConfigurableStrategy(newDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myCutConfiguration);
+            return new ConfigurableStrategy(newDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myCutConfiguration, myIncumbentListener);
         }
 
     }
@@ -366,7 +385,7 @@ public interface IntegerStrategy {
         NumberContext integrality = NumberContext.of(12, 8);
         NumberContext gap = NumberContext.of(5, 7);
 
-        return new ConfigurableStrategy(definitions, integrality, gap, DefaultStrategy::new, new CutConfiguration());
+        return new ConfigurableStrategy(definitions, integrality, gap, DefaultStrategy::new, new CutConfiguration(), null);
     }
 
     int countUniqueStrategies();

@@ -95,9 +95,32 @@ public final class NodeKey implements Comparable<NodeKey> {
 
     private static final BigDecimal INT_MIN = BigDecimal.valueOf(Integer.MIN_VALUE);
 
-    private static final AtomicLong SEQUENCE_GENERATOR = new AtomicLong();
-
     static final double MINIMUM_DISPLACEMENT = 1E-9;
+
+    /**
+     * Apply this node's bounds to a model variable, but only ever tightening: the node model may already
+     * carry tighter bounds derived by presolve (together with rows marked redundant and variables fixed on
+     * the strength of those bounds). Overwriting them with the node's looser bounds would leave the model
+     * inconsistent, and the LP built from it would be missing constraints.
+     */
+    private static void tightenBounds(final Variable variable, final BigDecimal lower, final BigDecimal upper) {
+
+        BigDecimal currentLower = variable.getLowerLimit();
+        BigDecimal currentUpper = variable.getUpperLimit();
+
+        if (lower != null && (currentLower == null || lower.compareTo(currentLower) > 0)) {
+            variable.lower(lower);
+        }
+        if (upper != null && (currentUpper == null || upper.compareTo(currentUpper) < 0)) {
+            variable.upper(upper);
+        }
+
+        BigDecimal value = variable.getValue();
+        if (value != null) {
+            // Re-setting will ensure the new bounds are not violated
+            variable.setValue(value);
+        }
+    }
 
     /**
      * The node lower bound for a variable lower limit: {@link Integer#MIN_VALUE} (unbounded) when there is no
@@ -156,23 +179,30 @@ public final class NodeKey implements Comparable<NodeKey> {
      */
     public final long parent;
     /**
-     * Node sequence number to keep track of in which order the nodes were created.
+     * Node sequence number to keep track of in which order the nodes were created: 0 for the root, then 1, 2,
+     * 3... within each solve.
      */
     public final long sequence;
 
     private final IntArrayPool myIntArrayPool;
     private final int[] myLowerBounds;
+    /**
+     * Shared by all nodes of one solve (created with the root), not static, so that the sequence numbers –
+     * and with them the hash codes – do not depend on what was solved before in the same JVM.
+     */
+    private final AtomicLong mySequenceGenerator;
     private final boolean mySignChanged;
     private final int[] myUpperBounds;
     private final boolean myUpperBranch;
 
     private NodeKey(final int[] lowerBounds, final int[] upperBounds, final long parentSequenceNumber, final int parentDepth, final int integerIndexBranchedOn,
             final double branchVariableDisplacement, final double parentObjectiveFunctionValue, final boolean signChanged, final boolean upperBranch,
-            final IntArrayPool pool) {
+            final IntArrayPool pool, final AtomicLong sequenceGenerator) {
 
         super();
 
-        sequence = SEQUENCE_GENERATOR.incrementAndGet();
+        sequence = sequenceGenerator.incrementAndGet();
+        mySequenceGenerator = sequenceGenerator;
 
         myLowerBounds = lowerBounds;
         myUpperBounds = upperBounds;
@@ -208,6 +238,7 @@ public final class NodeKey implements Comparable<NodeKey> {
         myUpperBranch = source.myUpperBranch;
 
         myIntArrayPool = source.myIntArrayPool;
+        mySequenceGenerator = source.mySequenceGenerator;
     }
 
     NodeKey(final ExpressionsBasedModel integerModel) {
@@ -215,6 +246,7 @@ public final class NodeKey implements Comparable<NodeKey> {
         super();
 
         sequence = 0L;
+        mySequenceGenerator = new AtomicLong();
 
         List<Variable> integerVariables = integerModel.getIntegerVariables();
         int nbIntegerVariables = integerVariables.size();
@@ -250,11 +282,7 @@ public final class NodeKey implements Comparable<NodeKey> {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof NodeKey)) {
-            return false;
-        }
-        NodeKey other = (NodeKey) obj;
-        if (sequence != other.sequence) {
+        if (!(obj instanceof NodeKey other) || (sequence != other.sequence)) {
             return false;
         }
         return true;
@@ -314,31 +342,6 @@ public final class NodeKey implements Comparable<NodeKey> {
         builder.append(myLowerBounds[idx]);
         builder.append('<');
         builder.append(myUpperBounds[idx]);
-    }
-
-    /**
-     * Apply this node's bounds to a model variable, but only ever tightening: the node model may already
-     * carry tighter bounds derived by presolve (together with rows marked redundant and variables fixed on
-     * the strength of those bounds). Overwriting them with the node's looser bounds would leave the model
-     * inconsistent, and the LP built from it would be missing constraints.
-     */
-    private static void tightenBounds(final Variable variable, final BigDecimal lower, final BigDecimal upper) {
-
-        BigDecimal currentLower = variable.getLowerLimit();
-        BigDecimal currentUpper = variable.getUpperLimit();
-
-        if (lower != null && (currentLower == null || lower.compareTo(currentLower) > 0)) {
-            variable.lower(lower);
-        }
-        if (upper != null && (currentUpper == null || upper.compareTo(currentUpper) < 0)) {
-            variable.upper(upper);
-        }
-
-        BigDecimal value = variable.getValue();
-        if (value != null) {
-            // Re-setting will ensure the new bounds are not violated
-            variable.setValue(value);
-        }
     }
 
     private void enforceBounds(final Variable variable, final NodeSolver nodeSolver, final int idx, final boolean signChanged) {
@@ -407,7 +410,8 @@ public final class NodeKey implements Comparable<NodeKey> {
         // thus forcing a full solver rebuild — on essentially every 0/1 down-branch.
         boolean changed = oldVal > 0 && newVal <= 0 && tmpLBs[branchIntegerIndex] < 0;
 
-        return new NodeKey(tmpLBs, tmpUBs, sequence, depth, branchIntegerIndex, value - floorValue, objVal, changed, false, myIntArrayPool);
+        return new NodeKey(tmpLBs, tmpUBs, sequence, depth, branchIntegerIndex, value - floorValue, objVal, changed, false, myIntArrayPool,
+                mySequenceGenerator);
     }
 
     NodeKey createUpperBranch(final int branchIntegerIndex, final double value, final double objVal) {
@@ -432,7 +436,7 @@ public final class NodeKey implements Comparable<NodeKey> {
         // forcing a rebuild on the common up-branch of a non-negative variable (e.g. [0,1] -> [1,1]).
         boolean changed = oldVal < 0 && newVal >= 0 && tmpUBs[branchIntegerIndex] <= 0;
 
-        return new NodeKey(tmpLBs, tmpUBs, sequence, depth, branchIntegerIndex, ceilValue - value, objVal, changed, true, myIntArrayPool);
+        return new NodeKey(tmpLBs, tmpUBs, sequence, depth, branchIntegerIndex, ceilValue - value, objVal, changed, true, myIntArrayPool, mySequenceGenerator);
     }
 
     void dispose() {

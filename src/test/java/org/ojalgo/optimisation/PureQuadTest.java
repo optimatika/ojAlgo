@@ -49,7 +49,7 @@ public class PureQuadTest extends OptimisationTests {
                 { 0.00200000, 0.00088000, 0.00200000, 0.00176000, 0.04000000 } };
 
         // create a quadratic only constraint
-        var constraintQ = model.addExpression("quadonly").weight(1.0);
+        Expression constraintQ = model.addExpression("quadonly").weight(1.0);
 
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[i].length; j++) {

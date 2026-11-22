@@ -27,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
+import org.ojalgo.optimisation.integer.IntegerStrategy;
 
 class FileFormatFZNTest extends OptimisationTests {
 
@@ -269,6 +270,53 @@ class FileFormatFZNTest extends OptimisationTests {
     @Test
     void testFileFormatDetected() {
         TestUtils.assertEquals(FileFormat.FZN, FileFormat.detect("model.fzn"));
+    }
+
+    /**
+     * Each new best solution is reported as it is found: each is feasible, better than the one before, and
+     * the last one is the optimal solution.
+     */
+    @Test
+    void testIncumbents() {
+
+        StringBuilder flatZinc = new StringBuilder();
+        int n = 12;
+        int[] weights = { 23, 31, 29, 44, 53, 38, 63, 85, 89, 82, 71, 47 };
+        int[] values = { 92, 57, 49, 68, 60, 43, 67, 84, 87, 72, 61, 55 };
+        StringBuilder items = new StringBuilder();
+        for (int i = 0; i < n; i++) {
+            flatZinc.append("var bool: x").append(i).append(";\n");
+            items.append(i == 0 ? "" : ",").append('x').append(i);
+        }
+        flatZinc.append("var 0..1000: value;\n");
+        flatZinc.append("var 0..165: weight;\n");
+        flatZinc.append("constraint bool_lin_eq(").append(java.util.Arrays.toString(weights)).append(", [").append(items).append("], weight);\n");
+        StringBuilder coefficients = new StringBuilder();
+        for (int v : values) {
+            coefficients.append(v).append(',');
+        }
+        flatZinc.append("constraint int_lin_eq([").append(coefficients).append("-1], [").append(items).append(", value], 0);\n");
+        flatZinc.append("solve maximize value;\n");
+
+        FileFormatFZN.Parsed parsed = FileFormatFZNTest.parse(flatZinc.toString());
+        ExpressionsBasedModel model = parsed.getModel();
+
+        java.util.List<Optimisation.Result> incumbents = new java.util.ArrayList<>();
+        model.options.integer(IntegerStrategy.DEFAULT.withIncumbentListener(incumbents::add));
+
+        Optimisation.Result result = model.maximise();
+
+        TestUtils.assertTrue(result.getState().isOptimal());
+        TestUtils.assertEquals(309.0, result.getValue(), 1E-9);
+
+        TestUtils.assertFalse(incumbents.isEmpty());
+        double previous = Double.NEGATIVE_INFINITY;
+        for (Optimisation.Result incumbent : incumbents) {
+            TestUtils.assertTrue(model.validate(incumbent));
+            TestUtils.assertTrue(incumbent.getValue() > previous);
+            previous = incumbent.getValue();
+        }
+        TestUtils.assertEquals(result.getValue(), previous, 1E-9);
     }
 
     /**

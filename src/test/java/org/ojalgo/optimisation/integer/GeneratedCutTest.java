@@ -182,10 +182,11 @@ public class GeneratedCutTest extends OptimisationIntegerTests implements ModelF
         TestUtils.assertTrue("LP should be optimal", lpResult.getState().isOptimal());
 
         Map<CutSignature, Expression> signatures = new HashMap<>();
+        CutStatistics statistics = new CutStatistics(Optimisation.Sense.MIN);
 
         int totalCuts = 0;
         for (int round = 0; round < 10; round++) {
-            separator.generateCuts(new CutRound(model, null, lpResult, IntegerStrategy.DEFAULT.getCutConfiguration(), signatures));
+            separator.generateCuts(new CutRound(model, null, lpResult, IntegerStrategy.DEFAULT.getCutConfiguration(), signatures, statistics));
             long count = model.getExpressions().stream().filter(e -> e.getName().startsWith("CUT_FC_")).count();
             if (count == totalCuts) {
                 break;
@@ -219,6 +220,7 @@ public class GeneratedCutTest extends OptimisationIntegerTests implements ModelF
             ExpressionsBasedModel model = ModelFileTest.makeModel("MIPLIB", name + ".mps", false);
             FlowCoverSeparator sep = new FlowCoverSeparator();
             Map<CutSignature, Expression> signatures = new HashMap<>();
+            CutStatistics statistics = new CutStatistics(Optimisation.Sense.MIN);
 
             ExpressionsBasedModel lpModel = ModelFileTest.makeModel("MIPLIB", name + ".mps", true);
             Optimisation.Result lpResult = lpModel.minimise();
@@ -226,7 +228,7 @@ public class GeneratedCutTest extends OptimisationIntegerTests implements ModelF
 
             int totalCuts = 0;
             for (int round = 0; round < 10; round++) {
-                sep.generateCuts(new CutRound(model, null, lpResult, IntegerStrategy.DEFAULT.getCutConfiguration(), signatures));
+                sep.generateCuts(new CutRound(model, null, lpResult, IntegerStrategy.DEFAULT.getCutConfiguration(), signatures, statistics));
                 long count = model.getExpressions().stream().filter(e -> e.getName().startsWith("CUT_FC_")).count();
                 if (count == totalCuts) {
                     break;

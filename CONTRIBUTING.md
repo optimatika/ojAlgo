@@ -81,6 +81,8 @@ The low-level operations in `org.ojalgo.array.operation` and `org.ojalgo.matrix.
 - **Use descriptive, meaningful names.** Avoid cryptic abbreviations. Match the surrounding ojAlgo code style (formatting, ordering, idioms) when writing new code.
 - **Naming convention for array/matrix types:** letter+digits encoding — R064=double, R032=float, C128=complex, Q128=rational, H256=quaternion, Z0xx=integer widths.
 - **Binary compatibility:** Deprecate before removal. Keep changes small and focused.
+- **No `var`.** Never write `var` in place of a type – in local variables, for-each loops, try-with-resources or lambda parameters. Write the type.
+- **Compact lambdas.** Write lambda parameters without types (`x -> ...`, `(a, b) -> ...`), not `(Type x) -> ...`, unless the compiler cannot infer them (as at the start of a `Comparator.comparing(..).thenComparing(..)` chain). Use the diamond operator.
 - **No commented-out code.** Use `TODO` with an issue reference when needed.
 - **Ensure exactly one trailing newline** in files. Keep formatting consistent with the existing codebase. Preserve imports order.
 

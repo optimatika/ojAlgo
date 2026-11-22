@@ -23,6 +23,7 @@ package org.ojalgo.optimisation.integer;
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.DoubleAdder;
 import java.util.concurrent.atomic.LongAdder;
 
@@ -44,12 +45,12 @@ final class CutStatistics {
         final LongAdder attempted = new LongAdder();
         final LongAdder calls = new LongAdder();
         final LongAdder callsWithCuts = new LongAdder();
+        final LongAdder nanos = new LongAdder();
         final LongAdder rejectedDensity = new LongAdder();
         final LongAdder rejectedDynamism = new LongAdder();
         final LongAdder rejectedEfficacy = new LongAdder();
         final LongAdder rejectedSimilar = new LongAdder();
         final LongAdder skipped = new LongAdder();
-        final LongAdder nanos = new LongAdder();
 
         void record(final Separator separator, final long elapsedNanos) {
             nanos.add(elapsedNanos);
@@ -94,6 +95,12 @@ final class CutStatistics {
      */
     static final int UNPRODUCTIVE_CALLS = 10;
     /**
+     * Numbers the cuts, for their names. One sequence per solve (not static), so that the names – and with
+     * them the order of the model's expressions, kept by name in a hash map – do not depend on what was
+     * solved before in the same JVM.
+     */
+    private final AtomicInteger myCutNumbers = new AtomicInteger();
+    /**
      * One entry per cut type, created up front so that the maps are never modified (and thus safe to read
      * from any thread); the counters themselves are thread-safe adders.
      */
@@ -123,23 +130,30 @@ final class CutStatistics {
         return builder.toString();
     }
 
-    /**
-     * Whether to call a separator of the given type at this level now. A separator that has had
-     * {@link #UNPRODUCTIVE_CALLS} calls at this level without a single accepted cut is left out (what it
-     * tried and did not get accepted on this model it would keep trying), but gets another chance every
-     * {@link #RETRY_INTERVAL} skipped calls, since the LP points change as the search moves on.
-     */
-    boolean shouldTry(final CutType type, final boolean root) {
+    private void append(final StringBuilder builder, final String where, final Map<CutType, Entry> entries, final Rounds rounds) {
 
-        Entry entry = (root ? myRootEntries : myNodeEntries).get(type);
+        builder.append(where).append(": rounds=").append(rounds.rounds.sum()).append(", improving=").append(rounds.roundsWithImprovement.sum())
+                .append(", bound improvement=").append(rounds.improvement.sum()).append(", re-solve ms=").append(rounds.resolveNanos.sum() / 1_000_000L)
+                .append('\n');
 
-        if (entry.accepted.sum() > 0L || entry.calls.sum() < UNPRODUCTIVE_CALLS) {
-            return true;
+        for (Map.Entry<CutType, Entry> mapEntry : entries.entrySet()) {
+            Entry entry = mapEntry.getValue();
+            if (entry.calls.sum() == 0L) {
+                continue;
+            }
+            builder.append("  ").append(mapEntry.getKey().code).append(": ms=").append(entry.nanos.sum() / 1_000_000L).append(", calls=")
+                    .append(entry.calls.sum()).append(" (with cuts ").append(entry.callsWithCuts.sum()).append("), attempted=").append(entry.attempted.sum())
+                    .append(", accepted=").append(entry.accepted.sum()).append(", rejected efficacy=").append(entry.rejectedEfficacy.sum()).append(" density=")
+                    .append(entry.rejectedDensity.sum()).append(" dynamism=").append(entry.rejectedDynamism.sum()).append(" similar=")
+                    .append(entry.rejectedSimilar.sum()).append(", skipped=").append(entry.skipped.sum()).append('\n');
         }
+    }
 
-        entry.skipped.increment();
-
-        return entry.skipped.sum() % RETRY_INTERVAL == 0L;
+    /**
+     * The number of the next cut, for its name: 1, 2, 3... for each solve
+     */
+    int nextCutNumber() {
+        return myCutNumbers.incrementAndGet();
     }
 
     /**
@@ -160,23 +174,23 @@ final class CutStatistics {
         rounds.resolveNanos.add(resolveNanos);
     }
 
-    private void append(final StringBuilder builder, final String where, final Map<CutType, Entry> entries, final Rounds rounds) {
+    /**
+     * Whether to call a separator of the given type at this level now. A separator that has had
+     * {@link #UNPRODUCTIVE_CALLS} calls at this level without a single accepted cut is left out (what it
+     * tried and did not get accepted on this model it would keep trying), but gets another chance every
+     * {@link #RETRY_INTERVAL} skipped calls, since the LP points change as the search moves on.
+     */
+    boolean shouldTry(final CutType type, final boolean root) {
 
-        builder.append(where).append(": rounds=").append(rounds.rounds.sum()).append(", improving=").append(rounds.roundsWithImprovement.sum())
-                .append(", bound improvement=").append(rounds.improvement.sum()).append(", re-solve ms=").append(rounds.resolveNanos.sum() / 1_000_000L)
-                .append('\n');
+        Entry entry = (root ? myRootEntries : myNodeEntries).get(type);
 
-        for (Map.Entry<CutType, Entry> mapEntry : entries.entrySet()) {
-            Entry entry = mapEntry.getValue();
-            if (entry.calls.sum() == 0L) {
-                continue;
-            }
-            builder.append("  ").append(mapEntry.getKey().code).append(": ms=").append(entry.nanos.sum() / 1_000_000L).append(", calls=")
-                    .append(entry.calls.sum()).append(" (with cuts ").append(entry.callsWithCuts.sum()).append("), attempted=").append(entry.attempted.sum())
-                    .append(", accepted=").append(entry.accepted.sum()).append(", rejected efficacy=").append(entry.rejectedEfficacy.sum()).append(" density=")
-                    .append(entry.rejectedDensity.sum()).append(" dynamism=").append(entry.rejectedDynamism.sum()).append(" similar=")
-                    .append(entry.rejectedSimilar.sum()).append(", skipped=").append(entry.skipped.sum()).append('\n');
+        if (entry.accepted.sum() > 0L || entry.calls.sum() < UNPRODUCTIVE_CALLS) {
+            return true;
         }
+
+        entry.skipped.increment();
+
+        return entry.skipped.sum() % RETRY_INTERVAL == 0L;
     }
 
 }

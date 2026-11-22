@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -48,12 +49,19 @@ public abstract class ModelStrategy implements IntegerStrategy {
 
     /**
      * When implementing your own {@link ModelStrategy} extending this abstract class is a good starting
-     * point. It gives you access to the default implementation as a delegate.
+     * point. Every hook forwards to the default implementation, so override only what you want to change, and
+     * call {@code super} (e.g. {@code super.scoreBranch(...)}) where you want the default behaviour.
+     * <p>
+     * Use {@code super} rather than {@link #delegate} – the hooks are protected, so outside this package they
+     * can't be called on the delegate.
      *
      * @author apete
      */
     public static abstract class AbstractStrategy extends ModelStrategy {
 
+        /**
+         * The default implementation that all hooks forward to.
+         */
         protected final ModelStrategy delegate;
 
         protected AbstractStrategy(final ExpressionsBasedModel model, final IntegerStrategy strategy) {
@@ -61,6 +69,47 @@ public abstract class ModelStrategy implements IntegerStrategy {
             super(model, strategy);
 
             delegate = new DefaultStrategy(model, strategy);
+        }
+
+        @Override
+        protected void initialise() {
+            delegate.initialise();
+        }
+
+        @Override
+        protected boolean isCutRatherThanBranch(final NodeKey nodeKey, final int branchIntegerIndex, final double variableValue, final double nodeValue,
+                final Optimisation.Result bestResultSoFar) {
+            return delegate.isCutRatherThanBranch(nodeKey, branchIntegerIndex, variableValue, nodeValue, bestResultSoFar);
+        }
+
+        @Override
+        protected void markInfeasible(final NodeKey key, final boolean found, final double incumbentValue) {
+            delegate.markInfeasible(key, found, incumbentValue);
+        }
+
+        @Override
+        protected void observeBranch(final int idx, final boolean upper, final double observation) {
+            delegate.observeBranch(idx, upper, observation);
+        }
+
+        @Override
+        protected void onCutFailure() {
+            delegate.onCutFailure();
+        }
+
+        @Override
+        protected void onCutSuccess(final NodeKey nodeKey) {
+            delegate.onCutSuccess(nodeKey);
+        }
+
+        @Override
+        protected void onNodeSolved(final NodeKey key, final Optimisation.Result child, final double childObj, final boolean minimisation) {
+            delegate.onNodeSolved(key, child, childObj, minimisation);
+        }
+
+        @Override
+        protected double scoreBranch(final int idx, final double distanceDown, final double distanceUp, final boolean found) {
+            return delegate.scoreBranch(idx, distanceDown, distanceUp, found);
         }
 
     }
@@ -211,11 +260,6 @@ public abstract class ModelStrategy implements IntegerStrategy {
         }
 
         @Override
-        protected void markInteger(final NodeKey key, final Optimisation.Result result) {
-            // No-op for pseudo-costs. Updates happen when child nodes are solved or infeasible.
-        }
-
-        @Override
         protected void observeBranch(final int idx, final boolean upper, final double observation) {
             this.updatePseudo(idx, upper, observation);
         }
@@ -289,6 +333,7 @@ public abstract class ModelStrategy implements IntegerStrategy {
      */
     private static final double LATTICE_NOISE_REL = 1.0E-9;
 
+    private Consumer<Optimisation.Result> myIncumbentListener = null;
     /**
      * One entry per integer variable, the entry is the global index of that integer variable
      */
@@ -453,7 +498,18 @@ public abstract class ModelStrategy implements IntegerStrategy {
 
     protected abstract void markInfeasible(NodeKey key, boolean found, double incumbentValue);
 
-    protected abstract void markInteger(NodeKey key, Optimisation.Result result);
+    /**
+     * Called with each new incumbent – an integer solution better than any found before – one call at a time.
+     * The key is the node it was found at, or null for a start solution (the variables' values when the solve
+     * began). By default it passes the solution on to the incumbent listener, if there is one (see
+     * {@link IntegerStrategy.ConfigurableStrategy#withIncumbentListener(Consumer)}); the pseudo-costs are
+     * updated as nodes are solved, not here.
+     */
+    protected void markInteger(final NodeKey key, final Optimisation.Result result) {
+        if (myIncumbentListener != null) {
+            myIncumbentListener.accept(result);
+        }
+    }
 
     /**
      * Inject a pseudo-cost observation (e.g. from root strong-branching probes). Default: no-op, so custom
@@ -516,6 +572,14 @@ public abstract class ModelStrategy implements IntegerStrategy {
      */
     boolean isObjectiveIntegral() {
         return myObjectiveUnit > ZERO;
+    }
+
+    /**
+     * Set by {@link IntegerStrategy.ConfigurableStrategy#newModelStrategy(ExpressionsBasedModel)}, see
+     * {@link IntegerStrategy.ConfigurableStrategy#withIncumbentListener(Consumer)}.
+     */
+    void setIncumbentListener(final Consumer<Optimisation.Result> listener) {
+        myIncumbentListener = listener;
     }
 
     /**

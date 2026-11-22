@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;
@@ -46,6 +45,7 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.integer.IntegerStrategy.CutConfiguration;
 import org.ojalgo.optimisation.integer.IntegerStrategy.CutType;
+import org.ojalgo.optimisation.integer.NodeSolver.CutRound;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.keyvalue.EntryPair;
@@ -74,15 +74,20 @@ public final class NodeSolver extends IntermediateSolver {
          * GMI cuts need it.
          */
         final UpdatableSolver solver;
+        /**
+         * The statistics of the solve, which also numbers the cuts (see {@link #newCut(CutRound)})
+         */
+        final CutStatistics statistics;
 
         CutRound(final ExpressionsBasedModel model, final UpdatableSolver solver, final Optimisation.Result solution, final CutConfiguration configuration,
-                final Map<CutSignature, Expression> accepted) {
+                final Map<CutSignature, Expression> accepted, final CutStatistics statistics) {
             super();
             this.model = model;
             this.solver = solver;
             this.solution = solution;
             this.configuration = configuration;
             this.accepted = accepted;
+            this.statistics = statistics;
         }
 
     }
@@ -125,10 +130,9 @@ public final class NodeSolver extends IntermediateSolver {
             if (this == obj) {
                 return true;
             }
-            if (!(obj instanceof CutSignature)) {
+            if (!(obj instanceof CutSignature other)) {
                 return false;
             }
-            CutSignature other = (CutSignature) obj;
             return myHash == other.myHash && Arrays.equals(myIndices, other.myIndices) && Arrays.equals(myCoefficients, other.myCoefficients);
         }
 
@@ -177,7 +181,6 @@ public final class NodeSolver extends IntermediateSolver {
         static final NumberContext PRECISION = NumberContext.of(12);
         private static final MathContext ROUND_LOWER = PRECISION.withMode(RoundingMode.FLOOR).getMathContext();
         private static final MathContext ROUND_UPPER = PRECISION.withMode(RoundingMode.CEILING).getMathContext();
-        static final AtomicInteger COUNTER = new AtomicInteger();
         static final boolean DEBUG = false;
 
         /**
@@ -472,7 +475,7 @@ public final class NodeSolver extends IntermediateSolver {
          * {@link #accept(CutRound, Expression)}.
          */
         final Expression newCut(final CutRound round) {
-            return round.model.newExpression("CUT_" + this.type().code + "_" + COUNTER.incrementAndGet());
+            return round.model.newExpression("CUT_" + this.type().code + "_" + round.statistics.nextCutNumber());
         }
 
         /**
@@ -520,7 +523,7 @@ public final class NodeSolver extends IntermediateSolver {
 
     private UpdatableSolver getUpdatableSolver() {
         Optimisation.Solver solver = this.getSolver();
-        return solver instanceof UpdatableSolver ? (UpdatableSolver) solver : null;
+        return solver instanceof UpdatableSolver u ? u : null;
     }
 
     /**
@@ -546,7 +549,7 @@ public final class NodeSolver extends IntermediateSolver {
         for (int round = 0; round < configuration.iterations && this.isSolved(); round++) {
 
             // The re-solve at the end of a round regenerates the solver, so it is looked up per round
-            CutRound cutRound = new CutRound(model, this.getUpdatableSolver(), result, configuration, accepted);
+            CutRound cutRound = new CutRound(model, this.getUpdatableSolver(), result, configuration, accepted, statistics);
 
             double valueBefore = result.getValue();
             int count = 0;
