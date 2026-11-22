@@ -253,6 +253,11 @@ public abstract class Presolvers {
 
             if (!model.isReferenced(variable)) {
 
+                if (variable.isInfeasible()) {
+                    // Lower limit above the upper – fixing it at either would hide that the model is infeasible
+                    return;
+                }
+
                 if (variable.isObjective()) {
                     int weightSignum = variable.getContributionWeight().signum();
 

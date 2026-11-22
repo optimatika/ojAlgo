@@ -307,6 +307,11 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
          */
         EBM,
         /**
+         * FlatZinc – what the MiniZinc compiler gives a solver. Only reading is supported, and only linear
+         * constraints, such as MiniZinc's linear library (the one used for MIP solvers) leaves in a model.
+         */
+        FZN,
+        /**
          * CPLEX' LP format. Contrary to what the name suggests it's not just for LP. It can describe a
          * variety of problem types.
          * <p>
@@ -335,6 +340,10 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
             if (lowerCasePath.endsWith("ebm")) {
                 return FileFormat.EBM;
+            }
+
+            if (lowerCasePath.endsWith("fzn")) {
+                return FileFormat.FZN;
             }
 
             if (lowerCasePath.endsWith("lp")) {
@@ -2527,6 +2536,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         switch (format) {
             case MPS -> FileFormatMPS.write(this, output);
             case LP  -> FileFormatLP.write(this, output);
+            case FZN -> throw new UnsupportedOperationException("Writing FlatZinc is not supported");
             default  -> FileFormatEBM.write(this, output);
         }
     }

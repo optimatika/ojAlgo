@@ -256,6 +256,7 @@ public interface Optimisation {
                 case MPS -> FileFormatMPS.read(input, this::newModel);
                 case EBM -> FileFormatEBM.read(input, this::newModel);
                 case LP  -> FileFormatLP.read(input, this::newModel);
+                case FZN -> FileFormatFZN.read(input, this::newModel);
                 default  -> throw new IllegalArgumentException();
             };
         }

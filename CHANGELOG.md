@@ -11,6 +11,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.optimisation
+
+- FlatZinc, what the MiniZinc compiler gives a solver, as a file format: `ExpressionsBasedModel.FileFormat.FZN` (files ending `.fzn`), reading only. It reads the linear constraints that MiniZinc's linear library (`-Glinear`, the one MiniZinc uses for MIP solvers) leaves in a model. Any other constraint is an error, with its line number – never skipped.
+
 ### Changed
 
 #### org.ojalgo.optimisation
@@ -24,6 +30,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Changing the objective after solving a model had no effect on the next solve. The `LINEAR_OBJECTIVE` presolver moved a linear objective expression's weights onto the variables, in the model itself, so the expression – the one `getObjective()` returns, say – was no longer part of the objective function. It is no longer one of the default presolvers, and solving leaves the objective expressions as they are.
 - The objective function's name disappeared when a model was read from one file format and written to another (or the same): it always came out as `obj`. An objective function that has its own name – `profit` in an LP file's `Maximize profit: …`, or an MPS file's objective row – now keeps it (in MPS where it fits the 8-character field). A constraint may no longer take the objective function's name in an LP file.
+- A variable that is in no constraint, with its lower limit above its upper, did not make the model infeasible. The `UNREFERENCED` presolver fixed it at one of its limits, and the model was solved as if the other was not there.
 
 ### Removed
 

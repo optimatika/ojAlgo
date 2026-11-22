@@ -152,4 +152,34 @@ public class PresolveTest extends OptimisationTests {
         TestUtils.assertEquals(0.0, result.getValue());
     }
 
+    /**
+     * A variable that is in no constraint, with its lower limit above its upper, makes the model infeasible.
+     * The UNREFERENCED presolver used to fix such a variable at one of its limits, and the model was solved
+     * as if the other limit was not there.
+     */
+    @Test
+    void testUnreferencedCrossedLimits() {
+
+        for (boolean objective : new boolean[] { false, true }) {
+            for (boolean integer : new boolean[] { false, true }) {
+                for (boolean withConstraint : new boolean[] { false, true }) {
+
+                    ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+                    Variable x = model.newVariable("x").lower(5).upper(3).integer(integer);
+                    if (objective) {
+                        x.weight(1);
+                    }
+                    Variable y = model.newVariable("y").lower(0).upper(10).weight(1);
+                    if (withConstraint) {
+                        model.newExpression("C").set(y, 1).upper(20);
+                    }
+
+                    TestUtils.assertStateInfeasible(model.maximise());
+                    TestUtils.assertStateInfeasible(model.minimise());
+                }
+            }
+        }
+    }
+
 }
