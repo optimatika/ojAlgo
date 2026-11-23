@@ -24,8 +24,10 @@ package org.ojalgo.optimisation.convex;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ModelEntity;
+import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.ConstraintType;
 import org.ojalgo.optimisation.Optimisation.Result;
@@ -43,6 +45,45 @@ public class AlternatingDirectionSolverTest extends OptimisationConvexTests {
             }
         }
         throw new IllegalArgumentException();
+    }
+
+    /**
+     * Convex regression, the convex sequence nearest to a sampled concave function – a smaller version of
+     * Maros-Meszaros YAO: min 1/2 |x - c|<sup>2</sup> with c<sub>i</sub> = sin((i + 1) / n), all second
+     * differences x<sub>i</sub> - 2 x<sub>i+1</sub> + x<sub>i+2</sub> >= 0, x<sub>0</sub> >= 0.08 and the
+     * last two variables fixed at 0. The second difference operator is so badly conditioned that ADMM doesn't
+     * converge. ADMM is what's chosen, automatically, for a model of this size, and when it fails the active
+     * set solver should be used instead.
+     */
+    @Test
+    public void testFallbackToActiveSet() {
+
+        int n = 500;
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable[] x = new Variable[n];
+        for (int i = 0; i < n; i++) {
+            x[i] = model.newVariable("x" + i).weight(-Math.sin((i + 1.0) / n));
+        }
+        x[0].lower(0.08);
+        x[n - 2].level(0.0);
+        x[n - 1].level(0.0);
+
+        Expression quadratic = model.newExpression("Q").weight(0.5);
+        for (int i = 0; i < n; i++) {
+            quadratic.set(x[i], x[i], 1.0);
+        }
+
+        for (int i = 0; i + 2 < n; i++) {
+            model.newExpression("D" + i).lower(0.0).set(x[i], 1.0).set(x[i + 1], -2.0).set(x[i + 2], 1.0);
+        }
+
+        Result result = model.minimise(ConvexSolver.INTEGRATION);
+
+        TestUtils.assertStateNotLessThanOptimal(result);
+        TestUtils.assertEquals(-18.799554674, result.getValue(), NumberContext.of(8));
+        TestUtils.assertTrue(model.validate(result));
     }
 
     /**
@@ -115,6 +156,26 @@ public class AlternatingDirectionSolverTest extends OptimisationConvexTests {
         Result result = solver.solve();
 
         TestUtils.assertEquals(Optimisation.State.INVALID, result.getState());
+    }
+
+    /**
+     * Maros-Meszaros QGROW7 (optimal value -4.2798714E7) - ADMM doesn't converge, and returns APPROXIMATE
+     * with an all NaN solution. NaN values pass the model validation, and that result was reported as OPTIMAL
+     * with value 0.0.
+     */
+    @Test
+    public void testNoSolutionIsNotOptimal() {
+
+        ExpressionsBasedModel model = ModelFileTest.makeModel("marosmeszaros", "QGROW7.SIF", false);
+        model.options.convex().algorithm(ConvexSolver.Algorithm.ADMM);
+
+        Result result = model.minimise(ConvexSolver.INTEGRATION);
+
+        if (result.getState().isOptimal()) {
+            TestUtils.assertEquals(-4.2798714E7, result.getValue(), NumberContext.of(6));
+        } else {
+            TestUtils.assertEquals(Optimisation.State.APPROXIMATE, result.getState());
+        }
     }
 
     /**

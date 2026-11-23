@@ -485,7 +485,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         myInvQC = this.getSolutionQ(this.getIterationC());
 
         // With [Q] zero there are no iterations - the LP is solved regardless of any kick-starter
-        boolean usableKickStarter = kickStarter != null && kickStarter.getState().isApproximate() && !this.isZeroQ();
+        boolean usableKickStarter = kickStarter != null && kickStarter.getState().isApproximate() && !this.isZeroQ() && ConvexSolver.isFinite(kickStarter);
 
         if (usableKickStarter) {
             this.getSolutionX().fillMatching(kickStarter);
@@ -714,7 +714,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             }
             for (int i = 0; i < nbI; i++) {
                 double slack = slackI.doubleValue(i);
-                if (slack < ZERO && !FEASIBILITY.isSmall(mtrxBI.doubleValue(i), slack)) {
+                if ((slack < ZERO || Double.isNaN(slack)) && !FEASIBILITY.isSmall(mtrxBI.doubleValue(i), slack)) {
                     retVal = false;
                     if (this.isLogDebug()) {
                         this.log("Negative I-slack! {}", slack);

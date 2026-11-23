@@ -347,8 +347,9 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
 
         /**
          * An approximate solution - not converged, but the relaxed tolerances are met - is accepted as
-         * optimal if it validates against the model. No infeasibility certificate: an INFEASIBLE result has
-         * neither dual values nor a reduced gradient.
+         * optimal if it validates against the model. When not even the relaxed tolerances are met the
+         * solution is all NaN - that would pass the validation, but stays APPROXIMATE. No infeasibility
+         * certificate: an INFEASIBLE result has neither dual values nor a reduced gradient.
          */
         @Override
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
@@ -365,7 +366,7 @@ final class AlternatingDirectionSolver extends ConvexSolver implements Updatable
                         this.getSolverSense());
             }
 
-            if (modelState.getState() == State.APPROXIMATE && model.validate(modelState)) {
+            if (modelState.getState() == State.APPROXIMATE && ConvexSolver.isFinite(modelState) && model.validate(modelState)) {
                 modelState = modelState.withState(State.OPTIMAL);
             }
 

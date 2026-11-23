@@ -517,6 +517,11 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     }
 
     @Test
+    public void testYAO() {
+        CuteMarosMeszarosCase.doTest("YAO.SIF");
+    }
+
+    @Test
     public void testZECEVIC2() {
         CuteMarosMeszarosCase.doTest("ZECEVIC2.SIF");
     }

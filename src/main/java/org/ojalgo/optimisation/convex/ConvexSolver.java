@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -53,6 +54,7 @@ import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.scalar.Quadruple;
@@ -611,19 +613,25 @@ public abstract class ConvexSolver extends GenericSolver {
 
     public static final class ModelIntegration extends ExpressionsBasedModel.Integration<ConvexSolver> {
 
+        /**
+         * Unless an algorithm is specified, the active set solver is used for small models, and for models
+         * with many more constraints than variables. ADMM is used for the others. For models that are not too
+         * large, the other algorithm is used as fallback, if the chosen one ends without a solution.
+         */
         @Override
         public ConvexSolver build(final ExpressionsBasedModel model) {
 
             Algorithm algorithm = model.options.convex().getAlgorithm();
+            boolean fallback = false;
 
             if (algorithm == null) {
+
                 int n = model.countVariables();
                 int m = model.countExpressions();
-                if (m > 50 * n) {
-                    algorithm = Algorithm.ACTIVE_SET;
-                } else if (n > 100 * m) {
-                    algorithm = Algorithm.ADMM;
-                } else if (m + n < 826) {
+
+                fallback = m <= 2_002 && n <= 2_002;
+
+                if (m > 10 * n || m + n < 826) {
                     algorithm = Algorithm.ACTIVE_SET;
                 } else {
                     algorithm = Algorithm.ADMM;
@@ -631,12 +639,43 @@ public abstract class ConvexSolver extends GenericSolver {
             }
 
             if (algorithm == Algorithm.ACTIVE_SET) {
+
                 ExpressionsBasedModel.Integration.setSwitch(model, ExpressionsBasedModel.IntegrationProperty.ACTIVE_SET_OR_ADMM, false);
-                return BasePrimitiveSolver.INTEGRATION.build(model);
+
+                ConvexSolver solver = BasePrimitiveSolver.INTEGRATION.build(model);
+
+                if (fallback) {
+
+                    return new ConvexSolver.SolverWithFallback(solver, () -> {
+                        ExpressionsBasedModel.Integration.setSwitch(model, ExpressionsBasedModel.IntegrationProperty.ACTIVE_SET_OR_ADMM, true);
+                        return AlternatingDirectionSolver.INTEGRATION.build(model);
+                    });
+
+                } else {
+
+                    return solver;
+                }
+
             } else if (algorithm == Algorithm.ADMM) {
+
                 ExpressionsBasedModel.Integration.setSwitch(model, ExpressionsBasedModel.IntegrationProperty.ACTIVE_SET_OR_ADMM, true);
-                return AlternatingDirectionSolver.INTEGRATION.build(model);
+
+                ConvexSolver solver = AlternatingDirectionSolver.INTEGRATION.build(model);
+
+                if (fallback) {
+
+                    return new ConvexSolver.SolverWithFallback(solver, () -> {
+                        ExpressionsBasedModel.Integration.setSwitch(model, ExpressionsBasedModel.IntegrationProperty.ACTIVE_SET_OR_ADMM, false);
+                        return BasePrimitiveSolver.INTEGRATION.build(model);
+                    });
+
+                } else {
+
+                    return solver;
+                }
+
             } else {
+
                 throw new IllegalStateException("Unknown algorithm: " + algorithm);
             }
         }
@@ -672,6 +711,104 @@ public abstract class ConvexSolver extends GenericSolver {
         @Override
         protected Optimisation.Sense getSolverSense() {
             return Optimisation.Sense.MIN;
+        }
+
+    }
+
+    /**
+     * A primary solver, with a fallback. If the primary solver ends without a solution – not feasible, and
+     * not proven infeasible or unbounded – the fallback solver is generated, from the model, and used
+     * instead, for this and any later solves.
+     * <p>
+     * Not after the primary solver has been updated in place. Some of those updates may be to the solver
+     * only, not to the model, and the fallback solver would not have them.
+     */
+    static final class SolverWithFallback extends ConvexSolver implements UpdatableSolver {
+
+        /**
+         * A feasible solution (not necessarily optimal), or proven to be infeasible or unbounded. Note that
+         * {@link Optimisation.State#isFeasible()} is also true for {@link Optimisation.State#UNBOUNDED}.
+         */
+        private static boolean isSolved(final Optimisation.Result result) {
+
+            Optimisation.State state = result.getState();
+
+            return state.isSuccess() && state.isFeasible() || state == Optimisation.State.INFEASIBLE || state == Optimisation.State.UNBOUNDED;
+        }
+
+        private ConvexSolver myFallback = null;
+        private final Supplier<ConvexSolver> myGenerator;
+        private final ConvexSolver mySolver;
+        private boolean myUpdatedInPlace = false;
+
+        SolverWithFallback(final ConvexSolver primary, final Supplier<ConvexSolver> secondary) {
+            super(primary.options);
+            mySolver = primary;
+            myGenerator = secondary;
+            myFallback = null;
+        }
+
+        @Override
+        public void dispose() {
+            super.dispose();
+            mySolver.dispose();
+            if (myFallback != null) {
+                myFallback.dispose();
+            }
+        }
+
+        @Override
+        public boolean fixVariable(final int index, final double value) {
+            boolean updated = this.getSolver() instanceof UpdatableSolver updatable && updatable.fixVariable(index, value);
+            myUpdatedInPlace |= updated;
+            return updated;
+        }
+
+        @Override
+        public double getDualMultiplier(final int index) {
+            return this.getSolver() instanceof UpdatableSolver updatable ? updatable.getDualMultiplier(index) : NaN;
+        }
+
+        @Override
+        public Optional<ExpressionsBasedModel.EntityMap> getEntityMap() {
+            return this.getSolver() instanceof UpdatableSolver updatable ? updatable.getEntityMap() : Optional.empty();
+        }
+
+        @Override
+        public double getReducedGradient(final int index) {
+            return this.getSolver() instanceof UpdatableSolver updatable ? updatable.getReducedGradient(index) : NaN;
+        }
+
+        @Override
+        public boolean updateRange(final int index, final double lower, final double upper) {
+            boolean updated = this.getSolver() instanceof UpdatableSolver updatable && updatable.updateRange(index, lower, upper);
+            myUpdatedInPlace |= updated;
+            return updated;
+        }
+
+        private ConvexSolver getSolver() {
+            return myFallback != null ? myFallback : mySolver;
+        }
+
+        @Override
+        protected Optimisation.Result doSolve(final Optimisation.Result kickStarter) {
+
+            Optimisation.Result result = this.getSolver().solve(kickStarter);
+            this.incrementIterationsCount();
+
+            if (myFallback == null && !myUpdatedInPlace && !SolverWithFallback.isSolved(result) && this.isIterationAllowed()) {
+
+                if (this.isLogProgress()) {
+                    this.log("Primary solver ended {} – switching to the fallback solver", result.getState());
+                }
+
+                myFallback = myGenerator.get();
+
+                result = myFallback.solve(kickStarter);
+                this.incrementIterationsCount();
+            }
+
+            return result;
         }
 
     }
@@ -852,14 +989,6 @@ public abstract class ConvexSolver extends GenericSolver {
     }
 
     /**
-     * Whether a result with this state may have dual values and a reduced gradient: only with a (possibly
-     * approximate) solution, not when the state is INFEASIBLE, UNBOUNDED or a failure.
-     */
-    static boolean isDualMeaningful(final Optimisation.State state) {
-        return state.isSuccess() && state.isApproximate();
-    }
-
-    /**
      * The equality constraints, in order, without those that are linear combinations of the ones before –
      * found with a Cholesky decomposition of [A][A]<sup>T</sup>, extended one row/column at a time. A row
      * that can't be added is [a]<sub>k</sub> = [c]<sup>T</sup>[A] with [c] =
@@ -955,6 +1084,28 @@ public abstract class ConvexSolver extends GenericSolver {
             retVal.add(equalities.get(kept[p]));
         }
         return retVal;
+    }
+
+    /**
+     * Whether a result with this state may have dual values and a reduced gradient: only with a (possibly
+     * approximate) solution, not when the state is INFEASIBLE, UNBOUNDED or a failure.
+     */
+    static boolean isDualMeaningful(final Optimisation.State state) {
+        return state.isSuccess() && state.isApproximate();
+    }
+
+    /**
+     * Whether all the values are finite. A solver may return NaN values to signal that there is no solution,
+     * with a state such as {@link Optimisation.State#APPROXIMATE} that otherwise suggests there is one. Note
+     * that NaN values pass {@link ExpressionsBasedModel#validate(Access1D)}.
+     */
+    static boolean isFinite(final Access1D<?> values) {
+        for (long i = 0L, limit = values.count(); i < limit; i++) {
+            if (!Double.isFinite(values.doubleValue(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     protected ConvexSolver(final Optimisation.Options optimisationOptions) {

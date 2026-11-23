@@ -23,6 +23,8 @@ package org.ojalgo.optimisation.convex;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.array.ArrayR064;
+import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ExpressionsBasedModel.Integration;
 import org.ojalgo.optimisation.Optimisation;
@@ -32,6 +34,48 @@ import org.ojalgo.type.context.NumberContext;
 public class ActiveSetSolverTest extends OptimisationConvexTests {
 
     private static final NumberContext ACCURACY = NumberContext.of(7);
+
+    /**
+     * min 1/2 (x0<sup>2</sup> + x1<sup>2</sup> + x2<sup>2</sup>) - x0 - x1 - x2, with x0 + x1 + x2 = 1 (or <=
+     * 1), x0 <= 0.2 and all variables non-negative - the solution is x0 = 0.2, x1 = x2 = 0.4. The solvers are
+     * kick-started with all NaN values, which is what the ADMM solver returns, with state APPROXIMATE, when
+     * it doesn't converge. Such a kick-starter was used, the NaN slacks passed the feasibility check, and the
+     * result was OPTIMAL with a NaN solution.
+     */
+    @Test
+    public void testNaNKickStarterIsNotUsed() {
+
+        ExpressionsBasedModel.Integration<?>[] activeSetVariants = { ConfiguredIntegration.ASET_PLAIN_D, ConfiguredIntegration.ASET_PLAIN_S,
+                ConfiguredIntegration.ASET_PROJ_D, ConfiguredIntegration.ASET_PROJ_S };
+
+        for (Integration<?> integration : activeSetVariants) {
+            for (boolean equality : new boolean[] { true, false }) {
+                for (Optimisation.State state : new Optimisation.State[] { Optimisation.State.APPROXIMATE, Optimisation.State.FEASIBLE }) {
+
+                    ExpressionsBasedModel model = new ExpressionsBasedModel();
+                    Variable x0 = model.newVariable("x0").lower(0.0).upper(0.2).weight(-1.0);
+                    Variable x1 = model.newVariable("x1").lower(0.0).weight(-1.0);
+                    Variable x2 = model.newVariable("x2").lower(0.0).weight(-1.0);
+                    model.newExpression("Q").weight(0.5).set(x0, x0, 1.0).set(x1, x1, 1.0).set(x2, x2, 1.0);
+                    Expression sum = model.newExpression("Sum").set(x0, 1.0).set(x1, 1.0).set(x2, 1.0);
+                    if (equality) {
+                        sum.level(1.0);
+                    } else {
+                        sum.upper(1.0);
+                    }
+
+                    Optimisation.Solver solver = integration.build(model);
+                    Optimisation.Result kickStarter = new Optimisation.Result(state, ArrayR064.wrap(new double[] { Double.NaN, Double.NaN, Double.NaN }));
+                    Optimisation.Result result = integration.toModelState(solver.solve(kickStarter), model);
+
+                    TestUtils.assertStateNotLessThanOptimal(result);
+                    TestUtils.assertEquals(0.2, result.doubleValue(0), ACCURACY);
+                    TestUtils.assertEquals(0.4, result.doubleValue(1), ACCURACY);
+                    TestUtils.assertEquals(0.4, result.doubleValue(2), ACCURACY);
+                }
+            }
+        }
+    }
 
     /**
      * min 1/2 x0<sup>2</sup> + 1/2 q x1<sup>2</sup> - x0 - x1, with x1 <= 1E6 (active) - the solution is x0 =
