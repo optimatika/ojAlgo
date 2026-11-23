@@ -888,6 +888,12 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
          */
         JAVA_OR_NATIVE_CODE,
         /**
+         * Any integration that can handle both linear (LC) and quadratic (QC) constraints.
+         * <p>
+         * LC==false, QC==true
+         */
+        LC_OR_QC,
+        /**
          * Any integration that can handle both LP and QP models.
          * <p>
          * LP==false, QP==true
