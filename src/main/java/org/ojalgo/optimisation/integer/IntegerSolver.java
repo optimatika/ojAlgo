@@ -82,6 +82,11 @@ public final class IntegerSolver extends GenericSolver {
         private final LongAdder myExhausted = new LongAdder();
         private final LongAdder myInfeasible = new LongAdder();
         private final LongAdder myInteger = new LongAdder();
+        /**
+         * Not a leaf category: how many node problems were solved again from scratch, see {@link #retried()}.
+         */
+        private final LongAdder myRetried = new LongAdder();
+        private final LongAdder myUnresolved = new LongAdder();
 
         @Override
         public String toString() {
@@ -92,8 +97,12 @@ public final class IntegerSolver extends GenericSolver {
             builder.append(myExhausted);
             builder.append(", S=");
             builder.append(myInfeasible);
+            builder.append(", U=");
+            builder.append(myUnresolved);
             builder.append(", A=");
             builder.append(myAbandoned);
+            builder.append("; R=");
+            builder.append(myRetried);
             builder.append("]");
             return builder.toString();
         }
@@ -108,11 +117,15 @@ public final class IntegerSolver extends GenericSolver {
         }
 
         long countEvaluatedNodes() {
-            return myInteger.longValue() + myInfeasible.longValue() + myExhausted.longValue();
+            return myInteger.longValue() + myInfeasible.longValue() + myExhausted.longValue() + myUnresolved.longValue();
         }
 
         int countIntegerSolutions() {
             return myInteger.intValue();
+        }
+
+        long countRetriedNodes() {
+            return myRetried.longValue();
         }
 
         long countSkippedNodes() {
@@ -121,6 +134,10 @@ public final class IntegerSolver extends GenericSolver {
 
         long countTotalNodes() {
             return this.countEvaluatedNodes() + this.countSkippedNodes();
+        }
+
+        long countUnresolvedNodes() {
+            return myUnresolved.longValue();
         }
 
         /**
@@ -133,8 +150,7 @@ public final class IntegerSolver extends GenericSolver {
         }
 
         /**
-         * Failed to solve node problem because of some unexpected error – not because the node was
-         * infeasible.
+         * Something that stops the whole search – such as an unbounded root problem.
          */
         boolean failed() {
             return false;
@@ -153,6 +169,25 @@ public final class IntegerSolver extends GenericSolver {
          */
         boolean integer() {
             myInteger.increment();
+            return true;
+        }
+
+        /**
+         * Node problem neither optimal nor infeasible, and solved again from scratch – whatever the outcome
+         * of that. Not a leaf: the node is then counted as whatever it turned out to be. A sign of trouble in
+         * the LP solver, or with how it is used.
+         */
+        void retried() {
+            myRetried.increment();
+        }
+
+        /**
+         * Node problem could not be solved – neither optimal nor infeasible, also not when solved again from
+         * scratch – or the node could not be branched. Its subtree is left unexplored, and the search
+         * continues with the other nodes.
+         */
+        boolean unresolved() {
+            myUnresolved.increment();
             return true;
         }
 
@@ -197,6 +232,23 @@ public final class IntegerSolver extends GenericSolver {
         return (long) Math.floor(v);
     }
 
+    /**
+     * The node problem was neither solved to optimality nor shown infeasible: FEASIBLE, APPROXIMATE... or the
+     * LP failed (FAILED, such as on a singular basis, UNBOUNDED while the root problem is not, or the root
+     * problem not even valid). An unbounded root problem is not "unsolved" – it makes the model unbounded or
+     * infeasible.
+     */
+    private static boolean isUnsolved(final Optimisation.Result nodeResult, final NodeKey nodeKey) {
+
+        State state = nodeResult.getState();
+
+        if (state.isOptimal() || state == State.UNBOUNDED && nodeKey.sequence == 0) {
+            return false;
+        }
+
+        return !state.isFailure() || state == State.FAILED || state == State.UNBOUNDED || nodeKey.sequence == 0 && !state.isValid();
+    }
+
     static void flush(final RingLogger buffer, final BasicLogger receiver) {
         if (buffer != null && receiver != null) {
             buffer.flush(receiver);
@@ -214,13 +266,13 @@ public final class IntegerSolver extends GenericSolver {
      * open subtrees the global dual bound must cover.
      */
     private final ConcurrentHashMap<Thread, Double> myCheckedOutBounds = new ConcurrentHashMap<>();
+    private final CutStatistics myCutStatistics;
     private final MultiviewSet<NodeKey> myDeferredNodes = new MultiviewSet<>();
     /**
      * Gap tolerance cached during solve() for logProgress; null otherwise.
      */
     private final NumberContext myGapTolerance;
     private final ExpressionsBasedModel myIntegerModel;
-    private final CutStatistics myCutStatistics;
     private final NodeStatistics myNodeStatistics = new NodeStatistics();
     private volatile boolean myOptimalityProven = false;
     /**
@@ -230,6 +282,12 @@ public final class IntegerSolver extends GenericSolver {
     private volatile boolean myRelaxationUnbounded = false;
     private final Optimisation.Sense mySense;
     private final ModelStrategy myStrategy;
+    /**
+     * The best relaxation bound of the subtrees left unexplored because their node could not be solved, see
+     * {@link #markUnresolved(double)}: positive infinity (when minimising) while there are none, negative
+     * infinity if one of them had no bound. Part of the global dual bound.
+     */
+    private volatile double myUnresolvedBound;
 
     IntegerSolver(final ExpressionsBasedModel model) {
 
@@ -237,6 +295,7 @@ public final class IntegerSolver extends GenericSolver {
 
         myIntegerModel = model.simplify();
         mySense = myIntegerModel.getOptimisationSense();
+        myUnresolvedBound = mySense == Optimisation.Sense.MIN ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
         myCutStatistics = new CutStatistics(mySense);
         myStrategy = options.integer().newModelStrategy(myIntegerModel);
         myGapTolerance = myStrategy.getGapTolerance();
@@ -267,10 +326,11 @@ public final class IntegerSolver extends GenericSolver {
 
     /**
      * Valid bound on the optimal integer objective: best relaxation bound over all open subtrees (deferred
-     * frontier head + nodes currently checked out by workers). A non-finite contribution could hide an
-     * arbitrarily good solution, so it collapses the bound to the pessimistic value — we never declare
-     * optimality on incomplete information. Without a view ordered by objective value, null when no worker
-     * uses one, the frontier is not known and the bound is the pessimistic value.
+     * frontier head + nodes currently checked out by workers + subtrees left unexplored because their node
+     * could not be solved). A non-finite contribution could hide an arbitrarily good solution, so it
+     * collapses the bound to the pessimistic value — we never declare optimality on incomplete information.
+     * Without a view ordered by objective value, null when no worker uses one, the frontier is not known and
+     * the bound is the pessimistic value.
      */
     private double globalDualBound(final MultiviewSet<NodeKey>.PrioritisedView boundView) {
 
@@ -297,7 +357,11 @@ public final class IntegerSolver extends GenericSolver {
             bound = mySense == Optimisation.Sense.MIN ? Math.min(bound, value) : Math.max(bound, value);
         }
 
-        return bound;
+        double unresolved = myUnresolvedBound;
+        if (unresolved == pessimistic) {
+            return pessimistic;
+        }
+        return mySense == Optimisation.Sense.MIN ? Math.min(bound, unresolved) : Math.max(bound, unresolved);
     }
 
     private boolean isOptimalityProven() {
@@ -327,6 +391,44 @@ public final class IntegerSolver extends GenericSolver {
         double gap = Math.max(ZERO, mySense == Optimisation.Sense.MIN ? incumbentValue - bound : bound - incumbentValue);
 
         return gap <= myGapTolerance.error(incumbentValue);
+    }
+
+    /**
+     * Could any of the subtrees left unexplored, because their node could not be solved, contain a better
+     * solution than the incumbent? If so, the search is not complete.
+     */
+    private boolean isUnresolvedSubtreeOpen() {
+
+        if (myNodeStatistics.countUnresolvedNodes() == 0L) {
+            return false;
+        }
+
+        double bound = myUnresolvedBound;
+
+        return !Double.isFinite(bound) || myStrategy.isGoodEnough(myBestResultSoFar, bound);
+    }
+
+    /**
+     * A node that could not be solved (or branched): its subtree is left unexplored, but the search
+     * continues. The bound is remembered, so that optimality is not claimed if that subtree could contain a
+     * better solution.
+     *
+     * @param bound The best objective value the subtree could have: the node's relaxation bound, NaN if
+     *              unknown
+     */
+    private synchronized boolean markUnresolved(final double bound) {
+
+        double pessimistic = mySense == Optimisation.Sense.MIN ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
+
+        if (Double.isNaN(bound)) {
+            myUnresolvedBound = pessimistic;
+        } else if (mySense == Optimisation.Sense.MIN) {
+            myUnresolvedBound = Math.min(myUnresolvedBound, bound);
+        } else {
+            myUnresolvedBound = Math.max(myUnresolvedBound, bound);
+        }
+
+        return myNodeStatistics.unresolved();
     }
 
     private RingLogger newPrinter() {
@@ -390,6 +492,11 @@ public final class IntegerSolver extends GenericSolver {
                     }
 
                     for (int k = 0; k < K; k++) {
+
+                        if (!this.isIterationAllowed()) {
+                            break;
+                        }
+
                         int ii = candidates[k];
                         int gi = myStrategy.getIndex(ii);
                         double v = rootResult.doubleValue(gi);
@@ -683,13 +790,17 @@ public final class IntegerSolver extends GenericSolver {
             return this.resolveUnboundedRelaxation(bestSolutionFound);
         }
 
+        // Complete: all subtrees explored or pruned, apart from any that could not be solved and might
+        // contain a better solution (the early optimality proof already takes those into account)
+        boolean complete = solverNormalExit.get() && (myOptimalityProven || !this.isUnresolvedSubtreeOpen());
+
         if (bestSolutionFound.getState().isFeasible()) {
-            if (solverNormalExit.get()) {
+            if (complete) {
                 return bestSolutionFound.withState(State.OPTIMAL);
             } else {
                 return bestSolutionFound.withState(State.FEASIBLE);
             }
-        } else if (solverNormalExit.get()) {
+        } else if (complete) {
             return bestSolutionFound.withState(State.INFEASIBLE);
         } else {
             return bestSolutionFound.withState(State.FAILED);
@@ -881,6 +992,18 @@ public final class IntegerSolver extends GenericSolver {
                 nodePrinter.println("Node Result: {}", nodeResult);
             }
 
+            if (IntegerSolver.isUnsolved(nodeResult, nodeKey)) {
+                // Before giving up on the node, solve it again from scratch: the solver rebuilt (from the
+                // node model, with its bounds and cuts) and solved cold
+                myNodeStatistics.retried();
+                nodeSolver.reset();
+                nodeResult = nodeSolver.solve(bestEstimate);
+
+                if (nodePrinter != null && this.isLogDebug()) {
+                    nodePrinter.println("Node Result, solved again from scratch: {}", nodeResult);
+                }
+            }
+
             if (nodeResult.getState() == State.UNBOUNDED && nodeKey.sequence == 0) {
                 if (nodePrinter != null && this.isLogDebug()) {
                     nodePrinter.println("Node problem unbounded - stop the search!");
@@ -906,13 +1029,10 @@ public final class IntegerSolver extends GenericSolver {
                 }
 
                 nodeSolver.dispose();
-                State nodeState = nodeResult.getState();
-                if (!nodeState.isFailure() || nodeState == State.FAILED || nodeState == State.UNBOUNDED || nodeKey.sequence == 0 && !nodeState.isValid()) {
-                    // Neither optimal nor infeasible (FEASIBLE, APPROXIMATE...), or the LP failed (FAILED, such as
-                    // on a singular basis, or UNBOUNDED while the root problem is not): the node can neither be
-                    // bounded nor pruned and the search cannot claim optimality. Abort (the result is reported as
-                    // FEASIBLE, not OPTIMAL).
-                    return myNodeStatistics.failed();
+                if (IntegerSolver.isUnsolved(nodeResult, nodeKey)) {
+                    // Not solved, also not from scratch: the node can neither be bounded nor pruned. Leave its
+                    // subtree unexplored, with the node's bound remembered, and continue with the other nodes.
+                    return this.markUnresolved(nodeKey.objective);
                 }
                 double incumbentValue = myBestResultSoFar != null ? myBestResultSoFar.getValue() : Double.NaN;
                 strategy.markInfeasible(nodeKey, myBestResultSoFar != null, incumbentValue);
@@ -1027,11 +1147,11 @@ public final class IntegerSolver extends GenericSolver {
 
             if (!NodeKey.isBranchable(variableValue)) {
                 if (nodePrinter != null && this.isLogDebug()) {
-                    nodePrinter.println("Can't branch on {} @ {} - outside the int range. Stop the search!", branchIntegerIndex, variableValue);
+                    nodePrinter.println("Can't branch on {} @ {} - outside the int range. Stop this branch!", branchIntegerIndex, variableValue);
                     IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
                 }
                 nodeSolver.dispose();
-                return myNodeStatistics.failed();
+                return this.markUnresolved(nodeValue);
             }
 
             NodeKey lowerBranch = nodeKey.createLowerBranch(branchIntegerIndex, variableValue, nodeValue);
@@ -1176,8 +1296,9 @@ public final class IntegerSolver extends GenericSolver {
             double lower = nodeKey.getLowerBound(i);
             double upper = nodeKey.getUpperBound(i);
             double intValue = Math.min(upper, Math.max(lower, Math.rint(value)));
-            if (!(Math.abs(intValue - value) <= QUARTER)) {
-                // Too far, or not a number
+            double distance = Math.abs(intValue - value);
+            if (Double.isNaN(distance) || distance > QUARTER) {
+                // Too far, or not a number (a NaN value, or an infinite one with no bound to round it to)
                 return;
             }
             rounded[globalIndex] = new BigDecimal(intValue); // Exact, and scale 0
