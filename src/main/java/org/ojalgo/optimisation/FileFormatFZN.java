@@ -400,7 +400,7 @@ abstract class FileFormatFZN {
             upper.add(variable, BigDecimal.ONE);
 
             long[] bounds = values.bounds();
-            for (int i = 0; i < bounds.length; i += 2) {
+            for (int i = 0; i + 1 < bounds.length; i += 2) {
                 Variable indicator = myModel.newVariable(variable.getName() + "#" + bounds[i] + ".." + bounds[i + 1]).binary();
                 choice.add(indicator, BigDecimal.ONE);
                 lower.add(indicator, BigDecimal.valueOf(-bounds[i]));
@@ -589,7 +589,7 @@ abstract class FileFormatFZN {
         }
 
         boolean contains(final long value) {
-            for (int i = 0; i < myBounds.length; i += 2) {
+            for (int i = 0; i + 1 < myBounds.length; i += 2) {
                 if (myBounds[i] <= value && value <= myBounds[i + 1]) {
                     return true;
                 }
@@ -615,7 +615,7 @@ abstract class FileFormatFZN {
 
         long size() {
             long retVal = 0L;
-            for (int i = 0; i < myBounds.length; i += 2) {
+            for (int i = 0; i + 1 < myBounds.length; i += 2) {
                 retVal += myBounds[i + 1] - myBounds[i] + 1L;
             }
             return retVal;
@@ -628,7 +628,7 @@ abstract class FileFormatFZN {
             }
             long[] retVal = new long[(int) size];
             int index = 0;
-            for (int i = 0; i < myBounds.length; i += 2) {
+            for (int i = 0; i + 1 < myBounds.length; i += 2) {
                 for (long v = myBounds[i]; v <= myBounds[i + 1]; v++) {
                     retVal[index++] = v;
                 }
