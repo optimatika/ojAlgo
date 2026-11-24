@@ -504,9 +504,11 @@ public final class IntegerSolver extends GenericSolver {
 
             Optimisation.Result rootResult = rootSolver.solve(this.getBestEstimate());
 
-            Optimisation.Result rootResultWithCuts = rootSolver.generateCuts(myStrategy, myCutStatistics, true);
-            if (rootResultWithCuts != null) {
-                rootResult = rootResultWithCuts;
+            if (rootResult.getState().isOptimal()) {
+                Optimisation.Result rootResultWithCuts = rootSolver.generateCuts(myStrategy, myCutStatistics, true);
+                if (rootResultWithCuts != null) {
+                    rootResult = rootResultWithCuts;
+                }
             }
 
             if (rootResult.getState().isOptimal() && rootSolver.isInPlaceBoundUpdateSafe()) {
@@ -1089,7 +1091,10 @@ public final class IntegerSolver extends GenericSolver {
                         IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
                     }
 
-                    if (this.identifyNonIntegerVariable(nodeResult, nodeKey, strategy) < 0) {
+                    // Not all solvers return a solution when the state is UNBOUNDED
+                    boolean anySolution = nodeResult.size() == myIntegerModel.countVariables();
+
+                    if (anySolution && this.identifyNonIntegerVariable(nodeResult, nodeKey, strategy) < 0) {
                         Optimisation.Result integerCandidate = this.validIntegerCandidate(nodeResult, strategy);
                         if (integerCandidate != null) {
                             this.markInteger(nodeKey, new Optimisation.Result(State.FEASIBLE, nodeResult.getValue(), integerCandidate), strategy);
@@ -1270,24 +1275,28 @@ public final class IntegerSolver extends GenericSolver {
             return original;
         }
 
+        int nbIntegers = strategy.countIntegerVariables();
+
+        // All of it before any bound is enforced, as a solver that has been updated may not have it any more
+        double[] reducedGradient = new double[nbIntegers];
+        for (int i = 0; i < nbIntegers; i++) {
+            if (original.getLowerBound(i) < original.getUpperBound(i)) {
+                reducedGradient[i] = nodeSolver.getReducedGradient(strategy.getIndex(i));
+            }
+        }
+
         NodeKey nodeKey = original;
 
-        for (int i = 0, limit = strategy.countIntegerVariables(); i < limit; i++) {
+        for (int i = 0; i < nbIntegers; i++) {
 
-            double lower = nodeKey.getLowerBound(i);
-            double upper = nodeKey.getUpperBound(i);
-
-            if (lower >= upper) {
-                continue;
-            }
-
-            int globalIndex = strategy.getIndex(i);
-            double value = nodeResult.doubleValue(globalIndex);
-
-            double rc = nodeSolver.getReducedGradient(globalIndex);
-            double absRC = Math.abs(rc);
+            double absRC = Math.abs(reducedGradient[i]);
 
             if (absRC > ZERO) {
+
+                double lower = nodeKey.getLowerBound(i);
+                double upper = nodeKey.getUpperBound(i);
+                double value = nodeResult.doubleValue(strategy.getIndex(i));
+
                 if (Math.abs(value - lower) < 0.5) {
                     double maxSteps = Math.floor(gap / absRC);
                     if (maxSteps < upper - lower) {

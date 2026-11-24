@@ -108,9 +108,13 @@ public interface UpdatableSolver extends Optimisation.Solver {
      * The reduced gradient of variable {@code index} — the rate of change of the objective if this variable
      * were to move from its current bound, accounting for the dual variables. For LP this is a constant per
      * variable at a given basis; for convex problems it is point-dependent.
+     * <p>
+     * It is that of the latest solve. When the solver is updated it may no longer be available, until it has
+     * been solved again.
      *
      * @param index solver-internal variable index (as defined by {@link EntityMap})
      * @return the reduced gradient at the current solution
+     * @throws UnsupportedOperationException if the solver does not provide the reduced gradient
      */
     double getReducedGradient(int index);
 

@@ -516,6 +516,7 @@ public final class NodeSolver extends IntermediateSolver {
 
     private boolean myCutRoundDone = false;
     private Boolean myInPlaceBoundUpdateSafe = null;
+    private boolean myReducedGradientProvided = true;
 
     NodeSolver(final ExpressionsBasedModel model) {
         super(model);
@@ -598,15 +599,20 @@ public final class NodeSolver extends IntermediateSolver {
 
     /**
      * The reduced gradient of the solved relaxation, or 0 if it is not solved, as after a bound update that
-     * the solver could not apply in place.
+     * the solver could not apply in place, or if the solver does not provide it. Should be called before the
+     * solver is updated, see {@link UpdatableSolver#getReducedGradient(int)}.
      */
     double getReducedGradient(final int globalModelIndex) {
 
-        if (this.isSolved()) {
+        if (myReducedGradientProvided && this.isSolved()) {
             UpdatableSolver solver = this.getUpdatableSolver();
             int indexInSolver = this.getIndexInSolver(globalModelIndex);
             if (solver != null && indexInSolver >= 0) {
-                return solver.getReducedGradient(indexInSolver);
+                try {
+                    return solver.getReducedGradient(indexInSolver);
+                } catch (UnsupportedOperationException cause) {
+                    myReducedGradientProvided = false;
+                }
             }
         }
 
