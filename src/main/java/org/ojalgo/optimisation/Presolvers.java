@@ -301,23 +301,20 @@ public abstract class Presolvers {
         public boolean simplify(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
                 final NumberContext precision) {
 
-            switch (remaining.size()) {
-                case 0:
-                    return Presolvers.doCase0(expression, remaining, lower, upper, precision);
-                case 1:
-                    return Presolvers.doCase1(expression, remaining, lower, upper, precision);
-                case 2:
-                    return Presolvers.doCase2(expression, remaining, lower, upper, precision);
-                // doCase3 (bound propagation) disabled — see doBoundPropagation javadoc
-                default:
-                    return Presolvers.doCaseN(expression, remaining, lower, upper, precision);
-            }
+            return switch (remaining.size()) {
+                case 0  -> Presolvers.doCase0(expression, remaining, lower, upper, precision);
+                case 1  -> Presolvers.doCase1(expression, remaining, lower, upper, precision);
+                case 2  -> Presolvers.doCase2(expression, remaining, lower, upper, precision);
+                default -> Presolvers.doCaseN(expression, remaining, lower, upper, precision);
+            };
         }
 
     };
 
+    private static final BigDecimal LARGEST = BigDecimal.valueOf(Double.MAX_VALUE);
     private static final MathContext LOWER = NumberContext.ofMath(MathContext.DECIMAL128).withMode(RoundingMode.FLOOR).getMathContext();
     private static final MathContext SIMILARITY = NumberContext.of(12).getMathContext();
+    private static final BigDecimal SMALLEST = BigDecimal.valueOf(-Double.MAX_VALUE);
     private static final MathContext UPPER = NumberContext.ofMath(MathContext.DECIMAL128).withMode(RoundingMode.CEILING).getMathContext();
 
     /**
@@ -525,6 +522,14 @@ public abstract class Presolvers {
     }
 
     /**
+     * No double value is within these limits, so no solver can find one: the lower limit is larger than any,
+     * or the upper limit smaller.
+     */
+    private static boolean isOutsideDoubleRange(final BigDecimal lower, final BigDecimal upper) {
+        return lower != null && lower.compareTo(LARGEST) > 0 || upper != null && upper.compareTo(SMALLEST) < 0;
+    }
+
+    /**
      * Rounds a lower bound up to an integer multiple of the step, with tolerance: the nearest multiple if the
      * bound is equal to it at the given precision, otherwise the smallest multiple that is not less than the
      * bound.
@@ -708,7 +713,7 @@ public abstract class Presolvers {
 
             BigDecimal solution = BigMath.DIVIDE.invoke(upper, factor);
 
-            if (!Simplifier.validate(variable, solution, precision)) {
+            if (!Simplifier.validate(variable, solution, precision) || Presolvers.isOutsideDoubleRange(solution, solution)) {
                 Simplifier.markInfeasible(expression);
                 return false;
             }
@@ -764,6 +769,11 @@ public abstract class Presolvers {
         }
         if (upperNew != null && variable.isInteger()) {
             upperNew = Presolvers.floor(upperNew, ONE, precision);
+        }
+
+        if (Presolvers.isOutsideDoubleRange(lowerNew, upperNew)) {
+            Simplifier.markInfeasible(expression);
+            return false;
         }
 
         if (Presolvers.fixWithinTolerance(expression, variable, lowerNew, upperNew, precision)) {
@@ -880,7 +890,11 @@ public abstract class Presolvers {
         BigDecimal lowerNewB = lowerOldB;
         BigDecimal upperNewB = upperOldB;
 
-        if (allowedMinA != null) {
+        // Most often nothing has changed, and the divisions are expensive. Something has if it's not the same
+        // instance: BigDecimal's min and max return the instance they are called on, unless the argument is
+        // strictly smaller or larger.
+
+        if (allowedMinA != contrMinA) {
             if (negA) {
                 upperNewA = allowedMinA.divide(factorA, UPPER);
             } else {
@@ -888,7 +902,7 @@ public abstract class Presolvers {
             }
         }
 
-        if (allowedMaxA != null) {
+        if (allowedMaxA != contrMaxA) {
             if (negA) {
                 lowerNewA = allowedMaxA.divide(factorA, LOWER);
             } else {
@@ -896,7 +910,7 @@ public abstract class Presolvers {
             }
         }
 
-        if (allowedMinB != null) {
+        if (allowedMinB != contrMinB) {
             if (negB) {
                 upperNewB = allowedMinB.divide(factorB, UPPER);
             } else {
@@ -904,7 +918,7 @@ public abstract class Presolvers {
             }
         }
 
-        if (allowedMaxB != null) {
+        if (allowedMaxB != contrMaxB) {
             if (negB) {
                 lowerNewB = allowedMaxB.divide(factorB, LOWER);
             } else {
@@ -930,6 +944,11 @@ public abstract class Presolvers {
             if (upperNewB != null) {
                 upperNewB = Presolvers.floor(upperNewB, ONE, precision);
             }
+        }
+
+        if (Presolvers.isOutsideDoubleRange(lowerNewA, upperNewA) || Presolvers.isOutsideDoubleRange(lowerNewB, upperNewB)) {
+            Simplifier.markInfeasible(expression);
+            return false;
         }
 
         if (!Presolvers.fixWithinTolerance(expression, variableA, lowerNewA, upperNewA, precision)) {

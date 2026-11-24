@@ -1,6 +1,7 @@
 package org.ojalgo.optimisation;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -190,6 +191,34 @@ public class PresolveTest extends OptimisationTests {
     }
 
     /**
+     * The limits of x and y, that follow from the constraints, can not be met by any double value: x is
+     * 1.989e167 and y at least 1.989e372, or at most -1.989e372. Neither can x = 1e400. There's no solution,
+     * also not one with infinite values.
+     */
+    @Test
+    void testLimitsOutsideDoubleRange() {
+
+        for (boolean integer : new boolean[] { true, false }) {
+            for (double sign : new double[] { 1, -1 }) {
+
+                ExpressionsBasedModel model = new ExpressionsBasedModel();
+                Variable x = model.newVariable("x").integer(integer);
+                Variable y = model.newVariable("y");
+                model.newExpression("r0").level(2.5738882534603326E256).set(x, 1.2939807349841934E89);
+                model.newExpression("r1").upper(1E202).set(x, 1E232).set(y, -sign * 1E27);
+
+                TestUtils.assertStateInfeasible(model.minimise());
+            }
+        }
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+        Variable x = model.newVariable("x");
+        model.newExpression("r0").level(1E200).set(x, 1E-200);
+
+        TestUtils.assertStateInfeasible(model.minimise());
+    }
+
+    /**
      * Presolve writes its conclusions (infeasibility and redundancy flags, tightened variable limits) into
      * the model, and nothing undoes them when the model is changed and solved again. A known, long-standing,
      * problem. Here the first solve is infeasible, and the second, after the limits have been relaxed, still
@@ -215,6 +244,49 @@ public class PresolveTest extends OptimisationTests {
 
         TestUtils.assertStateNotLessThanOptimal(result);
         TestUtils.assertEquals(0.0, result.getValue());
+    }
+
+    /**
+     * A constraint with 2 variables can tighten the limits of both. Those it doesn't tighten are left exactly
+     * as they are, also when they have more digits than presolve calculates with.
+     */
+    @Test
+    void testUnchangedLimits() {
+
+        BigDecimal third = BigDecimal.ONE.divide(new BigDecimal(3), new MathContext(50));
+        BigDecimal minus = third.negate();
+
+        for (int sign : new int[] { 1, -1 }) {
+
+            ExpressionsBasedModel model = new ExpressionsBasedModel();
+            Variable x = model.newVariable("x").lower(minus).upper(third).weight(1);
+            Variable y = model.newVariable("y").lower(minus).upper(third).weight(1);
+            model.newExpression("LOOSE").set(x, 3 * sign).set(y, -7).lower(-100).upper(100);
+
+            model.simplify();
+
+            TestUtils.assertEquals(0, minus.compareTo(x.getLowerLimit()));
+            TestUtils.assertEquals(0, third.compareTo(x.getUpperLimit()));
+            TestUtils.assertEquals(0, minus.compareTo(y.getLowerLimit()));
+            TestUtils.assertEquals(0, third.compareTo(y.getUpperLimit()));
+
+            // 10x + y <= 2, or 10x + y >= -2: one limit of x is tightened, to +/-(2 + 1/3)/10
+
+            model = new ExpressionsBasedModel();
+            x = model.newVariable("x").lower(minus).upper(third).weight(1);
+            y = model.newVariable("y").lower(minus).upper(third).weight(1);
+            model.newExpression("TIGHT").set(x, 10 * sign).set(y, sign).upper(2);
+
+            model.simplify();
+
+            BigDecimal tightened = sign > 0 ? x.getUpperLimit() : x.getLowerLimit();
+            BigDecimal unchanged = sign > 0 ? x.getLowerLimit() : x.getUpperLimit();
+
+            TestUtils.assertEquals(sign * 7.0 / 30.0, tightened.doubleValue());
+            TestUtils.assertEquals(0, third.multiply(new BigDecimal(-sign)).compareTo(unchanged));
+            TestUtils.assertEquals(0, minus.compareTo(y.getLowerLimit()));
+            TestUtils.assertEquals(0, third.compareTo(y.getUpperLimit()));
+        }
     }
 
     /**
