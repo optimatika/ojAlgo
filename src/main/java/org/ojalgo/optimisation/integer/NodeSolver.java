@@ -625,9 +625,8 @@ public final class NodeSolver extends IntermediateSolver {
      * the change in place. A quadratic relaxation is solved by a convex solver — ADMM drifts when
      * warm-started across bound changes and the active-set path effectively rebuilds anyway — so those must
      * keep the historical, numerically-stable behaviour of rebuilding fresh on every branch
-     * ({@link NodeKey#enforceBounds(NodeSolver, ModelStrategy)} forces a {@code reset()} for them, as the
-     * original over-broad sign-change condition implicitly did). The model's structure is fixed for this
-     * solver's lifetime, so the answer is cached.
+     * ({@link NodeKey#enforceBounds(NodeSolver, ModelStrategy)} forces a {@code reset()} for them). The
+     * model's structure is fixed for this solver's lifetime, so the answer is cached.
      */
     boolean isInPlaceBoundUpdateSafe() {
 
@@ -636,6 +635,13 @@ public final class NodeSolver extends IntermediateSolver {
         }
 
         return myInPlaceBoundUpdateSafe.booleanValue();
+    }
+
+    /**
+     * Is the variable in the solver, or was it eliminated (fixed by presolve) when that was built?
+     */
+    boolean isInSolver(final int globalModelIndex) {
+        return this.getIndexInSolver(globalModelIndex) >= 0;
     }
 
 }

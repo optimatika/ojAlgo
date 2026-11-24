@@ -102,17 +102,23 @@ public final class NodeKey implements Comparable<NodeKey> {
      * carry tighter bounds derived by presolve (together with rows marked redundant and variables fixed on
      * the strength of those bounds). Overwriting them with the node's looser bounds would leave the model
      * inconsistent, and the LP built from it would be missing constraints.
+     *
+     * @return true if any bound was changed
      */
-    private static void tightenBounds(final Variable variable, final BigDecimal lower, final BigDecimal upper) {
+    private static boolean tightenBounds(final Variable variable, final BigDecimal lower, final BigDecimal upper) {
 
         BigDecimal currentLower = variable.getLowerLimit();
         BigDecimal currentUpper = variable.getUpperLimit();
 
+        boolean retVal = false;
+
         if (lower != null && (currentLower == null || lower.compareTo(currentLower) > 0)) {
             variable.lower(lower);
+            retVal = true;
         }
         if (upper != null && (currentUpper == null || upper.compareTo(currentUpper) < 0)) {
             variable.upper(upper);
+            retVal = true;
         }
 
         BigDecimal value = variable.getValue();
@@ -120,6 +126,8 @@ public final class NodeKey implements Comparable<NodeKey> {
             // Re-setting will ensure the new bounds are not violated
             variable.setValue(value);
         }
+
+        return retVal;
     }
 
     /**
@@ -191,13 +199,12 @@ public final class NodeKey implements Comparable<NodeKey> {
      * and with them the hash codes – do not depend on what was solved before in the same JVM.
      */
     private final AtomicLong mySequenceGenerator;
-    private final boolean mySignChanged;
     private final int[] myUpperBounds;
     private final boolean myUpperBranch;
 
     private NodeKey(final int[] lowerBounds, final int[] upperBounds, final long parentSequenceNumber, final int parentDepth, final int integerIndexBranchedOn,
-            final double branchVariableDisplacement, final double parentObjectiveFunctionValue, final boolean signChanged, final boolean upperBranch,
-            final IntArrayPool pool, final AtomicLong sequenceGenerator) {
+            final double branchVariableDisplacement, final double parentObjectiveFunctionValue, final boolean upperBranch, final IntArrayPool pool,
+            final AtomicLong sequenceGenerator) {
 
         super();
 
@@ -213,7 +220,6 @@ public final class NodeKey implements Comparable<NodeKey> {
         displacement = Math.max(branchVariableDisplacement, MINIMUM_DISPLACEMENT);
         objective = parentObjectiveFunctionValue;
 
-        mySignChanged = signChanged;
         myUpperBranch = upperBranch;
 
         myIntArrayPool = pool;
@@ -234,7 +240,6 @@ public final class NodeKey implements Comparable<NodeKey> {
         displacement = source.displacement;
         objective = source.objective;
 
-        mySignChanged = source.mySignChanged;
         myUpperBranch = source.myUpperBranch;
 
         myIntArrayPool = source.myIntArrayPool;
@@ -268,7 +273,6 @@ public final class NodeKey implements Comparable<NodeKey> {
         displacement = NaN;
         objective = NaN;
 
-        mySignChanged = false;
         myUpperBranch = false;
     }
 
@@ -344,17 +348,6 @@ public final class NodeKey implements Comparable<NodeKey> {
         builder.append(myUpperBounds[idx]);
     }
 
-    private void enforceBounds(final Variable variable, final NodeSolver nodeSolver, final int idx, final boolean signChanged) {
-
-        NodeKey.tightenBounds(variable, this.getLower(idx), this.getUpper(idx));
-
-        if (signChanged || !nodeSolver.isInPlaceBoundUpdateSafe()) {
-            nodeSolver.reset();
-        } else {
-            nodeSolver.update(variable);
-        }
-    }
-
     private double feasible(final int idx, final double value, final boolean validate) {
 
         double feasibilityAdjusted = Math.min(Math.max(myLowerBounds[idx], value), myUpperBounds[idx]);
@@ -392,26 +385,13 @@ public final class NodeKey implements Comparable<NodeKey> {
 
         int floorValue = (int) Math.floor(this.feasible(branchIntegerIndex, value, false));
 
-        int oldVal = tmpUBs[branchIntegerIndex];
-
         if (floorValue >= tmpUBs[branchIntegerIndex] && floorValue > tmpLBs[branchIntegerIndex]) {
             tmpUBs[branchIntegerIndex] = floorValue - 1;
         } else {
             tmpUBs[branchIntegerIndex] = floorValue;
         }
 
-        int newVal = tmpUBs[branchIntegerIndex];
-
-        // A down-branch tightens only the upper bound. The solver treats a column as "negated" iff
-        // (ub <= 0 && lb < 0) — see SimplexStore.isNegated. With the lower bound unchanged here, that
-        // classification can flip only if the lower bound is itself negative; otherwise the upper bound
-        // crossing zero (e.g. the ubiquitous binary [0,1] -> [0,0] down-branch) is just a normal
-        // fix-to-zero the solver absorbs in place. Requiring lb < 0 avoids flagging a sign change — and
-        // thus forcing a full solver rebuild — on essentially every 0/1 down-branch.
-        boolean changed = oldVal > 0 && newVal <= 0 && tmpLBs[branchIntegerIndex] < 0;
-
-        return new NodeKey(tmpLBs, tmpUBs, sequence, depth, branchIntegerIndex, value - floorValue, objVal, changed, false, myIntArrayPool,
-                mySequenceGenerator);
+        return new NodeKey(tmpLBs, tmpUBs, sequence, depth, branchIntegerIndex, value - floorValue, objVal, false, myIntArrayPool, mySequenceGenerator);
     }
 
     NodeKey createUpperBranch(final int branchIntegerIndex, final double value, final double objVal) {
@@ -421,22 +401,13 @@ public final class NodeKey implements Comparable<NodeKey> {
 
         int ceilValue = (int) Math.ceil(this.feasible(branchIntegerIndex, value, false));
 
-        int oldVal = tmpLBs[branchIntegerIndex];
-
         if (ceilValue <= tmpLBs[branchIntegerIndex] && ceilValue < tmpUBs[branchIntegerIndex]) {
             tmpLBs[branchIntegerIndex] = ceilValue + 1;
         } else {
             tmpLBs[branchIntegerIndex] = ceilValue;
         }
 
-        int newVal = tmpLBs[branchIntegerIndex];
-
-        // Mirror of createLowerBranch: an up-branch tightens only the lower bound, so the negated-class
-        // (ub <= 0 && lb < 0) can flip only if the upper bound is itself <= 0. Requiring ub <= 0 avoids
-        // forcing a rebuild on the common up-branch of a non-negative variable (e.g. [0,1] -> [1,1]).
-        boolean changed = oldVal < 0 && newVal >= 0 && tmpUBs[branchIntegerIndex] <= 0;
-
-        return new NodeKey(tmpLBs, tmpUBs, sequence, depth, branchIntegerIndex, ceilValue - value, objVal, changed, true, myIntArrayPool, mySequenceGenerator);
+        return new NodeKey(tmpLBs, tmpUBs, sequence, depth, branchIntegerIndex, ceilValue - value, objVal, true, myIntArrayPool, mySequenceGenerator);
     }
 
     void dispose() {
@@ -444,21 +415,27 @@ public final class NodeKey implements Comparable<NodeKey> {
         myIntArrayPool.giveBack(myUpperBounds);
     }
 
+    /**
+     * Apply this node's bounds, of the variable at {@code idx}, to the model variable and the solver. A
+     * variable that presolve has fixed is not in the solver, so an update would cause the solver to be
+     * rebuilt. That's only done if the bounds of the model variable were changed.
+     */
     void enforceBounds(final NodeSolver nodeSolver, final int idx, final ModelStrategy strategy) {
 
-        Variable variable = nodeSolver.getVariable(strategy.getIndex(idx));
+        int globalIndex = strategy.getIndex(idx);
+        Variable variable = nodeSolver.getVariable(globalIndex);
 
-        BigDecimal oldLower = variable.getLowerLimit();
-        BigDecimal oldUpper = variable.getUpperLimit();
-        boolean wasNegated = oldUpper != null && oldUpper.signum() <= 0 && oldLower != null && oldLower.signum() < 0;
-        boolean isNegated = myUpperBounds[idx] <= 0 && myLowerBounds[idx] < 0;
+        boolean changed = NodeKey.tightenBounds(variable, this.getLower(idx), this.getUpper(idx));
 
-        this.enforceBounds(variable, nodeSolver, idx, wasNegated != isNegated);
+        if (!nodeSolver.isInPlaceBoundUpdateSafe()) {
+            nodeSolver.reset();
+        } else if (changed || nodeSolver.isInSolver(globalIndex)) {
+            nodeSolver.update(variable);
+        }
     }
 
     void enforceBounds(final NodeSolver nodeSolver, final ModelStrategy strategy) {
-        Variable variable = nodeSolver.getVariable(strategy.getIndex(index));
-        this.enforceBounds(variable, nodeSolver, index, this.isSignChanged());
+        this.enforceBounds(nodeSolver, index, strategy);
     }
 
     boolean equals(final int[] lowerBounds, final int[] upperBounds) {
@@ -517,10 +494,6 @@ public final class NodeKey implements Comparable<NodeKey> {
 
     boolean isLowerBranch() {
         return !myUpperBranch;
-    }
-
-    boolean isSignChanged() {
-        return mySignChanged;
     }
 
     boolean isUpperBranch() {
