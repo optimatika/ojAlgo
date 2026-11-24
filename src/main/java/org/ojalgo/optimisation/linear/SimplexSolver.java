@@ -106,10 +106,7 @@ abstract class SimplexSolver extends LinearSolver {
             if (this == obj) {
                 return true;
             }
-            if (!(obj instanceof EnterInfo other)) {
-                return false;
-            }
-            if (direction != other.direction || from != other.from || index != other.index) {
+            if (!(obj instanceof EnterInfo other) || direction != other.direction || from != other.from || index != other.index) {
                 return false;
             }
             return true;
@@ -178,10 +175,7 @@ abstract class SimplexSolver extends LinearSolver {
             if (this == obj) {
                 return true;
             }
-            if (!(obj instanceof ExitInfo other)) {
-                return false;
-            }
-            if (direction != other.direction || index != other.index || to != other.to) {
+            if (!(obj instanceof ExitInfo other) || direction != other.direction || index != other.index || to != other.to) {
                 return false;
             }
             return true;
@@ -752,6 +746,10 @@ abstract class SimplexSolver extends LinearSolver {
      * simplex has moved along a ray, the basic values are huge and the tableau/factorisation is poorly
      * conditioned, and a re-solve from there typically ends with a spurious INFEASIBLE or garbage. The caller
      * should rebuild the solver instead.
+     * <p>
+     * The range may be tightened or loosened, also to infinity. The next solve continues from where the last
+     * one ended. If a non-basic variable loses the bound it was at, the basis is neither primal nor dual
+     * feasible, and that solve does both phases, starting from that basis.
      */
     @Override
     public boolean updateRange(final int index, final double lower, final double upper) {
@@ -763,16 +761,12 @@ abstract class SimplexSolver extends LinearSolver {
         boolean changed = mySimplex.updateRange(index, lower, upper);
 
         if (changed) {
+
             this.invalidateCache();
-            if (state.isSuccess() && mySimplex.isExcluded(index)) {
-                ColumnState columnState = mySimplex.getColumnState(index);
-                if (columnState == ColumnState.LOWER) {
-                    mySimplex.setToLower(index);
-                } else if (columnState == ColumnState.UPPER) {
-                    mySimplex.setToUpper(index);
-                }
-            }
-            if (state.isOptimal()) {
+
+            if (state.isSuccess() && mySimplex.isExcluded(index) && !this.moveToBound(index)) {
+                state = State.UNEXPLORED;
+            } else if (state.isOptimal()) {
                 state = State.APPROXIMATE;
             }
         }
@@ -1132,6 +1126,37 @@ abstract class SimplexSolver extends LinearSolver {
             this.log(Arrays.toString(mySimplex.included), (Access2D<?>) mySimplex);
         } else {
             this.log(Arrays.toString(mySimplex.included));
+        }
+    }
+
+    /**
+     * The range of a non-basic variable has changed: move it to the bound it is at, or, if it was free
+     * (unbounded) and no longer is, to the nearest of its bounds.
+     *
+     * @return false if there is no longer a bound where it is at
+     */
+    private boolean moveToBound(final int index) {
+
+        double lower = mySimplex.getLowerBound(index);
+        double upper = mySimplex.getUpperBound(index);
+
+        ColumnState columnState = mySimplex.getColumnState(index);
+
+        if (columnState == ColumnState.UNBOUNDED) {
+            if (!Double.isFinite(lower) && !Double.isFinite(upper)) {
+                return true;
+            }
+            columnState = Math.abs(lower) <= Math.abs(upper) ? ColumnState.LOWER : ColumnState.UPPER;
+        }
+
+        if (columnState == ColumnState.LOWER && Double.isFinite(lower)) {
+            mySimplex.setToLower(index);
+            return true;
+        } else if (columnState == ColumnState.UPPER && Double.isFinite(upper)) {
+            mySimplex.setToUpper(index);
+            return true;
+        } else {
+            return false;
         }
     }
 

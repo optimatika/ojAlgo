@@ -115,12 +115,13 @@ public interface UpdatableSolver extends Optimisation.Solver {
     double getReducedGradient(int index);
 
     /**
-     * Tighten the bounds of a solver variable by intersecting with the given range. Generalises
-     * {@link #fixVariable(int, double)} (fixing ≡ {@code updateRange(index, value, value)}).
+     * Set the range, the lower and upper bounds, of a solver variable. It replaces the previous range, and
+     * may be tighter or looser than that. Generalises {@link #fixVariable(int, double)} (fixing ≡
+     * {@code updateRange(index, value, value)}).
      *
      * @param index solver-internal variable index (as defined by {@link EntityMap})
-     * @param lower new lower bound
-     * @param upper new upper bound
+     * @param lower new lower bound, {@link Double#NEGATIVE_INFINITY} if there is none
+     * @param upper new upper bound, {@link Double#POSITIVE_INFINITY} if there is none
      * @return {@code true} if successfully applied
      */
     default boolean updateRange(final int index, final double lower, final double upper) {
