@@ -305,10 +305,10 @@ public abstract class ModelStrategy implements IntegerStrategy {
          * never turned off for good.
          * <p>
          * Measured on 37 MIPLIB models, each in 7 random orderings of variables and constraints (2026-11-24),
-         * against the earlier rule (off for good after 3 rounds without cuts): 14% fewer nodes; the time is the
-         * same within the noise, 1.00 with one worker and 0.99 with 6. No variant tried (other initial intervals,
-         * halving the interval instead of resetting it, judging by whether any cut was added) was clearly
-         * better.
+         * against the earlier rule (off for good after 3 rounds without cuts): 14% fewer nodes; the time is
+         * the same within the noise, 1.00 with one worker and 0.99 with 6. No variant tried (other initial
+         * intervals, halving the interval instead of resetting it, judging by whether any cut was added) was
+         * clearly better.
          */
         @Override
         protected boolean isCutRatherThanBranch(final NodeKey nodeKey, final int branchIntegerIndex, final double variableValue, final double nodeValue,

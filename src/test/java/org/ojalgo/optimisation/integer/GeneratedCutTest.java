@@ -136,8 +136,8 @@ public class GeneratedCutTest extends OptimisationIntegerTests implements ModelF
     }
 
     private static int separate(final CliqueSeparator separator, final ExpressionsBasedModel model, final Result lpResult) {
-        return separator.generateCuts(new CutRound(model, null, lpResult, IntegerStrategy.DEFAULT.getCutConfiguration(), new HashMap<>(),
-                new CutStatistics(Optimisation.Sense.MAX)));
+        return separator.generateCuts(
+                new CutRound(model, null, lpResult, IntegerStrategy.DEFAULT.getCutConfiguration(), new HashMap<>(), new CutStatistics(Optimisation.Sense.MAX)));
     }
 
     /**

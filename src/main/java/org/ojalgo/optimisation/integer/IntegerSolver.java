@@ -249,6 +249,16 @@ public final class IntegerSolver extends GenericSolver {
         return !state.isFailure() || state == State.FAILED || state == State.UNBOUNDED || nodeKey.sequence == 0 && !state.isValid();
     }
 
+    /**
+     * Disposes a node key, created during a dive, when it's no longer needed. Not the key the dive started
+     * with – that is for the caller to dispose.
+     */
+    private static void disposeUnlessSame(final NodeKey nodeKey, final NodeKey inputKey) {
+        if (nodeKey != inputKey) {
+            nodeKey.dispose();
+        }
+    }
+
     static void flush(final RingLogger buffer, final BasicLogger receiver) {
         if (buffer != null && receiver != null) {
             buffer.flush(receiver);
@@ -961,218 +971,238 @@ public final class IntegerSolver extends GenericSolver {
         return retVal;
     }
 
+    /**
+     * Evaluates a node and, as long as it's worthwhile, continues with one of its two branches – a dive. The
+     * other branch is deferred, added to the nodes waiting to be evaluated. All nodes of the dive are solved
+     * with the same node solver, which is updated from one to the next, and disposed when the dive ends.
+     *
+     * @param inputKey The first node of the dive, disposed by the caller. (The others are created, and
+     *                 disposed, here.)
+     * @return true unless the search should stop
+     */
     boolean compute(final NodeKey inputKey, final NodeSolver nodeSolver, final RingLogger nodePrinter, final ModelStrategy strategy) {
 
         NodeKey nodeKey = inputKey;
 
         try {
 
-            if (myOptimalityProven) {
-                nodeSolver.dispose();
-                return myNodeStatistics.abandoned();
-            }
+            for (boolean first = true;; first = false) {
 
-            if (nodePrinter != null && this.isLogDebug()) {
-                nodePrinter.println();
-                nodePrinter.println("Branch&Bound Node");
-                nodePrinter.println(nodeKey.toString());
-                nodePrinter.println(this.toString());
-            }
-
-            if (nodeKey.index >= 0) {
-                nodeKey.enforceBounds(nodeSolver, strategy);
-            }
-
-            Optimisation.Result bestEstimate = this.getBestEstimate();
-            Optimisation.Result nodeResult = nodeSolver.solve(bestEstimate);
-
-            this.incrementIterationsCount();
-
-            if (nodePrinter != null && this.isLogDebug()) {
-                nodePrinter.println("Node Result: {}", nodeResult);
-            }
-
-            if (IntegerSolver.isUnsolved(nodeResult, nodeKey)) {
-                // Before giving up on the node, solve it again from scratch: the solver rebuilt (from the
-                // node model, with its bounds and cuts) and solved cold
-                myNodeStatistics.retried();
-                nodeSolver.reset();
-                nodeResult = nodeSolver.solve(bestEstimate);
-
-                if (nodePrinter != null && this.isLogDebug()) {
-                    nodePrinter.println("Node Result, solved again from scratch: {}", nodeResult);
-                }
-            }
-
-            if (nodeResult.getState() == State.UNBOUNDED && nodeKey.sequence == 0) {
-                if (nodePrinter != null && this.isLogDebug()) {
-                    nodePrinter.println("Node problem unbounded - stop the search!");
-                    IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
+                if (!first && !this.isIterationAllowed()) {
+                    nodeSolver.dispose();
+                    return false;
                 }
 
-                if (this.identifyNonIntegerVariable(nodeResult, nodeKey, strategy) < 0) {
-                    Optimisation.Result integerCandidate = this.validIntegerCandidate(nodeResult, strategy);
-                    if (integerCandidate != null) {
-                        this.markInteger(nodeKey, new Optimisation.Result(State.FEASIBLE, nodeResult.getValue(), integerCandidate), strategy);
+                if (myOptimalityProven) {
+                    nodeSolver.dispose();
+                    return myNodeStatistics.abandoned();
+                }
+
+                if (nodePrinter != null && this.isLogDebug()) {
+                    nodePrinter.println();
+                    nodePrinter.println("Branch&Bound Node");
+                    nodePrinter.println(nodeKey.toString());
+                    nodePrinter.println(this.toString());
+                }
+
+                if (nodeKey.index >= 0) {
+                    nodeKey.enforceBounds(nodeSolver, strategy);
+                }
+
+                Optimisation.Result bestEstimate = this.getBestEstimate();
+                Optimisation.Result nodeResult = nodeSolver.solve(bestEstimate);
+
+                this.incrementIterationsCount();
+
+                if (nodePrinter != null && this.isLogDebug()) {
+                    nodePrinter.println("Node Result: {}", nodeResult);
+                }
+
+                if (IntegerSolver.isUnsolved(nodeResult, nodeKey)) {
+                    // Before giving up on the node, solve it again from scratch: the solver rebuilt (from the
+                    // node model, with its bounds and cuts) and solved cold
+                    myNodeStatistics.retried();
+                    nodeSolver.reset();
+                    nodeResult = nodeSolver.solve(bestEstimate);
+
+                    if (nodePrinter != null && this.isLogDebug()) {
+                        nodePrinter.println("Node Result, solved again from scratch: {}", nodeResult);
                     }
                 }
 
-                myRelaxationUnbounded = true;
-                nodeSolver.dispose();
-                return myNodeStatistics.failed();
-            }
-
-            if (!nodeResult.getState().isOptimal()) {
-                if (nodePrinter != null && this.isLogDebug()) {
-                    nodePrinter.println("Failed to solve node problem - stop this branch!");
-                    IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
-                }
-
-                nodeSolver.dispose();
-                if (IntegerSolver.isUnsolved(nodeResult, nodeKey)) {
-                    // Not solved, also not from scratch: the node can neither be bounded nor pruned. Leave its
-                    // subtree unexplored, with the node's bound remembered, and continue with the other nodes.
-                    return this.markUnresolved(nodeKey.objective);
-                }
-                double incumbentValue = myBestResultSoFar != null ? myBestResultSoFar.getValue() : Double.NaN;
-                strategy.markInfeasible(nodeKey, myBestResultSoFar != null, incumbentValue);
-                return myNodeStatistics.infeasible();
-            }
-
-            if (nodePrinter != null && this.isLogDebug()) {
-                nodePrinter.println("Node solved to optimality!");
-            }
-
-            if (options.validate && !nodeSolver.validate(nodeResult, nodePrinter)) {
-                // This should not be possible. There is a bug somewhere.
-                if (nodePrinter != null) {
-                    nodePrinter.println("Node solution marked as OPTIMAL, but is actually INVALID/INFEASIBLE/FAILED. Stop this branch!");
-                    nodePrinter.println("Integer indices: {}", strategy);
-                    nodePrinter.println("Lower bounds: {}", Arrays.toString(nodeKey.copyLowerBounds()));
-                    nodePrinter.println("Upper bounds: {}", Arrays.toString(nodeKey.copyUpperBounds()));
-                }
-
-                IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
-
-                /*
-                 * Used to mark this as a failure since it happened because of problems with the linear
-                 * solver, but now could be just that the updated solver instance did not recognise that it
-                 * had become infeasible due to integer rounding on the constraints. (The LP solver simply
-                 * doesn't know it's actually solving a MIP.) Something model pre-solving would probably have
-                 * caught. Marking as failure will stop the overall solver process, which is not what we want
-                 * (if this is just an infeasible node). Therefore we'll mark it as infeasible.
-                 */
-                return myNodeStatistics.infeasible();
-            }
-
-            // The solver now reports the objective value in model space (un-scaled, with the objective constant
-            // and presolve-fixed contributions folded in), so the node value can be read directly rather than
-            // re-evaluating the model objective at the solution.
-            double nodeValue = nodeResult.getValue();
-            strategy.onNodeSolved(nodeKey, nodeResult, nodeValue, mySense == Optimisation.Sense.MIN);
-
-            if (nodeSolver.isInPlaceBoundUpdateSafe()) {
-                if (myBestResultSoFar != null) {
-                    nodeKey = this.fixByReducedCost(nodeKey, nodeSolver, nodeResult, nodeValue, strategy);
-                } else {
-                    this.tryRounding(nodeKey, nodeResult, strategy);
-                }
-            }
-
-            int branchIntegerIndex = this.identifyNonIntegerVariable(nodeResult, nodeKey, strategy);
-
-            if (branchIntegerIndex == -1) {
-                if (nodePrinter != null && this.isLogDebug()) {
-                    nodePrinter.println("Integer solution! Store it among the others, and stop this branch!");
-                }
-
-                Optimisation.Result integerCandidate = this.validIntegerCandidate(nodeResult, strategy);
-
-                if (integerCandidate == null) {
+                if (nodeResult.getState() == State.UNBOUNDED && nodeKey.sequence == 0) {
                     if (nodePrinter != null && this.isLogDebug()) {
-                        nodePrinter.println("Candidate integer solution is infeasible for the original model. Discarding.");
+                        nodePrinter.println("Node problem unbounded - stop the search!");
                         IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
+                    }
+
+                    if (this.identifyNonIntegerVariable(nodeResult, nodeKey, strategy) < 0) {
+                        Optimisation.Result integerCandidate = this.validIntegerCandidate(nodeResult, strategy);
+                        if (integerCandidate != null) {
+                            this.markInteger(nodeKey, new Optimisation.Result(State.FEASIBLE, nodeResult.getValue(), integerCandidate), strategy);
+                        }
+                    }
+
+                    myRelaxationUnbounded = true;
+                    nodeSolver.dispose();
+                    return myNodeStatistics.failed();
+                }
+
+                if (!nodeResult.getState().isOptimal()) {
+                    if (nodePrinter != null && this.isLogDebug()) {
+                        nodePrinter.println("Failed to solve node problem - stop this branch!");
+                        IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
+                    }
+
+                    nodeSolver.dispose();
+                    if (IntegerSolver.isUnsolved(nodeResult, nodeKey)) {
+                        // Not solved, also not from scratch: the node can neither be bounded nor pruned. Leave its
+                        // subtree unexplored, with the node's bound remembered, and continue with the other nodes.
+                        return this.markUnresolved(nodeKey.objective);
                     }
                     double incumbentValue = myBestResultSoFar != null ? myBestResultSoFar.getValue() : Double.NaN;
                     strategy.markInfeasible(nodeKey, myBestResultSoFar != null, incumbentValue);
-                    nodeSolver.dispose();
                     return myNodeStatistics.infeasible();
                 }
 
-                Optimisation.Result tmpIntegerSolutionResult = new Optimisation.Result(Optimisation.State.FEASIBLE, nodeValue, integerCandidate);
-
-                this.markInteger(nodeKey, tmpIntegerSolutionResult, strategy);
-
                 if (nodePrinter != null && this.isLogDebug()) {
-                    nodePrinter.println(this.getBestResultSoFar().toString());
-                    BasicLogger.debug();
-                    BasicLogger.debug(this.toString());
-                    // BasicLogger.debug(DaemonPoolExecutor.INSTANCE.toString());
+                    nodePrinter.println("Node solved to optimality!");
+                }
+
+                if (options.validate && !nodeSolver.validate(nodeResult, nodePrinter)) {
+                    // This should not be possible. There is a bug somewhere.
+                    if (nodePrinter != null) {
+                        nodePrinter.println("Node solution marked as OPTIMAL, but is actually INVALID/INFEASIBLE/FAILED. Stop this branch!");
+                        nodePrinter.println("Integer indices: {}", strategy);
+                        nodePrinter.println("Lower bounds: {}", Arrays.toString(nodeKey.copyLowerBounds()));
+                        nodePrinter.println("Upper bounds: {}", Arrays.toString(nodeKey.copyUpperBounds()));
+                    }
+
+                    IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
+
+                    /*
+                     * Used to mark this as a failure since it happened because of problems with the linear
+                     * solver, but now could be just that the updated solver instance did not recognise that
+                     * it had become infeasible due to integer rounding on the constraints. (The LP solver
+                     * simply doesn't know it's actually solving a MIP.) Something model pre-solving would
+                     * probably have caught. Marking as failure will stop the overall solver process, which is
+                     * not what we want (if this is just an infeasible node). Therefore we'll mark it as
+                     * infeasible.
+                     */
+                    return myNodeStatistics.infeasible();
+                }
+
+                // The solver now reports the objective value in model space (un-scaled, with the objective constant
+                // and presolve-fixed contributions folded in), so the node value can be read directly rather than
+                // re-evaluating the model objective at the solution.
+                double nodeValue = nodeResult.getValue();
+                strategy.onNodeSolved(nodeKey, nodeResult, nodeValue, mySense == Optimisation.Sense.MIN);
+
+                if (nodeSolver.isInPlaceBoundUpdateSafe()) {
+                    if (myBestResultSoFar != null) {
+                        NodeKey tightened = this.fixByReducedCost(nodeKey, nodeSolver, nodeResult, nodeValue, strategy);
+                        if (tightened != nodeKey) {
+                            IntegerSolver.disposeUnlessSame(nodeKey, inputKey);
+                            nodeKey = tightened;
+                        }
+                    } else {
+                        this.tryRounding(nodeKey, nodeResult, strategy);
+                    }
+                }
+
+                int branchIntegerIndex = this.identifyNonIntegerVariable(nodeResult, nodeKey, strategy);
+
+                if (branchIntegerIndex == -1) {
+                    if (nodePrinter != null && this.isLogDebug()) {
+                        nodePrinter.println("Integer solution! Store it among the others, and stop this branch!");
+                    }
+
+                    Optimisation.Result integerCandidate = this.validIntegerCandidate(nodeResult, strategy);
+
+                    if (integerCandidate == null) {
+                        if (nodePrinter != null && this.isLogDebug()) {
+                            nodePrinter.println("Candidate integer solution is infeasible for the original model. Discarding.");
+                            IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
+                        }
+                        double incumbentValue = myBestResultSoFar != null ? myBestResultSoFar.getValue() : Double.NaN;
+                        strategy.markInfeasible(nodeKey, myBestResultSoFar != null, incumbentValue);
+                        nodeSolver.dispose();
+                        return myNodeStatistics.infeasible();
+                    }
+
+                    Optimisation.Result tmpIntegerSolutionResult = new Optimisation.Result(Optimisation.State.FEASIBLE, nodeValue, integerCandidate);
+
+                    this.markInteger(nodeKey, tmpIntegerSolutionResult, strategy);
+
+                    if (nodePrinter != null && this.isLogDebug()) {
+                        nodePrinter.println(this.getBestResultSoFar().toString());
+                        BasicLogger.debug();
+                        BasicLogger.debug(this.toString());
+                        // BasicLogger.debug(DaemonPoolExecutor.INSTANCE.toString());
+                        IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
+                    }
+
+                    nodeSolver.dispose();
+                    return myNodeStatistics.integer();
+
+                }
+                if (nodePrinter != null && this.isLogDebug()) {
+                    nodePrinter.println("Not an Integer Solution: " + nodeValue);
+                }
+
+                double variableValue = nodeResult.doubleValue(strategy.getIndex(branchIntegerIndex));
+
+                if (!strategy.isGoodEnough(myBestResultSoFar, nodeValue)) {
+                    if (nodePrinter != null && this.isLogDebug()) {
+                        nodePrinter.println("Can't find better integer solutions - stop this branch!");
+                        IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
+                    }
+
+                    nodeSolver.dispose();
+                    return myNodeStatistics.exhausted();
+                }
+                if (nodePrinter != null && this.isLogDebug()) {
+                    nodePrinter.println("Still hope, branching on {} @ {} >>> {}", branchIntegerIndex, variableValue,
+                            nodeSolver.getVariable(strategy.getIndex(branchIntegerIndex)));
                     IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
                 }
 
-                nodeSolver.dispose();
-                return myNodeStatistics.integer();
-
-            }
-            if (nodePrinter != null && this.isLogDebug()) {
-                nodePrinter.println("Not an Integer Solution: " + nodeValue);
-            }
-
-            double variableValue = nodeResult.doubleValue(strategy.getIndex(branchIntegerIndex));
-
-            if (!strategy.isGoodEnough(myBestResultSoFar, nodeValue)) {
-                if (nodePrinter != null && this.isLogDebug()) {
-                    nodePrinter.println("Can't find better integer solutions - stop this branch!");
-                    IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
+                if (!nodeSolver.isCutRoundDone() && strategy.isCutRatherThanBranch(nodeKey, branchIntegerIndex, variableValue, nodeValue, myBestResultSoFar)) {
+                    if (nodeSolver.generateCuts(strategy, myCutStatistics, nodeKey.depth == 0)) {
+                        strategy.onCutSuccess(nodeKey);
+                        continue; // Solve it again, with the cuts
+                    } else {
+                        strategy.onCutFailure();
+                    }
                 }
 
-                nodeSolver.dispose();
-                return myNodeStatistics.exhausted();
-            }
-            if (nodePrinter != null && this.isLogDebug()) {
-                nodePrinter.println("Still hope, branching on {} @ {} >>> {}", branchIntegerIndex, variableValue,
-                        nodeSolver.getVariable(strategy.getIndex(branchIntegerIndex)));
-                IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
-            }
+                if (!NodeKey.isBranchable(variableValue)) {
+                    if (nodePrinter != null && this.isLogDebug()) {
+                        nodePrinter.println("Can't branch on {} @ {} - outside the int range. Stop this branch!", branchIntegerIndex, variableValue);
+                        IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
+                    }
+                    nodeSolver.dispose();
+                    return this.markUnresolved(nodeValue);
+                }
 
-            if (!nodeSolver.isCutRoundDone() && strategy.isCutRatherThanBranch(nodeKey, branchIntegerIndex, variableValue, nodeValue, myBestResultSoFar)) {
-                if (nodeSolver.generateCuts(strategy, myCutStatistics, nodeKey.depth == 0)) {
-                    strategy.onCutSuccess(nodeKey);
-                    return this.compute(nodeKey, nodeSolver, nodePrinter, strategy);
+                NodeKey lowerBranch = nodeKey.createLowerBranch(branchIntegerIndex, variableValue, nodeValue);
+                NodeKey upperBranch = nodeKey.createUpperBranch(branchIntegerIndex, variableValue, nodeValue);
+
+                NodeKey continued;
+                if (lowerBranch.displacement < upperBranch.displacement) {
+                    myDeferredNodes.add(upperBranch);
+                    continued = lowerBranch;
                 } else {
-                    strategy.onCutFailure();
+                    myDeferredNodes.add(lowerBranch);
+                    continued = upperBranch;
                 }
-            }
 
-            if (!NodeKey.isBranchable(variableValue)) {
-                if (nodePrinter != null && this.isLogDebug()) {
-                    nodePrinter.println("Can't branch on {} @ {} - outside the int range. Stop this branch!", branchIntegerIndex, variableValue);
-                    IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
-                }
-                nodeSolver.dispose();
-                return this.markUnresolved(nodeValue);
-            }
-
-            NodeKey lowerBranch = nodeKey.createLowerBranch(branchIntegerIndex, variableValue, nodeValue);
-            NodeKey upperBranch = nodeKey.createUpperBranch(branchIntegerIndex, variableValue, nodeValue);
-
-            if (lowerBranch.displacement < upperBranch.displacement) {
-                myDeferredNodes.add(upperBranch);
-                boolean ok = this.compute(lowerBranch, nodeSolver, nodePrinter, strategy);
-                lowerBranch.dispose();
-                return ok;
-            } else {
-                myDeferredNodes.add(lowerBranch);
-                boolean ok = this.compute(upperBranch, nodeSolver, nodePrinter, strategy);
-                upperBranch.dispose();
-                return ok;
+                IntegerSolver.disposeUnlessSame(nodeKey, inputKey);
+                nodeKey = continued;
             }
 
         } finally {
-            if (nodeKey != inputKey) {
-                nodeKey.dispose();
-            }
+            IntegerSolver.disposeUnlessSame(nodeKey, inputKey);
         }
     }
 
