@@ -233,6 +233,16 @@ public final class IntegerSolver extends GenericSolver {
     }
 
     /**
+     * Disposes a node key, created during a dive, when it's no longer needed. Not the key the dive started
+     * with – that is for the caller to dispose.
+     */
+    private static void disposeUnlessSame(final NodeKey nodeKey, final NodeKey inputKey) {
+        if (nodeKey != inputKey) {
+            nodeKey.dispose();
+        }
+    }
+
+    /**
      * The node problem was neither solved to optimality nor shown infeasible: FEASIBLE, APPROXIMATE... or the
      * LP failed (FAILED, such as on a singular basis, UNBOUNDED while the root problem is not, or the root
      * problem not even valid). An unbounded root problem is not "unsolved" – it makes the model unbounded or
@@ -247,16 +257,6 @@ public final class IntegerSolver extends GenericSolver {
         }
 
         return !state.isFailure() || state == State.FAILED || state == State.UNBOUNDED || nodeKey.sequence == 0 && !state.isValid();
-    }
-
-    /**
-     * Disposes a node key, created during a dive, when it's no longer needed. Not the key the dive started
-     * with – that is for the caller to dispose.
-     */
-    private static void disposeUnlessSame(final NodeKey nodeKey, final NodeKey inputKey) {
-        if (nodeKey != inputKey) {
-            nodeKey.dispose();
-        }
     }
 
     static void flush(final RingLogger buffer, final BasicLogger receiver) {
@@ -283,6 +283,11 @@ public final class IntegerSolver extends GenericSolver {
      */
     private final NumberContext myGapTolerance;
     private final ExpressionsBasedModel myIntegerModel;
+    /**
+     * The best relaxation bound of the nodes that were being worked on when the search stopped – they're not
+     * among the deferred nodes. See {@link #markInterrupted(double)}.
+     */
+    private volatile double myInterruptedBound;
     private final NodeStatistics myNodeStatistics = new NodeStatistics();
     private volatile boolean myOptimalityProven = false;
     /**
@@ -306,6 +311,7 @@ public final class IntegerSolver extends GenericSolver {
         myIntegerModel = model.simplify();
         mySense = myIntegerModel.getOptimisationSense();
         myUnresolvedBound = mySense == Optimisation.Sense.MIN ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
+        myInterruptedBound = myUnresolvedBound;
         myCutStatistics = new CutStatistics(mySense);
         myStrategy = options.integer().newModelStrategy(myIntegerModel);
         myGapTolerance = myStrategy.getGapTolerance();
@@ -332,6 +338,35 @@ public final class IntegerSolver extends GenericSolver {
         }
         Optimisation.Result integerResult = new Optimisation.Result(Optimisation.State.FEASIBLE, probeValue, candidate);
         this.markInteger(rootNode, integerResult, myStrategy);
+    }
+
+    /**
+     * The best of two bounds on the objective value, the lowest when minimising. A bound that isn't known,
+     * NaN, could be anything: the best possible.
+     */
+    private double bestBound(final double bound1, final double bound2) {
+        if (Double.isNaN(bound1) || Double.isNaN(bound2)) {
+            return mySense == Optimisation.Sense.MIN ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
+        }
+        return mySense == Optimisation.Sense.MIN ? Math.min(bound1, bound2) : Math.max(bound1, bound2);
+    }
+
+    /**
+     * The dual bound when the search has ended: of the nodes waiting to be evaluated, those interrupted when
+     * the search stopped, and those that could not be solved – with an integral objective rounded to the next
+     * attainable value. Never better than the incumbent, which is the bound when the search was completed
+     * (apart from what's pruned within the gap tolerance).
+     */
+    private double finalDualBound() {
+
+        double[] retVal = { this.bestBound(myUnresolvedBound, myInterruptedBound) };
+
+        myDeferredNodes.forEach(node -> retVal[0] = this.bestBound(retVal[0], node.objective));
+
+        double bound = myStrategy.toLatticeBound(retVal[0]);
+        Optimisation.Result incumbent = myBestResultSoFar;
+
+        return incumbent != null ? this.bestBound(bound, incumbent.getValue()) : bound;
     }
 
     /**
@@ -418,6 +453,28 @@ public final class IntegerSolver extends GenericSolver {
         return !Double.isFinite(bound) || myStrategy.isGoodEnough(myBestResultSoFar, bound);
     }
 
+    private void logBounds(final double bound) {
+        if (myBestResultSoFar != null && Double.isFinite(bound)) {
+            double inc = myBestResultSoFar.getValue();
+            double absGap = Math.max(ZERO, mySense == Optimisation.Sense.MIN ? inc - bound : bound - inc);
+            double relGap = Math.abs(inc) > ZERO ? absGap / Math.abs(inc) : absGap;
+            this.log("\tincumbent={}, dualBound={}, absGap={}, relGap={}, tol={}", inc, bound, absGap, relGap, myGapTolerance.error(inc));
+        } else {
+            this.log("\tincumbent={}, dualBound={} (not closable yet)", myBestResultSoFar != null ? myBestResultSoFar.getValue() : "none",
+                    Double.isFinite(bound) ? bound : "n/a");
+        }
+    }
+
+    /**
+     * The search stopped while this node, or one of its descendants, was being worked on. It's not among the
+     * deferred nodes, but its subtree is not explored – the bound is remembered, for the final dual bound.
+     *
+     * @param bound The relaxation bound of the node, NaN if unknown
+     */
+    private synchronized void markInterrupted(final double bound) {
+        myInterruptedBound = this.bestBound(myInterruptedBound, bound);
+    }
+
     /**
      * A node that could not be solved (or branched): its subtree is left unexplored, but the search
      * continues. The bound is remembered, so that optimality is not claimed if that subtree could contain a
@@ -427,17 +484,7 @@ public final class IntegerSolver extends GenericSolver {
      *              unknown
      */
     private synchronized boolean markUnresolved(final double bound) {
-
-        double pessimistic = mySense == Optimisation.Sense.MIN ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
-
-        if (Double.isNaN(bound)) {
-            myUnresolvedBound = pessimistic;
-        } else if (mySense == Optimisation.Sense.MIN) {
-            myUnresolvedBound = Math.min(myUnresolvedBound, bound);
-        } else {
-            myUnresolvedBound = Math.max(myUnresolvedBound, bound);
-        }
-
+        myUnresolvedBound = this.bestBound(myUnresolvedBound, bound);
         return myNodeStatistics.unresolved();
     }
 
@@ -752,8 +799,10 @@ public final class IntegerSolver extends GenericSolver {
                         myCheckedOutBounds.put(worker, Double.valueOf(node.objective));
 
                         if (!this.isIterationAllowed()) {
+                            this.markInterrupted(node.objective);
                             workerNormalExit = false;
                         } else if (this.isOptimalityProven()) {
+                            this.markInterrupted(node.objective);
                             myOptimalityProven = true;
                         } else if (!myStrategy.isGoodEnough(myBestResultSoFar, node.objective)) {
                             workerNormalExit = myNodeStatistics.abandoned();
@@ -782,17 +831,20 @@ public final class IntegerSolver extends GenericSolver {
             }
         });
 
+        // The bound includes the deferred nodes
+        double dualBound = this.finalDualBound();
+
         views.clear();
         myDeferredNodes.clear();
+        myBoundView = null;
 
         if (this.isLogProgress()) {
             if (myOptimalityProven) {
                 this.log("Incumbent proven optimal within gap tolerance - stopped early.");
             }
             this.logProgress(this.countIterations(), this.getClassSimpleName(), this.getDuration());
+            this.logBounds(dualBound);
         }
-
-        myBoundView = null;
 
         Optimisation.Result bestSolutionFound = this.getBestResultSoFar();
 
@@ -852,16 +904,7 @@ public final class IntegerSolver extends GenericSolver {
         this.log("Cuts {}", myCutStatistics);
 
         if (myBoundView != null) {
-            double bound = this.globalDualBound(myBoundView);
-            if (myBestResultSoFar != null && Double.isFinite(bound)) {
-                double inc = myBestResultSoFar.getValue();
-                double absGap = Math.max(ZERO, mySense == Optimisation.Sense.MIN ? inc - bound : bound - inc);
-                double relGap = Math.abs(inc) > ZERO ? absGap / Math.abs(inc) : absGap;
-                this.log("\tincumbent={}, dualBound={}, absGap={}, relGap={}, tol={}", inc, bound, absGap, relGap, myGapTolerance.error(inc));
-            } else {
-                this.log("\tincumbent={}, dualBound={} (not closable yet)", myBestResultSoFar != null ? myBestResultSoFar.getValue() : "none",
-                        Double.isFinite(bound) ? bound : "n/a");
-            }
+            this.logBounds(this.globalDualBound(myBoundView));
         }
     }
 
@@ -989,11 +1032,13 @@ public final class IntegerSolver extends GenericSolver {
             for (boolean first = true;; first = false) {
 
                 if (!first && !this.isIterationAllowed()) {
+                    this.markInterrupted(nodeKey.objective);
                     nodeSolver.dispose();
                     return false;
                 }
 
                 if (myOptimalityProven) {
+                    this.markInterrupted(nodeKey.objective);
                     nodeSolver.dispose();
                     return myNodeStatistics.abandoned();
                 }

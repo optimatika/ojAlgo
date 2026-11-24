@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.function.Consumer;
 
 /**
  * Multiple prioritised {@link Queue}:s backed by a common {@link Set}. Typical usage:
@@ -132,6 +133,13 @@ public final class MultiviewSet<T> {
         for (MultiviewSet<T>.PrioritisedView view : myViews) {
             view.clear();
         }
+    }
+
+    /**
+     * Each entry of the common {@link Set} – not those only in some view, already removed.
+     */
+    public void forEach(final Consumer<? super T> action) {
+        myCommonSet.forEach(action);
     }
 
     /**
