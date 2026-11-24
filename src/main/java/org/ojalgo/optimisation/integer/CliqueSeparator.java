@@ -76,6 +76,9 @@ final class CliqueSeparator extends NodeSolver.Separator {
      * The model the conflict graph was built for
      */
     private ExpressionsBasedModel myGraphModel = null;
+    /**
+     * The number of conflict pairs in the current graph, see {@link #MAX_PAIRS}
+     */
     private long myNbPairs = 0L;
 
     CliqueSeparator() {
@@ -110,6 +113,7 @@ final class CliqueSeparator extends NodeSolver.Separator {
     private void buildConflictGraph(final ExpressionsBasedModel model) {
 
         myAdjacency = new BitSet[2 * model.countVariables()];
+        myNbPairs = 0L;
 
         for (Expression constraint : model.getExpressions()) {
 

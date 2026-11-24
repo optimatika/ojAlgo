@@ -17,7 +17,7 @@
     </licenses>
     <organization>
         <name>Optimatika</name>
-        <url>http://optimatika.se</url>
+        <url>https://www.optimatika.se/</url>
     </organization>
     <developers>
         <developer>
@@ -25,7 +25,7 @@
             <name>Anders Peterson</name>
             <email>apete@optimatika.se</email>
             <organization>Optimatika</organization>
-            <organizationUrl>http://optimatika.se</organizationUrl>
+            <organizationUrl>https://www.optimatika.se/</organizationUrl>
         </developer>
     </developers>
     <scm>

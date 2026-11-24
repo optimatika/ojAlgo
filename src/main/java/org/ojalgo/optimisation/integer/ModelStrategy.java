@@ -116,6 +116,35 @@ public abstract class ModelStrategy implements IntegerStrategy {
 
     static final class DefaultStrategy extends ModelStrategy {
 
+        /**
+         * The latest attempt, by one worker thread, to generate cuts at a node.
+         */
+        private static final class CutAttempt {
+
+            /**
+             * Cuts were added, and the node is about to be solved again
+             */
+            boolean added = false;
+            /**
+             * The LP bound of the node, before the cuts
+             */
+            double bound = ZERO;
+            /**
+             * The sequence number of the node
+             */
+            long node = -1L;
+
+        }
+
+        /**
+         * Cuts are useful if they move the LP bound of the node by more than this, relative to the bound (at
+         * least 1).
+         */
+        private static final double CUT_IMPROVEMENT = 1.0E-4;
+        /**
+         * Never skip more opportunities than this, see {@link #isCutRatherThanBranch}.
+         */
+        private static final int CUT_INTERVAL_LIMIT = 1024;
         private static final double DEFAULT_INFEASIBLE_PENALTY = TEN;
         private static final int RELIABILITY_MIN = 2;
         private static final NumberContext ROUGHLY = NumberContext.of(2);
@@ -127,10 +156,15 @@ public abstract class ModelStrategy implements IntegerStrategy {
             return (u * distUp) * (d * distDn);
         }
 
+        private final ThreadLocal<CutAttempt> myCutAttempt = ThreadLocal.withInitial(CutAttempt::new);
         /**
-         * Adaptive cut generation state
+         * Attempt to generate cuts at every this many opportunities, see {@link #isCutRatherThanBranch}
          */
-        private volatile int myCutFailedStreak = 0;
+        private int myCutInterval = 1;
+        /**
+         * Opportunities to skip before the next attempt to generate cuts
+         */
+        private int myCutSkips = 0;
         private final int[] myLowerCount;
         /**
          * Pseudo-costs when down
@@ -185,6 +219,44 @@ public abstract class ModelStrategy implements IntegerStrategy {
             }
         }
 
+        /**
+         * If cuts were just added to this node, by this thread, were they useful?
+         *
+         * @param bound The LP bound of the node now, with the cuts
+         */
+        private void concludeCutAttempt(final NodeKey key, final double bound) {
+
+            CutAttempt attempt = myCutAttempt.get();
+
+            if (attempt.added) {
+
+                attempt.added = false;
+
+                if (attempt.node == key.sequence) {
+                    double improvement = this.isMinimisation() ? bound - attempt.bound : attempt.bound - bound;
+                    this.markCutAttempt(improvement > CUT_IMPROVEMENT * Math.max(ONE, Math.abs(attempt.bound)));
+                }
+            }
+        }
+
+        /**
+         * Is it time to attempt to generate cuts?
+         */
+        private synchronized boolean isCutDue() {
+
+            if (myCutSkips > 0) {
+                myCutSkips--;
+                return false;
+            }
+
+            return true;
+        }
+
+        private synchronized void markCutAttempt(final boolean useful) {
+            myCutInterval = useful ? 1 : Math.min(CUT_INTERVAL_LIMIT, 2 * myCutInterval);
+            myCutSkips = myCutInterval - 1;
+        }
+
         private void updatePseudo(final int idx, final boolean upper, final double observation) {
 
             if (upper) {
@@ -211,10 +283,13 @@ public abstract class ModelStrategy implements IntegerStrategy {
 
         /**
          * Reset per-solve state. The pseudo-cost weights are restored to the constructor-time seed (derived
-         * from each integer variable's objective contribution weight); the observation counts are zeroed.
+         * from each integer variable's objective contribution weight); the observation counts are zeroed. Cut
+         * generation starts over, with an attempt at every opportunity.
          */
         @Override
-        protected void initialise() {
+        protected synchronized void initialise() {
+            myCutInterval = 1;
+            myCutSkips = 0;
             Arrays.fill(myUpperCount, 0);
             Arrays.fill(myLowerCount, 0);
             System.arraycopy(mySeed, 0, myUpperPseudoWeight, 0, mySeed.length);
@@ -222,18 +297,33 @@ public abstract class ModelStrategy implements IntegerStrategy {
         }
 
         /**
-         * Cut at every node (one round per dive, see {@link NodeSolver#isCutRoundDone()}) as long as cutting
-         * keeps producing cuts; {@link #onCutFailure()} switches it off after repeated empty rounds. Measured
-         * on the 46 untagged MIPLIB models (2026-09-06) this beats both the earlier rule (cut when the
-         * branching displacement exceeds 0.4) and any fixed depth limit: fewer nodes on most models and about
-         * 15% less total time, while models where cuts never pass the filters pay only for the first few
-         * empty rounds.
+         * Attempt to generate cuts at every opportunity (a node not pruned and not integer, until a round of
+         * cuts has been added in the dive, see {@link NodeSolver#isCutRoundDone()}), and back off when it's
+         * not useful: after each attempt that doesn't move the LP bound of the node the interval between
+         * attempts is doubled (from 1, up to {@link #CUT_INTERVAL_LIMIT} opportunities), and it's back to 1
+         * after one that does (or that shows the node to be infeasible). Adding cuts is not enough. It is
+         * never turned off for good.
+         * <p>
+         * Measured on 37 MIPLIB models, each in 7 random orderings of variables and constraints (2026-11-24),
+         * against the earlier rule (off for good after 3 rounds without cuts): 14% fewer nodes; the time is the
+         * same within the noise, 1.00 with one worker and 0.99 with 6. No variant tried (other initial intervals,
+         * halving the interval instead of resetting it, judging by whether any cut was added) was clearly
+         * better.
          */
         @Override
         protected boolean isCutRatherThanBranch(final NodeKey nodeKey, final int branchIntegerIndex, final double variableValue, final double nodeValue,
                 final Optimisation.Result bestResultSoFar) {
 
-            return cutting;
+            if (!cutting || !this.isCutDue()) {
+                return false;
+            }
+
+            CutAttempt attempt = myCutAttempt.get();
+            attempt.added = false;
+            attempt.bound = nodeValue;
+            attempt.node = nodeKey.sequence;
+
+            return true;
         }
 
         /**
@@ -241,6 +331,8 @@ public abstract class ModelStrategy implements IntegerStrategy {
          */
         @Override
         protected void markInfeasible(final NodeKey key, final boolean found, final double incumbentValue) {
+
+            this.concludeCutAttempt(key, this.isMinimisation() ? POSITIVE_INFINITY : NEGATIVE_INFINITY);
 
             int index = key.index;
             if (index >= 0) {
@@ -264,25 +356,24 @@ public abstract class ModelStrategy implements IntegerStrategy {
             this.updatePseudo(idx, upper, observation);
         }
 
-        /**
-         * Called after a failed cut generation attempt (no cuts added). Original behaviour was to disable.
-         */
         @Override
         protected void onCutFailure() {
-            myCutFailedStreak++;
-            if (myCutFailedStreak >= 3) {
-                cutting = false; // Permanently disable after several failures
-            }
+            this.markCutAttempt(false);
         }
 
-        /** Called after a successful cut generation attempt. */
+        /**
+         * Cuts were added. If they're useful is known when the node has been solved again.
+         */
         @Override
         protected void onCutSuccess(final NodeKey nodeKey) {
-            myCutFailedStreak = 0;
+            CutAttempt attempt = myCutAttempt.get();
+            attempt.added = attempt.node == nodeKey.sequence;
         }
 
         @Override
         protected void onNodeSolved(final NodeKey key, final Optimisation.Result result, final double objective, final boolean minimisation) {
+
+            this.concludeCutAttempt(key, objective);
 
             int index = key.index;
 
@@ -522,12 +613,12 @@ public abstract class ModelStrategy implements IntegerStrategy {
     protected void observeBranch(final int idx, final boolean upper, final double observation) {}
 
     /**
-     * Called when cut generation produced no cuts (default: disable further cutting).
+     * Called when cut generation produced no cuts.
      */
     protected abstract void onCutFailure();
 
     /**
-     * Called when cut generation added at least one cut (default: no-op).
+     * Called when cut generation added at least one cut. The node is then solved again, with the cuts.
      */
     protected abstract void onCutSuccess(final NodeKey nodeKey);
 

@@ -113,6 +113,60 @@ public class GeneratedCutTest extends OptimisationIntegerTests implements ModelF
     }
 
     /**
+     * Three binary variables, of which at most one may be 1, but stated pairwise. At the LP solution (all
+     * 0.5) there is exactly one clique cut: x1 + x2 + x3 &lt;= 1.
+     */
+    private static int separateTriangle(final CliqueSeparator separator) {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable[] x = new Variable[3];
+        for (int i = 0; i < x.length; i++) {
+            x[i] = model.newVariable("x" + i).binary().weight(1);
+        }
+        for (int i = 0; i < x.length; i++) {
+            Expression pair = model.newExpression("pair" + i).upper(1);
+            pair.set(x[i], 1);
+            pair.set(x[(i + 1) % x.length], 1);
+        }
+
+        Result lpResult = Result.of(1.5, Optimisation.State.OPTIMAL, 0.5, 0.5, 0.5);
+
+        return GeneratedCutTest.separate(separator, model, lpResult);
+    }
+
+    private static int separate(final CliqueSeparator separator, final ExpressionsBasedModel model, final Result lpResult) {
+        return separator.generateCuts(new CutRound(model, null, lpResult, IntegerStrategy.DEFAULT.getCutConfiguration(), new HashMap<>(),
+                new CutStatistics(Optimisation.Sense.MAX)));
+    }
+
+    /**
+     * A separator is kept, one per thread, and used for every node model of every solve. Its limit on the
+     * number of conflict pairs is for the model at hand – not the total for all models it has been used with,
+     * which once reached would leave it without conflicts, and cuts, from then on.
+     */
+    @Test
+    public void testCliqueCutsAfterLargeModels() {
+
+        CliqueSeparator separator = new CliqueSeparator();
+
+        TestUtils.assertEquals(1, GeneratedCutTest.separateTriangle(separator));
+
+        // About 1.1 million conflict pairs in each model, and the limit is 4 million
+        int dim = 1500;
+        for (int m = 0; m < 5; m++) {
+            ExpressionsBasedModel model = new ExpressionsBasedModel();
+            Expression packing = model.newExpression("packing").upper(1);
+            for (int j = 0; j < dim; j++) {
+                packing.set(model.newVariable("x" + j).binary(), 1);
+            }
+            GeneratedCutTest.separate(separator, model, Result.of(0.0, Optimisation.State.OPTIMAL, new double[dim]));
+        }
+
+        TestUtils.assertEquals(1, GeneratedCutTest.separateTriangle(separator));
+    }
+
+    /**
      * MIP with non-zero lower bounds (shifted variables) solved with both the newer dual SimplexSolver and
      * the older primal SimplexTableauSolver, verifying that GMI cuts are actually generated and that both
      * solvers produce the correct optimum. Uses a model known to need cuts for proof of optimality.
