@@ -533,9 +533,11 @@ public final class NodeSolver extends IntermediateSolver {
      *
      * @param statistics Where to record what the separators did
      * @param root       Whether this is the root node
-     * @return true if any cuts were added
+     * @return The result of the relaxation with the cuts, optimal or not, or null if no cuts were added. No
+     *         need to solve it again – when optimal the solver can be updated in place, as after any other
+     *         solve.
      */
-    boolean generateCuts(final ModelStrategy strategy, final CutStatistics statistics, final boolean root) {
+    Optimisation.Result generateCuts(final ModelStrategy strategy, final CutStatistics statistics, final boolean root) {
 
         CutConfiguration configuration = strategy.getCutConfiguration();
         EnumMap<CutType, Separator> separators = SEPARATORS.get();
@@ -544,7 +546,7 @@ public final class NodeSolver extends IntermediateSolver {
         Result result = this.getResult();
         Map<CutSignature, Expression> accepted = new HashMap<>();
 
-        boolean retVal = false;
+        Optimisation.Result retVal = null;
 
         for (int round = 0; round < configuration.iterations && this.isSolved(); round++) {
 
@@ -577,23 +579,18 @@ public final class NodeSolver extends IntermediateSolver {
                 break;
             }
 
-            retVal = true;
+            myCutRoundDone = true;
 
             long started = System.nanoTime();
             this.reset();
-            result = this.getResult();
+            retVal = result = this.getResult();
             long resolveNanos = System.nanoTime() - started;
 
-            if (result == null || !result.getState().isOptimal()) {
+            if (!result.getState().isOptimal()) {
                 break;
             }
 
             statistics.recordRound(root, valueBefore, result.getValue(), resolveNanos);
-        }
-
-        if (retVal) {
-            this.reset();
-            myCutRoundDone = true;
         }
 
         return retVal;

@@ -95,8 +95,8 @@ public final class GomorySolver extends GenericSolver {
             this.log("Iteration {}: {}", this.countIterations(), retVal);
         }
         while (retVal.getState().isFeasible() && !myIntegerModel.validate(retVal)) {
-            iterativeSolver.generateCuts(strategy, statistics, true);
-            retVal = iterativeSolver.solve();
+            Result resultWithCuts = iterativeSolver.generateCuts(strategy, statistics, true);
+            retVal = resultWithCuts != null ? resultWithCuts : iterativeSolver.solve();
             this.incrementIterationsCount();
             if (this.isLogProgress()) {
                 this.log();

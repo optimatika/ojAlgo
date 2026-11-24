@@ -504,8 +504,9 @@ public final class IntegerSolver extends GenericSolver {
 
             Optimisation.Result rootResult = rootSolver.solve(this.getBestEstimate());
 
-            if (rootSolver.generateCuts(myStrategy, myCutStatistics, true)) {
-                rootResult = rootSolver.solve(rootResult.withState(Optimisation.State.APPROXIMATE));
+            Optimisation.Result rootResultWithCuts = rootSolver.generateCuts(myStrategy, myCutStatistics, true);
+            if (rootResultWithCuts != null) {
+                rootResult = rootResultWithCuts;
             }
 
             if (rootResult.getState().isOptimal() && rootSolver.isInPlaceBoundUpdateSafe()) {
@@ -1026,6 +1027,7 @@ public final class IntegerSolver extends GenericSolver {
     boolean compute(final NodeKey inputKey, final NodeSolver nodeSolver, final RingLogger nodePrinter, final ModelStrategy strategy) {
 
         NodeKey nodeKey = inputKey;
+        Optimisation.Result resultWithCuts = null; // When the node has just been solved again, with cuts
 
         try {
 
@@ -1050,12 +1052,18 @@ public final class IntegerSolver extends GenericSolver {
                     nodePrinter.println(this.toString());
                 }
 
-                if (nodeKey.index >= 0) {
-                    nodeKey.enforceBounds(nodeSolver, strategy);
-                }
-
                 Optimisation.Result bestEstimate = this.getBestEstimate();
-                Optimisation.Result nodeResult = nodeSolver.solve(bestEstimate);
+                Optimisation.Result nodeResult;
+
+                if (resultWithCuts != null) {
+                    nodeResult = resultWithCuts;
+                    resultWithCuts = null;
+                } else {
+                    if (nodeKey.index >= 0) {
+                        nodeKey.enforceBounds(nodeSolver, strategy);
+                    }
+                    nodeResult = nodeSolver.solve(bestEstimate);
+                }
 
                 this.incrementIterationsCount();
 
@@ -1213,9 +1221,10 @@ public final class IntegerSolver extends GenericSolver {
                 }
 
                 if (!nodeSolver.isCutRoundDone() && strategy.isCutRatherThanBranch(nodeKey, branchIntegerIndex, variableValue, nodeValue, myBestResultSoFar)) {
-                    if (nodeSolver.generateCuts(strategy, myCutStatistics, nodeKey.depth == 0)) {
+                    resultWithCuts = nodeSolver.generateCuts(strategy, myCutStatistics, nodeKey.depth == 0);
+                    if (resultWithCuts != null) {
                         strategy.onCutSuccess(nodeKey);
-                        continue; // Solve it again, with the cuts
+                        continue; // Evaluate it again, with the cuts
                     } else {
                         strategy.onCutFailure();
                     }
