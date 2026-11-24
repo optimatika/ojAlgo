@@ -22,7 +22,6 @@
 package org.ojalgo.optimisation.integer;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -50,8 +49,6 @@ import org.ojalgo.type.keyvalue.EntryPair;
 
 final class GMISeparator extends NodeSolver.Separator {
 
-    private static final NumberContext COEFFICIENT = PRECISION.withMode(RoundingMode.CEILING);
-    private static final NumberContext LIMIT = PRECISION.withMode(RoundingMode.FLOOR);
     private static final NumberContext SCALE = NumberContext.of(14);
 
     /**
@@ -212,9 +209,7 @@ final class GMISeparator extends NodeSolver.Separator {
 
                 BigDecimal cValue = entry.getValue();
 
-                if (!PRECISION.isSmall(cLargest, cValue)) {
-                    entry.setValue(COEFFICIENT.enforce(cValue));
-                } else {
+                if (PRECISION.isSmall(cLargest, cValue)) {
                     Variable var = model.getVariable(entry.getKey().index);
                     BigDecimal bound = cValue.signum() > 0 ? var.getUpperLimit() : var.getLowerLimit();
                     if (bound == null) {
@@ -231,7 +226,6 @@ final class GMISeparator extends NodeSolver.Separator {
                 continue;
             }
 
-            cRHS = LIMIT.enforce(cRHS);
             cut.lower(cRHS);
 
             if (this.accept(round, cut)) {

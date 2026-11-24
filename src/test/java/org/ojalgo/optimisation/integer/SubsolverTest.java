@@ -42,13 +42,90 @@ import org.ojalgo.optimisation.linear.LinearSolver;
  */
 public class SubsolverTest extends OptimisationIntegerTests {
 
+    private static final class Behaviour extends ExpressionsBasedModel.Integration<DelegatingSolver> {
+
+        private int myMaxCuts = Integer.MAX_VALUE;
+        private int myNbFailed = 0;
+        private final boolean myUpdatable;
+        final boolean emptyWhenFailed;
+        final boolean reducedGradient;
+
+        /**
+         * @param updatable       Can it be updated in place?
+         * @param reducedGradient Does it provide the reduced gradient (when it can be updated)? Never after
+         *                        an update, until it's solved again.
+         * @param emptyWhenFailed Are there no values at all when there is no solution?
+         */
+        Behaviour(final boolean updatable, final boolean reducedGradient, final boolean emptyWhenFailed) {
+            super();
+            myUpdatable = updatable;
+            this.reducedGradient = reducedGradient;
+            this.emptyWhenFailed = emptyWhenFailed;
+        }
+
+        @Override
+        public DelegatingSolver build(final ExpressionsBasedModel model) {
+            LinearSolver solver = LinearSolver.INTEGRATION.build(model);
+            if (model.constraints().filter(constraint -> constraint.getName().startsWith("CUT_")).count() > myMaxCuts) {
+                myNbFailed++;
+                return new DelegatingSolver(solver, this) {
+
+                    @Override
+                    public Optimisation.Result solve(final Optimisation.Result kickStarter) {
+                        return new Optimisation.Result(Optimisation.State.FAILED, delegate.solve(kickStarter));
+                    }
+
+                };
+            }
+            return myUpdatable ? new DelegatingUpdatableSolver(solver, this) : new DelegatingSolver(solver, this);
+        }
+
+        @Override
+        public boolean isCapable(final ExpressionsBasedModel model) {
+            return LinearSolver.INTEGRATION.isCapable(model);
+        }
+
+        @Override
+        public Optimisation.Result toModelState(final Optimisation.Result solverState, final ExpressionsBasedModel model) {
+            return solverState.size() > 0 ? LinearSolver.INTEGRATION.toModelState(solverState, model) : solverState;
+        }
+
+        @Override
+        public Optimisation.Result toSolverState(final Optimisation.Result modelState, final ExpressionsBasedModel model) {
+            return LinearSolver.INTEGRATION.toSolverState(modelState, model);
+        }
+
+        @Override
+        public String toString() {
+            return "updatable " + myUpdatable + ", reduced gradient " + reducedGradient + ", empty when failed " + emptyWhenFailed;
+        }
+
+        @Override
+        protected int getIndexInSolver(final ExpressionsBasedModel model, final Variable variable) {
+            return ExpressionsBasedModel.Integration.getIndexOfFreeInSolver(model, variable);
+        }
+
+        int countFailed() {
+            return myNbFailed;
+        }
+
+        /**
+         * Fails if there are more cuts than this
+         */
+        Behaviour withMaxCuts(final int maxCuts) {
+            myMaxCuts = maxCuts;
+            return this;
+        }
+
+    }
+
     /**
      * Solves with a {@link LinearSolver}, but does no more than a solver has to
      */
     private static class DelegatingSolver implements Optimisation.Solver {
 
-        final LinearSolver delegate;
         private final Behaviour myBehaviour;
+        final LinearSolver delegate;
         /**
          * Solved, and not updated since then
          */
@@ -82,13 +159,13 @@ public class SubsolverTest extends OptimisationIntegerTests {
         }
 
         @Override
-        public Optional<ExpressionsBasedModel.EntityMap> getEntityMap() {
-            return delegate.getEntityMap();
+        public double getDualMultiplier(final int index) {
+            return delegate.getDualMultiplier(index);
         }
 
         @Override
-        public double getDualMultiplier(final int index) {
-            return delegate.getDualMultiplier(index);
+        public Optional<ExpressionsBasedModel.EntityMap> getEntityMap() {
+            return delegate.getEntityMap();
         }
 
         @Override
@@ -106,58 +183,6 @@ public class SubsolverTest extends OptimisationIntegerTests {
         public boolean updateRange(final int index, final double lower, final double upper) {
             solved = false;
             return delegate.updateRange(index, lower, upper);
-        }
-
-    }
-
-    private static final class Behaviour extends ExpressionsBasedModel.Integration<DelegatingSolver> {
-
-        final boolean emptyWhenFailed;
-        final boolean reducedGradient;
-        private final boolean myUpdatable;
-
-        /**
-         * @param updatable       Can it be updated in place?
-         * @param reducedGradient Does it provide the reduced gradient (when it can be updated)? Never after an
-         *                        update, until it's solved again.
-         * @param emptyWhenFailed Are there no values at all when there is no solution?
-         */
-        Behaviour(final boolean updatable, final boolean reducedGradient, final boolean emptyWhenFailed) {
-            super();
-            myUpdatable = updatable;
-            this.reducedGradient = reducedGradient;
-            this.emptyWhenFailed = emptyWhenFailed;
-        }
-
-        @Override
-        public DelegatingSolver build(final ExpressionsBasedModel model) {
-            LinearSolver solver = LinearSolver.INTEGRATION.build(model);
-            return myUpdatable ? new DelegatingUpdatableSolver(solver, this) : new DelegatingSolver(solver, this);
-        }
-
-        @Override
-        public boolean isCapable(final ExpressionsBasedModel model) {
-            return LinearSolver.INTEGRATION.isCapable(model);
-        }
-
-        @Override
-        public Optimisation.Result toModelState(final Optimisation.Result solverState, final ExpressionsBasedModel model) {
-            return solverState.size() > 0 ? LinearSolver.INTEGRATION.toModelState(solverState, model) : solverState;
-        }
-
-        @Override
-        public Optimisation.Result toSolverState(final Optimisation.Result modelState, final ExpressionsBasedModel model) {
-            return LinearSolver.INTEGRATION.toSolverState(modelState, model);
-        }
-
-        @Override
-        public String toString() {
-            return "updatable " + myUpdatable + ", reduced gradient " + reducedGradient + ", empty when failed " + emptyWhenFailed;
-        }
-
-        @Override
-        protected int getIndexInSolver(final ExpressionsBasedModel model, final Variable variable) {
-            return ExpressionsBasedModel.Integration.getIndexOfFreeInSolver(model, variable);
         }
 
     }
@@ -303,6 +328,37 @@ public class SubsolverTest extends OptimisationIntegerTests {
         return retVal;
     }
 
+    /**
+     * A random multidimensional knapsack, to be solved with one worker
+     */
+    private static ExpressionsBasedModel newKnapsack(final ExpressionsBasedModel.Integration<?> subsolver, final long seed) {
+
+        Random random = new Random(seed);
+
+        ExpressionsBasedModel retVal = SubsolverTest.newModel(subsolver);
+
+        Expression[] rows = new Expression[4];
+        int[] totals = new int[rows.length];
+        for (int r = 0; r < rows.length; r++) {
+            rows[r] = retVal.newExpression("row" + r);
+        }
+        for (int i = 0; i < 20; i++) {
+            Variable item = retVal.newVariable("x" + i).binary().weight(10 + random.nextInt(90));
+            for (int r = 0; r < rows.length; r++) {
+                int coefficient = 5 + random.nextInt(60);
+                totals[r] += coefficient;
+                rows[r].set(item, coefficient);
+            }
+        }
+        for (int r = 0; r < rows.length; r++) {
+            rows[r].upper(totals[r] / 2);
+        }
+
+        retVal.options.parallelism(1);
+
+        return retVal;
+    }
+
     private static ExpressionsBasedModel newModel(final ExpressionsBasedModel.Integration<?> subsolver) {
         Optimisation.Environment environment = Optimisation.newEnvironment();
         environment.addIntegration(subsolver);
@@ -329,6 +385,33 @@ public class SubsolverTest extends OptimisationIntegerTests {
             SubsolverTest.doTest(configuration, "Configuration " + i);
             SubsolverTest.doTestUnbounded(configuration, "Configuration " + i);
             i++;
+        }
+    }
+
+    /**
+     * A solver that fails, every time, when there are (more than a few) cuts
+     */
+    @Test
+    public void testFailingWithCuts() {
+
+        for (int maxCuts = 0; maxCuts < 3; maxCuts++) {
+            for (Behaviour behaviour : SubsolverTest.newBehaviours()) {
+
+                behaviour.withMaxCuts(maxCuts);
+                String description = behaviour + ", fails with more than " + maxCuts + " cuts";
+
+                for (long seed = 1L; seed <= 10L; seed++) {
+
+                    double expected = SubsolverTest.newKnapsack(LinearSolver.INTEGRATION, seed).maximise().getValue();
+
+                    Optimisation.Result result = SubsolverTest.newKnapsack(behaviour, seed).maximise();
+
+                    TestUtils.assertStateNotLessThanOptimal(result);
+                    TestUtils.assertEquals(description + ", seed " + seed, expected, result.getValue(), 1E-6);
+                }
+
+                TestUtils.assertTrue(description + ", failed " + behaviour.countFailed(), behaviour.countFailed() >= 5);
+            }
         }
     }
 

@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;
@@ -43,6 +44,7 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.IntermediateSolver;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.UpdatableSolver;
+import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.integer.IntegerStrategy.CutConfiguration;
 import org.ojalgo.optimisation.integer.IntegerStrategy.CutType;
 import org.ojalgo.optimisation.integer.NodeSolver.CutRound;
@@ -179,8 +181,10 @@ public final class NodeSolver extends IntermediateSolver {
          * Rounding (outwards) of a limit brought into another scale
          */
         static final NumberContext PRECISION = NumberContext.of(12);
-        private static final MathContext ROUND_LOWER = PRECISION.withMode(RoundingMode.FLOOR).getMathContext();
-        private static final MathContext ROUND_UPPER = PRECISION.withMode(RoundingMode.CEILING).getMathContext();
+        private static final NumberContext CEILING = PRECISION.withMode(RoundingMode.CEILING);
+        private static final NumberContext FLOOR = PRECISION.withMode(RoundingMode.FLOOR);
+        private static final MathContext ROUND_LOWER = FLOOR.getMathContext();
+        private static final MathContext ROUND_UPPER = CEILING.getMathContext();
         static final boolean DEBUG = false;
 
         /**
@@ -213,6 +217,99 @@ public final class NodeSolver extends IntermediateSolver {
         private static boolean reject(final ExpressionsBasedModel model, final Expression cut) {
             model.removeExpression(cut.getName());
             return false;
+        }
+
+        /**
+         * Rounds the coefficients and limits of a cut to {@link #PRECISION}, so that nothing is cut off that
+         * was not before. How much a rounded coefficient changes the value of the cut depends on the value of
+         * the variable. The limits are moved outwards by the most it can be, within the variable's bounds. A
+         * coefficient is rounded up or down, whichever needs the least: nothing if it is rounded up, the
+         * variable is non-negative and the cut has only a lower limit. If neither is possible, because the
+         * variable is unbounded, the coefficient is not rounded.
+         */
+        private static void round(final ExpressionsBasedModel model, final Expression cut) {
+
+            BigDecimal lower = cut.getLowerLimit();
+            BigDecimal upper = cut.getUpperLimit();
+
+            for (Entry<IntIndex, BigDecimal> entry : cut.getLinearEntrySet()) {
+
+                BigDecimal exact = entry.getValue();
+                BigDecimal down = FLOOR.enforce(exact);
+
+                if (down.compareTo(exact) == 0) {
+                    entry.setValue(down);
+                    continue;
+                }
+
+                BigDecimal up = CEILING.enforce(exact);
+
+                Variable variable = model.getVariable(entry.getKey().index);
+
+                BigDecimal costDown = Separator.roundingCost(down.subtract(exact), variable, lower != null, upper != null);
+                BigDecimal costUp = Separator.roundingCost(up.subtract(exact), variable, lower != null, upper != null);
+
+                BigDecimal rounded;
+                BigDecimal cost;
+                if (costUp != null && (costDown == null || costUp.compareTo(costDown) <= 0)) {
+                    rounded = up;
+                    cost = costUp;
+                } else if (costDown != null) {
+                    rounded = down;
+                    cost = costDown;
+                } else {
+                    continue;
+                }
+
+                entry.setValue(rounded);
+                if (lower != null) {
+                    lower = lower.subtract(cost);
+                }
+                if (upper != null) {
+                    upper = upper.add(cost);
+                }
+            }
+
+            if (lower != null) {
+                cut.lower(FLOOR.enforce(lower));
+            }
+            if (upper != null) {
+                cut.upper(CEILING.enforce(upper));
+            }
+        }
+
+        /**
+         * By how much the limits of a cut have to be moved outwards when the coefficient of the variable is
+         * changed
+         *
+         * @return null if there is no such number
+         */
+        private static BigDecimal roundingCost(final BigDecimal change, final Variable variable, final boolean lower, final boolean upper) {
+
+            BigDecimal atLower = variable.getLowerLimit();
+            BigDecimal atUpper = variable.getUpperLimit();
+
+            BigDecimal retVal = BigDecimal.ZERO;
+
+            if (lower) {
+                // Where the value of the cut is reduced the most
+                BigDecimal bound = change.signum() > 0 ? atLower : atUpper;
+                if (bound == null) {
+                    return null;
+                }
+                retVal = retVal.max(change.multiply(bound).negate());
+            }
+
+            if (upper) {
+                // Where the value of the cut is increased the most
+                BigDecimal bound = change.signum() > 0 ? atUpper : atLower;
+                if (bound == null) {
+                    return null;
+                }
+                retVal = retVal.max(change.multiply(bound));
+            }
+
+            return retVal;
         }
 
         /**
@@ -331,7 +428,7 @@ public final class NodeSolver extends IntermediateSolver {
                 return Separator.reject(model, cut);
             }
 
-            cut.enforce(PRECISION);
+            Separator.round(model, cut);
             cut.tighten();
 
             CutSignature signature = new CutSignature(cut);
@@ -530,7 +627,9 @@ public final class NodeSolver extends IntermediateSolver {
     /**
      * Run up to {@link CutConfiguration#iterations} separation rounds. A round calls every enabled separator
      * once and, if any cut was added, re-solves the relaxation; rounds stop when a round adds no cuts or the
-     * re-solve fails. Called at most once per dive, see {@link #isCutRoundDone()}.
+     * relaxation is no longer solved to optimality. If it's not infeasible either, it could not be solved with
+     * the cuts of that round, and they are removed again. Called at most once per dive, see
+     * {@link #isCutRoundDone()}.
      *
      * @param statistics Where to record what the separators did
      * @param root       Whether this is the root node
@@ -553,6 +652,7 @@ public final class NodeSolver extends IntermediateSolver {
 
             // The re-solve at the end of a round regenerates the solver, so it is looked up per round
             CutRound cutRound = new CutRound(model, this.getUpdatableSolver(), result, configuration, accepted, statistics);
+            Set<String> earlier = accepted.values().stream().map(Expression::getName).collect(Collectors.toSet());
 
             double valueBefore = result.getValue();
             int count = 0;
@@ -588,6 +688,15 @@ public final class NodeSolver extends IntermediateSolver {
             long resolveNanos = System.nanoTime() - started;
 
             if (!result.getState().isOptimal()) {
+                if (result.getState() != State.INFEASIBLE) {
+                    for (Expression cut : accepted.values()) {
+                        if (!earlier.contains(cut.getName())) {
+                            model.removeExpression(cut.getName());
+                        }
+                    }
+                    this.reset();
+                    retVal = this.getResult();
+                }
                 break;
             }
 
