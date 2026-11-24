@@ -2741,33 +2741,42 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
         if (myEnvironment.containsPresolver(Presolvers.ZERO_ONE_TWO)) {
 
-            boolean needToRepeat = false;
-
-            BigDecimal compensatedLowerLimit;
-            BigDecimal compensatedUpperLimit;
+            boolean needToRepeat;
 
             do {
 
-                Set<IntIndex> fixedVariables = this.getFixedVariables();
                 needToRepeat = false;
 
-                for (Expression expr : this.getExpressions()) {
+                for (Expression expr : myExpressions.values()) {
 
-                    if (!needToRepeat && expr.isConstraint() && expr.isSafeToPresolve() && expr.countQuadraticFactors() == 0) {
+                    if (expr.isConstraint() && expr.isSafeToPresolve() && expr.countQuadraticFactors() == 0) {
 
-                        BigDecimal calculateSetValue = expr.calculateSetValue(fixedVariables);
+                        // Which variables are fixed is checked for each expression, as the previous ones may have
+                        // fixed more of them. Then there's no need to start over when that happens, just to repeat
+                        // until there's a pass that doesn't fix anything.
 
-                        compensatedLowerLimit = expr.getCompensatedLowerLimit(calculateSetValue);
-                        compensatedUpperLimit = expr.getCompensatedUpperLimit(calculateSetValue);
+                        boolean degenerate = expr.isDegenerate();
+                        BigDecimal fixedValue = ZERO;
 
                         myTemporary.clear();
-                        myTemporary.addAll(expr.getLinearKeySet());
-                        myTemporary.removeAll(fixedVariables);
-                        if (expr.isDegenerate()) {
-                            myTemporary.removeIf(index -> options.degeneracy.isZero(expr.get(index)));
+                        for (Entry<IntIndex, BigDecimal> entry : expr.getLinearEntrySet()) {
+                            Variable variable = myVariables.get(entry.getKey().index);
+                            if (variable.isFixed()) {
+                                fixedValue = fixedValue.add(entry.getValue().multiply(variable.getValue()));
+                            } else if (!degenerate || !options.degeneracy.isZero(entry.getValue())) {
+                                myTemporary.add(entry.getKey());
+                            }
                         }
 
+                        BigDecimal compensatedLowerLimit = expr.getCompensatedLowerLimit(fixedValue);
+                        BigDecimal compensatedUpperLimit = expr.getCompensatedUpperLimit(fixedValue);
+
                         needToRepeat |= Presolvers.ZERO_ONE_TWO.simplify(expr, myTemporary, compensatedLowerLimit, compensatedUpperLimit, options.feasibility);
+
+                        if (expr.isInfeasible()) {
+                            needToRepeat = false;
+                            break;
+                        }
                     }
                 }
             } while (needToRepeat);

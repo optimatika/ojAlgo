@@ -1,6 +1,10 @@
 package org.ojalgo.optimisation;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -28,6 +32,67 @@ public class PresolveTest extends OptimisationTests {
         Variable z = model.newVariable("z").lower(0).upper(1).weight(1);
         model.newExpression("ROW").set(x, 1e20).set(z, 1).upper(2);
         return model;
+    }
+
+    /**
+     * Fixing one variable leads to the next one being fixed, and so on – in whatever order the constraints
+     * are checked. The value of each variable is one more than that of the previous one, and the total
+     * depends on all of them. If there's a contradiction anywhere, the model is infeasible.
+     */
+    @Test
+    void testChain() {
+
+        int nbVariables = 50;
+        int first = 3;
+
+        for (long seed = 1L; seed <= 10L; seed++) {
+
+            // The names decide in which order the constraints are checked
+            List<Integer> names = new ArrayList<>();
+            for (int i = 0; i < nbVariables; i++) {
+                names.add(i);
+            }
+            Collections.shuffle(names, new Random(seed));
+
+            for (boolean feasible : new boolean[] { true, false }) {
+
+                ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+                Variable total = model.newVariable("total").lower(0).weight(1);
+                Expression sum = model.newExpression("SUM").level(0).set(total, -1);
+
+                Variable[] chain = new Variable[nbVariables];
+                for (int i = 0; i < nbVariables; i++) {
+                    chain[i] = model.newVariable("x" + i).lower(0).upper(1000);
+                    sum.set(chain[i], 1);
+                    if (i == 0) {
+                        model.newExpression("C" + names.get(i)).set(chain[i], 2).level(2 * first);
+                    } else {
+                        model.newExpression("C" + names.get(i)).set(chain[i], 1).set(chain[i - 1], -1).level(1);
+                    }
+                }
+                if (!feasible) {
+                    model.newExpression("LAST").set(chain[nbVariables - 1], 1).level(first + nbVariables);
+                }
+
+                model.simplify();
+
+                TestUtils.assertEquals(!feasible, model.isInfeasible());
+
+                if (feasible) {
+                    int expected = 0;
+                    for (int i = 0; i < nbVariables; i++) {
+                        TestUtils.assertTrue(chain[i].isFixed());
+                        TestUtils.assertEquals(first + i, chain[i].getValue().doubleValue());
+                        expected += first + i;
+                    }
+                    TestUtils.assertTrue(total.isFixed());
+                    TestUtils.assertEquals(expected, total.getValue().doubleValue());
+                } else {
+                    TestUtils.assertStateInfeasible(model.minimise());
+                }
+            }
+        }
     }
 
     /**
