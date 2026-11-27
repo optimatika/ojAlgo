@@ -158,15 +158,22 @@ public interface ToFileWriter<T> extends Closeable {
     };
 
     /**
-     * Make sure this directory exists, create if necessary
+     * Make sure this directory exists, create if necessary. Null, the parent of a file with no directory
+     * part, refers to the current working directory and nothing is created.
      */
     static void mkdirs(final File dir) {
-        if (!dir.exists() && !dir.mkdirs() && !dir.exists()) {
+        if (dir != null && !dir.exists() && !dir.mkdirs() && !dir.exists()) {
             throw new RuntimeException("Failed to create " + dir.getAbsolutePath());
         }
     }
 
+    /**
+     * @see #mkdirs(File)
+     */
     static void mkdirs(final Path dir) {
+        if (dir == null) {
+            return;
+        }
         try {
             Files.createDirectories(dir);
         } catch (IOException cause) {

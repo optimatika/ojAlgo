@@ -282,4 +282,54 @@ public class SparseArrayTest extends ArrayTests {
         TestUtils.assertEquals(dim, sumOfAll);
     }
 
+    /**
+     * Sparse arrays with 2^31 elements or more are segmented, and each segment must still be small enough to
+     * be a {@link SparseArray}.
+     */
+    @Test
+    public void testVeryLargeSparseBuilders() {
+
+        long count = 1L << 31;
+
+        Array1D<Double> array1D = Array1D.R064.newSparseBuilder(count);
+
+        array1D.set(count - 1L, 1.0);
+        array1D.set(count - 2L, 2.0);
+        array1D.set(0L, 3.0);
+
+        TestUtils.assertEquals(count, array1D.count());
+        TestUtils.assertEquals(1.0, array1D.doubleValue(count - 1L));
+        TestUtils.assertEquals(2.0, array1D.doubleValue(count - 2L));
+        TestUtils.assertEquals(0.0, array1D.doubleValue(count - 3L));
+        TestUtils.assertEquals(3.0, array1D.doubleValue(0L));
+        TestUtils.assertEquals(3, array1D.aggregateAll(Aggregator.CARDINALITY).intValue());
+
+        long nbRows = 50_000L;
+        long nbCols = 50_000L;
+
+        Array2D<Double> array2D = Array2D.R064.newSparseBuilder(nbRows, nbCols);
+
+        array2D.set(nbRows - 1L, nbCols - 1L, 1.0);
+        array2D.set(nbRows - 2L, nbCols - 1L, 2.0);
+        array2D.set(0L, 0L, 3.0);
+
+        TestUtils.assertEquals(nbRows * nbCols, array2D.count());
+        TestUtils.assertEquals(1.0, array2D.doubleValue(nbRows - 1L, nbCols - 1L));
+        TestUtils.assertEquals(2.0, array2D.doubleValue(nbRows - 2L, nbCols - 1L));
+        TestUtils.assertEquals(0.0, array2D.doubleValue(nbRows - 1L, nbCols - 2L));
+        TestUtils.assertEquals(3.0, array2D.doubleValue(0L, 0L));
+        TestUtils.assertEquals(3, array2D.aggregateAll(Aggregator.CARDINALITY).intValue());
+
+        ArrayAnyD<Double> arrayAnyD = ArrayAnyD.R064.newSparseBuilder(2_000L, 2_000L, 1_000L);
+
+        arrayAnyD.set(new long[] { 1_999L, 1_999L, 999L }, 1.0);
+        arrayAnyD.set(new long[] { 0L, 0L, 0L }, 3.0);
+
+        TestUtils.assertEquals(4_000_000_000L, arrayAnyD.count());
+        TestUtils.assertEquals(1.0, arrayAnyD.doubleValue(1_999L, 1_999L, 999L));
+        TestUtils.assertEquals(0.0, arrayAnyD.doubleValue(1_998L, 1_999L, 999L));
+        TestUtils.assertEquals(3.0, arrayAnyD.doubleValue(0L, 0L, 0L));
+        TestUtils.assertEquals(2, arrayAnyD.aggregateAll(Aggregator.CARDINALITY).intValue());
+    }
+
 }

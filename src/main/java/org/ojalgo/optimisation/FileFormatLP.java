@@ -303,8 +303,8 @@ abstract class FileFormatLP {
     }
 
     /**
-     * Whether a character is written as part of a name: an ASCII letter or digit, '_' or '.'. The reader takes
-     * any letter, but other programs reading the file may not.
+     * Whether a character is written as part of a name: an ASCII letter or digit, '_' or '.'. The reader
+     * takes any letter, but other programs reading the file may not.
      */
     private static boolean isNameCharacter(final char c) {
         return 'a' <= c && c <= 'z' || 'A' <= c && c <= 'Z' || '0' <= c && c <= '9' || c == '_' || c == '.';
@@ -369,10 +369,10 @@ abstract class FileFormatLP {
 
     /**
      * A name the LP format has, for an entity of the model, unique among those already used: the entity's own
-     * name, where that is one, and otherwise one made from it. Each character the format does not have becomes
-     * '_', and a name that would not be read as a name – it is empty, starts with a digit or a period, or is a
-     * word the format keeps for itself, such as End or inf – gets '_' in front. A name already used gets _2,
-     * _3 and so on after it. At most {@value #MAX_NAME_LENGTH} characters.
+     * name, where that is one, and otherwise one made from it. Each character the format does not have
+     * becomes '_', and a name that would not be read as a name – it is empty, starts with a digit or a
+     * period, or is a word the format keeps for itself, such as End or inf – gets '_' in front. A name
+     * already used gets _2, _3 and so on after it. At most {@value #MAX_NAME_LENGTH} characters.
      */
     private static String lpName(final String original, final Set<String> used) {
 
@@ -997,8 +997,8 @@ abstract class FileFormatLP {
         }
     }
 
-    private static void writeQuadraticTerms(final BufferedWriter writer, final String[] variables, final Expression expression,
-            final boolean objectiveHalf) throws IOException {
+    private static void writeQuadraticTerms(final BufferedWriter writer, final String[] variables, final Expression expression, final boolean objectiveHalf)
+            throws IOException {
 
         writer.write(" + [");
 

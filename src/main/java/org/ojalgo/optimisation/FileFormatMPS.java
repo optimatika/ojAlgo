@@ -406,9 +406,9 @@ final class FileFormatMPS {
     /**
      * Whether a name is one the MPS format has: 1 to 8 characters (the fixed-format fields are 8 wide, and
      * longer names run into the following field), each a printable ASCII character other than space – a name
-     * is ended by a space, and other programs reading the file may not take more than ASCII. Not starting with
-     * '*' or '$', which some readers take as the start of a comment, and not containing MARKER, which marks
-     * the start and end of the integer variables.
+     * is ended by a space, and other programs reading the file may not take more than ASCII. Not starting
+     * with '*' or '$', which some readers take as the start of a comment, and not containing MARKER, which
+     * marks the start and end of the integer variables.
      */
     private static boolean isMPSName(final String name) {
 
@@ -427,8 +427,8 @@ final class FileFormatMPS {
     }
 
     /**
-     * A name the MPS format has, for an entity of the model, unique among those already used: the entity's own
-     * name, where that is one, and otherwise a deterministic 8-character alias – the prefix ('V' for
+     * A name the MPS format has, for an entity of the model, unique among those already used: the entity's
+     * own name, where that is one, and otherwise a deterministic 8-character alias – the prefix ('V' for
      * variables, 'E' for expressions) followed by 7 base-36 digits derived from the original name's hash. A
      * hash collision is resolved by re-hashing, so the result is still deterministic for a given model.
      */

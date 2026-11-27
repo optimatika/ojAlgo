@@ -230,8 +230,8 @@ public class EnforceBoundsTest extends OptimisationIntegerTests {
     }
 
     /**
-     * A variable that can be negative as well as positive is limited to negative values, and then to
-     * positive ones
+     * A variable that can be negative as well as positive is limited to negative values, and then to positive
+     * ones
      */
     @Test
     public void testSignChange() {

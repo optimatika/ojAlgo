@@ -685,7 +685,9 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
 
     @Override
     default MatrixStore<N> select(final long[] rows, final long[] columns) {
-        return this.select(Structure1D.toIntIndexes(rows), Structure1D.toIntIndexes(columns));
+        int[] selectedRows = rows != null ? Structure1D.toIntIndexes(rows) : null;
+        int[] selectedColumns = columns != null ? Structure1D.toIntIndexes(columns) : null;
+        return this.select(selectedRows, selectedColumns);
     }
 
     @Override

@@ -349,9 +349,9 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
 
     /**
      * A node LP from the branch-and-bound search of the MIPLIB model misc07: the binaries fixed (or not) as
-     * at that node, and the objective limited by the optimal value. It is infeasible. The revised (sparse) dual
-     * simplex came to a basic variable 100 outside its bound, with a pivot row of zeros. Refactorising the
-     * basis turned the zeros into rounding errors, about 1e-14, some of them in columns with an infinite
+     * at that node, and the objective limited by the optimal value. It is infeasible. The revised (sparse)
+     * dual simplex came to a basic variable 100 outside its bound, with a pivot row of zeros. Refactorising
+     * the basis turned the zeros into rounding errors, about 1e-14, some of them in columns with an infinite
      * range. Together those were thought to reach the bound, so the row was not taken as proof of
      * infeasibility, and one of them entered the basis instead: a singular basis and state FAILED.
      */
@@ -359,8 +359,8 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
     public void testMisc07Node() {
 
         int[] fixedAtOne = { 11, 29, 244 };
-        int[] notFixed = { 59, 60, 61, 63, 66, 67, 69, 79, 87, 89, 90, 91, 97, 101, 102, 114, 115, 120, 121, 130, 142, 144, 145, 150, 151, 153, 160, 167,
-                171, 172, 174, 175, 177, 180, 181, 196, 198, 201, 205, 207, 211, 235, 240, 241, 246, 248, 250 };
+        int[] notFixed = { 59, 60, 61, 63, 66, 67, 69, 79, 87, 89, 90, 91, 97, 101, 102, 114, 115, 120, 121, 130, 142, 144, 145, 150, 151, 153, 160, 167, 171,
+                172, 174, 175, 177, 180, 181, 196, 198, 201, 205, 207, 211, 235, 240, 241, 246, 248, 250 };
 
         for (Boolean sparse : new Boolean[] { Boolean.TRUE, Boolean.FALSE }) {
 

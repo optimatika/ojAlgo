@@ -636,13 +636,12 @@ public final class NodeSolver extends IntermediateSolver {
     }
 
     /**
-     * Run up to {@link CutConfiguration#iterations} separation rounds – at the root {@link #ROOT_ROUNDS} times
-     * as many, as long as each round improves the bound. A round calls every enabled separator once (except, at
-     * other nodes than the root, those that are {@link Separator#isRootOnly()}) and, if any cut was added,
-     * re-solves the relaxation; rounds stop when a round adds no cuts or the relaxation is no
-     * longer solved to optimality. If it's not infeasible either, it could not be solved with
-     * the cuts of that round, and they are removed again. Called at most once per dive, see
-     * {@link #isCutRoundDone()}.
+     * Run up to {@link CutConfiguration#iterations} separation rounds – at the root {@link #ROOT_ROUNDS}
+     * times as many, as long as each round improves the bound. A round calls every enabled separator once
+     * (except, at other nodes than the root, those that are {@link Separator#isRootOnly()}) and, if any cut
+     * was added, re-solves the relaxation; rounds stop when a round adds no cuts or the relaxation is no
+     * longer solved to optimality. If it's not infeasible either, it could not be solved with the cuts of
+     * that round, and they are removed again. Called at most once per dive, see {@link #isCutRoundDone()}.
      *
      * @param statistics Where to record what the separators did
      * @param root       Whether this is the root node

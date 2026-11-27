@@ -353,8 +353,8 @@ public final class IntegerSolver extends GenericSolver {
     }
 
     /**
-     * A branch that the bound propagation found infeasible is not evaluated, or deferred. Otherwise it's as any
-     * other infeasible node – the strategy needs to know about it to choose what to branch on.
+     * A branch that the bound propagation found infeasible is not evaluated, or deferred. Otherwise it's as
+     * any other infeasible node – the strategy needs to know about it to choose what to branch on.
      *
      * @return The branch, or null if it was dropped
      */

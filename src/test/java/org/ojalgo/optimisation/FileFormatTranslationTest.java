@@ -42,8 +42,8 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * Writing a model in a file format and reading it back, and translating it from one format to another – read
- * in one, written in another – as the Optimisation Service's translate does. LP, MPS and EBM are translated in
- * every direction, and FZN, which is only read, to each of them. The text changes, but the mathematical
+ * in one, written in another – as the Optimisation Service's translate does. LP, MPS and EBM are translated
+ * in every direction, and FZN, which is only read, to each of them. The text changes, but the mathematical
  * problem must not: as many variables, as many of them integer, and the same optimal value minimised and
  * maximised.
  * <p>
@@ -53,8 +53,8 @@ import org.ojalgo.type.context.NumberContext;
  * <li>Names. A name a format does not have is replaced by one it has.
  * <li>The optimisation sense. EBM does not record it, and an MPS file need not. Each case states its own
  * sense, and the solves here say minimise or maximise themselves. A sense recorded in a file is checked
- * against the sense of the model that was written, when that model had one. A model read from EBM has none
- * – and the LP format, which always states a sense, then says Minimize.
+ * against the sense of the model that was written, when that model had one. A model read from EBM has none –
+ * and the LP format, which always states a sense, then says Minimize.
  * </ul>
  * Solving a model sets its sense, so a model that is written is never solved, and the reverse.
  */
@@ -64,8 +64,7 @@ class FileFormatTranslationTest extends OptimisationTests {
      * A model as text, in its format, and what it is: its sense, if the text says, and its optimal value
      * minimised and maximised – null where that is no test, as maximising a convex quadratic.
      */
-    record Case(String text, FileFormat format, Sense sense, Double minimum, Double maximum) {
-    }
+    record Case(String text, FileFormat format, Sense sense, Double minimum, Double maximum) {}
 
     private static final NumberContext ACCURACY = NumberContext.of(7, 8);
 
@@ -170,10 +169,10 @@ class FileFormatTranslationTest extends OptimisationTests {
      * for themselves, the names the formats give the objective function and their own sections, letters
      * outside ASCII, longer than the formats take – and the same name twice.
      */
-    private static final String[] NAMES = { "", " ", "x", "x", "1x", ".x", "_x", "x.1", "x y", "x\ty", "x\ny", "x\r\ny", "x y", "a+b", "a-b", "-x",
-            "x*y", "x^2", "x/2", "[x]", "x:y", "x<=y", "=", ">=", "x(2)", "x#1..3", "y#-5..-5", "a,b", "a;b", "\\x", "*x", "$x", "'x'", "\"x\"", "élan", "日本",
-            "𝑥", "end", "End", "Subject", "st", "s.t.", "bin", "Bounds", "General", "free", "inf", "Infinity", "obj", "rhs", "bnd", "rng", "NAME",
-            "ROWS", "MARKER", "'MARKER'", "INTORG", "V0000000", "E0000000", "x".repeat(300) };
+    private static final String[] NAMES = { "", " ", "x", "x", "1x", ".x", "_x", "x.1", "x y", "x\ty", "x\ny", "x\r\ny", "x y", "a+b", "a-b", "-x", "x*y",
+            "x^2", "x/2", "[x]", "x:y", "x<=y", "=", ">=", "x(2)", "x#1..3", "y#-5..-5", "a,b", "a;b", "\\x", "*x", "$x", "'x'", "\"x\"", "élan", "日本", "𝑥",
+            "end", "End", "Subject", "st", "s.t.", "bin", "Bounds", "General", "free", "inf", "Infinity", "obj", "rhs", "bnd", "rng", "NAME", "ROWS", "MARKER",
+            "'MARKER'", "INTORG", "V0000000", "E0000000", "x".repeat(300) };
 
     /**
      * Minimised -0.78125 at x = 0.375, y = 0.625. A convex quadratic, so maximising it is no test.
@@ -311,9 +310,9 @@ class FileFormatTranslationTest extends OptimisationTests {
             Expression constraint = model.newExpression(name).set(i, 1).set((i + 1) % n, 2).set((i + 2) % n, 3);
 
             switch (i % 4) {
-                case 0 -> constraint.upper(15);
-                case 1 -> constraint.lower(2);
-                case 2 -> constraint.lower(1).upper(20);
+                case 0  -> constraint.upper(15);
+                case 1  -> constraint.lower(2);
+                case 2  -> constraint.lower(1).upper(20);
                 default -> constraint.level(6 + i % 3);
             }
         }
@@ -341,8 +340,8 @@ class FileFormatTranslationTest extends OptimisationTests {
      */
     private static ExpressionsBasedModel newModelWithRandomNames(final long seed) {
 
-        String[] parts = { "a", "Z", "_", ".", "0", "9", " ", "\t", "\n", "\r", "+", "-", "*", "/", "^", "[", "]", "(", ")", ":", "<", "=", ">", ",", ";",
-                "#", "$", "'", "\"", "\\", "!", "@", "%", "&", "{", "}", "|", "~", "é", "日", " ", "end", "inf", "free", "st", "MARKER", "rhs", "obj" };
+        String[] parts = { "a", "Z", "_", ".", "0", "9", " ", "\t", "\n", "\r", "+", "-", "*", "/", "^", "[", "]", "(", ")", ":", "<", "=", ">", ",", ";", "#",
+                "$", "'", "\"", "\\", "!", "@", "%", "&", "{", "}", "|", "~", "é", "日", " ", "end", "inf", "free", "st", "MARKER", "rhs", "obj" };
 
         Random random = new Random(seed);
 

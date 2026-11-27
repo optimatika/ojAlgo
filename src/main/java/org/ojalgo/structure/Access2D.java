@@ -1047,8 +1047,13 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
         return this.select(rows, null);
     }
 
+    /**
+     * @see #select(long[], long[])
+     */
     default Access2D<N> select(final int[] rows, final int[] columns) {
-        return new Access2D.SelectionView<>(this, Structure1D.toLongIndexes(rows), Structure1D.toLongIndexes(columns));
+        long[] selectedRows = rows != null ? Structure1D.toLongIndexes(rows) : null;
+        long[] selectedColumns = columns != null ? Structure1D.toLongIndexes(columns) : null;
+        return new Access2D.SelectionView<>(this, selectedRows, selectedColumns);
     }
 
     /**

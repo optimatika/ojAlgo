@@ -35,9 +35,18 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Fixed
 
+#### org.ojalgo.array
+
+- Sparse arrays of 2^31 elements or more – from `newSparseBuilder(..)` of `Array1D`, `Array2D` or `ArrayAnyD`, a 50,000 × 50,000 `Array2D` say – threw `ArithmeticException: integer overflow`. Only arrays of more than 2^46 elements were segmented, while a `SparseArray` has `int` indices. Now arrays of more than 2^30 elements are segmented. The segment size set with `segment(..)` of `SparseArray.SparseFactory`, `NumberList.ListFactory` or `LongToNumberMap.MapFactory` is now at most 2^30 as well.
+
+#### org.ojalgo.matrix
+
+- `MatrixStore.select(long[], long[])` threw a `NullPointerException` when the rows or the columns were null, which is to select all of them – as with `select(int[], int[])`.
+
 #### org.ojalgo.netio
 
 - Lines printed with a `BasicLogger` from several threads at once could be mixed up, as each line was printed in parts. Now a line is printed in one go. With `columns(..)` a value as wide as the column, or wider, ran into the next column. Now it's cut, so there is always a space between the columns.
+- Reading a file given by its name only, with no directory part – `new File("data.csv")` – threw a `NullPointerException`. So did writing one, with a `TextLineWriter` or `ExpressionsBasedModel.writeTo(..)` say. (With `./data.csv` it worked.) Reading a file also created its directory, if it was missing. Now it doesn't, and a missing file is a `FileNotFoundException`, wrapped in a `RuntimeException` as before.
 
 #### org.ojalgo.optimisation
 
@@ -57,6 +66,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - The `IntegerSolver` could fail with a `StackOverflowError`. A dive – from a node to one of its branches, and on – was recursive, and overflowed the stack somewhere between 4,000 and 10,000 nodes deep (with the default stack size). It's now a loop. It also ignored the time and iteration limits: these were checked between dives only, now before each node.
 - A variable that is in no constraint, with its lower limit above its upper, did not make the model infeasible. The `UNREFERENCED` presolver fixed it at one of its limits, and the model was solved as if the other was not there.
 - The dual simplex (`LinearSolver`) with the sparse (revised) store could end FAILED on an infeasible LP, rather than INFEASIBLE. A basic variable outside its bound, with a pivot row of zeros, proves the infeasibility – but refactorising the basis can turn those zeros into rounding errors (1e-14 or so). If some of them were in columns with no lower or no upper limit, they were thought to reach the bound, and one of them entered the basis: a singular basis. Now elements of the dual pivot row smaller than 1e-11 count as zero. With the `IntegerSolver`, using the sparse dual simplex for the node LPs, misc07 (MIPLIB) had a node like that in about 1 run of 30, and the result was FEASIBLE instead of OPTIMAL.
+
+#### org.ojalgo.structure
+
+- `Access2D.rows(int...)` and `columns(int...)` threw a `NullPointerException` – with an `Array2D`, or a matrix of an `ArrayAnyD` (`matrices()`), say. So did `select(int[], int[])` when the rows or the columns were null, which is to select all of them. The `long` variants worked.
 
 ### Removed
 

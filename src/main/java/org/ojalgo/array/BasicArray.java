@@ -69,7 +69,7 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
             myDenseFactory = denseFactory;
 
             myDenseStrategy = GrowthStrategy.from(denseFactory.getMathType()).segment(PowerOf2.powerOfLong2(23));
-            mySparseStrategy = GrowthStrategy.from(denseFactory.getMathType()).segment(PowerOf2.powerOfLong2(46));
+            mySparseStrategy = GrowthStrategy.from(denseFactory.getMathType()).segment(PowerOf2.powerOfLong2(30));
         }
 
         @Override

@@ -155,7 +155,6 @@ public interface FromFileReader<T> extends Iterable<T>, Closeable {
 
         try {
 
-            ToFileWriter.mkdirs(file.getParentFile());
             String name = file.getName();
             InputStream retVal = new FileInputStream(file);
 

@@ -23,6 +23,8 @@ package org.ojalgo.structure;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.array.Array2D;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.random.Uniform;
 
 public class StructureTest {
@@ -109,6 +111,41 @@ public class StructureTest {
         StructureTest.backAndForth(81, structure, new long[] { 1, 1, 1, 1, 0 });
         StructureTest.backAndForth(38, structure, new long[] { 3, 1, 2, 0, 0 });
         StructureTest.backAndForth(119, structure, new long[] { 4, 2, 3, 1, 0 });
+    }
+
+    /**
+     * Selecting with int or long indexes gives the same result, and a null selection is all rows or all
+     * columns.
+     */
+    @Test
+    public void testSelectIntAndLongIndexes() {
+
+        Array2D<Double> array = Array2D.R064.make(4, 3);
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 3; j++) {
+                array.set(i, j, 10.0 * i + j);
+            }
+        }
+
+        Access2D<Double> rows = array.rows(1, 3);
+        TestUtils.assertEquals(2, rows.countRows());
+        TestUtils.assertEquals(3, rows.countColumns());
+        TestUtils.assertEquals(32.0, rows.doubleValue(1, 2));
+        TestUtils.assertEquals(array.rows(1L, 3L), rows);
+
+        Access2D<Double> columns = array.columns(0, 2);
+        TestUtils.assertEquals(4, columns.countRows());
+        TestUtils.assertEquals(2, columns.countColumns());
+        TestUtils.assertEquals(32.0, columns.doubleValue(3, 1));
+        TestUtils.assertEquals(array.columns(0L, 2L), columns);
+
+        TestUtils.assertEquals(array, array.select((int[]) null, (int[]) null));
+
+        R064Store store = R064Store.FACTORY.copy(array);
+
+        TestUtils.assertEquals(rows, store.select(new long[] { 1L, 3L }, null));
+        TestUtils.assertEquals(columns, store.select(null, new long[] { 0L, 2L }));
+        TestUtils.assertEquals(store, store.select((long[]) null, (long[]) null));
     }
 
 }

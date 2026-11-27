@@ -219,15 +219,15 @@ public class BoundPropagatorTest extends OptimisationIntegerTests {
                     }
                 }
                 switch (random.nextInt(3)) {
-                case 0:
-                    row.lower(limit);
-                    break;
-                case 1:
-                    row.upper(limit);
-                    break;
-                default:
-                    row.level(limit);
-                    break;
+                    case 0:
+                        row.lower(limit);
+                        break;
+                    case 1:
+                        row.upper(limit);
+                        break;
+                    default:
+                        row.level(limit);
+                        break;
                 }
             }
 
@@ -677,8 +677,8 @@ public class BoundPropagatorTest extends OptimisationIntegerTests {
 
     /**
      * 2a + 2b + 2c + s = 3 with a, b and c binary, and s between 0 and 0.5: no integer solution. At the root
-     * that's not known, but with a = 0 both b and c must be 1, and with a = 1 they must be 0. Neither branch is
-     * evaluated, but they're reported to the strategy as any other infeasible node.
+     * that's not known, but with a = 0 both b and c must be 1, and with a = 1 they must be 0. Neither branch
+     * is evaluated, but they're reported to the strategy as any other infeasible node.
      */
     @Test
     public void testPartOfTheSearch() {

@@ -407,8 +407,8 @@ public abstract class ModelStrategy implements IntegerStrategy {
     }
 
     /**
-     * Cuts are useful if they move the LP bound of the node by more than this, relative to the bound (at least
-     * 1).
+     * Cuts are useful if they move the LP bound of the node by more than this, relative to the bound (at
+     * least 1).
      */
     static final double CUT_IMPROVEMENT = 1.0E-4;
     /**

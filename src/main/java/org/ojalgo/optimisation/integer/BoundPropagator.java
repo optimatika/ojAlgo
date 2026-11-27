@@ -149,7 +149,8 @@ final class BoundPropagator {
     /**
      * One more constraint, not one of the model's: no better solution than the incumbent is cut off by it.
      * Either the objective function limit, for the whole search, or a node's reduced cost row, for the
-     * subtree of that node (see {@link BoundPropagator#newReducedCostCutoff(IntToDoubleFunction, IntToDoubleFunction, double)}).
+     * subtree of that node (see
+     * {@link BoundPropagator#newReducedCostCutoff(IntToDoubleFunction, IntToDoubleFunction, double)}).
      */
     static final class Cutoff {
 
@@ -570,13 +571,13 @@ final class BoundPropagator {
     }
 
     /**
-     * A node's reduced cost row. With the LP solution x̄ of the node, its reduced costs g (in the minimisation
-     * the solver does) and LP duality, any solution x within the node's (LP) region has an objective function
-     * value no better than that of the node plus the sum of g<sub>j</sub>(x<sub>j</sub> - x̄<sub>j</sub>). So
-     * a solution better than the incumbent has that sum at most the gap. Every term of it is non-negative
-     * (dual feasibility), so this is what fixing by reduced cost does for one variable at a time. Propagated
-     * together with the other constraints, it's stronger: whatever moves one variable away from x̄ leaves
-     * less of the gap for the others.
+     * A node's reduced cost row. With the LP solution x̄ of the node, its reduced costs g (in the
+     * minimisation the solver does) and LP duality, any solution x within the node's (LP) region has an
+     * objective function value no better than that of the node plus the sum of g<sub>j</sub>(x<sub>j</sub> -
+     * x̄<sub>j</sub>). So a solution better than the incumbent has that sum at most the gap. Every term of it
+     * is non-negative (dual feasibility), so this is what fixing by reduced cost does for one variable at a
+     * time. Propagated together with the other constraints, it's stronger: whatever moves one variable away
+     * from x̄ leaves less of the gap for the others.
      * <p>
      * The terms of the slack variables are non-negative too, and are left out. Valid for the subtree of the
      * node, to be used when deriving its branches, see

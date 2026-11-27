@@ -20,6 +20,10 @@ final class GrowthStrategy {
      */
     private static final long CHUNK = Hardware.OS_MEMORY_PAGE_SIZE / MathType.R064.getTotalMemory();
     private static final long INITIAL = 4L;
+    /**
+     * 2^30, the largest power of 2 that is a valid int array length
+     */
+    private static final long MAX_SEGMENT = 1L << 30;
     private static final long SEGMENT = 32_768L;
 
     static GrowthStrategy from(final MathType mathType) {
@@ -119,9 +123,12 @@ final class GrowthStrategy {
         return mySegment;
     }
 
+    /**
+     * Enforced to be a power of 2, not smaller than the chunk and not larger than 2^30
+     */
     GrowthStrategy segment(final long segment) {
 
-        long notSmallerThanCurrentChunk = Math.max(myChunk, segment);
+        long notSmallerThanCurrentChunk = Math.max(myChunk, Math.min(segment, MAX_SEGMENT));
         int power = PowerOf2.powerOf2Smaller(notSmallerThanCurrentChunk);
 
         return new GrowthStrategy(myInitial, myChunk, 1L << power);
