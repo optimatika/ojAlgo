@@ -555,6 +555,13 @@ public final class NodeSolver extends IntermediateSolver {
         }
 
         /**
+         * @return true if this separator is only used at the root node, false (the default) if at every node
+         */
+        boolean isRootOnly() {
+            return false;
+        }
+
+        /**
          * For separators that can estimate the efficacy of a candidate cheaply before building it: true (and
          * the candidate counted as attempted and rejected) if the estimate is below the minimum.
          */
@@ -589,6 +596,10 @@ public final class NodeSolver extends IntermediateSolver {
     }
 
     private static final boolean DEBUG = false;
+    /**
+     * The limit on the number of separation rounds is this many times higher at the root than at other nodes
+     */
+    private static final int ROOT_ROUNDS = 3;
     /**
      * One separator instance per type and thread. The separators hold no model reference (everything they
      * need is in the {@link CutRound} passed to them) and only per-round state, plus caches that they
@@ -625,9 +636,11 @@ public final class NodeSolver extends IntermediateSolver {
     }
 
     /**
-     * Run up to {@link CutConfiguration#iterations} separation rounds. A round calls every enabled separator
-     * once and, if any cut was added, re-solves the relaxation; rounds stop when a round adds no cuts or the
-     * relaxation is no longer solved to optimality. If it's not infeasible either, it could not be solved with
+     * Run up to {@link CutConfiguration#iterations} separation rounds – at the root {@link #ROOT_ROUNDS} times
+     * as many, as long as each round improves the bound. A round calls every enabled separator once (except, at
+     * other nodes than the root, those that are {@link Separator#isRootOnly()}) and, if any cut was added,
+     * re-solves the relaxation; rounds stop when a round adds no cuts or the relaxation is no
+     * longer solved to optimality. If it's not infeasible either, it could not be solved with
      * the cuts of that round, and they are removed again. Called at most once per dive, see
      * {@link #isCutRoundDone()}.
      *
@@ -648,7 +661,10 @@ public final class NodeSolver extends IntermediateSolver {
 
         Optimisation.Result retVal = null;
 
-        for (int round = 0; round < configuration.iterations && this.isSolved(); round++) {
+        int limit = root ? ROOT_ROUNDS * configuration.iterations : configuration.iterations;
+        boolean improved = true;
+
+        for (int round = 0; round < limit && (improved || round < configuration.iterations) && this.isSolved(); round++) {
 
             // The re-solve at the end of a round regenerates the solver, so it is looked up per round
             CutRound cutRound = new CutRound(model, this.getUpdatableSolver(), result, configuration, accepted, statistics);
@@ -659,11 +675,11 @@ public final class NodeSolver extends IntermediateSolver {
 
             for (CutType type : configuration.types) {
 
-                if (!statistics.shouldTry(type, root)) {
+                Separator separator = separators.get(type);
+
+                if (!root && separator.isRootOnly() || !statistics.shouldTry(type, root)) {
                     continue;
                 }
-
-                Separator separator = separators.get(type);
 
                 long started = System.nanoTime();
                 int added = separator.generateCuts(cutRound);
@@ -701,6 +717,8 @@ public final class NodeSolver extends IntermediateSolver {
             }
 
             statistics.recordRound(root, valueBefore, result.getValue(), resolveNanos);
+
+            improved = Math.abs(result.getValue() - valueBefore) > ModelStrategy.CUT_IMPROVEMENT * Math.max(PrimitiveMath.ONE, Math.abs(valueBefore));
         }
 
         return retVal;

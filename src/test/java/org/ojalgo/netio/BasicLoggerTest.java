@@ -39,6 +39,9 @@ public class BasicLoggerTest extends NetioTests {
         String string = receiver.toString();
 
         TestUtils.assertEquals(7 * 5 + 1, string.length()); // +1 for the newline at the end
+
+        // Values of width - 1 or more are cut, so the columns never run into each other
+        TestUtils.assertTrue(string.startsWith("123    1234   12345  123456 123456 "));
     }
 
 }

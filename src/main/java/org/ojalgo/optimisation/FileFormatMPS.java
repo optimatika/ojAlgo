@@ -404,34 +404,52 @@ final class FileFormatMPS {
     }
 
     /**
-     * MPS names are limited to 8 characters (the fixed-format fields are 8 wide, and longer names run into
-     * the following field). Names that fit are used as they are; longer (or duplicate/empty) ones are
-     * replaced by a deterministic 8-character alias: the prefix ('V' for variables, 'E' for expressions)
-     * followed by 7 base-36 digits derived from the original name's hash. A hash collision is resolved by
-     * re-hashing, so the result is still deterministic for a given model.
+     * Whether a name is one the MPS format has: 1 to 8 characters (the fixed-format fields are 8 wide, and
+     * longer names run into the following field), each a printable ASCII character other than space – a name
+     * is ended by a space, and other programs reading the file may not take more than ASCII. Not starting with
+     * '*' or '$', which some readers take as the start of a comment, and not containing MARKER, which marks
+     * the start and end of the integer variables.
      */
-    private static String mpsName(final String original, final char prefix, final Map<String, String> aliases, final java.util.Set<String> used) {
+    private static boolean isMPSName(final String name) {
 
-        String existing = aliases.get(original);
-        if (existing != null) {
-            return existing;
+        if (name.isEmpty() || name.length() > 8 || name.charAt(0) == '*' || name.charAt(0) == '$' || name.contains(MARKER)) {
+            return false;
         }
 
-        String name = original;
-        if (name == null || name.length() == 0 || name.length() > 8 || !used.add(name)) {
-            int hash = original == null ? 0 : original.hashCode();
-            do {
-                String digits = Long.toString(hash & 0xFFFFFFFFL, 36).toUpperCase();
-                StringBuilder builder = new StringBuilder(8).append(prefix);
-                for (int i = digits.length(); i < 7; i++) {
-                    builder.append('0');
-                }
-                name = builder.append(digits).toString();
-                hash = 31 * hash + 17;
-            } while (!used.add(name));
+        for (int i = 0; i < name.length(); i++) {
+            char c = name.charAt(i);
+            if (c <= ' ' || c > '~') {
+                return false;
+            }
         }
 
-        aliases.put(original, name);
+        return true;
+    }
+
+    /**
+     * A name the MPS format has, for an entity of the model, unique among those already used: the entity's own
+     * name, where that is one, and otherwise a deterministic 8-character alias – the prefix ('V' for
+     * variables, 'E' for expressions) followed by 7 base-36 digits derived from the original name's hash. A
+     * hash collision is resolved by re-hashing, so the result is still deterministic for a given model.
+     */
+    private static String mpsName(final String original, final char prefix, final java.util.Set<String> used) {
+
+        if (FileFormatMPS.isMPSName(original) && used.add(original)) {
+            return original;
+        }
+
+        String name;
+        int hash = original.hashCode();
+        do {
+            String digits = Long.toString(hash & 0xFFFFFFFFL, 36).toUpperCase();
+            StringBuilder builder = new StringBuilder(8).append(prefix);
+            for (int i = digits.length(); i < 7; i++) {
+                builder.append('0');
+            }
+            name = builder.append(digits).toString();
+            hash = 31 * hash + 17;
+        } while (!FileFormatMPS.isMPSName(name) || !used.add(name));
+
         return name;
     }
 
@@ -534,23 +552,23 @@ final class FileFormatMPS {
                 }
             }
 
-            // The objective keeps its own name where it has one that fits in the 8-character field
+            // The objective keeps its own name where it has one the format has
             String objName = model.getObjectiveName();
-            boolean fits = objName != null && !objName.isEmpty() && objName.length() <= 8 && objName.chars().noneMatch(Character::isWhitespace)
-                    && !Arrays.asList("rhs", "bnd", "rng").contains(objName);
-            String objRow = fits ? objName : ExpressionsBasedModel.OBJECTIVE_EXPRESSION;
             String rhsId = "rhs";
             String bndId = "bnd";
             String rngId = "rng";
+            boolean fits = objName != null && FileFormatMPS.isMPSName(objName) && !Arrays.asList(rhsId, bndId, rngId).contains(objName);
+            String objRow = fits ? objName : ExpressionsBasedModel.OBJECTIVE_EXPRESSION;
 
+            // Rows by expression name (unique in a model), columns by variable index (names need not be)
             java.util.Set<String> usedNames = new java.util.HashSet<>(Arrays.asList(objRow, rhsId, bndId, rngId));
             Map<String, String> rowNames = new HashMap<>();
-            Map<String, String> columnNames = new HashMap<>();
             for (Expression expr : constraints) {
-                FileFormatMPS.mpsName(expr.getName(), 'E', rowNames, usedNames);
+                rowNames.put(expr.getName(), FileFormatMPS.mpsName(expr.getName(), 'E', usedNames));
             }
-            for (Variable var : variables) {
-                FileFormatMPS.mpsName(var.getName(), 'V', columnNames, usedNames);
+            String[] columnNames = new String[variables.size()];
+            for (int v = 0; v < columnNames.length; v++) {
+                columnNames[v] = FileFormatMPS.mpsName(variables.get(v).getName(), 'V', usedNames);
             }
 
             // NAME
@@ -608,7 +626,7 @@ final class FileFormatMPS {
                     integerBlock = false;
                 }
 
-                String varName = columnNames.get(var.getName());
+                String varName = columnNames[v];
                 IntIndex varIndex = new IntIndex(v);
 
                 BigDecimal objCoeff = objective.get(varIndex);
@@ -682,8 +700,8 @@ final class FileFormatMPS {
             writer.write("BOUNDS");
             writer.newLine();
 
-            for (Variable var : variables) {
-                FileFormatMPS.writeBounds(writer, bndId, var, columnNames.get(var.getName()));
+            for (int v = 0; v < columnNames.length; v++) {
+                FileFormatMPS.writeBounds(writer, bndId, variables.get(v), columnNames[v]);
             }
 
             // QUADOBJ
@@ -701,7 +719,7 @@ final class FileFormatMPS {
                             BigDecimal transpose = objective.get(new IntRowColumn(col, row));
                             qValue = entry.getValue().add(transpose);
                         }
-                        FileFormatMPS.writeField3(writer, columnNames.get(variables.get(row).getName()), columnNames.get(variables.get(col).getName()), qValue);
+                        FileFormatMPS.writeField3(writer, columnNames[row], columnNames[col], qValue);
                     }
                 }
             }

@@ -194,7 +194,8 @@ public interface IntegerStrategy {
         public final double fractionality;
         /**
          * The maximum number of separation rounds at one node. Each round calls every enabled separator once
-         * and then re-solves the relaxation. Rounds stop early when no separator produces a cut.
+         * and then re-solves the relaxation. Rounds stop early when no separator produces a cut. At the root
+         * there can be up to 3 times as many rounds, as long as they improve the bound.
          */
         public final int iterations;
         /**
@@ -209,7 +210,7 @@ public interface IntegerStrategy {
          * The cut types to use, in the order they are attempted within a round. The order matters: the
          * separators that scan the model's rows also see the cuts added earlier in the same round, and when
          * two separators find the same cut the one that runs second looks unproductive and is switched off
-         * first. An empty list turns cut generation off.
+         * first. An empty list turns cut generation off. Implied bound cuts are only generated at the root.
          */
         public final List<CutType> types;
         /**

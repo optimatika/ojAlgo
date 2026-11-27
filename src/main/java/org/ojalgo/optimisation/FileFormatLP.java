@@ -33,10 +33,12 @@ import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import org.ojalgo.structure.Structure1D.IntIndex;
@@ -50,10 +52,18 @@ import org.ojalgo.structure.Structure2D.IntRowColumn;
  * model means without anything showing it. Two things beyond the bare format are read as CPLEX reads them:
  * {@code =<} and {@code =>} mean {@code <=} and {@code >=}, and a constant in the objective function is the
  * objective constant.
+ * <p>
+ * Writing gives each variable, constraint and the objective function a name the format has, whatever its name
+ * is in the model – see {@link #lpName(String, Set)}. Names may change, the model does not.
  *
  * @author apete
  */
 abstract class FileFormatLP {
+
+    /**
+     * The longest name CPLEX takes.
+     */
+    private static final int MAX_NAME_LENGTH = 255;
 
     /**
      * The tokens of an LP file, each with the number of the line it is on, and how far reading has come.
@@ -292,6 +302,14 @@ abstract class FileFormatLP {
         return Character.isLetter(c) || c == '_';
     }
 
+    /**
+     * Whether a character is written as part of a name: an ASCII letter or digit, '_' or '.'. The reader takes
+     * any letter, but other programs reading the file may not.
+     */
+    private static boolean isNameCharacter(final char c) {
+        return 'a' <= c && c <= 'z' || 'A' <= c && c <= 'Z' || '0' <= c && c <= '9' || c == '_' || c == '.';
+    }
+
     private static boolean isNumber(final String token) {
         if (token.isEmpty()) {
             return false;
@@ -347,6 +365,38 @@ abstract class FileFormatLP {
             case ">=" -> entity.lower(value);
             default   -> entity.level(value);
         }
+    }
+
+    /**
+     * A name the LP format has, for an entity of the model, unique among those already used: the entity's own
+     * name, where that is one, and otherwise one made from it. Each character the format does not have becomes
+     * '_', and a name that would not be read as a name – it is empty, starts with a digit or a period, or is a
+     * word the format keeps for itself, such as End or inf – gets '_' in front. A name already used gets _2,
+     * _3 and so on after it. At most {@value #MAX_NAME_LENGTH} characters.
+     */
+    private static String lpName(final String original, final Set<String> used) {
+
+        StringBuilder builder = new StringBuilder(original.length() + 1);
+        for (int i = 0; i < original.length(); i++) {
+            char c = original.charAt(i);
+            builder.append(FileFormatLP.isNameCharacter(c) ? c : '_');
+        }
+
+        String candidate = builder.toString();
+        if (!FileFormatLP.isVariableName(candidate) || "free".equalsIgnoreCase(candidate)) {
+            candidate = "_" + candidate;
+        }
+        if (candidate.length() > MAX_NAME_LENGTH) {
+            candidate = candidate.substring(0, MAX_NAME_LENGTH);
+        }
+
+        String retVal = candidate;
+        for (int count = 2; !used.add(retVal); count++) {
+            String suffix = "_" + count;
+            retVal = candidate.substring(0, Math.min(candidate.length(), MAX_NAME_LENGTH - suffix.length())) + suffix;
+        }
+
+        return retVal;
     }
 
     private static BigDecimal number(final Tokens tokens) {
@@ -833,11 +883,10 @@ abstract class FileFormatLP {
         };
     }
 
-    private static void writeBound(final BufferedWriter writer, final Variable var) throws IOException {
+    private static void writeBound(final BufferedWriter writer, final Variable var, final String name) throws IOException {
 
         BigDecimal lower = var.getLowerLimit();
         BigDecimal upper = var.getUpperLimit();
-        String name = var.getName();
 
         if (lower == null && upper == null) {
             writer.write("  ");
@@ -874,12 +923,12 @@ abstract class FileFormatLP {
         }
     }
 
-    private static void writeConstraint(final BufferedWriter writer, final List<Variable> variables, final Expression expr) throws IOException {
+    private static void writeConstraint(final BufferedWriter writer, final String[] variables, final Expression expr, final String name) throws IOException {
 
         Optimisation.ConstraintType type = expr.getConstraintType();
 
         writer.write("  ");
-        writer.write(expr.getName());
+        writer.write(name);
         writer.write(":");
 
         switch (type) {
@@ -915,14 +964,14 @@ abstract class FileFormatLP {
         writer.newLine();
     }
 
-    private static void writeExpressionTerms(final BufferedWriter writer, final List<Variable> variables, final Expression expr) throws IOException {
+    private static void writeExpressionTerms(final BufferedWriter writer, final String[] variables, final Expression expr) throws IOException {
         FileFormatLP.writeLinearTerms(writer, variables, expr);
         if (expr.isAnyQuadraticFactorNonZero()) {
             FileFormatLP.writeQuadraticTerms(writer, variables, expr, false);
         }
     }
 
-    private static void writeLinearTerms(final BufferedWriter writer, final List<Variable> variables, final Expression expression) throws IOException {
+    private static void writeLinearTerms(final BufferedWriter writer, final String[] variables, final Expression expression) throws IOException {
         boolean first = true;
         for (Entry<IntIndex, BigDecimal> entry : expression.getLinearEntrySet()) {
             BigDecimal value = entry.getValue();
@@ -930,7 +979,7 @@ abstract class FileFormatLP {
                 continue;
             }
 
-            String varName = variables.get(entry.getKey().index).getName();
+            String varName = variables[entry.getKey().index];
 
             if (first) {
                 if (value.signum() < 0) {
@@ -948,7 +997,7 @@ abstract class FileFormatLP {
         }
     }
 
-    private static void writeQuadraticTerms(final BufferedWriter writer, final List<Variable> variables, final Expression expression,
+    private static void writeQuadraticTerms(final BufferedWriter writer, final String[] variables, final Expression expression,
             final boolean objectiveHalf) throws IOException {
 
         writer.write(" + [");
@@ -981,8 +1030,8 @@ abstract class FileFormatLP {
                 continue;
             }
 
-            String var1 = variables.get(row).getName();
-            String var2 = variables.get(col).getName();
+            String var1 = variables[row];
+            String var2 = variables[col];
 
             if (first) {
                 if (value.signum() < 0) {
@@ -1090,18 +1139,27 @@ abstract class FileFormatLP {
             Expression objective = model.objective();
             Optimisation.Sense sense = model.getOptimisationSense();
 
+            // Names the format has: variables apart, and constraints and the objective function apart
+            Set<String> usedColumns = new HashSet<>();
+            String[] names = new String[variables.size()];
+            for (int i = 0; i < names.length; i++) {
+                names[i] = FileFormatLP.lpName(variables.get(i).getName(), usedColumns);
+            }
+            Set<String> usedRows = new HashSet<>();
+            String objectiveName = model.getObjectiveName();
+            String objectiveRow = FileFormatLP.lpName(objectiveName != null ? objectiveName : ExpressionsBasedModel.OBJECTIVE_EXPRESSION, usedRows);
+
             // Sense
             writer.write(sense == Optimisation.Sense.MAX ? "Maximize" : "Minimize");
             writer.newLine();
 
             // Objective
-            String name = model.getObjectiveName();
             writer.write("  ");
-            writer.write(name != null ? name : ExpressionsBasedModel.OBJECTIVE_EXPRESSION);
+            writer.write(objectiveRow);
             writer.write(":");
-            FileFormatLP.writeLinearTerms(writer, variables, objective);
+            FileFormatLP.writeLinearTerms(writer, names, objective);
             if (objective.isAnyQuadraticFactorNonZero()) {
-                FileFormatLP.writeQuadraticTerms(writer, variables, objective, true);
+                FileFormatLP.writeQuadraticTerms(writer, names, objective, true);
             }
             BigDecimal constant = objective.getConstant();
             if (constant.signum() != 0) {
@@ -1118,24 +1176,25 @@ abstract class FileFormatLP {
                 if (!expr.isConstraint()) {
                     continue;
                 }
-                FileFormatLP.writeConstraint(writer, variables, expr);
+                FileFormatLP.writeConstraint(writer, names, expr, FileFormatLP.lpName(expr.getName(), usedRows));
             }
 
             // Bounds
             writer.write("Bounds");
             writer.newLine();
-            for (Variable var : variables) {
-                FileFormatLP.writeBound(writer, var);
+            for (int i = 0; i < names.length; i++) {
+                FileFormatLP.writeBound(writer, variables.get(i), names[i]);
             }
 
             // Generals and Binary
-            List<Variable> generals = new ArrayList<>();
-            List<Variable> binaries = new ArrayList<>();
-            for (Variable var : variables) {
+            List<String> generals = new ArrayList<>();
+            List<String> binaries = new ArrayList<>();
+            for (int i = 0; i < names.length; i++) {
+                Variable var = variables.get(i);
                 if (var.isBinary()) {
-                    binaries.add(var);
+                    binaries.add(names[i]);
                 } else if (var.isInteger()) {
-                    generals.add(var);
+                    generals.add(names[i]);
                 }
             }
 
@@ -1143,8 +1202,8 @@ abstract class FileFormatLP {
                 writer.write("Generals");
                 writer.newLine();
                 StringBuilder sb = new StringBuilder(" ");
-                for (Variable var : generals) {
-                    sb.append(' ').append(var.getName());
+                for (String name : generals) {
+                    sb.append(' ').append(name);
                 }
                 writer.write(sb.toString());
                 writer.newLine();
@@ -1154,8 +1213,8 @@ abstract class FileFormatLP {
                 writer.write("Binary");
                 writer.newLine();
                 StringBuilder sb = new StringBuilder(" ");
-                for (Variable var : binaries) {
-                    sb.append(' ').append(var.getName());
+                for (String name : binaries) {
+                    sb.append(' ').append(name);
                 }
                 writer.write(sb.toString());
                 writer.newLine();

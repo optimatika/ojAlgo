@@ -137,11 +137,6 @@ public abstract class ModelStrategy implements IntegerStrategy {
         }
 
         /**
-         * Cuts are useful if they move the LP bound of the node by more than this, relative to the bound (at
-         * least 1).
-         */
-        private static final double CUT_IMPROVEMENT = 1.0E-4;
-        /**
          * Never skip more opportunities than this, see {@link #isCutRatherThanBranch}.
          */
         private static final int CUT_INTERVAL_LIMIT = 1024;
@@ -411,6 +406,11 @@ public abstract class ModelStrategy implements IntegerStrategy {
 
     }
 
+    /**
+     * Cuts are useful if they move the LP bound of the node by more than this, relative to the bound (at least
+     * 1).
+     */
+    static final double CUT_IMPROVEMENT = 1.0E-4;
     /**
      * Absolute tolerance, as a fraction of the lattice unit, when rounding objective values to the lattice.
      */

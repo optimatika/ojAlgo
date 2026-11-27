@@ -370,8 +370,11 @@ abstract class SimplexSolver extends LinearSolver {
      */
     private static final NumberContext PIVOT_BLOCKING = NumberContext.ofPrecision(9);
     /**
-     * Elements of the primal pivot column smaller than this never bound the step, see {@link #PIVOT_GROWTH}.
-     * {@link SparseDecomposition} considers a basis with a smaller pivot singular.
+     * Elements of the primal pivot column smaller than this never bound the step, see {@link #PIVOT_GROWTH},
+     * and elements of the dual pivot row smaller than this count as zero: they neither enter nor reach
+     * anything, see {@link #judgeInfeasibility(ExitInfo)}. {@link SparseDecomposition} considers a basis with
+     * a smaller pivot singular. Such an element is typically the rounding error of an element that is 0 – a
+     * refactorisation can turn a row of zeros into a row of those – so it must not decide anything.
      */
     private static final double PIVOT_FLOOR = 1E-11;
     /**
@@ -1231,7 +1234,8 @@ abstract class SimplexSolver extends LinearSolver {
      * regular candidates: those with elements that are small neither by {@link #PIVOT} nor by
      * {@link #PIVOT_GROWTH}. If none enters, because there are none or because they can all switch bounds
      * without removing the infeasibility, they are kept together with the candidates with elements that are
-     * small only by {@link #PIVOT}, see {@link #judgeInfeasibility(ExitInfo)}.
+     * small only by {@link #PIVOT}, see {@link #judgeInfeasibility(ExitInfo)}. Elements smaller than
+     * {@link #PIVOT_FLOOR} are no candidates at all.
      *
      * @return true if a regular candidate enters
      */
@@ -1278,7 +1282,7 @@ abstract class SimplexSolver extends LinearSolver {
             double denom = mySimplex.getCurrentElement(exit, je);
             double scale = Math.abs(denom);
             largestInRow = Math.max(largestInRow, scale);
-            if (denom == ZERO) {
+            if (scale < PIVOT_FLOOR) {
                 continue;
             }
 

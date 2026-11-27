@@ -35,9 +35,16 @@ import org.ojalgo.optimisation.Variable;
 public class DeepDiveTest extends OptimisationIntegerTests {
 
     /**
-     * 2x - 2y - s = 1 with x and y integer, and s between 0 and 0.5, has no integer solution. But the LP
-     * relaxation is feasible, with fractional x or y, until one of them has come to its upper limit: each
-     * branching moves it a step, so the dive is twice that limit deep.
+     * Cuts would solve it at the root
+     */
+    private static final IntegerStrategy.ConfigurableStrategy NO_CUTS = IntegerStrategy.DEFAULT
+            .withCutConfiguration(IntegerStrategy.DEFAULT.getCutConfiguration().withTypes());
+
+    /**
+     * 2x - 2y + 2z - s = 1 with x, y and z integer, and s between 0 and 0.5, has no integer solution. But the
+     * LP relaxation is feasible, with one of them fractional, until they have come to their limits: each
+     * branching moves one of them a step, so the dive is as deep as the limit. (With only x and y bound
+     * propagation takes many steps at a time, but not with 3 variables.)
      */
     private static ExpressionsBasedModel newModel(final int limit) {
 
@@ -45,29 +52,44 @@ public class DeepDiveTest extends OptimisationIntegerTests {
 
         Variable x = model.newVariable("x").lower(0).upper(limit).integer().weight(1);
         Variable y = model.newVariable("y").lower(0).upper(limit).integer();
+        Variable z = model.newVariable("z").lower(0).upper(limit).integer();
         Variable s = model.newVariable("s").lower(0).upper(0.5);
 
         Expression link = model.newExpression("link").level(1);
         link.set(x, 2);
         link.set(y, -2);
+        link.set(z, 2);
         link.set(s, -1);
 
         model.options.parallelism(1);
-        // Cuts would solve it at the root
-        model.options.integer(IntegerStrategy.DEFAULT.withCutConfiguration(IntegerStrategy.DEFAULT.getCutConfiguration().withTypes()));
+        model.options.integer(NO_CUTS);
 
         return model;
     }
 
     /**
-     * A dive of 100 000 nodes
+     * A dive that is 12 000 nodes deep
      */
     @Test
     public void testDepth() {
 
-        Optimisation.Result result = DeepDiveTest.newModel(50_000).minimise();
+        int[] depth = new int[1];
+
+        ExpressionsBasedModel model = DeepDiveTest.newModel(12_000);
+        model.options.integer(NO_CUTS.withModelStrategyFactory((m, strategy) -> new ModelStrategy.AbstractStrategy(m, strategy) {
+
+            @Override
+            protected void onNodeSolved(final NodeKey key, final Optimisation.Result child, final double childObj, final boolean minimisation) {
+                depth[0] = Math.max(depth[0], key.depth);
+                super.onNodeSolved(key, child, childObj, minimisation);
+            }
+
+        }));
+
+        Optimisation.Result result = model.minimise();
 
         TestUtils.assertEquals(Optimisation.State.INFEASIBLE, result.getState());
+        TestUtils.assertTrue("Depth " + depth[0], depth[0] > 11_000);
     }
 
     /**

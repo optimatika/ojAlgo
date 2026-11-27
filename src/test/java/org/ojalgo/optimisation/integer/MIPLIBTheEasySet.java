@@ -33,7 +33,10 @@ import org.ojalgo.type.context.NumberContext;
  * the top commercial solvers ALL can solve. Something for ojAlgo to aim for...
  * <p>
  * The definition of which models to include is not entirely deterministic. Any update to either of the
- * solvers or the benchmark code may change the outcome. Currently there are 103 models in this set.
+ * solvers or the benchmark code may change the outcome. Currently there are 104 models in this set.
+ * <p>
+ * There are 105 tests: one per model in the benchmark project's {@code AbstractMIPLIB.EASY_SET} or
+ * {@code AbstractMIPLIB.UNSTABLE} (neos5 is only in the latter). The tags decide which of them are run.
  * <p>
  * The tag 'slow' means getting a response takes too long (regardless of what the response is). The tag
  * 'unstable' means there is (sometimes) a problem with the returned solution (possibly that we've never seen
@@ -76,6 +79,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 2s
      * <li>2026-08-21: 0.2s
+     * <li>2026-11-26: 0.09s
      * </ul>
      */
     @Test
@@ -94,6 +98,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 2s
      * <li>2026-08-21: 0.3s
+     * <li>2026-11-26: 0.1s
      * </ul>
      */
     @Test
@@ -112,9 +117,9 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 601s
      * <li>2026-08-21: 10min
+     * <li>2026-11-26: 11-13s
      * </ul>
      */
-    @Tag("unstable")
     @Tag("slow")
     @Test
     public void testAflow30a() {
@@ -132,6 +137,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 2s
      * <li>2026-08-21: 0.02s
+     * <li>2026-11-26: 0.01s
      * </ul>
      */
     @Tag("pure-integer")
@@ -171,6 +177,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 2s
      * <li>2026-08-21: 1s
+     * <li>2026-11-26: 0.4s
      * </ul>
      */
     @Test
@@ -195,6 +202,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * with its defaults). With the default gap the search legitimately stops on an incumbent within 0.007% of
      * the optimum (a +-1 shift on two general integers away from it) in about half the runs. The assertion
      * accuracy now matches the gap tolerance, so any incumbent within the band passes.
+     * <li>2026-11-26: 1s
      * </ul>
      */
     @Test
@@ -213,6 +221,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 602s
      * <li>2026-08-21: OutOfMemoryError
+     * <li>2026-11-26: 2-3s
      * </ul>
      */
     @Tag("unstable")
@@ -233,9 +242,9 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 21s
      * <li>2026-08-21: 16s
+     * <li>2026-11-26: 0.6-0.8s
      * </ul>
      */
-    @Tag("slow")
     @Test
     public void testBell5() {
         MIPLIBTheEasySet.doTest("bell5.mps", "8966406.49", null);
@@ -252,9 +261,9 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 37s
      * <li>2026-08-21: 26s
+     * <li>2026-11-26: 1s
      * </ul>
      */
-    @Tag("slow")
     @Test
     public void testBienst1() {
         MIPLIBTheEasySet.doTest("bienst1.mps", "46.75", null);
@@ -266,8 +275,12 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * 505 variables, 577 expressions, density 0.0020
      * <p>
      * HiGHS 281s, SCIP 142s
+     * <p>
+     * MacBook Pro (2026) M5 Pro, 48GB
+     * <ul>
+     * <li>2026-11-26: 6-14s
+     * </ul>
      */
-    @Tag("unstable")
     @Tag("slow")
     @Test
     public void testBienst2() {
@@ -290,6 +303,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * optimum was pruned as infeasible. The warm path now finishes with primal iterations, and a node that is
      * neither optimal nor infeasible aborts the search instead of being pruned. Reproduced by looping the
      * model with a dozen busy threads in the same JVM.
+     * <li>2026-11-26: 0.2s
      * </ul>
      */
     @Test
@@ -308,6 +322,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 1s
      * <li>2026-08-21: 0.01s
+     * <li>2026-11-26: 0.01s
      * </ul>
      */
     @Tag("pure-integer")
@@ -327,6 +342,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 3s
      * <li>2026-08-21: 0.4s
+     * <li>2026-11-26: 0.2s
      * </ul>
      */
     @Test
@@ -345,6 +361,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 0.2s
      * <li>2026-08-21: 0.1s
+     * <li>2026-11-26: 0.04s
      * </ul>
      */
     @Tag("pure-integer")
@@ -368,6 +385,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * continuous variables, so every incumbent within the default relative gap (18.8 here) is a legitimate
      * stop, and which one comes first depends on thread timing. The assertion accuracy now matches the gap
      * tolerance, so any incumbent within the band passes.
+     * <li>2026-11-26: 0.2s
      * </ul>
      */
     @Test
@@ -400,6 +418,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 1s
      * <li>2026-08-21: 1s
+     * <li>2026-11-26: 0.03s
      * </ul>
      */
     @Test
@@ -418,6 +437,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 1s
      * <li>2026-08-21: 0.1s
+     * <li>2026-11-26: 0.02s
      * </ul>
      */
     @Tag("pure-integer")
@@ -437,6 +457,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 21s
      * <li>2026-08-21: 15s
+     * <li>2026-11-26: 5-44s
      * </ul>
      */
     @Tag("slow")
@@ -472,6 +493,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 3s
      * <li>2026-08-21: 0.5s
+     * <li>2026-11-26: 0.6s
      * </ul>
      */
     @Tag("pure-integer")
@@ -511,6 +533,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 2s
      * <li>2026-08-21: 0.1s
+     * <li>2026-11-26: 0.07s
      * </ul>
      */
     @Tag("pure-integer")
@@ -593,6 +616,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-09-05: wrong answer (1202100) about once in 500 solves: node bounds overwrote a variable that
      * presolve had fixed from an equality row already marked redundant, so the node LP lacked that row and
      * its "optimal" point was discarded by validation. Node bounds now only ever tighten (NodeKey).
+     * <li>2026-11-26: 0.01s
      * </ul>
      */
     @Test
@@ -611,6 +635,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 4s
      * <li>2026-08-21: 7s
+     * <li>2026-11-26: 0.03s
      * </ul>
      */
     @Test
@@ -624,8 +649,12 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * 35 variables, 29 expressions, density 1.0
      * <p>
      * HiGHS 263s, SCIP 158s
+     * <p>
+     * MacBook Pro (2026) M5 Pro, 48GB
+     * <ul>
+     * <li>2026-11-26: 15-18s
+     * </ul>
      */
-    @Tag("unstable")
     @Tag("slow")
     @Tag("pure-integer")
     @Test
@@ -639,8 +668,12 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * 29 variables, 47 expressions, density 1.0
      * <p>
      * HiGHS 281s, SCIP 145s
+     * <p>
+     * MacBook Pro (2026) M5 Pro, 48GB
+     * <ul>
+     * <li>2026-11-26: 16-19s
+     * </ul>
      */
-    @Tag("unstable")
     @Tag("slow")
     @Tag("pure-integer")
     @Test
@@ -659,6 +692,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 2s
      * <li>2026-08-21: 0.01s
+     * <li>2026-11-26: 0.01s
      * </ul>
      */
     @Test
@@ -687,6 +721,20 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
     }
 
     /**
+     * https://miplib.zib.de/instance_details_gsvm2rl3.html
+     * <p>
+     * 241 variables, 181 expressions, density 0.75
+     * <p>
+     * HiGHS 6.0s, SCIP 7.5s
+     */
+    @Tag("unstable")
+    @Tag("slow")
+    @Test
+    public void testGsvm2rl3() {
+        MIPLIBTheEasySet.doTest("gsvm2rl3.mps", "0.33652753", null);
+    }
+
+    /**
      * https://miplib.zib.de/instance_details_gt2.html
      * <p>
      * 188 variables, 30 expressions, density 0.49
@@ -697,6 +745,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 1s
      * <li>2026-08-21: 0.1s
+     * <li>2026-11-26: 0.1s
      * </ul>
      */
     @Tag("pure-integer")
@@ -736,6 +785,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 2s
      * <li>2026-08-21: 0.1s
+     * <li>2026-11-26: 0.02s
      * </ul>
      */
     @Tag("pure-integer")
@@ -750,9 +800,12 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * 34 variables, 5 expressions, density 0.12
      * <p>
      * HiGHS 80s, SCIP 42.2s
+     * <p>
+     * MacBook Pro (2026) M5 Pro, 48GB
+     * <ul>
+     * <li>2026-11-26: 4-5s
+     * </ul>
      */
-    @Tag("unstable")
-    @Tag("slow")
     @Test
     public void testMarkshare_4_0() {
         MIPLIBTheEasySet.doTest("markshare_4_0.mps", "1", null);
@@ -769,6 +822,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 4s
      * <li>2026-08-21: 2s
+     * <li>2026-11-26: 3-4s
      * </ul>
      */
     @Test
@@ -807,10 +861,9 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 602s
      * <li>2026-08-21: 10min
+     * <li>2026-11-26: 3-4s
      * </ul>
      */
-    @Tag("unstable")
-    @Tag("slow")
     @Test
     public void testMik_250_20_75_1() {
         MIPLIBTheEasySet.doTest("mik-250-20-75-1.mps", "-49716", null);
@@ -827,10 +880,9 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 602s
      * <li>2026-08-21: 10min
+     * <li>2026-11-26: 7-9s
      * </ul>
      */
-    @Tag("unstable")
-    @Tag("slow")
     @Test
     public void testMik_250_20_75_2() {
         MIPLIBTheEasySet.doTest("mik-250-20-75-2.mps", "-50768", null);
@@ -847,10 +899,9 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 602s
      * <li>2026-08-21: 10min
+     * <li>2026-11-26: 4-7s
      * </ul>
      */
-    @Tag("unstable")
-    @Tag("slow")
     @Test
     public void testMik_250_20_75_3() {
         MIPLIBTheEasySet.doTest("mik-250-20-75-3.mps", "-52242", null);
@@ -867,9 +918,9 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 602s
      * <li>2026-08-21: 10min
+     * <li>2026-11-26: 16-20s
      * </ul>
      */
-    @Tag("unstable")
     @Tag("slow")
     @Test
     public void testMik_250_20_75_4() {
@@ -887,10 +938,9 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 603s
      * <li>2026-08-21: 10min
+     * <li>2026-11-26: 4s
      * </ul>
      */
-    @Tag("unstable")
-    @Tag("slow")
     @Test
     public void testMik_250_20_75_5() {
         MIPLIBTheEasySet.doTest("mik-250-20-75-5.mps", "-51532", null);
@@ -907,6 +957,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 2s
      * <li>2026-08-21: 0.01s
+     * <li>2026-11-26: 0.03s
      * </ul>
      */
     @Test
@@ -925,6 +976,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 1s
      * <li>2026-08-21: 0.01s
+     * <li>2026-11-26: 0.01s
      * </ul>
      */
     @Test
@@ -943,6 +995,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 2s
      * <li>2026-08-21: 0.1s
+     * <li>2026-11-26: 0.03s
      * </ul>
      */
     @Test
@@ -961,6 +1014,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 2s
      * <li>2026-08-21: 1s
+     * <li>2026-11-26: 0.04s
      * </ul>
      */
     @Test
@@ -979,6 +1033,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 6s
      * <li>2026-08-21: 3s
+     * <li>2026-11-26: 1s
      * </ul>
      */
     @Test
@@ -997,6 +1052,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 2s
      * <li>2026-08-21: 0.1s
+     * <li>2026-11-26: 0.05s
      * </ul>
      */
     @Tag("pure-integer")
@@ -1016,6 +1072,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 1s
      * <li>2026-08-21: 0.02s
+     * <li>2026-11-26: 0.01s
      * </ul>
      */
     @Test
@@ -1054,6 +1111,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 0.1s
      * <li>2026-08-21: 0.01s
+     * <li>2026-11-26: 0.01s
      * </ul>
      */
     @Test
@@ -1069,6 +1127,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * HiGHS 5.1s, SCIP 2.0s
      */
     @Tag("slow")
+    @Tag("unstable")
     @Test
     public void testNeos_1430701() {
         MIPLIBTheEasySet.doTest("neos-1430701.mps", "-77", null);
@@ -1106,6 +1165,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 149s
      * <li>2026-08-21: 198s
+     * <li>2026-11-26: 17-22s
      * </ul>
      */
     @Tag("slow")
@@ -1145,6 +1205,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 297s
      * <li>2026-08-21: 341s
+     * <li>2026-11-26: 7-8s
      * </ul>
      */
     @Tag("slow")
@@ -1164,9 +1225,9 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 72s
      * <li>2026-08-21: 48s
+     * <li>2026-11-26: 5-9s
      * </ul>
      */
-    @Tag("slow")
     @Test
     public void testNeos_3611447_jijia() {
         MIPLIBTheEasySet.doTest("neos-3611447-jijia.mps", "107", null);
@@ -1183,9 +1244,9 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 121s
      * <li>2026-08-21: 57s
+     * <li>2026-11-26: 5-8s
      * </ul>
      */
-    @Tag("slow")
     @Test
     public void testNeos_3611689_kaihu() {
         MIPLIBTheEasySet.doTest("neos-3611689-kaihu.mps", "119", null);
@@ -1202,6 +1263,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 0.1s
      * <li>2026-08-21: 0.01s
+     * <li>2026-11-26: 0.01s
      * </ul>
      */
     @Test
@@ -1217,6 +1279,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * HiGHS 8.8s, SCIP 11.2s
      */
     @Tag("slow")
+    @Tag("unstable")
     @Test
     public void testNeos_911880() {
         MIPLIBTheEasySet.doTest("neos-911880.mps", "54.76", null);
@@ -1230,6 +1293,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * HiGHS 3.9s, SCIP 16.0s
      */
     @Tag("slow")
+    @Tag("unstable")
     @Test
     public void testNeos_911970() {
         MIPLIBTheEasySet.doTest("neos-911970.mps", "54.76", null);
@@ -1340,6 +1404,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 2s
      * <li>2026-08-21: 0.01s
+     * <li>2026-11-26: 0.01s
      * </ul>
      */
     @Tag("pure-integer")
@@ -1359,6 +1424,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 0.1s
      * <li>2026-08-21: 0.01s
+     * <li>2026-11-26: 0.01s
      * </ul>
      */
     @Tag("pure-integer")
@@ -1378,6 +1444,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 2s
      * <li>2026-08-21: 0.1s
+     * <li>2026-11-26: 0.1s
      * </ul>
      */
     @Tag("pure-integer")
@@ -1397,6 +1464,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 2s
      * <li>2026-08-21: 0.1s
+     * <li>2026-11-26: 0.1s
      * </ul>
      */
     @Tag("pure-integer")
@@ -1416,6 +1484,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 1s
      * <li>2026-08-21: 0.03s
+     * <li>2026-11-26: 0.02s
      * </ul>
      */
     @Tag("pure-integer")
@@ -1435,10 +1504,9 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 602s
      * <li>2026-08-21: 10min
+     * <li>2026-11-26: 3s
      * </ul>
      */
-    @Tag("unstable")
-    @Tag("slow")
     @Tag("pure-integer")
     @Test
     public void testP0548() {
@@ -1456,6 +1524,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 47s
      * <li>2026-08-21: 34s
+     * <li>2026-11-26: 13-17s
      * </ul>
      */
     @Tag("slow")
@@ -1475,6 +1544,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 2s
      * <li>2026-08-21: 0.02s
+     * <li>2026-11-26: 0.01s
      * </ul>
      */
     @Tag("pure-integer")
@@ -1494,6 +1564,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 3s
      * <li>2026-08-21: 2s
+     * <li>2026-11-26: 2s
      * </ul>
      */
     @Test
@@ -1512,9 +1583,9 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 602s
      * <li>2026-08-21: 10min
+     * <li>2026-11-26: 21-27s
      * </ul>
      */
-    @Tag("unstable")
     @Tag("slow")
     @Test
     public void testPp08a() {
@@ -1532,6 +1603,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 311s
      * <li>2026-08-21: 301s
+     * <li>2026-11-26: 19-25s
      * </ul>
      */
     @Tag("slow")
@@ -1551,6 +1623,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 117s
      * <li>2026-08-21: 23min
+     * <li>2026-11-26: 5s
      * </ul>
      */
     @Tag("unstable")
@@ -1631,6 +1704,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 143s
      * <li>2026-08-21: 142s
+     * <li>2026-11-26: 12-16s
      * </ul>
      */
     @Tag("slow")
@@ -1670,11 +1744,26 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 2s
      * <li>2026-08-21: 0.1s
+     * <li>2026-11-26: 0.08s
      * </ul>
      */
     @Test
     public void testRgn() {
         MIPLIBTheEasySet.doTest("rgn.mps", "82.2", null);
+    }
+
+    /**
+     * https://miplib.zib.de/instance_details_rlp1.html
+     * <p>
+     * 461 variables, 69 expressions, density 0.0022
+     * <p>
+     * HiGHS 204ms, SCIP 15.8s
+     */
+    @Tag("unstable")
+    @Tag("slow")
+    @Test
+    public void testRlp1() {
+        MIPLIBTheEasySet.doTest("rlp1.mps", "15", null);
     }
 
     /**
@@ -1708,6 +1797,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 0.2s
      * <li>2026-08-21: 0.01s
+     * <li>2026-11-26: 0.01s
      * </ul>
      */
     @Test
@@ -1726,6 +1816,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 2s
      * <li>2026-08-21: 0.01s
+     * <li>2026-11-26: 0.01s
      * </ul>
      */
     @Tag("pure-integer")
@@ -1746,6 +1837,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-07-17: 602s
      * <li>2026-08-21: 10min
      * <li>2026-08-22: 0.3s (flow cover cut propagation)
+     * <li>2026-11-26: 0.09s
      * </ul>
      */
     @Test
@@ -1785,6 +1877,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <li>2026-07-17: 603s
      * <li>2026-08-21: 10min
      * <li>2026-08-23: 0.2s (flow cover cuts)
+     * <li>2026-11-26: 0.03s
      * </ul>
      */
     @Test
@@ -1823,6 +1916,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 2s
      * <li>2026-08-21: 0.01s
+     * <li>2026-11-26: 0.01s
      * </ul>
      */
     @Tag("pure-integer")
@@ -1842,6 +1936,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 2s
      * <li>2026-08-21: 0.2s
+     * <li>2026-11-26: 0.03s
      * </ul>
      */
     @Tag("pure-integer")
@@ -1861,9 +1956,9 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 5s
      * <li>2026-08-21: 10s
+     * <li>2026-11-26: 2s
      * </ul>
      */
-    @Tag("slow")
     @Tag("pure-integer")
     @Test
     public void testStein45() {
@@ -1881,6 +1976,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 0.1s
      * <li>2026-08-21: 0.01s
+     * <li>2026-11-26: 0.01s
      * </ul>
      */
     @Tag("pure-integer")
@@ -1900,6 +1996,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 1s
      * <li>2026-08-21: 0.1s
+     * <li>2026-11-26: 0.02s
      * </ul>
      */
     @Tag("pure-integer")
@@ -1919,6 +2016,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 2s
      * <li>2026-08-21: 0.1s
+     * <li>2026-11-26: 0.02s
      * </ul>
      */
     @Tag("pure-integer")
@@ -1978,9 +2076,9 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 602s
      * <li>2026-08-21: 10min
+     * <li>2026-11-26: 19-27s
      * </ul>
      */
-    @Tag("unstable")
     @Tag("slow")
     @Test
     public void testVpm1() {
@@ -1998,9 +2096,9 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2026-07-17: 237s
      * <li>2026-08-21: 520s
+     * <li>2026-11-26: 10-21s
      * </ul>
      */
-    @Tag("unstable")
     @Tag("slow")
     @Test
     public void testVpm2() {

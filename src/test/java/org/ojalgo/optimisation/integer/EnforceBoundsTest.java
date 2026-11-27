@@ -56,6 +56,88 @@ public class EnforceBoundsTest extends OptimisationIntegerTests {
     }
 
     /**
+     * The same node with other bounds of one variable, but not what that implies for the others
+     */
+    private static NodeKey tighten(final NodeKey key, final ExpressionsBasedModel model, final ModelStrategy strategy, final int index, final int lower,
+            final int upper) {
+
+        ExpressionsBasedModel unconstrained = new ExpressionsBasedModel();
+        for (Variable variable : model.getVariables()) {
+            unconstrained.newVariable(variable.getName()).lower(variable.getLowerLimit()).upper(variable.getUpperLimit());
+        }
+
+        int[] lowerBounds = key.copyLowerBounds();
+        int[] upperBounds = key.copyUpperBounds();
+        lowerBounds[index] = lower;
+        upperBounds[index] = upper;
+
+        return key.withTightened(lowerBounds, upperBounds, BoundPropagator.of(unconstrained, strategy));
+    }
+
+    /**
+     * A variable that can be negative as well as positive is fixed, with any of ojAlgo's LP solvers. With the
+     * primal ones it's two variables, and only one of them was fixed: the LP solution had another value. (The
+     * LP is not the same as one built from scratch, as that has its limits rounded, but it can't be tighter.)
+     */
+    @Test
+    public void testFixed() {
+
+        int nbCompared = 0;
+
+        for (boolean primal : new boolean[] { false, true }) {
+            for (Boolean sparse : new Boolean[] { Boolean.FALSE, Boolean.TRUE }) {
+                for (int seed = 1; seed <= 100; seed++) {
+
+                    Random random = new Random(seed);
+
+                    ExpressionsBasedModel model = new ExpressionsBasedModel();
+                    model.options.sparse = sparse;
+                    if (primal) {
+                        model.options.linear().primal();
+                    } else {
+                        model.options.linear().dual();
+                    }
+                    for (int j = 0; j < 4; j++) {
+                        model.newVariable("x" + j).integer().lower(-5).upper(5).weight(random.nextInt(21) - 10);
+                    }
+                    for (int i = 0; i < 3; i++) {
+                        Expression row = model.newExpression("row" + i).lower(-7).upper(7);
+                        for (int j = 0; j < 4; j++) {
+                            row.set(j, random.nextInt(15) - 7);
+                        }
+                    }
+
+                    ModelStrategy strategy = IntegerStrategy.DEFAULT.newModelStrategy(model);
+                    NodeKey root = new NodeKey(model);
+                    NodeSolver solver = EnforceBoundsTest.newSolver(model, root, strategy);
+                    EnforceBoundsTest.solve(solver);
+
+                    int index = random.nextInt(4);
+                    int value = random.nextInt(11) - 5;
+                    NodeKey key = EnforceBoundsTest.tighten(root, model, strategy, index, value, value);
+                    key.enforceBounds(solver, root, strategy);
+
+                    Optimisation.Result actual = solver.solve();
+                    Optimisation.Result scratch = EnforceBoundsTest.newSolver(model, key, strategy).solve();
+
+                    String description = "Primal " + primal + ", sparse " + sparse + ", seed " + seed + ", x" + index + " = " + value;
+
+                    if (actual.getState().isOptimal()) {
+                        TestUtils.assertEquals(description, value, actual.doubleValue(index), 1E-7);
+                        nbCompared++;
+                    }
+                    if (scratch.getState().isOptimal()) {
+                        TestUtils.assertTrue(description, actual.getState().isOptimal());
+                        TestUtils.assertTrue(description, actual.getValue() >= scratch.getValue() - 1E-7);
+                    }
+                }
+            }
+        }
+
+        TestUtils.assertTrue("Compared " + nbCompared, nbCompared > 100);
+    }
+
+    /**
      * Models small enough to enumerate all the combinations, with variables that can be both negative and
      * positive.
      */
@@ -172,8 +254,9 @@ public class EnforceBoundsTest extends OptimisationIntegerTests {
             EnforceBoundsTest.solve(solver);
             TestUtils.assertEquals(1, builds.get());
 
-            NodeKey key = negative ? root.createLowerBranch(1, -0.5, 0.0) : root.createUpperBranch(1, 0.5, 0.0);
-            key.enforceBounds(solver, strategy);
+            BoundPropagator propagator = BoundPropagator.of(model, strategy);
+            NodeKey key = negative ? root.createLowerBranch(1, -0.5, 0.0, propagator, null) : root.createUpperBranch(1, 0.5, 0.0, propagator, null);
+            key.enforceBounds(solver, root, strategy);
             double actual = EnforceBoundsTest.solve(solver);
             TestUtils.assertEquals(1, builds.get());
 
@@ -187,10 +270,13 @@ public class EnforceBoundsTest extends OptimisationIntegerTests {
             EnforceBoundsTest.solve(solver);
             TestUtils.assertEquals(3, builds.get());
 
-            key = negative ? root.withTightenedUpper(1, -1) : root.withTightenedLower(1, 1);
+            key = EnforceBoundsTest.tighten(root, model, strategy, 1, negative ? -5 : 1, negative ? -1 : 5);
             key.enforceBounds(solver, 1, strategy);
-            TestUtils.assertEquals(expected, EnforceBoundsTest.solve(solver), 1E-9);
+            actual = EnforceBoundsTest.solve(solver);
             TestUtils.assertEquals(3, builds.get());
+
+            expected = EnforceBoundsTest.solve(EnforceBoundsTest.newSolver(model, key, strategy));
+            TestUtils.assertEquals(expected, actual, 1E-9);
         }
     }
 
@@ -213,7 +299,7 @@ public class EnforceBoundsTest extends OptimisationIntegerTests {
         model.newExpression("r1").set(u, 2).set(v, 3).set(w, 4).upper(6);
 
         ModelStrategy strategy = IntegerStrategy.DEFAULT.newModelStrategy(model);
-        NodeKey key = new NodeKey(model).withTightenedLower(0, 1);
+        NodeKey key = EnforceBoundsTest.tighten(new NodeKey(model), model, strategy, 0, 1, 1);
         NodeSolver solver = EnforceBoundsTest.newSolver(model, key, strategy);
 
         EnforceBoundsTest.solve(solver);
@@ -221,12 +307,12 @@ public class EnforceBoundsTest extends OptimisationIntegerTests {
         TestUtils.assertFalse(solver.isInSolver(1));
         TestUtils.assertTrue(solver.isInSolver(2));
 
-        key = key.withTightenedUpper(1, 0);
+        key = EnforceBoundsTest.tighten(key, model, strategy, 1, 0, 0);
         key.enforceBounds(solver, 1, strategy);
         EnforceBoundsTest.solve(solver);
         TestUtils.assertEquals(1, builds.get());
 
-        key = key.withTightenedUpper(2, 0);
+        key = EnforceBoundsTest.tighten(key, model, strategy, 2, 0, 0);
         key.enforceBounds(solver, 2, strategy);
         double actual = EnforceBoundsTest.solve(solver);
         TestUtils.assertEquals(1, builds.get());

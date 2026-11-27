@@ -38,9 +38,7 @@ public class CutBackOffTest extends OptimisationIntegerTests {
 
     private static ModelStrategy.DefaultStrategy newStrategy(final Optimisation.Sense sense) {
 
-        ExpressionsBasedModel model = new ExpressionsBasedModel();
-        model.newVariable("x").binary().weight(1);
-        model.newVariable("y").binary().weight(1);
+        ExpressionsBasedModel model = CutBackOffTest.newModel();
         model.prepare(sense, NodeSolver::new);
 
         ModelStrategy.DefaultStrategy retVal = new ModelStrategy.DefaultStrategy(model, IntegerStrategy.DEFAULT);
@@ -49,13 +47,22 @@ public class CutBackOffTest extends OptimisationIntegerTests {
         return retVal;
     }
 
+    private static ExpressionsBasedModel newModel() {
+
+        ExpressionsBasedModel retVal = new ExpressionsBasedModel();
+        retVal.newVariable("x").binary().weight(1);
+        retVal.newVariable("y").binary().weight(1);
+
+        return retVal;
+    }
+
+    private static BoundPropagator newPropagator() {
+        ExpressionsBasedModel model = CutBackOffTest.newModel();
+        return BoundPropagator.of(model, IntegerStrategy.DEFAULT.newModelStrategy(model));
+    }
+
     private static NodeKey newRoot() {
-
-        ExpressionsBasedModel model = new ExpressionsBasedModel();
-        model.newVariable("x").binary().weight(1);
-        model.newVariable("y").binary().weight(1);
-
-        return new NodeKey(model);
+        return new NodeKey(CutBackOffTest.newModel());
     }
 
     /**
@@ -196,7 +203,7 @@ public class CutBackOffTest extends OptimisationIntegerTests {
 
         ModelStrategy strategy = CutBackOffTest.newStrategy(Optimisation.Sense.MIN);
         NodeKey key = CutBackOffTest.newRoot();
-        NodeKey other = key.createLowerBranch(0, 0.5, 10.0);
+        NodeKey other = key.createLowerBranch(0, 0.5, 10.0, CutBackOffTest.newPropagator(), null);
 
         TestUtils.assertTrue(CutBackOffTest.isAttempt(strategy, key, 1000.0));
         strategy.onCutSuccess(key);

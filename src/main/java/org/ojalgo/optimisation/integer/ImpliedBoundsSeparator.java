@@ -50,6 +50,11 @@ import org.ojalgo.type.context.NumberContext;
  * <p>
  * Only non-binary target variables are considered; implications between two binaries are conflicts, handled
  * by the {@link CliqueSeparator}.
+ * <p>
+ * Only used at the root. At other nodes the bounds the cuts are derived from are those that bound propagation
+ * has tightened, so the cuts are only valid in that subtree, and once {@code x} is fixed they say no more
+ * than the propagated bound of {@code y}. Generated there anyway, they made the search trees 2–3 times larger
+ * (MIPLIB mik-250-20-75 models, 2026-11).
  */
 final class ImpliedBoundsSeparator extends NodeSolver.Separator {
 
@@ -284,6 +289,11 @@ final class ImpliedBoundsSeparator extends NodeSolver.Separator {
         }
 
         return this.endRound(round);
+    }
+
+    @Override
+    boolean isRootOnly() {
+        return true;
     }
 
     /**

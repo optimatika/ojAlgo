@@ -21,6 +21,8 @@
  */
 package org.ojalgo.optimisation.linear;
 
+import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.function.Function;
 
@@ -29,6 +31,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.State;
@@ -342,6 +345,47 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
         // That's different from what the EBM would result in.
 
         RevisedSimplexSolverTest.doTestPhasedVariants(builder, expected);
+    }
+
+    /**
+     * A node LP from the branch-and-bound search of the MIPLIB model misc07: the binaries fixed (or not) as
+     * at that node, and the objective limited by the optimal value. It is infeasible. The revised (sparse) dual
+     * simplex came to a basic variable 100 outside its bound, with a pivot row of zeros. Refactorising the
+     * basis turned the zeros into rounding errors, about 1e-14, some of them in columns with an infinite
+     * range. Together those were thought to reach the bound, so the row was not taken as proof of
+     * infeasibility, and one of them entered the basis instead: a singular basis and state FAILED.
+     */
+    @Test
+    public void testMisc07Node() {
+
+        int[] fixedAtOne = { 11, 29, 244 };
+        int[] notFixed = { 59, 60, 61, 63, 66, 67, 69, 79, 87, 89, 90, 91, 97, 101, 102, 114, 115, 120, 121, 130, 142, 144, 145, 150, 151, 153, 160, 167,
+                171, 172, 174, 175, 177, 180, 181, 196, 198, 201, 205, 207, 211, 235, 240, 241, 246, 248, 250 };
+
+        for (Boolean sparse : new Boolean[] { Boolean.TRUE, Boolean.FALSE }) {
+
+            ExpressionsBasedModel model = ModelFileTest.makeModel("MIPLIB", "misc07.mps", false).simplify();
+
+            for (Variable variable : model.getVariables()) {
+                if (variable.isInteger()) {
+                    int index = model.indexOf(variable);
+                    int lower = Arrays.binarySearch(fixedAtOne, index) >= 0 ? 1 : 0;
+                    int upper = lower == 1 || Arrays.binarySearch(notFixed, index) >= 0 ? 1 : 0;
+                    variable.lower(lower).upper(upper);
+                    variable.relax();
+                }
+            }
+
+            model.limitObjective(null, BigDecimal.valueOf(2810));
+
+            if (DEBUG) {
+                model.options.debug(LinearSolver.class);
+            }
+            model.options.linear().dual();
+            model.options.sparse = sparse;
+
+            TestUtils.assertEquals(State.INFEASIBLE, model.minimise().getState());
+        }
     }
 
     /**

@@ -26,7 +26,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.Optional;
 
 import org.ojalgo.matrix.MatrixC128;
@@ -435,32 +434,36 @@ public interface BasicLogger {
     Optional<Writer> asWriter();
 
     /**
-     * Will print 1 line/row with the objects in fixed width columns
+     * Will print 1 line/row with the objects in fixed width columns. Anything longer than width - 1 is cut,
+     * so there is always at least one space between columns. The line is put together first, and then printed
+     * with a single {@link #println(Object)} - so that lines logged from different threads don't get mixed up
+     * with each other.
      *
      * @param width   The exact witdth of each column
      * @param columns The column objects, {@link Object#toString()} and then fix the length/width
      */
     default void columns(final int width, final Object... columns) {
 
-        char[] chars = new char[width];
-        Arrays.fill(chars, ASCII.SP);
-        String padder = new String(chars);
+        int limit = Math.max(0, width - 1);
 
-        String[] strings = new String[columns.length];
+        StringBuilder line = new StringBuilder(width * columns.length);
 
-        for (int i = 0; i < strings.length; i++) {
-            strings[i] = String.valueOf(columns[i]);
+        for (Object column : columns) {
+            String string = String.valueOf(column);
+            if (string.length() > limit) {
+                line.append(string, 0, limit);
+                for (int i = limit; i < width; i++) {
+                    line.append(ASCII.SP);
+                }
+            } else {
+                line.append(string);
+                for (int i = string.length(); i < width; i++) {
+                    line.append(ASCII.SP);
+                }
+            }
         }
-        for (int i = 0; i < strings.length; i++) {
-            strings[i] = strings[i] + padder;
-        }
-        for (int i = 0; i < strings.length; i++) {
-            strings[i] = strings[i].substring(0, width);
-        }
-        for (int i = 0; i < strings.length; i++) {
-            this.print(strings[i]);
-        }
-        this.println();
+
+        this.println(line);
     }
 
     void print(boolean value);
@@ -488,11 +491,12 @@ public interface BasicLogger {
     void println();
 
     default void println(final int tabs, final String message, final Object... args) {
+        StringBuilder line = new StringBuilder();
         for (int i = 0; i < tabs; i++) {
-            this.print(ASCII.HT);
+            line.append(ASCII.HT);
         }
-        this.print(TypeUtils.format(message, args));
-        this.println();
+        line.append(TypeUtils.format(message, args));
+        this.println(line);
     }
 
     default void println(final Object object) {
@@ -501,8 +505,8 @@ public interface BasicLogger {
     }
 
     default void println(final String message, final Object... args) {
-        this.print(TypeUtils.format(message, args));
-        this.println();
+        Object line = TypeUtils.format(message, args);
+        this.println(line);
     }
 
     default void println(final Throwable throwable, final String message, final Object... args) {

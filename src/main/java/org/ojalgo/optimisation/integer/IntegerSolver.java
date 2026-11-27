@@ -290,6 +290,7 @@ public final class IntegerSolver extends GenericSolver {
     private volatile double myInterruptedBound;
     private final NodeStatistics myNodeStatistics = new NodeStatistics();
     private volatile boolean myOptimalityProven = false;
+    private BoundPropagator myPropagator = null;
     /**
      * Set when the root problem, the LP relaxation, is unbounded. Then the model is either infeasible or
      * unbounded, see {@link #resolveUnboundedRelaxation(Optimisation.Result)}.
@@ -349,6 +350,26 @@ public final class IntegerSolver extends GenericSolver {
             return mySense == Optimisation.Sense.MIN ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
         }
         return mySense == Optimisation.Sense.MIN ? Math.min(bound1, bound2) : Math.max(bound1, bound2);
+    }
+
+    /**
+     * A branch that the bound propagation found infeasible is not evaluated, or deferred. Otherwise it's as any
+     * other infeasible node – the strategy needs to know about it to choose what to branch on.
+     *
+     * @return The branch, or null if it was dropped
+     */
+    private NodeKey dropIfInfeasible(final NodeKey branch, final ModelStrategy strategy) {
+
+        if (branch.isFeasible()) {
+            return branch;
+        }
+
+        Optimisation.Result incumbent = myBestResultSoFar;
+        strategy.markInfeasible(branch, incumbent != null, incumbent != null ? incumbent.getValue() : Double.NaN);
+        myNodeStatistics.infeasible();
+        branch.dispose();
+
+        return null;
     }
 
     /**
@@ -561,6 +582,11 @@ public final class IntegerSolver extends GenericSolver {
                         int gi = myStrategy.getIndex(ii);
                         double v = rootResult.doubleValue(gi);
 
+                        if (v < rootNode.getLowerBound(ii) || v > rootNode.getUpperBound(ii)) {
+                            // Excluded by what an earlier probe implied
+                            continue;
+                        }
+
                         Variable variable = rootSolver.getVariable(gi);
                         double origLower = variable.getLowerLimit(false, NEGATIVE_INFINITY);
                         double origUpper = variable.getUpperLimit(false, POSITIVE_INFINITY);
@@ -610,23 +636,27 @@ public final class IntegerSolver extends GenericSolver {
                             return myNodeStatistics.infeasible();
                         }
 
-                        if (downInfeasible) {
-                            NodeKey prev = rootNode;
-                            rootNode = rootNode.withTightenedLower(ii, ceilVal);
-                            if (prev != rootNode) {
-                                if (prev != originalRootNode) {
-                                    prev.dispose();
-                                }
-                                rootNode.enforceBounds(rootSolver, ii, myStrategy);
+                        if (downInfeasible || upInfeasible) {
+
+                            int[] lowerBounds = rootNode.copyLowerBounds();
+                            int[] upperBounds = rootNode.copyUpperBounds();
+                            if (downInfeasible) {
+                                lowerBounds[ii] = Math.max(lowerBounds[ii], (int) ceilVal);
+                            } else {
+                                upperBounds[ii] = Math.min(upperBounds[ii], (int) floorVal);
                             }
-                        } else if (upInfeasible) {
-                            NodeKey prev = rootNode;
-                            rootNode = rootNode.withTightenedUpper(ii, floorVal);
-                            if (prev != rootNode) {
-                                if (prev != originalRootNode) {
-                                    prev.dispose();
-                                }
-                                rootNode.enforceBounds(rootSolver, ii, myStrategy);
+
+                            NodeKey tightened = rootNode.withTightened(lowerBounds, upperBounds, myPropagator);
+
+                            if (tightened == null) {
+                                rootSolver.dispose();
+                                return myNodeStatistics.infeasible();
+                            }
+
+                            if (tightened != rootNode) {
+                                tightened.enforceBounds(rootSolver, rootNode, myStrategy);
+                                IntegerSolver.disposeUnlessSame(rootNode, originalRootNode);
+                                rootNode = tightened;
                             }
                         }
                     }
@@ -636,7 +666,7 @@ public final class IntegerSolver extends GenericSolver {
                 }
             }
 
-            return this.compute(rootNode, rootSolver, rootPrinter, myStrategy);
+            return this.compute(rootNode, rootSolver, rootPrinter, myStrategy, myPropagator);
 
         } finally {
             if (rootNode != originalRootNode) {
@@ -743,6 +773,8 @@ public final class IntegerSolver extends GenericSolver {
         // makes those later calls pure updates and removes the race.
         myIntegerModel.limitObjective(null, null);
 
+        myPropagator = BoundPropagator.of(myIntegerModel, myStrategy);
+
         if (point != null && point.getState().isApproximate() && myIntegerModel.validate(point)) {
             // Must verify that it actually is an integer solution
             // The kickStarter may be user-supplied
@@ -752,16 +784,25 @@ public final class IntegerSolver extends GenericSolver {
             }
         }
 
-        NodeKey rootNode = new NodeKey(myIntegerModel);
-        ExpressionsBasedModel rootModel = myIntegerModel.snapshot();
-        rootNode.setNodeState(rootModel, myStrategy);
+        NodeKey rootNode = NodeKey.newRoot(myIntegerModel, myPropagator);
+        AtomicBoolean solverNormalExit;
 
-        RingLogger rootPrinter = this.newPrinter();
+        if (rootNode == null) {
 
-        NodeSolver rootSolver = rootModel.prepare(mySense, NodeSolver::new);
-        AtomicBoolean solverNormalExit = new AtomicBoolean(this.processRoot(rootNode, rootSolver, rootPrinter));
+            solverNormalExit = new AtomicBoolean(myNodeStatistics.infeasible());
 
-        rootNode.dispose();
+        } else {
+
+            ExpressionsBasedModel rootModel = myIntegerModel.snapshot();
+            rootNode.setNodeState(rootModel, myStrategy);
+
+            RingLogger rootPrinter = this.newPrinter();
+
+            NodeSolver rootSolver = rootModel.prepare(mySense, NodeSolver::new);
+            solverNormalExit = new AtomicBoolean(this.processRoot(rootNode, rootSolver, rootPrinter));
+
+            rootNode.dispose();
+        }
 
         Map<Comparator<NodeKey>, MultiviewSet<NodeKey>.PrioritisedView> views = new ConcurrentHashMap<>();
 
@@ -783,6 +824,7 @@ public final class IntegerSolver extends GenericSolver {
             MultiviewSet<NodeKey>.PrioritisedView view = views.computeIfAbsent(workerPriority, myDeferredNodes::newView);
 
             RingLogger nodePrinter = this.newPrinter();
+            BoundPropagator propagator = myPropagator.newInstance();
 
             Thread worker = Thread.currentThread();
             Double pessimistic = Double.valueOf(mySense == Optimisation.Sense.MIN ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY);
@@ -813,7 +855,7 @@ public final class IntegerSolver extends GenericSolver {
                             ExpressionsBasedModel nodeModel = myIntegerModel.snapshot();
                             node.setNodeState(nodeModel, myStrategy);
                             NodeSolver nodeSolver = nodeModel.prepare(mySense, NodeSolver::new);
-                            workerNormalExit &= this.compute(node, nodeSolver, nodePrinter, myStrategy);
+                            workerNormalExit &= this.compute(node, nodeSolver, nodePrinter, myStrategy, propagator);
                         }
 
                         node.dispose();
@@ -905,6 +947,9 @@ public final class IntegerSolver extends GenericSolver {
 
         this.log("Done {} {} iterations in {} with {}", iterationsDone, classSimpleName, duration, myNodeStatistics);
         this.log("Cuts {}", myCutStatistics);
+        if (myPropagator != null) {
+            this.log("Propagation {}", myPropagator);
+        }
 
         if (myBoundView != null) {
             this.logBounds(this.globalDualBound(myBoundView));
@@ -975,12 +1020,12 @@ public final class IntegerSolver extends GenericSolver {
         if (mySense != Optimisation.Sense.MAX) {
             double limit = bestValue - nudge;
             if (Double.isFinite(limit)) {
-                myIntegerModel.limitObjective(null, BigDecimal.valueOf(limit));
+                myPropagator.setObjectiveLimit(myIntegerModel.limitObjective(null, BigDecimal.valueOf(limit)));
             }
         } else {
             double limit = bestValue + nudge;
             if (Double.isFinite(limit)) {
-                myIntegerModel.limitObjective(BigDecimal.valueOf(limit), null);
+                myPropagator.setObjectiveLimit(myIntegerModel.limitObjective(BigDecimal.valueOf(limit), null));
             }
         }
     }
@@ -1026,7 +1071,8 @@ public final class IntegerSolver extends GenericSolver {
      *                 disposed, here.)
      * @return true unless the search should stop
      */
-    boolean compute(final NodeKey inputKey, final NodeSolver nodeSolver, final RingLogger nodePrinter, final ModelStrategy strategy) {
+    boolean compute(final NodeKey inputKey, final NodeSolver nodeSolver, final RingLogger nodePrinter, final ModelStrategy strategy,
+            final BoundPropagator propagator) {
 
         NodeKey nodeKey = inputKey;
         Optimisation.Result resultWithCuts = null; // When the node has just been solved again, with cuts
@@ -1061,9 +1107,6 @@ public final class IntegerSolver extends GenericSolver {
                     nodeResult = resultWithCuts;
                     resultWithCuts = null;
                 } else {
-                    if (nodeKey.index >= 0) {
-                        nodeKey.enforceBounds(nodeSolver, strategy);
-                    }
                     nodeResult = nodeSolver.solve(bestEstimate);
                 }
 
@@ -1156,12 +1199,34 @@ public final class IntegerSolver extends GenericSolver {
                 double nodeValue = nodeResult.getValue();
                 strategy.onNodeSolved(nodeKey, nodeResult, nodeValue, mySense == Optimisation.Sense.MIN);
 
+                // The node's reduced costs as a row, propagated when its branches are derived – in addition to
+                // fixing (and propagating) the node itself, see fixByReducedCost(..). Now, while the reduced costs
+                // are those of this solve: fixing by reduced cost updates the node solver.
+                BoundPropagator.Cutoff reducedCost = nodeSolver.isInPlaceBoundUpdateSafe()
+                        ? this.newReducedCostCutoff(nodeSolver, nodeResult, nodeValue, propagator)
+                        : null;
+
                 if (nodeSolver.isInPlaceBoundUpdateSafe()) {
                     if (myBestResultSoFar != null) {
-                        NodeKey tightened = this.fixByReducedCost(nodeKey, nodeSolver, nodeResult, nodeValue, strategy);
+                        NodeKey tightened = this.fixByReducedCost(nodeKey, nodeSolver, nodeResult, nodeValue, strategy, propagator);
+                        if (tightened == null) {
+                            if (nodePrinter != null && this.isLogDebug()) {
+                                nodePrinter.println("No better solutions, by reduced cost - stop this branch!");
+                                IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
+                            }
+                            nodeSolver.dispose();
+                            return myNodeStatistics.exhausted();
+                        }
                         if (tightened != nodeKey) {
+                            tightened.enforceBounds(nodeSolver, nodeKey, strategy);
                             IntegerSolver.disposeUnlessSame(nodeKey, inputKey);
                             nodeKey = tightened;
+                            if (!nodeKey.isWithinBounds(nodeResult, strategy)) {
+                                if (nodePrinter != null && this.isLogDebug()) {
+                                    nodePrinter.println("Node solution excluded, by reduced cost - solve it again!");
+                                }
+                                continue;
+                            }
                         }
                     } else {
                         this.tryRounding(nodeKey, nodeResult, strategy);
@@ -1235,26 +1300,48 @@ public final class IntegerSolver extends GenericSolver {
                     }
                 }
 
-                if (!NodeKey.isBranchable(variableValue)) {
+                // A variable that is fixed should have that value. Then the solver doesn't respect the bounds, and
+                // branching would make no difference.
+                boolean fixed = nodeKey.getLowerBound(branchIntegerIndex) >= nodeKey.getUpperBound(branchIntegerIndex);
+
+                if (fixed || !NodeKey.isBranchable(variableValue)) {
                     if (nodePrinter != null && this.isLogDebug()) {
-                        nodePrinter.println("Can't branch on {} @ {} - outside the int range. Stop this branch!", branchIntegerIndex, variableValue);
+                        nodePrinter.println("Can't branch on {} @ {} - fixed, or outside the int range. Stop this branch!", branchIntegerIndex, variableValue);
                         IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
                     }
                     nodeSolver.dispose();
                     return this.markUnresolved(nodeValue);
                 }
 
-                NodeKey lowerBranch = nodeKey.createLowerBranch(branchIntegerIndex, variableValue, nodeValue);
-                NodeKey upperBranch = nodeKey.createUpperBranch(branchIntegerIndex, variableValue, nodeValue);
+                NodeKey lowerBranch = this.dropIfInfeasible(nodeKey.createLowerBranch(branchIntegerIndex, variableValue, nodeValue, propagator, reducedCost),
+                        strategy);
+                NodeKey upperBranch = this.dropIfInfeasible(nodeKey.createUpperBranch(branchIntegerIndex, variableValue, nodeValue, propagator, reducedCost),
+                        strategy);
 
                 NodeKey continued;
-                if (lowerBranch.displacement < upperBranch.displacement) {
-                    myDeferredNodes.add(upperBranch);
+                NodeKey deferred;
+                if (upperBranch == null || lowerBranch != null && lowerBranch.displacement < upperBranch.displacement) {
                     continued = lowerBranch;
+                    deferred = upperBranch;
                 } else {
-                    myDeferredNodes.add(lowerBranch);
                     continued = upperBranch;
+                    deferred = lowerBranch;
                 }
+
+                if (deferred != null) {
+                    myDeferredNodes.add(deferred);
+                }
+
+                if (continued == null) {
+                    if (nodePrinter != null && this.isLogDebug()) {
+                        nodePrinter.println("Neither branch has a solution - stop this branch!");
+                        IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
+                    }
+                    nodeSolver.dispose();
+                    return true;
+                }
+
+                continued.enforceBounds(nodeSolver, nodeKey, strategy);
 
                 IntegerSolver.disposeUnlessSame(nodeKey, inputKey);
                 nodeKey = continued;
@@ -1265,67 +1352,82 @@ public final class IntegerSolver extends GenericSolver {
         }
     }
 
-    NodeKey fixByReducedCost(final NodeKey original, final NodeSolver nodeSolver, final Optimisation.Result nodeResult, final double nodeValue,
-            final ModelStrategy strategy) {
+    /**
+     * With the reduced costs and the incumbent: in any better solution a variable can't be too far from the
+     * bound it has in the relaxed solution. What that implies for the other variables is propagated. That may
+     * exclude the relaxed solution, then the node needs to be solved again.
+     *
+     * @return The same node, with tighter bounds if any was found, or null if there is no better solution
+     */
+    NodeKey fixByReducedCost(final NodeKey nodeKey, final NodeSolver nodeSolver, final Optimisation.Result nodeResult, final double nodeValue,
+            final ModelStrategy strategy, final BoundPropagator propagator) {
 
         double incumbentValue = myBestResultSoFar.getValue();
         double gap = mySense == Optimisation.Sense.MIN ? incumbentValue - nodeValue : nodeValue - incumbentValue;
 
         if (gap <= ZERO) {
-            return original;
+            return nodeKey;
         }
 
-        int nbIntegers = strategy.countIntegerVariables();
+        int[] lowerBounds = nodeKey.copyLowerBounds();
+        int[] upperBounds = nodeKey.copyUpperBounds();
 
-        // All of it before any bound is enforced, as a solver that has been updated may not have it any more
-        double[] reducedGradient = new double[nbIntegers];
-        for (int i = 0; i < nbIntegers; i++) {
-            if (original.getLowerBound(i) < original.getUpperBound(i)) {
-                reducedGradient[i] = nodeSolver.getReducedGradient(strategy.getIndex(i));
-            }
-        }
+        for (int i = 0, limit = strategy.countIntegerVariables(); i < limit; i++) {
 
-        NodeKey nodeKey = original;
+            double lower = nodeKey.getLowerBound(i);
+            double upper = nodeKey.getUpperBound(i);
 
-        for (int i = 0; i < nbIntegers; i++) {
+            if (lower < upper) {
 
-            double absRC = Math.abs(reducedGradient[i]);
+                int globalIndex = strategy.getIndex(i);
+                double absRC = Math.abs(nodeSolver.getReducedGradient(globalIndex));
 
-            if (absRC > ZERO) {
+                if (absRC > ZERO) {
 
-                double lower = nodeKey.getLowerBound(i);
-                double upper = nodeKey.getUpperBound(i);
-                double value = nodeResult.doubleValue(strategy.getIndex(i));
-
-                if (Math.abs(value - lower) < 0.5) {
+                    double value = nodeResult.doubleValue(globalIndex);
                     double maxSteps = Math.floor(gap / absRC);
+
                     if (maxSteps < upper - lower) {
-                        NodeKey prev = nodeKey;
-                        nodeKey = nodeKey.withTightenedUpper(i, lower + maxSteps);
-                        if (prev != nodeKey) {
-                            if (prev != original) {
-                                prev.dispose();
+                        if (Math.abs(value - lower) < HALF) {
+                            if (lower + maxSteps < upperBounds[i]) {
+                                upperBounds[i] = (int) (lower + maxSteps);
                             }
-                            nodeKey.enforceBounds(nodeSolver, i, strategy);
-                        }
-                    }
-                } else if (Math.abs(value - upper) < 0.5) {
-                    double maxSteps = Math.floor(gap / absRC);
-                    if (maxSteps < upper - lower) {
-                        NodeKey prev = nodeKey;
-                        nodeKey = nodeKey.withTightenedLower(i, upper - maxSteps);
-                        if (prev != nodeKey) {
-                            if (prev != original) {
-                                prev.dispose();
+                        } else if (Math.abs(value - upper) < HALF) {
+                            if (upper - maxSteps > lowerBounds[i]) {
+                                lowerBounds[i] = (int) (upper - maxSteps);
                             }
-                            nodeKey.enforceBounds(nodeSolver, i, strategy);
                         }
                     }
                 }
             }
         }
 
-        return nodeKey;
+        return nodeKey.withTightened(lowerBounds, upperBounds, propagator);
+    }
+
+    /**
+     * The node's reduced cost row, to be propagated when its branches are derived. Should be called before
+     * the node solver is updated (the reduced costs are those of the latest solve).
+     *
+     * @return null if there is no incumbent, or no row
+     */
+    BoundPropagator.Cutoff newReducedCostCutoff(final NodeSolver nodeSolver, final Optimisation.Result nodeResult, final double nodeValue,
+            final BoundPropagator propagator) {
+
+        Optimisation.Result incumbent = myBestResultSoFar;
+
+        if (incumbent == null) {
+            return null;
+        }
+
+        double incumbentValue = incumbent.getValue();
+        double gap = mySense == Optimisation.Sense.MIN ? incumbentValue - nodeValue : nodeValue - incumbentValue;
+
+        if (!(gap > ZERO)) {
+            return null;
+        }
+
+        return propagator.newReducedCostCutoff(j -> nodeSolver.getReducedGradient(j), j -> nodeResult.doubleValue(j), gap);
     }
 
     CutStatistics getCutStatistics() {

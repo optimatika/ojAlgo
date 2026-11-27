@@ -29,7 +29,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import org.ojalgo.netio.ASCII;
@@ -40,6 +42,28 @@ abstract class FileFormatEBM {
 
     private static final String TAB = String.valueOf(ASCII.HT);
     private static final String COMMENT = "*";
+
+    /**
+     * A name as written: a tab, which separates the fields, and a line break, which ends the line, are
+     * replaced by a no-break space. An expression's name is also unique among those already used – as the
+     * model requires – with _2, _3 and so on after it if not. A variable's name need not be: variables are
+     * known by their index.
+     */
+    private static String ebmName(final String original, final Set<String> used) {
+
+        String candidate = original.replace(ASCII.HT, ASCII.NBSP).replace(ASCII.LF, ASCII.NBSP).replace(ASCII.CR, ASCII.NBSP);
+
+        if (used == null) {
+            return candidate;
+        }
+
+        String retVal = candidate;
+        for (int count = 2; !used.add(retVal); count++) {
+            retVal = candidate + "_" + count;
+        }
+
+        return retVal;
+    }
 
     private static Expression readExpression(final ExpressionsBasedModel model, final String[] fields) {
 
@@ -100,9 +124,9 @@ abstract class FileFormatEBM {
         }
     }
 
-    private static void writeExpression(final Expression expression, final BufferedWriter writer) throws IOException {
+    private static void writeExpression(final Expression expression, final String name, final BufferedWriter writer) throws IOException {
         writer.write("E");
-        FileFormatEBM.writeModelEntity(expression, writer);
+        FileFormatEBM.writeModelEntity(expression, name, writer);
         writer.newLine();
     }
 
@@ -115,9 +139,8 @@ abstract class FileFormatEBM {
         writer.newLine();
     }
 
-    private static void writeModelEntity(final ModelEntity<?> entity, final BufferedWriter writer) throws IOException {
+    private static void writeModelEntity(final ModelEntity<?> entity, final String name, final BufferedWriter writer) throws IOException {
 
-        String name = entity.getName().replace(ASCII.HT, ASCII.NBSP);
         BigDecimal lower = entity.getLowerLimit();
         BigDecimal upper = entity.getUpperLimit();
         BigDecimal weight = entity.getContributionWeight();
@@ -154,7 +177,7 @@ abstract class FileFormatEBM {
 
     private static void writeVariable(final Variable variable, final BufferedWriter writer) throws IOException {
         writer.write("V");
-        FileFormatEBM.writeModelEntity(variable, writer);
+        FileFormatEBM.writeModelEntity(variable, FileFormatEBM.ebmName(variable.getName(), null), writer);
         writer.write(ASCII.HT);
         writer.write(Boolean.toString(variable.isInteger()));
         writer.write(ASCII.HT);
@@ -177,7 +200,7 @@ abstract class FileFormatEBM {
 
             while ((line = reader.readLine()) != null) {
 
-                String[] fields = line.split(TAB);
+                String[] fields = line.split(TAB, -1);
 
                 if (line.isBlank() || line.startsWith(COMMENT)) {
                     // Skip this line
@@ -223,8 +246,9 @@ abstract class FileFormatEBM {
                 FileFormatEBM.writeVariable(variable, writer);
             }
 
+            Set<String> used = new HashSet<>();
             for (Expression expression : model.getExpressions()) {
-                FileFormatEBM.writeExpression(expression, writer);
+                FileFormatEBM.writeExpression(expression, FileFormatEBM.ebmName(expression.getName(), used), writer);
                 for (Entry<IntIndex, BigDecimal> entry : expression.getLinearEntrySet()) {
                     FileFormatEBM.writeLinear(entry, writer);
                 }

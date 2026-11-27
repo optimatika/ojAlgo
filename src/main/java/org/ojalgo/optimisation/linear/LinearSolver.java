@@ -813,17 +813,20 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         @Override
         protected int getIndexInSolver(final ExpressionsBasedModel model, final Variable variable) {
 
-            int retVal = -1;
+            int positivePart = model.indexOfPositiveVariable(variable);
+            int negativePart = model.indexOfNegativeVariable(variable);
 
-            BigDecimal value = variable.getValue();
-
-            if ((value != null && value.signum() >= 0 || variable.isPositive()) && (retVal = model.indexOfPositiveVariable(variable)) >= 0) {
-                return retVal;
+            if (positivePart >= 0 && negativePart >= 0) {
+                // There is no single index, and changing only one of the parts is not enough
+                return -1;
             }
 
-            if ((value != null && value.signum() <= 0 || variable.isNegative()) && (retVal = model.indexOfNegativeVariable(variable)) >= 0) {
-                retVal += model.getPositiveVariables().size();
-                return retVal;
+            if (positivePart >= 0) {
+                return positivePart;
+            }
+
+            if (negativePart >= 0) {
+                return model.getPositiveVariables().size() + negativePart;
             }
 
             return -1;

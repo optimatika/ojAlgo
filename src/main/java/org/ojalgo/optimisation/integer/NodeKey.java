@@ -33,6 +33,7 @@ import org.ojalgo.array.operation.COPY;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.ObjectPool;
 import org.ojalgo.type.context.NumberContext;
 
@@ -86,6 +87,11 @@ public final class NodeKey implements Comparable<NodeKey> {
     public static final Comparator<NodeKey> SMALL_DISPLACEMENT = Comparator.comparingDouble((final NodeKey nk) -> nk.displacement);
 
     /**
+     * How far outside this node's bounds a value of the relaxed solution may be, and still count as within
+     * them, see {@link #isWithinBounds(Access1D, ModelStrategy)}.
+     */
+    private static final double BOUND_TOLERANCE = 1E-6;
+    /**
      * Used for one thing only - to validate (log problems with) node solver results. Does not effect the
      * algorithm.
      */
@@ -96,6 +102,16 @@ public final class NodeKey implements Comparable<NodeKey> {
     private static final BigDecimal INT_MIN = BigDecimal.valueOf(Integer.MIN_VALUE);
 
     static final double MINIMUM_DISPLACEMENT = 1E-9;
+
+    /**
+     * The root node, with the variables fixed that all constraints together imply can have only one value.
+     *
+     * @return null if there is no solution
+     */
+    static NodeKey newRoot(final ExpressionsBasedModel integerModel, final BoundPropagator propagator) {
+        NodeKey retVal = new NodeKey(integerModel);
+        return propagator.propagateRoot(retVal.myLowerBounds, retVal.myUpperBounds) ? retVal : null;
+    }
 
     /**
      * Apply this node's bounds to a model variable, but only ever tightening: the node model may already
@@ -192,6 +208,7 @@ public final class NodeKey implements Comparable<NodeKey> {
      */
     public final long sequence;
 
+    private final boolean myFeasible;
     private final IntArrayPool myIntArrayPool;
     private final int[] myLowerBounds;
     /**
@@ -203,8 +220,8 @@ public final class NodeKey implements Comparable<NodeKey> {
     private final boolean myUpperBranch;
 
     private NodeKey(final int[] lowerBounds, final int[] upperBounds, final long parentSequenceNumber, final int parentDepth, final int integerIndexBranchedOn,
-            final double branchVariableDisplacement, final double parentObjectiveFunctionValue, final boolean upperBranch, final IntArrayPool pool,
-            final AtomicLong sequenceGenerator) {
+            final double branchVariableDisplacement, final double parentObjectiveFunctionValue, final boolean upperBranch, final boolean feasible,
+            final IntArrayPool pool, final AtomicLong sequenceGenerator) {
 
         super();
 
@@ -221,6 +238,7 @@ public final class NodeKey implements Comparable<NodeKey> {
         objective = parentObjectiveFunctionValue;
 
         myUpperBranch = upperBranch;
+        myFeasible = feasible;
 
         myIntArrayPool = pool;
     }
@@ -241,6 +259,7 @@ public final class NodeKey implements Comparable<NodeKey> {
         objective = source.objective;
 
         myUpperBranch = source.myUpperBranch;
+        myFeasible = source.myFeasible;
 
         myIntArrayPool = source.myIntArrayPool;
         mySequenceGenerator = source.mySequenceGenerator;
@@ -274,6 +293,7 @@ public final class NodeKey implements Comparable<NodeKey> {
         objective = NaN;
 
         myUpperBranch = false;
+        myFeasible = true;
     }
 
     @Override
@@ -348,6 +368,15 @@ public final class NodeKey implements Comparable<NodeKey> {
         builder.append(myUpperBounds[idx]);
     }
 
+    private NodeKey createBranch(final int[] lowerBounds, final int[] upperBounds, final int branchIntegerIndex, final double branchDisplacement,
+            final double objVal, final boolean upperBranch, final BoundPropagator propagator, final BoundPropagator.Cutoff reducedCost) {
+
+        boolean feasible = propagator.propagate(lowerBounds, upperBounds, branchIntegerIndex, reducedCost);
+
+        return new NodeKey(lowerBounds, upperBounds, sequence, depth, branchIntegerIndex, branchDisplacement, objVal, upperBranch, feasible, myIntArrayPool,
+                mySequenceGenerator);
+    }
+
     private double feasible(final int idx, final double value, final boolean validate) {
 
         double feasibilityAdjusted = Math.min(Math.max(myLowerBounds[idx], value), myUpperBounds[idx]);
@@ -378,7 +407,16 @@ public final class NodeKey implements Comparable<NodeKey> {
         return COPY.invoke(myUpperBounds, myIntArrayPool.borrow());
     }
 
-    NodeKey createLowerBranch(final int branchIntegerIndex, final double value, final double objVal) {
+    /**
+     * The branch where the variable is at most its (fractional) value, rounded down. That's a new upper bound
+     * for one variable, and whatever bounds that implies for the others – or that there is no solution, see
+     * {@link #isFeasible()}.
+     *
+     * @param reducedCost This node's reduced cost row, propagated too, or null if there is none, see
+     *                    {@link BoundPropagator#newReducedCostCutoff(java.util.function.IntToDoubleFunction, java.util.function.IntToDoubleFunction, double)}
+     */
+    NodeKey createLowerBranch(final int branchIntegerIndex, final double value, final double objVal, final BoundPropagator propagator,
+            final BoundPropagator.Cutoff reducedCost) {
 
         int[] tmpLBs = this.copyLowerBounds();
         int[] tmpUBs = this.copyUpperBounds();
@@ -391,10 +429,19 @@ public final class NodeKey implements Comparable<NodeKey> {
             tmpUBs[branchIntegerIndex] = floorValue;
         }
 
-        return new NodeKey(tmpLBs, tmpUBs, sequence, depth, branchIntegerIndex, value - floorValue, objVal, false, myIntArrayPool, mySequenceGenerator);
+        return this.createBranch(tmpLBs, tmpUBs, branchIntegerIndex, value - floorValue, objVal, false, propagator, reducedCost);
     }
 
-    NodeKey createUpperBranch(final int branchIntegerIndex, final double value, final double objVal) {
+    /**
+     * The branch where the variable is at least its (fractional) value, rounded up. That's a new lower bound
+     * for one variable, and whatever bounds that implies for the others – or that there is no solution, see
+     * {@link #isFeasible()}.
+     *
+     * @param reducedCost This node's reduced cost row, propagated too, or null if there is none, see
+     *                    {@link BoundPropagator#newReducedCostCutoff(java.util.function.IntToDoubleFunction, java.util.function.IntToDoubleFunction, double)}
+     */
+    NodeKey createUpperBranch(final int branchIntegerIndex, final double value, final double objVal, final BoundPropagator propagator,
+            final BoundPropagator.Cutoff reducedCost) {
 
         int[] tmpLBs = this.copyLowerBounds();
         int[] tmpUBs = this.copyUpperBounds();
@@ -407,7 +454,7 @@ public final class NodeKey implements Comparable<NodeKey> {
             tmpLBs[branchIntegerIndex] = ceilValue;
         }
 
-        return new NodeKey(tmpLBs, tmpUBs, sequence, depth, branchIntegerIndex, ceilValue - value, objVal, true, myIntArrayPool, mySequenceGenerator);
+        return this.createBranch(tmpLBs, tmpUBs, branchIntegerIndex, ceilValue - value, objVal, true, propagator, reducedCost);
     }
 
     void dispose() {
@@ -434,8 +481,15 @@ public final class NodeKey implements Comparable<NodeKey> {
         }
     }
 
-    void enforceBounds(final NodeSolver nodeSolver, final ModelStrategy strategy) {
-        this.enforceBounds(nodeSolver, index, strategy);
+    /**
+     * Apply all of this node's bounds that differ from those of the other node, its parent
+     */
+    void enforceBounds(final NodeSolver nodeSolver, final NodeKey other, final ModelStrategy strategy) {
+        for (int idx = 0, limit = myLowerBounds.length; idx < limit; idx++) {
+            if (myLowerBounds[idx] != other.myLowerBounds[idx] || myUpperBounds[idx] != other.myUpperBounds[idx]) {
+                this.enforceBounds(nodeSolver, idx, strategy);
+            }
+        }
     }
 
     boolean equals(final int[] lowerBounds, final int[] upperBounds) {
@@ -492,6 +546,28 @@ public final class NodeKey implements Comparable<NodeKey> {
         return bound != Integer.MAX_VALUE ? bound : Double.POSITIVE_INFINITY;
     }
 
+    /**
+     * Are the integer variables within the bounds of this node? If it's the relaxed solution of the same node
+     * before its bounds were tightened, it is then still that.
+     */
+    boolean isWithinBounds(final Access1D<?> solution, final ModelStrategy strategy) {
+        for (int idx = 0; idx < myLowerBounds.length; idx++) {
+            double value = solution.doubleValue(strategy.getIndex(idx));
+            if (value < this.getLowerBound(idx) - BOUND_TOLERANCE || value > this.getUpperBound(idx) + BOUND_TOLERANCE) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * If not, the bound propagation found that there is no solution when this branch was created. It should
+     * not be evaluated, and its bounds should not be used.
+     */
+    boolean isFeasible() {
+        return myFeasible;
+    }
+
     boolean isLowerBranch() {
         return !myUpperBranch;
     }
@@ -512,31 +588,25 @@ public final class NodeKey implements Comparable<NodeKey> {
     }
 
     /**
-     * A node with the lower bound at {@code idx} raised to the integer {@code newLower}, or this node if that
-     * is not tighter or greater than {@link Integer#MAX_VALUE}.
+     * The same node with tighter bounds, and whatever bounds those imply for the other variables.
+     *
+     * @param lowerBounds Of the integer variables, what {@link #copyLowerBounds()} returned with some of them
+     *                    tighter. Not to be used after this call.
+     * @param upperBounds Of the integer variables, what {@link #copyUpperBounds()} returned with some of them
+     *                    tighter. Not to be used after this call.
+     * @return This node if no bound is tighter, null if there is no solution
      */
-    NodeKey withTightenedLower(final int idx, final double newLower) {
-        if (newLower <= myLowerBounds[idx] || newLower > Integer.MAX_VALUE) {
-            return this;
-        }
-        int[] lbs = this.copyLowerBounds();
-        int[] ubs = this.copyUpperBounds();
-        lbs[idx] = (int) newLower;
-        return new NodeKey(this, lbs, ubs);
-    }
+    NodeKey withTightened(final int[] lowerBounds, final int[] upperBounds, final BoundPropagator propagator) {
 
-    /**
-     * A node with the upper bound at {@code idx} lowered to the integer {@code newUpper}, or this node if
-     * that is not tighter or less than {@link Integer#MIN_VALUE}.
-     */
-    NodeKey withTightenedUpper(final int idx, final double newUpper) {
-        if (newUpper >= myUpperBounds[idx] || newUpper < Integer.MIN_VALUE) {
-            return this;
+        boolean unchanged = this.equals(lowerBounds, upperBounds);
+
+        if (unchanged || !propagator.propagate(lowerBounds, upperBounds, myLowerBounds, myUpperBounds)) {
+            myIntArrayPool.giveBack(lowerBounds);
+            myIntArrayPool.giveBack(upperBounds);
+            return unchanged ? this : null;
         }
-        int[] lbs = this.copyLowerBounds();
-        int[] ubs = this.copyUpperBounds();
-        ubs[idx] = (int) newUpper;
-        return new NodeKey(this, lbs, ubs);
+
+        return new NodeKey(this, lowerBounds, upperBounds);
     }
 
 }
