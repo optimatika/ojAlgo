@@ -1676,12 +1676,16 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
+     * The optimisation sense – may be null.
      * <ol>
-     * <li>The default optimisation sense is {@link Optimisation.Sense#MIN}
-     * <li>If this model was read from a file and that file format contained information about being a
-     * minimisation or maximisation model, that info is reflected here.
-     * <li>In general you are expected to know whether to call {@link #minimise()} or {@link #maximise()}.
-     * Once you have called one of those methods this method's return value will match that.
+     * <li>If this model was read from a file, and that file contained information about being a minimisation
+     * or maximisation model, that sense is present here.
+     * <li>Otherwise it is null until either {@link #minimise()} or {@link #maximise()} is called.
+     * <li>Once one of those methods has been called, the sense reflects that call – it overwrites any sense
+     * read from a file.
+     * </ol>
+     *
+     * @return {@link Optimisation.Sense#MIN}, {@link Optimisation.Sense#MAX} or null
      */
     public Optimisation.Sense getOptimisationSense() {
         return myOptimisationSense;

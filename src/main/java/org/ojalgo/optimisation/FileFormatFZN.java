@@ -1406,7 +1406,8 @@ abstract class FileFormatFZN {
             throw lexer.error("There is no solve item");
         }
 
-        model.setOptimisationSense(sense != null ? sense : Optimisation.Sense.MIN);
+        // Null for a satisfaction problem – until it is solved, with minimise() or maximise()
+        model.setOptimisationSense(sense);
 
         return new Parsed(model, sense, output);
     }

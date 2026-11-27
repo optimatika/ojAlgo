@@ -15,7 +15,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 #### org.ojalgo.optimisation
 
-- FlatZinc, what the MiniZinc compiler gives a solver, as a file format: `ExpressionsBasedModel.FileFormat.FZN` (files ending `.fzn`), reading only. It reads the linear constraints that MiniZinc's linear library (`-Glinear`, the one MiniZinc uses for MIP solvers) leaves in a model. Any other constraint is an error, with its line number – never skipped.
+- FlatZinc, what the MiniZinc compiler gives a solver, as a file format: `ExpressionsBasedModel.FileFormat.FZN` (files ending `.fzn`), reading only. It reads the linear constraints that MiniZinc's linear library (`-Glinear`, the one MiniZinc uses for MIP solvers) leaves in a model. Any other constraint is an error, with its line number – never skipped. A satisfaction problem has no optimisation sense: `getOptimisationSense()` is null until the model is solved.
 - `IntegerStrategy.ConfigurableStrategy.withIncumbentListener(Consumer<Optimisation.Result>)`: to be told about each new best solution (the incumbent) the `IntegerSolver` finds, as it finds it. It is `ModelStrategy.markInteger(..)` that calls the listener.
 
 ### Changed
